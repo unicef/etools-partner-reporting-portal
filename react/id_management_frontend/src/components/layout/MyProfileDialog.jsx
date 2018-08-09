@@ -6,7 +6,8 @@ import {reduxForm} from "redux-form";
 import {connect} from "react-redux";
 import {getRoleLabel, getWorkspaceLabel} from "../../helpers/user";
 import Grid from "@material-ui/core/Grid";
-import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
+import withProps from "../hoc/withProps";
+import {workspaceOptions} from "../../helpers/props";
 
 const title = "My Profile";
 
@@ -94,4 +95,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps)(withWorkspaceOptions((reduxForm({form: "myProfile"})(MyProfileDialog))));
+export default connect(mapStateToProps)(withProps(workspaceOptions)((reduxForm({form: "myProfile"})(MyProfileDialog))));

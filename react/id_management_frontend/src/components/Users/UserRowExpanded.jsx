@@ -2,7 +2,6 @@ import React, {Component, Fragment} from "react";
 import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
 import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
-import withUser from "../hoc/withUser";
 import {hasAnyRole, getUserRole, getUserTypeLabel} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {getLabels} from "../../labels";
@@ -10,7 +9,8 @@ import {Typography} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "../common/PlainButton";
 import UserRowExpandedText from "./UserRowExpandedText";
-import withPortal from "../hoc/withPortal";
+import withProps from "../hoc/withProps";
+import {portal, user} from "../../helpers/props";
 
 const labels = getLabels({
     userType: "User type",
@@ -108,4 +108,4 @@ class UserRowExpanded extends Component {
     }
 }
 
-export default withPortal(withUser(withStyles(styleSheet)(UserRowExpanded)));
+export default withProps(portal, user)(withStyles(styleSheet)(UserRowExpanded));

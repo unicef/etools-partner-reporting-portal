@@ -4,7 +4,8 @@ import ArrowBack from "@material-ui/icons/ArrowBack";
 import Grid from "@material-ui/core/Grid";
 import {withStyles} from "@material-ui/core/styles";
 import grey from "@material-ui/core/colors/grey";
-import withPortal from "../hoc/withPortal";
+import withProps from "../hoc/withProps";
+import {portal} from "../../helpers/props";
 
 const label = "User Management";
 
@@ -46,4 +47,4 @@ class MainBackButton extends Component {
     }
 }
 
-export default withPortal(withStyles(styleSheet)(MainBackButton));
+export default withProps(portal)(withStyles(styleSheet)(MainBackButton));

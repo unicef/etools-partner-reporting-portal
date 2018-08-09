@@ -4,14 +4,20 @@ import DialogActions from "../common/DialogActions";
 import TextFieldForm from "../form/TextFieldForm";
 import {Grid, Button} from "@material-ui/core";
 import {email} from "../../helpers/validation";
-import {reduxForm} from 'redux-form';
+import {reduxForm, formValueSelector} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
-import {PORTAL_TYPE, USER_TYPE_OPTIONS} from "../../constants";
-import withPortal from "../hoc/withPortal";
+import {PORTAL_TYPE, USER_TYPE, USER_TYPE_OPTIONS} from "../../constants";
 import SelectForm from "../form/SelectForm";
 import {PORTALS} from "../../actions";
+import withProps from "../hoc/withProps";
+import {partnerOptions, portal} from "../../helpers/props";
+import {connect} from "react-redux";
+
+
+const formName = "addUserForm";
+const selector = formValueSelector(formName);
 
 const labels = getLabels({
     title: "Add new user",
@@ -35,13 +41,9 @@ class AddUserDialog extends Component {
     onSubmit(values) {
         const {onSave, portal} = this.props;
 
-        let request = values;
-
-        request.portal = PORTAL_TYPE[portal];
-
         this.setState({loading: true});
 
-        return api.post("id-management/users/", request)
+        return api.post("id-management/users/", values, {portal: PORTAL_TYPE[portal]})
             .then(res => {
                 this.onClose();
                 onSave(res.data);
@@ -57,7 +59,7 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, portal} = this.props;
+        const {open, handleSubmit, portal, user_type, partnerOptions} = this.props;
 
         return (
             <Dialog
@@ -86,6 +88,11 @@ class AddUserDialog extends Component {
                         <Grid item md={6}>
                             <SelectForm fieldName="user_type" label={labels.userType} values={USER_TYPE_OPTIONS}/>
                         </Grid>}
+
+                        {user_type === USER_TYPE.PARTNER &&
+                        <Grid item md={6}>
+                            <SelectForm fieldName="partner" label={labels.partner} values={partnerOptions}/>
+                        </Grid>}
                     </Grid>
 
                     <DialogActions>
@@ -98,4 +105,10 @@ class AddUserDialog extends Component {
     }
 }
 
-export default withPortal(reduxForm({form: "addUserForm"})(AddUserDialog));
+const mapStateToProps = (state) => {
+    return {
+        user_type: selector(state, "user_type")
+    }
+};
+
+export default connect(mapStateToProps)(withProps(portal, partnerOptions)(reduxForm({form: formName})(AddUserDialog)));

@@ -4,15 +4,15 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {clusters, PORTALS, switchPortal, userProfile, workspaces} from "../actions";
+import {clusters, partners, PORTALS, switchPortal, userProfile, workspaces} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
 import {withRouter, matchPath} from "react-router-dom";
-import withPortal from "./hoc/withPortal";
 import {api} from "../infrastructure/api";
 import {connect} from "react-redux";
-import withUser from "./hoc/withUser";
+import withProps from "./hoc/withProps";
+import {portal, user} from "../helpers/props";
 
 const labels = {
     [PORTALS.IP]: "IP REPORTING",
@@ -49,7 +49,17 @@ class Main extends Component {
     }
 
     componentDidUpdate() {
-        const {user, location, dispatchSwitchPortal, history, dispatchClusters, portal} = this.props;
+        const {
+            user,
+            location,
+            dispatchSwitchPortal,
+            history,
+            dispatchClusters,
+            portal,
+            clusters,
+            partners,
+            dispatchPartners
+        } = this.props;
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
@@ -64,10 +74,19 @@ class Main extends Component {
         }
 
         if (portal === PORTALS.CLUSTER) {
-            api.get("id-management/assignable-clusters/")
-                .then(res => {
-                    dispatchClusters(res.data);
-                })
+            if (!clusters) {
+                api.get("id-management/assignable-clusters/")
+                    .then(res => {
+                        dispatchClusters(res.data);
+                    })
+            }
+
+            if (!partners) {
+                api.get("id-management/assignable-partners/")
+                    .then(res => {
+                        dispatchPartners(res.data);
+                    })
+            }
         }
     }
 
@@ -123,6 +142,15 @@ class Main extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    const {clusters, partners} = state;
+
+    return {
+        clusters,
+        partners
+    }
+};
+
 const mapDispatchToProps = dispatch => {
     return {
         dispatchUserProfile: user => {
@@ -137,8 +165,11 @@ const mapDispatchToProps = dispatch => {
         dispatchSwitchPortal: (portal, history) => {
             dispatch(switchPortal(portal));
             history.push(`/${portal}`);
+        },
+        dispatchPartners: data => {
+            dispatch(partners(data))
         }
     };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(withUser(withPortal(Main))));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withProps(user, portal)(Main)));

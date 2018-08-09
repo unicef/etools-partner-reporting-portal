@@ -7,7 +7,8 @@ import EtoolsLogo from "./EtoolsLogo";
 import {Typography} from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
 import ProfileMenu from "./ProfileMenu/ProfileMenu";
-import withUser from "../hoc/withUser";
+import withProps from "../hoc/withProps";
+import {user} from "../../helpers/props";
 
 const styleSheet = {
     header: Object.assign({}, mainStyles.header, {
@@ -65,4 +66,4 @@ class MainAppBar extends Component {
     }
 }
 
-export default withUser(withStyles(styleSheet, {name: "MainAppBar"})(MainAppBar));
+export default withProps(user)(withStyles(styleSheet, {name: "MainAppBar"})(MainAppBar));

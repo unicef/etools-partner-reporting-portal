@@ -10,8 +10,8 @@ import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
-import withPartnerTypeOptions from "../hoc/withPartnerTypeOptions";
-import withClusterOptions from "../hoc/withClusterOptions";
+import withProps from "../hoc/withProps";
+import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 
 const labels = getLabels({
     title: "Add new Partner",
@@ -115,11 +115,13 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner} values={sharedPartnerOptions} optional/>
+                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner}
+                                        values={sharedPartnerOptions} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions} optional/>
+                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}
+                                        optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -178,7 +180,8 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basisForRiskRating} optional/>
+                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basisForRiskRating}
+                                           optional/>
                         </Grid>
 
                         <Grid item md={6}/>
@@ -205,4 +208,7 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default withClusterOptions(withPartnerTypeOptions(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog))));
+export default withProps(
+    clusterOptions,
+    partnerTypeOptions
+)(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog)));

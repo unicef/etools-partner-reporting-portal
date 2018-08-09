@@ -1,13 +1,14 @@
 import React, {Component} from "react";
 import PaginatedList from "../common/PaginatedList";
 import UserRowExpanded from "./UserRowExpanded";
-import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import * as R from 'ramda';
 import {date} from "../../helpers/filters";
 import {FiberManualRecord as Dot} from "@material-ui/icons";
 import {red, green, grey} from "@material-ui/core/colors";
 import Grid from "@material-ui/core/Grid";
+import withProps from "../hoc/withProps";
+import {portal} from "../../helpers/props";
 
 const statusColor = {
     ACTIVE: green[500],
@@ -105,4 +106,4 @@ class UsersList extends Component {
     }
 }
 
-export default withPortal(UsersList);
+export default withProps(portal)(UsersList);

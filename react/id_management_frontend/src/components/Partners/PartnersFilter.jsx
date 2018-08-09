@@ -7,8 +7,8 @@ import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
 import labels from "../../labels";
-import withPartnerTypeOptions from "../hoc/withPartnerTypeOptions";
-import withClusterOptions from "../hoc/withClusterOptions";
+import withProps from "../hoc/withProps";
+import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 
 class PartnersFilter extends Component {
     reset() {
@@ -56,4 +56,7 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default connect(mapStateToProps)(reduxForm({form: 'partnersFilter'})(withPartnerTypeOptions(withClusterOptions(PartnersFilter))));
+export default connect(mapStateToProps)(reduxForm({form: 'partnersFilter'})(withProps(
+    partnerTypeOptions,
+    clusterOptions
+)(PartnersFilter)));

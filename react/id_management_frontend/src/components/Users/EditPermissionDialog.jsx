@@ -11,9 +11,10 @@ import {connect} from "react-redux";
 import PropTypes from "prop-types";
 import ButtonSubmit from "../common/ButtonSubmit";
 import {api} from "../../infrastructure/api";
-import withPortal from "../hoc/withPortal";
 import {getUserRole} from "../../helpers/user";
 import {PORTALS} from "../../actions";
+import withProps from "../hoc/withProps";
+import {portal} from "../../helpers/props";
 
 const title = "Edit permission";
 
@@ -96,7 +97,7 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default withPortal(connect(mapStateToProps)(reduxForm({
+export default withProps(portal)(connect(mapStateToProps)(reduxForm({
     form: "editPermissionForm",
     enableReinitialize: true
 })(EditPermissionDialog)));

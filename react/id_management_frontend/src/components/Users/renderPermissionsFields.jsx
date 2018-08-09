@@ -7,13 +7,11 @@ import FieldsArrayItem from "../common/FieldsArrayItem";
 import FieldsArrayPanel from "../common/FieldsArrayPanel";
 import FieldsArrayAddButton from "../common/FieldsArrayAddButton";
 import labels from "../../labels";
-import withPortal from "../hoc/withPortal";
-import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
-import withUser from "../hoc/withUser";
 import {userRoleInCluster, userRoleInWorkspace} from "../../helpers/user";
-import withClusterOptions from "../hoc/withClusterOptions";
 import {PORTALS} from "../../actions";
 import {filterOptionsValues} from "../../helpers/options";
+import withProps from "../hoc/withProps";
+import {clusterOptions, workspaceOptions, portal, user} from "../../helpers/props";
 
 const title = {
     [PORTALS.IP]: "Role per Workspace",
@@ -93,4 +91,4 @@ const renderPermissionsFields = ({fields, portal, workspaceOptions, user, cluste
     )
 };
 
-export default withClusterOptions(withWorkspaceOptions(withPortal(withUser(renderPermissionsFields))));
+export default withProps(clusterOptions, workspaceOptions, portal, user)(renderPermissionsFields);

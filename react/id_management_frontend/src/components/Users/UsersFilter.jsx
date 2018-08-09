@@ -5,26 +5,14 @@ import FilterButtons from "../common/FilterButtons";
 import {reduxForm} from 'redux-form';
 import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
-import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import labels from "../../labels";
 import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS} from "../../constants";
-import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
-import withClusterOptions from "../hoc/withClusterOptions";
+import withProps from "../hoc/withProps";
+import {clusterOptions, workspaceOptions, partnerOptions, portal} from "../../helpers/props";
 
 const searchPlaceholder = "Name or Email";
-
-const partnerOptions = [
-    {
-        label: "Partner 1",
-        value: 1
-    },
-    {
-        label: "Partner 2",
-        value: 2
-    }
-];
 
 class UsersFilter extends Component {
     componentDidUpdate(prevProps) {
@@ -41,7 +29,7 @@ class UsersFilter extends Component {
     }
 
     render() {
-        const {portal, workspaceOptions, clusterOptions} = this.props;
+        const {portal, workspaceOptions, clusterOptions, partnerOptions} = this.props;
 
         const roleOptions = portal === PORTALS.CLUSTER ? PRP_ROLE_CLUSTER_OPTIONS : PRP_ROLE_IP_OPTIONS;
 
@@ -91,4 +79,9 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default connect(mapStateToProps)(reduxForm({form: 'usersFilter'})(withClusterOptions(withWorkspaceOptions(withPortal(UsersFilter)))));
+export default connect(mapStateToProps)(withProps(
+    clusterOptions,
+    workspaceOptions,
+    partnerOptions,
+    portal
+)(reduxForm({form: 'usersFilter'})(UsersFilter)));

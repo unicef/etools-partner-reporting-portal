@@ -38,3 +38,9 @@ export const OPTIONS = 'OPTIONS';
 export function options(data, fields) {
     return {type: OPTIONS, data, fields}
 }
+
+export const PARTNERS = 'PARTNERS';
+
+export function partners(data) {
+    return {type: PARTNERS, data};
+}

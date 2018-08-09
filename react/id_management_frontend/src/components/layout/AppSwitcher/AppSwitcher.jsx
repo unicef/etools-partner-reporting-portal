@@ -10,8 +10,9 @@ import {PORTALS, switchPortal} from "../../../actions";
 import {connect} from "react-redux";
 import PropTypes from "prop-types";
 import withMenu from "../../hoc/withMenu";
-import withPortal from "../../hoc/withPortal";
 import {withRouter} from "react-router-dom";
+import withProps from "../../hoc/withProps";
+import {portal} from "../../../helpers/props";
 
 const border = "1px solid #e0e0e0";
 
@@ -110,6 +111,6 @@ const mapDispatchToProps = dispatch => {
 const ConnectedAppSwitcher = connect(
     null,
     mapDispatchToProps
-)(withPortal((withStyles(styleSheet)(withMenu(AppSwitcher)))));
+)(withProps(portal)((withStyles(styleSheet)(withMenu(AppSwitcher)))));
 
 export default withRouter(ConnectedAppSwitcher);

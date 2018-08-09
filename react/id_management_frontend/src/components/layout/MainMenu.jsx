@@ -7,7 +7,8 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import { withStyles } from "@material-ui/core/styles";
 import { Typography, Grid } from "@material-ui/core";
-import withPortal from "../hoc/withPortal";
+import withProps from "../hoc/withProps";
+import {portal} from "../../helpers/props";
 
 const styleSheet = theme => ({
     menuLink: {
@@ -68,4 +69,4 @@ class MainMenu extends Component {
     }
 }
 
-export default withPortal(withStyles(styleSheet)(MainMenu));
+export default withProps(portal)(withStyles(styleSheet)(MainMenu));

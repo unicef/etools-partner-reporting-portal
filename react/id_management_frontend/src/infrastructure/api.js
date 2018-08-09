@@ -4,12 +4,12 @@ import {SubmissionError} from "redux-form";
 
 const baseUrl = "/api/";
 
-function makeRequest(method, url, data) {
+function makeRequest(method, url, data, params) {
     return axios({
         method: method,
         url: baseUrl + url,
         data: data,
-        params: method === 'get' ? data : undefined,
+        params: method === 'get' ? data : params,
         paramsSerializer: qs.stringify,
         xsrfHeaderName: "X-CSRFToken",
         xsrfCookieName: "csrftoken",
@@ -34,8 +34,8 @@ function makeRequest(method, url, data) {
 }
 
 export var api = {
-    post: function (url, data) {
-        return makeRequest('post', url, data);
+    post: function (url, data, params) {
+        return makeRequest('post', url, data, params);
     },
     get: function (url, params) {
         return makeRequest('get', url, params);

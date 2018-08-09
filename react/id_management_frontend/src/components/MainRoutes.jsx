@@ -4,7 +4,8 @@ import Users from "./Users/Users";
 import Partners from "./Partners/Partners";
 import {PORTALS, switchPortal} from "../actions";
 import {connect} from "react-redux";
-import withPortal from "./hoc/withPortal";
+import withProps from "./hoc/withProps";
+import {portal} from "../helpers/props";
 
 class MainRoutes extends Component {
     constructor(props) {
@@ -68,4 +69,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(withPortal(MainRoutes)));
+export default withRouter(connect(null, mapDispatchToProps)(withProps(portal)(MainRoutes)));

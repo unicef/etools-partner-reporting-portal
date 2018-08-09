@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
-import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import UserRowExpandedText from "./UserRowExpandedText";
+import withProps from "../hoc/withProps";
+import {portal} from "../../helpers/props";
 
 class UserRoleControl extends Component {
     render() {
@@ -34,4 +35,4 @@ UserRoleControl.propTypes = {
     role: PropTypes.object.isRequired
 };
 
-export default withPortal(UserRoleControl);
+export default withProps(portal)(UserRoleControl);
