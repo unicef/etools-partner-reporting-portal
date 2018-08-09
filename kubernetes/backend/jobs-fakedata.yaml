@@ -9,7 +9,7 @@ spec:
       - name: backend-fakedata-container
         image: unicef/etools-prp
         command: ["bash"]
-        args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py generate_fake_data --quantity=1 --clean_before"]
+        args: ["-c", "/usr/local/bin/waitforit -host={{POSTGRES_HOST}} -port=5432 && python manage.py generate_fake_data --quantity=1 --clean_before"]
         env:
           - name: AWS_S3_ACCESS_KEY_ID
             valueFrom:
@@ -107,25 +107,13 @@ spec:
                 name: eprp-staging
                 key: PMP_API_USER
           - name: POSTGRES_DB
-            valueFrom:
-              secretKeyRef:
-                name: eprp-staging
-                key: POSTGRES_DB
+            value: {{POSTGRES_DB}}
           - name: POSTGRES_HOST
-            valueFrom:
-              secretKeyRef:
-                name: eprp-staging
-                key: POSTGRES_HOST
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: eprp-staging
-                key: POSTGRES_PASSWORD
+            value: {{POSTGRES_HOST}}
           - name: POSTGRES_USER
-            valueFrom:
-              secretKeyRef:
-                name: eprp-staging
-                key: POSTGRES_USER
+            value: {{POSTGRES_USER}}
+          - name: POSTGRES_PASSWORD
+            value: {{POSTGRES_PASSWORD}}
           - name: REDIS_URL
             valueFrom:
               secretKeyRef:

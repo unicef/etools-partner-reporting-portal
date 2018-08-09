@@ -33,12 +33,18 @@ spec:
 
             - name: POSTGRES_DB
               value: {{POSTGRES_DB}}
-
             - name: POSTGRES_HOST
               value: {{POSTGRES_HOST}}
-
             - name: POSTGRES_USER
               value: {{POSTGRES_USER}}
+            - name: POSTGRES_PASSWORD
+              value: {{POSTGRES_PASSWORD}}
+            - name: EMAIL_HOST_USER
+              value: {{EMAIL_HOST_USER}}
+            - name: EMAIL_HOST_PASSWORD
+              value: {{EMAIL_HOST_PASSWORD}}
+            - name: ADMIN_MAIL
+              value: {{ADMIN_MAIL}}
 
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
@@ -109,14 +115,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: pmp-api-endpoint
-                  key: password
-            
-            # - name: POSTGRES_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: postgres-password
-            #       key: password
-            
+                  key: password            
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -163,12 +162,18 @@ spec:
 
             - name: POSTGRES_DB
               value: {{POSTGRES_DB}}
-
             - name: POSTGRES_HOST
               value: {{POSTGRES_HOST}}
-
             - name: POSTGRES_USER
               value: {{POSTGRES_USER}}
+            - name: POSTGRES_PASSWORD
+              value: {{POSTGRES_PASSWORD}}
+            - name: EMAIL_HOST_USER
+              value: {{EMAIL_HOST_USER}}
+            - name: EMAIL_HOST_PASSWORD
+              value: {{EMAIL_HOST_PASSWORD}}
+            - name: ADMIN_MAIL
+              value: {{ADMIN_MAIL}}
 
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
@@ -234,14 +239,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: pmp-api-user
-                  key: password
-            
-            # - name: POSTGRES_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: postgres-password
-            #       key: password
-            
+                  key: password            
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
