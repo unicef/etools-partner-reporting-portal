@@ -12,35 +12,9 @@ import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
 import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
+import partnerLabels from "./partnerLabels";
 
-const labels = getLabels({
-    title: "Add new Partner",
-    ochaId: "OCHA ID",
-    externalId: "External ID",
-    externalIdHelper: "An ID representing this instance in an external system",
-    externalSource: "External source",
-    fullName: "Full name",
-    fullNameHelper: "Please make sure this matches the name you enter in VISION",
-    shortTitle: "Short title",
-    alternateTitle: "Alternate title",
-    sharedPartner: "Shared partner",
-    partnerType: "Partner type",
-    csoType: "CSO Type",
-    streetAddress: "Street address",
-    city: "City",
-    postalCode: "Postal code",
-    countryCode: "Country code",
-    totalCtCp: "Total ct cp",
-    totalCtCpHelper: "Total Cash Transferred for Country Programme",
-    totalCtCy: "Total ct cy",
-    totalCtCyHelper: "Total Cash Transferred per Current Year",
-    vendorNumber: "Vendor number",
-    alternateId: "Alternate ID",
-    riskRating: "Risk rating",
-    typeOfAssessment: "Type of assessment",
-    basisForRiskRating: "Basis for risk rating",
-    clusters: "Clusters"
-});
+const labels = getLabels(partnerLabels);
 
 class AddUserDialog extends Component {
     constructor(props) {
@@ -87,18 +61,18 @@ class AddUserDialog extends Component {
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="ocha_external_id" label={labels.ochaId} optional/>
+                            <TextFieldForm fieldName="ocha_external_id" label={labels.ocha_external_id} optional/>
                         </Grid>
 
                         <Grid item md={6}/>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="external_id" label={labels.externalId}
+                            <TextFieldForm fieldName="external_id" label={labels.external_id}
                                            textFieldProps={{helperText: labels.externalIdHelper}} optional/>
                         </Grid>
 
                         <Grid item md={12}>
-                            <TextFieldForm fieldName="external_source" label={labels.externalSource} optional/>
+                            <TextFieldForm fieldName="external_source" label={labels.external_source} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -107,15 +81,15 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="short_title" label={labels.shortTitle} optional/>
+                            <TextFieldForm fieldName="short_title" label={labels.short_title} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="alternate_title" label={labels.alternateTitle} optional/>
+                            <TextFieldForm fieldName="alternate_title" label={labels.alternate_title} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner}
+                            <SelectForm fieldName="shared_partner" label={labels.shared_partner}
                                         values={sharedPartnerOptions} optional/>
                         </Grid>
 
@@ -125,7 +99,7 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="cso_type" label={labels.csoType} values={csoTypeOptions} optional/>
+                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -133,12 +107,12 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="phone_number" label={labels.phoneNumber}
+                            <TextFieldForm fieldName="phone_number" label={labels.phone_number}
                                            validation={[phoneNumber]} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="street_address" label={labels.streetAddress} optional/>
+                            <TextFieldForm fieldName="street_address" label={labels.street_address} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -146,41 +120,41 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="postal_code" label={labels.postalCode} optional/>
+                            <TextFieldForm fieldName="postal_code" label={labels.postal_code} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="country_code" label={labels.countryCode} optional/>
+                            <TextFieldForm fieldName="country_code" label={labels.country_code} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="total_ct_cp" label={labels.totalCtCp}
+                            <TextFieldForm fieldName="total_ct_cp" label={labels.total_ct_cp}
                                            textFieldProps={{helperText: labels.totalCtCpHelper}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="total_ct_cy" label={labels.totalCtCy}
+                            <TextFieldForm fieldName="total_ct_cy" label={labels.total_ct_cy}
                                            textFieldProps={{helperText: labels.totalCtCyHelper}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="vendor_number" label={labels.vendorNumber}/>
+                            <TextFieldForm fieldName="vendor_number" label={labels.vendor_number}/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="alternate_id" label={labels.alternateId} optional/>
+                            <TextFieldForm fieldName="alternate_id" label={labels.alternate_id} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="rating" label={labels.riskRating} optional/>
+                            <TextFieldForm fieldName="rating" label={labels.rating} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="type_of_assessment" label={labels.typeOfAssessment} optional/>
+                            <TextFieldForm fieldName="type_of_assessment" label={labels.type_of_assessment} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basisForRiskRating}
+                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basis_for_risk_rating}
                                            optional/>
                         </Grid>
 

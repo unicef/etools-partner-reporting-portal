@@ -8,9 +8,9 @@ import {getLabels} from "../../labels";
 import {Typography} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "../common/PlainButton";
-import UserRowExpandedText from "./UserRowExpandedText";
 import withProps from "../hoc/withProps";
 import {portal, user} from "../../helpers/props";
+import SmallValue from "../common/SmallText";
 
 const labels = getLabels({
     userType: "User type",
@@ -91,7 +91,7 @@ class UserRowExpanded extends Component {
                 {row.user_type &&
                 <div className={roles.length ? classes.userType : ''}>
                     <Typography variant="caption" gutterBottom>{labels.userType}</Typography>
-                    <UserRowExpandedText>{userTypeLabel}</UserRowExpandedText>
+                    <SmallValue>{userTypeLabel}</SmallValue>
                 </div>}
 
                 {roles.length > 0 &&

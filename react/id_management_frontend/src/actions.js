@@ -44,3 +44,9 @@ export const PARTNERS = 'PARTNERS';
 export function partners(data) {
     return {type: PARTNERS, data};
 }
+
+export const PARTNER_DETAILS = 'PARTNER_DETAILS';
+
+export function partnerDetails(data) {
+    return {type: PARTNER_DETAILS, data};
+}

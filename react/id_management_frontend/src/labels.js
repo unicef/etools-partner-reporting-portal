@@ -11,7 +11,7 @@ const labels = {
     lastName: "Last name",
     email: "E-mail",
     none: "None",
-    phoneNumber: "Phone number",
+    phone_number: "Phone number",
     partnerType: "Partner type",
     userType: "User type"
 };

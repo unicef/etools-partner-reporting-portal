@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PORTALS} from "../../actions";
-import UserRowExpandedText from "./UserRowExpandedText";
 import withProps from "../hoc/withProps";
 import {portal} from "../../helpers/props";
+import SmallValue from "../common/SmallText";
 
 class UserRoleControl extends Component {
     render() {
@@ -24,7 +24,7 @@ class UserRoleControl extends Component {
 
         return (
             <div>
-                <UserRowExpandedText>{text}</UserRowExpandedText>
+                <SmallValue>{text}</SmallValue>
                 {actions}
             </div>
         );

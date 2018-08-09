@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Paper, Typography, CircularProgress} from "@material-ui/core";
+import {Paper, Typography} from "@material-ui/core";
 import {
     Grid,
     Table,
@@ -20,6 +20,7 @@ import {connect} from 'react-redux';
 import {expandedRowIds} from "../../actions";
 import IconButton from "@material-ui/core/IconButton";
 import Delete from "@material-ui/icons/Delete";
+import LoadingIndicator from "./LoadingIndicator";
 
 const allowedPageSizes = [5, 10, 15];
 
@@ -38,13 +39,6 @@ const styleSheet = (theme) => {
         },
         header: {
             padding: `${paddingSmall}px 0 ${paddingSmall}px ${paddingBig}px`,
-        },
-        loadingIndicator: {
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            marginLeft: -20,
-            marginTop: -20
         }
     }
 };
@@ -150,7 +144,7 @@ class PaginatedList extends Component {
                     />}
 
                     <PagingPanel pageSizes={allowedPageSizes}/>
-                    {loading && <CircularProgress className={classes.loadingIndicator}/>}
+                    {loading && <LoadingIndicator absolute/>}
                 </Grid>
             </Paper>
         );

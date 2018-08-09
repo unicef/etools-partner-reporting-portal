@@ -7,6 +7,7 @@ import workspaces from "./workspaces";
 import clusters from "./clusters";
 import options from "./options";
 import partners from "./partners";
+import partnerDetails from "./partnerDetails";
 
 const reducers = combineReducers({
     portal: switchPortal,
@@ -16,7 +17,8 @@ const reducers = combineReducers({
     workspaces,
     clusters,
     options,
-    partners
+    partners,
+    partnerDetails
 });
 
 export default reducers;
