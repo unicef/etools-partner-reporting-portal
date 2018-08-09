@@ -49,3 +49,9 @@ export function getUserRole(user, permission) {
     const userClusterRole = permission.cluster && userRoleInCluster(user, permission.cluster.id);
     return userClusterRole || userWorkspaceRole;
 }
+
+export function hasOnlyRoles(user, roles) {
+    const filtered = user.prp_roles.filter(item => roles.indexOf(item.role) > -1);
+
+    return filtered.length === user.prp_roles.length;
+}

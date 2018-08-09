@@ -13,17 +13,22 @@ import EditPermissionDialog from "./EditPermissionDialog";
 import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
 import {PRP_ROLE} from "../../constants";
+import withProps from "../hoc/withProps";
+import {user} from "../../helpers/props";
+import {hasOnlyRoles, userRoleInWorkspace} from "../../helpers/user";
 
 const header = "Users";
 const CONFIRM_ACTIONS = {
     DELETE_PERMISSION: "DELETE_PERMISSION",
     MAKE_IP_ADMIN: "MAKE_IP_ADMIN",
-    REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN"
+    REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN",
+    DISABLE_USER: "DISABLE_USER"
 };
 const confirmMessages = {
     [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove this role for this user?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
-    [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?"
+    [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
+    [CONFIRM_ACTIONS.DISABLE_USER]: "Are you sure you want to disable this user?"
 };
 
 class Users extends Component {
@@ -41,6 +46,7 @@ class Users extends Component {
         this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
         this.closeAndReload = this.closeAndReload.bind(this);
+        this.deleteCondition = this.deleteCondition.bind(this);
     }
 
     onUserSave(user) {
@@ -61,8 +67,15 @@ class Users extends Component {
     }
 
     openConfirmDialog(action) {
-        return (permission) => {
-            this.setState({action, selectedPermission: permission});
+        return (item) => {
+            switch (action) {
+                case CONFIRM_ACTIONS.DISABLE_USER:
+                    this.setState({action, selectedUser: item});
+                    break;
+                default:
+                    this.setState({action, selectedPermission: item});
+                    break;
+            }
             this.props.handleDialogOpen("confirm");
         }
     }
@@ -89,10 +102,34 @@ class Users extends Component {
             case CONFIRM_ACTIONS.MAKE_IP_ADMIN:
                 this.makeIpAdmin(this.state.selectedPermission);
                 break;
+            case CONFIRM_ACTIONS.DISABLE_USER:
+                this.disableUser(this.state.selectedUser);
+                break;
             default:
                 this.deletePermission(this.state.selectedPermission);
                 break;
         }
+    }
+
+    disableUser(user) {
+        api.delete(`id-management/users/${user.id}/`)
+            .then(this.closeAndReload)
+    }
+
+    deleteCondition(row) {
+        const {user} = this.props;
+
+        if (row.status === "DEACTIVATED") return false;
+
+        let hasIpAdmin = true;
+
+        row.prp_roles.forEach(role => {
+            if (!role.workspace || userRoleInWorkspace(user, role.workspace.id) !== PRP_ROLE.IP_ADMIN) {
+                hasIpAdmin = false;
+            }
+        });
+
+        return hasIpAdmin && hasOnlyRoles(row, [PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER])
     }
 
     render() {
@@ -111,7 +148,9 @@ class Users extends Component {
                                onPermissionEdit={this.openEditPermissionsDialog}
                                onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}
                                onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
-                               onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}/>
+                               onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}
+                               deleteCondition={this.deleteCondition}
+                               onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}/>
                 </PageContent>
 
                 {this.state.selectedUser &&
@@ -149,4 +188,4 @@ const getData = (request) => (
     })
 );
 
-export default withSearch(getData)(withDialogHandling(Users));
+export default withSearch(getData)(withProps(user)(withDialogHandling(Users)));

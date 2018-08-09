@@ -84,12 +84,13 @@ class UsersList extends Component {
     }
 
     render() {
-        const {onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
+        const {portal, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
 
         return (
             <div>
                 <PaginatedList
                     {...otherProps}
+                    showDelete={portal === PORTALS.IP}
                     columns={this.getColumns()}
                     expandedCell={row => (
                         <UserRowExpanded row={row}

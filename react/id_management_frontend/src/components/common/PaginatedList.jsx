@@ -6,7 +6,8 @@ import {
     TableHeaderRow,
     TableRowDetail,
     PagingPanel,
-    TableEditColumn
+    TableEditColumn,
+    TableEditRow
 } from "@devexpress/dx-react-grid-material-ui";
 import {
     PagingState,
@@ -62,7 +63,19 @@ const Command = ({id, onExecute}) => {
     );
 };
 
+const editCell = (deleteCondition) => (props) => {
+    const {row} = props;
+
+    return deleteCondition(row) ? <TableEditRow.Cell {...props} onValueChange={() => {}} /> : <Table.Cell/>;
+};
+
 class PaginatedList extends Component {
+    constructor(props) {
+        super(props);
+
+        this.commitChanges = this.commitChanges.bind(this);
+    }
+
     header() {
         const {data: {count}, classes, page, pageSize} = this.props;
 
@@ -97,7 +110,8 @@ class PaginatedList extends Component {
             loading,
             expandedRowIds,
             dispatchExpandedRowIds,
-            onDelete
+            showDelete,
+            deleteCondition
         } = this.props;
 
         const containerClasses = classNames(
@@ -122,7 +136,7 @@ class PaginatedList extends Component {
                         totalCount={data.count}
                     />
 
-                    {!!onDelete &&
+                    {showDelete &&
                     <EditingState
                         onCommitChanges={this.commitChanges}
                     />}
@@ -136,11 +150,12 @@ class PaginatedList extends Component {
                         contentComponent={({row}) => expandedCell(row)}
                     />
 
-                    {!!onDelete &&
+                    {showDelete &&
                     <TableEditColumn
                         width={64}
                         showDeleteCommand
                         commandComponent={Command}
+                        cellComponent={editCell(deleteCondition)}
                     />}
 
                     <PagingPanel pageSizes={allowedPageSizes}/>
@@ -157,7 +172,9 @@ PaginatedList.propTypes = {
     expandedCell: PropTypes.func,
     page: PropTypes.number.isRequired,
     onPageChange: PropTypes.func.isRequired,
-    onDelete: PropTypes.func
+    onDelete: PropTypes.func,
+    showDelete: PropTypes.bool,
+    deleteCondition: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
