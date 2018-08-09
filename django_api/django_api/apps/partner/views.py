@@ -38,6 +38,7 @@ from .serializers import (
     PartnerSimpleSerializer,
     PartnerActivityUpdateSerializer,
     PartnerIDManagementSerializer,
+    PartnerSimpleIDManagementSerializer,
 )
 from .models import PartnerProject, PartnerActivity, Partner
 from .filters import (
@@ -73,7 +74,6 @@ class PartnerDetailsAPIView(RetrieveAPIView):
 
 
 class PartnerListCreateAPIView(ListCreateAPIView):
-    serializer_class = PartnerIDManagementSerializer
     permission_classes = (
         AnyPermission(
             IsIMO,
@@ -84,6 +84,23 @@ class PartnerListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return PartnerSimpleIDManagementSerializer
+        if self.request.method == 'POST':
+            return PartnerIDManagementSerializer
+
+
+class PartnerRetrieveAPIView(RetrieveAPIView):
+    serializer_class = PartnerIDManagementSerializer
+    permission_classes = (
+        AnyPermission(
+            IsIMO,
+            IsClusterSystemAdmin
+        ),
+    )
+    queryset = Partner.objects.all()
 
 
 class AssignablePartnersListView(ListAPIView):

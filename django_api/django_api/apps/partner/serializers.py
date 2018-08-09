@@ -111,6 +111,20 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         return obj.get_shared_partner_display()
 
 
+class PartnerSimpleIDManagementSerializer(serializers.ModelSerializer):
+    partner_type_display = serializers.CharField(source='get_partner_type_display', read_only=True)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'title',
+            'partner_type_display',
+            'clusters',
+        )
+
+
 class PartnerIDManagementSerializer(serializers.ModelSerializer):
     partner_type_display = serializers.CharField(source='get_partner_type_display', read_only=True)
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
