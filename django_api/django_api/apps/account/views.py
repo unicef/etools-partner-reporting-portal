@@ -3,7 +3,7 @@ from django.db.models import Prefetch
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +14,7 @@ from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
+from id_management.permissions import UserDeactivatePermission
 
 from .filters import UserFilter
 from .models import User
@@ -110,3 +111,12 @@ class UserListCreateAPIView(ListCreateAPIView):
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
 
         return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
+
+
+class UserDeactivateAPIView(DestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, UserDeactivatePermission)
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()

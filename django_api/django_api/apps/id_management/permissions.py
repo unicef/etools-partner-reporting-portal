@@ -14,6 +14,10 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
         role_in_payload = request.data.get('role') if request.method == 'PATCH' else None
         obj_roles_set = {obj.role, role_in_payload or obj.role}
 
+        if not obj.user.is_active:
+            self.message = 'This user is deactivated.'
+            return False
+
         if (user == obj.user or
                 request.method in ('PATCH', 'DELETE') and (
                 obj.role in {ROLES.cluster_system_admin, ROLES.ip_authorized_officer} or
@@ -26,7 +30,7 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                     Q(cluster_id=obj.cluster_id),
                     user_id=obj.user_id
                 ).exists()):
-            self.message = f'Role already exists in cluster or workspace.'
+            self.message = 'Role already exists in cluster or workspace.'
             return False
 
         # for CLUSTER roles:
@@ -72,4 +76,14 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                     ).exists()):
                 return True
 
+        return False
+
+
+class UserDeactivatePermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user.partner_id == obj.partner_id and request.user.prp_roles.filter(role=ROLES.ip_admin).exists():
+            obj_roles = set(obj.role_list)
+            if (not {ROLES.ip_authorized_officer, ROLES.ip_admin}.intersection(obj_roles) and
+                    {ROLES.ip_viewer, ROLES.ip_editor}.intersection(obj_roles)):
+                return True
         return False
