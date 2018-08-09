@@ -26,7 +26,7 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                     Q(cluster_id=obj.cluster_id),
                     user_id=obj.user_id
                 ).exists()):
-            self.message = f'{self.message} Role already exists in cluster or workspace.'
+            self.message = f'Role already exists in cluster or workspace.'
             return False
 
         # for CLUSTER roles:
