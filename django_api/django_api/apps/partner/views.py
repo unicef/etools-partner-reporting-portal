@@ -10,6 +10,7 @@ from rest_framework import status
 
 import django_filters
 
+from core.common import PRP_ROLE_TYPES
 from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
@@ -83,6 +84,22 @@ class PartnerListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
+
+
+class AssignablePartnersListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PartnerSimpleSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        user_roles = set(user.role_list)
+
+        if {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}.intersection(user_roles):
+            return Partner.objects.all()
+        if PRP_ROLE_TYPES.cluster_member in user_roles:
+            return Partner.objects.filter(id=user.partner_id)
+
+        raise PermissionDenied()
 
 
 class PartnerProjectListCreateAPIView(ListCreateAPIView):
