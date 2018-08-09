@@ -1,6 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
+from core.models import PRPRole
 
 from cluster.models import Cluster
 from id_management.serializers import PRPRoleWithRelationsSerializer
@@ -62,7 +65,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     partner = PartnerSimpleSerializer(read_only=True)
     prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
-    user_type = serializers.ChoiceField(choices=USER_TYPES)
+    user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
 
     def get_status(self, obj):
         if obj.is_active:
@@ -82,3 +85,42 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
             'position', 'last_login',
             'status', 'user_type',
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        portal_choice = self.context['request'].query_params.get('portal')
+        user = self.context['request'].user
+
+        user_roles = set(user.role_list)
+
+        ip_roles_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
+        cluster_roles_access = {PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
+                                PRP_ROLE_TYPES.cluster_system_admin}
+
+        if portal_choice == 'IP' and user_roles.intersection(ip_roles_access):
+            return User.objects.create(partner_id=user.partner_id, **validated_data)
+
+        if portal_choice == 'CLUSTER' and cluster_roles_access.intersection(user_roles):
+            user_type = validated_data.pop('user_type')
+            partner_id = self.initial_data.pop('partner', None)
+
+            if user_type == USER_TYPES.partner:
+                if not partner_id:
+                    raise ValidationError('Partner ID is required.')
+
+                not_cluster_member = {PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_system_admin}
+
+                if not not_cluster_member.intersection(user_roles) and user.partner_id != partner_id:
+                    raise PermissionDenied('Partner ID does not match Cluster Member Partner ID.')
+
+                return User.objects.create(partner_id=partner_id, **validated_data)
+
+            if PRP_ROLE_TYPES.cluster_system_admin in user_roles and not partner_id:
+                new_user = User.objects.create(**validated_data)
+
+                if user_type == USER_TYPES.cluster_admin:
+                    PRPRole.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
+
+                return new_user
+
+        raise PermissionDenied()
