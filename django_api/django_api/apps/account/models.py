@@ -72,11 +72,6 @@ class User(AbstractUser):
             PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
             return USER_TYPES.partner
 
-    def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = self.email
-        super().save(*args, **kwargs)
-
 
 class UserProfile(TimeStampedModel):
     """

@@ -97,6 +97,8 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
         cluster_roles_access = {PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
                                 PRP_ROLE_TYPES.cluster_system_admin}
 
+        validated_data['username'] = validated_data['email']
+
         if portal_choice == 'IP' and user_roles.intersection(ip_roles_access):
             return User.objects.create(partner_id=user.partner_id, **validated_data)
 
