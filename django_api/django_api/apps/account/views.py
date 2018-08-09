@@ -89,11 +89,19 @@ class UserListCreateAPIView(ListCreateAPIView):
         ip_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
 
-        if portal_choice == 'CLUSTER' and all_users_access.intersection(user_prp_roles):
-            pass
-        elif (portal_choice == 'IP' and ip_users_access.intersection(user_prp_roles) or
-              portal_choice == 'CLUSTER' and PRP_ROLE_TYPES.cluster_member in user_prp_roles):
-            users_queryset = users_queryset.filter(partner_id__isnull=False, partner_id=user.partner_id)
+        if portal_choice == 'CLUSTER':
+            if all_users_access.intersection(user_prp_roles):
+                pass
+            elif PRP_ROLE_TYPES.cluster_member in user_prp_roles:
+                users_queryset = users_queryset.filter(partner_id__isnull=False, partner_id=user.partner_id)
+            else:
+                raise PermissionDenied()
+        elif portal_choice == 'IP' and ip_users_access.intersection(user_prp_roles):
+            user_workspaces = user.prp_roles.filter(
+                prp_roles__role__in=ip_users_access
+            ).values_list('workspace', flat=True).distinct()
+            users_queryset = users_queryset.filter(prp_roles__workspace__in=user_workspaces,
+                                                   partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()
 
