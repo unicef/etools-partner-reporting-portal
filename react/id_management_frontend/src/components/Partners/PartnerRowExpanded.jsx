@@ -6,6 +6,7 @@ import partnerLabels from "./partnerLabels";
 import {Grid} from "@material-ui/core";
 import SmallValue from "../common/SmallValue";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 const labels = getLabels(partnerLabels);
 
@@ -74,6 +75,10 @@ class PartnerRowExpanded extends Component {
         );
     }
 }
+
+PartnerRowExpanded.propTypes = {
+    row: PropTypes.object.isRequired
+};
 
 const mapStateToProps = (state, ownProps) => {
     return {

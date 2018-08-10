@@ -29,7 +29,8 @@ class SmallText extends Component {
 SmallText.propTypes = {
     block: PropTypes.bool,
     label: PropTypes.bool,
-    gutterBottom: PropTypes.bool
+    gutterBottom: PropTypes.bool,
+    children: PropTypes.node.isRequired
 };
 
 export default withStyles(styleSheet)(SmallText);

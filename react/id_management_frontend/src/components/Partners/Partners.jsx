@@ -24,6 +24,7 @@ class Partners extends Component {
 
         this.onEdit = this.onEdit.bind(this);
         this.onAdd = this.onAdd.bind(this);
+        this.onSave = this.onSave.bind(this);
         this.openPartnerDialog = this.openPartnerDialog.bind(this);
         this.fetchPartnerDetailsForRows = this.fetchPartnerDetailsForRows.bind(this);
         this.fetchPartnerDetails = this.fetchPartnerDetails.bind(this);
@@ -53,9 +54,10 @@ class Partners extends Component {
     }
 
     onSave() {
-        const {dispatchInvalidatePartnerDetails, expandedRowIds} = this.props;
+        const {dispatchInvalidatePartnerDetails, expandedRowIds, reload} = this.props;
         dispatchInvalidatePartnerDetails(this.state.selectedPartner.id);
-        this.fetchPartnerDetailsForRows(expandedRowIds)
+        this.fetchPartnerDetailsForRows(expandedRowIds);
+        reload();
     }
 
     onAdd() {
@@ -77,7 +79,7 @@ class Partners extends Component {
     }
 
     render() {
-        const {dialogOpen, handleDialogClose, filterChange, getQuery, listProps, reload} = this.props;
+        const {dialogOpen, handleDialogClose, filterChange, getQuery, listProps} = this.props;
 
         if (this.state.initialLoading) {
             return null;
@@ -96,7 +98,7 @@ class Partners extends Component {
                 </PageContent>
 
                 <PartnerDialog open={dialogOpen.addPartner} partner={this.state.selectedPartner}
-                               onClose={handleDialogClose} onSave={() => reload()}/>
+                               onClose={handleDialogClose} onSave={this.onSave}/>
             </div>
         )
     }

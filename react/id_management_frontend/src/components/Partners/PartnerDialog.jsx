@@ -14,6 +14,7 @@ import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 import partnerLabels from "./partnerLabels";
 import LoadingIndicator from "../common/LoadingIndicator";
+import PropTypes from "prop-types";
 
 const labels = getLabels(partnerLabels);
 
@@ -191,6 +192,13 @@ class PartnerDialog extends Component {
         );
     }
 }
+
+PartnerDialog.propTypes = {
+    partner: PropTypes.object,
+    open: PropTypes.bool,
+    onClose: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired
+};
 
 const title = {
     add: "Add new Partner",
