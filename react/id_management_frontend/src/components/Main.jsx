@@ -4,7 +4,7 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {clusters, partners, PORTALS, switchPortal, userProfile, workspaces} from "../actions";
+import {clusters, partners, PORTALS, switchPortal, userProfile, workspaces, error as errorAction} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
@@ -13,6 +13,7 @@ import {api} from "../infrastructure/api";
 import {connect} from "react-redux";
 import withProps from "./hoc/withProps";
 import {portal, user} from "../helpers/props";
+import Snackbar from "./common/Snackbar";
 
 const labels = {
     [PORTALS.IP]: "IP REPORTING",
@@ -22,6 +23,8 @@ const labels = {
 class Main extends Component {
     constructor(props) {
         super(props);
+
+        this.onSnackbarClose = this.onSnackbarClose.bind(this);
 
         this.state = {
             loading: true
@@ -90,8 +93,14 @@ class Main extends Component {
         }
     }
 
+    onSnackbarClose() {
+        const {dispatchError} = this.props;
+
+        dispatchError(null);
+    }
+
     render() {
-        const {portal, user} = this.props;
+        const {portal, user, error} = this.props;
 
         if (!user) {
             return null;
@@ -135,6 +144,8 @@ class Main extends Component {
                                 <MainRoutes {...props}/>
                             )}
                         />
+
+                        <Snackbar open={!!error} variant="error" onClose={this.onSnackbarClose} message={error}/>
                     </MainContent>
                 </div>}
             </MuiThemeProvider>
@@ -143,11 +154,12 @@ class Main extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const {clusters, partners} = state;
+    const {clusters, partners, error} = state;
 
     return {
         clusters,
-        partners
+        partners,
+        error
     }
 };
 
@@ -168,6 +180,9 @@ const mapDispatchToProps = dispatch => {
         },
         dispatchPartners: data => {
             dispatch(partners(data))
+        },
+        dispatchError: message => {
+            dispatch(errorAction(message));
         }
     };
 };

@@ -7,7 +7,7 @@ const styleSheet = {
         marginTop: mainStyles.header.height,
         marginLeft: mainStyles.sideBar.width,
         backgroundColor: '#F1F1F1',
-        minHeight: 'calc(100vh - ' + mainStyles.header.height + 'px)'
+        minHeight: 'calc(100vh - ' + mainStyles.header.height + 'px)',
     }
 };
 

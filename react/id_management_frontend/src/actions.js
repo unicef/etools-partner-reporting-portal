@@ -50,3 +50,9 @@ export const PARTNER_DETAILS = 'PARTNER_DETAILS';
 export function partnerDetails(data) {
     return {type: PARTNER_DETAILS, data};
 }
+
+export const ERROR = 'ERROR';
+
+export function error(message) {
+    return {type: ERROR, message};
+}

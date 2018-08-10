@@ -1,6 +1,8 @@
 import qs from "query-string";
 import axios from "axios";
 import {SubmissionError} from "redux-form";
+import store from "../store";
+import {error as errorAction} from "../actions";
 
 const baseUrl = "/api/";
 
@@ -22,18 +24,26 @@ function makeRequest(method, url, data, params) {
         }
 
         switch (error.response.status) {
-            case 403:
-                throw new SubmissionError({_error: error.response.data.detail[0]});
             case 500:
                 alert("Internal Server Error occurred");
                 throw new Error(error.response);
             default:
-                throw new SubmissionError(error.response.data);
+                const errorDetail = error.response.data.detail ? error.response.data.detail[0] : undefined;
+
+                if (error.response.data.error_codes && typeof error.response.data.error_codes === "object") {
+                    const errors = {
+                        _error: errorDetail
+                    };
+                    throw new SubmissionError(Object.assign({}, error.response.data, errors));
+                }
+                else {
+                    store.dispatch(errorAction(errorDetail));
+                }
         }
     });
 }
 
-export var api = {
+export const api = {
     post: function (url, data, params) {
         return makeRequest('post', url, data, params);
     },
