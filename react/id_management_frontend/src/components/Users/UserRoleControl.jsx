@@ -24,7 +24,7 @@ class UserRoleControl extends Component {
 
         return (
             <div>
-                <SmallValue>{text}</SmallValue>
+                <SmallValue gutterBottom>{text}</SmallValue>
                 {actions}
             </div>
         );

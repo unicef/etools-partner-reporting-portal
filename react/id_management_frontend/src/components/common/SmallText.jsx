@@ -14,12 +14,12 @@ const styleSheet = theme => ({
 
 class SmallText extends Component {
     render() {
-        const {children, classes, block, label} = this.props;
+        const {children, classes, block, label, gutterBottom} = this.props;
 
         return (
             <Typography variant="caption"
                         color={!label ? "inherit" : "default"}
-                        className={block ? classes.block : classes.text}>
+                        className={block ? classes.block : classes.text} gutterBottom={gutterBottom}>
                 {children}
             </Typography>
         );
@@ -28,7 +28,8 @@ class SmallText extends Component {
 
 SmallText.propTypes = {
     block: PropTypes.bool,
-    label: PropTypes.bool
+    label: PropTypes.bool,
+    gutterBottom: PropTypes.bool
 };
 
 export default withStyles(styleSheet)(SmallText);
