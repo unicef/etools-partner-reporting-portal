@@ -1,0 +1,12 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>You have been assigned the Information Management Officer rights for:</p>
+    <p>Cluster: {{ role.cluster.title }}</p>
+    <p>Response Plan: {{ role.cluster.response_plan.title }}</p>
+    <p>Workspace: {{ role.cluster.response_plan.workspace.title }}</p>
+    <p>You can now assign access rights for the cluster members, so that they can report on the progress they achieved. You can do this here: <a href="{{ id_management_url }}">{{ id_management_url }}</a>.</p>
+    <p>For more information and training materials, please go here: <a href="{{ training_materials_url }}">{{ training_materials_url }}</a>.</p>
+    <p>Please note this is an automated message and any replies to this address are not monitored.</p>
+{% endblock content %}

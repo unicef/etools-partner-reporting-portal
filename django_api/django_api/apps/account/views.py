@@ -15,6 +15,7 @@ from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from id_management.permissions import UserDeactivatePermission
+from utils.emails import send_email_from_template
 
 from .filters import UserFilter
 from .models import User
@@ -117,6 +118,16 @@ class UserDeactivateAPIView(DestroyAPIView):
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, UserDeactivatePermission)
 
+    def send_email_notification(self, user):
+        send_email_from_template(
+            subject_template_path='emails/ip/notify_on_delete_cso_user_subject.txt',
+            body_template_path='emails/ip/notify_on_delete_cso_user.html',
+            template_data={'user': user, 'training_materials_url': '#'},  # TBD
+            to_email_list=[user.email],
+            content_subtype='html'
+        )
+
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
+        self.send_email_notification(instance)

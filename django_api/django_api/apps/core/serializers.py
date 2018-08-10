@@ -206,6 +206,11 @@ class PRPRoleUpdateSerializer(serializers.ModelSerializer):
         model = PRPRole
         fields = ('role',)
 
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        instance.send_email_notification(created=False)
+        return instance
+
 
 class PRPRoleCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -225,6 +230,8 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
             PRPRole.objects.create(user_id=user_id, **prp_roles_data)
             for prp_roles_data in validated_data['prp_roles']
         ]
+
+        [role.send_email_notification(created=True) for role in roles_created]
 
         return {'user_id': user_id, 'prp_roles': roles_created}
 

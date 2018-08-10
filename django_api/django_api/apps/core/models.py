@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pycountry
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.core.validators import (
     MinValueValidator,
@@ -25,6 +26,7 @@ from .common import (
     EXTERNAL_DATA_SOURCES,
     PRP_ROLE_TYPES,
 )
+from utils.emails import send_email_from_template
 from utils.groups.wrappers import GroupWrapper
 
 
@@ -196,6 +198,51 @@ class PRPRole(TimeStampedExternalSourceModel):
 
     def __str__(self):
         return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
+
+    def send_email_notification(self, created):
+        template_data = {
+            'user': self.user,
+            'role': self,
+            'id_management_url': f'{settings.FRONTEND_HOST}/id-management/',
+        }
+        to_email_list = [self.user.email]
+        content_subtype = 'html'
+
+        if self.role == PRP_ROLE_TYPES.ip_admin:
+            subject_template_path = 'emails/ip/notify_newly_designated_ip_admin_subject.txt'
+            body_template_path = 'emails/ip/notify_newly_designated_ip_admin.html'
+            template_data['training_materials_url'] = '#'  # TBD
+        elif self.role in {PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer}:
+            if created:
+                subject_template_path = 'emails/ip/notify_on_role_assignment_subject.txt'
+                body_template_path = 'emails/ip/notify_on_role_assignment.html'
+                template_data['training_materials_url'] = '#'  # TBD
+            else:
+                subject_template_path = 'emails/ip/notify_on_role_edit_subject.txt'
+                body_template_path = 'emails/ip/notify_on_role_edit.html'
+                template_data['training_materials_url'] = '#'   # TBD
+        elif self.role == PRP_ROLE_TYPES.cluster_imo and created:
+            subject_template_path = 'emails/cluster/notify_imo_on_role_assignment_subject.txt'
+            body_template_path = 'emails/cluster/notify_imo_on_role_assignment.html'
+            template_data['training_materials_url'] = '#'  # TBD
+        elif self.role in {PRP_ROLE_TYPES.cluster_member,
+                           PRP_ROLE_TYPES.cluster_viewer,
+                           PRP_ROLE_TYPES.cluster_coordinator} and created:
+            subject_template_path = 'emails/cluster/notify_on_role_assignment_subject.txt'
+            body_template_path = 'emails/cluster/notify_on_role_assignment.html'
+            template_data['training_materials_url'] = '#'  # TBD
+            template_data['system_admin_email'] = '#'  # TBD
+        else:
+            return False
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
 
 
 class ResponsePlan(TimeStampedExternalSourceModel):

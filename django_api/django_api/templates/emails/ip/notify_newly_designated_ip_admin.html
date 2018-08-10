@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>You have been assigned as ID Management Administrator for {{ user.partner.title }}.</p>
+    <p>You can now assign access rights for the staff members of your organization to either view, edit or submit the
+        reports on the progress of partnerships with UNICEF. ID management can be accessed here <a href="{{ id_management_url }}">{{ id_management_url }}</a>.</p>
+    <p>For more information and training materials, please go here: <a href="{{ training_materials_url }}">{{ training_materials_url }}</a>.</p>
+    <p>Thank you.</p>
+    <p>UNICEF partner reporting portal</p>
+{% endblock content %}
