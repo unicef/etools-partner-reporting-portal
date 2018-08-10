@@ -3,7 +3,7 @@ from django.conf.urls import url
 from account.views import UserListCreateAPIView, UserDeactivateAPIView
 from core.views import PRPRoleUpdateDestroyAPIView, PRPRoleCreateAPIView
 from cluster.views import AssignableClustersListView
-from partner.views import PartnerListCreateAPIView, AssignablePartnersListView, PartnerRetrieveAPIView
+from partner.views import PartnerListCreateAPIView, AssignablePartnersListView, PartnerRetrieveUpdateAPIView
 
 
 urlpatterns = [
@@ -14,5 +14,5 @@ urlpatterns = [
     url(r'^assignable-clusters/$', AssignableClustersListView.as_view(), name='assignable-clusters'),
     url(r'^assignable-partners/$', AssignablePartnersListView.as_view(), name='assignable-partners'),
     url(r'^partners/$', PartnerListCreateAPIView.as_view(), name='partners-list-create'),
-    url(r'^partners/(?P<pk>\d+)/$', PartnerRetrieveAPIView.as_view(), name='partner-detail'),
+    url(r'^partners/(?P<pk>\d+)/$', PartnerRetrieveUpdateAPIView.as_view(), name='partner-detail'),
 ]

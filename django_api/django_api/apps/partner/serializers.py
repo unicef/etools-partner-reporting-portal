@@ -170,6 +170,17 @@ class PartnerIDManagementSerializer(serializers.ModelSerializer):
         partner.clusters.add(*cluster_ids)
         return partner
 
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        cluster_ids = self.initial_data.pop('clusters', [])
+        if not cluster_ids and not isinstance(cluster_ids, list):
+            raise serializers.ValidationError({
+                'clusters': 'This should be a list and cannot be empty.'
+            })
+        partner = super().update(instance, validated_data)
+        partner.clusters.set(*cluster_ids)
+        return partner
+
 
 class PartnerProjectFundingSerializer(serializers.ModelSerializer):
 

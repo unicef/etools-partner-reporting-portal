@@ -4,7 +4,14 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView, CreateAPIView
+from rest_framework.generics import (
+    RetrieveAPIView,
+    ListCreateAPIView,
+    ListAPIView,
+    UpdateAPIView,
+    CreateAPIView,
+    RetrieveUpdateAPIView
+)
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -92,7 +99,7 @@ class PartnerListCreateAPIView(ListCreateAPIView):
             return PartnerIDManagementSerializer
 
 
-class PartnerRetrieveAPIView(RetrieveAPIView):
+class PartnerRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = PartnerIDManagementSerializer
     permission_classes = (
         AnyPermission(
