@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import PageHeader from "../common/PageHeader";
 import ButtonNew from "../common/ButtonNew";
 import withDialogHandling from "../hoc/withDialogHandling";
-import AddPartnerDialog from "./AddPartnerDialog";
+import PartnerDialog from "./PartnerDialog";
 import {api} from "../../infrastructure/api";
-import {options} from "../../actions";
+import {fetchPartnerDetails, invalidatePartnerDetails, options} from "../../actions";
 import {connect} from "react-redux";
 import PageContent from "../common/PageContent";
 import PartnersFilter from "./PartnersFilter";
@@ -18,8 +18,15 @@ class Partners extends Component {
         super(props);
 
         this.state = {
-            initialLoading: true
+            initialLoading: true,
+            selectedPartner: null
         };
+
+        this.onEdit = this.onEdit.bind(this);
+        this.onAdd = this.onAdd.bind(this);
+        this.openPartnerDialog = this.openPartnerDialog.bind(this);
+        this.fetchPartnerDetailsForRows = this.fetchPartnerDetailsForRows.bind(this);
+        this.fetchPartnerDetails = this.fetchPartnerDetails.bind(this);
 
         api.options("id-management/partners/")
             .then(res => {
@@ -29,11 +36,48 @@ class Partners extends Component {
                     "cso_type"
                 ]);
             })
-            .finally(() => {this.setState({initialLoading: false})});
+            .finally(() => {
+                this.setState({initialLoading: false})
+            });
+    }
+
+    fetchPartnerDetails(id) {
+        const {dispatchFetchPartnerDetails} = this.props;
+        dispatchFetchPartnerDetails(id);
+    }
+
+    onEdit(row) {
+        this.fetchPartnerDetails(row.id);
+        this.setState({selectedPartner: row});
+        this.openPartnerDialog();
+    }
+
+    onSave() {
+        const {dispatchInvalidatePartnerDetails, expandedRowIds} = this.props;
+        dispatchInvalidatePartnerDetails(this.state.selectedPartner.id);
+        this.fetchPartnerDetailsForRows(expandedRowIds)
+    }
+
+    onAdd() {
+        this.setState({selectedPartner: null});
+        this.openPartnerDialog();
+    }
+
+    openPartnerDialog() {
+        const {handleDialogOpen} = this.props;
+        handleDialogOpen('addPartner');
+    }
+
+    fetchPartnerDetailsForRows(ids) {
+        const {listProps: {data: {results}}} = this.props;
+
+        ids.forEach(idx => {
+            this.fetchPartnerDetails(results[idx].id)
+        });
     }
 
     render() {
-        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, getQuery, listProps, reload} = this.props;
+        const {dialogOpen, handleDialogClose, filterChange, getQuery, listProps, reload} = this.props;
 
         if (this.state.initialLoading) {
             return null;
@@ -42,23 +86,33 @@ class Partners extends Component {
         return (
             <div>
                 <PageHeader>
-                    {header} <ButtonNew onClick={() => handleDialogOpen('addPartner')}/>
+                    {header} <ButtonNew onClick={this.onAdd}/>
                 </PageHeader>
 
                 <PageContent>
                     <PartnersFilter onChange={filterChange} initialValues={getQuery()}/>
-                    <PartnersList {...listProps}/>
+                    <PartnersList {...listProps} onEdit={this.onEdit}
+                                  onExpandedRowIdsChange={this.fetchPartnerDetailsForRows}/>
                 </PageContent>
 
-                <AddPartnerDialog open={dialogOpen.addPartner} onClose={handleDialogClose} onSave={() => reload()}/>
+                <PartnerDialog open={dialogOpen.addPartner} partner={this.state.selectedPartner}
+                               onClose={handleDialogClose} onSave={() => reload()}/>
             </div>
         )
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        expandedRowIds: state.expandedRowIds
+    }
+};
+
 const mapDispatchToProps = dispatch => {
     return {
-        dispatchOptions: (data, fields) => dispatch(options(data, fields))
+        dispatchOptions: (data, fields) => dispatch(options(data, fields)),
+        dispatchFetchPartnerDetails: (id) => dispatch(fetchPartnerDetails(id)),
+        dispatchInvalidatePartnerDetails: (id) => dispatch(invalidatePartnerDetails(id))
     }
 };
 
@@ -71,4 +125,4 @@ const getData = (request) => (
     })
 );
 
-export default withSearch(getData)(connect(null, mapDispatchToProps)(withDialogHandling(Partners)));
+export default withSearch(getData)(connect(mapStateToProps, mapDispatchToProps)(withDialogHandling(Partners)));

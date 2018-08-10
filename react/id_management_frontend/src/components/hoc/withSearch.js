@@ -10,7 +10,8 @@ const arrayFormat = 'bracket';
 
 const mapStateToProps = state => {
     return {
-        portal: PORTAL_TYPE[state.portal]
+        portal: PORTAL_TYPE[state.portal],
+        user: state.user
     }
 };
 
@@ -69,7 +70,7 @@ export default (getDataFn) => {
                 }
 
                 onSearch(filter, page, pageSize) {
-                    const {history, portal} = this.props;
+                    const {history, portal, user} = this.props;
 
                     let request = filter;
 
@@ -84,7 +85,7 @@ export default (getDataFn) => {
 
                     Promise.resolve(getDataFn(Object.assign({}, request, {
                         portal
-                    })))
+                    }), user))
                         .then(data => this.setState({data, loading: false}));
 
 

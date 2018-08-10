@@ -84,13 +84,17 @@ class UsersList extends Component {
     }
 
     render() {
-        const {portal, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
+        const {portal, data, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
+
+        const removableItems = data.results.filter(item => item.canBeDeleted);
+        const showDelete = portal === PORTALS.IP && removableItems.length > 0;
 
         return (
             <div>
                 <PaginatedList
                     {...otherProps}
-                    showDelete={portal === PORTALS.IP}
+                    data={data}
+                    showDelete={showDelete}
                     columns={this.getColumns()}
                     expandedCell={row => (
                         <UserRowExpanded row={row}

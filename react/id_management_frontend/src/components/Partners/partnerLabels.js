@@ -1,5 +1,4 @@
 export default {
-    title: "Add new Partner",
     ocha_external_id: "OCHA ID",
     external_id: "External ID",
     externalIdHelper: "An ID representing this instance in an external system",

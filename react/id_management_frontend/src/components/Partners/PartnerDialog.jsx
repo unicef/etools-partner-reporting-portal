@@ -13,10 +13,11 @@ import {connect} from "react-redux";
 import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 import partnerLabels from "./partnerLabels";
+import LoadingIndicator from "../common/LoadingIndicator";
 
 const labels = getLabels(partnerLabels);
 
-class AddUserDialog extends Component {
+class PartnerDialog extends Component {
     constructor(props) {
         super(props);
 
@@ -29,11 +30,15 @@ class AddUserDialog extends Component {
     }
 
     onSubmit(values) {
-        const {onSave} = this.props;
+        const {onSave, partner} = this.props;
 
         this.setState({loading: true});
 
-        return api.post("id-management/partners/", values)
+        const method = partner ?
+            api.patch(`id-management/partners/${partner.id}/`, values) :
+            api.post("id-management/partners/", values);
+
+        return method
             .then(res => {
                 this.onClose();
                 onSave(res.data);
@@ -49,15 +54,27 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, sharedPartnerOptions, csoTypeOptions, partnerTypeOptions, clusterOptions} = this.props;
+        const {
+            open,
+            handleSubmit,
+            sharedPartnerOptions,
+            csoTypeOptions,
+            partnerTypeOptions,
+            clusterOptions,
+            dataLoading,
+            title
+        } = this.props;
 
         return (
             <Dialog
                 open={open}
                 onClose={this.onClose}
-                title={labels.title}
-                loading={this.state.loading}
+                title={title}
+                loading={this.state.loading || dataLoading}
             >
+                {dataLoading &&
+                <LoadingIndicator absolute/>}
+
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={6}>
@@ -175,14 +192,36 @@ class AddUserDialog extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const title = {
+    add: "Add new Partner",
+    edit: "Edit Partner"
+};
+
+const mapStateToProps = (state, ownProps) => {
+    const {partner} = ownProps;
+
+    let initialValues = null;
+
+    if (partner) {
+        const partnerDetails = state.partnerDetails[partner.id];
+
+        if (partnerDetails) {
+            const clusters = partnerDetails.clusters.map(item => String(item.id));
+
+            initialValues = Object.assign({}, partnerDetails, {clusters});
+        }
+    }
+
     return {
         sharedPartnerOptions: state.options.shared_partner || [],
-        csoTypeOptions: state.options.cso_type || []
+        csoTypeOptions: state.options.cso_type || [],
+        initialValues,
+        dataLoading: !!(ownProps.partner && !initialValues),
+        title: partner ? title.edit : title.add
     }
 };
 
 export default withProps(
     clusterOptions,
     partnerTypeOptions
-)(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog)));
+)(connect(mapStateToProps)(reduxForm({form: "addPartnerForm", enableReinitialize: true})(PartnerDialog)));

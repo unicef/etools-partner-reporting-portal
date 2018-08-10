@@ -46,7 +46,6 @@ class Users extends Component {
         this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
         this.closeAndReload = this.closeAndReload.bind(this);
-        this.deleteCondition = this.deleteCondition.bind(this);
     }
 
     onUserSave(user) {
@@ -116,22 +115,6 @@ class Users extends Component {
             .then(this.closeAndReload)
     }
 
-    deleteCondition(row) {
-        const {user} = this.props;
-
-        if (row.status === "DEACTIVATED") return false;
-
-        let hasIpAdmin = true;
-
-        row.prp_roles.forEach(role => {
-            if (!role.workspace || userRoleInWorkspace(user, role.workspace.id) !== PRP_ROLE.IP_ADMIN) {
-                hasIpAdmin = false;
-            }
-        });
-
-        return hasIpAdmin && hasOnlyRoles(row, [PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER])
-    }
-
     render() {
         const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, getQuery, reload} = this.props;
 
@@ -149,7 +132,6 @@ class Users extends Component {
                                onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}
                                onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
                                onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}
-                               deleteCondition={this.deleteCondition}
                                onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}/>
                 </PageContent>
 
@@ -175,12 +157,27 @@ class Users extends Component {
     }
 }
 
-const getData = (request) => (
+const deleteCondition = (user, item) => {
+    if (item.status === "DEACTIVATED") return false;
+
+    let hasIpAdmin = true;
+
+    item.prp_roles.forEach(role => {
+        if (!role.workspace || userRoleInWorkspace(user, role.workspace.id) !== PRP_ROLE.IP_ADMIN) {
+            hasIpAdmin = false;
+        }
+    });
+
+    return hasIpAdmin && hasOnlyRoles(item, [PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER])
+};
+
+const getData = (request, user) => (
     new Promise((resolve, reject) => {
         api.get("id-management/users/", request)
             .then(res => {
                 res.data.results.forEach(function (item) {
                     item.name = fullName(item);
+                    item.canBeDeleted = deleteCondition(user, item);
                 });
 
                 resolve(res.data);

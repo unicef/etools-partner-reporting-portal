@@ -9,6 +9,7 @@ import options from "./options";
 import partners from "./partners";
 import partnerDetails from "./partnerDetails";
 import error from "./error";
+import fetchPartnerDetails from "./fetchPartnerDetails";
 
 const reducers = combineReducers({
     portal: switchPortal,
@@ -20,7 +21,8 @@ const reducers = combineReducers({
     options,
     partners,
     partnerDetails,
-    error
+    error,
+    partnerDetailsPromises: fetchPartnerDetails
 });
 
 export default reducers;

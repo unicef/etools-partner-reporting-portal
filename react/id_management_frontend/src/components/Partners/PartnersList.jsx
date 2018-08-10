@@ -27,6 +27,7 @@ class PartnersList extends Component {
             <div>
                 <PaginatedList
                     {...this.props}
+                    showEdit
                     columns={this.getColumns()}
                     expandedCell={row => (
                         <PartnerRowExpanded row={row}/>

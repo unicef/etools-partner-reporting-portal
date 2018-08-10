@@ -21,6 +21,7 @@ import {connect} from 'react-redux';
 import {expandedRowIds} from "../../actions";
 import IconButton from "@material-ui/core/IconButton";
 import Delete from "@material-ui/icons/Delete";
+import Edit from "@material-ui/icons/Edit";
 import LoadingIndicator from "./LoadingIndicator";
 
 const allowedPageSizes = [5, 10, 15];
@@ -44,36 +45,36 @@ const styleSheet = (theme) => {
     }
 };
 
-const DeleteButton = ({onExecute}) => (
-    <IconButton onClick={onExecute} title="Delete row">
+const DeleteButton = ({onClick}) => (
+    <IconButton onClick={onClick} title="Delete row">
         <Delete/>
     </IconButton>
 );
 
-const commandComponents = {
-    delete: DeleteButton,
-};
-
-const Command = ({id, onExecute}) => {
-    const CommandButton = commandComponents[id];
-    return (
-        <CommandButton
-            onExecute={onExecute}
-        />
-    );
-};
-
-const editCell = (deleteCondition) => (props) => {
-    const {row} = props;
-
-    return deleteCondition(row) ? <TableEditRow.Cell {...props} onValueChange={() => {}} /> : <Table.Cell/>;
-};
+const EditButton = ({onClick}) => (
+    <IconButton onClick={onClick} title="Edit row">
+        <Edit/>
+    </IconButton>
+);
 
 class PaginatedList extends Component {
     constructor(props) {
         super(props);
 
-        this.commitChanges = this.commitChanges.bind(this);
+        this.onExpandedRowIdsChange = this.onExpandedRowIdsChange.bind(this);
+
+        this.editCell = (showEdit, showDelete) => (props) => {
+            const {row} = props;
+            const {onEdit, onDelete} = this.props;
+
+            return (
+                <TableEditRow.Cell onValueChange={() => {
+                }}>
+                    {showEdit && <EditButton onClick={() => onEdit(row)}/>}
+                    {showDelete && row.canBeDeleted && <DeleteButton onClick={() => onDelete(row)}/>}
+                </TableEditRow.Cell>
+            )
+        }
     }
 
     header() {
@@ -91,10 +92,14 @@ class PaginatedList extends Component {
         );
     }
 
-    commitChanges({deleted}) {
-        const {onDelete, data: {results}} = this.props;
+    onExpandedRowIdsChange(ids) {
+        const {dispatchExpandedRowIds} = this.props;
 
-        onDelete(results[deleted[0]]);
+        dispatchExpandedRowIds(ids);
+
+        if (this.props.onExpandedRowIdsChange) {
+            this.props.onExpandedRowIdsChange(ids);
+        }
     }
 
     render() {
@@ -109,9 +114,8 @@ class PaginatedList extends Component {
             onPageSizeChange,
             loading,
             expandedRowIds,
-            dispatchExpandedRowIds,
             showDelete,
-            deleteCondition
+            showEdit
         } = this.props;
 
         const containerClasses = classNames(
@@ -136,26 +140,27 @@ class PaginatedList extends Component {
                         totalCount={data.count}
                     />
 
-                    {showDelete &&
+                    {(showDelete || showEdit) &&
                     <EditingState
-                        onCommitChanges={this.commitChanges}
+                        onCommitChanges={() => {
+                        }}
                     />}
 
                     <Table/>
                     <TableHeaderRow/>
                     <RowDetailState expandedRowIds={expandedRowIds}
-                                    onExpandedRowIdsChange={dispatchExpandedRowIds}/>
+                                    onExpandedRowIdsChange={this.onExpandedRowIdsChange}/>
 
                     <TableRowDetail
                         contentComponent={({row}) => expandedCell(row)}
                     />
 
-                    {showDelete &&
+                    {(showDelete || showEdit) &&
                     <TableEditColumn
                         width={64}
-                        showDeleteCommand
-                        commandComponent={Command}
-                        cellComponent={editCell(deleteCondition)}
+                        showDeleteCommand={showDelete}
+                        showEditCommand={showEdit}
+                        cellComponent={this.editCell(showEdit, showDelete)}
                     />}
 
                     <PagingPanel pageSizes={allowedPageSizes}/>
@@ -174,7 +179,9 @@ PaginatedList.propTypes = {
     onPageChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func,
     showDelete: PropTypes.bool,
-    deleteCondition: PropTypes.func
+    onEdit: PropTypes.func,
+    showEdit: PropTypes.bool,
+    onExpandedRowIdsChange: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {

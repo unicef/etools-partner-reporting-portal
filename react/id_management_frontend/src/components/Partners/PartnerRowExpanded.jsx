@@ -1,12 +1,10 @@
 import React, {Component} from "react";
 import {withStyles} from "@material-ui/core/styles";
 import LoadingIndicator from "../common/LoadingIndicator";
-import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import partnerLabels from "./partnerLabels";
 import {Grid} from "@material-ui/core";
 import SmallValue from "../common/SmallValue";
-import {partnerDetails} from "../../actions";
 import {connect} from "react-redux";
 
 const labels = getLabels(partnerLabels);
@@ -44,15 +42,6 @@ const renderFields = [
 class PartnerRowExpanded extends Component {
     constructor(props) {
         super(props);
-
-        if (!props.data) {
-            api.get(`id-management/partners/${props.row.id}/`)
-                .then(res => {
-                    props.dispatchPartnerDetails(res.data)
-                });
-
-        }
-
         this.renderField = this.renderField.bind(this);
     }
 
@@ -92,10 +81,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        dispatchPartnerDetails: data => dispatch(partnerDetails(data))
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styleSheet)(PartnerRowExpanded));
+export default connect(mapStateToProps)(withStyles(styleSheet)(PartnerRowExpanded));
