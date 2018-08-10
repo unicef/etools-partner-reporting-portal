@@ -16,7 +16,8 @@ const labels = getLabels({
     userType: "User type",
     makeIpAdmin: "(make IP admin)",
     edit: "edit",
-    delete: "delete"
+    delete: "delete",
+    addPermission: "Add new permission"
 });
 
 const roleCaption = {
@@ -101,8 +102,8 @@ class UserRowExpanded extends Component {
                     <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
                 ))}
 
-                {this.canAdd(user) &&
-                <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>Add new permission</PlainButton>}
+                {this.canAdd(user) && row.status !== "DEACTIVATED" &&
+                <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>{labels.addPermission}</PlainButton>}
             </div>
         );
     }
