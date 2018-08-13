@@ -54,13 +54,14 @@ const multipleSelectionsStyleSheet = (theme) => {
             alignItems: 'center',
         },
         itemsContainer: {
-            overflowX: 'auto',
+            display: 'flex',
+            flexWrap: 'wrap'
         },
     };
 };
 
 function renderMultipleSelectionsBase({classes, fieldName, onSelectionRemove, selectedValues}) {
-    return (<div className={`${classes.rowContainer} ${classes.itemsContainer}`}>
+    return (<div className={`${classes.itemsContainer}`}>
         {selectedValues.map(item => (<div
             key={`${fieldName}_selection_item_${item.value}`}
             className={classes.rowContainer}
