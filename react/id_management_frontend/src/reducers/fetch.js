@@ -1,7 +1,7 @@
 import {FETCH_REQUEST, FETCH_FINISHED, FETCH_INVALIDATE} from "../fetch";
 import * as R from "ramda";
 
-export default function fetch(state = {}, action) {
+export default function fetch(state = {promises: {}, pending: {}}, action) {
     let data, _promises, _pending, actionPromises, actionPending;
 
     switch (action.type) {
@@ -51,6 +51,7 @@ export default function fetch(state = {}, action) {
             return Object.assign({}, state, {
                 pending
             });
+
         case FETCH_INVALIDATE:
             if (action.id) {
                 actionPromises = state.promises[action.option] || {};

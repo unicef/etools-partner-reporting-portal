@@ -26,21 +26,10 @@ class Main extends Component {
 
         this.onSnackbarClose = this.onSnackbarClose.bind(this);
 
-        this.state = {
-            loading: true
-        };
-
         const {fetchData} = props;
 
-        let promises = [
-            fetchData(FETCH_OPTIONS.USER_PROFILE),
-            fetchData(FETCH_OPTIONS.WORKSPACES)
-        ];
-
-        Promise.all(promises)
-            .finally(() => {
-                this.setState({loading: false})
-            });
+        fetchData(FETCH_OPTIONS.USER_PROFILE);
+        fetchData(FETCH_OPTIONS.WORKSPACES);
     }
 
     getPortalsPath() {
@@ -54,8 +43,13 @@ class Main extends Component {
             dispatchSwitchPortal,
             history,
             portal,
-            fetchData
+            fetchData,
+            error
         } = this.props;
+
+        if (error) {
+            throw new Error(error);
+        }
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
@@ -82,11 +76,11 @@ class Main extends Component {
     }
 
     render() {
-        if (this.state.loading) {
+        const {portal, error, initialized} = this.props;
+
+        if (!initialized) {
             return null;
         }
-
-        const {portal, error} = this.props;
 
         const theme = createMuiTheme({
             palette: {
@@ -135,10 +129,11 @@ class Main extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const {error} = state;
+    const {error, fetch: {pending}} = state;
 
     return {
-        error
+        error,
+        initialized: pending[FETCH_OPTIONS.USER_PROFILE] === false && pending[FETCH_OPTIONS.WORKSPACES] === false
     }
 };
 

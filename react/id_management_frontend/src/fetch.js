@@ -20,61 +20,61 @@ export function fetch(option, id) {
             promises[option] = {};
         }
 
-        if (id ? !promises[option][id] : !promises[option]) {
-            const finished = () => fetchFinished(option, id);
+        const _promise = id ? promises[option][id] : promises[option];
 
-            let promise;
-            switch (option) {
-                case FETCH_OPTIONS.CLUSTERS:
-                    promise = api.get("id-management/assignable-clusters/")
-                        .then(res => {
-                            dispatch(clusters(res.data));
-                        });
-                    break;
-                case FETCH_OPTIONS.PARTNERS:
-                    promise = api.get("id-management/assignable-partners/")
-                        .then(res => {
-                            dispatch(partners(res.data));
-                        });
-                    break;
-                case FETCH_OPTIONS.USER_PROFILE:
-                    promise = api.get("account/user-profile/")
-                        .then(res => {
-                            dispatch(userProfile(res.data));
-                        });
-                    break;
-                case FETCH_OPTIONS.WORKSPACES:
-                    promise = api.get("core/workspace/")
-                        .then(res => {
-                            dispatch(workspaces(res.data));
-                        });
-                    break;
-                case FETCH_OPTIONS.PARTNER_DETAILS:
-                    promise = api.get(`id-management/partners/${id}/`)
-                        .then(res => {
-                            dispatch(partnerDetails(res.data));
-                        });
-                    break;
-                case FETCH_OPTIONS.PARTNERS_OPTIONS:
-                    promise = api.options("id-management/partners/")
-                        .then(res => {
-                            dispatch(options(res.data, [
-                                "shared_partner",
-                                "partner_type",
-                                "cso_type"
-                            ]));
-                        });
-                    break;
-                default:
-                    throw new Error("Invalid fetch option, please see FETCH_OPTIONS in actions.js");
-            }
-
-            promise.finally(finished);
-
-            dispatch(fetchRequest(option, promise, id));
-
-            return promise;
+        if (_promise) {
+            return;
         }
+
+        let promise;
+        switch (option) {
+            case FETCH_OPTIONS.CLUSTERS:
+                promise = api.get("id-management/assignable-clusters/")
+                    .then(res => {
+                        dispatch(clusters(res.data));
+                    });
+                break;
+            case FETCH_OPTIONS.PARTNERS:
+                promise = api.get("id-management/assignable-partners/")
+                    .then(res => {
+                        dispatch(partners(res.data));
+                    });
+                break;
+            case FETCH_OPTIONS.USER_PROFILE:
+                promise = api.get("account/user-profile/")
+                    .then(res => {
+                        dispatch(userProfile(res.data));
+                    });
+                break;
+            case FETCH_OPTIONS.WORKSPACES:
+                promise = api.get("core/workspace/")
+                    .then(res => {
+                        dispatch(workspaces(res.data));
+                    });
+                break;
+            case FETCH_OPTIONS.PARTNER_DETAILS:
+                promise = api.get(`id-management/partners/${id}/`)
+                    .then(res => {
+                        dispatch(partnerDetails(res.data));
+                    });
+                break;
+            case FETCH_OPTIONS.PARTNERS_OPTIONS:
+                promise = api.options("id-management/partners/")
+                    .then(res => {
+                        dispatch(options(res.data, [
+                            "shared_partner",
+                            "partner_type",
+                            "cso_type"
+                        ]));
+                    });
+                break;
+            default:
+                throw new Error("Invalid fetch option, please see FETCH_OPTIONS in actions.js");
+        }
+
+        promise.finally(() => {dispatch(fetchFinished(option, id))});
+
+        dispatch(fetchRequest(option, promise, id));
     };
 }
 

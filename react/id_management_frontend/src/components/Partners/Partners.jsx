@@ -18,7 +18,6 @@ class Partners extends Component {
         super(props);
 
         this.state = {
-            initialLoading: true,
             selectedPartner: null
         };
 
@@ -29,10 +28,7 @@ class Partners extends Component {
         this.fetchPartnerDetailsForRows = this.fetchPartnerDetailsForRows.bind(this);
         this.fetchPartnerDetails = this.fetchPartnerDetails.bind(this);
 
-        props.dispatchFetchOptions()
-            .finally(() => {
-                this.setState({initialLoading: false})
-            });
+                props.dispatchFetchOptions()
     }
 
     fetchPartnerDetails(id) {
@@ -72,9 +68,9 @@ class Partners extends Component {
     }
 
     render() {
-        const {dialogOpen, handleDialogClose, filterChange, getQuery, listProps} = this.props;
+        const {dialogOpen, handleDialogClose, filterChange, getQuery, listProps, optionsLoading} = this.props;
 
-        if (this.state.initialLoading) {
+        if (optionsLoading) {
             return null;
         }
 
@@ -99,7 +95,8 @@ class Partners extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        expandedRowIds: state.expandedRowIds
+        expandedRowIds: state.expandedRowIds,
+        optionsLoading: state.fetch.pending[FETCH_OPTIONS.PARTNERS_OPTIONS]
     }
 };
 
