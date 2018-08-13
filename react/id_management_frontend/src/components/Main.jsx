@@ -4,12 +4,12 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {clusters, partners, PORTALS, switchPortal, userProfile, workspaces, error as errorAction} from "../actions";
+import {PORTALS, switchPortal, error as errorAction} from "../actions";
+import {fetch, FETCH_OPTIONS} from "../fetch";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
 import {withRouter, matchPath} from "react-router-dom";
-import {api} from "../infrastructure/api";
 import {connect} from "react-redux";
 import withProps from "./hoc/withProps";
 import {portal, user} from "../helpers/props";
@@ -30,15 +30,11 @@ class Main extends Component {
             loading: true
         };
 
+        const {fetchData} = props;
+
         let promises = [
-            api.get("account/user-profile/")
-                .then(res => {
-                    props.dispatchUserProfile(res.data);
-                }),
-            api.get("core/workspace/")
-                .then(res => {
-                    props.dispatchWorkspaces(res.data);
-                }),
+            fetchData(FETCH_OPTIONS.USER_PROFILE),
+            fetchData(FETCH_OPTIONS.WORKSPACES)
         ];
 
         Promise.all(promises)
@@ -57,11 +53,8 @@ class Main extends Component {
             location,
             dispatchSwitchPortal,
             history,
-            dispatchClusters,
             portal,
-            clusters,
-            partners,
-            dispatchPartners
+            fetchData
         } = this.props;
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
@@ -77,19 +70,8 @@ class Main extends Component {
         }
 
         if (portal === PORTALS.CLUSTER) {
-            if (!clusters) {
-                api.get("id-management/assignable-clusters/")
-                    .then(res => {
-                        dispatchClusters(res.data);
-                    })
-            }
-
-            if (!partners) {
-                api.get("id-management/assignable-partners/")
-                    .then(res => {
-                        dispatchPartners(res.data);
-                    })
-            }
+            fetchData(FETCH_OPTIONS.CLUSTERS);
+            fetchData(FETCH_OPTIONS.PARTNERS);
         }
     }
 
@@ -100,11 +82,11 @@ class Main extends Component {
     }
 
     render() {
-        const {portal, user, error} = this.props;
-
-        if (!user) {
+        if (this.state.loading) {
             return null;
         }
+
+        const {portal, error} = this.props;
 
         const theme = createMuiTheme({
             palette: {
@@ -123,7 +105,6 @@ class Main extends Component {
 
         return (
             <MuiThemeProvider theme={theme}>
-                {!this.state.loading &&
                 <div className="App">
                     <Route exact path="/" render={() => <Redirect to={`/${redirect}`}/>}/>
                     <CssBaseline/>
@@ -147,43 +128,31 @@ class Main extends Component {
 
                         <Snackbar open={!!error} variant="error" onClose={this.onSnackbarClose} message={error}/>
                     </MainContent>
-                </div>}
+                </div>
             </MuiThemeProvider>
         );
     }
 }
 
 const mapStateToProps = (state) => {
-    const {clusters, partners, error} = state;
+    const {error} = state;
 
     return {
-        clusters,
-        partners,
         error
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        dispatchUserProfile: user => {
-            dispatch(userProfile(user));
-        },
-        dispatchWorkspaces: data => {
-            dispatch(workspaces(data))
-        },
-        dispatchClusters: data => {
-            dispatch(clusters(data))
-        },
         dispatchSwitchPortal: (portal, history) => {
             dispatch(switchPortal(portal));
             history.push(`/${portal}`);
         },
-        dispatchPartners: data => {
-            dispatch(partners(data))
-        },
         dispatchError: message => {
             dispatch(errorAction(message));
-        }
+        },
+        fetchData: option => dispatch(fetch(option))
+
     };
 };
 

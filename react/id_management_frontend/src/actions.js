@@ -56,15 +56,3 @@ export const ERROR = 'ERROR';
 export function error(message) {
     return {type: ERROR, message};
 }
-
-export const FETCH_PARTNER_DETAILS = 'FETCH_PARTNER_DETAILS';
-
-export function fetchPartnerDetails(id) {
-    return {type: FETCH_PARTNER_DETAILS, id};
-}
-
-export const INVALIDATE_PARTNER_DETAILS = 'INVALIDATE_PARTNER_DETAILS';
-
-export function invalidatePartnerDetails(id) {
-    return {type: INVALIDATE_PARTNER_DETAILS, id};
-}

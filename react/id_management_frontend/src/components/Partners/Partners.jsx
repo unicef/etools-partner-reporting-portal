@@ -4,12 +4,12 @@ import ButtonNew from "../common/ButtonNew";
 import withDialogHandling from "../hoc/withDialogHandling";
 import PartnerDialog from "./PartnerDialog";
 import {api} from "../../infrastructure/api";
-import {fetchPartnerDetails, invalidatePartnerDetails, options} from "../../actions";
 import {connect} from "react-redux";
 import PageContent from "../common/PageContent";
 import PartnersFilter from "./PartnersFilter";
 import withSearch from "../hoc/withSearch";
 import PartnersList from "./PartnersList";
+import {FETCH_OPTIONS, fetch, fetchInvalidate} from "../../fetch";
 
 const header = "Partners";
 
@@ -29,14 +29,7 @@ class Partners extends Component {
         this.fetchPartnerDetailsForRows = this.fetchPartnerDetailsForRows.bind(this);
         this.fetchPartnerDetails = this.fetchPartnerDetails.bind(this);
 
-        api.options("id-management/partners/")
-            .then(res => {
-                props.dispatchOptions(res.data, [
-                    "shared_partner",
-                    "partner_type",
-                    "cso_type"
-                ]);
-            })
+        props.dispatchFetchOptions()
             .finally(() => {
                 this.setState({initialLoading: false})
             });
@@ -112,9 +105,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        dispatchOptions: (data, fields) => dispatch(options(data, fields)),
-        dispatchFetchPartnerDetails: (id) => dispatch(fetchPartnerDetails(id)),
-        dispatchInvalidatePartnerDetails: (id) => dispatch(invalidatePartnerDetails(id))
+        dispatchFetchOptions: () => dispatch(fetch(FETCH_OPTIONS.PARTNERS_OPTIONS)),
+        dispatchFetchPartnerDetails: (id) => dispatch(fetch(FETCH_OPTIONS.PARTNER_DETAILS, id)),
+        dispatchInvalidatePartnerDetails: (id) => dispatch(fetchInvalidate(FETCH_OPTIONS.PARTNER_DETAILS, id))
     }
 };
 

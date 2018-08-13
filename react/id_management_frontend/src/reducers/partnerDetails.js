@@ -1,5 +1,4 @@
-import {INVALIDATE_PARTNER_DETAILS, PARTNER_DETAILS} from "../actions";
-import * as R from "ramda";
+import {PARTNER_DETAILS} from "../actions";
 
 export default function partnerDetails(state = {}, action) {
     switch (action.type) {
@@ -7,8 +6,6 @@ export default function partnerDetails(state = {}, action) {
             return Object.assign({}, state, {
                 [action.data.id]: action.data
             });
-        case INVALIDATE_PARTNER_DETAILS:
-            return R.dissoc(action.id, state);
         default:
             return state;
     }
