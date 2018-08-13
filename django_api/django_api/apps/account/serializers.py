@@ -104,7 +104,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
 
         if portal_choice == 'CLUSTER' and cluster_roles_access.intersection(user_roles):
             user_type = validated_data.pop('user_type')
-            partner_id = self.initial_data.pop('partner', None)
+            partner_id = int(self.initial_data.pop('partner', None))
 
             if user_type == USER_TYPES.partner:
                 if not partner_id:
