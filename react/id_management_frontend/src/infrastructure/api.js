@@ -3,8 +3,18 @@ import axios from "axios";
 import {SubmissionError} from "redux-form";
 import store from "../store";
 import {error as errorAction} from "../actions";
+import * as R from 'ramda';
+
 
 const baseUrl = "/api/";
+
+function transformParam(param) {
+    if (Array.isArray(param)) {
+        return String(param);
+    }
+
+    return param;
+}
 
 function makeRequest(method, url, data, params) {
     return axios({
@@ -12,7 +22,9 @@ function makeRequest(method, url, data, params) {
         url: baseUrl + url,
         data: data,
         params: method === 'get' ? data : params,
-        paramsSerializer: qs.stringify,
+        paramsSerializer: function (params) {
+            return qs.stringify(R.mapObjIndexed(transformParam, params), {encode: false});
+        },
         xsrfHeaderName: "X-CSRFToken",
         xsrfCookieName: "csrftoken",
         headers: {
