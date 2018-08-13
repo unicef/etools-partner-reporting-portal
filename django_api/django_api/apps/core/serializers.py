@@ -225,13 +225,12 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         user_id = validated_data['user_id']
+        roles_created = []
 
-        roles_created = [
-            PRPRole.objects.create(user_id=user_id, **prp_roles_data)
-            for prp_roles_data in validated_data['prp_roles']
-        ]
-
-        [role.send_email_notification(created=True) for role in roles_created]
+        for prp_roles_data in validated_data['prp_roles']:
+            new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
+            roles_created.append(new_role)
+            transaction.on_commit(lambda role=new_role: role.send_email_notification(created=True))
 
         return {'user_id': user_id, 'prp_roles': roles_created}
 
