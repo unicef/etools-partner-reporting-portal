@@ -5,7 +5,8 @@ import Partners from "./Partners/Partners";
 import {PORTALS, switchPortal} from "../actions";
 import {connect} from "react-redux";
 import withProps from "./hoc/withProps";
-import {portal} from "../helpers/props";
+import {portal, user} from "../helpers/props";
+import {hasPartnersAccess} from "../helpers/user";
 
 class MainRoutes extends Component {
     constructor(props) {
@@ -17,7 +18,7 @@ class MainRoutes extends Component {
     }
 
     render() {
-        const {portal, match, location} = this.props;
+        const {portal, match, location, user} = this.props;
 
         const routes = [
             {
@@ -27,7 +28,7 @@ class MainRoutes extends Component {
             {
                 url: match.url + "/partners",
                 component: Partners,
-                hide: portal === PORTALS.IP
+                hide: portal === PORTALS.IP || !hasPartnersAccess(user)
             }
         ];
 
@@ -69,4 +70,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(withProps(portal)(MainRoutes)));
+export default withRouter(connect(null, mapDispatchToProps)(withProps(portal, user)(MainRoutes)));

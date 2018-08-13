@@ -8,7 +8,8 @@ import ListItem from "@material-ui/core/ListItem";
 import { withStyles } from "@material-ui/core/styles";
 import { Typography, Grid } from "@material-ui/core";
 import withProps from "../hoc/withProps";
-import {portal} from "../../helpers/props";
+import {portal, user} from "../../helpers/props";
+import {hasPartnersAccess} from "../../helpers/user";
 
 const styleSheet = theme => ({
     menuLink: {
@@ -33,7 +34,7 @@ const styleSheet = theme => ({
 
 class MainMenu extends Component {
     render() {
-        const { portal, match, classes } = this.props;
+        const { portal, match, classes, user } = this.props;
 
         const menuOptions = [
             {
@@ -45,7 +46,7 @@ class MainMenu extends Component {
                 icon: Business,
                 label: "Partners",
                 url: match.url + "/partners",
-                hide: portal === PORTALS.IP
+                hide: portal === PORTALS.IP || !hasPartnersAccess(user)
             }
         ];
 
@@ -69,4 +70,4 @@ class MainMenu extends Component {
     }
 }
 
-export default withProps(portal)(withStyles(styleSheet)(MainMenu));
+export default withProps(portal, user)(withStyles(styleSheet)(MainMenu));

@@ -55,3 +55,7 @@ export function hasOnlyRoles(user, roles) {
 
     return filtered.length === user.prp_roles.length;
 }
+
+export function hasPartnersAccess(user) {
+    return hasAnyRole(user, [PRP_ROLE.CLUSTER_IMO, PRP_ROLE.CLUSTER_SYSTEM_ADMIN])
+}

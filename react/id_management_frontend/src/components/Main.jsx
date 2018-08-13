@@ -53,6 +53,7 @@ class Main extends Component {
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
+            throw new Error("Unauthorized - Redirecting");
         }
 
         if ((!user.hasIpAccess && matchPath(location.pathname, `/${PORTALS.IP}`))) {
