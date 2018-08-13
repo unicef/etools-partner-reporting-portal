@@ -8,12 +8,13 @@ import {reduxForm, formValueSelector} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
-import {PORTAL_TYPE, USER_TYPE, USER_TYPE_OPTIONS} from "../../constants";
+import {EDITABLE_USER_TYPE_OPTIONS, PORTAL_TYPE, PRP_ROLE, USER_TYPE, USER_TYPE_OPTIONS} from "../../constants";
 import SelectForm from "../form/SelectForm";
 import {PORTALS} from "../../actions";
 import withProps from "../hoc/withProps";
-import {partnerOptions, portal} from "../../helpers/props";
+import {partnerOptions, portal, user} from "../../helpers/props";
 import {connect} from "react-redux";
+import {hasAnyRole} from "../../helpers/user";
 
 
 const formName = "addUserForm";
@@ -59,7 +60,10 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, portal, user_type, partnerOptions} = this.props;
+        const {open, handleSubmit, portal, user_type, partnerOptions, user} = this.props;
+
+        const userTypeOptions = hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN, PRP_ROLE.CLUSTER_IMO]) ?
+            USER_TYPE_OPTIONS : EDITABLE_USER_TYPE_OPTIONS[PRP_ROLE.CLUSTER_MEMBER];
 
         return (
             <Dialog
@@ -86,7 +90,7 @@ class AddUserDialog extends Component {
 
                         {portal === PORTALS.CLUSTER &&
                         <Grid item md={6}>
-                            <SelectForm fieldName="user_type" label={labels.userType} values={USER_TYPE_OPTIONS}/>
+                            <SelectForm fieldName="user_type" label={labels.userType} values={userTypeOptions}/>
                         </Grid>}
 
                         {user_type === USER_TYPE.PARTNER &&
@@ -111,4 +115,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps)(withProps(portal, partnerOptions)(reduxForm({form: formName})(AddUserDialog)));
+export default connect(mapStateToProps)(withProps(portal, partnerOptions, user)(reduxForm({form: formName})(AddUserDialog)));

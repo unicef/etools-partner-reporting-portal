@@ -74,35 +74,6 @@ export const EDITABLE_PRP_ROLES = {
     ]
 };
 
-const getEditablePrpRoleOptions = () => {
-    let options = {};
-
-    for (let prop in EDITABLE_PRP_ROLES) {
-        options[prop] = PRP_ROLE_OPTIONS.filter(option => EDITABLE_PRP_ROLES[prop].indexOf(option.value) > -1)
-    }
-
-    return options;
-};
-
-export const EDITABLE_PRP_ROLE_OPTIONS = getEditablePrpRoleOptions();
-
-export const PORTAL_ACCESS = {
-    [PORTALS.CLUSTER]: [
-        PRP_ROLE.CLUSTER_IMO,
-        PRP_ROLE.CLUSTER_MEMBER,
-        PRP_ROLE.CLUSTER_SYSTEM_ADMIN
-    ],
-    [PORTALS.IP]: [
-        PRP_ROLE.IP_ADMIN,
-        PRP_ROLE.IP_AUTHORIZED_OFFICER
-    ]
-};
-
-export const PORTAL_TYPE = {
-    [PORTALS.CLUSTER]: "CLUSTER",
-    [PORTALS.IP]: "IP"
-};
-
 export const USER_TYPE = {
     CLUSTER_ADMIN: "CLUSTER_ADMIN",
     IMO: "IMO",
@@ -123,3 +94,38 @@ export const USER_TYPE_OPTIONS = [
         value: USER_TYPE.PARTNER
     }
 ];
+
+export const EDITABLE_USER_TYPES = {
+    [PRP_ROLE.CLUSTER_MEMBER]: [USER_TYPE.PARTNER]
+};
+
+const editableOptions = (editable, options) => {
+    let _options = {};
+
+    for (let prop in editable) {
+        _options[prop] = options.filter(option => editable[prop].indexOf(option.value) > -1)
+    }
+
+    return _options;
+};
+
+export const EDITABLE_PRP_ROLE_OPTIONS = editableOptions(EDITABLE_PRP_ROLES, PRP_ROLE_OPTIONS);
+
+export const EDITABLE_USER_TYPE_OPTIONS = editableOptions(EDITABLE_USER_TYPES, USER_TYPE_OPTIONS);
+
+export const PORTAL_ACCESS = {
+    [PORTALS.CLUSTER]: [
+        PRP_ROLE.CLUSTER_IMO,
+        PRP_ROLE.CLUSTER_MEMBER,
+        PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+    ],
+    [PORTALS.IP]: [
+        PRP_ROLE.IP_ADMIN,
+        PRP_ROLE.IP_AUTHORIZED_OFFICER
+    ]
+};
+
+export const PORTAL_TYPE = {
+    [PORTALS.CLUSTER]: "CLUSTER",
+    [PORTALS.IP]: "IP"
+};
