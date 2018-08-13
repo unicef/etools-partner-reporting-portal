@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from "react";
 import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
-import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
+import {PRP_ROLE, EDITABLE_PRP_ROLES, USER_TYPE} from "../../constants";
 import {hasAnyRole, getUserRole, getUserTypeLabel} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {getLabels} from "../../labels";
@@ -35,13 +35,13 @@ const styleSheet = (theme) => ({
 });
 
 class UserRowExpanded extends Component {
-    canEdit(userRole) {
+    canEdit(userRole, row) {
         switch (userRole) {
             case PRP_ROLE.IP_ADMIN:
             case PRP_ROLE.CLUSTER_IMO:
             case PRP_ROLE.CLUSTER_MEMBER:
             case PRP_ROLE.CLUSTER_SYSTEM_ADMIN:
-                return true;
+                return hasAnyRole(row, EDITABLE_PRP_ROLES[userRole]);
             default:
                 return false;
         }
@@ -54,8 +54,7 @@ class UserRowExpanded extends Component {
 
         return (
             <Fragment>
-                {this.canEdit(userRole) &&
-                hasAnyRole(row, EDITABLE_PRP_ROLES[userRole]) &&
+                {this.canEdit(userRole, row) &&
                 <Fragment>
                     <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
                     <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
@@ -72,8 +71,8 @@ class UserRowExpanded extends Component {
         )
     }
 
-    canAdd(user) {
-        return hasAnyRole(user, [
+    canAdd(user, row) {
+        return  row.status !== "DEACTIVATED" && row.user_type !== USER_TYPE.CLUSTER_ADMIN && hasAnyRole(user, [
              PRP_ROLE.IP_ADMIN,
              PRP_ROLE.IP_AUTHORIZED_OFFICER,
              PRP_ROLE.CLUSTER_IMO,
@@ -102,7 +101,7 @@ class UserRowExpanded extends Component {
                     <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
                 ))}
 
-                {this.canAdd(user) && row.status !== "DEACTIVATED" &&
+                {this.canAdd(user, row) &&
                 <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>{labels.addPermission}</PlainButton>}
             </div>
         );
