@@ -178,7 +178,7 @@ class PartnerIDManagementSerializer(serializers.ModelSerializer):
                 'clusters': 'This should be a list and cannot be empty.'
             })
         partner = super().update(instance, validated_data)
-        partner.clusters.set(*cluster_ids)
+        partner.clusters.set(cluster_ids)
         return partner
 
 
