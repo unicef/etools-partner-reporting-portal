@@ -17,16 +17,16 @@ export function userRoleInWorkspace(user, workspace) {
 }
 
 export function getRoleLabel(role) {
-    return PRP_ROLE_OPTIONS.filter(option => option.value === role)[0].label;
+    return getLabelFromOptions(PRP_ROLE_OPTIONS, role);
 }
 
 export function getUserTypeLabel(userType) {
-    return USER_TYPE_OPTIONS.filter(option => option.value === userType)[0].label;
+    return getLabelFromOptions(USER_TYPE_OPTIONS, userType);
 }
 
-export function getWorkspaceLabel(workspaceOptions, workspace) {
+export function getLabelFromOptions(options, value) {
     // eslint-disable-next-line
-    return workspaceOptions.filter(option => option.value == workspace)[0].label;
+    return options.filter(option => option.value == value)[0].label;
 }
 
 export function logout() {

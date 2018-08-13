@@ -4,10 +4,10 @@ import Dialog from "../common/Dialog";
 import TextFieldForm from "../form/TextFieldForm";
 import {reduxForm} from "redux-form";
 import {connect} from "react-redux";
-import {getRoleLabel, getWorkspaceLabel} from "../../helpers/user";
+import {getLabelFromOptions, getRoleLabel} from "../../helpers/user";
 import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
-import {workspaceOptions} from "../../helpers/props";
+import {clusterOptions, workspaceOptions} from "../../helpers/props";
 
 const title = "My Profile";
 
@@ -27,19 +27,26 @@ class MyProfileDialog extends Component {
     }
 
     formatPrpRoles(prp_roles) {
-        const {workspaceOptions} = this.props;
+        const {workspaceOptions, clusterOptions} = this.props;
 
-        const _role = prp_roles.filter(item => !item.workspace && !item.cluster);
-        let result = _role.length ? getRoleLabel(_role[0].role) : null;
+        const roles = prp_roles.map(item => {
+            let result = "";
 
-        if (!result) {
-            const workspaceRoles = prp_roles.filter(role => !!role.workspace);
-            const roles = workspaceRoles.map(role => `${getWorkspaceLabel(workspaceOptions, role.workspace)} / ${getRoleLabel(role.role)}`);
+            if (item.cluster) {
+                result += getLabelFromOptions(clusterOptions, item.cluster);
+            }
+            else if (item.workspace) {
+                result += getLabelFromOptions(workspaceOptions, item.workspace);
+            }
 
-            result = roles.length ? roles.join(", ") : '-';
-        }
+            if (result) {
+                result += " / ";
+            }
 
-        return result;
+            return result + getRoleLabel(item.role);
+        });
+
+        return roles.length ? roles.join(", ") : '-';
     }
 
     render() {
@@ -95,4 +102,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps)(withProps(workspaceOptions)((reduxForm({form: "myProfile"})(MyProfileDialog))));
+export default connect(mapStateToProps)(withProps(workspaceOptions, clusterOptions)((reduxForm({form: "myProfile"})(MyProfileDialog))));
