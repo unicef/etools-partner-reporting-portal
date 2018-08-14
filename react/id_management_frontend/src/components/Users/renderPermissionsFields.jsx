@@ -59,7 +59,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                         roleOptions = PRP_ROLE_OPTIONS.filter(item => item.value === PRP_ROLE.CLUSTER_IMO);
                     }
                     else if (role) {
-                        roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role];
+                        roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role] || [];
                     }
 
                     return (
