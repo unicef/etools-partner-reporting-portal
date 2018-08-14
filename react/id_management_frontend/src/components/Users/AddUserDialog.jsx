@@ -65,6 +65,8 @@ class AddUserDialog extends Component {
         const userTypeOptions = hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN, PRP_ROLE.CLUSTER_IMO]) ?
             USER_TYPE_OPTIONS : EDITABLE_USER_TYPE_OPTIONS[PRP_ROLE.CLUSTER_MEMBER];
 
+        const submitLabel = user_type === USER_TYPE.CLUSTER_ADMIN ? labels.save : labels.saveAndContinue;
+
         return (
             <Dialog
                 open={open}
@@ -101,7 +103,7 @@ class AddUserDialog extends Component {
 
                     <DialogActions>
                         <Button onClick={this.onClose}>{labels.cancel}</Button>
-                        <ButtonSubmit loading={this.state.loading} label={labels.saveAndContinue}/>
+                        <ButtonSubmit loading={this.state.loading} label={submitLabel}/>
                     </DialogActions>
                 </form>
             </Dialog>

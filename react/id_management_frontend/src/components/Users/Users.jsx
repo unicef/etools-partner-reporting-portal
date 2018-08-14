@@ -12,7 +12,7 @@ import AddPermissionsDialog from "./AddPermissionsDialog";
 import EditPermissionDialog from "./EditPermissionDialog";
 import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
-import {PRP_ROLE} from "../../constants";
+import {PRP_ROLE, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
 import {user} from "../../helpers/props";
 import {hasOnlyRoles, userRoleInWorkspace} from "../../helpers/user";
@@ -52,7 +52,10 @@ class Users extends Component {
         const {reload} = this.props;
 
         reload();
-        this.openAddPermissionsDialog(user);
+
+        if (user.user_type !== USER_TYPE.CLUSTER_ADMIN) {
+            this.openAddPermissionsDialog(user);
+        }
     }
 
     openAddPermissionsDialog(user) {
