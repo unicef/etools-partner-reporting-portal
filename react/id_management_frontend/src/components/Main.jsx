@@ -47,6 +47,10 @@ class Main extends Component {
             error
         } = this.props;
 
+        if (error) {
+            throw new Error(error);
+        }
+
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
             throw new Error("Unauthorized - Redirecting");
