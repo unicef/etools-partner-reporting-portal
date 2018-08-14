@@ -62,8 +62,8 @@ class AddUserDialog extends Component {
     render() {
         const {open, handleSubmit, portal, user_type, partnerOptions, user} = this.props;
 
-        const userTypeOptions = hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN, PRP_ROLE.CLUSTER_IMO]) ?
-            USER_TYPE_OPTIONS : EDITABLE_USER_TYPE_OPTIONS[PRP_ROLE.CLUSTER_MEMBER];
+        const userTypeOptions = hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN]) ?
+            USER_TYPE_OPTIONS : EDITABLE_USER_TYPE_OPTIONS["RESTRICTED"];
 
         const submitLabel = user_type === USER_TYPE.CLUSTER_ADMIN ? labels.save : labels.saveAndContinue;
 

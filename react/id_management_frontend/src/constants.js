@@ -96,7 +96,7 @@ export const USER_TYPE_OPTIONS = [
 ];
 
 export const EDITABLE_USER_TYPES = {
-    [PRP_ROLE.CLUSTER_MEMBER]: [USER_TYPE.PARTNER]
+    "RESTRICTED": [USER_TYPE.PARTNER]
 };
 
 const editableOptions = (editable, options) => {
