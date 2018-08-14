@@ -40,14 +40,14 @@ class AddUserDialog extends Component {
     }
 
     onSubmit(values) {
-        const {onSave, portal} = this.props;
+        const {onSave, portal, user_type} = this.props;
 
         this.setState({loading: true});
 
         return api.post("id-management/users/", values, {portal: PORTAL_TYPE[portal]})
             .then(res => {
                 this.onClose();
-                onSave(res.data);
+                onSave(Object.assign({}, res.data, {user_type}));
             })
             .finally(() => this.setState({loading: false}))
     }
