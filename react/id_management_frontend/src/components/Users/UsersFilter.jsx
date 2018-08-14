@@ -8,9 +8,10 @@ import SelectForm from "../form/SelectForm";
 import {PORTALS} from "../../actions";
 import {connect} from "react-redux";
 import labels from "../../labels";
-import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS} from "../../constants";
+import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS, PRP_ROLE} from "../../constants";
 import withProps from "../hoc/withProps";
-import {clusterOptions, workspaceOptions, partnerOptions, portal} from "../../helpers/props";
+import {clusterOptions, workspaceOptions, partnerOptions, portal, user} from "../../helpers/props";
+import {hasAnyRole} from "../../helpers/user";
 
 const searchPlaceholder = "Name or Email";
 
@@ -28,6 +29,12 @@ class UsersFilter extends Component {
         initialize({});
     }
 
+    canFilterPartners() {
+        const {user} = this.props;
+
+        return hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN, PRP_ROLE.CLUSTER_IMO]);
+    }
+
     render() {
         const {portal, workspaceOptions, clusterOptions, partnerOptions} = this.props;
 
@@ -43,7 +50,7 @@ class UsersFilter extends Component {
                                            margin="none" optional/>
                         </Grid>
 
-                        {portal === PORTALS.CLUSTER &&
+                        {portal === PORTALS.CLUSTER && this.canFilterPartners() &&
                         <Grid item md={4}>
                             <SelectForm fieldName="partners" label={labels.partner} values={partnerOptions}
                                         optional multiple/>
@@ -83,5 +90,6 @@ export default connect(mapStateToProps)(withProps(
     clusterOptions,
     workspaceOptions,
     partnerOptions,
-    portal
+    portal,
+    user
 )(reduxForm({form: 'usersFilter'})(UsersFilter)));
