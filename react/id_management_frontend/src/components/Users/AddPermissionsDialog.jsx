@@ -57,7 +57,7 @@ class AddPermissionsDialog extends Component {
                 loading={this.state.loading}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
-                    <FieldArray name="prp_roles" component={renderPermissionsFields(user)}/>
+                    <FieldArray name="prp_roles" props={{selectedUser: user}} component={renderPermissionsFields}/>
 
                     {error && <Typography color="error" variant="body2">{error}</Typography>}
 

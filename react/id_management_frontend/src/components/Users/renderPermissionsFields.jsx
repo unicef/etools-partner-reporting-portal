@@ -1,5 +1,5 @@
 import React from 'react';
-import {EDITABLE_PRP_ROLE_OPTIONS, PRP_ROLE, PRP_ROLE_OPTIONS, USER_TYPE} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
 import SelectForm from "../form/SelectForm";
 import {Grid, Typography} from "@material-ui/core";
 import DeleteButton from "../common/DeleteButton";
@@ -30,73 +30,72 @@ const getSelectedOptions = (optionName, fields, index) => {
     return options;
 };
 
-const renderPermissionsFields = (selectedUser) =>
-    withProps(clusterOptions, workspaceOptions, portal, user)(({fields, portal, workspaceOptions, user, clusterOptions}) => {
-        return (
-            <div>
-                <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
+const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterOptions}) => {
+    return (
+        <div>
+            <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
 
-                <FieldsArrayPanel>
-                    {fields.map((item, index, fields) => {
-                        const field = fields.get(index);
+            <FieldsArrayPanel>
+                {fields.map((item, index, fields) => {
+                    const field = fields.get(index);
 
-                        const selectedClusters = getSelectedOptions("cluster", fields, index);
-                        const selectedWorkspaces = getSelectedOptions("workspace", fields, index);
-                        const filteredWorkspaceOptions = filterOptionsValues(workspaceOptions, selectedWorkspaces);
-                        const filteredClusterOptions = filterOptionsValues(clusterOptions, selectedClusters);
+                    const selectedClusters = getSelectedOptions("cluster", fields, index);
+                    const selectedWorkspaces = getSelectedOptions("workspace", fields, index);
+                    const filteredWorkspaceOptions = filterOptionsValues(workspaceOptions, selectedWorkspaces);
+                    const filteredClusterOptions = filterOptionsValues(clusterOptions, selectedClusters);
 
-                        let role;
+                    let role;
 
-                        if (portal === PORTALS.IP) {
-                            role = userRoleInWorkspace(user, field.workspace);
-                        }
-                        else {
-                            role = userRoleInCluster(user, field.cluster)
-                        }
+                    if (portal === PORTALS.IP) {
+                        role = userRoleInWorkspace(user, field.workspace);
+                    }
+                    else {
+                        role = userRoleInCluster(user, field.cluster)
+                    }
 
-                        let roleOptions = [];
+                    let roleOptions = [];
 
-                        if (selectedUser.user_type === USER_TYPE.IMO) {
-                            roleOptions = PRP_ROLE_OPTIONS.filter(item => item.value === PRP_ROLE.CLUSTER_IMO);
-                        }
-                        else if (role) {
-                            roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role];
-                        }
+                    if (selectedUser.user_type === USER_TYPE.IMO) {
+                        roleOptions = PRP_ROLE_OPTIONS.filter(item => item.value === PRP_ROLE.CLUSTER_IMO);
+                    }
+                    else if (role) {
+                        roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role];
+                    }
 
-                        return (
-                            <FieldsArrayItem key={index}>
-                                <Grid container justify="flex-end">
-                                    <Grid item>
-                                        {fields.length > 1 &&
-                                        <DeleteButton onClick={() => fields.remove(index)}/>}
-                                    </Grid>
+                    return (
+                        <FieldsArrayItem key={index}>
+                            <Grid container justify="flex-end">
+                                <Grid item>
+                                    {fields.length > 1 &&
+                                    <DeleteButton onClick={() => fields.remove(index)}/>}
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={24}>
+                                <Grid item md={6}>
+                                    {portal === PORTALS.IP &&
+                                    <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
+                                                values={filteredWorkspaceOptions}/>}
+
+                                    {portal === PORTALS.CLUSTER &&
+                                    <SelectForm fieldName={`${item}.cluster`} label={labels.cluster}
+                                                values={filteredClusterOptions}/>}
                                 </Grid>
 
-                                <Grid container spacing={24}>
-                                    <Grid item md={6}>
-                                        {portal === PORTALS.IP &&
-                                        <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                                    values={filteredWorkspaceOptions}/>}
-
-                                        {portal === PORTALS.CLUSTER &&
-                                        <SelectForm fieldName={`${item}.cluster`} label={labels.cluster}
-                                                    values={filteredClusterOptions}/>}
-                                    </Grid>
-
-                                    <Grid item md={6}>
-                                        <SelectForm fieldName={`${item}.role`} label={labels.role}
-                                                    values={roleOptions}
-                                                    selectFieldProps={{disabled: !roleOptions.length}}/>
-                                    </Grid>
+                                <Grid item md={6}>
+                                    <SelectForm fieldName={`${item}.role`} label={labels.role}
+                                                values={roleOptions}
+                                                selectFieldProps={{disabled: !roleOptions.length}}/>
                                 </Grid>
-                            </FieldsArrayItem>
-                        )
-                    })}
+                            </Grid>
+                        </FieldsArrayItem>
+                    )
+                })}
 
-                    <FieldsArrayAddButton onClick={() => fields.push({})}/>
-                </FieldsArrayPanel>
-            </div>
-        )
-    });
+                <FieldsArrayAddButton onClick={() => fields.push({})}/>
+            </FieldsArrayPanel>
+        </div>
+    )
+};
 
-export default renderPermissionsFields;
+export default withProps(clusterOptions, workspaceOptions, portal, user)(renderPermissionsFields);
