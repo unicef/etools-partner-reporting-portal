@@ -85,7 +85,7 @@ EditPermissionDialog.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => {
-    const userRole = getUserRole(state.user, ownProps.permission);
+    const userRole = getUserRole(state.user, ownProps.permission, state.portal);
 
     return {
         roleOptions: EDITABLE_PRP_ROLE_OPTIONS[userRole],

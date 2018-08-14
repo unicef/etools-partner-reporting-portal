@@ -48,9 +48,9 @@ class UserRowExpanded extends Component {
     }
 
     getActions(role) {
-        const {user, onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, row} = this.props;
+        const {user, onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, row, portal} = this.props;
 
-        const userRole = getUserRole(user, role);
+        const userRole = getUserRole(user, role, portal);
 
         return (
             <Fragment>

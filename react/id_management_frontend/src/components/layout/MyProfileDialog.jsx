@@ -7,7 +7,8 @@ import {connect} from "react-redux";
 import {getLabelFromOptions, getRoleLabel} from "../../helpers/user";
 import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
-import {clusterOptions, workspaceOptions} from "../../helpers/props";
+import {clusterOptions, portal, workspaceOptions} from "../../helpers/props";
+import {PORTALS} from "../../actions";
 
 const title = "My Profile";
 
@@ -27,12 +28,12 @@ class MyProfileDialog extends Component {
     }
 
     formatPrpRoles(prp_roles) {
-        const {workspaceOptions, clusterOptions} = this.props;
+        const {workspaceOptions, clusterOptions, portal} = this.props;
 
         const roles = prp_roles.map(item => {
             let result = "";
 
-            if (item.cluster) {
+            if (item.cluster && portal === PORTALS.CLUSTER) {
                 result += getLabelFromOptions(clusterOptions, item.cluster);
             }
             else if (item.workspace) {
@@ -102,4 +103,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps)(withProps(workspaceOptions, clusterOptions)((reduxForm({form: "myProfile"})(MyProfileDialog))));
+export default connect(mapStateToProps)(withProps(workspaceOptions, clusterOptions, portal)((reduxForm({form: "myProfile"})(MyProfileDialog))));

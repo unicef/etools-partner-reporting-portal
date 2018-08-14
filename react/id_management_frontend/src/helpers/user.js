@@ -1,5 +1,6 @@
 import {PRP_ROLE, PRP_ROLE_OPTIONS, USER_TYPE_OPTIONS} from "../constants";
 import {api} from "../infrastructure/api";
+import {PORTALS} from "../actions";
 
 export function hasAnyRole(user, roles) {
     const filtered = user.prp_roles.filter(item => roles.indexOf(item.role) > -1);
@@ -44,10 +45,15 @@ export function userRoleInCluster(user, cluster) {
     return roles.length ? roles[0].role : null;
 }
 
-export function getUserRole(user, permission) {
+export function getUserRole(user, permission, portal) {
     const userWorkspaceRole = permission.workspace && userRoleInWorkspace(user, permission.workspace.id);
     const userClusterRole = permission.cluster && userRoleInCluster(user, permission.cluster.id);
-    return userClusterRole || userWorkspaceRole;
+
+    if (portal === PORTALS.CLUSTER) {
+        return userClusterRole;
+    }
+
+    return userWorkspaceRole;
 }
 
 export function hasOnlyRoles(user, roles) {
