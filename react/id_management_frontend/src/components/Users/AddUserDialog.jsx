@@ -47,7 +47,10 @@ class AddUserDialog extends Component {
         return api.post("id-management/users/", values, {portal: PORTAL_TYPE[portal]})
             .then(res => {
                 this.onClose();
-                onSave(Object.assign({}, res.data, {user_type}));
+
+                if (res && res.data) {
+                    onSave(Object.assign({}, res.data, {user_type}));
+                }
             })
             .finally(() => this.setState({loading: false}))
     }

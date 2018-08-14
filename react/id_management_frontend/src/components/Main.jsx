@@ -43,13 +43,8 @@ class Main extends Component {
             dispatchSwitchPortal,
             history,
             portal,
-            fetchData,
-            error
+            fetchData
         } = this.props;
-
-        if (error) {
-            throw new Error(error);
-        }
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
