@@ -116,6 +116,7 @@ class UserListCreateAPIView(ListCreateAPIView):
 
 
 class UserDeactivateAPIView(GenericAPIView):
+    serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
 
@@ -137,6 +138,7 @@ class UserDeactivateAPIView(GenericAPIView):
 
 
 class UserActivateAPIView(GenericAPIView):
+    serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
 
