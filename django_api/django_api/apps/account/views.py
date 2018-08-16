@@ -3,7 +3,7 @@ from django.db.models import Prefetch, Q
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, DestroyAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,7 +14,7 @@ from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
-from id_management.permissions import UserDeactivatePermission
+from id_management.permissions import UserActivateDeactivatePermission
 from utils.emails import send_email_from_template
 
 from .filters import UserFilter
@@ -115,9 +115,9 @@ class UserListCreateAPIView(ListCreateAPIView):
         return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
 
 
-class UserDeactivateAPIView(DestroyAPIView):
+class UserDeactivateAPIView(GenericAPIView):
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated, UserDeactivatePermission)
+    permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
 
     def send_email_notification(self, user):
         send_email_from_template(
@@ -128,7 +128,20 @@ class UserDeactivateAPIView(DestroyAPIView):
             content_subtype='html'
         )
 
-    def perform_destroy(self, instance):
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
         instance.is_active = False
         instance.save()
         self.send_email_notification(instance)
+        return Response(status=statuses.HTTP_200_OK)
+
+
+class UserActivateAPIView(GenericAPIView):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_active = True
+        instance.save()
+        return Response(status=statuses.HTTP_200_OK)
