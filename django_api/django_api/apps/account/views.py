@@ -112,7 +112,7 @@ class UserListCreateAPIView(ListCreateAPIView):
                                                             'cluster__response_plan__workspace')
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
 
-        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
+        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch).order_by('id')
 
 
 class UserDeactivateAPIView(GenericAPIView):
