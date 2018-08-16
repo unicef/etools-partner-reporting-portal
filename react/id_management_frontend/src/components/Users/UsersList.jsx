@@ -86,7 +86,7 @@ class UsersList extends Component {
     }
 
     render() {
-        const {portal, data, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
+        const {portal, data, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, user, ...otherProps} = this.props;
 
         const removableItems = data.results.filter(item => item.canBeDeleted);
         const showDelete = hasAnyRole(user, [PRP_ROLE.IP_ADMIN]) && portal === PORTALS.IP && removableItems.length > 0;

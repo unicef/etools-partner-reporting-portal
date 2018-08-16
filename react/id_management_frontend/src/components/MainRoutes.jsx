@@ -17,20 +17,34 @@ class MainRoutes extends Component {
         dispatchSwitchPortal(params.portal);
     }
 
+    buildUrl(path) {
+        const {match: {url}} = this.props;
+
+        let result = url;
+
+        if (!url.endsWith("/")) {
+            result += "/";
+        }
+
+        return result + path;
+    }
+
     render() {
         const {portal, match, location, user} = this.props;
 
         const routes = [
             {
-                url: match.url + "/users",
+                url: this.buildUrl("users"),
                 component: Users
             },
             {
-                url: match.url + "/partners",
+                url: this.buildUrl("partners"),
                 component: Partners,
                 hide: portal === PORTALS.IP || !hasPartnersAccess(user)
             }
         ];
+
+        console.log(routes);
 
         const availableRoutes = routes.map(
             (route, idx) =>
