@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import {getLabels} from "../../labels";
 import Dialog from "../common/Dialog";
 import TextFieldForm from "../form/TextFieldForm";
@@ -9,6 +9,10 @@ import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
 import {clusterOptions, portal, workspaceOptions} from "../../helpers/props";
 import {PORTALS} from "../../actions";
+import Typography from "../../../node_modules/@material-ui/core/Typography";
+import List from "../../../node_modules/@material-ui/core/List/List";
+import ListItem from "../../../node_modules/@material-ui/core/ListItem/ListItem";
+import Divider from "../../../node_modules/@material-ui/core/Divider/Divider";
 
 const title = "My Profile";
 
@@ -24,37 +28,47 @@ class MyProfileDialog extends Component {
             roleLabel: ''
         };
 
-        this.formatPrpRoles = this.formatPrpRoles.bind(this);
+        this.renderPrpRoles = this.renderPrpRoles.bind(this);
     }
 
-    formatPrpRoles(prp_roles) {
+    renderPrpRoles(prp_roles) {
         const {workspaceOptions, clusterOptions, portal} = this.props;
 
-        const roles = prp_roles.map(item => {
-            let result = "";
+        return (
+            <Fragment>
+                <List disablePadding>
+                    {prp_roles.map((item, idx) => {
+                        let result = "";
 
-            if (item.cluster && portal === PORTALS.CLUSTER) {
-                result += getLabelFromOptions(clusterOptions, item.cluster);
-            }
-            else if (item.workspace) {
-                result += getLabelFromOptions(workspaceOptions, item.workspace);
-            }
+                        if (item.cluster && portal === PORTALS.CLUSTER) {
+                            result += getLabelFromOptions(clusterOptions, item.cluster);
+                        }
+                        else if (item.workspace) {
+                            result += getLabelFromOptions(workspaceOptions, item.workspace);
+                        }
 
-            if (result) {
-                result += " / ";
-            }
+                        if (result) {
+                            result += " / ";
+                        }
 
-            return result + getRoleLabel(item.role);
-        });
-
-        return roles.length ? roles.join(", ") : '-';
+                        return <ListItem key={idx} disableGutters>{result + getRoleLabel(item.role)}</ListItem>;
+                    })}
+                </List>
+                <Divider/>
+            </Fragment>
+        )
     }
 
     render() {
-        const {open, onClose} = this.props;
+        const {open, onClose, prp_roles} = this.props;
 
         const textFieldProps = {
-            disabled: true
+            disabled: true,
+            inputProps: {
+                style: {
+                    color: "black"
+                }
+            }
         };
 
         return (
@@ -77,8 +91,8 @@ class MyProfileDialog extends Component {
 
                     </Grid>
                     <Grid item xs={12}>
-                        <TextFieldForm fieldName="prp_roles" label={labels.myRoles}
-                                       textFieldProps={textFieldProps} format={this.formatPrpRoles}/>
+                        <Typography variant="caption" gutterBottom>{labels.myRoles}</Typography>
+                        {this.renderPrpRoles(prp_roles)}
                     </Grid>
                     <Grid item xs={12}>
                         <TextFieldForm fieldName="partner" label={labels.partner} textFieldProps={textFieldProps}/>
@@ -98,8 +112,8 @@ const mapStateToProps = (state) => {
             last_name,
             email,
             partner: partner ? partner.title : '-',
-            prp_roles
-        }
+        },
+        prp_roles
     }
 };
 

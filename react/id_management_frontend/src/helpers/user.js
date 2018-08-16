@@ -27,7 +27,9 @@ export function getUserTypeLabel(userType) {
 
 export function getLabelFromOptions(options, value) {
     // eslint-disable-next-line
-    return options.filter(option => option.value == value)[0].label;
+    const filtered = options.filter(option => option.value == value);
+
+    return filtered.length ? filtered[0].label : "";
 }
 
 export function logout() {
