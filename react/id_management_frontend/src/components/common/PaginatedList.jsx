@@ -20,8 +20,9 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {expandedRowIds} from "../../actions";
 import IconButton from "@material-ui/core/IconButton";
-import Delete from "@material-ui/icons/Delete";
+import Close from "@material-ui/icons/Close";
 import Edit from "@material-ui/icons/Edit";
+import Restore from "@material-ui/icons/SettingsBackupRestore";
 import LoadingIndicator from "./LoadingIndicator";
 
 const allowedPageSizes = [5, 10, 15];
@@ -47,7 +48,7 @@ const styleSheet = (theme) => {
 
 const DeleteButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Delete row">
-        <Delete/>
+        <Close />
     </IconButton>
 );
 
@@ -57,21 +58,28 @@ const EditButton = ({onClick}) => (
     </IconButton>
 );
 
+const RestoreButton = ({onClick}) => (
+    <IconButton onClick={onClick} title="Restore row">
+        <Restore/>
+    </IconButton>
+);
+
 class PaginatedList extends Component {
     constructor(props) {
         super(props);
 
         this.onExpandedRowIdsChange = this.onExpandedRowIdsChange.bind(this);
 
-        this.editCell = (showEdit, showDelete) => (props) => {
+        this.editCell = (showEdit, showDelete, showRestore) => (props) => {
             const {row} = props;
-            const {onEdit, onDelete} = this.props;
+            const {onEdit, onDelete, onRestore} = this.props;
 
             return (
                 <TableEditRow.Cell onValueChange={() => {
                 }}>
                     {showEdit && <EditButton onClick={() => onEdit(row)}/>}
                     {showDelete && row.canBeDeleted && <DeleteButton onClick={() => onDelete(row)}/>}
+                    {showRestore && row.canBeRestored && <RestoreButton onClick={() => onRestore(row)}/>}
                 </TableEditRow.Cell>
             )
         }
@@ -115,7 +123,8 @@ class PaginatedList extends Component {
             loading,
             expandedRowIds,
             showDelete,
-            showEdit
+            showEdit,
+            showRestore
         } = this.props;
 
         const containerClasses = classNames(
@@ -155,12 +164,10 @@ class PaginatedList extends Component {
                         contentComponent={({row}) => expandedCell(row)}
                     />
 
-                    {(showDelete || showEdit) &&
+                    {(showDelete || showEdit || showRestore) &&
                     <TableEditColumn
                         width={64}
-                        showDeleteCommand={showDelete}
-                        showEditCommand={showEdit}
-                        cellComponent={this.editCell(showEdit, showDelete)}
+                        cellComponent={this.editCell(showEdit, showDelete, showRestore)}
                     />}
 
                     <PagingPanel pageSizes={allowedPageSizes}/>

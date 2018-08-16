@@ -78,10 +78,7 @@ class EditPermissionDialog extends Component {
 }
 
 EditPermissionDialog.propTypes = {
-    permission: PropTypes.shape({
-        workspace: PropTypes.any,
-        role: PropTypes.any.isRequired,
-    })
+    permission: PropTypes.object
 };
 
 const mapStateToProps = (state, ownProps) => {

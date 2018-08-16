@@ -22,13 +22,15 @@ const CONFIRM_ACTIONS = {
     DELETE_PERMISSION: "DELETE_PERMISSION",
     MAKE_IP_ADMIN: "MAKE_IP_ADMIN",
     REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN",
-    DISABLE_USER: "DISABLE_USER"
+    DISABLE_USER: "DISABLE_USER",
+    ENABLE_USER: "ENABLE_USER"
 };
 const confirmMessages = {
     [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove this role for this user?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
     [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
-    [CONFIRM_ACTIONS.DISABLE_USER]: "Are you sure you want to disable this user?"
+    [CONFIRM_ACTIONS.DISABLE_USER]: "Are you sure you want to disable this user?",
+    [CONFIRM_ACTIONS.ENABLE_USER]: "Are you sure you want to enable this user?"
 };
 
 class Users extends Component {
@@ -107,6 +109,9 @@ class Users extends Component {
             case CONFIRM_ACTIONS.DISABLE_USER:
                 this.disableUser(this.state.selectedUser);
                 break;
+            case CONFIRM_ACTIONS.ENABLE_USER:
+                this.enableUser(this.state.selectedUser);
+                break;
             default:
                 this.deletePermission(this.state.selectedPermission);
                 break;
@@ -114,7 +119,12 @@ class Users extends Component {
     }
 
     disableUser(user) {
-        api.delete(`id-management/users/${user.id}/`)
+        api.post(`id-management/users/${user.id}/deactivate/`)
+            .then(this.closeAndReload)
+    }
+
+    enableUser(user) {
+        api.post(`id-management/users/${user.id}/activate/`)
             .then(this.closeAndReload)
     }
 
@@ -135,7 +145,8 @@ class Users extends Component {
                                onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}
                                onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
                                onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}
-                               onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}/>
+                               onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}
+                               onRestore={this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER)}/>
                 </PageContent>
 
                 {this.state.selectedUser &&
@@ -160,9 +171,7 @@ class Users extends Component {
     }
 }
 
-const deleteCondition = (user, item) => {
-    if (item.status === "DEACTIVATED") return false;
-
+const canDelete = (user, item) => {
     let hasIpAdmin = true;
 
     item.prp_roles.forEach(role => {
@@ -180,7 +189,8 @@ const getData = (request, user) => (
             .then(res => {
                 res.data.results.forEach(function (item) {
                     item.name = fullName(item);
-                    item.canBeDeleted = deleteCondition(user, item);
+                    item.canBeDeleted = item.status !== "DEACTIVATED" && canDelete(user, item);
+                    item.canBeRestored = item.status === "DEACTIVATED" && canDelete(user, item);
                 });
 
                 resolve(res.data);
