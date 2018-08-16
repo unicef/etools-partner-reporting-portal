@@ -92,6 +92,13 @@ class UserListCreateAPIView(ListCreateAPIView):
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
 
         if portal_choice == 'CLUSTER':
+            roles_in = (
+                PRP_ROLE_TYPES.cluster_system_admin,
+                PRP_ROLE_TYPES.cluster_imo,
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer,
+            )
             if all_users_access.intersection(user_prp_roles):
                 pass
             elif PRP_ROLE_TYPES.cluster_member in user_prp_roles:
@@ -99,6 +106,12 @@ class UserListCreateAPIView(ListCreateAPIView):
             else:
                 raise PermissionDenied()
         elif portal_choice == 'IP' and ip_users_access.intersection(user_prp_roles):
+            roles_in = (
+                PRP_ROLE_TYPES.ip_authorized_officer,
+                PRP_ROLE_TYPES.ip_admin,
+                PRP_ROLE_TYPES.ip_viewer,
+                PRP_ROLE_TYPES.ip_editor,
+            )
             user_workspaces = user.prp_roles.filter(
                 role__in=ip_users_access
             ).values_list('workspace', flat=True).distinct()
@@ -108,8 +121,8 @@ class UserListCreateAPIView(ListCreateAPIView):
         else:
             raise PermissionDenied()
 
-        prp_roles_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
-                                                            'cluster__response_plan__workspace')
+        prp_roles_queryset = PRPRole.objects.filter(role__in=roles_in).select_related(
+            'workspace', 'cluster', 'cluster__response_plan', 'cluster__response_plan__workspace')
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
 
         return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch).order_by('-id')
