@@ -156,7 +156,7 @@ class PartnerDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="vendor_number" label={labels.vendor_number}/>
+                            <TextFieldForm fieldName="vendor_number" label={labels.vendor_number} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -165,10 +165,6 @@ class PartnerDialog extends Component {
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="rating" label={labels.rating} optional/>
-                        </Grid>
-
-                        <Grid item md={6}>
-                            <TextFieldForm fieldName="type_of_assessment" label={labels.type_of_assessment} optional/>
                         </Grid>
 
                         <Grid item md={6}>

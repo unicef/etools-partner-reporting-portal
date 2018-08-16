@@ -15,13 +15,15 @@ import {hasAnyRole} from "../../helpers/user";
 const statusColor = {
     ACTIVE: green[500],
     INVITED: red[500],
-    DEACTIVATED: grey[900]
+    DEACTIVATED: grey[900],
+    INCOMPLETE: red[500]
 };
 
 const statusLabel = {
     ACTIVE: "Active",
     INVITED: "Invited",
-    DEACTIVATED: "Deactivated"
+    DEACTIVATED: "Deactivated",
+    INCOMPLETE: "Incomplete"
 };
 
 class UsersList extends Component {
