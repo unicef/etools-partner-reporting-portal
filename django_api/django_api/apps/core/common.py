@@ -33,6 +33,7 @@ USER_STATUS_TYPES = Choices(
     ('ACTIVE', 'active', 'Active'),
     ('INVITED', 'invited', 'Invited'),
     ('DEACTIVATED', 'deactivated', 'Deactivated'),
+    ('INCOMPLETE', 'incomplete', 'Incomplete'),
 )
 
 USER_TYPES = Choices(

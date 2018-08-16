@@ -68,6 +68,9 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
 
     def get_status(self, obj):
+        if not obj.role_list:
+            return USER_STATUS_TYPES.incomplete
+
         if obj.is_active:
             if obj.last_login:
                 return USER_STATUS_TYPES.active
