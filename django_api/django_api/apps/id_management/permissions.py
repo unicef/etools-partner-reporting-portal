@@ -27,7 +27,8 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
         if (request.method == 'POST' and
                 PRPRole.objects.filter(
                     Q(workspace__isnull=False, workspace_id=obj.workspace_id) |
-                    Q(cluster__isnull=False, cluster_id=obj.cluster_id),
+                    Q(cluster__isnull=False, cluster_id=obj.cluster_id) |
+                    Q(role=ROLES.cluster_system_admin),
                     user_id=obj.user_id
                 ).exists()):
             self.message = 'Role already exists in cluster or workspace.'
@@ -63,17 +64,20 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
 
         # for IP roles:
         if user.partner_id == obj.user.partner_id:
+            workspace_kwargs = {'workspace__isnull': False, 'workspace_id': obj.workspace_id}
+
             if ((ROLES.ip_admin == role_in_payload or
-                 obj.role == ROLES.ip_admin and request.method in ('POST', 'DELETE')) and
-                    user.prp_roles.filter(
-                        role=ROLES.ip_authorized_officer, workspace__isnull=False, workspace_id=obj.workspace_id
-                    ).exists()):
+                 obj.role == ROLES.ip_admin and request.method == 'POST') and
+                    user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs)):
+                return True
+
+            if (obj.role == ROLES.ip_admin and
+                    request.method == 'DELETE' and
+                    user.prp_roles.filter(role=ROLES.ip_authorized_officer, **workspace_kwargs)):
                 return True
 
             if (obj_roles_set.issubset({ROLES.ip_editor, ROLES.ip_viewer}) and
-                    user.prp_roles.filter(
-                        role=ROLES.ip_admin, workspace__isnull=False, workspace_id=obj.workspace_id
-                    ).exists()):
+                    user.prp_roles.filter(role=ROLES.ip_admin, **workspace_kwargs).exists()):
                 return True
 
         return False

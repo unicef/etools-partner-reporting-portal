@@ -87,7 +87,7 @@ class PartnerListCreateAPIView(ListCreateAPIView):
             IsClusterSystemAdmin
         ),
     )
-    queryset = Partner.objects.all()
+    queryset = Partner.objects.order_by('-id')
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
