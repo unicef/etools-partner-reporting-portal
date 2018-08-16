@@ -35,13 +35,13 @@ const styleSheet = (theme) => ({
 });
 
 class UserRowExpanded extends Component {
-    canEdit(userRole, row) {
+    canEdit(userRole, role) {
         switch (userRole) {
             case PRP_ROLE.IP_ADMIN:
             case PRP_ROLE.CLUSTER_IMO:
             case PRP_ROLE.CLUSTER_MEMBER:
             case PRP_ROLE.CLUSTER_SYSTEM_ADMIN:
-                return hasAnyRole(row, EDITABLE_PRP_ROLES[userRole]);
+                return EDITABLE_PRP_ROLES[userRole].indexOf(role.role) > -1;
             default:
                 return false;
         }
@@ -54,7 +54,7 @@ class UserRowExpanded extends Component {
 
         return (
             <Fragment>
-                {this.canEdit(userRole, row) &&
+                {this.canEdit(userRole, role) &&
                 <Fragment>
                     <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
                     <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
