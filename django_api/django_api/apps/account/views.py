@@ -1,5 +1,5 @@
 from django.contrib.auth import login, logout
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -102,7 +102,8 @@ class UserListCreateAPIView(ListCreateAPIView):
             user_workspaces = user.prp_roles.filter(
                 role__in=ip_users_access
             ).values_list('workspace', flat=True).distinct()
-            users_queryset = users_queryset.filter(prp_roles__workspace__in=user_workspaces,
+            users_queryset = users_queryset.filter(Q(prp_roles__workspace__in=user_workspaces) |
+                                                   Q(prp_roles__isnull=True),
                                                    partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()
