@@ -28,7 +28,7 @@ class Partners extends Component {
         this.fetchPartnerDetailsForRows = this.fetchPartnerDetailsForRows.bind(this);
         this.fetchPartnerDetails = this.fetchPartnerDetails.bind(this);
 
-                props.dispatchFetchOptions()
+        props.dispatchFetchOptions()
     }
 
     fetchPartnerDetails(id) {
@@ -43,9 +43,19 @@ class Partners extends Component {
     }
 
     onSave() {
-        const {dispatchInvalidatePartnerDetails, expandedRowIds, reload} = this.props;
-        dispatchInvalidatePartnerDetails(this.state.selectedPartner.id);
-        this.fetchPartnerDetailsForRows(expandedRowIds);
+        const {dispatchInvalidatePartnerDetails, expandedRowIds, reload, handleDialogClose} = this.props;
+
+        handleDialogClose();
+
+        if (this.state.selectedPartner) {
+            const id = this.state.selectedPartner.id;
+
+            this.setState({selectedPartner: null});
+
+            dispatchInvalidatePartnerDetails(id);
+            this.fetchPartnerDetailsForRows(expandedRowIds);
+        }
+
         reload();
     }
 

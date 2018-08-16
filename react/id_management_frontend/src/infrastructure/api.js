@@ -42,14 +42,16 @@ function makeRequest(method, url, data, params) {
             default:
                 const errorDetail = error.response.data.detail ? error.response.data.detail[0] : undefined;
 
-                if (error.response.data.error_codes && typeof error.response.data.error_codes === "object") {
-                    const errors = {
-                        _error: errorDetail
-                    };
-                    throw new SubmissionError(Object.assign({}, error.response.data, errors));
-                }
-                else {
-                    store.dispatch(errorAction(errorDetail));
+                switch (method) {
+                    case 'post':
+                    case 'put':
+                    case 'patch':
+                        const errors = {
+                            _error: errorDetail
+                        };
+                        throw new SubmissionError(Object.assign({}, error.response.data, errors));
+                    default:
+                        store.dispatch(errorAction(errorDetail));
                 }
         }
     });

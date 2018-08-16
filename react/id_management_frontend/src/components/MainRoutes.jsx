@@ -44,8 +44,6 @@ class MainRoutes extends Component {
             }
         ];
 
-        console.log(routes);
-
         const availableRoutes = routes.map(
             (route, idx) =>
                 route.hide ? (

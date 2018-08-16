@@ -54,11 +54,12 @@ export default function fetch(state = {promises: {}, pending: {}}, action) {
 
         case FETCH_INVALIDATE:
             if (action.id) {
+                console.log(state, action);
                 actionPromises = state.promises[action.option] || {};
-                _promises = R.dissoc(actionPromises, action.id);
+                _promises = Object.assign({}, state.promises, {[action.option]: R.dissoc(actionPromises, action.id)});
 
                 actionPending = state.pending[action.option] || {};
-                _pending = R.dissoc(actionPending, action.id);
+                _pending = Object.assign({}, state.pending, {[action.option]: R.dissoc(actionPending, action.id)});
             }
             else {
                 _promises = R.dissoc(action.option, state.promises);
