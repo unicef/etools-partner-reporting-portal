@@ -1,6 +1,7 @@
 import store from "./store";
 import {api} from "./infrastructure/api";
-import {clusters, options, partnerDetails, partners, userProfile, workspaces} from "./actions";
+import {clusters, options, otherAo, partnerDetails, partners, userProfile, workspaces} from "./actions";
+import {PRP_ROLE} from "./constants";
 
 export const FETCH_OPTIONS = {
     CLUSTERS: "CLUSTERS",
@@ -8,7 +9,8 @@ export const FETCH_OPTIONS = {
     USER_PROFILE: "USER_PROFILE",
     WORKSPACES: "WORKSPACES",
     PARTNER_DETAILS: "PARTNER_DETAILS",
-    PARTNERS_OPTIONS: "PARTNERS_OPTIONS"
+    PARTNERS_OPTIONS: "PARTNERS_OPTIONS",
+    OTHER_AO: "OTHER_AO"
 };
 
 export function fetch(option, id) {
@@ -68,11 +70,24 @@ export function fetch(option, id) {
                         ]));
                     });
                 break;
+            case FETCH_OPTIONS.OTHER_AO:
+                promise = api.get("id-management/users/", {
+                    roles: [PRP_ROLE.IP_AUTHORIZED_OFFICER],
+                    page: 1,
+                    page_size: 1,
+                    portal: "IP"
+                })
+                    .then(res => {
+                        dispatch(otherAo(res.data.results.length > 0))
+                    });
+                break;
             default:
                 throw new Error("Invalid fetch option, please see FETCH_OPTIONS in actions.js");
         }
 
-        promise.finally(() => {dispatch(fetchFinished(option, id))});
+        promise.finally(() => {
+            dispatch(fetchFinished(option, id))
+        });
 
         dispatch(fetchRequest(option, promise, id));
     };

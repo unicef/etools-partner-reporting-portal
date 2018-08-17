@@ -149,7 +149,7 @@ class PaginatedList extends Component {
                         totalCount={data.count}
                     />
 
-                    {(showDelete || showEdit) &&
+                    {(showDelete || showEdit || showRestore) &&
                     <EditingState
                         onCommitChanges={() => {
                         }}

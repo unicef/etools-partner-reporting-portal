@@ -10,6 +10,7 @@ import partners from "./partners";
 import partnerDetails from "./partnerDetails";
 import error from "./error";
 import fetch from "./fetch";
+import {otherAo} from "../actions";
 
 const reducers = combineReducers({
     portal: switchPortal,
@@ -22,7 +23,8 @@ const reducers = combineReducers({
     partners,
     partnerDetails,
     error,
-    fetch
+    fetch,
+    otherAo
 });
 
 export default reducers;

@@ -15,7 +15,10 @@ import withSearch from "../hoc/withSearch";
 import {PRP_ROLE, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
 import {user} from "../../helpers/props";
-import {hasOnlyRoles, userRoleInWorkspace} from "../../helpers/user";
+import {hasAnyRole, hasOnlyRoles, userRoleInWorkspace} from "../../helpers/user";
+import AoAlert from "./AoAlert";
+import {FETCH_OPTIONS, fetch} from "../../fetch";
+import {connect} from "react-redux";
 
 const header = "Users";
 const CONFIRM_ACTIONS = {
@@ -36,11 +39,14 @@ const confirmMessages = {
 class Users extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             selectedUser: null,
             selectedPermission: null,
             addUserDialogOpen: false,
-            action: CONFIRM_ACTIONS.DELETE_PERMISSION
+            action: CONFIRM_ACTIONS.DELETE_PERMISSION,
+            filterValues: props.getQuery(),
+            isAo: hasAnyRole(props.user, [PRP_ROLE.IP_AUTHORIZED_OFFICER]),
         };
 
         this.onUserSave = this.onUserSave.bind(this);
@@ -48,6 +54,12 @@ class Users extends Component {
         this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
         this.closeAndReload = this.closeAndReload.bind(this);
+        this.setAoFilter = this.setAoFilter.bind(this);
+        this.onFilterReset = this.onFilterReset.bind(this);
+
+        if (this.state.isAo) {
+            props.fetchOtherAo();
+        }
     }
 
     onUserSave(user) {
@@ -128,8 +140,22 @@ class Users extends Component {
             .then(this.closeAndReload)
     }
 
+    setAoFilter() {
+        this.setState({
+            filterValues: {
+                roles: [PRP_ROLE.IP_AUTHORIZED_OFFICER]
+            }
+        })
+    }
+
+    onFilterReset() {
+        this.setState({filterValues: {}})
+    }
+
     render() {
-        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, getQuery, reload} = this.props;
+        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, reload, otherAo} = this.props;
+
+        const showAoAlert = this.state.isAo && otherAo;
 
         return (
             <div>
@@ -138,7 +164,11 @@ class Users extends Component {
                 </PageHeader>
 
                 <PageContent>
-                    <UsersFilter onChange={filterChange} initialValues={getQuery()}/>
+                    {showAoAlert &&
+                    <AoAlert onClick={this.setAoFilter}/>}
+
+                    <UsersFilter onChange={filterChange} initialValues={this.state.filterValues}
+                                 onReset={this.onFilterReset}/>
                     <UsersList {...listProps}
                                onPermissionsAdd={this.openAddPermissionsDialog}
                                onPermissionEdit={this.openEditPermissionsDialog}
@@ -198,4 +228,18 @@ const getData = (request, user) => (
     })
 );
 
-export default withSearch(getData)(withProps(user)(withDialogHandling(Users)));
+const mapStateToProps = (state) => {
+    const {otherAo} = state;
+
+    return {
+        otherAo
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        fetchOtherAo: () => dispatch(fetch(FETCH_OPTIONS.OTHER_AO))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withSearch(getData)(withProps(user)(withDialogHandling(Users))));

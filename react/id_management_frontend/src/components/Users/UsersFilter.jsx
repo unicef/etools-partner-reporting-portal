@@ -22,13 +22,6 @@ class UsersFilter extends Component {
         }
     }
 
-    reset() {
-        const {destroy, initialize} = this.props;
-
-        destroy();
-        initialize({});
-    }
-
     canFilterPartners() {
         const {user} = this.props;
 
@@ -36,7 +29,7 @@ class UsersFilter extends Component {
     }
 
     render() {
-        const {portal, workspaceOptions, clusterOptions, partnerOptions} = this.props;
+        const {portal, workspaceOptions, clusterOptions, partnerOptions, onReset} = this.props;
 
         const roleOptions = portal === PORTALS.CLUSTER ? PRP_ROLE_CLUSTER_OPTIONS : PRP_ROLE_IP_OPTIONS;
 
@@ -73,7 +66,7 @@ class UsersFilter extends Component {
                         </Grid>}
                     </Grid>
 
-                    <FilterButtons onClear={() => this.reset()}/>
+                    <FilterButtons onClear={onReset}/>
                 </form>
             </GreyPanel>
         );
@@ -92,4 +85,4 @@ export default connect(mapStateToProps)(withProps(
     partnerOptions,
     portal,
     user
-)(reduxForm({form: 'usersFilter'})(UsersFilter)));
+)(reduxForm({form: 'usersFilter', enableReinitialize: true})(UsersFilter)));

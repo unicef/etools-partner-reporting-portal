@@ -56,3 +56,9 @@ export const ERROR = 'ERROR';
 export function error(message) {
     return {type: ERROR, message};
 }
+
+export const OTHER_AO = 'OTHER_AO';
+
+export function otherAo(isPresent) {
+    return {type: OTHER_AO, isPresent};
+}
