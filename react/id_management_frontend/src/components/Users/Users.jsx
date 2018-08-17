@@ -51,9 +51,18 @@ class Users extends Component {
             isAo: hasAnyRole(props.user, [PRP_ROLE.IP_AUTHORIZED_OFFICER]),
         };
 
+        this.listEventListeners = {
+            onPermissionsAdd: this.openAddPermissionsDialog.bind(this),
+            onPermissionEdit: this.openEditPermissionsDialog.bind(this),
+            onPermissionDelete: this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION),
+            onRemoveIpAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN),
+            onMakeIpAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN),
+            onDelete: this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER),
+            onRestore: this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER),
+            onMakeSystemAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN)
+        };
+
         this.onUserSave = this.onUserSave.bind(this);
-        this.openAddPermissionsDialog = this.openAddPermissionsDialog.bind(this);
-        this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
         this.closeAndReload = this.closeAndReload.bind(this);
         this.setAoFilter = this.setAoFilter.bind(this);
@@ -183,15 +192,7 @@ class Users extends Component {
 
                     <UsersFilter onChange={filterChange} initialValues={this.state.filterValues}
                                  onReset={this.onFilterReset}/>
-                    <UsersList {...listProps}
-                               onPermissionsAdd={this.openAddPermissionsDialog}
-                               onPermissionEdit={this.openEditPermissionsDialog}
-                               onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}
-                               onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
-                               onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}
-                               onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}
-                               onRestore={this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER)}
-                               onMakeSystemAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN)}/>
+                    <UsersList {...listProps} {...this.listEventListeners}/>
                 </PageContent>
 
                 {this.state.selectedUser &&
