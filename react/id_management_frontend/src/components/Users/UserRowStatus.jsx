@@ -54,7 +54,7 @@ class UserRowStatus extends Component {
                 <Grid item>
                     {statusLabel[row.status]}
                     {row.is_incomplete &&
-                    <Tooltip title={incompleteMessage} placement="top">
+                    <Tooltip title={incompleteMessage}>
                         <span className={classes.incomplete}>{`(${statusLabel["INCOMPLETE"]})`}</span>
                     </Tooltip>}
                 </Grid>
