@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Dialog from "../common/Dialog";
 import DialogActions from "../common/DialogActions";
-import {Button, Grid} from "@material-ui/core";
+import {Button, Grid, Typography} from "@material-ui/core";
 import {reduxForm} from 'redux-form';
 import labels from "../../labels";
 import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
@@ -43,7 +43,7 @@ class EditPermissionDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, onClose, roleOptions, portal} = this.props;
+        const {open, handleSubmit, onClose, roleOptions, portal, error} = this.props;
 
         return (
             <Dialog
@@ -66,6 +66,8 @@ class EditPermissionDialog extends Component {
                                         values={roleOptions}/>
                         </Grid>
                     </Grid>
+
+                    {error && <Typography color="error" variant="body2">{error}</Typography>}
 
                     <DialogActions>
                         <Button onClick={onClose}>{labels.cancel}</Button>

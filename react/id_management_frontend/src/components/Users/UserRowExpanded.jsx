@@ -36,26 +36,26 @@ const styleSheet = (theme) => ({
 });
 
 class UserRowExpanded extends Component {
-    canEdit(userRole, role) {
+    canEdit(userRole, role, row) {
         switch (userRole) {
             case PRP_ROLE.IP_ADMIN:
             case PRP_ROLE.CLUSTER_IMO:
             case PRP_ROLE.CLUSTER_MEMBER:
             case PRP_ROLE.CLUSTER_SYSTEM_ADMIN:
-                return EDITABLE_PRP_ROLES[userRole].indexOf(role.role) > -1;
+                return row.status !== "DEACTIVATED" && EDITABLE_PRP_ROLES[userRole].indexOf(role.role) > -1;
             default:
                 return false;
         }
     }
 
-    getActions(role) {
+    getActions(role, row) {
         const {user, onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, portal} = this.props;
 
         const userRole = getUserRole(user, role, portal);
 
         return (
             <Fragment>
-                {this.canEdit(userRole, role) &&
+                {this.canEdit(userRole, role, row) &&
                 <Fragment>
                     <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
                     <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
@@ -103,7 +103,7 @@ class UserRowExpanded extends Component {
                 <Typography variant="caption" gutterBottom>{roleCaption[portal]}</Typography>}
 
                 {roles.map(role => (
-                    <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
+                    <UserRoleControl key={role.id} role={role} actions={this.getActions(role, row)}/>
                 ))}
 
                 {this.canAdd(user, row) &&

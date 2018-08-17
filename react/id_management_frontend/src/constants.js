@@ -99,17 +99,20 @@ export const EDITABLE_USER_TYPES = {
     "RESTRICTED": [USER_TYPE.PARTNER]
 };
 
-const editableOptions = (editable, options) => {
+const editableOptions = (editable, options, additions) => {
     let _options = {};
 
     for (let prop in editable) {
-        _options[prop] = options.filter(option => editable[prop].indexOf(option.value) > -1)
+        let _editable = additions ? editable[prop].concat(additions[prop] || []) : editable[prop];
+        _options[prop] = options.filter(option => _editable.indexOf(option.value) > -1)
     }
 
     return _options;
 };
 
-export const EDITABLE_PRP_ROLE_OPTIONS = editableOptions(EDITABLE_PRP_ROLES, PRP_ROLE_OPTIONS);
+export const EDITABLE_PRP_ROLE_OPTIONS = editableOptions(EDITABLE_PRP_ROLES, PRP_ROLE_OPTIONS, {
+    [PRP_ROLE.IP_ADMIN]: [PRP_ROLE.IP_ADMIN]
+});
 
 export const EDITABLE_USER_TYPE_OPTIONS = editableOptions(EDITABLE_USER_TYPES, USER_TYPE_OPTIONS);
 
