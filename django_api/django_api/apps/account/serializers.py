@@ -66,11 +66,9 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
     user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
+    is_incomplete = serializers.SerializerMethodField(read_only=True)
 
     def get_status(self, obj):
-        if not obj.role_list:
-            return USER_STATUS_TYPES.incomplete
-
         if obj.is_active:
             if obj.last_login:
                 return USER_STATUS_TYPES.active
@@ -78,6 +76,9 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
                 return USER_STATUS_TYPES.invited
         else:
             return USER_STATUS_TYPES.deactivated
+
+    def get_is_incomplete(self, obj):
+        return not bool(obj.role_list)
 
     class Meta:
         model = User
@@ -87,6 +88,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
             'organization', 'prp_roles',
             'position', 'last_login',
             'status', 'user_type',
+            'is_incomplete',
         )
 
     @transaction.atomic
