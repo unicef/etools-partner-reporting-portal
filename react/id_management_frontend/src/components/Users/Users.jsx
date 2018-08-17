@@ -26,14 +26,16 @@ const CONFIRM_ACTIONS = {
     MAKE_IP_ADMIN: "MAKE_IP_ADMIN",
     REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN",
     DISABLE_USER: "DISABLE_USER",
-    ENABLE_USER: "ENABLE_USER"
+    ENABLE_USER: "ENABLE_USER",
+    MAKE_CLUSTER_ADMIN: "MAKE_CLUSTER_ADMIN"
 };
 const confirmMessages = {
     [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove this role for this user?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
     [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
     [CONFIRM_ACTIONS.DISABLE_USER]: "Are you sure you want to disable this user?",
-    [CONFIRM_ACTIONS.ENABLE_USER]: "Are you sure you want to enable this user?"
+    [CONFIRM_ACTIONS.ENABLE_USER]: "Are you sure you want to enable this user?",
+    [CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN]: "Are you sure you want to make this user an Cluster Admin?"
 };
 
 class Users extends Component {
@@ -86,6 +88,7 @@ class Users extends Component {
         return (item) => {
             switch (action) {
                 case CONFIRM_ACTIONS.DISABLE_USER:
+                case CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN:
                     this.setState({action, selectedUser: item});
                     break;
                 default:
@@ -113,6 +116,14 @@ class Users extends Component {
             .then(this.closeAndReload)
     }
 
+    makeClusterAdmin(user) {
+        api.post(`id-management/role-group/`, {
+            user_id: user.id,
+            prp_roles: [{role: PRP_ROLE.CLUSTER_SYSTEM_ADMIN}]
+        })
+            .then(this.closeAndReload)
+    }
+
     onConfirm() {
         switch (this.state.action) {
             case CONFIRM_ACTIONS.MAKE_IP_ADMIN:
@@ -123,6 +134,9 @@ class Users extends Component {
                 break;
             case CONFIRM_ACTIONS.ENABLE_USER:
                 this.enableUser(this.state.selectedUser);
+                break;
+            case CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN:
+                this.makeClusterAdmin(this.state.selectedUser);
                 break;
             default:
                 this.deletePermission(this.state.selectedPermission);
@@ -176,7 +190,8 @@ class Users extends Component {
                                onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
                                onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}
                                onDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER)}
-                               onRestore={this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER)}/>
+                               onRestore={this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER)}
+                               onMakeSystemAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN)}/>
                 </PageContent>
 
                 {this.state.selectedUser &&

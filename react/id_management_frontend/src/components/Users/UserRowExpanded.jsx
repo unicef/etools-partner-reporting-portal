@@ -17,7 +17,8 @@ const labels = getLabels({
     makeIpAdmin: "(make IP admin)",
     edit: "edit",
     delete: "delete",
-    addPermission: "Add new permission"
+    addPermission: "Add new permission",
+    makeSystemAdmin: "Make system admin"
 });
 
 const roleCaption = {
@@ -72,17 +73,21 @@ class UserRowExpanded extends Component {
     }
 
     canAdd(user, row) {
-        return  row.status !== "DEACTIVATED" && row.user_type !== USER_TYPE.CLUSTER_ADMIN && hasAnyRole(user, [
-             PRP_ROLE.IP_ADMIN,
-             PRP_ROLE.IP_AUTHORIZED_OFFICER,
-             PRP_ROLE.CLUSTER_IMO,
-             PRP_ROLE.CLUSTER_MEMBER,
-             PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+        return row.status !== "DEACTIVATED" && row.user_type !== USER_TYPE.CLUSTER_ADMIN && hasAnyRole(user, [
+            PRP_ROLE.IP_ADMIN,
+            PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            PRP_ROLE.CLUSTER_IMO,
+            PRP_ROLE.CLUSTER_MEMBER,
+            PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ]);
     }
 
+    isSystemAdmin(user) {
+        return hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN]);
+    }
+
     render() {
-        const {user, row, portal, classes, onPermissionsAdd} = this.props;
+        const {user, row, portal, classes, onPermissionsAdd, onMakeSystemAdmin} = this.props;
         const roles = row.prp_roles;
         const userTypeLabel = row.user_type ? getUserTypeLabel(row.user_type) : null;
 
@@ -103,6 +108,12 @@ class UserRowExpanded extends Component {
 
                 {this.canAdd(user, row) &&
                 <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>{labels.addPermission}</PlainButton>}
+
+                {this.isSystemAdmin(user) && !this.isSystemAdmin(row) &&
+                <div>
+                    <PlainButton color="primary"
+                                 onClick={() => onMakeSystemAdmin(row)}>{labels.makeSystemAdmin}</PlainButton>
+                </div>}
             </div>
         );
     }

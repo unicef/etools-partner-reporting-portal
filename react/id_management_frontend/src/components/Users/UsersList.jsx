@@ -57,7 +57,18 @@ class UsersList extends Component {
     }
 
     render() {
-        const {portal, data, onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, user, ...otherProps} = this.props;
+        const {
+            portal,
+            data,
+            onPermissionEdit,
+            onPermissionDelete,
+            onPermissionsAdd,
+            onRemoveIpAdmin,
+            onMakeIpAdmin,
+            user,
+            onMakeSystemAdmin,
+            ...otherProps
+        } = this.props;
 
         const removableItems = data.results.filter(item => item.canBeDeleted);
         const restorebleItems = data.results.filter(item => item.canBeRestored);
@@ -79,6 +90,7 @@ class UsersList extends Component {
                                          onPermissionsAdd={onPermissionsAdd}
                                          onRemoveIpAdmin={onRemoveIpAdmin}
                                          onMakeIpAdmin={onMakeIpAdmin}
+                                         onMakeSystemAdmin={onMakeSystemAdmin}
                         />
                     )}
                 />
