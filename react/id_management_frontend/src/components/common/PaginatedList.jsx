@@ -24,6 +24,7 @@ import Close from "@material-ui/icons/Close";
 import Edit from "@material-ui/icons/Edit";
 import Restore from "@material-ui/icons/SettingsBackupRestore";
 import LoadingIndicator from "./LoadingIndicator";
+import orange from "@material-ui/core/colors/orange";
 
 const allowedPageSizes = [5, 10, 15];
 
@@ -45,6 +46,17 @@ const styleSheet = (theme) => {
         }
     }
 };
+
+const highlightStyle = {
+    backgroundColor: orange[100]
+};
+
+const TableRow = ({ row, ...restProps }) => (
+  <Table.Row
+    {...restProps}
+    style={row.highlight ? highlightStyle : {}}
+  />
+);
 
 const DeleteButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Delete row">
@@ -155,7 +167,7 @@ class PaginatedList extends Component {
                         }}
                     />}
 
-                    <Table/>
+                    <Table rowComponent={TableRow}/>
                     <TableHeaderRow/>
                     <RowDetailState expandedRowIds={expandedRowIds}
                                     onExpandedRowIdsChange={this.onExpandedRowIdsChange}/>

@@ -221,6 +221,7 @@ const getData = (request, user) => (
                     item.name = fullName(item);
                     item.canBeDeleted = item.status !== "DEACTIVATED" && canDelete(user, item);
                     item.canBeRestored = item.status === "DEACTIVATED" && canDelete(user, item);
+                    item.highlight = item.is_incomplete
                 });
 
                 resolve(res.data);

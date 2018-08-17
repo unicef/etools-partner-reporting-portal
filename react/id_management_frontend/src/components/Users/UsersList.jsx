@@ -4,47 +4,16 @@ import UserRowExpanded from "./UserRowExpanded";
 import {PORTALS} from "../../actions";
 import * as R from 'ramda';
 import {date} from "../../helpers/filters";
-import {FiberManualRecord as Dot} from "@material-ui/icons";
-import {red, green, grey} from "@material-ui/core/colors";
-import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
 import {portal, user} from "../../helpers/props";
 import {PRP_ROLE} from "../../constants";
 import {hasAnyRole} from "../../helpers/user";
-
-const statusColor = {
-    ACTIVE: green[500],
-    INVITED: red[500],
-    DEACTIVATED: grey[900],
-    INCOMPLETE: red[500]
-};
-
-const statusLabel = {
-    ACTIVE: "Active",
-    INVITED: "Invited",
-    DEACTIVATED: "Deactivated",
-    INCOMPLETE: "Incomplete"
-};
+import UserRowStatus from "./UserRowStatus";
 
 class UsersList extends Component {
-    renderDot(status) {
-        const dotStyle = {
-            color: statusColor[status],
-            fontSize: '16px',
-            marginRight: 5
-        };
-
-        return <Dot style={dotStyle}/>
-    }
-
     renderStatus(row) {
         return (
-            <Grid container alignItems="center">
-                <Grid item component={() => this.renderDot(row.status)}/>
-                <Grid item>
-                    {statusLabel[row.status]}
-                </Grid>
-            </Grid>
+            <UserRowStatus row={row}/>
         )
     }
 
