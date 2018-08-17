@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -42,4 +43,12 @@ class AppButton extends Component {
     }
 }
 
+AppButton.propTypes = {
+    classes: PropTypes.object.isRequired,
+    disabled: PropTypes.bool,
+    name: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired
+};
+
 export default withStyles(styleSheet)(AppButton);
+

@@ -1,12 +1,13 @@
-import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
+import PropTypes from 'prop-types'
+import React, {Component} from "react";
+import {NavLink} from "react-router-dom";
 import Group from "@material-ui/icons/Group";
 import Business from "@material-ui/icons/Business";
-import { PORTALS } from "../../actions";
+import {PORTALS} from "../../actions";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import { withStyles } from "@material-ui/core/styles";
-import { Typography, Grid } from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
+import {Typography, Grid} from "@material-ui/core";
 import withProps from "../hoc/withProps";
 import {portal, user} from "../../helpers/props";
 import {hasPartnersAccess} from "../../helpers/user";
@@ -34,7 +35,7 @@ const styleSheet = theme => ({
 
 class MainMenu extends Component {
     render() {
-        const { portal, match, classes, user } = this.props;
+        const {portal, match, classes, user} = this.props;
 
         const menuOptions = [
             {
@@ -56,7 +57,7 @@ class MainMenu extends Component {
                     <ListItem key={idx} className={classes.listItem}>
                         <NavLink to={option.url} className={classes.menuLink}>
                             <Grid container alignItems="center">
-                                <option.icon className={classes.icon} />
+                                <option.icon className={classes.icon}/>
                                 <Typography variant="body2" color="inherit">
                                     {option.label}
                                 </Typography>
@@ -70,4 +71,12 @@ class MainMenu extends Component {
     }
 }
 
+MainMenu.propTypes = {
+    classes: PropTypes.object.isRequired,
+    match: PropTypes.object.isRequired,
+    portal: PropTypes.string,
+    user: PropTypes.object
+};
+
 export default withProps(portal, user)(withStyles(styleSheet)(MainMenu));
+

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import ProfileButton from "./ProfileButton";
 import {Menu, MenuItem, ListItemIcon, ListItemText} from "@material-ui/core";
@@ -57,4 +58,14 @@ class ProfileMenu extends Component {
     }
 }
 
+ProfileMenu.propTypes = {
+    anchorEl: PropTypes.any,
+    dialogOpen: PropTypes.object.isRequired,
+    handleClick: PropTypes.func.isRequired,
+    handleClose: PropTypes.func.isRequired,
+    handleDialogClose: PropTypes.func.isRequired,
+    handleDialogOpen: PropTypes.func.isRequired
+};
+
 export default withDialogHandling(withMenu(ProfileMenu));
+

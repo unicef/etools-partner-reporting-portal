@@ -35,6 +35,7 @@ class AoAlert extends Component {
 }
 
 AoAlert.propTypes = {
+    classes: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired
 };
 

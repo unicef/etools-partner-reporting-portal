@@ -43,8 +43,7 @@ MenuSelect.propTypes = {
         })
     ).isRequired,
     onChange: PropTypes.func.isRequired,
-    value: PropTypes.any.isRequired,
-    nullable: PropTypes.bool
+    value: PropTypes.any.isRequired
 };
 
 export default MenuSelect;

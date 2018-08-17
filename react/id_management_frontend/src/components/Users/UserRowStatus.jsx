@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import Grid from "@material-ui/core/Grid";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -63,4 +64,10 @@ class UserRowStatus extends Component {
     }
 }
 
+UserRowStatus.propTypes = {
+    classes: PropTypes.object.isRequired,
+    row: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(UserRowStatus);
+

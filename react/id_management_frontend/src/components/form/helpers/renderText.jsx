@@ -4,20 +4,22 @@ import {FormControl} from '@material-ui/core/';
 import FieldLabelWithTooltipIcon from '../../common/FieldLabelWithTooltip';
 import React from 'react';
 
-export const renderText = ({
-                               className,
-                               input,
-                               values,
-                               optional,
-                               label,
-                               infoText,
-                               date,
-                               meta,
-                               multiline,
-                               inputProps,
-                               InputProps,
-                               ...other
-                           }) => {
+export const renderText = (
+    {
+        className,
+        input,
+        values,
+        optional,
+        label,
+        infoText,
+        date,
+        meta,
+        multiline,
+        inputProps,
+        InputProps,
+        ...other
+    }
+) => {
     let value = (!R.isNil(input.value) && !R.isEmpty(input.value))
         ? input.value
         : (InputProps

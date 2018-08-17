@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import MainBackButton from "./MainBackButton";
 import {withStyles} from "@material-ui/core/styles";
@@ -44,4 +45,11 @@ class MainSideBar extends Component {
     }
 }
 
+MainSideBar.propTypes = {
+    classes: PropTypes.object.isRequired,
+    match: PropTypes.object.isRequired,
+    portalName: PropTypes.string
+};
+
 export default withStyles(styleSheet)(MainSideBar);
+

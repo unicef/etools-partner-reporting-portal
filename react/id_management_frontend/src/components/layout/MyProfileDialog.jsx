@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component, Fragment} from "react";
 import {getLabels} from "../../labels";
 import Dialog from "../common/Dialog";
@@ -117,4 +118,14 @@ const mapStateToProps = (state) => {
     }
 };
 
+MyProfileDialog.propTypes = {
+    clusterOptions: PropTypes.array,
+    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    portal: PropTypes.string,
+    prp_roles: PropTypes.array,
+    workspaceOptions: PropTypes.array
+};
+
 export default connect(mapStateToProps)(withProps(workspaceOptions, clusterOptions, portal)((reduxForm({form: "myProfile"})(MyProfileDialog))));
+

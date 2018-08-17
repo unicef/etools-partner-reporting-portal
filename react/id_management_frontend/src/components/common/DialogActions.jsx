@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {DialogActions as MDialogActions} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
@@ -20,4 +21,10 @@ class DialogActions extends Component {
     }
 }
 
+DialogActions.propTypes = {
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(DialogActions);
+

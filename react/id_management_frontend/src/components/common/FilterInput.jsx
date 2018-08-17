@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
@@ -20,4 +21,10 @@ class FilterInput extends Component {
     }
 }
 
+FilterInput.propTypes = {
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(FilterInput);
+

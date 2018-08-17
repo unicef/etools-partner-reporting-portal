@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import PageHeader from "../common/PageHeader";
 import ButtonNew from "../common/ButtonNew";
@@ -259,4 +260,18 @@ const mapDispatchToProps = dispatch => {
     }
 };
 
+Users.propTypes = {
+    dialogOpen: PropTypes.object.isRequired,
+    fetchOtherAo: PropTypes.func.isRequired,
+    filterChange: PropTypes.func,
+    getQuery: PropTypes.func.isRequired,
+    handleDialogClose: PropTypes.func.isRequired,
+    handleDialogOpen: PropTypes.func.isRequired,
+    listProps: PropTypes.object.isRequired,
+    otherAo: PropTypes.bool,
+    reload: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired
+};
+
 export default connect(mapStateToProps, mapDispatchToProps)(withSearch(getData)(withProps(user)(withDialogHandling(Users))));
+

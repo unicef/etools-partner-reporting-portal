@@ -65,11 +65,13 @@ class Dialog extends Component {
 }
 
 Dialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
     caption: PropTypes.string,
-    loading: PropTypes.bool
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired,
+    loading: PropTypes.bool,
+    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    title: PropTypes.string.isRequired
 };
 
 export default withStyles(styleSheet)(Dialog);

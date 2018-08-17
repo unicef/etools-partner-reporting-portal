@@ -1,6 +1,7 @@
-import React, { Component } from "react";
-import { Grid, Paper, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import PropTypes from 'prop-types'
+import React, {Component} from "react";
+import {Grid, Paper, Typography} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
 
 const styleSheet = theme => ({
     header: {
@@ -12,7 +13,7 @@ const styleSheet = theme => ({
 
 class PageHeader extends Component {
     render() {
-        const { children, classes } = this.props;
+        const {children, classes} = this.props;
 
         return (
             <Paper square className={classes.header} elevation={1}>
@@ -26,4 +27,10 @@ class PageHeader extends Component {
     }
 }
 
+PageHeader.propTypes = {
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(PageHeader);
+

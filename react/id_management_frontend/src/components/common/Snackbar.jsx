@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import SnackbarContentWrapper from "./SnackbarContentWrapper";
 import MSnackbar from "@material-ui/core/Snackbar";
@@ -28,4 +29,12 @@ class Snackbar extends Component {
     }
 }
 
+Snackbar.propTypes = {
+    message: PropTypes.string,
+    onClose: PropTypes.func,
+    open: PropTypes.bool,
+    variant: PropTypes.string
+};
+
 export default Snackbar;
+

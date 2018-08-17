@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import PageHeader from "../common/PageHeader";
 import ButtonNew from "../common/ButtonNew";
@@ -127,4 +128,20 @@ const getData = (request) => (
     })
 );
 
+Partners.propTypes = {
+    dialogOpen: PropTypes.object.isRequired,
+    dispatchFetchOptions: PropTypes.func.isRequired,
+    dispatchFetchPartnerDetails: PropTypes.func.isRequired,
+    dispatchInvalidatePartnerDetails: PropTypes.func.isRequired,
+    expandedRowIds: PropTypes.array.isRequired,
+    filterChange: PropTypes.func,
+    getQuery: PropTypes.func.isRequired,
+    handleDialogClose: PropTypes.func.isRequired,
+    handleDialogOpen: PropTypes.func.isRequired,
+    listProps: PropTypes.object.isRequired,
+    optionsLoading: PropTypes.bool,
+    reload: PropTypes.func.isRequired
+};
+
 export default withSearch(getData)(connect(mapStateToProps, mapDispatchToProps)(withDialogHandling(Partners)));
+

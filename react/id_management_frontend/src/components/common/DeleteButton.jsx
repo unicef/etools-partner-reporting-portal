@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "./PlainButton";
 import Delete from "@material-ui/icons/Delete";
+import PropTypes from "prop-types";
 
 const styleSheet = theme => ({
     icon: {
@@ -18,5 +19,10 @@ class DeleteButton extends Component {
         );
     }
 }
+
+DeleteButton.propTypes = {
+    classes: PropTypes.object.isRequired,
+    onClick: PropTypes.func
+};
 
 export default withStyles(styleSheet)(DeleteButton);

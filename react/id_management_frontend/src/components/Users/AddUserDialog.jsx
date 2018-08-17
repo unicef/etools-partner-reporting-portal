@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import Dialog from "../common/Dialog";
 import DialogActions from "../common/DialogActions";
@@ -114,6 +115,18 @@ class AddUserDialog extends Component {
     }
 }
 
+AddUserDialog.propTypes = {
+    handleSubmit: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    partnerOptions: PropTypes.array,
+    portal: PropTypes.string,
+    reset: PropTypes.func.isRequired,
+    user: PropTypes.object,
+    user_type: PropTypes.string
+};
+
 const mapStateToProps = (state) => {
     return {
         user_type: selector(state, "user_type")
@@ -121,3 +134,4 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps)(withProps(portal, partnerOptions, user)(reduxForm({form: formName})(AddUserDialog)));
+

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import Dialog from "../common/Dialog";
 import DialogActions from "../common/DialogActions";
@@ -71,4 +72,15 @@ class AddPermissionsDialog extends Component {
     }
 }
 
+AddPermissionsDialog.propTypes = {
+    error: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    reset: PropTypes.func.isRequired,
+    user: PropTypes.object
+};
+
 export default reduxForm({form: "addPermissionsForm", initialValues: {prp_roles: [{}]}})(AddPermissionsDialog);
+

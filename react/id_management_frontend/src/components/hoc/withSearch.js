@@ -5,6 +5,22 @@ import {expandedRowIds} from "../../actions";
 import {connect} from "react-redux";
 import {PORTAL_TYPE} from "../../constants";
 
+/*
+    withSearch adds default search functionality to a component
+    @param {function} getDataFn should provide data in a form presented below
+
+    {
+        count: Int,
+        results: Array<Object>
+    }
+
+    the component adds following props:
+    Object: listProps - should then be passed to PaginatedList component
+    Function: reload() - force reloading existing page
+    Function: getQuery() - get URL params
+    Function: filterChange(filter) - debounced function that should be called on filter value changes
+ */
+
 const firstPage = 1;
 const arrayFormat = 'bracket';
 
@@ -108,7 +124,7 @@ export default (getDataFn) => {
                     return (
                         <WrappedComponent
                             filterChange={this.filterChange}
-                            reload={this.reload}
+                            reload={() => this.reload()}
                             getQuery={this.getQuery}
                             listProps={listProps}
                             {...this.props}

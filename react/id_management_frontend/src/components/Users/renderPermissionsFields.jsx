@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
 import SelectForm from "../form/SelectForm";
@@ -98,4 +99,14 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
     )
 };
 
+renderPermissionsFields.propTypes = {
+    clusterOptions: PropTypes.array,
+    fields: PropTypes.any.isRequired,
+    portal: PropTypes.string,
+    selectedUser: PropTypes.object,
+    user: PropTypes.object,
+    workspaceOptions: PropTypes.array
+};
+
 export default withProps(clusterOptions, workspaceOptions, portal, user)(renderPermissionsFields);
+

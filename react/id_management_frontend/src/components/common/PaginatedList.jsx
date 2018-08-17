@@ -51,16 +51,16 @@ const highlightStyle = {
     backgroundColor: orange[100]
 };
 
-const TableRow = ({ row, ...restProps }) => (
-  <Table.Row
-    {...restProps}
-    style={row.highlight ? highlightStyle : {}}
-  />
+const TableRow = ({row, ...restProps}) => (
+    <Table.Row
+        {...restProps}
+        style={row.highlight ? highlightStyle : {}}
+    />
 );
 
 const DeleteButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Delete row">
-        <Close />
+        <Close/>
     </IconButton>
 );
 
@@ -198,9 +198,12 @@ PaginatedList.propTypes = {
     onPageChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func,
     showDelete: PropTypes.bool,
+    showRestore: PropTypes.bool,
+    loading: PropTypes.bool,
     onEdit: PropTypes.func,
     showEdit: PropTypes.bool,
     onExpandedRowIdsChange: PropTypes.func,
+    classes: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => {

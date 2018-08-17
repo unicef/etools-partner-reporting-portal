@@ -10,7 +10,7 @@ import partners from "./partners";
 import partnerDetails from "./partnerDetails";
 import error from "./error";
 import fetch from "./fetch";
-import {otherAo} from "../actions";
+import otherAo from "./otherAo";
 
 const reducers = combineReducers({
     portal: switchPortal,

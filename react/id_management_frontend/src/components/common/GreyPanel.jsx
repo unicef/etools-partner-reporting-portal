@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 
@@ -20,4 +21,10 @@ class GreyPanel extends Component {
     }
 }
 
+GreyPanel.propTypes = {
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(GreyPanel);
+

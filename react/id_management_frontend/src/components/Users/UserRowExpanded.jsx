@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component, Fragment} from "react";
 import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
@@ -119,4 +120,18 @@ class UserRowExpanded extends Component {
     }
 }
 
+UserRowExpanded.propTypes = {
+    classes: PropTypes.object.isRequired,
+    onMakeIpAdmin: PropTypes.func.isRequired,
+    onMakeSystemAdmin: PropTypes.func.isRequired,
+    onPermissionDelete: PropTypes.func.isRequired,
+    onPermissionEdit: PropTypes.func.isRequired,
+    onPermissionsAdd: PropTypes.func.isRequired,
+    onRemoveIpAdmin: PropTypes.func.isRequired,
+    portal: PropTypes.string,
+    row: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired
+};
+
 export default withProps(portal, user)(withStyles(styleSheet)(UserRowExpanded));
+

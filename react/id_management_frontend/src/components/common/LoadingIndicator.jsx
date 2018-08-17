@@ -29,7 +29,8 @@ class LoadingIndicator extends Component {
 }
 
 LoadingIndicator.propTypes = {
-    absolute: PropTypes.bool
+    absolute: PropTypes.bool,
+    classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styleSheet)(LoadingIndicator);

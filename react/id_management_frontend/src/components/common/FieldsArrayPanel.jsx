@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 
@@ -19,4 +20,10 @@ class FieldsArrayPanel extends Component {
     }
 }
 
+FieldsArrayPanel.propTypes = {
+    children: PropTypes.any.isRequired,
+    classes: PropTypes.object.isRequired
+};
+
 export default withStyles(styleSheet)(FieldsArrayPanel);
+

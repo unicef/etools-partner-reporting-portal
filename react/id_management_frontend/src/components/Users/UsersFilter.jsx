@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import GreyPanel from "../common/GreyPanel";
 import Grid from "@material-ui/core/Grid";
@@ -73,6 +74,16 @@ class UsersFilter extends Component {
     }
 }
 
+UsersFilter.propTypes = {
+    clusterOptions: PropTypes.array,
+    onReset: PropTypes.func.isRequired,
+    partnerOptions: PropTypes.array,
+    portal: PropTypes.string,
+    reset: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+    workspaceOptions: PropTypes.array
+};
+
 const mapStateToProps = (state, ownProps) => {
     return {
         initialValues: ownProps.initialValues
@@ -86,3 +97,4 @@ export default connect(mapStateToProps)(withProps(
     portal,
     user
 )(reduxForm({form: 'usersFilter', enableReinitialize: true})(UsersFilter)));
+

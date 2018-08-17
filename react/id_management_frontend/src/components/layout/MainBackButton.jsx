@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import Button from "@material-ui/core/Button";
 import ArrowBack from "@material-ui/icons/ArrowBack";
@@ -47,4 +48,10 @@ class MainBackButton extends Component {
     }
 }
 
+MainBackButton.propTypes = {
+    classes: PropTypes.object.isRequired,
+    portal: PropTypes.string
+};
+
 export default withProps(portal)(withStyles(styleSheet)(MainBackButton));
+

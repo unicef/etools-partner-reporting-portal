@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import MainAppBar from "./layout/MainAppBar";
 import MainSideBar from "./layout/MainSideBar";
@@ -124,6 +125,18 @@ class Main extends Component {
     }
 }
 
+Main.propTypes = {
+    dispatchError: PropTypes.func.isRequired,
+    dispatchSwitchPortal: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    fetchData: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
+    initialized: PropTypes.bool,
+    location: PropTypes.object.isRequired,
+    portal: PropTypes.string,
+    user: PropTypes.object
+};
+
 const mapStateToProps = (state) => {
     const {error, fetch: {pending}} = state;
 
@@ -148,3 +161,4 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withProps(user, portal)(Main)));
+

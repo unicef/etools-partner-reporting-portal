@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import {withStyles} from "@material-ui/core/styles";
 import mainStyles from "../../styles/mainStyles";
@@ -66,4 +67,10 @@ class MainAppBar extends Component {
     }
 }
 
+MainAppBar.propTypes = {
+    classes: PropTypes.object.isRequired,
+    user: PropTypes.object
+};
+
 export default withProps(user)(withStyles(styleSheet, {name: "MainAppBar"})(MainAppBar));
+

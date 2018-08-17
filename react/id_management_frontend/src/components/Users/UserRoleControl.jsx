@@ -32,6 +32,8 @@ class UserRoleControl extends Component {
 }
 
 UserRoleControl.propTypes = {
+    actions: PropTypes.any,
+    portal: PropTypes.string,
     role: PropTypes.object.isRequired
 };
 

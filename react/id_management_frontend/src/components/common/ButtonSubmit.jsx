@@ -34,6 +34,7 @@ class ButtonSubmit extends Component {
 }
 
 ButtonSubmit.propTypes = {
+    classes: PropTypes.object.isRequired,
     label: PropTypes.string,
     loading: PropTypes.bool
 };

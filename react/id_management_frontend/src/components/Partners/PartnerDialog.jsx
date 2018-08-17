@@ -190,10 +190,18 @@ class PartnerDialog extends Component {
 }
 
 PartnerDialog.propTypes = {
-    partner: PropTypes.object,
-    open: PropTypes.bool,
+    clusterOptions: PropTypes.array,
+    csoTypeOptions: PropTypes.array,
+    dataLoading: PropTypes.bool,
+    handleSubmit: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    partner: PropTypes.object,
+    partnerTypeOptions: PropTypes.array,
+    reset: PropTypes.func.isRequired,
+    sharedPartnerOptions: PropTypes.array,
+    title: PropTypes.string
 };
 
 const title = {

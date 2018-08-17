@@ -80,7 +80,14 @@ class EditPermissionDialog extends Component {
 }
 
 EditPermissionDialog.propTypes = {
-    permission: PropTypes.object
+    error: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    open: PropTypes.bool,
+    permission: PropTypes.object,
+    portal: PropTypes.string,
+    roleOptions: PropTypes.array
 };
 
 const mapStateToProps = (state, ownProps) => {

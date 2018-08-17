@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import GreyPanel from "../common/GreyPanel";
 import Grid from "@material-ui/core/Grid";
@@ -50,6 +51,13 @@ class PartnersFilter extends Component {
     }
 }
 
+PartnersFilter.propTypes = {
+    clusterOptions: PropTypes.array,
+    destroy: PropTypes.func.isRequired,
+    initialize: PropTypes.func.isRequired,
+    partnerTypeOptions: PropTypes.array
+};
+
 const mapStateToProps = (state, ownProps) => {
     return {
         initialValues: ownProps.initialValues
@@ -60,3 +68,4 @@ export default connect(mapStateToProps)(reduxForm({form: 'partnersFilter'})(with
     partnerTypeOptions,
     clusterOptions
 )(PartnersFilter)));
+

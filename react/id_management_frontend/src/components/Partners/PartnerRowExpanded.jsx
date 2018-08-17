@@ -77,6 +77,8 @@ class PartnerRowExpanded extends Component {
 }
 
 PartnerRowExpanded.propTypes = {
+    classes: PropTypes.object.isRequired,
+    data: PropTypes.object,
     row: PropTypes.object.isRequired
 };
 

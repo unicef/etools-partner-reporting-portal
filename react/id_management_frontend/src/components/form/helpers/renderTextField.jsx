@@ -4,16 +4,18 @@ import TextField from '@material-ui/core/TextField';
 import {FormControl, FormHelperText} from '@material-ui/core';
 import FieldLabelWithTooltipIcon from '../../common/FieldLabelWithTooltip';
 
-export const renderTextField = ({
-                                    name,
-                                    className,
-                                    meta: {touched, error, warning},
-                                    input,
-                                    label,
-                                    infoText,
-                                    formControlStyle,
-                                    ...other
-                                }) => (<FormControl fullWidth style={formControlStyle}>
+export const renderTextField = (
+    {
+        name,
+        className,
+        meta: {touched, error, warning},
+        input,
+        label,
+        infoText,
+        formControlStyle,
+        ...other
+    }
+) => (<FormControl fullWidth style={formControlStyle}>
     <FieldLabelWithTooltipIcon
         infoText={infoText}
         tooltipIconProps={{

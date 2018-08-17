@@ -96,8 +96,13 @@ class AppSwitcher extends Component {
 }
 
 AppSwitcher.propTypes = {
-    portal: PropTypes.string,
-    onAppButtonClick: PropTypes.func.isRequired
+    anchorEl: PropTypes.any,
+    classes: PropTypes.object.isRequired,
+    handleClick: PropTypes.func.isRequired,
+    handleClose: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
+    onAppButtonClick: PropTypes.func.isRequired,
+    portal: PropTypes.string
 };
 
 const mapDispatchToProps = dispatch => {

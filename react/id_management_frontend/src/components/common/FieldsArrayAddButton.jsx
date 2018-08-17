@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -18,4 +19,10 @@ class FieldsArrayPanel extends Component {
     }
 }
 
+FieldsArrayPanel.propTypes = {
+    classes: PropTypes.object.isRequired,
+    onClick: PropTypes.func
+};
+
 export default withStyles(styleSheet)(FieldsArrayPanel);
+

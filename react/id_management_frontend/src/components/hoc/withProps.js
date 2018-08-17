@@ -1,5 +1,11 @@
 import {connect} from "react-redux";
 
+/*
+* This component maps prop functions - passed with
+* @param props
+* to name of those functions allowing quick access to store data
+* */
+
 export default function withProps(...props) {
     function _withProps(WrappedComponent) {
         const mapStateToProps = (state) => {

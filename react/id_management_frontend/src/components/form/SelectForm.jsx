@@ -89,9 +89,9 @@ SelectForm.propTypes = {
     /**
      * array of objects with values for menu items
      * {
-   *   value: name of value represented by item
-   *   label: label used for button
-   * }
+     *   value: name of value represented by item
+     *   label: label used for button
+     * }
      */
     values: PropTypes.array.isRequired,
     /**

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import PaginatedList from "../common/PaginatedList";
 import UserRowExpanded from "./UserRowExpanded";
@@ -99,4 +100,17 @@ class UsersList extends Component {
     }
 }
 
+UsersList.propTypes = {
+    data: PropTypes.object,
+    onMakeIpAdmin: PropTypes.func.isRequired,
+    onMakeSystemAdmin: PropTypes.func.isRequired,
+    onPermissionDelete: PropTypes.func.isRequired,
+    onPermissionEdit: PropTypes.func.isRequired,
+    onPermissionsAdd: PropTypes.func.isRequired,
+    onRemoveIpAdmin: PropTypes.func.isRequired,
+    portal: PropTypes.string,
+    user: PropTypes.object.isRequired
+};
+
 export default withProps(portal, user)(UsersList);
+

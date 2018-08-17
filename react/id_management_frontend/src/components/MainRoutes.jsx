@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Component, Fragment} from "react";
 import {Redirect, Route, matchPath, withRouter} from "react-router-dom";
 import Users from "./Users/Users";
@@ -74,6 +75,14 @@ class MainRoutes extends Component {
     }
 }
 
+MainRoutes.propTypes = {
+    dispatchSwitchPortal: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
+    match: PropTypes.object.isRequired,
+    portal: PropTypes.string,
+    user: PropTypes.object.isRequired
+};
+
 const mapDispatchToProps = dispatch => {
     return {
         dispatchSwitchPortal: portal => {
@@ -83,3 +92,4 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default withRouter(connect(null, mapDispatchToProps)(withProps(portal, user)(MainRoutes)));
+

@@ -30,7 +30,8 @@ SmallText.propTypes = {
     block: PropTypes.bool,
     label: PropTypes.bool,
     gutterBottom: PropTypes.bool,
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styleSheet)(SmallText);
