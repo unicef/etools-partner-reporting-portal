@@ -9,6 +9,7 @@ import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
+import SearchSelectForm from "../form/SearchSelectForm";
 import {connect} from "react-redux";
 import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
@@ -175,7 +176,7 @@ class PartnerDialog extends Component {
                         <Grid item md={6}/>
 
                         <Grid item md={12}>
-                            <SelectForm fieldName="clusters" label={labels.clusters} values={clusterOptions} multiple/>
+                            <SearchSelectForm fieldName="clusters" label={labels.clusters} options={clusterOptions} multiple/>
                         </Grid>
                     </Grid>
 

@@ -5,7 +5,6 @@ import Grid from "@material-ui/core/Grid";
 import FilterButtons from "../common/FilterButtons";
 import {reduxForm} from 'redux-form';
 import TextFieldForm from "../form/TextFieldForm";
-import SelectForm from "../form/SelectForm";
 import {PORTALS} from "../../actions";
 import {connect} from "react-redux";
 import labels from "../../labels";
@@ -13,6 +12,7 @@ import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS, PRP_ROLE} from "../../con
 import withProps from "../hoc/withProps";
 import {clusterOptions, workspaceOptions, partnerOptions, portal, user} from "../../helpers/props";
 import {hasAnyRole} from "../../helpers/user";
+import SearchSelectForm from "../form/SearchSelectForm";
 
 const searchPlaceholder = "Name or Email";
 
@@ -46,23 +46,23 @@ class UsersFilter extends Component {
 
                         {portal === PORTALS.CLUSTER && this.canFilterPartners() &&
                         <Grid item md={4}>
-                            <SelectForm fieldName="partners" label={labels.partner} values={partnerOptions}
+                            <SearchSelectForm fieldName="partners" label={labels.partner} options={partnerOptions}
                                         optional multiple/>
                         </Grid>}
 
                         {portal === PORTALS.IP &&
                         <Grid item md={4}>
-                            <SelectForm fieldName="workspaces" label={labels.workspace} values={workspaceOptions}
+                            <SearchSelectForm fieldName="workspaces" label={labels.workspace} options={workspaceOptions}
                                         optional multiple/>
                         </Grid>}
 
                         <Grid item md={4}>
-                            <SelectForm fieldName="roles" label={labels.role} values={roleOptions}
+                            <SearchSelectForm fieldName="roles" label={labels.role} options={roleOptions}
                                         optional multiple/>
                         </Grid>
 
                         {portal === PORTALS.CLUSTER && <Grid item md={12}>
-                            <SelectForm fieldName="clusters" label={labels.cluster} values={clusterOptions}
+                            <SearchSelectForm fieldName="clusters" label={labels.cluster} options={clusterOptions}
                                         optional multiple/>
                         </Grid>}
                     </Grid>

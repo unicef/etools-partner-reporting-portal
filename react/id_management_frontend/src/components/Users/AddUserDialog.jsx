@@ -16,6 +16,7 @@ import withProps from "../hoc/withProps";
 import {partnerOptions, portal, user} from "../../helpers/props";
 import {connect} from "react-redux";
 import {hasAnyRole} from "../../helpers/user";
+import SearchSelectForm from "../form/SearchSelectForm";
 
 
 const formName = "addUserForm";
@@ -101,7 +102,7 @@ class AddUserDialog extends Component {
 
                         {user_type === USER_TYPE.PARTNER &&
                         <Grid item md={6}>
-                            <SelectForm fieldName="partner" label={labels.partner} values={partnerOptions}/>
+                            <SearchSelectForm fieldName="partner" label={labels.partner} options={partnerOptions}/>
                         </Grid>}
                     </Grid>
 

@@ -5,7 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import FilterButtons from "../common/FilterButtons";
 import {reduxForm} from 'redux-form';
 import TextFieldForm from "../form/TextFieldForm";
-import SelectForm from "../form/SelectForm";
+import SearchSelectForm from "../form/SearchSelectForm";
 import {connect} from "react-redux";
 import labels from "../../labels";
 import withProps from "../hoc/withProps";
@@ -33,12 +33,12 @@ class PartnersFilter extends Component {
                         </Grid>
 
                         <Grid item md={4}>
-                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}
+                            <SearchSelectForm fieldName="partner_type" label={labels.partnerType} options={partnerTypeOptions}
                                         optional/>
                         </Grid>
 
                         <Grid item md={12}>
-                            <SelectForm fieldName="clusters" label={labels.cluster} values={clusterOptions}
+                            <SearchSelectForm fieldName="clusters" label={labels.cluster} options={clusterOptions}
                                         optional multiple/>
                         </Grid>
 

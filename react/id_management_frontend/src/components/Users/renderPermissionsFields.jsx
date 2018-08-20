@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react';
 import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
 import SelectForm from "../form/SelectForm";
+import SearchSelectForm from "../form/SearchSelectForm";
 import {Grid, Typography} from "@material-ui/core";
 import DeleteButton from "../common/DeleteButton";
 import FieldsArrayItem from "../common/FieldsArrayItem";
@@ -75,12 +76,12 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                             <Grid container spacing={24}>
                                 <Grid item md={6}>
                                     {portal === PORTALS.IP &&
-                                    <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                                values={filteredWorkspaceOptions}/>}
+                                    <SearchSelectForm fieldName={`${item}.workspace`} label={labels.workspace}
+                                                options={filteredWorkspaceOptions}/>}
 
                                     {portal === PORTALS.CLUSTER &&
-                                    <SelectForm fieldName={`${item}.cluster`} label={labels.cluster}
-                                                values={filteredClusterOptions}/>}
+                                    <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
+                                                options={filteredClusterOptions}/>}
                                 </Grid>
 
                                 <Grid item md={6}>
