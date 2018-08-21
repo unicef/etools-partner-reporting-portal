@@ -23,6 +23,9 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     AnyPermission,
+    IsIPAuthorizedOfficer,
+    IsIPEditor,
+    IsIPViewer,
 )
 from core.paginations import SmallPagination
 from core.models import Location
@@ -544,10 +547,9 @@ class IndicatorReportListAPIView(APIView):
     """
     permission_classes = (
         AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace
+            IsIPAuthorizedOfficer,
+            IsIPEditor,
+            IsIPViewer,
         ),
     )
 

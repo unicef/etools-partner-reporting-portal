@@ -175,6 +175,30 @@ def IsClusterMemberForCurrentWorkspaceCheck(request):
     return False
 
 
+def IsIPAuthorizedOfficerCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer).exists(),
+    ]
+    return all(rules)
+
+
+def IsIPEditorCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_editor).exists(),
+    ]
+    return all(rules)
+
+
+def IsIPViewerCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
+    ]
+    return all(rules)
+
+
 class IsPartnerAuthorizedOfficerForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
@@ -207,10 +231,30 @@ class IsSuperuser(BasePermission):
 
 
 class IsClusterSystemAdmin(BasePermission):
+
     def has_permission(self, request, view):
         return IsClusterSystemAdminCheck(request)
 
 
 class IsIMO(BasePermission):
+
     def has_permission(self, request, view):
         return IsIMOCheck(request)
+
+
+class IsIPAuthorizedOfficer(BasePermission):
+
+    def has_permission(self, request, view):
+        return IsIPAuthorizedOfficerCheck(request)
+
+
+class IsIPEditor(BasePermission):
+
+    def has_permission(self, request, view):
+        return IsIPEditorCheck(request)
+
+
+class IsIPViewer(BasePermission):
+
+    def has_permission(self, request, view):
+        return IsIPViewerCheck(request)
