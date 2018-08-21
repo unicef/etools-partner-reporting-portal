@@ -32,19 +32,28 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     partner = PartnerDetailsSerializer(read_only=True)
+    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
     access = serializers.SerializerMethodField()
 
     def get_access(self, obj):
         accesses = []
-        is_imo = obj.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists()
+        cluster_roles = [
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        ]
 
-        # Cluster access check
-        if is_imo or (obj.partner and obj.partner.clusters.exists()):
-            accesses.append('cluster-reporting')
+        if obj.is_active:
+            # Cluster access check
+            cluster_access = obj.prp_roles.filter(role__in=cluster_roles).exists()
+            if cluster_access or (obj.partner and obj.partner.clusters.exists()):
+                accesses.append('cluster-reporting')
 
-        # IP access check
-        if obj.partner and obj.partner.programmedocument_set.exists():
-            accesses.append('ip-reporting')
+            # IP access check
+            if obj.partner and obj.partner.programmedocument_set.exists():
+                accesses.append('ip-reporting')
 
         return accesses
 
