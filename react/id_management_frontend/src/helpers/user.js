@@ -3,9 +3,7 @@ import {api} from "../infrastructure/api";
 import {PORTALS} from "../actions";
 
 export function hasAnyRole(user, roles) {
-    const filtered = user.prp_roles.filter(item => roles.indexOf(item.role) > -1);
-
-    return filtered.length > 0;
+    return user.prp_roles.some(item => roles.indexOf(item.role) > -1);
 }
 
 export function userRoleInWorkspace(user, workspace) {

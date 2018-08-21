@@ -4,6 +4,7 @@ import {debounce} from "throttle-debounce";
 import {expandedRowIds} from "../../actions";
 import {connect} from "react-redux";
 import {PORTAL_TYPE} from "../../constants";
+import {computePermissions} from "../../helpers/permissions";
 
 /*
     withSearch adds default search functionality to a component
@@ -27,7 +28,7 @@ const arrayFormat = 'bracket';
 const mapStateToProps = state => {
     return {
         portal: PORTAL_TYPE[state.portal],
-        user: state.user
+        permissions: computePermissions(state)
     }
 };
 
@@ -86,7 +87,7 @@ export default (getDataFn) => {
                 }
 
                 onSearch(filter, page, pageSize) {
-                    const {history, portal, user} = this.props;
+                    const {history, portal, permissions} = this.props;
 
                     let request = filter;
 
@@ -101,7 +102,7 @@ export default (getDataFn) => {
 
                     Promise.resolve(getDataFn(Object.assign({}, request, {
                         portal
-                    }), user))
+                    }), permissions))
                         .then(data => this.setState({data, loading: false}));
 
 

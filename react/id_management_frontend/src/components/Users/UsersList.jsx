@@ -6,9 +6,7 @@ import {PORTALS} from "../../actions";
 import * as R from 'ramda';
 import {date} from "../../helpers/filters";
 import withProps from "../hoc/withProps";
-import {portal, user} from "../../helpers/props";
-import {PRP_ROLE} from "../../constants";
-import {hasAnyRole} from "../../helpers/user";
+import {permissions, portal} from "../../helpers/props";
 import UserRowStatus from "./UserRowStatus";
 
 class UsersList extends Component {
@@ -59,22 +57,21 @@ class UsersList extends Component {
 
     render() {
         const {
-            portal,
             data,
             onPermissionEdit,
             onPermissionDelete,
             onPermissionsAdd,
             onRemoveIpAdmin,
             onMakeIpAdmin,
-            user,
             onMakeSystemAdmin,
+            permissions,
             ...otherProps
         } = this.props;
 
         const removableItems = data.results.filter(item => item.canBeDeleted);
         const restorebleItems = data.results.filter(item => item.canBeRestored);
-        const showDelete = hasAnyRole(user, [PRP_ROLE.IP_ADMIN]) && portal === PORTALS.IP && removableItems.length > 0;
-        const showRestore = hasAnyRole(user, [PRP_ROLE.IP_ADMIN]) && portal === PORTALS.IP && restorebleItems.length > 0;
+        const showDelete = permissions.manageUser && removableItems.length > 0;
+        const showRestore = permissions.manageUser && restorebleItems.length > 0;
 
         return (
             <div>
@@ -109,8 +106,8 @@ UsersList.propTypes = {
     onPermissionsAdd: PropTypes.func.isRequired,
     onRemoveIpAdmin: PropTypes.func.isRequired,
     portal: PropTypes.string,
-    user: PropTypes.object.isRequired
+    permissions: PropTypes.object.isRequired,
 };
 
-export default withProps(portal, user)(UsersList);
+export default withProps(portal, permissions)(UsersList);
 

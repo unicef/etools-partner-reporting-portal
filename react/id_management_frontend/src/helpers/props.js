@@ -1,3 +1,5 @@
+import {computePermissions} from "./permissions";
+
 export function clusterOptions(state) {
     return Array.isArray(state.clusters) ? state.clusters.map(item => ({
         value: String(item.id),
@@ -26,4 +28,8 @@ export function user(state) {
 
 export function partnerTypeOptions(state) {
     return state.options.partner_type || [];
+}
+
+export function permissions(state) {
+    return computePermissions(state);
 }

@@ -16,7 +16,7 @@ import withSearch from "../hoc/withSearch";
 import {PRP_ROLE, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
 import {user} from "../../helpers/props";
-import {hasAnyRole, hasOnlyRoles, userRoleInWorkspace} from "../../helpers/user";
+import {hasAnyRole} from "../../helpers/user";
 import AoAlert from "./AoAlert";
 import {FETCH_OPTIONS, fetch} from "../../fetch";
 import {connect} from "react-redux";
@@ -98,6 +98,7 @@ class Users extends Component {
         return (item) => {
             switch (action) {
                 case CONFIRM_ACTIONS.DISABLE_USER:
+                case CONFIRM_ACTIONS.ENABLE_USER:
                 case CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN:
                     this.setState({action, selectedUser: item});
                     break;
@@ -218,26 +219,14 @@ class Users extends Component {
     }
 }
 
-const canDelete = (user, item) => {
-    let hasIpAdmin = true;
-
-    item.prp_roles.forEach(role => {
-        if (!role.workspace || userRoleInWorkspace(user, role.workspace.id) !== PRP_ROLE.IP_ADMIN) {
-            hasIpAdmin = false;
-        }
-    });
-
-    return hasIpAdmin && hasOnlyRoles(item, [PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER])
-};
-
-const getData = (request, user) => (
+const getData = (request, permissions) => (
     new Promise((resolve, reject) => {
         api.get("id-management/users/", request)
             .then(res => {
                 res.data.results.forEach(function (item) {
                     item.name = fullName(item);
-                    item.canBeDeleted = item.status !== "DEACTIVATED" && canDelete(user, item);
-                    item.canBeRestored = item.status === "DEACTIVATED" && canDelete(user, item);
+                    item.canBeDeleted = item.status !== "DEACTIVATED" && permissions.deleteUser(item);
+                    item.canBeRestored = item.status === "DEACTIVATED" && permissions.deleteUser(item);
                     item.highlight = item.is_incomplete
                 });
 
@@ -273,5 +262,5 @@ Users.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withSearch(getData)(withProps(user)(withDialogHandling(Users))));
+export default connect(mapStateToProps, mapDispatchToProps)(withProps(user)(withSearch(getData)(withDialogHandling(Users))));
 
