@@ -102,7 +102,7 @@
         </a>
       </paper-item>
 
-      <template is="dom-if" if="[[hasIdManagementAccess]]" restamp="true">
+      <template is="dom-if" if="[[permissions.accessClusterIdManagement]]" restamp="true">
         <paper-divider></paper-divider>
 
         <paper-item name="id-management" id="id-management" on-tap="goToIdManagement">
@@ -194,16 +194,6 @@
         analysisUrl: {
           type: String,
           computed: 'buildUrl(_baseUrlCluster, \'analysis\')',
-        },
-
-        prpRoles: {
-          type: Array,
-          statePath: 'userProfile.profile.prp_roles'
-        },
-
-        hasIdManagementAccess: {
-          type: Boolean,
-          computed: '_computeIdManagementAccess(prpRoles)'
         }
       },
 
@@ -238,19 +228,6 @@
         }
 
         return query;
-      },
-
-      _computeIdManagementAccess: function (prpRoles) {
-        var PRP_ROLE = App.Constants.PRP_ROLE;
-
-        return prpRoles.filter(function (item) {
-            return [
-              PRP_ROLE.CLUSTER_IMO,
-              PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
-              PRP_ROLE.CLUSTER_MEMBER
-            ].indexOf(item.role) > -1;
-          }
-        ).length > 0;
       }
     });
   </script>

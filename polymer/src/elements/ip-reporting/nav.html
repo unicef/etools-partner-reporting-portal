@@ -13,12 +13,17 @@
 <link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../constants.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <link rel="import" href="../../styles/page-nav.html">
 
 <dom-module id="ip-reporting-nav">
   <template>
     <style include="page-nav-styles"></style>
+
+    <etools-prp-permissions
+      permissions="{{ permissions }}">
+    </etools-prp-permissions>
 
     <paper-menu
       id="menu"
@@ -50,7 +55,7 @@
         </a>
       </paper-item>
 
-      <template is="dom-if" if="[[hasIdManagementAccess]]" restamp="true">
+      <template is="dom-if" if="[[permissions.accessIpIdManagement]]" restamp="true">
         <paper-divider></paper-divider>
 
         <paper-item name="id-management" on-tap="goToIdManagement">
@@ -129,27 +134,7 @@
             };
           },
         },
-
-        prpRoles: {
-          type: Array,
-          statePath: 'userProfile.profile.prp_roles',
-        },
-
-        hasIdManagementAccess: {
-          type: Boolean,
-          computed: '_computeIdManagementAccess(prpRoles)'
-        }
-      },
-
-      _computeIdManagementAccess: function (prpRoles) {
-        var PRP_ROLE = App.Constants.PRP_ROLE;
-
-        return prpRoles.filter(function (item) {
-            return PRP_ROLE.IP_AUTHORIZED_OFFICER === item.role;
-          }
-        ).length > 0;
       }
-
     });
   </script>
 </dom-module>
