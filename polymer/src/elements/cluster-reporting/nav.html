@@ -102,22 +102,20 @@
         </a>
       </paper-item>
 
-      <paper-divider></paper-divider>
+      <template is="dom-if" if="[[hasIdManagementAccess]]" restamp="true">
+        <paper-divider></paper-divider>
 
-      <paper-item name="id-management" id="id-management">
-        <a href="/id-management/cluster-reporting/">
-          <span><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('id_management')]]</span>
-        </a>
-      </paper-item>
+        <paper-item name="id-management" id="id-management" on-tap="goToIdManagement">
+          <a href="/id-management/cluster-reporting/">
+            <span><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('id_management')]]</span>
+          </a>
+        </paper-item>
+      </template>
   </template>
 
   <script>
     Polymer({
       is: 'cluster-reporting-nav',
-
-      listeners: {
-        'id-management.tap': 'goToIdManagement'
-      },
 
       goToIdManagement: function (e) {
         e.preventDefault();
@@ -197,6 +195,16 @@
           type: String,
           computed: 'buildUrl(_baseUrlCluster, \'analysis\')',
         },
+
+        prpRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles'
+        },
+
+        hasIdManagementAccess: {
+          type: Boolean,
+          computed: '_computeIdManagementAccess(prpRoles)'
+        }
       },
 
       observers: [
@@ -231,6 +239,19 @@
 
         return query;
       },
+
+      _computeIdManagementAccess: function (prpRoles) {
+        var PRP_ROLE = App.Constants.PRP_ROLE;
+
+        return prpRoles.filter(function (item) {
+            return [
+              PRP_ROLE.CLUSTER_IMO,
+              PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+              PRP_ROLE.CLUSTER_MEMBER
+            ].indexOf(item.role) > -1;
+          }
+        ).length > 0;
+      }
     });
   </script>
 </dom-module>
