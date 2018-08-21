@@ -101,7 +101,7 @@
         </div>
 
         <div class="full-width">
-          <paper-input label="My Roles/Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
+          <paper-input label="My Roles" value="[[prpRoles]]" placeholder="---" readonly always-float-label></paper-input>
         </div>
 
         <template is="dom-if" if="{{profile.partner}}">
@@ -168,9 +168,9 @@
             statePath: 'userProfile.profile',
           },
 
-          groups: {
+          prpRoles: {
             type: Array,
-            computed: '_computeGroups(profile)',
+            computed: '_computePrpRoles(profile)',
           },
 
           is_imo_clusters: {
@@ -187,9 +187,9 @@
           this.set('opened', true);
         },
 
-        _computeGroups: function (profile) {
-          return (profile.groups || []).map(function(group) {
-            return group.name;
+        _computePrpRoles: function (profile) {
+          return (profile.prp_roles || []).map(function(role) {
+            return role.role;
           }).join(', ');
         },
 
