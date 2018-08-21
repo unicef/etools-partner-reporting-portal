@@ -198,15 +198,13 @@
 
           params: {
             type: Object,
-            computed: '_computeParams(prpRoles, imoClusters, partner)',
-            observer: '_log'
+            computed: '_computeParams(prpRoles, imoClusters, partner)'
           },
 
           permissions: {
             type: Object,
             computed: '_computePermissions(params)',
-            notify: true,
-            observer: '_log'
+            notify: true
           },
 
         },
