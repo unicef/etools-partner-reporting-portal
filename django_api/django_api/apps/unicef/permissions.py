@@ -21,11 +21,10 @@ class CanChangePDCalculationMethod(BasePermission):
         if user.is_authenticated() and request.method in SAFE_METHODS:
             return True
 
-        partner_permission = IsPartnerEditorForCurrentWorkspaceCheck(request) \
-            and IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request)
+        partner_permission = (IsPartnerEditorForCurrentWorkspaceCheck(request) or
+                              IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request))
 
         return user.is_authenticated() and partner_permission
-
 
 
 class UnicefPartnershipManagerOrRead(BasePermission):
