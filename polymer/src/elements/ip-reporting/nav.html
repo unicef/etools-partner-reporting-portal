@@ -51,9 +51,9 @@
 
       <paper-divider></paper-divider>
 
-      <paper-item name="id-management">
-        <a href="/id-management/ip-reporting/" target="_blank">
-          <span><iron-icon icon="open-in-new" role="presentation"></iron-icon>[[localize('id_management')]]</span>
+      <paper-item name="id-management" id="id-management">
+        <a href="/id-management/ip-reporting/">
+          <span><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('id_management')]]</span>
         </a>
       </paper-item>
 
@@ -63,6 +63,16 @@
   <script>
     Polymer({
       is: 'ip-reporting-nav',
+
+      listeners: {
+        'id-management.tap': 'goToIdManagement'
+      },
+
+      goToIdManagement: function (e) {
+        e.preventDefault();
+
+        window.location.href = "/id-management/ip-reporting/";
+      },
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
