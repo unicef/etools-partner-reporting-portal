@@ -43,7 +43,7 @@ Below filters user can see search results in a form of a list of users. It conta
 * Name
 * Position \(optional field\)
 * E-mail
-* Status \(Active or Invited\)
+* Status \(Active or Invited\) - Row will be highlighted if no role has been assigned to them.
 * Last login
 
 ![Search results on User screen](https://lh4.googleusercontent.com/l5CZ2lN3xyP_qVnwQmMLTPCdHjjRCt2SKcfu-3i_wlM-DJ31notAkjfCwX3KFyGxrdKq69mN5KdiYsdjmgdj7fkoc1Q5jKAktw2nOk80G7ACT7RbnXiBWXlloB6HE5Irve4Djr8c)
@@ -55,9 +55,13 @@ Each row in a table is expandable. By expanding a row, additional data is reveal
 
 **Depending on the role of logged in person, different actions can be taken here:**
 
-* **As Authorized Officer** of particular workspaces, this person can make the user an IP Admin or can delete \(remove\) this role for this user in those workspaces. These actions are accessible by clicking on the links next to the Workspace/Role pair:
+* **As Authorized Officer** of particular workspaces, this person can make the user an IP Admin or can delete \(remove\) this role for this user in those workspaces. These actions are accessible by clicking on the links next to the Workspace/Role pair.
+* If AO is logged in and there are other AO's in the system \(can re-use existing user list API endpoint with AO filter\) then at top of user list \(above filters\) show the names of those AO's and a link saying "see all below" which triggers the filter then.
+* Also if role is AO a different color in the table row to make it stand out.
+* Only Authorized officers from PMP will be synced and assign correct roles in the new ID management data models.
+* AO of a workspace can remove AO role from another user in same workspace.
 
-![View of Authorized Officer of Kenya and India workspaces ](https://lh6.googleusercontent.com/bHak4nMtGJo98IMXTf7eP7qw9cVO6xpFLPXYyTrwrTUqHbPJrsYqS2cqKO27vDdpafoPNXk_cJPfg-joFVqRrVT1fiPuYtT-gHTMCBMBDtBK8VbsE3BPRTifyg-Inu9o6K_qUE4R)
+![View of IP Admin of Kenya and India workspaces ](https://lh6.googleusercontent.com/bHak4nMtGJo98IMXTf7eP7qw9cVO6xpFLPXYyTrwrTUqHbPJrsYqS2cqKO27vDdpafoPNXk_cJPfg-joFVqRrVT1fiPuYtT-gHTMCBMBDtBK8VbsE3BPRTifyg-Inu9o6K_qUE4R)
 
 Both actions of making and removing a role of IP Admin will display modal window, so Authorized Officer will need to confirm this decision:
 
@@ -84,6 +88,25 @@ For chosen workspace \(this field is not editable\), user can select different r
 ![Add new permission modal window](https://lh5.googleusercontent.com/D9cPxllapbMsumOcm_M3CdEPkmY40k6pdAIOS3HfK993aPXm7oHEh5FgepEcKWjG312UCNnU9nuJ-B1nQMklJKUPbc9oTLDet3QaFm3GSTv2XjRNndeljdrz5o_SmH-16RKUp3uV)
 
 User can select from workspaces he has access to.
+
+### No permissions assigned
+
+User with no permissions assigned is displayed in the UI as shown below. Status of this user has additional information \(No roles assigned\):
+
+![](../../.gitbook/assets/image-2.png)
+
+
+
+
+
+### Information about other Authorized Officers
+
+If user is logged in as an  AO and there are other AOs in his workspaces, information \(as shown below\) will be displayed:
+
+![](../../.gitbook/assets/screen-shot-2018-08-22-at-19.47.34.png)
+
+  
+Clicking on the button "Click here to see them" will filter search results.
 
 ##  
 

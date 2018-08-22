@@ -12,7 +12,7 @@ The overall user interface for User Management in IP Reporting consists of the f
 
 ![Header](https://lh6.googleusercontent.com/hoPORkewz9AJAPHFMAYac5PyGje7xnqKAUJRHtDzhc0CVezJ3Kecqnh-RfB15uGQbRGtqWIook1O1YMnWwaZQWu_a_xVVLawnkErF4_iPohmFVh2xMZLhDpD_hhhfH7rFPFMRuHW)
 
-![Switch to User Management in Cluster Portal](https://lh6.googleusercontent.com/e2BHLR2cvDiMuhQxLa814xVK5WY-zDb7sve6a2n1OptLRR12yyZRVp0tJqW8lMspSypixPOe7mhJdW8RwaQDXwVmKJ840errU5RQlWFGmLIZcwt4HK-4XyG18zcON3MBheLNcN5y)
+![](../../.gitbook/assets/screen-shot-2018-08-22-at-09.36.48.png)
 
 **Left navigation** with:
 
