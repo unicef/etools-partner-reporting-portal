@@ -45,7 +45,7 @@ class WorkspaceAPIView(ListAPIView):
         Only return workspaces that the user is associated with.
         """
         queryset = self.get_queryset()
-        wk_ids = request.user.prp_roles.values_list('workspace', flat=True).distinct()
+        wk_ids = request.user.get_workspaces()
 
         queryset = queryset.filter(id__in=wk_ids)
         serializer = self.get_serializer(queryset, many=True)
