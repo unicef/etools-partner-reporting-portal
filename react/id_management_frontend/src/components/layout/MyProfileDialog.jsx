@@ -5,10 +5,10 @@ import Dialog from "../common/Dialog";
 import TextFieldForm from "../form/TextFieldForm";
 import {reduxForm} from "redux-form";
 import {connect} from "react-redux";
-import {getLabelFromOptions, getRoleLabel} from "../../helpers/user";
+import {getRoleLabel} from "../../helpers/user";
 import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
-import {clusterOptions, portal, workspaceOptions} from "../../helpers/props";
+import {portal} from "../../helpers/props";
 import {PORTALS} from "../../actions";
 import Typography from "../../../node_modules/@material-ui/core/Typography";
 import List from "../../../node_modules/@material-ui/core/List/List";
@@ -33,7 +33,7 @@ class MyProfileDialog extends Component {
     }
 
     renderPrpRoles(prp_roles) {
-        const {workspaceOptions, clusterOptions, portal} = this.props;
+        const {portal} = this.props;
 
         return (
             <Fragment>
@@ -42,17 +42,17 @@ class MyProfileDialog extends Component {
                         let result = "";
 
                         if (item.cluster && portal === PORTALS.CLUSTER) {
-                            result += getLabelFromOptions(clusterOptions, item.cluster);
+                            result += item.cluster.full_title;
                         }
                         else if (item.workspace) {
-                            result += getLabelFromOptions(workspaceOptions, item.workspace);
+                            result += item.workspace.title;
                         }
 
                         if (result) {
                             result += " / ";
                         }
 
-                        return <ListItem key={idx} disableGutters>{result + getRoleLabel(item.role)}</ListItem>;
+                        return <ListItem key={idx} disableGutters>{result + item.role_display}</ListItem>;
                     })}
                 </List>
                 <Divider/>
@@ -127,5 +127,5 @@ MyProfileDialog.propTypes = {
     workspaceOptions: PropTypes.array
 };
 
-export default connect(mapStateToProps)(withProps(workspaceOptions, clusterOptions, portal)((reduxForm({form: "myProfile"})(MyProfileDialog))));
+export default connect(mapStateToProps)(withProps(portal)((reduxForm({form: "myProfile"})(MyProfileDialog))));
 

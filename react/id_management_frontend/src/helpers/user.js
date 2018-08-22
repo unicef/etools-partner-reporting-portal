@@ -10,7 +10,7 @@ export function userRoleInWorkspace(user, workspace) {
     if (!workspace) return null;
 
     // eslint-disable-next-line
-    const roles = user.prp_roles.filter(role => role.workspace == workspace);
+    const roles = user.prp_roles.filter(role => role.workspace && role.workspace.id == workspace);
 
     return roles.length ? roles[0].role : null;
 }
