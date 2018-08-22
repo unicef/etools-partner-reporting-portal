@@ -16,6 +16,11 @@ import {portal} from "../../../helpers/props";
 
 const border = "1px solid #e0e0e0";
 
+const labels = {
+    [PORTALS.CLUSTER]: "CLUSTER PORTAL",
+    [PORTALS.IP]: "UNICEF IP PORTAL"
+};
+
 const styleSheet = {
     appsHeader: {
         padding: "10px 20px",
@@ -75,7 +80,7 @@ class AppSwitcher extends Component {
                                         this.appButtonClick(PORTALS.CLUSTER)
                                     }
                                     disabled={portal === PORTALS.CLUSTER}
-                                    name="Cluster Portal"
+                                    name={labels[PORTALS.CLUSTER]}
                                 />
                             </Grid>
                             <Grid item>
@@ -84,7 +89,7 @@ class AppSwitcher extends Component {
                                         this.appButtonClick(PORTALS.IP)
                                     }
                                     disabled={portal === PORTALS.IP}
-                                    name="IP Portal"
+                                    name={labels[PORTALS.IP]}
                                 />
                             </Grid>
                         </Grid>
