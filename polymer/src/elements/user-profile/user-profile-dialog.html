@@ -75,127 +75,151 @@
       }
     </style>
 
-    <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
+    <paper-dialog id="userProfileDialog" opened="{{ opened }}" with-backdrop>
       <div class="header layout horizontal justified">
         <h2>My Profile</h2>
 
         <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
+          class="self-center"
+          on-tap="close"
+          icon="icons:close">
         </paper-icon-button>
       </div>
 
-       <paper-dialog-scrollable>
+      <paper-dialog-scrollable>
         <iron-form class="app-grid">
-        <div class="full-width">
-          <paper-input label="First Name" value="{{profile.first_name}}" placeholder="---" readonly always-float-label></paper-input>
-        </div>
-
-        <div class="full-width">
-          <paper-input label="Last Name" value="{{profile.last_name}}" placeholder="---" readonly always-float-label></paper-input>
-        </div>
-
-        <div class="full-width">
-          <paper-input label="Email" value="{{profile.email}}" placeholder="---" always-float-label readonly></paper-input>
-        </div>
-
-        <div class="full-width">
-          <paper-input label="My Roles" value="[[prpRoles]]" placeholder="---" readonly always-float-label></paper-input>
-        </div>
-
-        <template is="dom-if" if="{{profile.partner}}">
           <div class="full-width">
-            <paper-input label="Partner" value="{{profile.partner.title}}" placeholder="---" readonly always-float-label></paper-input>
+            <paper-input label="First Name" value="{{ profile.first_name }}" placeholder="---" readonly
+                         always-float-label></paper-input>
           </div>
-        </template>
 
-        <template is="dom-if" if="{{profile.organization}}">
           <div class="full-width">
-            <paper-input label="My Organization" value="{{profile.organization}}" placeholder="---" readonly always-float-label></paper-input>
+            <paper-input label="Last Name" value="{{ profile.last_name }}" placeholder="---" readonly
+                         always-float-label></paper-input>
           </div>
-        </template>
 
-        <template is="dom-if" if="[[is_imo_clusters]]">
           <div class="full-width">
-            <labelled-item label="IMO for Clusters">
-              <dl class="clusters">
-                <template is="dom-repeat" items="[[profile.imo_clusters]]">
-                  <dt>
-                    <template
+            <paper-input label="Email" value="{{ profile.email }}" placeholder="---" always-float-label
+                         readonly></paper-input>
+          </div>
+
+          <div class="full-width">
+            <paper-input label="My Roles" value="[[prpRoles]]" placeholder="---" readonly
+                         always-float-label></paper-input>
+          </div>
+
+          <template is="dom-if" if="{{ profile.partner }}">
+            <div class="full-width">
+              <paper-input label="Partner" value="{{ profile.partner.title }}" placeholder="---" readonly
+                           always-float-label></paper-input>
+            </div>
+          </template>
+
+          <template is="dom-if" if="{{ profile.organization }}">
+            <div class="full-width">
+              <paper-input label="My Organization" value="{{ profile.organization }}" placeholder="---" readonly
+                           always-float-label></paper-input>
+            </div>
+          </template>
+
+          <template is="dom-if" if="[[is_imo_clusters]]">
+            <div class="full-width">
+              <labelled-item label="IMO for Clusters">
+                <dl class="clusters">
+                  <template is="dom-repeat" items="[[profile.imo_clusters]]">
+                    <dt>
+                      <template
                         is="dom-if"
                         if="[[_equals(item.type, 'imported')]]"
                         restamp="[[true]]">
-                      [[item.imported_type]]:
-                    </template>
-                    <template
+                        [[item.imported_type]]:
+                      </template>
+                      <template
                         is="dom-if"
                         if="[[!_equals(item.type, 'imported')]]"
                         restamp="[[true]]">
-                      [[item.title]]:
-                    </template>
-                  </dt>
-                  <dd>[[item.response_plan.title]]</dd>
-                </template>
-              </dl>
-            </labelled-item>
-          </div>
-        </template>
+                        [[item.title]]:
+                      </template>
+                    </dt>
+                    <dd>[[item.response_plan.title]]</dd>
+                  </template>
+                </dl>
+              </labelled-item>
+            </div>
+          </template>
 
-      </iron-form>
-    </paper-dialog-scrollable>
+        </iron-form>
+      </paper-dialog-scrollable>
     </paper-dialog>
   </template>
 
   <script>
-      Polymer({
-        is: 'user-profile-dialog',
+    Polymer({
+      is: 'user-profile-dialog',
 
-        behaviors: [
+      behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
-        properties: {
-          opened: {
-            type: Boolean,
-            value: false,
-          },
-
-          profile: {
-            type: Object,
-            statePath: 'userProfile.profile',
-          },
-
-          prpRoles: {
-            type: Array,
-            computed: '_computePrpRoles(profile)',
-          },
-
-          is_imo_clusters: {
-            type: Boolean,
-            computed: '_computeIsIMOClusters(profile)'
-          },
+      properties: {
+        opened: {
+          type: Boolean,
+          value: false,
         },
 
-        close: function () {
-          this.set('opened', false);
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
         },
 
-        open: function () {
-          this.set('opened', true);
+        prpRoles: {
+          type: Array,
+          computed: '_computePrpRoles(profile)',
         },
 
-        _computePrpRoles: function (profile) {
-          return (profile.prp_roles || []).map(function(role) {
-            return role.role;
-          }).join(', ');
+        is_imo_clusters: {
+          type: Boolean,
+          computed: '_computeIsIMOClusters(profile, portal)'
         },
 
-        _computeIsIMOClusters: function (profile) {
-          return (profile.imo_clusters || []).length > 0;
-        },
-      });
+        portal: {
+          type: String,
+          statePath: 'app.current',
+        }
+      },
+
+      close: function () {
+        this.set('opened', false);
+      },
+
+      open: function () {
+        this.set('opened', true);
+      },
+
+      _computePrpRoles: function (profile, portal) {
+        return (profile.prp_roles || []).map(function (role) {
+          let result = "";
+
+          if (role.cluster && portal === 'ip-reporting') {
+            result += role.cluster.full_title;
+          }
+          else if (role.workspace) {
+            result += role.workspace.title;
+          }
+
+          if (result) {
+            result += " / ";
+          }
+
+          return result + role.role_display;
+        }).join(', ');
+      },
+
+      _computeIsIMOClusters: function (profile) {
+        return (profile.imo_clusters || []).length > 0;
+      },
+    });
   </script>
 </dom-module>
