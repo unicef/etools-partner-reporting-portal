@@ -59,6 +59,6 @@ export function error(message) {
 
 export const OTHER_AO = 'OTHER_AO';
 
-export function otherAo(isPresent) {
-    return {type: OTHER_AO, isPresent};
+export function otherAo(results) {
+    return {type: OTHER_AO, results};
 }

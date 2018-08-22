@@ -74,11 +74,11 @@ export function fetch(option, id) {
                 promise = api.get("id-management/users/", {
                     roles: [PRP_ROLE.IP_AUTHORIZED_OFFICER],
                     page: 1,
-                    page_size: 1,
+                    page_size: 1000,
                     portal: "IP"
                 })
                     .then(res => {
-                        dispatch(otherAo(res.data.results.length > 0))
+                        dispatch(otherAo(res.data.results))
                     });
                 break;
             default:

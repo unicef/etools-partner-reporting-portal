@@ -5,7 +5,6 @@ import Dialog from "../common/Dialog";
 import TextFieldForm from "../form/TextFieldForm";
 import {reduxForm} from "redux-form";
 import {connect} from "react-redux";
-import {getRoleLabel} from "../../helpers/user";
 import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
 import {portal} from "../../helpers/props";

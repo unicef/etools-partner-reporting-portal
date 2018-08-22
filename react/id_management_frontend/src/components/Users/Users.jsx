@@ -235,11 +235,26 @@ const getData = (request, permissions) => (
     })
 );
 
+const intersectingAo = (otherAo, user) => (
+    otherAo &&
+    otherAo.some(ao =>
+        (ao.prp_roles.some(
+                aoRole => (aoRole.role === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+                    user.prp_roles.some(
+                        uRole => uRole.role === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+                            uRole.workspace.id === aoRole.workspace.id
+                    )
+                )
+            )
+        )
+    )
+);
+
 const mapStateToProps = (state) => {
-    const {otherAo} = state;
+    const {otherAo, user} = state;
 
     return {
-        otherAo
+        otherAo: intersectingAo(otherAo, user)
     }
 };
 
