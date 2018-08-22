@@ -39,6 +39,7 @@ from core.common import (
     REPORTABLE_PA_CONTENT_OBJECT,
     OVERALL_STATUS,
     REPORTABLE_FREQUENCY_LEVEL,
+    PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
@@ -497,12 +498,16 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     output in a PD progress report. TODO: move to 'unicef' app?
     """
     serializer_class = OverallNarrativeSerializer
-    permission_classes = (
-        AnyPermission(
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        pd_progress_report_id = self.kwargs.get('pd_progress_report_id')
+        if not request.user.prp_roles.filter(
+                role__in=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_editor],
+                workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
+        ).exists():
+            self.permission_denied(request)
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """
