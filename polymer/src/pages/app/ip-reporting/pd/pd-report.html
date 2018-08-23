@@ -438,7 +438,6 @@
 
       _handlePermissions: function (permissions, mode, baseUrl, tail) {
         if (
-          !permissions.viewProgressReport ||
           (!permissions.editProgressReport && mode === 'edit')
         ) {
           window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));

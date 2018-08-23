@@ -158,8 +158,8 @@
         },
       },
 
-      _getLink: function (report) {
-        var suffix = this._getMode(report);
+      _getLink: function (report, permissions) {
+        var suffix = this._getMode(report, permissions);
 
         return this.buildUrl(
           this._baseUrl,
