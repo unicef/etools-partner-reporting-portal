@@ -5,6 +5,8 @@ import withProps from "../hoc/withProps";
 import {portal} from "../../helpers/props";
 import SmallValue from "../common/SmallText";
 
+const inactive = "Deactivated";
+
 class UserRoleControl extends Component {
     render() {
         const {role, actions, portal} = this.props;
@@ -21,6 +23,10 @@ class UserRoleControl extends Component {
         }
 
         text += role.role_display;
+
+        if (!role.is_active) {
+            text += ` (${inactive})`;
+        }
 
         return (
             <div>

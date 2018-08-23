@@ -64,6 +64,8 @@ class UsersList extends Component {
             onRemoveIpAdmin,
             onMakeIpAdmin,
             onMakeSystemAdmin,
+            onDeactivateAo,
+            onActivateAo,
             ...otherProps
         } = this.props;
 
@@ -81,6 +83,8 @@ class UsersList extends Component {
                                          onRemoveIpAdmin={onRemoveIpAdmin}
                                          onMakeIpAdmin={onMakeIpAdmin}
                                          onMakeSystemAdmin={onMakeSystemAdmin}
+                                         onDeactivateAo={onDeactivateAo}
+                                         onActivateAo={onActivateAo}
                         />
                     )}
                 />

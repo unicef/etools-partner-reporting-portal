@@ -1,6 +1,6 @@
 import {OTHER_AO} from "../actions";
 
-export default function otherAo(state = false, action) {
+export default function otherAo(state = [], action) {
     switch (action.type) {
         case OTHER_AO:
             return action.results;

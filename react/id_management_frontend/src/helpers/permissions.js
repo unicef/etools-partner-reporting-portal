@@ -1,7 +1,6 @@
 import {EDITABLE_PRP_ROLES, PRP_ROLE, USER_TYPE} from "../constants";
-import {getUserRole, hasAnyRole, hasOnlyRoles, userRoleInWorkspace} from "./user";
+import {getUserRole, hasAnyRole, userRoleInWorkspace} from "./user";
 import * as R from 'ramda';
-import {PORTALS} from "../actions";
 
 const isSystemAdmin = (user) => hasAnyRole(user, [PRP_ROLE.CLUSTER_SYSTEM_ADMIN]);
 
@@ -43,22 +42,14 @@ const _permissions = {
         return userRole === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
             permission.role === PRP_ROLE.IP_ADMIN;
     },
-    deleteUser: ({userProfile}, user) => {
-        let hasIpAdmin = true;
-
-        user.prp_roles.forEach(role => {
-            if (!role.workspace || userRoleInWorkspace(userProfile, role.workspace.id) !== PRP_ROLE.IP_ADMIN) {
-                hasIpAdmin = false;
-            }
-        });
-
-        return hasIpAdmin && hasOnlyRoles(user, [PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER])
-    },
     filterPartners: [
         PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         PRP_ROLE.CLUSTER_IMO
     ],
-    manageUser: ({userProfile, portal}) => hasAnyRole(userProfile, [PRP_ROLE.IP_ADMIN]) && portal === PORTALS.IP
+    manageAo: ({userProfile}, permission) => {
+        return permission.role === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+            userRoleInWorkspace(userProfile, permission.workspace.id) === PRP_ROLE.IP_AUTHORIZED_OFFICER;
+    }
 };
 
 export function computePermissions(state) {

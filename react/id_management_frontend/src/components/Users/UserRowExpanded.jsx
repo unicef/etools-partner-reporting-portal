@@ -18,7 +18,9 @@ const labels = getLabels({
     edit: "edit",
     delete: "delete",
     addPermission: "Add new permission",
-    makeSystemAdmin: "Make system admin"
+    makeSystemAdmin: "Make system admin",
+    deactivate: "deactivate",
+    activate: "activate"
 });
 
 const roleCaption = {
@@ -37,7 +39,15 @@ const styleSheet = (theme) => ({
 
 class UserRowExpanded extends Component {
     getActions(role, row) {
-        const {onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, permissions} = this.props;
+        const {
+            onPermissionEdit,
+            onPermissionDelete,
+            onRemoveIpAdmin,
+            onMakeIpAdmin,
+            onDeactivateAo,
+            onActivateAo,
+            permissions
+        } = this.props;
 
         return (
             <Fragment>
@@ -52,6 +62,15 @@ class UserRowExpanded extends Component {
 
                 {permissions.revokeIpAdmin(role) &&
                 <LinkButton label={labels.delete} variant="danger" onClick={() => onRemoveIpAdmin(role)}/>}
+
+                {permissions.manageAo(role) &&
+                <Fragment>
+                    {role.is_active &&
+                    <LinkButton label={labels.deactivate} variant="danger" onClick={() => onDeactivateAo(role)}/>}
+
+                    {!role.is_active &&
+                    <LinkButton label={labels.activate} onClick={() => onActivateAo(role)}/>}
+                </Fragment>}
             </Fragment>
         )
     }

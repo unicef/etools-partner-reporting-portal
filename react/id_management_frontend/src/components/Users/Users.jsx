@@ -18,7 +18,7 @@ import withProps from "../hoc/withProps";
 import {user} from "../../helpers/props";
 import {hasAnyRole} from "../../helpers/user";
 import AoAlert from "./AoAlert";
-import {FETCH_OPTIONS, fetch} from "../../fetch";
+import {FETCH_OPTIONS, fetch, fetchInvalidate} from "../../fetch";
 import {connect} from "react-redux";
 
 const header = "Users";
@@ -26,17 +26,17 @@ const CONFIRM_ACTIONS = {
     DELETE_PERMISSION: "DELETE_PERMISSION",
     MAKE_IP_ADMIN: "MAKE_IP_ADMIN",
     REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN",
-    DISABLE_USER: "DISABLE_USER",
-    ENABLE_USER: "ENABLE_USER",
-    MAKE_CLUSTER_ADMIN: "MAKE_CLUSTER_ADMIN"
+    MAKE_CLUSTER_ADMIN: "MAKE_CLUSTER_ADMIN",
+    DEACTIVATE_AO: "DEACTIVATE_AO",
+    ACTIVATE_AO: "ACTIVATE_AO"
 };
 const confirmMessages = {
     [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove this role for this user?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
     [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
-    [CONFIRM_ACTIONS.DISABLE_USER]: "Are you sure you want to disable this user?",
-    [CONFIRM_ACTIONS.ENABLE_USER]: "Are you sure you want to enable this user?",
-    [CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN]: "Are you sure you want to make this user an Cluster Admin?"
+    [CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN]: "Are you sure you want to make this user an Cluster Admin?",
+    [CONFIRM_ACTIONS.DEACTIVATE_AO]: "Are you sure you want to deactivate IP Authorized Officer role for this user in this workspace?",
+    [CONFIRM_ACTIONS.ACTIVATE_AO]: "Are you sure you want to activate IP Authorized Officer role for this user in this workspace?",
 };
 
 class Users extends Component {
@@ -58,9 +58,9 @@ class Users extends Component {
             onPermissionDelete: this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION),
             onRemoveIpAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN),
             onMakeIpAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN),
-            onDelete: this.openConfirmDialog(CONFIRM_ACTIONS.DISABLE_USER),
-            onRestore: this.openConfirmDialog(CONFIRM_ACTIONS.ENABLE_USER),
-            onMakeSystemAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN)
+            onMakeSystemAdmin: this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN),
+            onDeactivateAo: this.openConfirmDialog(CONFIRM_ACTIONS.DEACTIVATE_AO),
+            onActivateAo: this.openConfirmDialog(CONFIRM_ACTIONS.ACTIVATE_AO)
         };
 
         this.onUserSave = this.onUserSave.bind(this);
@@ -97,8 +97,6 @@ class Users extends Component {
     openConfirmDialog(action) {
         return (item) => {
             switch (action) {
-                case CONFIRM_ACTIONS.DISABLE_USER:
-                case CONFIRM_ACTIONS.ENABLE_USER:
                 case CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN:
                     this.setState({action, selectedUser: item});
                     break;
@@ -140,29 +138,19 @@ class Users extends Component {
             case CONFIRM_ACTIONS.MAKE_IP_ADMIN:
                 this.makeIpAdmin(this.state.selectedPermission);
                 break;
-            case CONFIRM_ACTIONS.DISABLE_USER:
-                this.disableUser(this.state.selectedUser);
-                break;
-            case CONFIRM_ACTIONS.ENABLE_USER:
-                this.enableUser(this.state.selectedUser);
-                break;
             case CONFIRM_ACTIONS.MAKE_CLUSTER_ADMIN:
                 this.makeClusterAdmin(this.state.selectedUser);
+                break;
+            case CONFIRM_ACTIONS.DEACTIVATE_AO:
+                this.patchAo(this.state.selectedPermission, false);
+                break;
+            case CONFIRM_ACTIONS.ACTIVATE_AO:
+                this.patchAo(this.state.selectedPermission, true);
                 break;
             default:
                 this.deletePermission(this.state.selectedPermission);
                 break;
         }
-    }
-
-    disableUser(user) {
-        api.post(`id-management/users/${user.id}/deactivate/`)
-            .then(this.closeAndReload)
-    }
-
-    enableUser(user) {
-        api.post(`id-management/users/${user.id}/activate/`)
-            .then(this.closeAndReload)
     }
 
     setAoFilter() {
@@ -175,6 +163,16 @@ class Users extends Component {
 
     onFilterReset() {
         this.setState({filterValues: {}})
+    }
+
+    patchAo(permission, is_active) {
+        const {fetchOtherAo, invalidateOtherAo} = this.props;
+
+        api.patch(`id-management/role-group/${permission.id}/`, {is_active})
+            .then(this.closeAndReload);
+
+        invalidateOtherAo();
+        fetchOtherAo();
     }
 
     render() {
@@ -237,7 +235,7 @@ const intersectingAo = (otherAo, user) => (
     otherAo &&
     otherAo.some(ao =>
         (ao.prp_roles.some(
-                aoRole => (aoRole.role === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+                aoRole => (aoRole.role === PRP_ROLE.IP_AUTHORIZED_OFFICER && aoRole.is_active &&
                     user.prp_roles.some(
                         uRole => uRole.role === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
                             uRole.workspace.id === aoRole.workspace.id
@@ -258,7 +256,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        fetchOtherAo: () => dispatch(fetch(FETCH_OPTIONS.OTHER_AO))
+        fetchOtherAo: () => dispatch(fetch(FETCH_OPTIONS.OTHER_AO)),
+        invalidateOtherAo: () => dispatch(fetchInvalidate(FETCH_OPTIONS.OTHER_AO))
     }
 };
 
