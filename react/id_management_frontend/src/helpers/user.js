@@ -3,14 +3,14 @@ import {api} from "../infrastructure/api";
 import {PORTALS} from "../actions";
 
 export function hasAnyRole(user, roles) {
-    return user.prp_roles.some(item => roles.indexOf(item.role) > -1);
+    return user.prp_roles.some(item => item.is_active && roles.indexOf(item.role) > -1);
 }
 
 export function userRoleInWorkspace(user, workspace) {
     if (!workspace) return null;
 
     // eslint-disable-next-line
-    const roles = user.prp_roles.filter(role => role.workspace && role.workspace.id == workspace);
+    const roles = user.prp_roles.filter(role => role.is_active && role.workspace && role.workspace.id == workspace);
 
     return roles.length ? roles[0].role : null;
 }
@@ -57,7 +57,7 @@ export function getUserRole(user, permission, portal) {
 }
 
 export function hasOnlyRoles(user, roles) {
-    const filtered = user.prp_roles.filter(item => roles.indexOf(item.role) > -1);
+    const filtered = user.prp_roles.filter(item => item.is_active && roles.indexOf(item.role) > -1);
 
     return filtered.length === user.prp_roles.length;
 }
