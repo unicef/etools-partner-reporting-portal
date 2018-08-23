@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {Component} from "react";
 import Grid from "@material-ui/core/Grid";
-import Tooltip from "@material-ui/core/Tooltip";
 import {green, grey, red} from "@material-ui/core/colors";
 import {FiberManualRecord as Dot} from "@material-ui/icons";
 import {withStyles} from "@material-ui/core/styles";
@@ -18,17 +17,13 @@ const statusLabel = {
     ACTIVE: "Active",
     INVITED: "Invited",
     DEACTIVATED: "Deactivated",
-    INCOMPLETE: "Incomplete"
+    INCOMPLETE: "No roles assigned"
 };
-
-const incompleteMessage = "This user was marked as incomplete because it doesn't have any role assigned to it";
 
 const styleSheet = theme => {
     return {
         incomplete: {
             color: theme.palette.secondary.main,
-            cursor: "pointer",
-            textDecoration: "underline",
             display: "inline-block",
             marginLeft: theme.spacing.unit * 0.5
         }
@@ -55,9 +50,7 @@ class UserRowStatus extends Component {
                 <Grid item>
                     {statusLabel[row.status]}
                     {row.is_incomplete &&
-                    <Tooltip title={incompleteMessage}>
-                        <span className={classes.incomplete}>{`(${statusLabel["INCOMPLETE"]})`}</span>
-                    </Tooltip>}
+                        <span className={classes.incomplete}>{`(${statusLabel["INCOMPLETE"]})`}</span>}
                 </Grid>
             </Grid>
         )

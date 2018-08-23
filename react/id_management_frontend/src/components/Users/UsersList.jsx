@@ -6,7 +6,7 @@ import {PORTALS} from "../../actions";
 import * as R from 'ramda';
 import {date} from "../../helpers/filters";
 import withProps from "../hoc/withProps";
-import {permissions, portal} from "../../helpers/props";
+import {portal} from "../../helpers/props";
 import UserRowStatus from "./UserRowStatus";
 
 class UsersList extends Component {
@@ -64,22 +64,14 @@ class UsersList extends Component {
             onRemoveIpAdmin,
             onMakeIpAdmin,
             onMakeSystemAdmin,
-            permissions,
             ...otherProps
         } = this.props;
-
-        const removableItems = data.results.filter(item => item.canBeDeleted);
-        const restorebleItems = data.results.filter(item => item.canBeRestored);
-        const showDelete = permissions.manageUser && removableItems.length > 0;
-        const showRestore = permissions.manageUser && restorebleItems.length > 0;
 
         return (
             <div>
                 <PaginatedList
                     {...otherProps}
                     data={data}
-                    showDelete={showDelete}
-                    showRestore={showRestore}
                     columns={this.getColumns()}
                     expandedCell={row => (
                         <UserRowExpanded row={row}
@@ -106,8 +98,7 @@ UsersList.propTypes = {
     onPermissionsAdd: PropTypes.func.isRequired,
     onRemoveIpAdmin: PropTypes.func.isRequired,
     portal: PropTypes.string,
-    permissions: PropTypes.object.isRequired,
 };
 
-export default withProps(portal, permissions)(UsersList);
+export default withProps(portal)(UsersList);
 

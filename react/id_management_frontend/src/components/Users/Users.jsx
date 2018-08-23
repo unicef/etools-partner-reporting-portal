@@ -219,14 +219,12 @@ class Users extends Component {
     }
 }
 
-const getData = (request, permissions) => (
+const getData = (request) => (
     new Promise((resolve, reject) => {
         api.get("id-management/users/", request)
             .then(res => {
                 res.data.results.forEach(function (item) {
                     item.name = fullName(item);
-                    item.canBeDeleted = item.status !== "DEACTIVATED" && permissions.deleteUser(item);
-                    item.canBeRestored = item.status === "DEACTIVATED" && permissions.deleteUser(item);
                     item.highlight = item.is_incomplete
                 });
 
