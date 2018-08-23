@@ -27,8 +27,8 @@
         var mode = this._getMode(report);
 
         switch (true) {
-          case mode === 'view' && !permissions.viewProgressReport:
-          case mode === 'edit' && !permissions.editProgressReport:
+          case mode === 'view' || !permissions.viewProgressReport:
+          case mode === 'edit' || !permissions.editProgressReport:
             return false;
 
           default:

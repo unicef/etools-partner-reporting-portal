@@ -315,7 +315,7 @@
         canSubmit: {
           type: Boolean,
           value: false,
-          computed: '_computeCanSubmit(mode, currentReport)',
+          computed: '_computeCanSubmit(mode, currentReport, permissions)',
         },
 
         submittedOnBehalf: {
@@ -408,8 +408,9 @@
 
       _canExport: function (report, mode, permissions) {
         switch (true) {
-          case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+          case report.status === 'Sub':
           case mode === 'edit':
+          case !permissions.exportSubmittedProgressReport:
             return false;
 
           default:
@@ -417,12 +418,13 @@
         }
       },
 
-      _computeCanSubmit: function (mode, report) {
+      _computeCanSubmit: function (mode, report, permissions) {
         switch (true) {
           case mode === 'view':
           case report.programme_document &&
             (report.programme_document.status === 'Sig'
             || report.programme_document.status === 'Clo'):
+          case !permissions.editProgressReport:
             return false;
 
           default:
