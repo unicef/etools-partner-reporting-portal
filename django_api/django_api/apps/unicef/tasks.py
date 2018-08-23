@@ -10,10 +10,9 @@ from celery import shared_task
 from rest_framework.exceptions import ValidationError
 
 from core.api import PMP_API
-from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
+from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole, PRPRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from core.factories import PRPRoleFactory
 
 from partner.models import PartnerActivity
 
@@ -234,11 +233,17 @@ def process_programme_documents(fast=False, area=False):
                             user.partner = partner
                             user.save()
 
-                            PRPRoleFactory(
+                            obj, created = PRPRole.objects.get_or_create(
                                 user=user,
                                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                                 workspace=workspace,
                             )
+
+                            is_active = person_data.get('active')
+
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
 
                         # Create focal_points
                         person_data_list = item['focal_points']
@@ -252,11 +257,17 @@ def process_programme_documents(fast=False, area=False):
                             user.partner = partner
                             user.save()
 
-                            PRPRoleFactory(
+                            obj, created = PRPRole.objects.get_or_create(
                                 user=user,
                                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                                 workspace=workspace,
                             )
+
+                            is_active = person_data.get('active')
+
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
 
                         # Create sections
                         section_data_list = item['sections']
