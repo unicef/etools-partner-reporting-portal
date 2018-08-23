@@ -105,7 +105,7 @@ function SelectContainer(props) {
 
         return (
             <Fragment>
-                <div style={holderStyle}></div>
+                <div style={holderStyle}/>
                 <Grow in={true} style={{transformOrigin: '0 0 0'}}>
                     <Paper square className={props.selectProps.classes.searchWrapper}>
                         <components.SelectContainer {...props}/>
@@ -344,7 +344,7 @@ class SearchSelectForm extends Component {
 
     loadOptions(options) {
         return (query) => {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 let result = options;
 
                 if (query) {

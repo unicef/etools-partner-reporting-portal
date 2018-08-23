@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {withStyles} from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 
-const styleSheet = theme => ({
+const styleSheet = () => ({
     formControl: {
         minWidth: '100%'
     }

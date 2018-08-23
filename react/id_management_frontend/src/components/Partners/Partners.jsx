@@ -120,7 +120,7 @@ const mapDispatchToProps = dispatch => {
 };
 
 const getData = (request) => (
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
         api.get("id-management/partners/", request)
             .then(res => {
                 resolve(res.data);

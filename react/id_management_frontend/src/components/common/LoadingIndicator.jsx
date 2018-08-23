@@ -4,7 +4,7 @@ import {CircularProgress} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import PropTypes from "prop-types";
 
-const styleSheet = theme => ({
+const styleSheet = () => ({
     absolute: {
         position: 'absolute',
         top: '50%',

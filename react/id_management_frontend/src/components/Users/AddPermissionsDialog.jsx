@@ -33,7 +33,7 @@ class AddPermissionsDialog extends Component {
 
 
         return api.post("id-management/role-group/", request)
-            .then(res => {
+            .then(() => {
                 onSave();
                 this.onClose();
             })

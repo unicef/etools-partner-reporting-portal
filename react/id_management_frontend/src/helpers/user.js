@@ -1,4 +1,4 @@
-import {PRP_ROLE, PRP_ROLE_OPTIONS, USER_TYPE_OPTIONS} from "../constants";
+import {PRP_ROLE, USER_TYPE_OPTIONS} from "../constants";
 import {api} from "../infrastructure/api";
 import {PORTALS} from "../actions";
 
@@ -13,10 +13,6 @@ export function userRoleInWorkspace(user, workspace) {
     const roles = user.prp_roles.filter(role => role.is_active && role.workspace && role.workspace.id == workspace);
 
     return roles.length ? roles[0].role : null;
-}
-
-export function getRoleLabel(role) {
-    return getLabelFromOptions(PRP_ROLE_OPTIONS, role);
 }
 
 export function getUserTypeLabel(userType) {
@@ -54,12 +50,6 @@ export function getUserRole(user, permission, portal) {
     }
 
     return userWorkspaceRole;
-}
-
-export function hasOnlyRoles(user, roles) {
-    const filtered = user.prp_roles.filter(item => item.is_active && roles.indexOf(item.role) > -1);
-
-    return filtered.length === user.prp_roles.length;
 }
 
 export function hasPartnersAccess(user) {

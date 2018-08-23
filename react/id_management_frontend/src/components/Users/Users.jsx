@@ -218,7 +218,7 @@ class Users extends Component {
 }
 
 const getData = (request) => (
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
         api.get("id-management/users/", request)
             .then(res => {
                 res.data.results.forEach(function (item) {

@@ -35,7 +35,7 @@ class EditPermissionDialog extends Component {
         this.setState({loading: true});
 
         return api.patch(`id-management/role-group/${id}/`, {role: values.role})
-            .then(res => {
+            .then(() => {
                 onClose();
                 onSave();
             })
