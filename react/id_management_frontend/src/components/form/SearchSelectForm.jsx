@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from "react";
-import Select, {components} from 'react-select';
+import {components} from 'react-select';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -10,7 +10,8 @@ import {required} from "../../helpers/validation";
 import {Field} from "redux-form";
 import {Close, Search, Check} from "@material-ui/icons";
 import classNames from "classnames";
-
+import Async from 'react-select/lib/Async';
+import * as R from 'ramda';
 
 const styles = theme => ({
     root: {
@@ -291,7 +292,9 @@ class SearchSelectForm extends Component {
 
         this.fieldWrapperRef = null;
 
-        this.setFieldWrapperRef = (elem) => {this.fieldWrapperRef = elem};
+        this.setFieldWrapperRef = (elem) => {
+            this.fieldWrapperRef = elem
+        };
 
         this.renderSelect = this.renderSelect.bind(this);
         this.getObject = this.getObject.bind(this);
@@ -301,6 +304,10 @@ class SearchSelectForm extends Component {
     renderSelect({input, options}) {
         const {classes, theme, placeholder, multiple, label} = this.props;
 
+        if (!options || !options.length) {
+            return null;
+        }
+
         const selectStyles = {
             input: base => ({
                 ...base,
@@ -309,7 +316,7 @@ class SearchSelectForm extends Component {
         };
 
         return (
-            <Select
+            <Async
                 {...input}
                 classes={classes}
                 styles={selectStyles}
@@ -319,7 +326,6 @@ class SearchSelectForm extends Component {
                         shrink: true,
                     },
                 }}
-                options={options}
                 components={_components}
                 value={input.value || []}
                 placeholder={placeholder || `Select ${label.toLowerCase()}`}
@@ -330,8 +336,28 @@ class SearchSelectForm extends Component {
                 isClearable={multiple}
                 backspaceRemovesValue={false}
                 fieldWrapperRef={this.fieldWrapperRef}
+                defaultOptions={true}
+                loadOptions={this.loadOptions(options)}
             />
         )
+    }
+
+    loadOptions(options) {
+        return (query) => {
+            return new Promise((resolve, reject) => {
+                let result = options;
+
+                if (query) {
+                    result = R.filter(
+                        R.propSatisfies(
+                            str => str.toLowerCase().includes(query.toLowerCase()), 'label'
+                        ), options
+                    );
+                }
+
+                resolve(result.slice(0, 30));
+            })
+        };
     }
 
     normalize(val) {
@@ -367,7 +393,7 @@ class SearchSelectForm extends Component {
 
         return (
             <div className={classes.fieldWrapper}
-             ref={this.setFieldWrapperRef}>
+                 ref={this.setFieldWrapperRef}>
                 <Field
                     name={fieldName}
                     component={this.renderSelect}
