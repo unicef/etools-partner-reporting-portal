@@ -204,7 +204,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
 class PRPRoleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PRPRole
-        fields = ('role',)
+        fields = ('role', 'is_active')
 
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)

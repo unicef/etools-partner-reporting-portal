@@ -18,11 +18,23 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
             self.message = 'This user is deactivated.'
             return False
 
-        if (user == obj.user or
-                request.method in ('PATCH', 'DELETE') and (
-                obj.role in {ROLES.cluster_system_admin, ROLES.ip_authorized_officer} or
-                role_in_payload == obj.role)):
+        if user == obj.user or role_in_payload == obj.role:
             return False
+
+        if request.method == 'DELETE' and obj.role in {ROLES.cluster_system_admin, ROLES.ip_authorized_officer}:
+            return False
+
+        if request.method == 'PATCH':
+            if obj.role == ROLES.cluster_system_admin:
+                return False
+            if obj.role == ROLES.ip_authorized_officer:
+                if ('is_active' in request.data.keys() and
+                        len(request.data.keys()) == 1 and
+                        user.prp_roles.filter(workspace__isnull=False,
+                                              workspace_id=obj.workspace_id,
+                                              role=ROLES.ip_authorized_officer)):
+                    return True
+                return False
 
         if (request.method == 'POST' and
                 PRPRole.objects.filter(

@@ -12,4 +12,4 @@ class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PRPRole
-        fields = ('id', 'user', 'role', 'role_display', 'workspace', 'cluster')
+        fields = ('id', 'user', 'role', 'role_display', 'workspace', 'cluster', 'is_active')

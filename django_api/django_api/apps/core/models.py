@@ -195,6 +195,7 @@ class PRPRole(TimeStampedExternalSourceModel):
         'cluster.Cluster', related_name="prp_roles",
         blank=True, null=True
     )
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
