@@ -37,22 +37,30 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_access(self, obj):
         accesses = []
-        cluster_roles = [
+        cluster_roles = {
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.cluster_coordinator,
             PRP_ROLE_TYPES.cluster_viewer
-        ]
+        }
+
+        ip_roles = {
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_viewer
+        }
+
+        user_roles = set(obj.role_list)
 
         if obj.is_active:
             # Cluster access check
-            cluster_access = obj.prp_roles.filter(role__in=cluster_roles).exists()
-            if cluster_access or (obj.partner and obj.partner.clusters.exists()):
+            if user_roles.intersection(cluster_roles):
                 accesses.append('cluster-reporting')
 
             # IP access check
-            if obj.partner and obj.partner.programmedocument_set.exists():
+            if obj.partner and obj.partner.programmedocument_set.exists() and user_roles.intersection(ip_roles):
                 accesses.append('ip-reporting')
 
         return accesses
