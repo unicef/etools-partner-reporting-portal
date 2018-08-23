@@ -63,6 +63,7 @@ def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                 workspace__id=workspace_id,
+                is_active=True
             ).exists(),
         ]
 
@@ -178,7 +179,7 @@ def IsClusterMemberForCurrentWorkspaceCheck(request):
 def IsIPAuthorizedOfficerCheck(request):
     rules = [
         request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer).exists(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer, is_active=True).exists(),
     ]
     return all(rules)
 
