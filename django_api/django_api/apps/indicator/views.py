@@ -22,8 +22,10 @@ from core.permissions import (
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
     AnyPermission,
     IsIPAuthorizedOfficer,
+    IsIPAdmin,
     IsIPEditor,
     IsIPViewer,
 )
@@ -103,6 +105,7 @@ class PDReportsAPIView(ListAPIView):
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -143,6 +146,7 @@ class PDReportsDetailAPIView(RetrieveAPIView):
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -188,6 +192,7 @@ class IndicatorListAPIView(ListAPIView):
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     serializer_class = IndicatorListSerializer
@@ -286,6 +291,7 @@ class ReportableDetailAPIView(RetrieveAPIView):
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     lookup_url_kwarg = 'reportable_id'
@@ -553,6 +559,7 @@ class IndicatorReportListAPIView(APIView):
     permission_classes = (
         AnyPermission(
             IsIPAuthorizedOfficer,
+            IsIPAdmin,
             IsIPEditor,
             IsIPViewer,
         ),

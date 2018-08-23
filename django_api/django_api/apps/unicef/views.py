@@ -32,6 +32,7 @@ from core.permissions import (
     AnyPermission,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
 )
 from core.models import Location, PartnerAuthorizedOfficerRole
 from core.serializers import ShortLocationSerializer
@@ -91,6 +92,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     pagination_class = SmallPagination
@@ -115,6 +117,7 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     lookup_url_kwarg = 'pd_id'
@@ -153,6 +156,7 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     lookup_url_kwarg = 'pd_id'
@@ -220,6 +224,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -248,6 +253,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -384,6 +390,7 @@ class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -420,6 +427,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)

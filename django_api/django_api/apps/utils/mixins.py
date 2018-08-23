@@ -11,8 +11,8 @@ from core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
     IsIMOForCurrentWorkspace,
-
 )
 
 
@@ -67,6 +67,7 @@ class ListExportMixin(object):
                     IsPartnerAuthorizedOfficerForCurrentWorkspace,
                     IsPartnerEditorForCurrentWorkspace,
                     IsPartnerViewerForCurrentWorkspace,
+                    IsPartnerAdminForCurrentWorkspace,
                     IsIMOForCurrentWorkspace,
                 ),
             )
@@ -97,6 +98,7 @@ class ObjectExportMixin(object):
                     IsPartnerAuthorizedOfficerForCurrentWorkspace,
                     IsPartnerEditorForCurrentWorkspace,
                     IsPartnerViewerForCurrentWorkspace,
+                    IsPartnerAdminForCurrentWorkspace,
                     IsIMOForCurrentWorkspace,
                 ),
             )

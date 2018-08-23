@@ -184,6 +184,14 @@ def IsIPAuthorizedOfficerCheck(request):
     return all(rules)
 
 
+def IsIPAdminCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_admin).exists(),
+    ]
+    return all(rules)
+
+
 def IsIPEditorCheck(request):
     rules = [
         request.user.is_authenticated(),
@@ -204,6 +212,12 @@ class IsPartnerAuthorizedOfficerForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
         return IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request)
+
+
+class IsPartnerAdminForCurrentWorkspace(BasePermission):
+
+    def has_permission(self, request, view):
+        return IsPartnerAdminForCurrentWorkspaceCheck(request)
 
 
 class IsPartnerEditorForCurrentWorkspace(BasePermission):
@@ -247,6 +261,12 @@ class IsIPAuthorizedOfficer(BasePermission):
 
     def has_permission(self, request, view):
         return IsIPAuthorizedOfficerCheck(request)
+
+
+class IsIPAdmin(BasePermission):
+
+    def has_permission(self, request, view):
+        return IsIPAdminCheck(request)
 
 
 class IsIPEditor(BasePermission):
