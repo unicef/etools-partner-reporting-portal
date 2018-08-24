@@ -317,6 +317,7 @@ def process_programme_documents(fast=False, area=False):
                                 for i in d['indicators']:
                                     # Check if indicator is cluster indicator
                                     i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+                                    i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
                                     # If indicator is not cluster, create Blueprint
                                     # otherwise use parent Blueprint
@@ -435,7 +436,7 @@ def process_programme_documents(fast=False, area=False):
                                         i,
                                         {'external_id': i['id']}
                                     )
-                                    reportable.active = True
+                                    reportable.active = i['is_active']
 
                                     # TODO: Update the PMP PD indicator data field
                                     # for ca_indicator_used_by_reporting_entity
