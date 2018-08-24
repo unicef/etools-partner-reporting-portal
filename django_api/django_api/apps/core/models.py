@@ -114,6 +114,23 @@ class Country(TimeStampedModel):
                 pass
 
 
+class WorkspaceManager(models.Manager):
+    def user_workspaces(self, user, role_list=None):
+        ip_kw = {'prp_roles__user': user}
+        cluster_kw = {'response_plans__clusters__prp_roles__user': user}
+
+        if role_list:
+            ip_kw['prp_roles__role__in'] = role_list
+            cluster_kw['response_plans__clusters__prp_roles__role__in'] = role_list
+
+        if user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
+            q_cluster_admin = Q(response_plans__clusters__isnull=False)
+        else:
+            q_cluster_admin = Q()
+
+        return self.filter(Q(**ip_kw) | Q(**cluster_kw) | q_cluster_admin).distinct()
+
+
 class Workspace(TimeStampedExternalSourceModel):
     """
     Workspace (previously called Workspace, also synonym was
@@ -149,6 +166,8 @@ class Workspace(TimeStampedExternalSourceModel):
         ]
     )
     initial_zoom = models.IntegerField(default=8)
+
+    objects = WorkspaceManager()
 
     class Meta:
         ordering = ['title']

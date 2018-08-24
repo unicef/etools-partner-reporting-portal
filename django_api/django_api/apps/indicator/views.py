@@ -30,7 +30,7 @@ from core.permissions import (
     IsIPViewer,
 )
 from core.paginations import SmallPagination
-from core.models import Location
+from core.models import Location, Workspace
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -663,7 +663,7 @@ class IndicatorLocationDataUpdateAPIView(APIView):
             PRP_ROLE_TYPES.cluster_imo,
         ]
 
-        user_workspaces = request.user.get_workspaces(roles_permitted)
+        user_workspaces = Workspace.objects.user_workspaces(request.user, roles_permitted).values_list('id', flat=True)
 
         if not IndicatorLocationData.objects.filter(
                 id=indicator_location_data_id,

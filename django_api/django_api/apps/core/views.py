@@ -34,25 +34,16 @@ class WorkspaceAPIView(ListAPIView):
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Workspace.objects.prefetch_related('countries').distinct()
     serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_fields = ('business_area_code', 'workspace_code')
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
         """
         Only return workspaces that the user is associated with.
         """
-        queryset = self.get_queryset()
-        wk_ids = request.user.get_workspaces()
-
-        queryset = queryset.filter(id__in=wk_ids)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
-        )
+        return Workspace.objects.user_workspaces(self.request.user).prefetch_related('countries').distinct()
 
 
 class LocationListAPIView(ListAPIView):

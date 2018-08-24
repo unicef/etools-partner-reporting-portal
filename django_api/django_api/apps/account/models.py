@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Value, CharField, Case, When
 from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
@@ -73,30 +71,6 @@ class User(AbstractUser):
             PRP_ROLE_TYPES.cluster_viewer,
             PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
             return USER_TYPES.partner
-
-    def get_workspaces(self, role_list=None):
-        workspaces = set()
-        role_in_kwarg = {}
-        agg_kwarg = {}
-        if role_list:
-            if PRP_ROLE_TYPES.cluster_system_admin in role_list:
-                agg_kwarg['all'] = ArrayAgg(
-                    Case(When(role='CLUSTER_SYSTEM_ADMIN', then=Value('__all__')), output_field=CharField())
-                )
-            role_in_kwarg['role__in'] = role_list
-
-        aggregated_workspaces = self.prp_roles.filter(**role_in_kwarg).aggregate(
-            workspaces=ArrayAgg('workspace'),
-            cluster_workspaces=ArrayAgg('cluster__response_plan__workspace'),
-            **agg_kwarg
-        )
-
-        for workspace_list in aggregated_workspaces.values():
-            workspaces.update(workspace_list)
-
-        workspaces.discard(None)
-
-        return workspaces
 
 
 class UserProfile(TimeStampedModel):
