@@ -428,7 +428,14 @@ class ResponsePlanClusterDashboardAPIView(APIView):
     Returns:
         - GET method - ClusterDashboardSerializer object.
     """
-    permission_classes = (IsIMOForCurrentWorkspace, )
+    permission_classes = (IsAuthenticated, )
+
+    def check_response_plan_permission(self, request, obj):
+        if not request.user.prp_roles.filter(
+            Q(cluster__response_plan=obj, role=PRP_ROLE_TYPES.cluster_imo) |
+            Q(role=PRP_ROLE_TYPES.cluster_system_admin)
+        ).exists():
+            self.permission_denied(request)
 
     def get_instance(self, request, response_plan_id=None):
         try:
@@ -441,6 +448,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
+        self.check_response_plan_permission(request, response_plan)
         cluster_ids = request.GET.get('cluster_id', None)
 
         # validate this cluster belongs to the response plan
@@ -475,16 +483,21 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     Returns:
         - GET method - ResponsePlanPartnerDashboardSerializer object.
     """
-    permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_response_plan_permission(self, request, obj):
+        roles_permitted = (
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_viewer,
+            PRP_ROLE_TYPES.cluster_coordinator,
+        )
+
+        if not request.user.prp_roles.filter(cluster__response_plan=obj, role__in=roles_permitted).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
+        self.check_response_plan_permission(request, response_plan)
         cluster_ids = request.GET.get('cluster_id', None)
 
         if not request.user.partner:
