@@ -10,6 +10,7 @@
       var isViewer = isMember.bind(null, App.Constants.PRP_ROLE.IP_VIEWER);
       var isIMO = isMember.bind(null, App.Constants.PRP_ROLE.CLUSTER_IMO);
       var isAuthorizedOfficer = isMember.bind(null, App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER);
+      var isClusterMember = isMember.bind(null, App.Constants.PRP_ROLE.CLUSTER_MEMBER);
 
       var permissions = {
         editProgressReport: [
@@ -64,7 +65,7 @@
                 return cluster.id === clusterId;
               });
 
-            case isAuthorizedOfficer(params.prpRoles):
+            case isClusterMember(params.prpRoles):
               return partnerId === (params.partner && params.partner.id);
 
             default:
@@ -77,7 +78,7 @@
         ],
 
         createPartnerEntities: [
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
         ],
 
         createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
@@ -110,14 +111,12 @@
         },
 
         viewPlannedAction: [
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-          App.Constants.PRP_ROLE.IP_EDITOR,
-          App.Constants.PRP_ROLE.IP_VIEWER,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          App.Constants.PRP_ROLE.CLUSTER_VIEWER,
         ],
 
         createPartnerProject: [
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-          App.Constants.PRP_ROLE.IP_EDITOR,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           App.Constants.PRP_ROLE.CLUSTER_IMO,
         ],
 
@@ -139,13 +138,11 @@
 
         editIndicatorDetails: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-          App.Constants.PRP_ROLE.IP_EDITOR,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
         ],
 
         onlyEditOwnIndicatorDetails: [
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-          App.Constants.PRP_ROLE.IP_EDITOR,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
         ],
 
         editIndicatorLocations: [
