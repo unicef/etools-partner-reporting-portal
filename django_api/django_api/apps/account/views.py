@@ -1,5 +1,5 @@
 from django.contrib.auth import login, logout
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Count
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -84,9 +84,9 @@ class UserListCreateAPIView(ListCreateAPIView):
         portal_choice = self.request.query_params.get('portal')
 
         user = self.request.user
-        user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
+        user_prp_roles = set(user.role_list)
 
-        users_queryset = User.objects.exclude(id=user.id)
+        users_queryset = User.objects.exclude(id=user.id).annotate(role_count=Count('prp_roles'))
 
         ip_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}

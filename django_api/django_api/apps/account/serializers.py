@@ -95,6 +95,9 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
             return USER_STATUS_TYPES.deactivated
 
     def get_is_incomplete(self, obj):
+        role_count = getattr(obj, 'role_count', None)
+        if role_count is not None:
+            return not role_count
         return not PRPRole.objects.filter(user=obj).exists()
 
     class Meta:

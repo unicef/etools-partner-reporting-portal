@@ -62,7 +62,7 @@ class User(AbstractUser):
 
     @property
     def user_type(self):
-        user_prp_roles = set(self.role_list)
+        user_prp_roles = set(prp_role.role for prp_role in self.prp_roles.all())
         if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
             return USER_TYPES.cluster_admin
         if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
