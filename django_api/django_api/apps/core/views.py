@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from djcelery.models import PeriodicTask
 
-from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS, PRP_ROLE_TYPES
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
@@ -107,10 +107,10 @@ class ResponsePlanAPIView(ListAPIView):
 
         queryset = ResponsePlan.objects.filter(workspace_id=workspace_id)
 
-        if self.request.user.partner:
-            queryset = queryset.filter(clusters__partners=self.request.user.partner).distinct()
+        if self.request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
+            return queryset.filter(clusters__isnull=False)
 
-        return queryset
+        return queryset.filter(clusters__prp_roles__user=self.request.user)
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):
