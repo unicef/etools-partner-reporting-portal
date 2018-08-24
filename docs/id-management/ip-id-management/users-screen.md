@@ -71,7 +71,7 @@ Both actions of making and removing a role of IP Admin will display modal window
 
 
 
-* **As IP Admin** of particular workspaces, this person can edit or delete roles for this user in those workspaces. These actions are accessible by clicking on the links next to the Workspace/Role pair:
+* **As IP Admin** of particular workspaces, this person can edit or delete roles for users in those workspaces. These actions are accessible by clicking on the links next to the Workspace/Role pair:
 
 ![View of Authorized Officer of Kenya and India workspaces](https://lh3.googleusercontent.com/uXk3WnEWoG3riO2BDXnVgJxYb34EVGlE1gSJdePk-e73RdVm26WOmBuX7OU_9G3M7zR3FfQCkY6Mo4de-QdueNDFsJ2K0Mg1dHccshBupAKYtDRdfnkppQFE3XxFgLko3yYkoPCD)
 
