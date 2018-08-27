@@ -24,10 +24,7 @@ from core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerAdminForCurrentWorkspace,
     AnyPermission,
-    IsIPAuthorizedOfficer,
-    IsIPAdmin,
-    IsIPEditor,
-    IsIPViewer,
+    HasAnyRole,
 )
 from core.paginations import SmallPagination
 from core.models import Location, Workspace
@@ -187,13 +184,14 @@ class IndicatorListAPIView(ListAPIView):
      - /api/indicator/<content_object>/                                   [will throw exception]
     """
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        )
     )
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
@@ -557,12 +555,18 @@ class IndicatorReportListAPIView(APIView):
     reportable_id many times.
     """
     permission_classes = (
-        AnyPermission(
-            IsIPAuthorizedOfficer,
-            IsIPAdmin,
-            IsIPEditor,
-            IsIPViewer,
-        ),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_viewer,
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        )
     )
 
     def get_queryset(self, *args, **kwargs):

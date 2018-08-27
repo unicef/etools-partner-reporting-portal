@@ -22,6 +22,17 @@ class AnyPermission(BasePermission):
         return self
 
 
+class HasAnyRole(BasePermission):
+    def __init__(self, *roles):
+        self.roles = roles
+
+    def has_permission(self, request, view):
+        return request.user.prp_roles.filter(role__in=self.roles).exists()
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+
 class IsAuthenticated(BasePermission):
     """
     Allows access only to authenticated users.
