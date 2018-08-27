@@ -29,17 +29,6 @@
           statePath: 'auth.token',
         },
 
-        _accountType: {
-          type: String,
-          statePath: 'auth.accountType',
-        },
-
-        accountType: {
-          type: String,
-          notify: true,
-          computed: '_identity(_accountType)',
-        },
-
         authenticated: {
           type: Boolean,
           notify: true,

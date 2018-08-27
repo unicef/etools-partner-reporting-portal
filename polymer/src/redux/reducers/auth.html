@@ -8,8 +8,7 @@
     App.Reducers = App.Reducers || {};
 
     App.Reducers.Auth = Redux.combineReducers({
-      token: tokenReducer,
-      accountType: accountTypeReducer,
+      token: tokenReducer
     });
 
     function tokenReducer(state, action) {
@@ -22,29 +21,6 @@
           return action.token;
 
         case App.Constants.RESET_TOKEN:
-          return '';
-
-        default:
-          return state;
-      }
-    }
-
-    function accountTypeReducer(state, action) {
-      if (typeof state === 'undefined') {
-        state = '';
-      }
-
-      switch (action.type) {
-        case App.Constants.SET_ACCOUNT_TYPE:
-          return (function () {
-            var isCluster = !!action.data.partner;
-
-            return isCluster ?
-                App.Constants.ACCOUNT_TYPE_PARTNER :
-                App.Constants.ACCOUNT_TYPE_CLUSTER;
-          }());
-
-        case App.Constants.RESET:
           return '';
 
         default:

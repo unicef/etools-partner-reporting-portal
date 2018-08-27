@@ -69,7 +69,6 @@
           return profileThunk()
           .then(function(res) {
             dispatch(App.Actions.setUserProfile(res.data));
-            dispatch(App.Actions.setAccountType(res.data));
             dispatch(App.Actions.setPartner(res.data.partner));
           });
         };
@@ -78,13 +77,6 @@
       setUserProfile: function(data) {
         return {
           type: App.Constants.SET_USER_PROFILE,
-          data: data,
-        };
-      },
-
-      setAccountType: function (data) {
-        return {
-          type: App.Constants.SET_ACCOUNT_TYPE,
           data: data,
         };
       },
