@@ -57,10 +57,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
 
                     let roleOptions = [];
 
-                    if (selectedUser.user_type === USER_TYPE.IMO) {
-                        roleOptions = PRP_ROLE_OPTIONS.filter(item => item.value === PRP_ROLE.CLUSTER_IMO);
-                    }
-                    else if (role) {
+                    if (role) {
                         roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role] || [];
                     }
 
@@ -77,11 +74,11 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                 <Grid item md={6}>
                                     {portal === PORTALS.IP &&
                                     <SearchSelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                                options={filteredWorkspaceOptions}/>}
+                                                      options={filteredWorkspaceOptions}/>}
 
                                     {portal === PORTALS.CLUSTER &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
-                                                options={filteredClusterOptions}/>}
+                                                      options={filteredClusterOptions}/>}
                                 </Grid>
 
                                 <Grid item md={6}>
