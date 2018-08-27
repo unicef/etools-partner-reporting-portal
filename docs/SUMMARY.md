@@ -43,6 +43,7 @@
   * [Overview](id-management/overview.md)
   * [AD Integration & Sign In](id-management/ad-integration-and-sign-in.md)
   * [Email Notifications](id-management/email-notifications.md)
+  * [User Statuses](id-management/user-statuses.md)
   * [Permissions](id-management/permissions.md)
   * [IP ID Management](id-management/ip-id-management/README.md)
     * [User Interface](id-management/ip-id-management/user-interface.md)

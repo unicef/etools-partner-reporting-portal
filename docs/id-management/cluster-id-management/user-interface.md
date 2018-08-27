@@ -1,6 +1,6 @@
 # User Interface
 
-The overall user interface for User Management in Cluster Portal consists of the following sections, depending on role of logged in person. The user will get here via the Cluster Reporting interface with ID Management option in the left hand navigation.
+The overall user interface for User Management in Cluster Portal consists of the following sections, depending on role of logged in person. The user will get here via the Cluster Reporting interface with ID Management option in the left hand navigation. The first super admin user will be added via Django admin. Then this user should be able to add other cluster members, viewers, coordinators etc. along with IMO's as well.
 
 ![Overall user interface for Cluster super admin and IMO](https://lh5.googleusercontent.com/qHzi7rFx9DoHpvFN2bjNVrWuMAkwvgyJiHfmwRNpcO4aDPwDLMOgmew17vJbQ32Zpo7wmjC4kgNY9Nhetuks4frxRqWNWK59risn5GbkIh25mIp2HJgGSH59z5y6YCbjrSjePRkv)
 

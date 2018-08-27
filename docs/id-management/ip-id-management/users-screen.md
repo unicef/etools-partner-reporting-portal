@@ -43,7 +43,7 @@ Below filters user can see search results in a form of a list of users. It conta
 * Name
 * Position \(optional field\)
 * E-mail
-* Status \(Active or Invited\) - Row will be highlighted if no role has been assigned to them.
+* Status \(Active or Invited or Inactive\) - Row will be highlighted if no role has been assigned to them.
 * Last login
 
 ![Search results on User screen](https://lh4.googleusercontent.com/l5CZ2lN3xyP_qVnwQmMLTPCdHjjRCt2SKcfu-3i_wlM-DJ31notAkjfCwX3KFyGxrdKq69mN5KdiYsdjmgdj7fkoc1Q5jKAktw2nOk80G7ACT7RbnXiBWXlloB6HE5Irve4Djr8c)
