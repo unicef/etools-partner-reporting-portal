@@ -89,7 +89,10 @@ class ClusterListAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        return Cluster.objects.filter(response_plan_id=response_plan_id)
+
+        if self.request.user.is_cluster_system_admin:
+            return Cluster.objects.filter(response_plan_id=response_plan_id)
+        return Cluster.objects.filter(prp_roles__user=self.request.user, response_plan_id=response_plan_id)
 
 
 class ClusterObjectiveAPIView(APIView):
