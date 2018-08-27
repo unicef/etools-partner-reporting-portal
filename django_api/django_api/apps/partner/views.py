@@ -22,6 +22,7 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     AnyPermission,
+    HasAnyRole,
     IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
     IsIMOForCurrentWorkspace,
     IsIMOForCurrentWorkspaceCheck,
@@ -87,7 +88,7 @@ class PartnerListCreateAPIView(ListCreateAPIView):
             IsClusterSystemAdmin
         ),
     )
-    queryset = Partner.objects.order_by('-id')
+    queryset = Partner.objects.prefetch_related('clusters').order_by('-id')
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
@@ -366,12 +367,14 @@ class ClusterActivityPartnersAPIView(ListAPIView):
 
     serializer_class = ClusterActivityPartnersSerializer
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        )
     )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -388,11 +391,13 @@ class PartnerActivityListAPIView(ListAPIView):
 
     serializer_class = PartnerActivitySerializer
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer,
         ),
     )
     pagination_class = SmallPagination
