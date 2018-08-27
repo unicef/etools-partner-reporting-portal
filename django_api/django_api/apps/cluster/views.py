@@ -1172,11 +1172,13 @@ class AssignableClustersListView(ListAPIView):
         user = self.request.user
         user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
 
+        queryset = Cluster.objects.select_related('response_plan', 'response_plan__workspace')
+
         if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
-            return Cluster.objects.all()
+            return queryset
         if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
-            return Cluster.objects.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_imo)
+            return queryset.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_imo)
         if PRP_ROLE_TYPES.cluster_member in user_prp_roles:
-            return Cluster.objects.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_member)
+            return queryset.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_member)
 
         raise PermissionDenied()
