@@ -25,7 +25,8 @@
       _computeCurrentRole: function (clusterId, roles) {
         var id = parseInt(clusterId);
 
-        return roles.find(role => role.cluster.id === id).role;
+        return roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+          (role.cluster && role.cluster.id === id)).role;
       },
     };
 
