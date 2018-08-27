@@ -7,6 +7,7 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/user.html">
 <link rel="import" href="../../../elements/etools-prp-auth.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
@@ -144,6 +145,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.User
       ],
 
       properties: {
@@ -154,7 +156,7 @@
 
         mode: {
           type: String,
-          computed: '_computeMode(accountType)',
+          computed: '_computeMode(currentRole)',
         },
 
         page_title: {
@@ -176,14 +178,8 @@
         'report-submitted': '_fetchData',
       },
 
-      _computeMode: function (accountType) {
-        switch (accountType) {
-          case App.Constants.ACCOUNT_TYPE_PARTNER:
-            return 'partner';
-
-          case App.Constants.ACCOUNT_TYPE_IMO:
-            return 'cluster';
-        }
+      _computeMode: function (currentRole) {
+        return App.Constants.PARTNER_ROLES.indexOf(currentRole) > -1 ? 'partner' : 'cluster';
       },
 
       _computePageTitle: function(mode) {

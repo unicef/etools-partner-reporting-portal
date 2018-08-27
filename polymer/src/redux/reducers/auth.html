@@ -37,11 +37,11 @@
       switch (action.type) {
         case App.Constants.SET_ACCOUNT_TYPE:
           return (function () {
-            var isPartner = !!action.data.partner;
+            var isCluster = !!action.data.partner;
 
-            return isPartner ?
+            return isCluster ?
                 App.Constants.ACCOUNT_TYPE_PARTNER :
-                App.Constants.ACCOUNT_TYPE_IMO;
+                App.Constants.ACCOUNT_TYPE_CLUSTER;
           }());
 
         case App.Constants.RESET:
