@@ -30,22 +30,22 @@
 
     <etools-content-panel panel-title="[[label]]">
       <template
-          is="dom-if"
-          if="[[active]]"
-          restamp="true">
+        is="dom-if"
+        if="[[active]]"
+        restamp="true">
         <template
-            is="dom-repeat"
-            items="[[data]]">
+          is="dom-repeat"
+          items="[[data]]">
           <cluster-report
-              data="[[item]]"
-              mode="edit">
+            data="[[item]]"
+            mode="edit">
           </cluster-report>
         </template>
       </template>
 
       <list-placeholder
-          data="[[data]]"
-          loading="[[loading]]">
+        data="[[data]]"
+        loading="[[loading]]">
       </list-placeholder>
 
       <etools-loading active="[[loading]]"></etools-loading>
@@ -115,7 +115,9 @@
       },
 
       _computeIsIMOClusters: function (profile) {
-        return (profile.imo_clusters || []).length > 0;
+        return profile.prp_roles.some(function (role) {
+          return role.role === App.Constants.PRP_ROLE.CLUSTER_IMO
+        });
       },
 
       _onConfirm: function (e, result) {
@@ -124,9 +126,9 @@
         if (!this.isIMO) {
           this.$.confirm.run({
             body:
-                'The IMO will be informed of this submission and you will ' +
-                'not be able to make any changes on this report unless it ' +
-                'is sent back to you. Are you sure you’d like to Submit this report?',
+              'The IMO will be informed of this submission and you will ' +
+              'not be able to make any changes on this report unless it ' +
+              'is sent back to you. Are you sure you’d like to Submit this report?',
             result: result,
             maxWidth: '500px',
             mode: App.Constants.CONFIRM_MODAL,

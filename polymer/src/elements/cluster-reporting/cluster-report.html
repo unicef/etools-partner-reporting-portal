@@ -810,7 +810,7 @@
           return mode;
         }
 
-        canSubmit = permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
+        canSubmit = permissions.editIndicatorReport(data.cluster_id, data.partner_id);
 
         return canSubmit ? mode : 'view';
       },
@@ -822,7 +822,7 @@
 
       _computeShowFeedback: function (data, permissions) {
         return data.report_status === 'Sen' &&
-            permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
+            permissions.editIndicatorReport(data.cluster_id, data.partner_id);
       },
 
       _sendBack: function () {

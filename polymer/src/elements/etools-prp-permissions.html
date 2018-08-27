@@ -44,33 +44,18 @@
         },
 
         editIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isViewer(params.prpRoles):
-              return false;
+          var allowedRoles = [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          ];
 
-            case isIMO(params.prpRoles):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
-
-            default:
-              return partnerId === (params.partner && params.partner.id);
-          }
-        },
-
-        submitIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isIMO(params.prpRoles):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
-
-            case isClusterMember(params.prpRoles):
-              return partnerId === (params.partner && params.partner.id);
-
-            default:
-              return false;
-          }
+          params.prpRoles.some(function (role) {
+            return allowedRoles.indexOf(role) > -1 ?
+              role.role === App.Constants.PRP_ROLE.CLUSTER_IMO ?
+                role.cluster.id === clusterId :
+                partnerId === (params.partner && params.partner.id) :
+              false;
+          });
         },
 
         sendBackIndicatorReport: [
@@ -244,7 +229,8 @@
 
         _computeImoClusters: function (profile) {
           return profile.prp_roles ?
-            profile.prp_roles.filter(item => item.role === App.Constants.PRP_ROLE.CLUSTER_IMO) : [];
+            profile.prp_roles.filter(item => item.role === App.Constants.PRP_ROLE.CLUSTER_IMO)
+              .map(item => item.cluster) : [];
         },
 
         _computeParams: function (prpRoles, imoClusters, partner) {
