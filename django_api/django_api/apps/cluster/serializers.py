@@ -66,7 +66,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         cluster = data['cluster']
         user = self.context['request'].user
 
-        if cluster not in user.prp_roles.values_list('cluster', flat=True):
+        if not user.is_cluster_system_admin and cluster not in user.prp_roles.values_list('cluster', flat=True):
             raise ValidationError({
                 "cluster": "Cluster does not belong to this user",
             })
@@ -83,6 +83,17 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
             'id',
             'title',
         )
+
+    def validate(self, data):
+        cluster_objective_id = int(self.context['pk'])
+        user = self.context['request'].user
+
+        if (not user.is_cluster_system_admin and
+                not user.prp_roles.filter(cluster__cluster_objectives=cluster_objective_id).exists()):
+            raise ValidationError({
+                "cluster": "Cluster does not belong to this user",
+            })
+        return data
 
 
 class ClusterActivitySerializer(serializers.ModelSerializer):

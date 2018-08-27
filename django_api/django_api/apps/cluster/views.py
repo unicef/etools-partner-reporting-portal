@@ -134,7 +134,7 @@ class ClusterObjectiveAPIView(APIView):
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request, pk=pk),
             data=self.request.data,
-            context={'request', request},
+            context={'request': request, 'pk': pk},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -152,7 +152,7 @@ class ClusterObjectiveAPIView(APIView):
             serializer = ClusterObjectiveSerializer(
                 instance=self.get_instance(self.request),
                 data=self.request.data,
-                context={'request', request},
+                context={'request': request},
             )
         else:
             raise ValidationError({"id": "This field is required!"})
@@ -247,7 +247,7 @@ class ClusterActivityAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
-        if not IsIMOForCurrentWorkspaceCheck(request):
+        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
             raise PermissionDenied
 
         serializer = ClusterActivityPatchSerializer(
@@ -263,7 +263,7 @@ class ClusterActivityAPIView(APIView):
         Update on ClusterActivity model
         :return: ClusterActivity serializer data
         """
-        if not IsIMOForCurrentWorkspaceCheck(request):
+        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
             raise PermissionDenied
 
         if 'id' in self.request.data.keys():
