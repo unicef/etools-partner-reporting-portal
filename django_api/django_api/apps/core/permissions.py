@@ -22,12 +22,16 @@ class AnyPermission(BasePermission):
         return self
 
 
+def HasAnyRoleCheck(request, roles):
+    return request.user.prp_roles.filter(role__in=roles).exists()
+
+
 class HasAnyRole(BasePermission):
     def __init__(self, *roles):
         self.roles = roles
 
     def has_permission(self, request, view):
-        return request.user.prp_roles.filter(role__in=self.roles).exists()
+        return HasAnyRoleCheck(request, self.roles)
 
     def __call__(self, *args, **kwargs):
         return self

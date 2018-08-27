@@ -733,11 +733,12 @@ class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
 
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+        )
     )
     queryset = Reportable.objects.all()
 

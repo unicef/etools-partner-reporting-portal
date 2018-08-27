@@ -17,6 +17,8 @@ import django_filters
 from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
 from core.permissions import (
     IsIMOForCurrentWorkspaceCheck,
+    HasAnyRoleCheck,
+    HasAnyRole,
     AnyPermission,
     IsPartnerEditorForCurrentWorkspace,
     IsAuthenticated,
@@ -126,7 +128,7 @@ class ClusterObjectiveAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
-        if not IsIMOForCurrentWorkspaceCheck(request):
+        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
             raise PermissionDenied
 
         serializer = ClusterObjectivePatchSerializer(
@@ -143,7 +145,7 @@ class ClusterObjectiveAPIView(APIView):
         Update on ClusterObjective model
         :return: ClusterObjective serializer data
         """
-        if not IsIMOForCurrentWorkspaceCheck(request):
+        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
             raise PermissionDenied
 
         if 'id' in self.request.data.keys():
@@ -199,7 +201,9 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         Create on ClusterObjective model
         :return: ClusterObjective object id
         """
-        if not IsIMOForCurrentWorkspaceCheck(request):
+        if not request.user.prp_roles.filter(
+                role__in=(PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)
+        ).exists():
             raise PermissionDenied
 
         serializer = ClusterObjectiveSerializer(
@@ -524,10 +528,11 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 class ClusterIndicatorsListExcelImportView(APIView):
 
     permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member
         ),
     )
 
@@ -576,10 +581,11 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
         - GET method - Cluster indicator list data as Excel file
     """
     permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member
         ),
     )
     serializer_class = ClusterIndicatorReportSerializer
@@ -637,7 +643,13 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+        ),
+    )
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
@@ -795,7 +807,13 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     Returns:
         - GET method - A JSON object of many aggregations.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+        )
+    )
 
     def query_data(self, response_plan_id):
         response_plan = get_object_or_404(
@@ -888,7 +906,13 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - OperationalPresenceLocationListSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+        )
+    )
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -1015,7 +1039,13 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+        )
+    )
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 

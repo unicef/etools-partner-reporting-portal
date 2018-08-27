@@ -22,6 +22,7 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     AnyPermission,
+    HasAnyRoleCheck,
     HasAnyRole,
     IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
     IsIMOForCurrentWorkspace,
@@ -206,15 +207,16 @@ class PartnerProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, *args, **kwargs):
-        if not IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request) and not IsIMOForCurrentWorkspace(request):
+        if not HasAnyRoleCheck(request, (
+                PRP_ROLE_TYPES.cluster_system_admin,
+                PRP_ROLE_TYPES.cluster_imo,
+                PRP_ROLE_TYPES.cluster_member
+        )):
             raise PermissionDenied
 
         partner_id = self.kwargs.get('partner_id')
 
-        if partner_id:
-            if not IsIMOForCurrentWorkspaceCheck(request):
-                raise PermissionDenied
-
+        if partner_id and not request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
             # Check if incoming partner belongs to IMO's clusters
             user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
             if not Cluster.objects.filter(
@@ -397,7 +399,7 @@ class PartnerActivityListAPIView(ListAPIView):
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.cluster_coordinator,
-            PRP_ROLE_TYPES.cluster_viewer,
+            PRP_ROLE_TYPES.cluster_viewer
         ),
     )
     pagination_class = SmallPagination
@@ -431,11 +433,13 @@ class PartnerActivityAPIView(RetrieveAPIView):
     """
     serializer_class = PartnerActivitySerializer
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
         ),
     )
 
