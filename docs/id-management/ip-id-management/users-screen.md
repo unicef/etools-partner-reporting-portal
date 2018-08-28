@@ -34,7 +34,7 @@ Authorized Officer will have the possibility to add a new CSO user as an IP Admi
   
 ****On the top of the screen person can use filter area to narrow down search results that appear below.
 
-![Filters on Users screen](https://lh4.googleusercontent.com/vpmTEM1A2fPOMwhDQ-gBbPZT4-x0gwPe2vudtCphC9s4As4nUguJoGhodX8d0TOMzv4s7wE5DMnQtmMs1VCgV6OaRY-PU00qcNHoTsjzSYDqAJVKjHzFgTQ_pTEp9cYmKj1a3Vs2)
+![](../../.gitbook/assets/screen-shot-2018-08-28-at-10.40.52.png)
 
 ## **Search results**
 

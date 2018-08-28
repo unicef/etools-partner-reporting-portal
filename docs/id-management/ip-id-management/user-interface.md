@@ -2,7 +2,7 @@
 
 The overall user interface for User Management in IP Reporting consists of the following sections:
 
-![Overall user interface](https://lh3.googleusercontent.com/kXbi31ov10hbklZj6_8OuuxxhUwEBUNk931ZQJSZWDlk0zBWOcDIwASDIvBVDBBhEfBLeP8rmzfsLFpwrb1hpW5CMtftZ-Nd_tuXVoH2BLFWEb83zTSeDMuFvrKZKlw1WF66Hr3f)
+![](../../.gitbook/assets/screen-shot-2018-08-28-at-10.32.59.png)
 
 **Header** with:
 
