@@ -35,8 +35,8 @@ export function logout() {
 export function userRoleInCluster(user, cluster) {
     if (!cluster) return null;
 
-    // eslint-disable-next-line
     const roles = user.prp_roles.filter(role =>
+        // eslint-disable-next-line
         role.role === PRP_ROLE.CLUSTER_SYSTEM_ADMIN || (role.cluster && role.cluster.id == cluster)
     );
 

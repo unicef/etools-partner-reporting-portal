@@ -3,6 +3,7 @@
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/paper-styles/typography.html">
 
 <link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
@@ -71,6 +72,17 @@
         content: "\A";
         white-space: pre;
       }
+
+      .caption {
+        @apply(--paper-font-caption);
+        color: var(--secondary-text-color);
+      }
+
+      paper-divider.p-divider {
+        --paper-divider-color: #737373;
+        margin-top: 5px;
+        opacity: 1;
+      }
     </style>
 
     <paper-dialog id="userProfileDialog" opened="{{ opened }}" with-backdrop>
@@ -102,8 +114,17 @@
           </div>
 
           <div class="full-width">
-            <paper-input label="My Roles" value="[[prpRoles]]" placeholder="---" readonly
-                         always-float-label></paper-input>
+            <div class="caption">My roles</div>
+            <iron-list>
+              <template is="dom-repeat"
+                        items="[[prpRoles]]"
+                        as="role">
+                <div>
+                  {{ role }}
+                </div>
+              </template>
+            </iron-list>
+            <paper-divider class="p-divider" colored="black"/>
           </div>
 
           <template is="dom-if" if="{{ profile.partner }}">
@@ -117,32 +138,6 @@
             <div class="full-width">
               <paper-input label="My Organization" value="{{ profile.organization }}" placeholder="---" readonly
                            always-float-label></paper-input>
-            </div>
-          </template>
-
-          <template is="dom-if" if="[[is_imo_clusters]]">
-            <div class="full-width">
-              <labelled-item label="IMO for Clusters">
-                <dl class="clusters">
-                  <template is="dom-repeat" items="[[imo_clusters]]">
-                    <dt>
-                      <template
-                        is="dom-if"
-                        if="[[_equals(item.type, 'imported')]]"
-                        restamp="[[true]]">
-                        [[item.imported_type]]:
-                      </template>
-                      <template
-                        is="dom-if"
-                        if="[[!_equals(item.type, 'imported')]]"
-                        restamp="[[true]]">
-                        [[item.title]]:
-                      </template>
-                    </dt>
-                    <dd>[[item.response_plan.title]]</dd>
-                  </template>
-                </dl>
-              </labelled-item>
             </div>
           </template>
 
@@ -174,17 +169,7 @@
 
         prpRoles: {
           type: Array,
-          computed: '_computePrpRoles(profile)',
-        },
-
-        imo_clusters: {
-          type: Array,
-          computed: '_computeIMOClusters(profile)'
-        },
-
-        is_imo_clusters: {
-          type: Boolean,
-          computed: '_computeIsIMOClusters(imo_clusters)'
+          computed: '_computePrpRoles(profile, portal)',
         },
 
         portal: {
@@ -205,7 +190,7 @@
         return (profile.prp_roles || []).map(function (role) {
           let result = "";
 
-          if (role.cluster && portal === 'ip-reporting') {
+          if (role.cluster && portal === 'cluster-reporting') {
             result += role.cluster.full_title;
           }
           else if (role.workspace) {
@@ -217,18 +202,8 @@
           }
 
           return result + role.role_display;
-        }).join(', ');
-      },
-
-      _computeIMOClusters: function (profile) {
-        return profile.prp_roles ?
-          profile.prp_roles.filter(item => item.role === App.Constants.PRP_ROLE.CLUSTER_IMO)
-            .map(item => item.cluster) : [];
-      },
-
-      _computeIsIMOClusters: function (imo_clusters) {
-        return imo_clusters.length > 0;
-      },
+        });
+      }
     });
   </script>
 </dom-module>
