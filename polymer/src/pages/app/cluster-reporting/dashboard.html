@@ -178,7 +178,7 @@
       },
 
       _computeMode: function (currentRole) {
-        return App.Constants.PARTNER_ROLES.indexOf(currentRole) > -1 ? 'partner' : 'cluster';
+        return App.Constants.PARTNER_ROLES.indexOf(currentRole.role) > -1 ? 'partner' : 'cluster';
       },
 
       _computePageTitle: function (mode) {

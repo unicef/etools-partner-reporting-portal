@@ -46,7 +46,7 @@
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           ];
 
-          return allowedRoles.indexOf(params.currentRole) > -1 ?
+          return allowedRoles.indexOf(params.currentRole.role) > -1 ?
             params.currentRole.role === App.Constants.PRP_ROLE.CLUSTER_IMO ?
               params.currentRole.cluster.id === clusterId :
               partnerId === (params.partner && params.partner.id) :
@@ -194,7 +194,7 @@
             acc[key] = (function () {
               switch (true) {
                 case Array.isArray(granted):
-                  return granted.indexOf(params.currentRole) > -1;
+                  return granted.indexOf(params.currentRole.role) > -1;
 
                 case typeof granted === 'function':
                   return function () {
@@ -217,10 +217,9 @@
 
         _computeCurrentRole: function (clusterId, roles) {
           var id = parseInt(clusterId);
-          var result = roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-            (role.cluster && role.cluster.id === id));
 
-          return result ? result.role : null;
+          return roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+            (role.cluster && role.cluster.id === id));
         },
 
         _computePrpRoles: function (profile) {
