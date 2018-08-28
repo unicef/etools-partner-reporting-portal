@@ -180,9 +180,20 @@
             statePath: 'partner.current',
           },
 
+          currentPlanId: {
+            type: String,
+            statePath: 'responsePlans.currentID',
+          },
+
+          currentRole: {
+            type: String,
+            computed: '_computeCurrentRole(currentPlanId, prpRoles)',
+            notify: true
+          },
+
           params: {
             type: Object,
-            computed: '_computeParams(prpRoles, imoClusters, partner)'
+            computed: '_computeParams(prpRoles, imoClusters, partner, currentRole)'
           },
 
           permissions: {
@@ -190,7 +201,6 @@
             computed: '_computePermissions(params)',
             notify: true
           },
-
         },
 
         _computePermissions: function (params) {
@@ -200,9 +210,7 @@
             acc[key] = (function () {
               switch (true) {
                 case Array.isArray(granted):
-                  return params.prpRoles.some(function (role) {
-                    return granted.indexOf(role.role) !== -1;
-                  });
+                  return granted.indexOf(params.currentRole) > -1;
 
                 case typeof granted === 'function':
                   return function () {
@@ -223,6 +231,14 @@
           }, {});
         },
 
+        _computeCurrentRole: function (clusterId, roles) {
+          var id = parseInt(clusterId);
+          var result = roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+            (role.cluster && role.cluster.id === id));
+
+          return result ? result.role : null;
+        },
+
         _computePrpRoles: function (profile) {
           return profile.prp_roles || [];
         },
@@ -233,11 +249,12 @@
               .map(item => item.cluster) : [];
         },
 
-        _computeParams: function (prpRoles, imoClusters, partner) {
+        _computeParams: function (prpRoles, imoClusters, partner, currentRole) {
           return {
             prpRoles: prpRoles,
             imoClusters: imoClusters,
             partner: partner,
+            currentRole: currentRole
           };
         },
       });
