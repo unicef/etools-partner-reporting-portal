@@ -3,7 +3,7 @@ from django.db.models import Prefetch, Q, Count
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, GenericAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,8 +14,6 @@ from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
-from id_management.permissions import UserActivateDeactivatePermission
-from utils.emails import send_email_from_template
 
 from .filters import UserFilter
 from .models import User
@@ -126,37 +124,3 @@ class UserListCreateAPIView(ListCreateAPIView):
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
 
         return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch).order_by('-id')
-
-
-class UserDeactivateAPIView(GenericAPIView):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
-
-    def send_email_notification(self, user):
-        send_email_from_template(
-            subject_template_path='emails/ip/notify_on_delete_cso_user_subject.txt',
-            body_template_path='emails/ip/notify_on_delete_cso_user.html',
-            template_data={'user': user, 'training_materials_url': '#'},  # TBD
-            to_email_list=[user.email],
-            content_subtype='html'
-        )
-
-    def post(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.is_active = False
-        instance.save()
-        self.send_email_notification(instance)
-        return Response(status=statuses.HTTP_200_OK)
-
-
-class UserActivateAPIView(GenericAPIView):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = (IsAuthenticated, UserActivateDeactivatePermission)
-
-    def post(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.is_active = True
-        instance.save()
-        return Response(status=statuses.HTTP_200_OK)

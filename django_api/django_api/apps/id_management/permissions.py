@@ -93,13 +93,3 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                 return True
 
         return False
-
-
-class UserActivateDeactivatePermission(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.user.partner_id == obj.partner_id and request.user.prp_roles.filter(role=ROLES.ip_admin).exists():
-            obj_roles = set(obj.role_list)
-            if (not {ROLES.ip_authorized_officer, ROLES.ip_admin}.intersection(obj_roles) and
-                    {ROLES.ip_viewer, ROLES.ip_editor}.intersection(obj_roles)):
-                return True
-        return False
