@@ -28,10 +28,11 @@
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 700px; & > *{
-        margin: 0;
-      }
-      };
+          width: 700px;
+          & > *{
+            margin: 0;
+          }
+        };
       }
 
       .full-width {
@@ -115,15 +116,13 @@
 
           <div class="full-width">
             <div class="caption">My roles</div>
-            <iron-list>
               <template is="dom-repeat"
                         items="[[prpRoles]]"
                         as="role">
                 <div>
-                  {{ role }}
+                  [[ role ]]
                 </div>
               </template>
-            </iron-list>
             <paper-divider class="p-divider" colored="black"/>
           </div>
 

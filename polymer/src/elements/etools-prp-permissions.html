@@ -7,10 +7,7 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-      var isViewer = isMember.bind(null, App.Constants.PRP_ROLE.IP_VIEWER);
       var isIMO = isMember.bind(null, App.Constants.PRP_ROLE.CLUSTER_IMO);
-      var isAuthorizedOfficer = isMember.bind(null, App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER);
-      var isClusterMember = isMember.bind(null, App.Constants.PRP_ROLE.CLUSTER_MEMBER);
 
       var permissions = {
         editProgressReport: [
@@ -49,13 +46,11 @@
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           ];
 
-          params.prpRoles.some(function (role) {
-            return allowedRoles.indexOf(role) > -1 ?
-              role.role === App.Constants.PRP_ROLE.CLUSTER_IMO ?
-                role.cluster.id === clusterId :
-                partnerId === (params.partner && params.partner.id) :
-              false;
-          });
+          return allowedRoles.indexOf(params.currentRole) > -1 ?
+            params.currentRole.role === App.Constants.PRP_ROLE.CLUSTER_IMO ?
+              params.currentRole.cluster.id === clusterId :
+              partnerId === (params.partner && params.partner.id) :
+            false;
         },
 
         sendBackIndicatorReport: [
@@ -65,13 +60,6 @@
         createPartnerEntities: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
         ],
-
-        createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
-          return isAuthorizedOfficer(params.prpRoles) &&
-            responsePlanClusters.some(function (cluster) {
-              return params.partner.clusters.indexOf(cluster.id) !== -1;
-            });
-        },
 
         createPartnerEntitiesByResponsePlanAsIMO: function (params, responsePlanClusters) {
           return isIMO(params.prpRoles) &&
@@ -89,10 +77,6 @@
                 return imoCluster.id === cluster.id;
               });
             });
-        },
-
-        editPartnerEntities: function (params, entityPartnerId) {
-          return isAuthorizedOfficer(params.prpRoles) && entityPartnerId === params.partner.id;
         },
 
         viewPlannedAction: [
