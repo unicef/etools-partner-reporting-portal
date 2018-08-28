@@ -418,6 +418,29 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterIndicatorsFilter
 
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
+    def get_user_check_kwarg(self, key):
+        key = key + 'prp_roles__user'
+        if not self.request.user.is_cluster_system_admin:
+            return {key: self.request.user}
+        return {}
+
     def get_queryset(self):
         response_plan_id = self.kwargs['response_plan_id']
         queryset = IndicatorReport.objects.filter(
@@ -426,11 +449,16 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
             | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)   # noqa: E501
-            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id)   # noqa: E501
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,    # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))   # noqa: E501
+            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))   # noqa: E501
         )
         return queryset
 
@@ -440,6 +468,23 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     get_queryset = IndicatorReportsListAPIView.get_queryset
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
 
 class ClusterReportablesIdListAPIView(ListAPIView):
@@ -458,6 +503,29 @@ class ClusterReportablesIdListAPIView(ListAPIView):
     serializer_class = ReportableIdSerializer
     pagination_class = filter_class = None
 
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
+    def get_user_check_kwarg(self, key):
+        key = key + 'prp_roles__user'
+        if not self.request.user.is_cluster_system_admin:
+            return {key: self.request.user}
+        return {}
+
     def get_queryset(self):
         response_plan_id = self.kwargs['response_plan_id']
         queryset = Reportable.objects.filter(
@@ -466,11 +534,16 @@ class ClusterReportablesIdListAPIView(ListAPIView):
             | Q(partner_projects__isnull=False)
             | Q(partner_activities__isnull=False)
         ).filter(
-            Q(cluster_objectives__cluster__response_plan=response_plan_id)
-            | Q(cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            | Q(partner_projects__clusters__response_plan=response_plan_id)
-            | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
-            | Q(partner_activities__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            Q(cluster_objectives__cluster__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('cluster_objectives__cluster__'))
+            | Q(cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('cluster_activities__cluster_objective__cluster__'))
+            | Q(partner_projects__clusters__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('partner_projects__clusters__'))
+            | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
+            | Q(partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('partner_activities__cluster_objective__cluster__'))  # noqa: E501
         ).distinct()
         return queryset
 
@@ -506,22 +579,27 @@ class ResponsePlanClusterDashboardAPIView(APIView):
         except ResponsePlan.DoesNotExist:
             # TODO: log exception
             raise Http404
+        self.check_response_plan_permission(request, instance)
         return instance
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
-        self.check_response_plan_permission(request, response_plan)
         cluster_ids = request.GET.get('cluster_id', None)
 
         # validate this cluster belongs to the response plan
         if cluster_ids:
             cluster_ids = list(map(lambda x: int(x), cluster_ids.split(',')))
+            user_kwarg = {} if request.user.is_cluster_system_admin else {'prp_roles__user': request.user}
             clusters = Cluster.objects.filter(id__in=cluster_ids,
-                                              response_plan=response_plan)
+                                              response_plan=response_plan,
+                                              **user_kwarg)
             if not clusters:
                 raise Exception('Invalid cluster ids')
         else:
-            clusters = []
+            if request.user.is_cluster_system_admin:
+                clusters = []
+            else:
+                clusters = response_plan.clusters.filter(prp_roles__user=request.user)
 
         serializer = ResponsePlanClusterDashboardSerializer(
             instance=response_plan, context={'clusters': clusters})
@@ -548,6 +626,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     permission_classes = (IsAuthenticated, )
 
     def check_response_plan_permission(self, request, obj):
+        # called in inherited get_instance method
         roles_permitted = (
             PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.cluster_viewer,
@@ -559,7 +638,6 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
-        self.check_response_plan_permission(request, response_plan)
         cluster_ids = request.GET.get('cluster_id', None)
 
         if not request.user.partner:
@@ -569,11 +647,12 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
         if cluster_ids:
             cluster_ids = list(map(lambda x: int(x), cluster_ids.split(',')))
             clusters = Cluster.objects.filter(id__in=cluster_ids,
-                                              response_plan=response_plan)
+                                              response_plan=response_plan,
+                                              prp_roles__user=request.user)
             if not clusters:
                 raise Exception('Invalid cluster ids')
         else:
-            clusters = []
+            clusters = response_plan.clusters.filter(prp_roles__user=request.user)
 
         serializer = ResponsePlanPartnerDashboardSerializer(
             instance=response_plan, context={
@@ -585,27 +664,27 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
 class ClusterIndicatorsListExcelImportView(APIView):
 
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request, response_plan_id, format=None):
 
         # IMO user are able to upload any partner data
-        if request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists():
+        if request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+        ).exists():
             partner = None
-        else:
+        elif request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.cluster_member, cluster__response_plan_id=response_plan_id
+        ).exists():
             partner = request.user.partner
 
             if not partner:
                 raise ValidationError({
                     'partner': "Cannot find partner from this user. Is this user correctly configured?"
                 })
+        else:
+            self.permission_denied(request)
 
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
@@ -638,18 +717,29 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = ClusterIndicatorsFilter
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
+    def get_user_check_kwarg(self, key):
+        key = key + 'prp_roles__user'
+        if not self.request.user.is_cluster_system_admin:
+            return {key: self.request.user}
+        return {}
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
@@ -660,13 +750,16 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
             | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(
-                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
-            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            # noqa: E501
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))  # noqa: E501
         )
         return queryset
 
@@ -701,13 +794,18 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
@@ -865,13 +963,18 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     Returns:
         - GET method - A JSON object of many aggregations.
     """
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-        )
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def query_data(self, response_plan_id):
         response_plan = get_object_or_404(
@@ -897,6 +1000,8 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         }
 
         clusters = Cluster.objects.filter(response_plan=response_plan)
+        if not self.request.user.is_cluster_system_admin:
+            clusters = clusters.filter(prp_roles__user=self.request.user)
 
         if filter_parameters['clusters']:
             clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
@@ -921,8 +1026,11 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         response_data["partners_per_cluster"] = {}
         response_data["partners_per_cluster_objective"] = {}
 
+        partner_types = set(partner_types)
+        partner_types.discard(None)
+
         # As long as clusters have any partners
-        if partner_types != [None]:
+        if partner_types:
             for partner_type in partner_types:
                 response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
                     partner_type=partner_type, clusters__in=clusters
@@ -1258,7 +1366,7 @@ class AssignableClustersListView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
+        user_prp_roles = set(user.role_list)
 
         queryset = Cluster.objects.select_related('response_plan', 'response_plan__workspace')
 
