@@ -72,6 +72,10 @@ class User(AbstractUser):
             PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
             return USER_TYPES.partner
 
+    @cached_property
+    def is_cluster_system_admin(self):
+        return self.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
+
 
 class UserProfile(TimeStampedModel):
     """
