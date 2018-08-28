@@ -91,7 +91,7 @@ class ResponsePlanAdmin(admin.ModelAdmin):
 class PRPRoleAdmin(admin.ModelAdmin):
     list_display = ('user', 'role', 'workspace', 'cluster')
     list_filter = ('role', )
-    search_fields = ('user', )
+    search_fields = ('user__first_name', 'user__last_name', 'user__email')
 
 
 admin.site.register(Workspace, WorkspaceAdmin)
