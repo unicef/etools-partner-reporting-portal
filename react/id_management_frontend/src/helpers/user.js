@@ -36,7 +36,9 @@ export function userRoleInCluster(user, cluster) {
     if (!cluster) return null;
 
     // eslint-disable-next-line
-    const roles = user.prp_roles.filter(role => role.cluster.id == cluster || role.role === PRP_ROLE.CLUSTER_SYSTEM_ADMIN);
+    const roles = user.prp_roles.filter(role =>
+        role.role === PRP_ROLE.CLUSTER_SYSTEM_ADMIN || (role.cluster && role.cluster.id == cluster)
+    );
 
     return roles.length ? roles[0].role : null;
 }
