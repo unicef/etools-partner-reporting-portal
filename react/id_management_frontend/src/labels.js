@@ -13,7 +13,8 @@ const labels = {
     none: "None",
     phone_number: "Phone number",
     partnerType: "Partner type",
-    userType: "User type"
+    userType: "User type",
+    status: "Status"
 };
 
 export function getLabels(localLabels) {

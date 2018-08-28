@@ -132,3 +132,24 @@ export const PORTAL_TYPE = {
     [PORTALS.CLUSTER]: "CLUSTER",
     [PORTALS.IP]: "IP"
 };
+
+export const USER_STATUS = {
+    ACTIVE: "ACTIVE",
+    INVITED: "INVITED",
+    INCOMPLETE: "INCOMPLETE"
+};
+
+export const USER_STATUS_OPTIONS = [
+    {
+        label: "Active",
+        value: USER_STATUS.ACTIVE
+    },
+    {
+        label: "Invited",
+        value: USER_STATUS.INVITED
+    },
+    {
+        label: "Inactive",
+        value: USER_STATUS.INCOMPLETE
+    }
+];

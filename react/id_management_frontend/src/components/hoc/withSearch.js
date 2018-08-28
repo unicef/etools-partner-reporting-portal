@@ -5,6 +5,7 @@ import {expandedRowIds} from "../../actions";
 import {connect} from "react-redux";
 import {PORTAL_TYPE} from "../../constants";
 import {computePermissions} from "../../helpers/permissions";
+import * as R from 'ramda';
 
 /*
     withSearch adds default search functionality to a component
@@ -14,6 +15,8 @@ import {computePermissions} from "../../helpers/permissions";
         count: Int,
         results: Array<Object>
     }
+
+    @param {Object} defaultFilter
 
     the component adds following props:
     Object: listProps - should then be passed to PaginatedList component
@@ -38,7 +41,7 @@ const mapDispatchToProps = dispatch => {
     }
 };
 
-export default (getDataFn) => {
+export default (getDataFn, defaultFilter) => {
     return WrappedComponent =>
         connect(mapStateToProps, mapDispatchToProps)(
             class WithSearch extends Component {
@@ -63,6 +66,13 @@ export default (getDataFn) => {
                     this.onPageChange = this.onPageChange.bind(this);
                 }
 
+                isEmpty(query) {
+                    return R.isEmpty(query) || R.equals({
+                        page: String(firstPage),
+                        page_size: String(this.state.page_size)
+                    }, query);
+                }
+
                 reload(page, pageSize) {
                     this.onSearch(this.getQuery(), page, pageSize);
                 }
@@ -73,7 +83,9 @@ export default (getDataFn) => {
                 }
 
                 getQuery() {
-                    return qs.parse(this.props.history.location.search, {arrayFormat});
+                    const query = qs.parse(this.props.history.location.search, {arrayFormat});
+
+                    return this.isEmpty(query) ? Object.assign({}, defaultFilter, query) : query;
                 }
 
                 onPageSizeChange(pageSize) {

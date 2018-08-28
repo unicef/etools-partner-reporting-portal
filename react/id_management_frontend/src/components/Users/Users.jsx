@@ -13,7 +13,7 @@ import AddPermissionsDialog from "./AddPermissionsDialog";
 import EditPermissionDialog from "./EditPermissionDialog";
 import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
-import {PRP_ROLE, USER_TYPE} from "../../constants";
+import {PRP_ROLE, USER_STATUS, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
 import {user} from "../../helpers/props";
 import {hasAnyRole} from "../../helpers/user";
@@ -231,6 +231,13 @@ const getData = (request) => (
     })
 );
 
+const defaultFilter = {
+    status: [
+        USER_STATUS.ACTIVE,
+        USER_STATUS.INVITED
+    ]
+};
+
 const intersectingAo = (otherAo, user) => (
     otherAo &&
     otherAo.some(ao =>
@@ -274,5 +281,5 @@ Users.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withProps(user)(withSearch(getData)(withDialogHandling(Users))));
+export default connect(mapStateToProps, mapDispatchToProps)(withProps(user)(withSearch(getData, defaultFilter)(withDialogHandling(Users))));
 

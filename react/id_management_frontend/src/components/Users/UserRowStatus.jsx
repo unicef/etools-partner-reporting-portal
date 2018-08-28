@@ -3,31 +3,18 @@ import React, {Component} from "react";
 import Grid from "@material-ui/core/Grid";
 import {green, grey, red} from "@material-ui/core/colors";
 import {FiberManualRecord as Dot} from "@material-ui/icons";
-import {withStyles} from "@material-ui/core/styles";
-
+import {USER_STATUS} from "../../constants";
 
 const statusColor = {
-    ACTIVE: green[500],
-    INVITED: red[500],
-    DEACTIVATED: grey[900],
-    INCOMPLETE: red[500]
+    [USER_STATUS.ACTIVE]: green[500],
+    [USER_STATUS.INVITED]: red[500],
+    [USER_STATUS.INCOMPLETE]: grey[700],
 };
 
 const statusLabel = {
-    ACTIVE: "Active",
-    INVITED: "Invited",
-    DEACTIVATED: "Deactivated",
-    INCOMPLETE: "No roles assigned"
-};
-
-const styleSheet = theme => {
-    return {
-        incomplete: {
-            color: theme.palette.secondary.main,
-            display: "inline-block",
-            marginLeft: theme.spacing.unit * 0.5
-        }
-    }
+    [USER_STATUS.ACTIVE]: "Active",
+    [USER_STATUS.INVITED]: "Invited",
+    [USER_STATUS.INCOMPLETE]: "Inactive"
 };
 
 class UserRowStatus extends Component {
@@ -42,15 +29,15 @@ class UserRowStatus extends Component {
     }
 
     render() {
-        const {row, classes} = this.props;
+        const {row} = this.props;
+
+        const status = row.is_incomplete ? USER_STATUS.INCOMPLETE : row.status;
 
         return (
             <Grid container alignItems="center">
-                <Grid item component={() => this.renderDot(row.status)}/>
+                <Grid item component={() => this.renderDot(status)}/>
                 <Grid item>
-                    {statusLabel[row.status]}
-                    {row.is_incomplete &&
-                        <span className={classes.incomplete}>{`(${statusLabel["INCOMPLETE"]})`}</span>}
+                    {statusLabel[status]}
                 </Grid>
             </Grid>
         )
@@ -58,9 +45,8 @@ class UserRowStatus extends Component {
 }
 
 UserRowStatus.propTypes = {
-    classes: PropTypes.object.isRequired,
     row: PropTypes.object.isRequired
 };
 
-export default withStyles(styleSheet)(UserRowStatus);
+export default UserRowStatus;
 

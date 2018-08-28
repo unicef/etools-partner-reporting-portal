@@ -8,7 +8,7 @@ import TextFieldForm from "../form/TextFieldForm";
 import {PORTALS} from "../../actions";
 import {connect} from "react-redux";
 import labels from "../../labels";
-import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS} from "../../constants";
+import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS, USER_STATUS_OPTIONS} from "../../constants";
 import withProps from "../hoc/withProps";
 import {clusterOptions, workspaceOptions, partnerOptions, portal, permissions} from "../../helpers/props";
 import SearchSelectForm from "../form/SearchSelectForm";
@@ -40,23 +40,28 @@ class UsersFilter extends Component {
                         {portal === PORTALS.CLUSTER && permissions.filterPartners &&
                         <Grid item md={4}>
                             <SearchSelectForm fieldName="partners" label={labels.partner} options={partnerOptions}
-                                        optional multiple/>
+                                              optional multiple/>
                         </Grid>}
 
                         {portal === PORTALS.IP &&
                         <Grid item md={4}>
                             <SearchSelectForm fieldName="workspaces" label={labels.workspace} options={workspaceOptions}
-                                        optional multiple/>
+                                              optional multiple/>
                         </Grid>}
 
                         <Grid item md={4}>
                             <SearchSelectForm fieldName="roles" label={labels.role} options={roleOptions}
-                                        optional multiple/>
+                                              optional multiple/>
+                        </Grid>
+
+                        <Grid item md={4}>
+                            <SearchSelectForm fieldName="status" label={labels.status} options={USER_STATUS_OPTIONS}
+                                              optional multiple/>
                         </Grid>
 
                         {portal === PORTALS.CLUSTER && <Grid item md={12}>
                             <SearchSelectForm fieldName="clusters" label={labels.cluster} options={clusterOptions}
-                                        optional multiple/>
+                                              optional multiple/>
                         </Grid>}
                     </Grid>
 
