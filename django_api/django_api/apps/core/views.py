@@ -107,10 +107,10 @@ class ResponsePlanAPIView(ListAPIView):
 
         queryset = ResponsePlan.objects.filter(workspace_id=workspace_id)
 
-        if self.request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
-            return queryset.filter(clusters__isnull=False)
+        if self.request.user.is_cluster_system_admin:
+            return queryset.filter(clusters__isnull=False).distinct()
 
-        return queryset.filter(clusters__prp_roles__user=self.request.user)
+        return queryset.filter(clusters__prp_roles__user=self.request.user).distinct()
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):
