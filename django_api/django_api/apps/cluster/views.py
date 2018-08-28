@@ -89,10 +89,12 @@ class ClusterListAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get(self.lookup_field)
+        queryset = Cluster.objects.filter(response_plan_id=response_plan_id)
 
-        if self.request.user.is_cluster_system_admin:
-            return Cluster.objects.filter(response_plan_id=response_plan_id)
-        return Cluster.objects.filter(prp_roles__user=self.request.user, response_plan_id=response_plan_id)
+        if not self.request.user.is_cluster_system_admin:
+            queryset = queryset.filter(prp_roles__user=self.request.user)
+
+        return queryset
 
 
 class ClusterObjectiveAPIView(APIView):
@@ -111,6 +113,19 @@ class ClusterObjectiveAPIView(APIView):
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
 
+    def check_cluster_objective_permission(self, request, obj):
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+
+        if not request.user.prp_roles.filter(Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                                             Q(role__in=roles_permitted, cluster_id=obj.cluster_id)).exists():
+            self.permission_denied(request)
+
     def get_instance(self, request, pk=None):
         try:
             instance = ClusterObjective.objects.get(
@@ -123,6 +138,7 @@ class ClusterObjectiveAPIView(APIView):
                 "exception": exp,
             })
             raise Http404
+        self.check_cluster_objective_permission(request, instance)
         return instance
 
     def get(self, request, pk, *args, **kwargs):
@@ -131,9 +147,6 @@ class ClusterObjectiveAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
-        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
-            raise PermissionDenied
-
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request, pk=pk),
             data=self.request.data,
@@ -148,8 +161,6 @@ class ClusterObjectiveAPIView(APIView):
         Update on ClusterObjective model
         :return: ClusterObjective serializer data
         """
-        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
-            raise PermissionDenied
 
         if 'id' in self.request.data.keys():
             serializer = ClusterObjectiveSerializer(
@@ -184,11 +195,31 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
 
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
         queryset = ClusterObjective.objects.select_related('cluster').filter(
             cluster__response_plan_id=response_plan_id)
+
+        if not self.request.user.is_cluster_system_admin:
+            queryset = queryset.filter(cluster__prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -204,10 +235,6 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         Create on ClusterObjective model
         :return: ClusterObjective object id
         """
-        if not request.user.prp_roles.filter(
-                role__in=(PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)
-        ).exists():
-            raise PermissionDenied
 
         serializer = ClusterObjectiveSerializer(
             data=self.request.data,
@@ -235,6 +262,21 @@ class ClusterActivityAPIView(APIView):
     """
     permission_classes = (IsAuthenticated, )
 
+    def check_cluster_activity_permission(self, request, obj):
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__cluster_objectives=obj.cluster_objective_id)
+        ).exists():
+            self.permission_denied(request)
+
     def get_instance(self, request, pk=None):
         try:
             instance = ClusterActivity.objects.get(
@@ -242,6 +284,7 @@ class ClusterActivityAPIView(APIView):
         except ClusterActivity.DoesNotExist:
             # TODO: log exception
             raise Http404
+        self.check_cluster_activity_permission(request, instance)
         return instance
 
     def get(self, request, pk, *args, **kwargs):
@@ -250,9 +293,6 @@ class ClusterActivityAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
-        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
-            raise PermissionDenied
-
         serializer = ClusterActivityPatchSerializer(
             instance=self.get_instance(self.request, pk),
             data=self.request.data
@@ -266,9 +306,6 @@ class ClusterActivityAPIView(APIView):
         Update on ClusterActivity model
         :return: ClusterActivity serializer data
         """
-        if not HasAnyRoleCheck(request, (PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)):
-            raise PermissionDenied
-
         if 'id' in self.request.data.keys():
             serializer = ClusterActivitySerializer(
                 instance=self.get_instance(self.request, pk=pk),
@@ -301,11 +338,31 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterActivityFilter
 
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer
+            ])
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
         queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
             cluster_objective__cluster__response_plan_id=response_plan_id)
+
+        if not self.request.user.is_cluster_system_admin:
+            queryset = queryset.filter(cluster_objective__cluster__prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -322,8 +379,6 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         Create on ClusterActivity model
         :return: ClusterActivity object id
         """
-        if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied
 
         serializer = ClusterActivitySerializer(
             data=self.request.data,
