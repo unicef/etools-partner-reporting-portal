@@ -91,9 +91,9 @@ User can select from workspaces he has access to.
 
 ### No permissions assigned
 
-User with no permissions assigned is displayed in the UI as shown below. Status of this user has additional information \(No roles assigned\):
+User with no permissions assigned is displayed in the UI as shown below:
 
-![](../../.gitbook/assets/image-2.png)
+![](../../.gitbook/assets/screen-shot-2018-08-28-at-17.00.28.png)
 
 
 
