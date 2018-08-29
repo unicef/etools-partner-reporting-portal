@@ -32,6 +32,7 @@
 
         createClusterEntities: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         createClusterEntitiesForCluster: function (params, clusterId) {
@@ -45,33 +46,37 @@
           var allowedRoles = [
             App.Constants.PRP_ROLE.CLUSTER_IMO,
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
           ];
 
           return params.prpRoles.some(function (item) {
             return allowedRoles.indexOf(item.role) > -1 &&
-              (App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
-              partnerId === (params.partner && params.partner.id) :
-              String(item.cluster.id) === String(clusterId));
+              (item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                (App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
+                  partnerId === (params.partner && params.partner.id) :
+                  String(item.cluster.id) === String(clusterId)));
           });
         },
 
         sendBackIndicatorReport: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         createPartnerEntities: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
-          App.Constants.PRP_ROLE.CLUSTER_IMO
+          App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
-          return isIMO(params.prpRoles) &&
-            responsePlanClusters.some(function (cluster) {
-              return params.prpRoles.some(function (item) {
-                return String(item.cluster.id) === String(cluster.id) &&
-                  permissions.createPartnerEntities.indexOf(item.role) > -1;
-              });
+          return responsePlanClusters.some(function (cluster) {
+            return params.prpRoles.some(function (item) {
+              return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                (String(item.cluster.id) === String(cluster.id) &&
+                  permissions.createPartnerEntities.indexOf(item.role) > -1);
             });
+          });
         },
 
         editPartnerEntities: function (params, entityClusters) {
@@ -79,8 +84,9 @@
 
           return entityClusters.some(function (cluster) {
             return params.prpRoles.some(function (item) {
-              return String(item.cluster.id) === String(cluster.id) &&
-                allowedRoles.indexOf(item.role) > -1;
+              return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                (String(item.cluster.id) === String(cluster.id) &&
+                  allowedRoles.indexOf(item.role) > -1);
             });
           });
         },
@@ -99,36 +105,43 @@
         createPartnerProject: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         adminResponsePlan: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
-          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         addPartnerToProject: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         createPartnerEntitiesAsImo: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         addPartnerToActivity: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         editIndicatorDetails: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         onlyEditOwnIndicatorDetails: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
         ],
 
         editIndicatorLocations: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
         ],
 
         accessIpIdManagement: [
