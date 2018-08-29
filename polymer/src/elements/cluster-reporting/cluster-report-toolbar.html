@@ -26,24 +26,19 @@
 
       <template
         is="dom-if"
-        if="[[permissions.importTemplate]]"
+        if="[[_equals(submitted, 0)]]"
         restamp="true">
-        <template
-          is="dom-if"
-          if="[[_equals(submitted, 0)]]"
-          restamp="true">
-          <upload-button
-            url="[[importUrl]]"
-            modal-title="Import Template">
-            Import Template
-          </upload-button>
-        </template>
-        <template
-          is="dom-if"
-          if="[[_equals(submitted, 0)]]"
-          restamp="true">
-          <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
-        </template>
+        <upload-button
+          url="[[importUrl]]"
+          modal-title="Import Template">
+          Import Template
+        </upload-button>
+      </template>
+      <template
+        is="dom-if"
+        if="[[_equals(submitted, 0)]]"
+        restamp="true">
+        <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
       </template>
     </etools-prp-toolbar>
   </template>

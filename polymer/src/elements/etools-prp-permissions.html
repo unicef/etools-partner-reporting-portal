@@ -7,8 +7,6 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-      var isIMO = isMember.bind(null, App.Constants.PRP_ROLE.CLUSTER_IMO);
-
       var permissions = {
         editProgressReport: [
           App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
@@ -150,12 +148,6 @@
         ],
 
         accessClusterIdManagement: [
-          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
-          App.Constants.PRP_ROLE.CLUSTER_IMO,
-          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
-        ],
-
-        importTemplate: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           App.Constants.PRP_ROLE.CLUSTER_IMO,
           App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
