@@ -333,6 +333,16 @@ def process_programme_documents(fast=False, area=False):
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
                                         i['title'] = i['title'] or '<EMPTY TITLE PROVIDED BY EXTERNAL SYSTEM>'
+
+                                        if i['unit'] == '':
+                                            if int(i['baseline']['d']) == 1:
+                                                i['unit'] = 'number'
+                                                i['display_type'] = 'number'
+
+                                            elif int(i['baseline']['d']) != 1:
+                                                i['unit'] = 'percentage'
+                                                i['display_type'] = 'percentage'
+
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
