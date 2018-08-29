@@ -304,8 +304,22 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     Reserved for IMO only.
     """
     serializer_class = ReportableLocationGoalBaselineInNeedSerializer
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated,)
     lookup_url_kwarg = 'reportable_id'
+
+    def check_permissions(self, request):
+        super().check_permissions()
+        reportable_id = self.kwargs.get('reportable_id')
+
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+            Q(role=PRP_ROLE_TYPES.cluster_imo),
+            Q(cluster__cluster_objectives__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
+            Q(cluster__partner_projects__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__partner__activities__reportables=reportable_id),
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self, *args, **kwargs):
         reportable_id = self.kwargs.get('reportable_id', None)
@@ -354,13 +368,18 @@ class IndicatorDataAPIView(APIView):
     TODO: check on the GET data being sent / used in the frontend and other
     HTTP operations being opened here.
     """
-    permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_indicator_report_permission(self, request, obj):
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+            Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member)),
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
+            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner__activities__reportables__indicator_reports=obj),
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self, id):
         queryset = Reportable.objects.filter(
@@ -385,7 +404,7 @@ class IndicatorDataAPIView(APIView):
 
     def get_indicator_report(self, id):
         try:
-            return IndicatorReport.objects.get(id=id)
+            instance = IndicatorReport.objects.get(id=id)
         except IndicatorReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "IndicatorDataAPIView",
@@ -394,6 +413,9 @@ class IndicatorDataAPIView(APIView):
                 "exception": exp,
             })
             return None
+        else:
+            self.check_indicator_report_permission(self.request, instance)
+            return instance
 
     def get_narrative_object(self, id):
         ir = self.get_indicator_report(id)
@@ -612,11 +634,22 @@ class IndicatorReportReviewAPIView(APIView):
 
     Only a IMO should be allowed to do this action.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated, )
+
+    def check_indicator_report_permission(self, request, obj):
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+            Q(role_=PRP_ROLE_TYPES.cluster_imo),
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
+            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner__activities__reportables__indicator_reports=obj),
+        ).exists():
+            self.permission_denied(request)
 
     def get_object(self):
         try:
-            return IndicatorReport.objects.get(pk=self.kwargs['pk'])
+            instance = IndicatorReport.objects.get(pk=self.kwargs['pk'])
         except IndicatorReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "IndicatorReportReviewAPIView",
@@ -625,6 +658,9 @@ class IndicatorReportReviewAPIView(APIView):
                 "exception": exp,
             })
             raise Http404
+        else:
+            self.check_indicator_report_permission(self.request, instance)
+            return instance
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
