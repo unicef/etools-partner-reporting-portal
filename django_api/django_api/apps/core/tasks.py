@@ -218,7 +218,8 @@ def process_period_reports():
         print("\nProcessing ProgrammeDocument {}".format(pd.id))
         print(10 * "****")
 
-        reportable_queryset = pd.reportable_queryset
+        # Get Active LLO indicators only
+        reportable_queryset = pd.reportable_queryset.filter(active=True)
 
         latest_progress_report_qpr = get_latest_pr_by_type(pd, "QPR")
         latest_progress_report_hr = get_latest_pr_by_type(pd, "HR")
