@@ -1678,6 +1678,8 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'blueprint_id',
             'title',
             'disaggregatable',
+            'unit',
+            'display_type',
         )
 
 
@@ -1709,7 +1711,6 @@ class PMPDisaggregationValueSerializer(DiscardUniqueTogetherValidationMixin, ser
 
 class PMPReportableSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
-    title = serializers.CharField(source='means_of_verification')
     blueprint_id = serializers.PrimaryKeyRelatedField(queryset=IndicatorBlueprint.objects.all(), source="blueprint")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
@@ -1724,12 +1725,15 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'id',
             'target',
             'baseline',
-            'title',
             'is_cluster_indicator',
+            'is_unicef_hf_indicator',
             'blueprint_id',
             'disaggregation_ids',
             'content_type',
             'object_id',
+            'means_of_verification',
+            'numerator_label',
+            'denominator_label',
         )
 
 

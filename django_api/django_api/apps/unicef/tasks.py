@@ -332,7 +332,8 @@ def process_programme_documents(fast=False, area=False):
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
-                                        i['title'] = i['title'] or '<EMPTY TITLE PROVIDED BY EXTERNAL SYSTEM>'
+                                        # TODO: Fix db schema to accommodate larger lengths
+                                        i['title'] = i['title'][:255] if i['title'] else "unknown"
 
                                         if i['unit'] == '':
                                             if int(i['baseline']['d']) == 1:
@@ -438,8 +439,6 @@ def process_programme_documents(fast=False, area=False):
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
 
-                                    # TODO: Fix db schema to accommodate larger lengths
-                                    i['title'] = i['title'][:255] if i['title'] else "unknown"
                                     reportable = process_model(
                                         Reportable,
                                         PMPReportableSerializer,
