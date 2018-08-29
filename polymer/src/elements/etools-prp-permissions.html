@@ -85,9 +85,16 @@
           });
         },
 
-        viewPlannedAction: [
-          App.Constants.PRP_ROLE.CLUSTER_MEMBER
-        ],
+        viewPlannedAction: function (params) {
+          var allowedRoles = [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_VIEWER
+          ];
+
+          return params.partner && params.partner.id && params.prpRoles.some(function (item) {
+            return allowedRoles.indexOf(item.role) > -1;
+          })
+        },
 
         createPartnerProject: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,

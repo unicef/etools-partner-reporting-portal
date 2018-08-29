@@ -80,7 +80,7 @@
 
       <template
         is="dom-if"
-        if="[[permissions.viewPlannedAction]]"
+        if="[[canViewPlannedAction]]"
         restamp="true">
         <paper-item name="planned-action" class="selectable">
           <a href="[[_appendQuery(plannedActionUrl, clusterQuery)]]">
@@ -194,12 +194,21 @@
         analysisUrl: {
           type: String,
           computed: 'buildUrl(_baseUrlCluster, \'analysis\')',
+        },
+
+        canViewPlannedAction: {
+          type: Boolean,
+          computed: '_computeViewPlannedAction(permissions)'
         }
       },
 
       observers: [
         '_routeChanged(route)',
       ],
+
+      _computeViewPlannedAction: function(permissions) {
+        return permissions.viewPlannedAction();
+      },
 
       //Shows the submenu item selected upon initial load.
       _routeChanged: function () {
