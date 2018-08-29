@@ -249,10 +249,14 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
+        App.Behaviors.RoutingBehavior
       ],
 
       properties: {
+        permissions: {
+          type: Object,
+        },
+
         responsePlans: {
           type: Array,
           statePath: 'responsePlans.all',

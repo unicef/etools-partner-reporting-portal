@@ -89,9 +89,13 @@
           App.Constants.PRP_ROLE.CLUSTER_IMO,
         ],
 
-        adminResponsePlan: [
-          App.Constants.PRP_ROLE.CLUSTER_IMO,
-        ],
+        adminResponsePlan: {
+          any: true,
+          roles: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+          ]
+        },
 
         addPartnerToProject: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
@@ -172,7 +176,7 @@
           currentRole: {
             type: String,
             computed: '_computeCurrentRole(currentPlanId, prpRoles)',
-            notify: true
+            notify: true,
           },
 
           params: {
@@ -203,6 +207,16 @@
                     return granted.apply(null, [params].concat(args));
                   };
 
+                case typeof granted === 'object':
+                  if (granted.any) {
+                    return params.prpRoles.some(function (role) {
+                      return granted.roles.indexOf(role.role) > -1;
+                    });
+                  }
+                  else {
+                    return granted.roles.indexOf(params.currentRole.role) > -1;
+                  }
+
                 case granted === App.Constants.PRP_ROLE.ALL:
                   return true;
 
@@ -219,7 +233,7 @@
           var id = parseInt(clusterId);
 
           return roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-            (role.cluster && role.cluster.id === id));
+            (role.cluster && role.cluster.id === id)) || {};
         },
 
         _computePrpRoles: function (profile) {
