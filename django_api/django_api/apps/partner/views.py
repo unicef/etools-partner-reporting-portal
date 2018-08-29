@@ -304,7 +304,7 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
-        partner = serializer.validated_data['partner']
+        partner = int(serializer.validated_data['partner'])
 
         if request.user.partner_id and request.user.partner_id != partner:
             raise ValidationError({
