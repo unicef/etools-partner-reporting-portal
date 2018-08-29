@@ -864,7 +864,14 @@ class PartnerAnalysisSummaryAPIView(APIView):
     Returns:
         - GET method - PartnerAnalysisSummarySerializer object.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated,)
+
+    def check_partner_permissions(self, request, obj):
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__partners=obj)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, *args, **kwargs):
         if 'partner' not in request.query_params:
@@ -873,6 +880,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
         serializer_context = {}
 
         partner = get_object_or_404(Partner, id=request.query_params.get('partner'))
+        self.check_partner_permissions(request, partner)
 
         if 'project' in request.query_params:
             if request.query_params.get('project'):
@@ -940,7 +948,19 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     Returns:
         - GET method - ClusterPartnerAnalysisIndicatorResultSerializer object.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated,)
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(Reportable, id=reportable_id)
@@ -1349,7 +1369,19 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
     Returns:
         - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated,)
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(
