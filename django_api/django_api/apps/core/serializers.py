@@ -143,11 +143,13 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
             )
 
             if 'request' in self.context:
-                self.context['request'].user.prp_roles.create(
-                    role=PRP_ROLE_TYPES.cluster_imo,
-                    cluster=cluster_obj,
-                    workspace=response_plan.workspace,
-                )
+                user = self.context['request'].user
+                if not user.is_cluster_system_admin:
+                    user.prp_roles.create(
+                        role=PRP_ROLE_TYPES.cluster_imo,
+                        cluster=cluster_obj,
+                        workspace=response_plan.workspace,
+                    )
 
         return response_plan
 

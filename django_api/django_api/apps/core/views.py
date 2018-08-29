@@ -16,7 +16,7 @@ from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS, PRP_ROLE_
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser, AnyPermission, IsClusterSystemAdmin
 from .models import Workspace, Location, ResponsePlan, PRPRole
 from .serializers import (
     WorkspaceSerializer,
@@ -119,7 +119,12 @@ class ResponsePlanCreateAPIView(CreateAPIView):
     """
 
     serializer_class = CreateResponsePlanSerializer
-    permission_classes = (IsIMOForCurrentWorkspace, )
+    permission_classes = (
+        AnyPermission(
+            IsClusterSystemAdmin,
+            IsIMOForCurrentWorkspace,
+        )
+    )
 
 
 class ConfigurationAPIView(APIView):
