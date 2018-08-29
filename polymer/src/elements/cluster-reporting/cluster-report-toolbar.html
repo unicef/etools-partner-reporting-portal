@@ -5,6 +5,7 @@
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../upload-button.html">
+<link rel="import" href="../../elements/etools-prp-permissions.html">
 
 <dom-module id="cluster-report-toolbar">
   <template>
@@ -14,25 +15,35 @@
       }
     </style>
 
+    <etools-prp-permissions
+      permissions="{{ permissions }}">
+    </etools-prp-permissions>
+
     <etools-prp-toolbar
-        query="{{query}}"
-        response-plan-id="{{responsePlanId}}">
-        <download-button url="[[exportUrl]]">Export</download-button>
-        <template
-            is="dom-if"
-            if="[[_equals(submitted, 0)]]"
-            restamp="true">
-            <upload-button
-                url="[[importUrl]]"
-                modal-title="Import Template">
-              Import Template
-            </upload-button>
-        </template>
+      query="{{ query }}"
+      response-plan-id="{{ responsePlanId }}">
+      <download-button url="[[exportUrl]]">Export</download-button>
+
       <template
+        is="dom-if"
+        if="[[permissions.importTemplate]]"
+        restamp="true">
+        <template
           is="dom-if"
           if="[[_equals(submitted, 0)]]"
           restamp="true">
-        <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
+          <upload-button
+            url="[[importUrl]]"
+            modal-title="Import Template">
+            Import Template
+          </upload-button>
+        </template>
+        <template
+          is="dom-if"
+          if="[[_equals(submitted, 0)]]"
+          restamp="true">
+          <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
+        </template>
       </template>
     </etools-prp-toolbar>
   </template>

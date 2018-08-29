@@ -80,8 +80,7 @@
         },
 
         viewPlannedAction: [
-          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
-          App.Constants.PRP_ROLE.CLUSTER_VIEWER,
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER
         ],
 
         createPartnerProject: [
@@ -122,12 +121,24 @@
           App.Constants.PRP_ROLE.CLUSTER_IMO,
         ],
 
-        accessIpIdManagement: [
-          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-          App.Constants.PRP_ROLE.IP_ADMIN
-        ],
+        accessIpIdManagement: {
+          any: true,
+          roles: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_ADMIN
+          ]
+        },
 
-        accessClusterIdManagement: [
+        accessClusterIdManagement: {
+          any: true,
+          roles: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+          ]
+        },
+
+        importTemplate: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           App.Constants.PRP_ROLE.CLUSTER_IMO,
           App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
