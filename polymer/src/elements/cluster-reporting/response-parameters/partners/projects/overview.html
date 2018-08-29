@@ -67,7 +67,7 @@
 
       _canEditProject: function(permissions, projectClusters) {
         return projectClusters ?
-            permissions.editPartnerEntitiesAsIMO(projectClusters) :
+            permissions.editPartnerEntities(projectClusters) :
             false;
       },
     });

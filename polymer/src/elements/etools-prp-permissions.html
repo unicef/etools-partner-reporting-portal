@@ -35,8 +35,9 @@
         ],
 
         createClusterEntitiesForCluster: function (params, clusterId) {
-          return params.imoClusters.some(function (cluster) {
-            return String(cluster.id) === String(clusterId);
+          return params.prpRoles.some(function (item) {
+            return String(clusterId) === String(item.cluster.id) &&
+              permissions.createClusterEntities.indexOf(item.role) > -1;
           });
         },
 
@@ -46,11 +47,12 @@
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           ];
 
-          return allowedRoles.indexOf(params.currentRole.role) > -1 ?
-            params.currentRole.role === App.Constants.PRP_ROLE.CLUSTER_IMO ?
-              params.currentRole.cluster.id === clusterId :
+          return params.prpRoles.some(function (item) {
+            return allowedRoles.indexOf(item.role) > -1 &&
+              (App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
               partnerId === (params.partner && params.partner.id) :
-            false;
+              String(item.cluster.id) === String(clusterId));
+          });
         },
 
         sendBackIndicatorReport: [
@@ -59,24 +61,28 @@
 
         createPartnerEntities: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          App.Constants.PRP_ROLE.CLUSTER_IMO
         ],
 
-        createPartnerEntitiesByResponsePlanAsIMO: function (params, responsePlanClusters) {
+        createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
           return isIMO(params.prpRoles) &&
             responsePlanClusters.some(function (cluster) {
-              return params.imoClusters.some(function (imoCluster) {
-                return imoCluster.id === cluster.id;
+              return params.prpRoles.some(function (item) {
+                return String(item.cluster.id) === String(cluster.id) &&
+                  permissions.createPartnerEntities.indexOf(item.role) > -1;
               });
             });
         },
 
-        editPartnerEntitiesAsIMO: function (params, entityClusters) {
-          return isIMO(params.prpRoles) &&
-            entityClusters.some(function (cluster) {
-              return params.imoClusters.some(function (imoCluster) {
-                return imoCluster.id === cluster.id;
-              });
+        editPartnerEntities: function (params, entityClusters) {
+          var allowedRoles = permissions.createPartnerEntities;
+
+          return entityClusters.some(function (cluster) {
+            return params.prpRoles.some(function (item) {
+              return String(item.cluster.id) === String(cluster.id) &&
+                allowedRoles.indexOf(item.role) > -1;
             });
+          });
         },
 
         viewPlannedAction: [
@@ -88,13 +94,10 @@
           App.Constants.PRP_ROLE.CLUSTER_IMO,
         ],
 
-        adminResponsePlan: {
-          any: true,
-          roles: [
-            App.Constants.PRP_ROLE.CLUSTER_IMO,
-            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
-          ]
-        },
+        adminResponsePlan: [
+          App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+        ],
 
         addPartnerToProject: [
           App.Constants.PRP_ROLE.CLUSTER_IMO,
@@ -121,22 +124,16 @@
           App.Constants.PRP_ROLE.CLUSTER_IMO,
         ],
 
-        accessIpIdManagement: {
-          any: true,
-          roles: [
-            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-            App.Constants.PRP_ROLE.IP_ADMIN
-          ]
-        },
+        accessIpIdManagement: [
+          App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+          App.Constants.PRP_ROLE.IP_ADMIN
+        ],
 
-        accessClusterIdManagement: {
-          any: true,
-          roles: [
-            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
-            App.Constants.PRP_ROLE.CLUSTER_IMO,
-            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
-          ]
-        },
+        accessClusterIdManagement: [
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+        ],
 
         importTemplate: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
@@ -179,20 +176,9 @@
             statePath: 'partner.current',
           },
 
-          currentPlanId: {
-            type: String,
-            statePath: 'responsePlans.currentID',
-          },
-
-          currentRole: {
-            type: String,
-            computed: '_computeCurrentRole(currentPlanId, prpRoles)',
-            notify: true,
-          },
-
           params: {
             type: Object,
-            computed: '_computeParams(prpRoles, imoClusters, partner, currentRole)'
+            computed: '_computeParams(prpRoles, imoClusters, partner)'
           },
 
           permissions: {
@@ -209,7 +195,9 @@
             acc[key] = (function () {
               switch (true) {
                 case Array.isArray(granted):
-                  return granted.indexOf(params.currentRole.role) > -1;
+                  return params.prpRoles.some(function (role) {
+                    return granted.indexOf(role.role) > -1;
+                  });
 
                 case typeof granted === 'function':
                   return function () {
@@ -217,16 +205,6 @@
 
                     return granted.apply(null, [params].concat(args));
                   };
-
-                case typeof granted === 'object':
-                  if (granted.any) {
-                    return params.prpRoles.some(function (role) {
-                      return granted.roles.indexOf(role.role) > -1;
-                    });
-                  }
-                  else {
-                    return granted.roles.indexOf(params.currentRole.role) > -1;
-                  }
 
                 case granted === App.Constants.PRP_ROLE.ALL:
                   return true;
@@ -240,13 +218,6 @@
           }, {});
         },
 
-        _computeCurrentRole: function (clusterId, roles) {
-          var id = parseInt(clusterId);
-
-          return roles.find(role => role.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-            (role.cluster && role.cluster.id === id)) || {};
-        },
-
         _computePrpRoles: function (profile) {
           return profile.prp_roles || [];
         },
@@ -257,12 +228,11 @@
               .map(item => item.cluster) : [];
         },
 
-        _computeParams: function (prpRoles, imoClusters, partner, currentRole) {
+        _computeParams: function (prpRoles, imoClusters, partner) {
           return {
             prpRoles: prpRoles,
             imoClusters: imoClusters,
-            partner: partner,
-            currentRole: currentRole
+            partner: partner
           };
         },
       });

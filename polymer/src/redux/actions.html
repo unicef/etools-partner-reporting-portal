@@ -58,7 +58,7 @@
       userLogout: function (logoutThunk) {
         return function (dispatch) {
           return logoutThunk()
-            .then(function() {
+            .then(function () {
               dispatch(App.Actions.resetToken());
             });
         };
@@ -67,16 +67,24 @@
       fetchUserProfile: function (profileThunk) {
         return function (dispatch) {
           return profileThunk()
-          .then(function(res) {
-            dispatch(App.Actions.setUserProfile(res.data));
-            dispatch(App.Actions.setPartner(res.data.partner));
-          });
+            .then(function (res) {
+              dispatch(App.Actions.setUserProfile(res.data));
+              dispatch(App.Actions.setAccountType(res.data));
+              dispatch(App.Actions.setPartner(res.data.partner));
+            });
         };
       },
 
-      setUserProfile: function(data) {
+      setUserProfile: function (data) {
         return {
           type: App.Constants.SET_USER_PROFILE,
+          data: data,
+        };
+      },
+
+      setAccountType: function (data) {
+        return {
+          type: App.Constants.SET_ACCOUNT_TYPE,
           data: data,
         };
       },
@@ -85,34 +93,37 @@
       fetchWorkspaces: function (interventionsThunk) {
         return function (dispatch) {
           return interventionsThunk()
-              .then(function (res) {
-                var workspaces = (res.data || [])
-                    .map(function (workspace) {
-                      return {
-                        id: workspace.id,
-                        code: workspace.workspace_code,
-                        name: workspace.title,
-                      };
-                    });
+            .then(function (res) {
+              var workspaces = (res.data || [])
+                .map(function (workspace) {
+                  return {
+                    id: workspace.id,
+                    code: workspace.workspace_code,
+                    name: workspace.title,
+                  };
+                });
 
-                dispatch(App.Actions.setWorkspaces(workspaces));
-              });
+              dispatch(App.Actions.setWorkspaces(workspaces));
+            });
         };
-      },
+      }
+      ,
 
       setWorkspace: function (newWorkspace) {
         return {
           type: App.Constants.SET_WORKSPACE,
           workspace: newWorkspace,
         };
-      },
+      }
+      ,
 
       setWorkspaces: function (workspaces) {
         return {
           type: App.Constants.SET_WORKSPACES,
           workspaces: workspaces,
         };
-      },
+      }
+      ,
 
       // Gets a list of all response plans for the currently selected location ID.
       fetchResponsePlans: function (responsePlansThunk) {
@@ -122,42 +133,48 @@
               dispatch(App.Actions.setResponsePlans(res.data));
             });
         };
-      },
+      }
+      ,
 
       setResponsePlans: function (plans) {
         return {
           type: App.Constants.SET_RESPONSE_PLANS,
           plans: plans
         };
-      },
+      }
+      ,
 
       setCurrentResponsePlanID: function (newPlanID) {
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
           planID: newPlanID,
         };
-      },
+      }
+      ,
 
       setCurrentResponsePlan: function (newPlan) {
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
           plan: newPlan,
         };
-      },
+      }
+      ,
 
       addResponsePlan: function (newPlan) {
         return {
           type: App.Constants.ADD_RESPONSE_PLAN,
           plan: newPlan,
         };
-      },
+      }
+      ,
 
       setApp: function (app) {
         return {
           type: App.Constants.SET_APP,
           app: app,
         };
-      },
+      }
+      ,
 
       // Partner data
       setPartner: function (partnerData) {
@@ -165,26 +182,29 @@
           type: App.Constants.SET_PARTNER,
           partnerData: partnerData,
         };
-      },
+      }
+      ,
 
       // Programme documents
       fetchProgrammeDocuments: function (pdThunk) {
         return function (dispatch) {
           return pdThunk()
-              .then(function (res) {
-                var pdData = res.data;
+            .then(function (res) {
+              var pdData = res.data;
 
-                dispatch(App.Actions.setProgrammeDocuments(pdData));
-              });
+              dispatch(App.Actions.setProgrammeDocuments(pdData));
+            });
         };
-      },
+      }
+      ,
 
       setProgrammeDocuments: function (data) {
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENTS,
           data: data,
         };
-      },
+      }
+      ,
 
       fetchProgrammeDocumentDetails: function (pdDetailsThunk) {
         return function (dispatch) {
@@ -194,21 +214,24 @@
               dispatch(App.Actions.setProgrammeDocumentDetails(pdDetailsData));
             });
         };
-      },
+      }
+      ,
 
       setProgrammeDocumentDetails: function (pdDetailsData) {
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
           pdDetailsData: pdDetailsData,
         };
-      },
+      }
+      ,
 
       // Master reset
       reset: function () {
         return {
           type: App.Constants.RESET,
         };
-      },
+      }
+      ,
 
     });
   }());

@@ -19,7 +19,6 @@
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/activities-list.html">
-<link rel="import" href="../../../elements/etools-prp-permissions.html">
 
 <dom-module id="page-cluster-reporting-dashboard">]
   <template>
@@ -56,9 +55,9 @@
       }
     </style>
 
-    <etools-prp-permissions
-      current-role="{{ currentRole }}">
-    </etools-prp-permissions>
+    <etools-prp-auth
+      account-type="{{ accountType }}">
+    </etools-prp-auth>
 
     <iron-location
       query="{{ query }}">
@@ -153,9 +152,14 @@
           statePath: 'responsePlans.currentID',
         },
 
+        accountType: {
+          type: String,
+          statePath: 'auth.accountType',
+        },
+
         mode: {
           type: String,
-          computed: '_computeMode(currentRole)',
+          computed: '_computeMode(accountType)',
         },
 
         page_title: {
@@ -177,8 +181,14 @@
         'report-submitted': '_fetchData',
       },
 
-      _computeMode: function (currentRole) {
-        return App.Constants.PARTNER_ROLES.indexOf(currentRole.role) > -1 ? 'partner' : 'cluster';
+      _computeMode: function (accountType) {
+        switch (accountType) {
+          case App.Constants.ACCOUNT_TYPE_PARTNER:
+            return 'partner';
+
+          case App.Constants.ACCOUNT_TYPE_CLUSTER:
+            return 'cluster';
+        }
       },
 
       _computePageTitle: function (mode) {
