@@ -136,12 +136,36 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PartnerProjectFilter
 
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
+        partner_id = self.kwargs.get('partner_id')
+
+        if request.method == 'GET':
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_coordinator,
+            ])
+
+        if request.method == 'POST' and partner_id:
+            roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
+
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
         queryset = PartnerProject.objects.select_related(
             'partner').prefetch_related('clusters', 'locations').filter(
                 clusters__response_plan_id=response_plan_id).distinct()
+
+        if self.request.user.partner:
+            queryset = queryset.filter(partner=self.request.user.partner)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -159,19 +183,11 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         """
         Create on PartnerProject model
         """
-        if not IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request) and not IsIMOForCurrentWorkspace(request):
-            raise PermissionDenied
 
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
-            if not IsIMOForCurrentWorkspaceCheck(request):
-                raise PermissionDenied
-
-            partner = get_object_or_404(Partner, id=partner_id)
-
-            user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
-            if not Cluster.objects.filter(id__in=user_cluster_ids, partners=partner).exists():
+            if not Cluster.objects.filter(prp_roles__user=request.user, partners=partner_id).exists():
                 raise ValidationError({
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
@@ -265,12 +281,19 @@ class PartnerActivityCreateAPIView(CreateAPIView):
     """
     PartnerActivityCreateAPIView CRUD endpoint
     """
-    permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def post(self, request, create_mode, *args, **kwargs):
         """
@@ -283,12 +306,18 @@ class PartnerActivityCreateAPIView(CreateAPIView):
 
         partner = serializer.validated_data['partner']
 
-        # If user is IMO check if incoming partner belongs to IMO's clusters
-        user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+        if request.user.partner_id and request.user.partner_id != partner:
+            raise ValidationError({
+                'partner_id': "the partner_id does not match user partner id"
+            })
 
-        if IsIMOForCurrentWorkspace(request) \
-                and partner.id not in Cluster.objects.filter(
-                    id__in=user_cluster_ids).values_list('partners', flat=True):
+        # If user is IMO check if incoming partner belongs to IMO's clusters
+        if (not request.user.is_cluster_system_admin and
+                not request.user.prp_roles.filter(
+                    role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+                    cluster__partners=partner
+                ).exists()):
+
             raise ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"
             })
@@ -311,7 +340,6 @@ class PartnerActivityCreateAPIView(CreateAPIView):
     def get_serializer_context(self):
         return {
             'request': self.request,
-            'imo': IsIMOForCurrentWorkspace(self.request),
         }
 
 
@@ -319,18 +347,25 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
     """
     PartnerActivityUpdateAPIView CRUD endpoint
     """
-    permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
     serializer_class = PartnerActivityUpdateSerializer
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self):
         return PartnerActivity.objects.filter(
             project__clusters__response_plan_id=self.kwargs['response_plan_id']
-        )
+        ).distinct()
 
     def get_object(self, pk):
         return get_object_or_404(self.get_queryset(), pk=pk)
@@ -344,13 +379,18 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 
         serializer.is_valid(raise_exception=True)
 
-        # If user is IMO
-        # Check if incoming partner belongs to IMO's clusters
-        user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+        if request.user.partner_id and request.user.partner_id != instance.partner_id:
+            raise ValidationError({
+                'partner_id': "the partner_id does not match user partner id"
+            })
 
-        if IsIMOForCurrentWorkspace(request) \
-                and instance.partner.id not in Cluster.objects.filter(
-                    id__in=user_cluster_ids).values_list('partners', flat=True):
+        # If user is IMO check if incoming partner belongs to IMO's clusters
+        if (not request.user.is_cluster_system_admin and
+                not request.user.prp_roles.filter(
+                    role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+                    cluster__partners=instance.partner_id
+                ).exists()):
+
             raise ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"
             })
@@ -361,7 +401,6 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
     def get_serializer_context(self):
         return {
             'request': self.request,
-            'imo': IsIMOForCurrentWorkspace(self.request),
         }
 
 
