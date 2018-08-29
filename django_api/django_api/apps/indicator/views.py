@@ -316,8 +316,8 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
             Q(cluster__cluster_objectives__reportables=reportable_id) |
             Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
             Q(cluster__partner_projects__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__partner__activities__reportables=reportable_id),
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__partner_activities__reportables=reportable_id),
         ).exists():
             self.permission_denied(request)
 
@@ -371,13 +371,13 @@ class IndicatorDataAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def check_indicator_report_permission(self, request, obj):
-        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
             Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member)),
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
             Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner__activities__reportables__indicator_reports=obj),
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj)
         ).exists():
             self.permission_denied(request)
 
@@ -642,8 +642,8 @@ class IndicatorReportReviewAPIView(APIView):
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
             Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner__activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner__activities__reportables__indicator_reports=obj),
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj),
         ).exists():
             self.permission_denied(request)
 
@@ -691,6 +691,7 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
     permission_classes = (IsAuthenticated, )
+
 
     def check_permissions(self, request):
         super().check_permissions(request)
