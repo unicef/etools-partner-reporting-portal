@@ -17,7 +17,7 @@ class CountrySerializer(serializers.ModelSerializer):
 class WorkspaceSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workspace
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'workspace_code')
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):

@@ -67,10 +67,7 @@ export default (getDataFn, defaultFilter) => {
                 }
 
                 isEmpty(query) {
-                    return R.isEmpty(query) || R.equals({
-                        page: String(firstPage),
-                        page_size: String(this.state.page_size)
-                    }, query);
+                    return R.isEmpty(query);
                 }
 
                 reload(page, pageSize) {

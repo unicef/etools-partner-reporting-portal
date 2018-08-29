@@ -154,12 +154,6 @@
         ]
       };
 
-      function isMember(roleName, roles) {
-        return roles.some(function (role) {
-          return role.role === roleName;
-        });
-      }
-
       Polymer({
         is: 'etools-prp-permissions',
 
@@ -188,9 +182,14 @@
             statePath: 'partner.current',
           },
 
+          workspace: {
+            type: String,
+            statePath: 'workspaces.current'
+          },
+
           params: {
             type: Object,
-            computed: '_computeParams(prpRoles, imoClusters, partner)'
+            computed: '_computeParams(prpRoles, imoClusters, partner, workspace)'
           },
 
           permissions: {
@@ -208,7 +207,9 @@
               switch (true) {
                 case Array.isArray(granted):
                   return params.prpRoles.some(function (role) {
-                    return granted.indexOf(role.role) > -1;
+                    return granted.indexOf(role.role) > -1 &&
+                      (App.Constants.WORKSPACE_ROLES.indexOf(role.role) > -1 ?
+                        (role.workspace && role.workspace.workspace_code === params.workspace) : true);
                   });
 
                 case typeof granted === 'function':
@@ -240,11 +241,12 @@
               .map(item => item.cluster) : [];
         },
 
-        _computeParams: function (prpRoles, imoClusters, partner) {
+        _computeParams: function (prpRoles, imoClusters, partner, workspace) {
           return {
             prpRoles: prpRoles,
             imoClusters: imoClusters,
-            partner: partner
+            partner: partner,
+            workspace: workspace
           };
         },
       });
