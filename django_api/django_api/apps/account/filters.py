@@ -33,8 +33,8 @@ class UserFilter(django_filters.FilterSet):
     def get_status(self, queryset, name, value):
         statuses = parse.unquote(value).split(',')
         status_to_q = {
-            USER_STATUS_TYPES.active: Q(is_active__isnull=False, last_login__isnull=False),
-            USER_STATUS_TYPES.invited: Q(is_active__isnull=False, last_login__isnull=True),
+            USER_STATUS_TYPES.active: Q(is_active__isnull=False, last_login__isnull=False, prp_roles__isnull=False),
+            USER_STATUS_TYPES.invited: Q(is_active__isnull=False, last_login__isnull=True, prp_roles__isnull=False),
             USER_STATUS_TYPES.incomplete: Q(prp_roles__isnull=True)
         }
         return queryset.filter(reduce(
