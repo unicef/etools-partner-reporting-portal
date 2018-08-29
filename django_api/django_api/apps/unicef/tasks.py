@@ -344,6 +344,9 @@ def process_programme_documents(fast=False, area=False):
                                                 i['unit'] = 'percentage'
                                                 i['display_type'] = 'percentage'
 
+                                        elif i['unit'] == 'number':
+                                            i['display_type'] = 'number'
+
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
