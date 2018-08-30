@@ -97,14 +97,7 @@ class PDReportsAPIView(ListAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
-    permission_classes = (
-        AnyPermission(
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PDReportsFilter
 
@@ -112,6 +105,9 @@ class PDReportsAPIView(ListAPIView):
         from unicef.models import ProgrammeDocument
 
         pd = get_object_or_404(ProgrammeDocument, pk=self.pd_id)
+
+        if pd.partner != self.request.user.partner:
+            self.permission_denied(self.request)
 
         pks = pd.reportable_queryset.values_list(
             'indicator_reports__pk', flat=True)
@@ -138,14 +134,13 @@ class PDReportsAPIView(ListAPIView):
 class PDReportsDetailAPIView(RetrieveAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
-    permission_classes = (
-        AnyPermission(
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        pd_id = self.kwargs['pd_id']
+        if not request.user.partner.programmedocument_set.filter(id=pd_id).exists():
+            self.permission_denied(request)
 
     def get_indicator_report(self, report_id):
         try:
@@ -284,12 +279,15 @@ class ReportableDetailAPIView(RetrieveAPIView):
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
     permission_classes = (
-        AnyPermission(
-            IsIMOForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_viewer,
+            PRP_ROLE_TYPES.ip_coordinator,
         ),
     )
     lookup_url_kwarg = 'reportable_id'
@@ -692,7 +690,6 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     """
     permission_classes = (IsAuthenticated, )
 
-
     def check_permissions(self, request):
         super().check_permissions(request)
 
@@ -813,9 +810,10 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     """
 
     permission_classes = (
-        AnyPermission(
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_editor,
         ),
     )
 
