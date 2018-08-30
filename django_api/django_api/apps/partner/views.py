@@ -64,13 +64,12 @@ class PartnerDetailsAPIView(RetrieveAPIView):
     Endpoint for getting Partner Details for overview tab.
     """
     serializer_class = PartnerDetailsSerializer
-    permission_classes = (
-        AnyPermission(
-            IsPartnerViewerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        if not request.user.partner:
+            self.permission_denied(request)
 
     def get(self, request, *args, **kwargs):
         """
@@ -187,7 +186,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
-            if not Cluster.objects.filter(prp_roles__user=request.user, partners=partner_id).exists():
+            if (not request.user.is_cluster_system_admin and
+                    not Cluster.objects.filter(prp_roles__user=request.user, partners=partner_id).exists()):
                 raise ValidationError({
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
@@ -205,16 +205,25 @@ class PartnerProjectAPIView(APIView):
     """
     PartnerProject CRUD endpoint
     """
-    # TODO: Implement Object-level permission for IMO
+
     permission_classes = (
         IsAuthenticated,
     )
+
+    def check_partner_project_permission(self, request, obj):
+        if not request.user.prp_roles.filter(
+            Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+            Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+              cluster__partner_projects=obj)
+        ).exists():
+            self.permission_denied(request)
 
     def get_instance(self):
         try:
             instance = PartnerProject.objects.get(id=(self.kwargs.get('pk') or self.request.data['id']))
         except PartnerProject.DoesNotExist:
             raise Http404
+        self.check_partner_project_permission(self.request, instance)
         return instance
 
     def get(self, *args, **kwargs):
@@ -223,13 +232,6 @@ class PartnerProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, *args, **kwargs):
-        if not HasAnyRoleCheck(request, (
-                PRP_ROLE_TYPES.cluster_system_admin,
-                PRP_ROLE_TYPES.cluster_imo,
-                PRP_ROLE_TYPES.cluster_member
-        )):
-            raise PermissionDenied
-
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id and not request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
@@ -431,19 +433,23 @@ class ClusterActivityPartnersAPIView(ListAPIView):
 class PartnerActivityListAPIView(ListAPIView):
 
     serializer_class = PartnerActivitySerializer
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
-            PRP_ROLE_TYPES.cluster_coordinator,
-            PRP_ROLE_TYPES.cluster_viewer
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PartnerActivityFilter
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
+                           PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
@@ -471,16 +477,20 @@ class PartnerActivityAPIView(RetrieveAPIView):
     Endpoint for getting Partner Activity Details for overview tab.
     """
     serializer_class = PartnerActivitySerializer
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
-            PRP_ROLE_TYPES.cluster_coordinator,
-            PRP_ROLE_TYPES.cluster_viewer
-        ),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
+                           PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer]
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id, pk, *args, **kwargs):
         """
