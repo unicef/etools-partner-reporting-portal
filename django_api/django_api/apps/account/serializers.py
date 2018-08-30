@@ -125,7 +125,9 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
         validated_data['username'] = validated_data['email']
 
         if portal_choice == 'IP' and user_roles.intersection(ip_roles_access):
-            return User.objects.create(partner_id=user.partner_id, **validated_data)
+            new_user = User.objects.create(partner_id=user.partner_id, **validated_data)
+            transaction.on_commit(lambda user_l=new_user: user_l.send_email_notification_on_create(portal='IP'))
+            return new_user
 
         if portal_choice == 'CLUSTER' and cluster_roles_access.intersection(user_roles):
             user_type = validated_data.pop('user_type')
@@ -142,13 +144,19 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
                 if not not_cluster_member.intersection(user_roles) and user.partner_id != partner_id:
                     raise PermissionDenied('Partner ID does not match Cluster Member Partner ID.')
 
-                return User.objects.create(partner_id=partner_id, **validated_data)
+                new_user = User.objects.create(partner_id=partner_id, **validated_data)
+                transaction.on_commit(lambda user_l=new_user:
+                                      user_l.send_email_notification_on_create(portal='CLUSTER'))
+                return new_user
 
             if PRP_ROLE_TYPES.cluster_system_admin in user_roles and not partner_id:
                 new_user = User.objects.create(**validated_data)
+                transaction.on_commit(lambda user_l=new_user:
+                                      user_l.send_email_notification_on_create(portal='CLUSTER'))
 
                 if user_type == USER_TYPES.cluster_admin:
-                    PRPRole.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
+                    role = PRPRole.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
+                    transaction.on_commit(lambda role_l=role: role_l.send_email_notification())
 
                 return new_user
 

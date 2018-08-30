@@ -2,9 +2,8 @@
 
 {% block content %}
     <p>Dear {{ user.get_full_name }},</p>
-    <p>Your access to UNICEF’s Partner Reporting Portal for {{ user.partner.title }} has been revoked.</p>
+    <p>You now have access to UNICEF’s Partner Reporting Portal. Click here to sign up: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
     <p>For any queries, please refer to your Organization’s administrator.</p>
-    <p>For more information and training materials, please go here: <a href="{{ training_materials_url }}">{{ training_materials_url }}</a>.</p>
     <p>Thank you.</p>
     <p>UNICEF partner reporting portal</p>
 {% endblock content %}

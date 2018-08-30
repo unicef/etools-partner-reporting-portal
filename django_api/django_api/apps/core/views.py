@@ -206,6 +206,10 @@ class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView)
     permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
     queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
 
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+        instance.send_email_notification(deleted=True)
+
 
 class PRPRoleCreateAPIView(CreateAPIView):
     serializer_class = PRPRoleCreateMultipleSerializer

@@ -210,7 +210,8 @@ class PRPRoleUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
-        instance.send_email_notification(created=False)
+        deactivated = not validated_data.get('is_active', True)
+        instance.send_email_notification(deleted=deactivated)
         return instance
 
 
@@ -241,7 +242,7 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
 
             new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
             roles_created.append(new_role)
-            transaction.on_commit(lambda role=new_role: role.send_email_notification(created=True))
+            transaction.on_commit(lambda role=new_role: role.send_email_notification())
 
         return {'user_id': user_id, 'prp_roles': roles_created}
 

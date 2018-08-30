@@ -1,0 +1,16 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>Your access to UNICEF’s Partner Reporting Portal has been removed for:</p>
+    {% if portal == 'CLUSTER' %}
+        <p>Cluster: {{ role.cluster.title }}</p>
+    {% elif portal == 'IP' %}
+        <p>Workspace: {{ role.workspace.title }}</p>
+    {% endif %}
+    <p>Permission: {{ role.get_role_display }}</p>
+    <p>For any queries, please refer to your Organization’s administrator.</p>
+    <p>The portal is available here: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
+    <p>Thank you.</p>
+    <p>UNICEF partner reporting portal</p>
+{% endblock content %}

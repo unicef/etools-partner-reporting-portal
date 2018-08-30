@@ -219,41 +219,34 @@ class PRPRole(TimeStampedExternalSourceModel):
     def __str__(self):
         return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
 
-    def send_email_notification(self, created):
+    def send_email_notification(self, deleted=None):
         template_data = {
             'user': self.user,
             'role': self,
-            'id_management_url': f'{settings.FRONTEND_HOST}/id-management/',
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': None
         }
         to_email_list = [self.user.email]
         content_subtype = 'html'
 
-        if self.role == PRP_ROLE_TYPES.ip_admin:
-            subject_template_path = 'emails/ip/notify_newly_designated_ip_admin_subject.txt'
-            body_template_path = 'emails/ip/notify_newly_designated_ip_admin.html'
-            template_data['training_materials_url'] = '#'  # TBD
-        elif self.role in {PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer}:
-            if created:
-                subject_template_path = 'emails/ip/notify_on_role_assignment_subject.txt'
-                body_template_path = 'emails/ip/notify_on_role_assignment.html'
-                template_data['training_materials_url'] = '#'  # TBD
-            else:
-                subject_template_path = 'emails/ip/notify_on_role_edit_subject.txt'
-                body_template_path = 'emails/ip/notify_on_role_edit.html'
-                template_data['training_materials_url'] = '#'   # TBD
-        elif self.role == PRP_ROLE_TYPES.cluster_imo and created:
-            subject_template_path = 'emails/cluster/notify_imo_on_role_assignment_subject.txt'
-            body_template_path = 'emails/cluster/notify_imo_on_role_assignment.html'
-            template_data['training_materials_url'] = '#'  # TBD
-        elif self.role in {PRP_ROLE_TYPES.cluster_member,
-                           PRP_ROLE_TYPES.cluster_viewer,
-                           PRP_ROLE_TYPES.cluster_coordinator} and created:
-            subject_template_path = 'emails/cluster/notify_on_role_assignment_subject.txt'
-            body_template_path = 'emails/cluster/notify_on_role_assignment.html'
-            template_data['training_materials_url'] = '#'  # TBD
-            template_data['system_admin_email'] = '#'  # TBD
+        if self.role in {PRP_ROLE_TYPES.cluster_system_admin,
+                         PRP_ROLE_TYPES.cluster_imo,
+                         PRP_ROLE_TYPES.cluster_member,
+                         PRP_ROLE_TYPES.cluster_viewer,
+                         PRP_ROLE_TYPES.cluster_coordinator}:
+            template_data['portal'] = 'CLUSTER'
+        elif self.role in {PRP_ROLE_TYPES.ip_authorized_officer,
+                           PRP_ROLE_TYPES.ip_admin,
+                           PRP_ROLE_TYPES.ip_editor,
+                           PRP_ROLE_TYPES.ip_viewer}:
+            template_data['portal'] = 'IP'
+
+        if deleted:
+            subject_template_path = 'emails/on_role_remove_subject.txt'
+            body_template_path = 'emails/on_role_remove.html'
         else:
-            return False
+            subject_template_path = 'emails/on_role_assign_change_subject.txt'
+            body_template_path = 'emails/on_role_assign_change.html'
 
         send_email_from_template(
             subject_template_path=subject_template_path,

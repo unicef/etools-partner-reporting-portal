@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 
 from core.common import PRP_ROLE_TYPES, USER_TYPES
+from utils.emails import send_email_from_template
 
 
 class User(AbstractUser):
@@ -75,6 +76,27 @@ class User(AbstractUser):
     @cached_property
     def is_cluster_system_admin(self):
         return self.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
+
+    def send_email_notification_on_create(self, portal=None):
+        template_data = {
+            'user': self,
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': portal
+        }
+        to_email_list = [self.email]
+        content_subtype = 'html'
+
+        subject_template_path = 'emails/on_create_user_subject.txt'
+        body_template_path = 'emails/on_create_user.html'
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
 
 
 class UserProfile(TimeStampedModel):
