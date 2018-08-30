@@ -212,10 +212,14 @@ class PartnerProjectAPIView(APIView):
     )
 
     def check_partner_project_permission(self, request, obj):
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
+
+        if request.method == 'GET':
+            roles_permitted.extend([PRP_ROLE_TYPES.viewer])
+
         if not request.user.prp_roles.filter(
             Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-            Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
-              cluster__partner_projects=obj)
+            Q(role__in=roles_permitted, cluster__partner_projects=obj)
         ).exists():
             self.permission_denied(request)
 
