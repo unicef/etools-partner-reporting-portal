@@ -117,7 +117,7 @@ class UserListCreateAPIView(ListCreateAPIView):
             ).values_list('workspace', flat=True).distinct()
             users_queryset = users_queryset.filter(Q(prp_roles__workspace__in=user_workspaces) |
                                                    Q(prp_roles__isnull=True) |
-                                                   Q(prp_roles__in=cluster_roles),
+                                                   Q(prp_roles__role__in=cluster_roles),
                                                    partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()
