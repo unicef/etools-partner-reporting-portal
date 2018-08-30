@@ -215,7 +215,7 @@ class PartnerProjectAPIView(APIView):
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
 
         if request.method == 'GET':
-            roles_permitted.extend([PRP_ROLE_TYPES.viewer])
+            roles_permitted.extend([PRP_ROLE_TYPES.cluster_viewer])
 
         if not request.user.prp_roles.filter(
             Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
