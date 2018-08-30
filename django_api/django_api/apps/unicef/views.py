@@ -498,9 +498,14 @@ class ProgressReportLocationsAPIView(ListAPIView):
 
 class ProgressReportSubmitAPIView(APIView):
     """
-    Only a partner authorized officer can submit a progress report.
+    Only a partner authorized officer and partner editor can submit a progress report.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerForCurrentWorkspace,)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+        ),
+    )
 
     def get_object(self):
         try:
@@ -623,9 +628,14 @@ class ProgressReportSubmitAPIView(APIView):
 class ProgressReportSRSubmitAPIView(APIView):
     """
     A dedicated API endpoint for submitting SR Progress Report.
-    Only a partner authorized officer can submit a progress report.
+    Only a partner authorized officer and partner editor can submit a progress report.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerForCurrentWorkspace,)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+        ),
+    )
 
     def get_object(self):
         try:
@@ -707,7 +717,12 @@ class ProgressReportPullHFDataAPIView(APIView):
     to pull data from LLO Reportable's IndicatorLocationData on HR ProgressReports
     with overlapping start and end date period to QPR end date.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerForCurrentWorkspace,)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+        ),
+    )
 
     def get_object(self):
         try:
