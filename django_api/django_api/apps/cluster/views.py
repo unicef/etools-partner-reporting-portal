@@ -992,7 +992,8 @@ class OperationalPresenceAggregationDataAPIView(APIView):
 
         if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+                Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member, PRP_ROLE_TYPES.cluster_viewer),
+                  cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -1097,6 +1098,8 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         HasAnyRole(
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_viewer,
         )
     )
     serializer_class = OperationalPresenceLocationListSerializer
