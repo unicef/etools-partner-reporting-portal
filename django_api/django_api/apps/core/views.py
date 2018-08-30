@@ -123,7 +123,7 @@ class ResponsePlanCreateAPIView(CreateAPIView):
         AnyPermission(
             IsClusterSystemAdmin,
             IsIMOForCurrentWorkspace,
-        )
+        ),
     )
 
 
