@@ -68,11 +68,16 @@
         ],
 
         createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
+          var allowedRoles = [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ];
+
           return responsePlanClusters.some(function (cluster) {
             return params.prpRoles.some(function (item) {
               return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
                 (String(item.cluster.id) === String(cluster.id) &&
-                  permissions.createPartnerEntities.indexOf(item.role) > -1);
+                  allowedRoles.indexOf(item.role) > -1);
             });
           });
         },
@@ -99,6 +104,10 @@
             return allowedRoles.indexOf(item.role) > -1;
           })
         },
+
+        addPlannedActionProject: [
+          App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+        ],
 
         createPartnerProject: [
           App.Constants.PRP_ROLE.CLUSTER_MEMBER,
