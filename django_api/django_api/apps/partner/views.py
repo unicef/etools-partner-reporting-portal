@@ -145,6 +145,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         if request.method == 'GET':
             roles_permitted.extend([
                 PRP_ROLE_TYPES.cluster_coordinator,
+                PRP_ROLE_TYPES.cluster_viewer,
             ])
 
         if request.method == 'POST' and partner_id:
