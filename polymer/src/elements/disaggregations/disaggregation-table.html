@@ -96,27 +96,32 @@
 
       <template
           is="dom-if"
-          if="[[labels]]"
+          if="[[viewLabel]]"
           restamp="true">
-          <dl class="data-key">
-            <dt>Label -</dt>
-            <template
-                is="dom-if"
-                if="[[_equals(data.display_type, 'number')]]"
-                restamp="true">
-              <dd>[[[_withDefault(labels.label)]]]</dd>
-            </template>
-            <template
-                is="dom-if"
-                if="[[!_equals(data.display_type, 'number')]]"
-                restamp="true">
-              <dd>
-                [[[_withDefault(labels.numerator_label)]]]
-                /
-                [[[_withDefault(labels.denominator_label)]]]
-              </dd>
-            </template>
-          </dl>
+          <template
+              is="dom-if"
+              if="[[labels]]"
+              restamp="true">
+              <dl class="data-key">
+                <dt>Label -</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(data.display_type, 'number')]]"
+                    restamp="true">
+                  <dd>[[[_withDefault(labels.label)]]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(data.display_type, 'number')]]"
+                    restamp="true">
+                  <dd>
+                    [[[_withDefault(labels.numerator_label)]]]
+                    /
+                    [[[_withDefault(labels.denominator_label)]]]
+                  </dd>
+                </template>
+              </dl>
+          </template>
       </template>
 
       <div class="layout horizontal justified">
@@ -273,6 +278,11 @@
           computed: '_computeIndicatorType(data)',
         },
 
+        viewLabel: {
+          type: Boolean,
+          computed: '_computeLabelVisibility(app, indicatorType)',
+        },
+
         dualReportingEnabled: {
           type: Boolean,
           computed: '_computeDualReportingEnabled(byEntity, editableBool)',
@@ -366,6 +376,13 @@
 
       _computeEditableBool: function (editable) {
         return editable === 1;
+      },
+
+      _computeLabelVisibility: function (app, indicatorType) {
+        if ((String(app) === String("ip-reporting"))
+        && (String(indicatorType) === String("number"))) {
+          return false
+        } else return true;
       },
 
       save: function () {
