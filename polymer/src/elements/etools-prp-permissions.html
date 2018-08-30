@@ -40,19 +40,22 @@
           });
         },
 
-        editIndicatorReport: function (params, clusterId, partnerId) {
+        editIndicatorReport: function (params, report) {
           var allowedRoles = [
             App.Constants.PRP_ROLE.CLUSTER_IMO,
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
             App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+            App.Constants.PRP_ROLE.CLUSTER_COORDINATOR,
           ];
 
           return params.prpRoles.some(function (item) {
             return allowedRoles.indexOf(item.role) > -1 &&
               (item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-                (App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
-                  partnerId === (params.partner && params.partner.id) :
-                  String(item.cluster.id) === String(clusterId)));
+                ((App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
+                  report.partner_id === (params.partner && params.partner.id) :
+                  String(item.cluster.id) === String(report.cluster_id)) &&
+                  (item.role === App.Constants.PRP_ROLE.CLUSTER_COORDINATOR ? !report.cluster_activity : true))
+              );
           });
         },
 
