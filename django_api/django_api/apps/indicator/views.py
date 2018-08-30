@@ -287,7 +287,6 @@ class ReportableDetailAPIView(RetrieveAPIView):
             PRP_ROLE_TYPES.ip_admin,
             PRP_ROLE_TYPES.ip_editor,
             PRP_ROLE_TYPES.ip_viewer,
-            PRP_ROLE_TYPES.ip_coordinator,
         ),
     )
     lookup_url_kwarg = 'reportable_id'

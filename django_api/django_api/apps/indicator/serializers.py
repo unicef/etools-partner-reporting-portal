@@ -1946,9 +1946,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             reportable = ild.indicator_report.reportable
 
             partner_titles = set()
-            partner_title = reportable.content_object.partner.title \
-                + " (" + str(reportable.total['c']) + ")"
-            partner_titles.add(partner_title)
+            if hasattr(reportable.content_object, 'partner'):
+                partner_title = reportable.content_object.partner.title \
+                    + " (" + str(reportable.total['c']) + ")"
+                partner_titles.add(partner_title)
 
             data = {
                 'progress': ild.disaggregation['()']['c'],
