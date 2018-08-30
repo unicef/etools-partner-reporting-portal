@@ -1,5 +1,6 @@
 from dateutil.parser import parse
 from django.conf import settings
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers, status
@@ -13,6 +14,8 @@ from core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     AnyPermission,
     IsIMOForCurrentWorkspaceCheck,
+    IsClusterSystemAdmin,
+    IsAuthenticated,
 )
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
@@ -31,7 +34,10 @@ from partner.serializers import PartnerProjectSerializer
 class RPMWorkspaceResponsePlanAPIView(APIView):
 
     permission_classes = (
-        IsIMOForCurrentWorkspace,
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsClusterSystemAdmin,
+        ),
     )
 
     def get_workspace(self):
@@ -91,9 +97,17 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
 class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
-    permission_classes = (
-        IsIMOForCurrentWorkspace,
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        response_plan_id = self.kwargs['id']
+
+        if not request.user.prp_roles(
+            Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+            Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, *args, **kwargs):
         source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(self.kwargs['id'])
@@ -127,14 +141,22 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
 class RPMProjectListAPIView(APIView):
 
-    permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
-    )
+    permission_classes = (IsAuthenticated,)
+
+    def check_response_plan_permission(self, request, obj):
+        if not request.user.prp_roles(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=obj.id) |
+                Q(role=PRP_ROLE_TYPES.ip_authorized_officer, workspace__response_plans=obj.id)
+        ).exists():
+            self.permission_denied(request)
 
     def get_response_plan(self):
-        return get_object_or_404(
+        response_plan = get_object_or_404(
             ResponsePlan, id=self.kwargs['plan_id']
         )
+        self.check_response_plan_permission(self.request, response_plan)
+        return response_plan
 
     def get_projects(self):
         response_plan = self.get_response_plan()
@@ -165,8 +187,13 @@ class RPMProjectListAPIView(APIView):
         return Response(trim_list(result))
 
     def get_partner(self):
-        if IsIMOForCurrentWorkspaceCheck(request):
+        if self.request.user.prp_roles(
+                role__in=(PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)
+        ).exists():
             partner = get_object_or_404(Partner, id=self.request.data.get('partner_id'))
+
+            if self.request.user.is_cluster_system_admin:
+                return partner
 
             user_cluster_ids = self.request.user.prp_roles.values_list('cluster', flat=True)
             if not Cluster.objects.filter(id__in=user_cluster_ids, partners=partner).exists():
@@ -198,9 +225,18 @@ class RPMProjectListAPIView(APIView):
 
 class RPMProjectDetailAPIView(APIView):
 
-    permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        project_id = self.kwargs['id']
+
+        if not request.user.prp_roles(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__partner_projects=project_id) |
+                Q(role=PRP_ROLE_TYPES.ip_authorized_officer, user__partner__partner_projects=project_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, *args, **kwargs):
         details_url = HPC_V2_ROOT_URL + 'project/{}'.format(self.kwargs['id'])
