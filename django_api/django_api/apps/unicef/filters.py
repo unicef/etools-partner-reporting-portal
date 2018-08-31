@@ -79,6 +79,7 @@ class ProgressReportFilter(django_filters.FilterSet):
     section = CharFilter(name='section', method='get_section')
     cp_output = CharFilter(name='cp_output', method='get_cp_output')
     report_type = CharFilter(method='get_report_type')
+    unicef_focal_points = CharFilter(method='get_unicef_focal_points')
 
     class Meta:
         model = ProgressReport
@@ -86,6 +87,11 @@ class ProgressReportFilter(django_filters.FilterSet):
             'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
             'programme_document__external_id', 'section', 'cp_output', 'report_type'
         ]
+
+    def get_unicef_focal_points(self, queryset, name, value):
+        return queryset.filter(
+            programme_document__unicef_focal_points__name__in=parse.unquote(value).split(',')
+        ).distinct()
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status__in=parse.unquote(value).split(','))
