@@ -234,6 +234,18 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
     is_draft = serializers.SerializerMethodField()
     review_overall_status_display = serializers.CharField(
         source='get_review_overall_status_display')
+    partner_name = serializers.SerializerMethodField()
+    partner_vendor_number = serializers.SerializerMethodField()
+    unicef_focal_points = serializers.SerializerMethodField()
+
+    def get_partner_name(self, obj):
+        return obj.programme_document.partner.title
+
+    def get_partner_vendor_number(self, obj):
+        return obj.programme_document.partner.vendor_number
+
+    def get_unicef_focal_points(self, obj):
+        return list(obj.programme_document.unicef_focal_point.values_list('name', flat=True))
 
     class Meta:
         model = ProgressReport
@@ -256,6 +268,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'sent_back_feedback',
             'programme_document',
             'narrative',
+            'partner_name',
+            'partner_vendor_number',
+            'unicef_focal_points',
         )
 
     def get_reporting_period(self, obj):
@@ -279,6 +294,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     submitting_user = serializers.SerializerMethodField()
     partner_org_id = serializers.SerializerMethodField()
     partner_org_name = serializers.SerializerMethodField()
+    partner_vendor_number = serializers.SerializerMethodField()
+    unicef_focal_points = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         request = kwargs.get('context', {}).get('request')
@@ -298,6 +315,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'partner_contribution_to_date',
             'partner_org_id',
             'partner_org_name',
+            'partner_vendor_number',
+            'unicef_focal_points',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',
@@ -325,6 +344,12 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
     def get_partner_org_name(self, obj):
         return obj.programme_document.partner.title
+
+    def get_partner_vendor_number(self, obj):
+        return obj.programme_document.partner.vendor_number
+
+    def get_unicef_focal_points(self, obj):
+        return list(obj.programme_document.unicef_focal_point.values_list('name', flat=True))
 
     def get_submitted_by(self, obj):
         return obj.submitted_by.display_name if obj.submitted_by else None
