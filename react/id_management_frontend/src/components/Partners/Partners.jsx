@@ -44,7 +44,7 @@ class Partners extends Component {
     }
 
     onSave() {
-        const {dispatchInvalidatePartnerDetails, expandedRowIds, reload, handleDialogClose} = this.props;
+        const {dispatchInvalidatePartnerDetails, resetExpandedRows, reload, handleDialogClose} = this.props;
 
         handleDialogClose();
 
@@ -54,7 +54,7 @@ class Partners extends Component {
             this.setState({selectedPartner: null});
 
             dispatchInvalidatePartnerDetails(id);
-            this.fetchPartnerDetailsForRows(expandedRowIds);
+            resetExpandedRows();
         }
 
         reload();
