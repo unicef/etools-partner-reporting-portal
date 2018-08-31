@@ -319,6 +319,9 @@ class Reportable(TimeStampedExternalSourceModel):
 
     @property
     def calculated_target(self):
+        if not self.target['v']:
+            return 0.0
+
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
             return float(self.target['v'])
         else:
@@ -326,6 +329,9 @@ class Reportable(TimeStampedExternalSourceModel):
 
     @property
     def calculated_baseline(self):
+        if not self.baseline['v']:
+            return 0.0
+
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
             return float(self.baseline['v'])
         else:
