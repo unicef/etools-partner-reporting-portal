@@ -73,6 +73,7 @@ class PartnerDialog extends Component {
                 onClose={this.onClose}
                 title={title}
                 loading={this.state.loading || dataLoading}
+                width="md"
             >
                 {dataLoading &&
                 <LoadingIndicator absolute/>}

@@ -13,16 +13,17 @@ export const renderTextField = (
         label,
         infoText,
         formControlStyle,
+        required,
         ...other
     }
-) => (<FormControl fullWidth style={formControlStyle}>
+) => (<FormControl fullWidth style={formControlStyle} error={(touched && !!error) || !!warning}>
     <FieldLabelWithTooltipIcon
         infoText={infoText}
         tooltipIconProps={{
             name: input.name,
         }}
     >
-        {label}
+        {label} {required ? ' *': ''}
     </FieldLabelWithTooltipIcon>
     <TextField
         className={className}

@@ -44,6 +44,7 @@ function TextFieldForm(props) {
                     warn={warn ? warning : null}
                     formControlStyle={formControlStyle}
                     format={format}
+                    required={!optional}
                     {...textFieldProps}
                 />
             }

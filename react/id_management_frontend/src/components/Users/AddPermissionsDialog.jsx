@@ -48,7 +48,7 @@ class AddPermissionsDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, error, user} = this.props;
+        const {open, handleSubmit, error, user, width} = this.props;
 
         return (
             <Dialog
@@ -56,6 +56,7 @@ class AddPermissionsDialog extends Component {
                 onClose={this.onClose}
                 title={title}
                 loading={this.state.loading}
+                width={width}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <FieldArray name="prp_roles" props={{selectedUser: user}} component={renderPermissionsFields}/>
@@ -79,8 +80,12 @@ AddPermissionsDialog.propTypes = {
     onSave: PropTypes.func.isRequired,
     open: PropTypes.bool,
     reset: PropTypes.func.isRequired,
-    user: PropTypes.object
+    user: PropTypes.object,
+    width: PropTypes.string
 };
 
-export default reduxForm({form: "addPermissionsForm", initialValues: {prp_roles: [{}]}})(AddPermissionsDialog);
+export default reduxForm({
+    form: "addPermissionsForm",
+    initialValues: {prp_roles: [{}]}
+})(AddPermissionsDialog);
 

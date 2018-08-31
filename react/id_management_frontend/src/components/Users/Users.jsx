@@ -15,11 +15,12 @@ import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
 import {PRP_ROLE, USER_STATUS, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
-import {user} from "../../helpers/props";
+import {user, portal} from "../../helpers/props";
 import {hasAnyRole} from "../../helpers/user";
 import AoAlert from "./AoAlert";
 import {FETCH_OPTIONS, fetch, fetchInvalidate} from "../../fetch";
 import {connect} from "react-redux";
+import {PORTALS} from "../../actions";
 
 const header = "Users";
 const CONFIRM_ACTIONS = {
@@ -176,9 +177,10 @@ class Users extends Component {
     }
 
     render() {
-        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, reload, otherAo} = this.props;
+        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, reload, otherAo, portal} = this.props;
 
         const showAoAlert = this.state.isAo && otherAo;
+        const dialogWidth = portal === PORTALS.IP ? 'sm' : 'md';
 
         return (
             <div>
@@ -196,13 +198,15 @@ class Users extends Component {
                 </PageContent>
 
                 {this.state.selectedUser &&
-                <AddPermissionsDialog user={this.state.selectedUser}
+                <AddPermissionsDialog width={dialogWidth}
+                                      user={this.state.selectedUser}
                                       open={dialogOpen.addPermissions}
                                       onClose={handleDialogClose}
                                       onSave={reload}/>}
 
                 {this.state.selectedPermission &&
-                <EditPermissionDialog user={this.state.selectedUser}
+                <EditPermissionDialog width={dialogWidth}
+                                      user={this.state.selectedUser}
                                       permission={this.state.selectedPermission}
                                       open={dialogOpen.editPermission}
                                       onClose={handleDialogClose}
@@ -281,5 +285,5 @@ Users.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withProps(user)(withSearch(getData, defaultFilter)(withDialogHandling(Users))));
+export default connect(mapStateToProps, mapDispatchToProps)(withProps(user, portal)(withSearch(getData, defaultFilter)(withDialogHandling(Users))));
 

@@ -61,6 +61,8 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                         roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role] || [];
                     }
 
+                    const maxMenuHeight = 120;
+
                     return (
                         <FieldsArrayItem key={index}>
                             <Grid container justify="flex-end">
@@ -74,11 +76,11 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                 <Grid item md={6}>
                                     {portal === PORTALS.IP &&
                                     <SearchSelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                                      options={filteredWorkspaceOptions}/>}
+                                                      options={filteredWorkspaceOptions} maxMenuHeight={maxMenuHeight}/>}
 
                                     {portal === PORTALS.CLUSTER &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
-                                                      options={filteredClusterOptions}/>}
+                                                      options={filteredClusterOptions} maxMenuHeight={maxMenuHeight}/>}
                                 </Grid>
 
                                 <Grid item md={6}>

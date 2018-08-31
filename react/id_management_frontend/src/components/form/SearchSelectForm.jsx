@@ -12,6 +12,7 @@ import {Close, Search, Check} from "@material-ui/icons";
 import classNames from "classnames";
 import Async from 'react-select/lib/Async';
 import * as R from 'ramda';
+import {FormControl, FormHelperText} from "@material-ui/core";
 
 const styles = theme => ({
     root: {
@@ -123,23 +124,34 @@ function Control(props) {
         [props.selectProps.classes.inputWrapper]: props.selectProps.menuIsOpen
     });
 
+    const {meta: {touched, error, warning}, required} = props.selectProps;
+    let label = props.selectProps.menuIsOpen ? null : props.selectProps.textFieldProps.label;
+
+    if (label && required) {
+        label += ' *';
+    }
+
     return (
-        <div className={classes}>
-            <TextField
-                fullWidth
-                InputProps={{
-                    inputComponent,
-                    inputProps: {
-                        className: props.selectProps.classes.input,
-                        inputRef: props.innerRef,
-                        children: props.children,
-                        ...props.innerProps,
-                    },
-                }}
-                {...props.selectProps.textFieldProps}
-                label={props.selectProps.menuIsOpen ? null : props.selectProps.textFieldProps.label}
-            />
-        </div>
+        <FormControl fullWidth error={(touched && !!error) || warning}>
+            <div className={classes}>
+                <TextField
+                    fullWidth
+                    error={(touched && !!error) || !!warning}
+                    InputProps={{
+                        inputComponent,
+                        inputProps: {
+                            className: props.selectProps.classes.input,
+                            inputRef: props.innerRef,
+                            children: props.children,
+                            ...props.innerProps,
+                        },
+                    }}
+                    {...props.selectProps.textFieldProps}
+                    label={label}
+                />
+            </div>
+            {((touched && error) || warning) && <FormHelperText>{error || warning}</FormHelperText>}
+        </FormControl>
     );
 }
 
@@ -301,8 +313,8 @@ class SearchSelectForm extends Component {
         this.format = this.format.bind(this);
     }
 
-    renderSelect({input, options}) {
-        const {classes, theme, placeholder, multiple, label} = this.props;
+    renderSelect({input, options, meta, required}) {
+        const {classes, theme, placeholder, multiple, label, maxMenuHeight} = this.props;
 
         if (!options || !options.length) {
             return null;
@@ -320,6 +332,8 @@ class SearchSelectForm extends Component {
                 {...input}
                 classes={classes}
                 styles={selectStyles}
+                meta={meta}
+                required={required}
                 textFieldProps={{
                     label: label,
                     InputLabelProps: {
@@ -338,6 +352,7 @@ class SearchSelectForm extends Component {
                 fieldWrapperRef={this.fieldWrapperRef}
                 defaultOptions={true}
                 loadOptions={this.loadOptions(options)}
+                maxMenuHeight={maxMenuHeight}
             />
         )
     }
@@ -400,6 +415,7 @@ class SearchSelectForm extends Component {
                     normalize={this.normalize}
                     format={this.format}
                     options={options}
+                    required={!optional}
                     validate={(optional ? (validation || []) : [required].concat(validation || []))}
                 />
             </div>

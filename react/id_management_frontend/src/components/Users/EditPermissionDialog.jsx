@@ -43,7 +43,7 @@ class EditPermissionDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, onClose, roleOptions, portal, error} = this.props;
+        const {open, handleSubmit, onClose, roleOptions, portal, error, width} = this.props;
 
         return (
             <Dialog
@@ -51,6 +51,7 @@ class EditPermissionDialog extends Component {
                 onClose={onClose}
                 title={title}
                 loading={this.state.loading}
+                width={width}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
@@ -87,7 +88,8 @@ EditPermissionDialog.propTypes = {
     open: PropTypes.bool,
     permission: PropTypes.object,
     portal: PropTypes.string,
-    roleOptions: PropTypes.array
+    roleOptions: PropTypes.array,
+    width: PropTypes.string
 };
 
 const mapStateToProps = (state, ownProps) => {

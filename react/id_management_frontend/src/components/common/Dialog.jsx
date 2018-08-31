@@ -30,7 +30,8 @@ const styleSheet = (theme) => ({
 
 class Dialog extends Component {
     render() {
-        const {open, onClose, title, children, classes, caption, loading} = this.props;
+        const {open, onClose, title, children, classes, caption, loading, width} = this.props;
+        const maxWidth = width || 'sm';
 
         return (
             <MDialog
@@ -40,6 +41,7 @@ class Dialog extends Component {
                 disableBackdropClick={loading}
                 disableEscapeKeyDown={loading}
                 className={loading ? classes.dialogLoading : ''}
+                maxWidth={maxWidth}
             >
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar className={classes.toolbar}>
@@ -71,7 +73,8 @@ Dialog.propTypes = {
     loading: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     open: PropTypes.bool,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
+    width: PropTypes.oneOf(['xs', 'sm', 'md', 'lg'])
 };
 
 export default withStyles(styleSheet)(Dialog);
