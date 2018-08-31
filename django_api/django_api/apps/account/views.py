@@ -3,6 +3,7 @@ from django.db.models import Prefetch, Q, Count
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -74,9 +75,10 @@ class LoginUserWithTokenAPIView(APIView):
 class UserListCreateAPIView(ListCreateAPIView):
     serializer_class = UserWithPRPRolesSerializer
     permission_classes = (IsAuthenticated,)
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, OrderingFilter)
     filter_class = UserFilter
     pagination_class = SmallPagination
+    ordering_fields = ('last_login', 'first_name', 'last_name', 'partner')
 
     def get_queryset(self):
         portal_choice = self.request.query_params.get('portal')
