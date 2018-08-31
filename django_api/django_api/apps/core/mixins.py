@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from django.utils.deconstruct import deconstructible
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 
 from social_core.backends.azuread_b2c import AzureADB2COAuth2
 from social_core.pipeline import social_auth

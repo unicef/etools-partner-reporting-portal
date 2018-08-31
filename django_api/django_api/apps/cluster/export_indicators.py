@@ -8,7 +8,7 @@ from django.db.models import Count
 import itertools
 import uuid
 
-from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint, IndicatorReport
+from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorReport
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
 SAVE_PATH = '/tmp/'

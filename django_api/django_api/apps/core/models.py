@@ -331,7 +331,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         """
         from indicator.models import Reportable, IndicatorReport
         reportables = Reportable.objects.filter(
-            Q(partner_activities__cluster_activity__cluster_objective__cluster__in=clusters) | \
+            Q(partner_activities__cluster_activity__cluster_objective__cluster__in=clusters) |
             Q(partner_activities__cluster_objective__cluster__in=clusters))
         return IndicatorReport.objects.filter(
             reportable__in=reportables).order_by(
