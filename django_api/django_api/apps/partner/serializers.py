@@ -158,6 +158,7 @@ class PartnerIDManagementSerializer(serializers.ModelSerializer):
             'basis_for_risk_rating',
             'clusters',
         )
+        extra_kwargs = {'vendor_number': {'required': False, 'default': None}}
 
     @transaction.atomic
     def create(self, validated_data):
