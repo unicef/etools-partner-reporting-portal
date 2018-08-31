@@ -11,7 +11,9 @@ import {
 } from "@devexpress/dx-react-grid-material-ui";
 import {
     PagingState,
-    CustomPaging, EditingState,
+    CustomPaging,
+    EditingState,
+    SortingState,
 } from '@devexpress/dx-react-grid';
 import {RowDetailState} from "@devexpress/dx-react-grid";
 import {withStyles} from "@material-ui/core/styles";
@@ -81,6 +83,7 @@ class PaginatedList extends Component {
         super(props);
 
         this.onExpandedRowIdsChange = this.onExpandedRowIdsChange.bind(this);
+        this.sortingChange = this.sortingChange.bind(this);
 
         this.editCell = (showEdit, showDelete, showRestore) => (props) => {
             const {row} = props;
@@ -122,6 +125,61 @@ class PaginatedList extends Component {
         }
     }
 
+    generateSortingOptions(columnNames, direction) {
+        return columnNames.map(columnName => ({
+            columnName,
+            direction
+        }));
+    }
+
+    sortingChange(sorting) {
+        const {onSortingChange, alternativeSorting} = this.props;
+
+        if (alternativeSorting) {
+            let result = sorting.slice();
+
+            for (let i = result.length - 1; i > -1; i--) {
+                alternativeSorting.forEach(option => {
+                    if (option.columnName === result[i].columnName) {
+                        result.splice(i, 1, ...this.generateSortingOptions(option.orderingNames, result[i].direction))
+                    }
+                });
+            }
+
+            onSortingChange(result);
+        }
+        else {
+            onSortingChange(sorting);
+        }
+    }
+
+    computeInnerSorting(sorting) {
+        const {alternativeSorting} = this.props;
+
+        if (alternativeSorting) {
+            let result = sorting.slice();
+
+            alternativeSorting.forEach(option => {
+                option.orderingNames.forEach((name, idx) => {
+                    let found = result.findIndex(item => item.columnName === name);
+
+                    if (found > -1) {
+                        if (idx === option.orderingNames.length - 1) {
+                            result.splice(found, 1, ...this.generateSortingOptions([option.columnName], result[found].direction))
+                        }
+                        else {
+                            result.splice(found, 1);
+                        }
+                    }
+                })
+            });
+
+            return result;
+        }
+
+        return sorting;
+    }
+
     render() {
         const {
             columns,
@@ -136,7 +194,10 @@ class PaginatedList extends Component {
             expandedRowIds,
             showDelete,
             showEdit,
-            showRestore
+            showRestore,
+            sorting,
+            columnExtensions,
+            allowSorting
         } = this.props;
 
         const containerClasses = classNames(
@@ -146,10 +207,18 @@ class PaginatedList extends Component {
             }
         );
 
+        const innerSorting = this.computeInnerSorting(sorting);
+
         return (
             <Paper className={containerClasses}>
                 <Grid rows={data.results} columns={columns}>
                     {this.header()}
+
+                    <SortingState
+                        sorting={innerSorting}
+                        onSortingChange={this.sortingChange}
+                        columnExtensions={columnExtensions}
+                    />
 
                     <PagingState
                         currentPage={page - 1}
@@ -168,7 +237,7 @@ class PaginatedList extends Component {
                     />}
 
                     <Table rowComponent={TableRow}/>
-                    <TableHeaderRow/>
+                    <TableHeaderRow showSortingControls={allowSorting}/>
                     <RowDetailState expandedRowIds={expandedRowIds}
                                     onExpandedRowIdsChange={this.onExpandedRowIdsChange}/>
 
@@ -192,6 +261,8 @@ class PaginatedList extends Component {
 
 PaginatedList.propTypes = {
     columns: PropTypes.array.isRequired,
+    columnExtensions: PropTypes.array,
+    alternativeSorting: PropTypes.array,
     data: PropTypes.object.isRequired,
     expandedCell: PropTypes.func,
     page: PropTypes.number.isRequired,
@@ -199,6 +270,7 @@ PaginatedList.propTypes = {
     onDelete: PropTypes.func,
     showDelete: PropTypes.bool,
     showRestore: PropTypes.bool,
+    allowSorting: PropTypes.bool,
     loading: PropTypes.bool,
     onEdit: PropTypes.func,
     showEdit: PropTypes.bool,

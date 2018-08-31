@@ -41,19 +41,23 @@ const mapDispatchToProps = dispatch => {
     }
 };
 
-export default (getDataFn, defaultFilter) => {
+export default (getDataFn, defaultFilter, defaultSorting) => {
     return WrappedComponent =>
         connect(mapStateToProps, mapDispatchToProps)(
             class WithSearch extends Component {
                 constructor(props) {
                     super(props);
+
+                    const sorting = this.parseOrdering(this.getQuery().ordering);
+
                     this.state = {
                         data: {
                             results: []
                         },
                         page: firstPage,
                         page_size: 10,
-                        loading: false
+                        loading: false,
+                        sorting: sorting || defaultSorting
                     };
 
                     this.filterChange = debounce(500, (filter) => {
@@ -85,6 +89,13 @@ export default (getDataFn, defaultFilter) => {
                     return this.isEmpty(query) ? Object.assign({}, defaultFilter, query) : query;
                 }
 
+                onSortingChange(order) {
+                    this.setState({sorting: order}, () => {
+                        this.reload();
+                        this.props.resetExpandedRows();
+                    });
+                }
+
                 onPageSizeChange(pageSize) {
                     this.reload(firstPage, pageSize);
                     this.props.resetExpandedRows();
@@ -95,6 +106,35 @@ export default (getDataFn, defaultFilter) => {
                     this.props.resetExpandedRows();
                 }
 
+                parseOrdering(ordering) {
+                    return ordering ? ordering.split(',').map(option => {
+                        let sorting = {};
+
+                        if (option.startsWith('-')) {
+                            sorting.columnName = option.substr(1);
+                            sorting.direction = 'desc';
+                        }
+                        else {
+                            sorting.columnName = option;
+                            sorting.direction = 'asc';
+                        }
+
+                        return sorting;
+                    }) : null;
+                }
+
+                stringifySorting(sorting) {
+                    return sorting ? sorting.map(option => {
+                        let ordering = option.columnName;
+
+                        if (option.direction === 'desc') {
+                            ordering = `-${ordering}`;
+                        }
+
+                        return ordering;
+                    }).join(',') : null;
+                }
+
                 onSearch(filter, page, pageSize) {
                     const {history, portal_type, permissions} = this.props;
 
@@ -102,6 +142,7 @@ export default (getDataFn, defaultFilter) => {
 
                     request.page = page || filter.page || this.state.page;
                     request.page_size = pageSize || filter.page_size || this.state.page_size;
+                    request.ordering = this.stringifySorting(this.state.sorting);
 
                     this.setState({
                         page: parseInt(request.page, 10),
@@ -127,8 +168,10 @@ export default (getDataFn, defaultFilter) => {
                         loading: this.state.loading,
                         pageSize: this.state.page_size,
                         data: this.state.data,
+                        sorting: this.state.sorting,
                         onPageSizeChange: this.onPageSizeChange.bind(this),
-                        onPageChange: this.onPageChange
+                        onPageChange: this.onPageChange,
+                        onSortingChange: this.onSortingChange.bind(this)
                     };
 
                     return (

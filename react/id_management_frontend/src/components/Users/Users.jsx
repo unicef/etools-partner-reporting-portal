@@ -285,5 +285,8 @@ Users.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withProps(user, portal)(withSearch(getData, defaultFilter)(withDialogHandling(Users))));
+export default connect(mapStateToProps, mapDispatchToProps)(withProps(user, portal)(withSearch(getData, defaultFilter, [{
+    columnName: 'last_login',
+    direction: 'desc'
+}])(withDialogHandling(Users))));
 

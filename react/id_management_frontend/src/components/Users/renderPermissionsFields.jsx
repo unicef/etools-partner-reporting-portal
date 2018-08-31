@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
 import SelectForm from "../form/SelectForm";
 import SearchSelectForm from "../form/SearchSelectForm";
 import {Grid, Typography} from "@material-ui/core";

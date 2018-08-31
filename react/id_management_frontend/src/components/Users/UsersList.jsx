@@ -10,6 +10,20 @@ import {portal} from "../../helpers/props";
 import UserRowStatus from "./UserRowStatus";
 
 class UsersList extends Component {
+    columnExtensions = [
+        {
+            columnName: 'email',
+            sortingEnabled: false
+        }
+    ];
+
+    alternativeSorting = [
+        {
+            columnName: 'name',
+            orderingNames: ['first_name', 'last_name']
+        }
+    ];
+
     renderStatus(row) {
         return (
             <UserRowStatus row={row}/>
@@ -75,6 +89,9 @@ class UsersList extends Component {
                     {...otherProps}
                     data={data}
                     columns={this.getColumns()}
+                    columnExtensions={this.columnExtensions}
+                    alternativeSorting={this.alternativeSorting}
+                    allowSorting
                     expandedCell={row => (
                         <UserRowExpanded row={row}
                                          onPermissionEdit={onPermissionEdit}
