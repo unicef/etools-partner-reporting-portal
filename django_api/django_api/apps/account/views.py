@@ -80,13 +80,24 @@ class UserListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     ordering_fields = ('last_login', 'first_name', 'last_name', 'partner')
 
+    def custom_ordering(self, queryset):
+        ordering = self.request.query_params.get('ordering')
+
+        if ordering == 'status':
+            return queryset.order_by('last_login', 'role_count')
+
+        if ordering == '-status':
+            return queryset.order_by('-last_login', '-role_count')
+
+        return queryset
+
     def get_queryset(self):
         portal_choice = self.request.query_params.get('portal')
 
         user = self.request.user
         user_prp_roles = set(user.role_list)
 
-        users_queryset = User.objects.exclude(id=user.id).annotate(role_count=Count('prp_roles'))
+        users_queryset = User.objects.exclude(id=user.id).annotate(role_count=Count('prp_roles')).order_by('-id')
 
         ip_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
@@ -128,4 +139,6 @@ class UserListCreateAPIView(ListCreateAPIView):
             'workspace', 'cluster', 'cluster__response_plan', 'cluster__response_plan__workspace')
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
 
-        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch).order_by('-id')
+        users_queryset = self.custom_ordering(users_queryset)
+
+        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
