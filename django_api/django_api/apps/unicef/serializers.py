@@ -591,6 +591,7 @@ class PMPPDPartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
         fields = (
+            "external_id",
             "name",
             "short_name",
             "unicef_vendor_number",

@@ -160,6 +160,8 @@ def process_programme_documents(fast=False, area=False):
                             print("No partner name - skipping!")
                             continue
 
+                        partner_data['external_id'] = partner_data.get('id', '#')
+
                         try:
                             partner = process_model(
                                 Partner,
