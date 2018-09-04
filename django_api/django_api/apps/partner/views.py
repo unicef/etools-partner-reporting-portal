@@ -33,6 +33,7 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsIMO,
     IsClusterSystemAdmin,
+    has_permission_for_clusters_check
 )
 
 from cluster.models import Cluster
@@ -150,8 +151,14 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
                 PRP_ROLE_TYPES.cluster_viewer,
             ])
 
-        if request.method == 'POST' and partner_id:
-            roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        if request.method == 'POST':
+            if partner_id:
+                roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+
+            cluster_ids = [int(cluster_dict['id']) for cluster_dict in request.data.get('clusters', [])]
+            if not has_permission_for_clusters_check(request, cluster_ids, roles_permitted):
+                message = {'clusters': 'You may not have required permission to add some of the clusters.'}
+                self.permission_denied(request, message=message)
 
         if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |

@@ -223,6 +223,18 @@ def IsIPViewerCheck(request):
     return all(rules)
 
 
+def has_permission_for_clusters_check(request, cluster_ids, roles):
+    if request.user.is_cluster_system_admin:
+        return True
+
+    cluster_ids = set(cluster_ids)
+    cluster_role_count = request.user.prp_roles.filter(cluster__in=cluster_ids, role__in=roles).distinct().count()
+
+    if cluster_role_count == len(cluster_ids):
+        return True
+    return False
+
+
 class IsPartnerAuthorizedOfficerForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
