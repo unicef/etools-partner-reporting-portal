@@ -3,6 +3,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.filters import OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.generics import (
     RetrieveAPIView,
@@ -89,9 +90,10 @@ class PartnerListCreateAPIView(ListCreateAPIView):
         ),
     )
     queryset = Partner.objects.prefetch_related('clusters').order_by('-id')
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, OrderingFilter)
     filter_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
+    ordering_fields = ('title', 'partner_type')
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
