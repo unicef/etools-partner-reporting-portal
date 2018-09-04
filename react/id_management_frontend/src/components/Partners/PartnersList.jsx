@@ -4,6 +4,13 @@ import PartnerRowExpanded from "./PartnerRowExpanded";
 
 
 class PartnersList extends Component {
+    columnExtensions = [
+        {
+            columnName: 'clusters',
+            sortingEnabled: false
+        }
+    ];
+
     getColumns() {
         return [
             {
@@ -12,7 +19,8 @@ class PartnersList extends Component {
             },
             {
                 title: "Partner Type",
-                name: "partner_type_display"
+                name: "partner_type",
+                getCellValue: row => row.partner_type_display
             },
             {
                 title: "Clusters",
@@ -29,6 +37,8 @@ class PartnersList extends Component {
                     {...this.props}
                     showEdit
                     columns={this.getColumns()}
+                    columnExtensions={this.columnExtensions}
+                    allowSorting
                     expandedCell={row => (
                         <PartnerRowExpanded row={row}/>
                     )}
