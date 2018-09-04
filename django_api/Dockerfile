@@ -66,7 +66,7 @@ RUN chmod -R a+rw /data
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code/
 
-COPY waitforit /usr/local/bin/waitforit
+RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.2.0/waitforit-linux_amd64
 RUN chmod +x /usr/local/bin/waitforit
 
 EXPOSE 8000
