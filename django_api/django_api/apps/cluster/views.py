@@ -15,17 +15,7 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 import django_filters
 
 from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
-from core.permissions import (
-    IsIMOForCurrentWorkspaceCheck,
-    HasAnyRoleCheck,
-    HasAnyRole,
-    AnyPermission,
-    IsPartnerEditorForCurrentWorkspace,
-    IsAuthenticated,
-    IsIMOForCurrentWorkspace,
-    IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    IsPartnerViewerForCurrentWorkspace,
-)
+from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
@@ -566,8 +556,17 @@ class ResponsePlanClusterDashboardAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def check_response_plan_permission(self, request, obj):
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+
+        if not request.user.partner:
+            roles_permitted.extend([
+                PRP_ROLE_TYPES.cluster_member,
+                PRP_ROLE_TYPES.cluster_viewer,
+                PRP_ROLE_TYPES.cluster_coordinator
+            ])
+
         if not request.user.prp_roles.filter(
-            Q(cluster__response_plan=obj, role=PRP_ROLE_TYPES.cluster_imo) |
+            Q(cluster__response_plan=obj, role__in=roles_permitted) |
             Q(role=PRP_ROLE_TYPES.cluster_system_admin)
         ).exists():
             self.permission_denied(request)
@@ -1093,17 +1092,21 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - OperationalPresenceLocationListSerializer object list.
     """
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
-            PRP_ROLE_TYPES.cluster_viewer,
-        )
-    )
+    permission_classes = (IsAuthenticated, )
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member, PRP_ROLE_TYPES.cluster_viewer),
+                  cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id):
         if self.request.GET.get('narrow_loc_type', None):
@@ -1228,15 +1231,20 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
-    permission_classes = (
-        IsAuthenticated,
-        HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-        )
-    )
+    permission_classes = (IsAuthenticated, )
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        if not request.user.prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+        ).exists():
+            self.permission_denied(request)
 
     def get(self, request, response_plan_id):
         return self.list(request, response_plan_id)
