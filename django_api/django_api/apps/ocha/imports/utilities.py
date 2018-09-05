@@ -115,24 +115,21 @@ def save_location_list(location_list, parent=None, save_children=False):
                 ))
                 continue
 
-            gateway_name = '{} - {} - Admin Level {}'.format(country.country_short_code, location_data['data']['name'],
-                                                             location_data['data']['adminLevel'])
+            gateway_name = '{}-Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
             logger.debug('Saving gateway type with name {}'.format(gateway_name))
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
                 admin_level=location_data['data']['adminLevel'],
-                name=gateway_name,
             )
 
             location, _ = Location.objects.update_or_create(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=location_data['data']['id'],
+                gateway=gateway,
+                title=location_data['data']['name'],
                 defaults={
-                    'title': location_data['data']['name'],
-                    'p_code': location_data['data']['pcode'],
+                    'external_source': EXTERNAL_DATA_SOURCES.HPC,
+                    'external_id': location_data['data']['id'],
                     'latitude': location_data['data'].get('latitude'),
                     'longitude': location_data['data'].get('longitude'),
-                    'gateway': gateway,
                     'parent': parent,
                 }
             )

@@ -340,6 +340,7 @@ def process_programme_documents(fast=False, area=False):
                                 for i in d['indicators']:
                                     # Check if indicator is cluster indicator
                                     i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+                                    i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
                                     # If indicator is not cluster, create Blueprint
                                     # otherwise use parent Blueprint
@@ -354,7 +355,21 @@ def process_programme_documents(fast=False, area=False):
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
-                                        i['title'] = i['title'] or '<EMPTY TITLE PROVIDED BY EXTERNAL SYSTEM>'
+                                        # TODO: Fix db schema to accommodate larger lengths
+                                        i['title'] = i['title'][:255] if i['title'] else "unknown"
+
+                                        if i['unit'] == '':
+                                            if int(i['baseline']['d']) == 1:
+                                                i['unit'] = 'number'
+                                                i['display_type'] = 'number'
+
+                                            elif int(i['baseline']['d']) != 1:
+                                                i['unit'] = 'percentage'
+                                                i['display_type'] = 'percentage'
+
+                                        elif i['unit'] == 'number':
+                                            i['display_type'] = 'number'
+
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
@@ -367,22 +382,43 @@ def process_programme_documents(fast=False, area=False):
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
-                                        l['gateway_country'] = workspace.countries.all()[
-                                            0].id  # TODO: later figure out how to fix this on eTools PMP side
-                                        if not l['admin_level']:
-                                            l['admin_level'] = 1
-                                        if not l['pcode']:
+                                        country = workspace.countries.first()
+                                        l['gateway_country'] = country.id
+
+                                        if l['admin_level'] is None:
+                                            print("Admin level empty! Skipping!")
+                                            continue
+
+                                        if l['pcode'] is None or not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
+
+                                        l['location_type'] = '{}-Admin Level {}'.format(
+                                            country.country_short_code,
+                                            l['admin_level']
+                                        )
+
                                         gateway = process_model(
-                                            GatewayType, PMPGatewayTypeSerializer, l, {
-                                                'name': l['pcode']})
+                                            GatewayType,
+                                            PMPGatewayTypeSerializer,
+                                            l,
+                                            {
+                                                'admin_level': l['admin_level'],
+                                                'country': l['gateway_country'],
+                                            },
+                                        )
 
                                         # Create location
                                         l['gateway'] = gateway.id
                                         location = process_model(
-                                            Location, PMPLocationSerializer, l, {
-                                                'p_code': l['pcode']})
+                                            Location,
+                                            PMPLocationSerializer,
+                                            l,
+                                            {
+                                                'gateway': l['gateway'],
+                                                'p_code': l['pcode'],
+                                            }
+                                        )
                                         locations.append(location)
 
                                     # If indicator is not cluster, create
@@ -429,15 +465,13 @@ def process_programme_documents(fast=False, area=False):
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
 
-                                    # TODO: Fix db schema to accommodate larger lengths
-                                    i['title'] = i['title'][:255] if i['title'] else "unknown"
                                     reportable = process_model(
                                         Reportable,
                                         PMPReportableSerializer,
                                         i,
                                         {'external_id': i['id']}
                                     )
-                                    reportable.active = True
+                                    reportable.active = i['is_active']
 
                                     # TODO: Update the PMP PD indicator data field
                                     # for ca_indicator_used_by_reporting_entity

@@ -418,7 +418,7 @@ class ProgressReport(TimeStampedModel):
         return "{} - {}".format(
             self.start_date.strftime(settings.PRINT_DATA_FORMAT),
             self.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if self.start_date and self.end_date else "No reporting period"
 
     def get_submission_date(self):
         return self.submission_date.strftime(settings.PRINT_DATA_FORMAT) if self.submission_date else None

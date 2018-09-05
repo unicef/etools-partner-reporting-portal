@@ -235,7 +235,6 @@ class PartnerProject(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
-        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
         permissions = (
             ('imo_object', 'IMO Object'),
             ('partner_object', 'Partner Object'),

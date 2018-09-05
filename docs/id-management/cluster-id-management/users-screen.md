@@ -31,7 +31,7 @@ Below filters user can see search results in a form of a list of users. It conta
 * Name
 * Partner \(on IMO And System Admin screens\)
 * E-mail
-* Status \(Active or Invited\)
+* Status \(Active or Invited or Inactive\) - Row will be highlighted if no role has been assigned to them.
 * Last login
 
 ![Search results on User screen](https://lh6.googleusercontent.com/n7cvvj6KFEGDtX2c3ymMIGQI6Orw7DA6Khv8ekQXYPLpvIcLW4DFmn3aa_Ie-AAdceUjH-wwYwmnMS974wPlmEPcsidX20QWmBbMNgVI2ELD-Q6Su_p4KpQbwXcKkXtDGwCwdDQM)

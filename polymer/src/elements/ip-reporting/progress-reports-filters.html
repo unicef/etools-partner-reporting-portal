@@ -67,6 +67,7 @@
         </dropdown-filter-multi>
 
         <dropdown-filter-multi
+          class="item item-2-col"
           label="Report Type"
           name="report_type"
           value="[[_withDefault(queryParams.report_type, '')]]"
@@ -111,9 +112,9 @@
           type: Array,
           value: function () {
             return [
-              {title: 'QPR', id: 'QPR'},
-              {title: 'HR', id: 'HR'},
-              {title: 'SR', id: 'SR'},
+              {title: 'QPR (Quarterly Progress Report)', id: 'QPR'},
+              {title: 'HR (Humanitarian Report)', id: 'HR'},
+              {title: 'SR (Special Report)', id: 'SR'},
             ];
           },
         },

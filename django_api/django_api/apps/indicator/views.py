@@ -601,7 +601,9 @@ class IndicatorReportListAPIView(APIView):
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+            indicator_reports = reportable.indicator_reports.filter(
+                report_status__in=[INDICATOR_REPORT_STATUS.submitted, INDICATOR_REPORT_STATUS.accepted]
+            ).order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = int(self.request.query_params.get('limit', '2'))

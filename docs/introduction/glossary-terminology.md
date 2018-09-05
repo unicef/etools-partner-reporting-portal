@@ -11,6 +11,7 @@
 * CSO - Civil Society Organization
 * CSP - Civil Society Partnership. When partnerships require a transfer of resources from UNICEF to the CSO, there are two established modalities: 1\) a Small Scale Funding Agreement \(SSFA\), or a 2\) Programme Cooperation Agreement \(PCA\).
 * Disaggregation - How reported data is split based on certain key indicating dimensions, eg. gender, age etc.
+* FA - Flash Appeal
 * FACE -  Funding Authorization and Certification of Expenditures. FACE form in Annex J, along with the itemized cost estimate, is used to request cash transfers, report on expenditures and certify expenditures. FACE is used for all types of fund transfers; Cash Advance/Direct cash transfers, direct payments and reimbursements.
 * FRG - Field Results Group. [Presentation](https://www.unicef.org/publicpartnerships/files/UNICEF_Results_Based_Management.pdf).
 * FTS - Financial Tracking System, by OCHA.
@@ -25,7 +26,7 @@
 * OCHA - Office for the Coordination of Humanitarian Affairs. [Website](https://www.unocha.org/).
 * Output - Think of this as a statement of what is expected to be achieved.
 * QPR \(Quarterly Progress Report\) - This is a report that the partner files with UNICEF, typically on a quarterly basis to report progress on indicators as part of a PD. This report contains progress on all indicators, irrespective of whether they PD indicators, high frequency non-cluster or high frequency cluster indicators.
-* **Programme Document \(PD\)** - At least one programme document is required to operationalize the PCA \(Annex C of the CSO Procedure\).
+* **Programme Document \(PD\)** - At least one programme document is required to operationalize the PCA \(Annex C of the CSO Procedure\). One PCA can have many PD's. One SSFA has one PD only.
 * PO - Programme Officer
 * PMP - Partnership Management Portal \(part of eTools\)
 * **Progress Report** - A grouping report that is filed by the partner for a certain reporting period and contains one or more indicator reports, along with narrative data.
@@ -33,13 +34,13 @@
 * PRP - Partner Reporting Portal
 * PRP-Cluster - Partner Reporting Portal for members of humanitarian clusters
 * PRP-IP - Partner Reporting Portal for UNICEF Implementing Partners
-* PCA - Programme Cooperation Agreement. A PCA is an umbrella agreement with a CSO; once it is signed it remains valid through the end of the UNICEF country programme.
+* **PCA** - Programme Cooperation Agreement. A PCA is an umbrella agreement with a CSO; once it is signed it remains valid through the end of the UNICEF country programme. One PCA can have many PD's.
 * RPM - Response Planning & Monitoring, by OCHA. [Video](https://www.youtube.com/watch?v=SCwvJ8f_VUQ).
 * Reporting Period - The time period \(start date -&gt; end date\) for which a report is being filed.
 * **Response Plan** - Higher level abstraction than a cluster that captures details and strategies for a humanitarian response. [Example HRP document](https://www.humanitarianresponse.info/system/files/documents/files/2017_hrp_bangladesh_041017_3.pdf).
 * RO - Regional office
 * SR \(Special Report\) - Report filed by partner, per UNICEF request, for the IP to provide specific information on an ad hoc basis.
-* SSFA - Small-Scale Funding Agreement
+* SSFA - Small-Scale Funding Agreement. One SSFA has one PD only.
 * TOR - Terms of Reference
 * UNPP - UN Partner Portal
 

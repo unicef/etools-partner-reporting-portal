@@ -10,7 +10,7 @@ Adding new Partner is possible by clicking button placed in the top right of thi
 
 When button is clicked, following modal window is displayed to the user:
 
-![Add new Partner modal window](https://lh6.googleusercontent.com/g862cEKtPbih0B4WQ2D8cJIVeXpnw7sleDZv1ORtgCObNVEATs0k4phqdxivl54kqotSn-879HlRh2aaWQt7OVux_a20BpSmcQZHmEAiikgv4gLWu_0s3iu9JHc2_VNVEiaBW8vU)
+![](../../.gitbook/assets/screen-shot-2018-08-22-at-19.53.46.png)
 
 ## **Filters**
 

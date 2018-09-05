@@ -28,5 +28,13 @@
             "domain": "127.0.0.1",
             "name": "127.0.0.1"
         }
+    },
+    {
+        "model": "sites.site",
+        "pk": 6,
+        "fields": {
+            "domain": "dev.partnerreportingportal.org",
+            "name": "dev.partnerreportingportal.org"
+        }
     }
 ]

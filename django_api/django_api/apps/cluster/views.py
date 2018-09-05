@@ -459,7 +459,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
                 **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))   # noqa: E501
             | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
                 **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))   # noqa: E501
-        )
+        ).distinct()
         return queryset
 
 
@@ -597,7 +597,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
                 raise Exception('Invalid cluster ids')
         else:
             if request.user.is_cluster_system_admin:
-                clusters = []
+                clusters = Cluster.objects.filter(response_plan=response_plan)
             else:
                 clusters = response_plan.clusters.filter(prp_roles__user=request.user)
 

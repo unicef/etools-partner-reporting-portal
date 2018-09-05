@@ -403,11 +403,23 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
             })
 
         if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError("start_date should come before end_date")
+            raise serializers.ValidationError({
+                "start_date": "start_date should come before end_date",
+            })
 
         data['cluster'] = cluster
         data['partner'] = partner
         data['project'] = project
+
+        if data['project'].start_date > data['start_date']:
+            raise serializers.ValidationError({
+                "start_date": "start_date cannot start before its project's start date",
+            })
+
+        if data['project'].end_date < data['end_date']:
+            raise serializers.ValidationError({
+                "end_date": "end_date cannot end after its project's end date",
+            })
 
         return data
 

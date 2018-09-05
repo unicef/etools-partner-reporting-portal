@@ -15,7 +15,7 @@ from unicef.models import LowerLevelOutput, ProgressReport
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
+from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -210,24 +210,46 @@ class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSeriali
 class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField()
+    in_need = serializers.JSONField(required=False, allow_null=True)
+    target = serializers.JSONField()
     location = LocationSerializer(read_only=True)
 
+    def validate(self, data):
+        in_need = data['in_need']
+        target = data['target']
+
+        if in_need and 'v' in in_need:
+            # Defaulting to 0 if this is optional value
+            if in_need['v'] == "":
+                data['in_need']['v'] = 0
+
+            elif float(in_need['v']) < float(target['v']):
+                raise serializers.ValidationError({
+                    "in_need": "Target cannot be greater than In Need",
+                })
+
+        return data
+
     def validate_baseline(self, value):
+
+        if 'v' in value and value['v'] == "":
+            raise serializers.ValidationError("Baseline cannot be empty")
+
         if 'd' not in value:
             value['d'] = 1
-
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
 
         return value
 
     def validate_in_need(self, value):
-        if 'd' not in value:
-            value['d'] = 1
 
-        elif value['d'] == 0:
-            raise serializers.ValidationError("key 'd' cannot be zero")
+        if value:
+            if 'd' not in value:
+                value['d'] = 1
+
+            elif value['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
 
         return value
 
@@ -239,6 +261,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
             'baseline',
             'in_need',
             'location',
+            'target',
         )
 
 
@@ -1073,18 +1096,22 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data):
+    def check_progress_values(self, partner, reportable_object_content_model, validated_data):
         """
         Validates baseline, target, in-need
         """
+
         if 'baseline' not in validated_data:
-            raise ValidationError(
-                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
-            )
+            if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
+                    raise ValidationError(
+                        {"baseline": "baseline is required for IMO to create Indicator"}
+                    )
+            else:
+                validated_data['baseline'] = {'v': 0, 'd': 1}
 
         if 'target' not in validated_data:
             raise ValidationError(
-                {"target": "target is required for IMO creating Cluster Indicator"}
+                {"target": "target is required to create Indicator"}
             )
 
         if 'd' not in validated_data['baseline']:
@@ -1103,6 +1130,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "denominator for target cannot be zero"}
             )
 
+        if validated_data['baseline']['v'] == "":
+            raise ValidationError(
+                {"baseline": "cannot be empty"}
+            )
+
+        if validated_data['target']['v'] == "":
+            raise ValidationError(
+                {"target": "cannot be empty"}
+            )
+
         baseline_value = float(validated_data['baseline']['v']) if float(validated_data['baseline']['d']) == 1 else \
             float(validated_data['baseline']['v']) / float(validated_data['baseline']['d'])
 
@@ -1114,7 +1151,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"baseline": "Cannot be greater than target"}
             )
 
-        if 'in_need' in validated_data and validated_data['in_need']:
+        if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "":
             if 'd' not in validated_data['in_need']:
                 validated_data['in_need']['d'] = 1
 
@@ -1138,14 +1175,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 {"locations": "Selected locations should share same admin level"})
 
+    def resolve_reportable_content_type(self, object_type):
+        return ContentType.objects.get_by_natural_key(
+            *object_type.split('.')
+        )
+
     @transaction.atomic
     def create(self, validated_data):
         partner = self.context['request'].user.partner
-
-        self.check_disaggregation(self.initial_data.get('disaggregations'))
-
-        if not partner:
-            self.check_progress_values(validated_data)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
@@ -1169,10 +1206,29 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         validated_data['blueprint'] = blueprint.save()
 
-        reportable_object_content_type = ContentType.objects.get_by_natural_key(
-            *validated_data.pop('object_type').split('.')
-        )
+        reportable_object_content_type = self.resolve_reportable_content_type(validated_data.pop('object_type'))
         reportable_object_content_model = reportable_object_content_type.model_class()
+
+        self.check_disaggregation(self.initial_data.get('disaggregations'))
+        self.check_progress_values(partner, reportable_object_content_model, validated_data)
+
+        # If indicator reporting frequency is custom and there is no start_date_of_reporting_period
+        if validated_data['frequency'] == REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates \
+                and not validated_data['start_date_of_reporting_period']:
+            error_msg = "Start date of reporting period is required for custom specific date frequency"
+
+            raise ValidationError({
+                "start_date_of_reporting_period": error_msg,
+            })
+
+        # If indicator reporting frequency is custom and start_date_of_reporting_period exists in the due dates
+        if validated_data['frequency'] == REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates \
+                and validated_data['start_date_of_reporting_period'] in validated_data['cs_dates']:
+            error_msg = "Start date of reporting period cannot be in custom due dates of report"
+
+            raise ValidationError({
+                "start_date_of_reporting_period": error_msg,
+            })
 
         if reportable_object_content_model == ClusterObjective:
             get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
@@ -1181,11 +1237,26 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == PartnerProject:
-            get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the project's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
         elif reportable_object_content_model == PartnerActivity:
-            get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+            content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
         else:
             raise NotImplemented()
 
@@ -1207,14 +1278,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_location_admin_levels(location_queryset)
 
         for loc_data in locations:
-            if partner:
+            # If partner updating partner activity indicator adopted from CA,
+            # do not take out baseline and in-need at location level
+            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
                 # Filter out location goal level baseline, in_need
                 loc_data.pop('baseline', None)
                 loc_data.pop('in_need', None)
 
             else:
                 # Location-level progress value validation
-                self.check_progress_values(loc_data)
+                self.check_progress_values(partner, reportable_object_content_model, loc_data)
 
             loc_data['reportable'] = self.instance
 
@@ -1237,16 +1310,43 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         # Remove disaggregations to update
         validated_data.pop('disaggregations', [])
 
-        if partner:
+        reportable_object_content_type = self.resolve_reportable_content_type(validated_data.pop('object_type'))
+        reportable_object_content_model = reportable_object_content_type.model_class()
+
+        if reportable_object_content_model == PartnerProject:
+            content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the project's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
+        elif reportable_object_content_model == PartnerActivity:
+            content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
+            # If PartnerActivity is adopted from CA,
             # Filter out IndicatorBlueprint instance
             # and Indicator level baseline, in_need, and target
-            validated_data.pop('blueprint', None)
-            validated_data.pop('baseline', None)
-            validated_data.pop('in_need', None)
-            validated_data.pop('target', None)
+            if partner and content_object.cluster_activity:
+                validated_data.pop('blueprint', None)
+                validated_data.pop('baseline', None)
+                validated_data.pop('in_need', None)
+                validated_data.pop('target', None)
 
-        if not partner:
-            self.check_progress_values(validated_data)
+        # If partner updating partner activity indicator adopted from CA, do not process progress value as it is fixed
+        if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+            pass
+        else:
+            self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
@@ -1262,14 +1362,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
                 loc_goal['reportable'] = reportable
 
-                if partner:
+                # If partner updating partner activity indicator adopted from CA,
+                # do not take out baseline and in-need at location level
+                if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
                     # Filter out location goal level baseline, in_need
                     loc_goal.pop('baseline', None)
                     loc_goal.pop('in_need', None)
 
                 if not partner:
                     # Location-level progress value validation
-                    self.check_progress_values(loc_goal)
+                    self.check_progress_values(partner, reportable_object_content_model, loc_goal)
 
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
@@ -1299,8 +1401,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         for data_id, data in data_mapping.items():
             loc_goal = loc_goal_mapping.get(data_id, None)
 
-            if partner:
-                # Filter out location level baseline and in_need
+            # If partner updating partner activity indicator adopted from CA,
+            # do not take out baseline and in-need at location level
+            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+                # Filter out location goal level baseline, in_need
                 data.pop('baseline', None)
                 data.pop('in_need', None)
 
@@ -1488,7 +1592,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)
-        return {"id": cluster.id, "title": cluster.get_type_display()} if cluster else None
+        return {"id": cluster.id, "title": cluster.title} if cluster else None
 
     def get_cluster_id(self, obj):
         cluster = self._get_cluster(obj)
@@ -1574,6 +1678,8 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'blueprint_id',
             'title',
             'disaggregatable',
+            'unit',
+            'display_type',
         )
 
 
@@ -1605,7 +1711,6 @@ class PMPDisaggregationValueSerializer(DiscardUniqueTogetherValidationMixin, ser
 
 class PMPReportableSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
-    title = serializers.CharField(source='means_of_verification')
     blueprint_id = serializers.PrimaryKeyRelatedField(queryset=IndicatorBlueprint.objects.all(), source="blueprint")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
@@ -1620,12 +1725,15 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'id',
             'target',
             'baseline',
-            'title',
             'is_cluster_indicator',
+            'is_unicef_hf_indicator',
             'blueprint_id',
             'disaggregation_ids',
             'content_type',
             'object_id',
+            'means_of_verification',
+            'numerator_label',
+            'denominator_label',
         )
 
 

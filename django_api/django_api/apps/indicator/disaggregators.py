@@ -195,7 +195,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
                             ordered_dict[key][ValueType.DENOMINATOR]
 
         # Calculating all level_reported N c values
-        for key in ordered_dict_keys:
+        for key in ordered_dict.keys():
             if ordered_dict[key][ValueType.VALUE] == 0 and ordered_dict[key][ValueType.DENOMINATOR] == 0:
                 ordered_dict[key][ValueType.CALCULATED] = 0
             elif ordered_dict[key][ValueType.DENOMINATOR] == 0:

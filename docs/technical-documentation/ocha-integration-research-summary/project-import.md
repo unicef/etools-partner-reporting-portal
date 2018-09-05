@@ -20,7 +20,7 @@ That list is displayed by the frontend to the user, where after selection a requ
 Project details are retrieved from a **V2** endpoint `https://api.hpc.tools/v2/public/project/<projectId>`
 
 | **Partner Project model** | **OCHA Source** |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | title | name |
 | description | objective |
 | start\_date | startDate |
@@ -43,7 +43,7 @@ Projects clustes will also be populated up to Partners clusters
 Funding information is pulled from `https://api.hpc.tools/v1/public/fts/flow?projectId=<projectId>`
 
 | **Partner Project model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | total\_budget | amountUSD |
 | funding\_source | sourceObjects\[name\] |
 
@@ -56,11 +56,11 @@ Parent Cluster Activity for an Indicator is referenced by `objectId`, some Indic
 {% endhint %}
 
 | **Indicator Blueprint Model** | **OCHA Source** |
-| --- | --- |
+| :--- | :--- |
 | title | value.description |
 
 | **Reportable Model** | **OCHA Source** |
-| --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | blueprint | _as saved above_ |
 | target | value.metrics.values.totals _where_ `name.en = Target` |
 | in\_need | value.metrics.values.totals _where_ `name.en = In Need` |

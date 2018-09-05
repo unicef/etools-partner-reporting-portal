@@ -42,6 +42,8 @@ class IndicatorsXLSXReader(object):
             # Find first Disaggregation Value column
             dis_data_column_start_id = None
             for column in range(1, MAX_COLUMNS):
+                if not self.sheet.cell(row=COLUMN_HASH_ID, column=column).value:
+                    break
                 if "#indicator+value" in self.sheet.cell(row=COLUMN_HASH_ID, column=column).value:
                     dis_data_column_start_id = column
                     break
@@ -118,7 +120,8 @@ class IndicatorsXLSXReader(object):
                 data = indicator.disaggregation
                 # Prepare
                 already_updated_row_value = False
-                for column in range(dis_data_column_start_id, total_column_id + 1):
+                for column in range(dis_data_column_start_id if dis_data_column_start_id else total_column_id,
+                                    total_column_id + 1):
                     try:
                         value = self.sheet.cell(row=row, column=column).value
                         # Check if value is present in cell

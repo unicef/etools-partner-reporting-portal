@@ -8,7 +8,7 @@ from suit.widgets import AutosizedTextarea
 from carto.sql import SQLClient
 from carto.exceptions import CartoException
 
-from core.cartodb import get_carto_client
+from core.cartodb import EtoolsCartoNoAuthClient
 from core.models import GatewayType, CartoDBTable
 
 
@@ -37,36 +37,32 @@ class CartoDBTableForm(forms.ModelForm):
     def clean(self):
 
         domain = self.cleaned_data['domain']
-        api_key = self.cleaned_data['api_key']
         table_name = self.cleaned_data['table_name']
+        name_col = self.cleaned_data['name_col']
+        pcode_col = self.cleaned_data['pcode_col']
+        parent_code_col = self.cleaned_data['parent_code_col']
+        auth_client = EtoolsCartoNoAuthClient(base_url="https://{}.carto.com/".format(str(domain)))
 
-        client = get_carto_client(api_key, domain)
-        sql = SQLClient(client)
-
+        sql_client = SQLClient(auth_client)
         try:
-            sites = sql.send(
-                'select * from {} limit 1'.format(table_name)
-            )
+            sites = sql_client.send('select * from {} limit 1'.format(table_name))
         except CartoException:
-            logging.exception("CartoDB exception occured", exc_info=True)
-            raise ValidationError(
-                "Couldn't connect to CartoDB table: " + table_name)
+            logger.exception("CartoDB exception occured")
+            raise ValidationError("Couldn't connect to CartoDB table: {}".format(table_name))
         else:
             row = sites['rows'][0]
-            if 'name' not in row:
-                raise ValidationError(
-                    'The Name column ({}) is not in table: {}'.format(
-                        'name', table_name))
-
-            if 'pcode' not in row:
-                raise ValidationError(
-                    'The PCode column ({}) is not in table: {}'.format(
-                        'pcode', table_name))
-
-            if self.cleaned_data['parent'] and 'parent_pcode' not in row:
-                raise ValidationError(
-                    'The Parent Code column ({}) is not in table: {}'.format(
-                        'parent_pcode', table_name))
+            if name_col not in row:
+                raise ValidationError('The Name column ({}) is not in table: {}'.format(
+                    name_col, table_name
+                ))
+            if pcode_col not in row:
+                raise ValidationError('The PCode column ({}) is not in table: {}'.format(
+                    pcode_col, table_name
+                ))
+            if parent_code_col and parent_code_col not in row:
+                raise ValidationError('The Parent Code column ({}) is not in table: {}'.format(
+                    parent_code_col, table_name
+                ))
 
         return self.cleaned_data
 

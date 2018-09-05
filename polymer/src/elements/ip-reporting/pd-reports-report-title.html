@@ -38,7 +38,7 @@
       is="dom-if"
       if="[[!showLink]]"
       restamp="true">
-      [[_getReportTitle(report)]]
+      [[_getReportTitleFull(report)]]
     </template>
     <template
       is="dom-if"
@@ -79,6 +79,18 @@
 
       _shouldDisplayLink: function(displayLink, report, permissions) {
         return displayLink && this._canNavigateToReport(permissions, report);
+      },
+
+      _getReportTitleFull: function (report) {
+        var title =  report.report_type + report.report_number;
+        if (report.report_type === 'QPR') {
+          title += ' (Quarterly Progress Report)';
+        } else if (report.report_type === 'HR') {
+          title += ' (Humanitarian Report)';
+        } else if (report.report_type === 'SR') {
+          title += ' (Special Report)';
+        }
+        return title;
       },
 
       _getReportTitle: function (report) {

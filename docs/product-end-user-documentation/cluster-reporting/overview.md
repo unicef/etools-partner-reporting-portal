@@ -2,6 +2,8 @@
 
 The goal of Cluster Reporting in PRP is to enable IMO’s and Cluster partners to report on various indicators and have access to the associated data they need to demonstrate progress against targets and to support coordination.
 
+![](../../.gitbook/assets/please_send_me_your_deck__specifically_the_2-3_slides_related_to_overall_data_model__eom___-_sumit_c.png)
+
 Both IMO’s and Partners have access to Cluster Reporting and can view all data for their respective organizations.
 
 Partners can add

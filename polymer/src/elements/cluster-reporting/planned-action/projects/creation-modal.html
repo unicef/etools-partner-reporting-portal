@@ -250,18 +250,23 @@
             is="dom-if"
             if="[[permissions.addPartnerToProject]]"
             restamp="true">
-            <etools-single-selection-menu
-              class="item validate full-width"
-              label="Partner"
-              options="[[partners]]"
-              option-value="id"
-              option-label="title"
-              selected="{{ data.partner_id }}"
-              selected-item="{{ selectedPartner }}"
-              on-iron-activate="_validate"
-              trigger-value-change-event
-              required>
-            </etools-single-selection-menu>
+            <template
+              is="dom-if"
+              if="[[!edit]]"
+              restamp="true">
+              <etools-single-selection-menu
+                class="item validate full-width"
+                label="Partner"
+                options="[[partners]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.partner_id}}"
+                selected-item="{{selectedPartner}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                required>
+              </etools-single-selection-menu>
+            </template>
           </template>
           <paper-radio-group
             id="mode"

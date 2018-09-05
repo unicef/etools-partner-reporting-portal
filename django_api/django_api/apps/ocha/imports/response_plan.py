@@ -49,7 +49,8 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
                 new_activity_data = list()
                 for value in activity_data.values():
                     new_activity_data.append(value)
-            activity_data = new_activity_data
+
+                activity_data = new_activity_data
 
             parent_objective_ids = list(itertools.chain(*[
                 s['planEntityIds'] for s in activity_data

@@ -89,7 +89,7 @@ CACHES = {
 
 # Application definition
 INSTALLED_APPS = [
-    'elasticapm.contrib.django',
+    # 'elasticapm.contrib.django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -126,7 +126,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
-    'elasticapm.contrib.django.middleware.TracingMiddleware',
+    # 'elasticapm.contrib.django.middleware.TracingMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -309,13 +309,13 @@ LOGGING = {
             'stream': sys.stdout,
             'formatter': 'standard',
         },
-        'elasticapm': {
-            'level': 'ERROR',
-            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
-        },
+        # 'elasticapm': {
+        #     'level': 'ERROR',
+        #     'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        # },
     },
     'loggers': {
-        '': {
+        'django': {
             'handlers': ['default'],
             'level': 'INFO',
             'propagate': True
@@ -325,11 +325,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'elasticapm.errors': {
-            'level': 'ERROR',
-            'handlers': ['default'],
-            'propagate': False,
-        },
+        # 'elasticapm.errors': {
+        #     'level': 'ERROR',
+        #     'handlers': ['default'],
+        #     'propagate': False,
+        # },
     }
 }
 
@@ -471,25 +471,6 @@ AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)
 AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', None)
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', None)
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', None)
-
-if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
-    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-    AZURE_SSL = True
-    AZURE_AUTO_SIGN = True  # flag for automatically signing urls
-    AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
-    AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
-
-    from storages.backends.azure_storage import AzureStorage
-    storage = AzureStorage()
-    with storage.open('keys/jwt/certificate.pem') as jwt_cert:
-        with open('keys/jwt/certificate.pem', 'w+') as new_jwt_cert:
-            new_jwt_cert.write(jwt_cert.read())
-elif all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_S3_SIGNATURE_VERSION = 's3v4'
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
-
 
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
