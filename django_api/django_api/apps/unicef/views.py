@@ -788,7 +788,12 @@ class ProgressReportReviewAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         progress_report.status = serializer.validated_data['status']
-        progress_report.review_date = datetime.now().date()
+        progress_report.review_date = serializer.validated_data['review_date'] or datetime.now().date()
+
+        assert hasattr(request.user, 'jwt_payload'), "This request should come from a unicef user logged in to etools"
+        progress_report.reviewed_by_email = request.user.jwt_payload['email']
+        progress_report.reviewed_by_name = serializer.validated_data['reviewed_by_name']
+        progress_report.reviewed_by_external_id = request.user.jwt_payload['user_id']
 
         if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             progress_report.sent_back_feedback = serializer.validated_data['comment']

@@ -468,6 +468,8 @@ class ProgressReportReviewSerializer(serializers.Serializer):
     ])
     comment = serializers.CharField(required=False)
     overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
+    reviewed_by_name = serializers.CharField()
+    review_date = serializers.DateField()
 
     def validate(self, data):
         """
