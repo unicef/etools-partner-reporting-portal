@@ -18,7 +18,7 @@ from .views import (
     ProgressReportAttachmentAPIView,
     ProgressReportSRSubmitAPIView,
     ProgressReportPullHFDataAPIView,
-)
+    InterventionPMPDocumentView)
 
 
 urlpatterns = [
@@ -41,6 +41,9 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/programme-document/indicators/$',
         ProgrammeDocumentIndicatorsAPIView.as_view(),
         name="programme-document-indicators"),
+    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/pmp-document/$',
+        InterventionPMPDocumentView.as_view(),
+        name="programme-document-file"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/$',
         ProgressReportAPIView.as_view(),
         name="progress-reports"),
@@ -74,4 +77,5 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/attachment/$',
         ProgressReportAttachmentAPIView.as_view(),
         name="progress-reports-attachment"),
+
 ]
