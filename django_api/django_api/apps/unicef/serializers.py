@@ -271,6 +271,10 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'partner_name',
             'partner_vendor_number',
             'unicef_focal_points',
+            'reviewed_by_name',
+            'reviewed_by_email',
+            'reviewed_by_external_id'
+
         )
 
     def get_reporting_period(self, obj):
@@ -337,6 +341,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'submitting_user',
             'is_final',
             'narrative',
+            'reviewed_by_name',
+            'reviewed_by_email',
+            'reviewed_by_external_id'
         )
 
     def get_partner_org_id(self, obj):
