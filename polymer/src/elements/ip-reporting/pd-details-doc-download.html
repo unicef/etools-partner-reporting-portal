@@ -77,18 +77,17 @@
         }
       },
 
-
       _computeDocUrl: function (locationId, pdId) {
         return pdId ? App.Endpoints.programmeDocumentDocDownload(locationId, pdId) : '';
       },
 
-      _openDoc: function (e){
+      _openDoc: function (e) {
         var self = this;
         e.preventDefault();
-        this.set("spinnerActive", true);
+        this.set('spinnerActive', true);
         this.$.pddoc.thunk()()
             .then(function (res) {
-              self.set("spinnerActive", false);
+              self.set('spinnerActive', false);
               console.log(res);
               if (res.status !== 200 || !res.data.signed_pd_document_file) {
                 // Fire Toast with error
@@ -98,15 +97,14 @@
                 var anchor = document.createElement('a');
                 anchor.setAttribute('href', res.data.signed_pd_document_file);
                 anchor.setAttribute('target', '_blank');
-                //* anchor.click() doesn't work on ff, edge
-                anchor.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
-                anchor.delete()
+                anchor.dispatchEvent(new MouseEvent('click',
+                  {bubbles: true, cancelable: true, view: window})
+                );
+                anchor.delete();
               }
             });
       }
-
-
-      })
+      });
     </script>
 
 
