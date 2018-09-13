@@ -103,7 +103,7 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_unicef_focal_points(self, queryset, name, value):
         return queryset.filter(
-            programme_document__unicef_focal_points__email__in=parse.unquote(value).split(',')
+            programme_document__unicef_focal_point__email__in=parse.unquote(value).split(',')
         ).distinct()
 
     def get_status(self, queryset, name, value):
