@@ -44,6 +44,9 @@
       programmeDocumentDetail: function (locationId, pdId) {
         return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId);
       },
+      programmeDocumentDocDownload: function (locationId, pdId) {
+        return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId + '/pmp-document/');
+      },
 
       programmeDocumentReports: function (workspaceId) {
         return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/');

@@ -8,6 +8,7 @@
 <link rel="import" href="../../../bower_components/moment-element/moment-import.html">
 
 <link rel="import" href="pd-details-reporting-requirements.html">
+<link rel="import" href="pd-details-doc-download.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../settings.html">
@@ -138,8 +139,8 @@
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="In response to an HRP">
-              - <!-- TODO -->
+            <labelled-item label="PD/SSFA Document">
+              <pd-details-doc-download pd="[[pd.id]]"></pd-details-doc-download>
             </labelled-item>
           </li>
           <li class="item">
