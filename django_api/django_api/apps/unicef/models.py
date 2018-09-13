@@ -388,6 +388,9 @@ class ProgressReport(TimeStampedModel):
     review_date = models.DateField(verbose_name='Review Date',
                                    blank=True,
                                    null=True)
+    reviewed_by_email = models.CharField(max_length=256, null=True, blank=True)
+    reviewed_by_name = models.CharField(max_length=256, null=True, blank=True)
+    reviewed_by_external_id = models.IntegerField(null=True, blank=True)
     review_overall_status = models.CharField(
         verbose_name='Overall status set by UNICEF PO',
         choices=OVERALL_STATUS,

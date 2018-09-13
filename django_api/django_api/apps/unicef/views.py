@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -17,6 +18,7 @@ from rest_framework.views import APIView
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf_response
 
+from core.api import PMP_API
 from core.api_error_codes import APIErrorCode
 from core.common import (
     PROGRESS_REPORT_STATUS,
@@ -229,10 +231,13 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     )
 
     def get_queryset(self):
+        user_has_global_view = self.request.user.is_unicef
         programme_documents = ProgrammeDocument.objects.filter(
-            partner=self.request.user.partner,
             workspace=self.kwargs['workspace_id']
         )
+        if not user_has_global_view:
+            programme_documents = programme_documents.filter(partner=self.request.user.partner)
+
         return super(ProgrammeDocumentIndicatorsAPIView, self).get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=programme_documents
         ).distinct()
@@ -862,7 +867,12 @@ class ProgressReportReviewAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         progress_report.status = serializer.validated_data['status']
-        progress_report.review_date = datetime.now().date()
+        progress_report.review_date = serializer.validated_data['review_date'] or datetime.now().date()
+
+        assert hasattr(request.user, 'jwt_payload'), "This request should come from a unicef user logged in to etools"
+        progress_report.reviewed_by_email = request.user.jwt_payload['email']
+        progress_report.reviewed_by_name = serializer.validated_data['reviewed_by_name']
+        progress_report.reviewed_by_external_id = request.user.jwt_payload['user_id']
 
         if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             progress_report.sent_back_feedback = serializer.validated_data['comment']
@@ -1041,3 +1051,37 @@ class ProgressReportAttachmentAPIView(APIView):
         return Response(
             ProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
         )
+
+
+class InterventionPMPDocumentView(APIView):
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer),)
+
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
+        """
+        Get PD File from PMP given a PD id
+        """
+
+        try:
+            pd = ProgrammeDocument.objects.get(
+                partner=self.request.user.partner,
+                workspace=workspace_id,
+                pk=pd_id)
+
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgrammeDocumentDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pd_id,
+                "exception": exp,
+            })
+            raise Http404
+
+        api = PMP_API()
+        try:
+            document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
+        except HTTPError as e:
+            return Response(e.response)
+        except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+            return Response("eTools API seems to have a problem, please try again later")
+
+        return Response(document_url)
