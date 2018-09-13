@@ -199,10 +199,13 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
 
     def get_queryset(self):
+        user_has_global_view = self.request.user.is_unicef
         programme_documents = ProgrammeDocument.objects.filter(
-            partner=self.request.user.partner,
             workspace=self.kwargs['workspace_id']
         )
+        if not user_has_global_view:
+            programme_documents = programme_documents.filter(partner=self.request.user.partner)
+
         return super(ProgrammeDocumentIndicatorsAPIView, self).get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=programme_documents
         ).distinct()

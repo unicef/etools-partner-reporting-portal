@@ -23,6 +23,19 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
+    report_partner_external = CommaSeparatedListFilter(
+        name='indicator_reports__progress_report__programme_document__partner__external_id'
+    )
+    report_status = CommaSeparatedListFilter(
+        name='indicator_reports__progress_report__status'
+    )
+    report_type = CommaSeparatedListFilter(
+        name='indicator_reports__progress_report__report_type'
+    )
+    cp_output = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__external_cp_output_id')
+    report_section = CommaSeparatedListFilter(
+        name='lower_level_outputs__cp_output__programme_document__sections__external_id')
+
 
     class Meta:
         model = Reportable
