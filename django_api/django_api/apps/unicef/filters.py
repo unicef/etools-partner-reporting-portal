@@ -36,7 +36,6 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     report_section = CommaSeparatedListFilter(
         name='lower_level_outputs__cp_output__programme_document__sections__external_id')
 
-
     class Meta:
         model = Reportable
         fields = (
