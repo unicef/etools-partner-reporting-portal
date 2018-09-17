@@ -144,7 +144,7 @@
 
       _computeCanEdit: function (permissions, activityData) {
         return activityData.cluster ?
-            permissions.createPartnerEntitiesByResponsePlanAsIMO([activityData.cluster]) :
+            permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
             false;
       },
 

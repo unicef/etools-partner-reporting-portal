@@ -105,3 +105,20 @@ class PartnerFilter(django_filters.FilterSet):
     class Meta:
         model = Partner
         fields = ['clusters']
+
+
+class PartnerIDManagementFilter(django_filters.FilterSet):
+    partner_type = CharFilter(name='partner_type')
+    clusters = CommaSeparatedListFilter(name='clusters__id')
+    title = CharFilter(method='get_title')
+
+    class Meta:
+        model = Partner
+        fields = ['partner_type', 'clusters', 'title']
+
+    def get_title(self, queryset, name, value):
+        return queryset.filter(
+            Q(title__icontains=value) |
+            Q(short_title__icontains=value) |
+            Q(alternate_title__icontains=value)
+        )

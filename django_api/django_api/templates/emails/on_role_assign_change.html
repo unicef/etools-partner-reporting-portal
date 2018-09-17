@@ -1,0 +1,15 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>You now have access to UNICEF's Partner Reporting Portal for:</p>
+    {% if portal == 'CLUSTER' %}
+        <p>Cluster: {% if role.role == 'CLUSTER_SYSTEM_ADMIN' %}All clusters{% else %}{{ role.cluster.title }}{% endif %}</p>
+    {% elif portal == 'IP' %}
+        <p>Workspace: {{ role.workspace.title }}</p>
+    {% endif %}
+    <p>Permission: {{ role.get_role_display }}</p>
+    <p>For any queries, please refer to your Organization's administrator.</p>
+    <p>The portal is available here: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
+    <p>Thank you.</p>
+{% endblock content %}

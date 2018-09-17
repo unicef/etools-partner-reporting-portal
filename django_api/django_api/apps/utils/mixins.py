@@ -7,8 +7,12 @@ from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
 
 from core.permissions import (
-    IsPartnerAuthorizedOfficerCheck,
-    IsIMOForCurrentWorkspaceCheck,
+    AnyPermission,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    IsPartnerEditorForCurrentWorkspace,
+    IsPartnerViewerForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
+    IsIMOForCurrentWorkspace,
 )
 
 
@@ -53,11 +57,24 @@ class ListExportMixin(object):
     export_url_kwarg = 'export'
     exporters = {}
 
-    def get(self, request, *args, **kwargs):
-        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied
+    def get_exporter_class(self):
+        return self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
 
-        exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
+    def get_permissions(self):
+        if self.get_exporter_class():
+            return (
+                AnyPermission(
+                    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+                    IsPartnerEditorForCurrentWorkspace,
+                    IsPartnerViewerForCurrentWorkspace,
+                    IsPartnerAdminForCurrentWorkspace,
+                    IsIMOForCurrentWorkspace,
+                ),
+            )
+        return super().get_permissions()
+
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.get_exporter_class()
         if exporter_class:
             return exporter_class(
                 self.filter_queryset(self.get_queryset())
@@ -71,11 +88,24 @@ class ObjectExportMixin(object):
     export_url_kwarg = 'export'
     exporters = {}
 
-    def get(self, request, *args, **kwargs):
-        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied
+    def get_exporter_class(self):
+        return self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
 
-        exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
+    def get_permissions(self):
+        if self.get_exporter_class():
+            return (
+                AnyPermission(
+                    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+                    IsPartnerEditorForCurrentWorkspace,
+                    IsPartnerViewerForCurrentWorkspace,
+                    IsPartnerAdminForCurrentWorkspace,
+                    IsIMOForCurrentWorkspace,
+                ),
+            )
+        return super().get_permissions()
+
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.get_exporter_class()
         if exporter_class:
             return exporter_class(self.get_object()).get_as_response()
 

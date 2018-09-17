@@ -64,7 +64,7 @@
 
     <template
         is="dom-if"
-        if="[[!userHasGroupsOrAccess]]">
+        if="[[!userHasPrpRolesOrAccess]]">
     <div class="no-groups-notification">
       <h3>Account created.</h3>
       <p>Please wait 1-2 business days for your admin to approve you.<br>
@@ -165,9 +165,9 @@
           value: App.Endpoints.userProfile(),
         },
 
-        groups: {
+        prpRoles: {
           type: Array,
-          statePath: 'userProfile.profile.groups',
+          statePath: 'userProfile.profile.prp_roles',
         },
 
         access: {
@@ -175,9 +175,9 @@
           statePath: 'userProfile.profile.access'
         },
 
-        userHasGroupsOrAccess: {
+        userHasPrpRolesOrAccess: {
           type: Boolean,
-          computed: '_computeUserHasGroupsOrAccess(groups, access)',
+          computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)',
         }
       },
 
@@ -262,8 +262,8 @@
         });
       },
 
-      _computeUserHasGroupsOrAccess: function (groups, access) {
-        return !!groups.length || !!access.length;
+      _computeUserHasPrpRolesOrAccess: function (prpRoles, access) {
+        return !!prpRoles.length || !!access.length;
       },
 
       _pageChanged: function (page) {

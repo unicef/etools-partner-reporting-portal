@@ -9,7 +9,7 @@
 
     App.Reducers.Auth = Redux.combineReducers({
       token: tokenReducer,
-      accountType: accountTypeReducer,
+      accountType: accountTypeReducer
     });
 
     function tokenReducer(state, action) {
@@ -40,8 +40,8 @@
             var isPartner = !!action.data.partner;
 
             return isPartner ?
-                App.Constants.ACCOUNT_TYPE_PARTNER :
-                App.Constants.ACCOUNT_TYPE_IMO;
+              App.Constants.ACCOUNT_TYPE_PARTNER :
+              App.Constants.ACCOUNT_TYPE_CLUSTER;
           }());
 
         case App.Constants.RESET:
