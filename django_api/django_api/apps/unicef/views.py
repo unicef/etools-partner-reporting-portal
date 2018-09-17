@@ -1054,7 +1054,12 @@ class ProgressReportAttachmentAPIView(APIView):
 
 
 class InterventionPMPDocumentView(APIView):
-    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer),)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace),
+    )
 
     def get(self, request, workspace_id, pd_id, *args, **kwargs):
         """
