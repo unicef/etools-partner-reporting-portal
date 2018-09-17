@@ -27,6 +27,11 @@
           }
         };
 
+        var createClusterEntitiesUsers = [
+          App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+        ];
+
         var permissions = {
           editProgressReport: [
             App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
@@ -48,15 +53,12 @@
             App.Constants.PRP_ROLE.IP_EDITOR,
           ],
 
-          createClusterEntities: checkInResponsePlan([
-            App.Constants.PRP_ROLE.CLUSTER_IMO,
-            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
-          ]),
+          createClusterEntities: checkInResponsePlan(createClusterEntitiesUsers),
 
           createClusterEntitiesForCluster: function (params, clusterId) {
             return params.prpRoles.some(function (item) {
               return String(clusterId) === String(item.cluster.id) &&
-                permissions.createClusterEntities.indexOf(item.role) > -1;
+                createClusterEntitiesUsers.indexOf(item.role) > -1;
             });
           },
 
@@ -151,6 +153,10 @@
           },
 
           addPlannedActionProject: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          ],
+
+          editPlannedActionEntities: [
             App.Constants.PRP_ROLE.CLUSTER_MEMBER,
           ],
 
