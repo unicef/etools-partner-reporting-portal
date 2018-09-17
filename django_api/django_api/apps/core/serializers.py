@@ -242,6 +242,10 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
         roles_created = []
 
         for prp_roles_data in validated_data['prp_roles']:
+            new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
+            roles_created.append(new_role)
+            transaction.on_commit(lambda role=new_role: role.send_email_notification())
+
             if prp_roles_data['role'] == PRP_ROLE_TYPES.cluster_system_admin:
                 cluster_roles = (
                     PRP_ROLE_TYPES.cluster_imo,
@@ -250,10 +254,7 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
                     PRP_ROLE_TYPES.cluster_coordinator
                 )
                 PRPRole.objects.filter(user_id=user_id, role__in=cluster_roles).delete()
-
-            new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
-            roles_created.append(new_role)
-            transaction.on_commit(lambda role=new_role: role.send_email_notification())
+                break
 
         return {'user_id': user_id, 'prp_roles': roles_created}
 
