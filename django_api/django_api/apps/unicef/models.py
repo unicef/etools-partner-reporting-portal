@@ -22,7 +22,8 @@ from core.common import (
     PD_STATUS,
     CURRENCIES,
     OVERALL_STATUS,
-    REPORTING_TYPES
+    REPORTING_TYPES,
+    PRP_ROLE_TYPES,
 )
 from core.models import TimeStampedExternalSyncModelMixin, PartnerAuthorizedOfficerRole
 from indicator.models import Reportable  # IndicatorReport
@@ -65,7 +66,8 @@ class Person(TimeStampedExternalSyncModelMixin):
     @property
     def is_authorized_officer(self):
         return get_user_model().objects.filter(
-            email=self.email, groups=PartnerAuthorizedOfficerRole.as_group()
+            email=self.email,
+            prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
 
 

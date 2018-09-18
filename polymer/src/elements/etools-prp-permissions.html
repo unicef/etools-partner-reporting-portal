@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/utils.html">
 
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../constants.html">
@@ -7,244 +8,322 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-      var isViewer = isMember.bind(null, App.Constants.GROUP_VIEWER);
-      var isIMO = isMember.bind(null, App.Constants.GROUP_IMO);
-      var isAuthorizedOfficer = isMember.bind(null, App.Constants.GROUP_AUTHORIZED_OFFICER);
+        function getFunctionName(fun) {
+          var ret = fun.toString();
+          ret = ret.substr('function '.length);
+          ret = ret.substr(0, ret.indexOf('('));
+          return ret;
+        }
 
-      var permissions = {
-        viewProgressReport: App.Constants.GROUP_ALL,
-
-        editProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
-
-        exportSubmittedProgressReport: App.Constants.GROUP_ALL,
-
-        savePdReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
-
-        changeProgrammeDocumentCalculationMethod: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
-
-        createClusterEntities: [
-          App.Constants.GROUP_IMO,
-        ],
-
-        createClusterEntitiesForCluster: function (params, clusterId) {
-          return params.imoClusters.some(function (cluster) {
-            return String(cluster.id) === String(clusterId);
-          });
-        },
-
-        editIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isViewer(params.groups):
-              return false;
-
-            case isIMO(params.groups):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
-
-            default:
-              return partnerId === (params.partner && params.partner.id);
+        var checkInResponsePlan = function (roles) {
+          return function immediate(params) {
+            return params.prpRoles.filter(function (role) {
+              return params.responsePlan && params.responsePlan.clusters.some(function (cluster) {
+                return role.cluster && cluster.id === role.cluster.id;
+              })
+            }).some(function (item) {
+              return roles.indexOf(item.role) > -1;
+            })
           }
-        },
+        };
 
-        submitIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isIMO(params.groups):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
+        var createClusterEntitiesUsers = [
+          App.Constants.PRP_ROLE.CLUSTER_IMO,
+          App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+        ];
 
-            case isAuthorizedOfficer(params.groups):
-              return partnerId === (params.partner && params.partner.id);
+        var permissions = {
+          editProgressReport: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_EDITOR,
+          ],
 
-            default:
-              return false;
-          }
-        },
+          exportSubmittedProgressReport: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_EDITOR,
+          ],
 
-        sendBackIndicatorReport: [
-          App.Constants.GROUP_IMO,
-        ],
+          savePdReport: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_EDITOR,
+          ],
 
-        createPartnerEntities: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-        ],
+          changeProgrammeDocumentCalculationMethod: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_EDITOR,
+          ],
 
-        createPartnerEntitiesByResponsePlan: function(params, responsePlanClusters) {
-          return isAuthorizedOfficer(params.groups) &&
-            responsePlanClusters.some(function (cluster) {
-              return params.partner.clusters.indexOf(cluster.id) !== -1;
+          createClusterEntities: checkInResponsePlan(createClusterEntitiesUsers),
+
+          createClusterEntitiesForCluster: function (params, clusterId) {
+            return params.prpRoles.some(function (item) {
+              return String(clusterId) === String(item.cluster.id) &&
+                createClusterEntitiesUsers.indexOf(item.role) > -1;
             });
-        },
+          },
 
-        createPartnerEntitiesByResponsePlanAsIMO: function(params, responsePlanClusters) {
-          return isIMO(params.groups) &&
-            responsePlanClusters.some(function (cluster) {
-              return params.imoClusters.some(function (imoCluster) {
-                return imoCluster.id === cluster.id;
+          submitIndicatorReport: function (params, report) {
+            var allowedRoles = [
+              App.Constants.PRP_ROLE.CLUSTER_IMO,
+              App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+              App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+              App.Constants.PRP_ROLE.CLUSTER_COORDINATOR,
+            ];
+
+            return params.prpRoles.some(function (item) {
+              return allowedRoles.indexOf(item.role) > -1 &&
+                (item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                  ((App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
+                    report.partner_id === (params.partner && params.partner.id) :
+                    String(item.cluster.id) === String(report.cluster_id)) &&
+                    (item.role === App.Constants.PRP_ROLE.CLUSTER_COORDINATOR ? !report.cluster_activity : true))
+                );
+            });
+          },
+
+
+          editIndicatorReport: function (params, report) {
+            var allowedRoles = [
+              App.Constants.PRP_ROLE.CLUSTER_IMO,
+              App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+              App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+            ];
+
+            return params.prpRoles.filter(function (role) {
+              return params.responsePlan && params.responsePlan.clusters.some(function (cluster) {
+                return role.cluster && cluster.id === role.cluster.id;
+              });
+            }).some(function (item) {
+              return allowedRoles.indexOf(item.role) > -1 &&
+                (item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                  (App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
+                    report.partner_id === (params.partner && params.partner.id) :
+                    String(item.cluster.id) === String(report.cluster_id))
+                );
+            });
+          },
+
+          sendBackIndicatorReport: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
+
+          createPartnerEntities: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
+
+          createPartnerEntitiesByResponsePlan: function (params, responsePlanClusters) {
+            var allowedRoles = [
+              App.Constants.PRP_ROLE.CLUSTER_IMO,
+              App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+            ];
+
+            return responsePlanClusters.some(function (cluster) {
+              return params.prpRoles.some(function (item) {
+                return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                  (String(item.cluster.id) === String(cluster.id) &&
+                    allowedRoles.indexOf(item.role) > -1);
               });
             });
-        },
+          },
 
-        editPartnerEntitiesAsIMO: function(params, entityClusters) {
-          return isIMO(params.groups) &&
-            entityClusters.some(function (cluster) {
-              return params.imoClusters.some(function (imoCluster) {
-                return imoCluster.id === cluster.id;
+          editPartnerEntities: function (params, entityClusters) {
+            var allowedRoles = permissions.createPartnerEntities;
+
+            return entityClusters.some(function (cluster) {
+              return params.prpRoles.some(function (item) {
+                return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                  (String(item.cluster.id) === String(cluster.id) &&
+                    allowedRoles.indexOf(item.role) > -1);
               });
             });
-        },
+          },
 
-        editPartnerEntities: function(params, entityPartnerId) {
-          return isAuthorizedOfficer(params.groups) && entityPartnerId === params.partner.id;
-        },
+          viewPlannedAction: function (params) {
+            var allowedRoles = [
+              App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+              App.Constants.PRP_ROLE.CLUSTER_VIEWER
+            ];
 
-        viewPlannedAction: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-          App.Constants.GROUP_VIEWER,
-        ],
+            return params.partner && params.partner.id && params.prpRoles.some(function (item) {
+              return allowedRoles.indexOf(item.role) > -1;
+            })
+          },
 
-        createPartnerProject: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-          App.Constants.GROUP_IMO,
-        ],
+          addPlannedActionProject: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          ],
 
-        adminResponsePlan: [
-          App.Constants.GROUP_IMO,
-        ],
+          editPlannedActionEntities: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+          ],
 
-        addPartnerToProject: [
-          App.Constants.GROUP_IMO,
-        ],
+          createPartnerProject: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
 
-        createPartnerEntitiesAsImo: [
-          App.Constants.GROUP_IMO,
-        ],
+          adminResponsePlan: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
 
-        addPartnerToActivity: [
-          App.Constants.GROUP_IMO,
-        ],
+          addPartnerToProject: checkInResponsePlan([
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ]),
 
-        editIndicatorDetails: [
-          App.Constants.GROUP_IMO,
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
+          createPartnerEntitiesAsImo: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
 
-        onlyEditOwnIndicatorDetails: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
+          addPartnerToActivity: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
 
-        editIndicatorLocations: [
-          App.Constants.GROUP_IMO,
-        ],
-      };
+          editIndicatorDetails: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
 
-      function isMember(groupName, groups) {
-        return groups.some(function (group) {
-          return group.name === groupName;
+          onlyEditOwnIndicatorDetails: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+          ],
+
+          editIndicatorLocations: [
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+          ],
+
+          accessIpIdManagement: [
+            App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
+            App.Constants.PRP_ROLE.IP_ADMIN
+          ],
+
+          accessClusterIdManagement: [
+            App.Constants.PRP_ROLE.CLUSTER_MEMBER,
+            App.Constants.PRP_ROLE.CLUSTER_IMO,
+            App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+          ]
+        };
+
+        Polymer({
+          is: 'etools-prp-permissions',
+
+          behaviors: [
+            App.Behaviors.ReduxBehavior,
+            App.Behaviors.UtilsBehavior,
+          ],
+
+          properties: {
+            profile: {
+              type: Object,
+              statePath: 'userProfile.profile',
+            },
+
+            prpRoles: {
+              type: Array,
+              computed: '_computePrpRoles(profile)',
+            },
+
+            imoClusters: {
+              type: Array,
+              computed: '_computeImoClusters(profile)',
+            },
+
+            partner: {
+              type: Object,
+              statePath: 'partner.current',
+            },
+
+            workspace: {
+              type: String,
+              statePath: 'workspaces.current'
+            },
+
+            responsePlan: {
+              type: Object,
+              statePath: 'responsePlans.current'
+            },
+
+            params: {
+              type: Object,
+              computed: '_computeParams(prpRoles, imoClusters, partner, workspace, responsePlan)'
+            },
+
+            permissions: {
+              type: Object,
+              computed: '_computePermissions(params)',
+              notify: true
+            },
+          },
+
+          _computePermissions: function (params) {
+            return Object.keys(permissions).reduce(function (acc, key) {
+              var granted = permissions[key];
+
+              acc[key] = (function () {
+                switch (true) {
+                  case Array.isArray(granted):
+                    return params.prpRoles.some(function (role) {
+                      return granted.indexOf(role.role) > -1 &&
+                        (App.Constants.WORKSPACE_ROLES.indexOf(role.role) > -1 ?
+                          (role.workspace && role.workspace.workspace_code === params.workspace) : true);
+                    });
+
+                  case typeof granted === 'function':
+                    if (getFunctionName(granted) === 'immediate') {
+                      return granted(params);
+                    }
+
+                    return function () {
+                      var args = [].slice.call(arguments);
+
+                      return granted.apply(null, [params].concat(args));
+                    };
+
+                  case granted === App.Constants.PRP_ROLE.ALL:
+                    return true;
+
+                  default:
+                    return false;
+                }
+              }());
+
+              return acc;
+            }, {});
+          },
+
+          _computePrpRoles: function (profile) {
+            return profile.prp_roles || [];
+          },
+
+          _computeImoClusters: function (profile) {
+            return profile.prp_roles ?
+              profile.prp_roles.filter(item => item.role === App.Constants.PRP_ROLE.CLUSTER_IMO)
+                .map(item => item.cluster) : [];
+          },
+
+          _computeParams: function (prpRoles, imoClusters, partner, workspace, responsePlan) {
+            return {
+              prpRoles: prpRoles,
+              imoClusters: imoClusters,
+              partner: partner,
+              workspace: workspace,
+              responsePlan: responsePlan
+            };
+          },
         });
       }
-
-      Polymer({
-        is: 'etools-prp-permissions',
-
-        behaviors: [
-          App.Behaviors.ReduxBehavior,
-        ],
-
-        properties: {
-          profile: {
-            type: Object,
-            statePath: 'userProfile.profile',
-          },
-
-          groups: {
-            type: Array,
-            computed: '_computeGroups(profile)',
-          },
-
-          imoClusters: {
-            type: Array,
-            computed: '_computeImoClusters(profile)',
-          },
-
-          partner: {
-            type: Object,
-            statePath: 'partner.current',
-          },
-
-          params: {
-            type: Object,
-            computed: '_computeParams(groups, imoClusters, partner)',
-          },
-
-          permissions: {
-            type: Object,
-            computed: '_computePermissions(params)',
-            notify: true,
-          },
-
-        },
-
-        _computePermissions: function (params) {
-          return Object.keys(permissions).reduce(function (acc, key) {
-            var granted = permissions[key];
-
-            acc[key] = (function () {
-              switch (true) {
-                case Array.isArray(granted):
-                  return params.groups.some(function (group) {
-                    return granted.indexOf(group.name) !== -1;
-                  });
-
-                case typeof granted === 'function':
-                  return function () {
-                    var args = [].slice.call(arguments);
-
-                    return granted.apply(null, [params].concat(args));
-                  };
-
-                case granted === App.Constants.GROUP_ALL:
-                  return true;
-
-                default:
-                  return false;
-              }
-            }());
-
-            return acc;
-          }, {});
-        },
-
-        _computeGroups: function (profile) {
-          return profile.groups || [];
-        },
-
-        _computeImoClusters: function (profile) {
-          return profile.imo_clusters || [];
-        },
-
-        _computeParams: function (groups, imoClusters, partner) {
-          return {
-            groups: groups,
-            imoClusters: imoClusters,
-            partner: partner,
-          };
-        },
-      });
-    }());
+      ()
+    )
+    ;
   </script>
 </dom-module>

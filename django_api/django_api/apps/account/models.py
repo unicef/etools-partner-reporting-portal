@@ -8,6 +8,9 @@ from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
+from core.common import PRP_ROLE_TYPES, USER_TYPES
+from utils.emails import send_email_from_template
+
 
 class User(AbstractUser):
     """
@@ -29,14 +32,7 @@ class User(AbstractUser):
         unique=True,
         db_index=True
     )
-    workspaces = models.ManyToManyField(
-        'core.Workspace', related_name='users', blank=True,
-        help_text='These are workspaces that the user will be able to access.'
-    )
-    imo_clusters = models.ManyToManyField(
-        'cluster.Cluster', related_name='users', blank=True,
-        help_text='These are the clusters this user will have IMO privileges over.'
-    )
+    position = models.CharField(max_length=64, null=True, blank=True, default=None)
 
     def __str__(self):
         return '[{}] {} ({})'.format(
@@ -60,6 +56,47 @@ class User(AbstractUser):
         if created:
             instance.set_unusable_password()
             instance.save()
+
+    @cached_property
+    def role_list(self):
+        return self.prp_roles.values_list('role', flat=True).distinct()
+
+    @property
+    def user_type(self):
+        user_prp_roles = set(prp_role.role for prp_role in self.prp_roles.all())
+        if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
+            return USER_TYPES.cluster_admin
+        if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
+            return USER_TYPES.imo
+        if {PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_viewer,
+            PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
+            return USER_TYPES.partner
+
+    @cached_property
+    def is_cluster_system_admin(self):
+        return self.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
+
+    def send_email_notification_on_create(self, portal=None):
+        template_data = {
+            'user': self,
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': portal
+        }
+        to_email_list = [self.email]
+        content_subtype = 'html'
+
+        subject_template_path = 'emails/on_create_user_subject.txt'
+        body_template_path = 'emails/on_create_user.html'
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
 
 
 class UserProfile(TimeStampedModel):

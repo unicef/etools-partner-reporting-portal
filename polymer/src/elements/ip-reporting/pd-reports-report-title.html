@@ -32,7 +32,7 @@
       is="dom-if"
       if="[[showLink]]"
       restamp="true">
-      <a href="[[_getReportLink(report)]]">[[_getReportTitle(report)]]</a>
+      <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report)]]</a>
     </template>
     <template
       is="dom-if"
@@ -97,8 +97,8 @@
         return report.report_type + report.report_number;
       },
 
-      _getReportLink: function (report) {
-        var suffix = this._getMode(report);
+      _getReportLink: function (report, permissions) {
+        var suffix = this._getMode(report, permissions);
         return this.buildUrl(
           this._baseUrl,
           '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix

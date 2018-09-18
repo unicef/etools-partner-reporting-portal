@@ -12,6 +12,7 @@
       :host {
         display: block;
       }
+
       div#action {
         margin: 25px 0;
         @apply(--layout-horizontal);
@@ -20,19 +21,20 @@
     </style>
 
     <etools-prp-permissions
-        permissions="{{permissions}}">
+      permissions="{{ permissions }}">
     </etools-prp-permissions>
 
     <page-body>
 
-       <template is="dom-if"
-        if="[[permissions.createPartnerProject]]"
-        restamp="true">
+      <template is="dom-if"
+                if="[[_canEdit(permissions, projectData)]]"
+                restamp="true">
         <planned-action-projects-modal
           id="modal"
           edit-data="[[projectData]]"
           edit>
         </planned-action-projects-modal>
+
 
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
@@ -51,6 +53,12 @@
       properties: {
         projectData: Object,
         permissions: Object,
+      },
+
+      _canEdit(permissions, projectData) {
+        return projectData.clusters ?
+            permissions.editPartnerEntities(projectData.clusters) :
+            false;
       },
 
       _openModal: function () {

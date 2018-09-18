@@ -5,11 +5,14 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
+from account.models import User
+
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PRP_ROLE_TYPES,
     CLUSTER_TYPES)
-from core.models import TimeStampedExternalSourceModel, IMORole
+from core.models import TimeStampedExternalSourceModel, PRPRole
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
@@ -54,7 +57,11 @@ class Cluster(TimeStampedExternalSourceModel):
 
     @property
     def imo_users(self):
-        return self.users.filter(groups__name=IMORole.as_group().name)
+        return User.objects.filter(
+            id__in=PRPRole.objects.filter(
+                cluster=self, role=PRP_ROLE_TYPES.cluster_imo
+            ).values_list('user', flat=True).distinct()
+        )
 
     @property
     def num_of_partners(self):

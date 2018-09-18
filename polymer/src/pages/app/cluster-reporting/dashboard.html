@@ -56,25 +56,25 @@
     </style>
 
     <etools-prp-auth
-        account-type="{{accountType}}">
+      account-type="{{ accountType }}">
     </etools-prp-auth>
 
     <iron-location
-        query="{{query}}">
+      query="{{ query }}">
     </iron-location>
 
     <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
+      params-string="{{ query }}"
+      params-object="{{ queryParams }}">
     </iron-query-params>
 
     <etools-prp-ajax
-        id="data"
-        url="[[dataUrl]]"
-        params="[[queryParams]]">
+      id="data"
+      url="[[dataUrl]]"
+      params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <page-header title="{{page_title}}">
+    <page-header title="{{ page_title }}">
       <div class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
       </div>
@@ -90,16 +90,16 @@
             <div class="app-grid">
               <div class="item">
                 <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'cluster')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[_equals(mode, 'cluster')]]"
+                  restamp="true">
                   <number-of-partners></number-of-partners>
                 </template>
 
                 <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'partner')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[_equals(mode, 'partner')]]"
+                  restamp="true">
                   <number-of-projects></number-of-projects>
                 </template>
               </div>
@@ -116,8 +116,8 @@
 
       <div class="row">
         <reports-list
-            label="List of overdue indicator reports"
-            collection="overdue_indicator_reports">
+          label="List of overdue indicator reports"
+          collection="overdue_indicator_reports">
         </reports-list>
       </div>
 
@@ -126,9 +126,9 @@
       </div>
 
       <template
-          is="dom-if"
-          if="[[_equals(mode, 'partner')]]"
-          restamp="true">
+        is="dom-if"
+        if="[[_equals(mode, 'partner')]]"
+        restamp="true">
         <div class="row">
           <activities-list></activities-list>
         </div>
@@ -143,13 +143,18 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ReduxBehavior
       ],
 
       properties: {
         responsePlanId: {
           type: String,
           statePath: 'responsePlans.currentID',
+        },
+
+        accountType: {
+          type: String,
+          statePath: 'auth.accountType',
         },
 
         mode: {
@@ -181,12 +186,12 @@
           case App.Constants.ACCOUNT_TYPE_PARTNER:
             return 'partner';
 
-          case App.Constants.ACCOUNT_TYPE_IMO:
+          case App.Constants.ACCOUNT_TYPE_CLUSTER:
             return 'cluster';
         }
       },
 
-      _computePageTitle: function(mode) {
+      _computePageTitle: function (mode) {
         switch (mode) {
           case 'partner':
             return 'Partner Dashboard';

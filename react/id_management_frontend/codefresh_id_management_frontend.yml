@@ -1,0 +1,37 @@
+version: '1.0'
+
+steps:
+
+    build_id_management_react:
+        type: build
+        image_name: unicef/etools-prp-id-management-frontend
+        dockerfile: Dockerfile-bundle
+        working_directory: ${{main_clone}}/react/id_management_frontend
+        tag: ${{CF_BRANCH}}
+
+    push_to_hub:
+        type: push
+        title: Pushing id management react image to docker hub
+        candidate: ${{build_id_management_react}}
+        tags:
+            - ${{CF_BRANCH}}
+            - ${{CF_SHORT_REVISION}}
+            - latest
+        when:
+            branch:
+                only:
+                    - develop
+
+    deploy_frontend:
+        image: codefresh/cf-deploy-kubernetes
+        tag: ${{CF_SHORT_REVISION}}
+        working_directory: ${{main_clone}}
+        commands:
+          - /cf-deploy-kubernetes ./kubernetes/react/deployment.yaml
+        environment:
+          - KUBECONTEXT=${{KUBECONTEXT}}
+          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+        when:
+          branch:
+            only:
+              - develop

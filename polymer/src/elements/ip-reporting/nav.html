@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-divider/paper-divider.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
@@ -11,6 +12,8 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../constants.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <link rel="import" href="../../styles/page-nav.html">
 
@@ -18,12 +21,16 @@
   <template>
     <style include="page-nav-styles"></style>
 
+    <etools-prp-permissions
+      permissions="{{ permissions }}">
+    </etools-prp-permissions>
+
     <paper-menu
-        id="menu"
-        selected="{{selected}}"
-        attr-for-selected="name"
-        selectable="paper-item"
-        key-event-target="null">
+      id="menu"
+      selected="{{ selected }}"
+      attr-for-selected="name"
+      selectable="paper-item"
+      key-event-target="null">
       <paper-item name="overview">
         <a href="[[overviewUrl]]">
           <span><iron-icon icon="social:public" role="presentation"></iron-icon>[[localize('overview')]]</span>
@@ -48,12 +55,28 @@
         </a>
       </paper-item>
 
+      <template is="dom-if" if="[[permissions.accessIpIdManagement]]" restamp="true">
+        <paper-divider></paper-divider>
+
+        <paper-item name="id-management" on-tap="goToIdManagement">
+          <a href="/id-management/ip-reporting/">
+            <span><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('id_management')]]</span>
+          </a>
+        </paper-item>
+      </template>
+
     </paper-menu>
   </template>
 
   <script>
     Polymer({
       is: 'ip-reporting-nav',
+
+      goToIdManagement: function (e) {
+        e.preventDefault();
+
+        window.location.href = "/id-management/ip-reporting/";
+      },
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -111,8 +134,7 @@
             };
           },
         },
-      },
-
+      }
     });
   </script>
 </dom-module>

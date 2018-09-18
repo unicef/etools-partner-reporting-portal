@@ -1,0 +1,8 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>You now have access to UNICEF's Partner Reporting Portal. Click here to sign up: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
+    <p>For any queries, please refer to your Organization's administrator.</p>
+    <p>Thank you.</p>
+{% endblock content %}

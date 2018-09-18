@@ -2,7 +2,6 @@
 
 <link rel="import" href="dropdown-form-input.html">
 <link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 
@@ -15,13 +14,9 @@
     </style>
 
     <etools-prp-ajax
-        id="clusterNames"
-        url="[[clusterNamesUrl]]">
+      id="clusterNames"
+      url="[[clusterNamesUrl]]">
     </etools-prp-ajax>
-
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
   </template>
 
   <script>
@@ -33,8 +28,6 @@
       ],
 
       properties: {
-        permissions: Object,
-
         partner: {
           type: Object,
           statePath: 'partner.current'
@@ -63,33 +56,25 @@
       },
 
       observers: [
-        '_fetchClusterNames(clusterNamesUrl, permissions)',
+        '_fetchClusterNames(clusterNamesUrl)',
       ],
 
       _computeClusterNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterNames(responsePlanID);
       },
 
-      _fetchClusterNames: function (_, permissions) {
+      _fetchClusterNames: function (_) {
         var self = this;
 
         this.$.clusterNames.abort();
 
         this.$.clusterNames.thunk()()
-            .then(function (res) {
-              if (!self.partner.clusters) {
-                self.set('clusters', res.data.filter(function (cluster) {
-                  return permissions.createClusterEntitiesForCluster(cluster.id);
-                }));
-              } else {
-                self.set('clusters', res.data.filter(function (cluster) {
-                  return self.partner.clusters.indexOf(cluster.id) !== -1;
-                }));
-              }
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          .then(function (res) {
+              self.set('clusters', res.data);
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
 
       },
 

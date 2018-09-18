@@ -51,6 +51,7 @@ from core.models import (
     ResponsePlan,
     GatewayType,
     CartoDBTable,
+    PRPRole,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -208,11 +209,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = fuzzy.FuzzyText()
     email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
-
-    @factory.post_generation
-    def groups(self, create, extracted, **kwargs):
-        group, created = Group.objects.get_or_create(name='UNICEF User')
-        self.groups.add(group)
 
     class Meta:
         model = User
@@ -687,3 +683,8 @@ class CartoDBTableFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = CartoDBTable
+
+
+class PRPRoleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PRPRole
