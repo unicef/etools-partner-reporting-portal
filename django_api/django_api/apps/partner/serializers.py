@@ -111,6 +111,78 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         return obj.get_shared_partner_display()
 
 
+class PartnerSimpleIDManagementSerializer(serializers.ModelSerializer):
+    partner_type_display = serializers.CharField(source='get_partner_type_display', read_only=True)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'title',
+            'partner_type_display',
+            'clusters',
+        )
+
+
+class PartnerIDManagementSerializer(serializers.ModelSerializer):
+    partner_type_display = serializers.CharField(source='get_partner_type_display', read_only=True)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'ocha_external_id',
+            'external_id',
+            'external_source',
+            'title',
+            'short_title',
+            'alternate_title',
+            'shared_partner',
+            'partner_type',
+            'partner_type_display',
+            'cso_type',
+            'email',
+            'phone_number',
+            'street_address',
+            'city',
+            'postal_code',
+            'country_code',
+            'total_ct_cp',
+            'total_ct_cy',
+            'vendor_number',
+            'alternate_id',
+            'rating',
+            # 'type_of_assessment',
+            'basis_for_risk_rating',
+            'clusters',
+        )
+        extra_kwargs = {'vendor_number': {'required': False, 'default': None}}
+
+    @transaction.atomic
+    def create(self, validated_data):
+        cluster_ids = self.initial_data.pop('clusters', [])
+        if not cluster_ids and not isinstance(cluster_ids, list):
+            raise serializers.ValidationError({
+                'clusters': 'This should be a list and cannot be empty.'
+            })
+        partner = super().create(validated_data)
+        partner.clusters.add(*cluster_ids)
+        return partner
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        cluster_ids = self.initial_data.pop('clusters', [])
+        if not cluster_ids and not isinstance(cluster_ids, list):
+            raise serializers.ValidationError({
+                'clusters': 'This should be a list and cannot be empty.'
+            })
+        partner = super().update(instance, validated_data)
+        partner.clusters.set(cluster_ids)
+        return partner
+
+
 class PartnerProjectFundingSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -419,12 +491,6 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                     self.initial_data['cluster']
                 )
             })
-
-        if 'request' in self.context and not self.context['imo'] \
-                and not data['partner'] == self.context['request'].user.partner:
-                raise serializers.ValidationError({
-                    'partner': "Partner id did not match this user's partner"
-                })
 
         if data['project'].partner != data['partner']:
             return serializers.ValidationError({

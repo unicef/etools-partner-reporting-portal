@@ -34,6 +34,22 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class ClusterIDManagementSerializer(serializers.ModelSerializer):
+    full_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cluster
+        fields = (
+            'id',
+            'full_title',
+        )
+
+    def get_full_title(self, obj):
+        if obj.response_plan:
+            return f'{obj.title} ({obj.response_plan.title} {obj.response_plan.workspace.title})'
+        return obj.title
+
+
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
     cluster_title = serializers.CharField(source='cluster.title', read_only=True)
 
@@ -50,7 +66,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         cluster = data['cluster']
         user = self.context['request'].user
 
-        if cluster not in user.imo_clusters.all():
+        if not user.is_cluster_system_admin and not user.prp_roles.filter(cluster=cluster.id).exists():
             raise ValidationError({
                 "cluster": "Cluster does not belong to this user",
             })
@@ -67,6 +83,17 @@ class ClusterObjectivePatchSerializer(serializers.ModelSerializer):
             'id',
             'title',
         )
+
+    def validate(self, data):
+        cluster_objective_id = int(self.context['pk'])
+        user = self.context['request'].user
+
+        if (not user.is_cluster_system_admin and
+                not user.prp_roles.filter(cluster__cluster_objectives=cluster_objective_id).exists()):
+            raise ValidationError({
+                "cluster": "Cluster does not belong to this user",
+            })
+        return data
 
 
 class ClusterActivitySerializer(serializers.ModelSerializer):
@@ -92,7 +119,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         cluster = data['cluster_objective'].cluster
         user = self.context['request'].user
 
-        if cluster not in user.imo_clusters.all():
+        if not user.prp_roles.filter(cluster=cluster.id).exists():
             raise ValidationError({
                 "cluster": "Cluster does not belong to this user",
             })

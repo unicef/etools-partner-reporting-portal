@@ -39,51 +39,51 @@
     </style>
 
     <iron-location
-        query="{{query}}">
+      query="{{ query }}">
     </iron-location>
 
     <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
+      params-string="{{ query }}"
+      params-object="{{ queryParams }}">
     </iron-query-params>
 
     <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
+      page-size="[[pageSize]]"
+      page-number="[[pageNumber]]"
+      total-results="[[totalResults]]"
+      on-page-size-changed="_pageSizeChanged"
+      on-page-number-changed="_pageNumberChanged">
     </etools-data-table-footer>
 
     <div class="wrapper">
       <template
-          is="dom-repeat"
-          items="[[data]]"
-          initial-count="[[pageSize]]">
+        is="dom-repeat"
+        items="[[data]]"
+        initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <cluster-report-proxy
-                data="[[item]]"
-                mode="[[mode]]">
+              data="[[item]]"
+              mode="[[mode]]">
             </cluster-report-proxy>
           </div>
         </etools-data-table-row>
       </template>
 
       <list-placeholder
-          data="[[data]]"
-          loading="[[loading]]">
+        data="[[data]]"
+        loading="[[loading]]">
       </list-placeholder>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </div>
 
     <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
+      page-size="[[pageSize]]"
+      page-number="[[pageNumber]]"
+      total-results="[[totalResults]]"
+      on-page-size-changed="_pageSizeChanged"
+      on-page-number-changed="_pageNumberChanged">
     </etools-data-table-footer>
 
     <confirm-box id="confirm"></confirm-box>
@@ -120,12 +120,12 @@
 
         profile: {
           type: Object,
-          statePath: 'auth.accountType',
+          statePath: 'userProfile.profile',
         },
 
         isIMO: {
           type: Boolean,
-          computed: '_checkIMO(profile)'
+          computed: '_computeIsIMOClusters(profile)'
         },
       },
 
@@ -135,12 +135,10 @@
         'report-reviewed': '_onContentsChanged',
       },
 
-      _checkIMO: function (profile) {
-        if (String(profile) === 'ACCOUNT_TYPE_IMO') {
-          return true;
-        } else {
-          return false;
-        }
+      _computeIsIMOClusters: function (profile) {
+        return profile.prp_roles ? profile.prp_roles.some(function (role) {
+          return role.role === App.Constants.PRP_ROLE.CLUSTER_IMO;
+        }) : [];
       },
 
       _onConfirm: function (e, result) {
@@ -149,9 +147,9 @@
         if (!this.isIMO) {
           this.$.confirm.run({
             body:
-                'The IMO will be informed of this submission and you will ' +
-                'not be able to make any changes on this report unless it ' +
-                'is sent back to you. Are you sure you’d like to Submit this report?',
+              'The IMO will be informed of this submission and you will ' +
+              'not be able to make any changes on this report unless it ' +
+              'is sent back to you. Are you sure you’d like to Submit this report?',
             result: result,
             maxWidth: '500px',
             mode: App.Constants.CONFIRM_MODAL,

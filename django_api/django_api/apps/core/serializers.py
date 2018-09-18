@@ -1,16 +1,23 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from cluster.models import Cluster
-from core.common import CLUSTER_TYPES
+from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES
 from utils.serializers import CurrentWorkspaceDefault
-from .models import Workspace, Location, ResponsePlan, Country, GatewayType
+from .models import Workspace, Location, ResponsePlan, Country, GatewayType, PRPRole
 
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = ('name', 'country_short_code', 'long_name')
+
+
+class WorkspaceSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workspace
+        fields = ('id', 'title', 'workspace_code')
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):
@@ -140,13 +147,21 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         clusters_data = validated_data.pop('clusters')
         response_plan = ResponsePlan.objects.create(**validated_data)
-        clusters = []
+
         for cluster in clusters_data:
-            clusters.append(Cluster.objects.create(
+            cluster_obj = Cluster.objects.create(
                 type=cluster, response_plan=response_plan
-            ))
-        if 'request' in self.context:
-            self.context['request'].user.imo_clusters.add(*clusters)
+            )
+
+            if 'request' in self.context:
+                user = self.context['request'].user
+                if not user.is_cluster_system_admin:
+                    user.prp_roles.create(
+                        role=PRP_ROLE_TYPES.cluster_imo,
+                        cluster=cluster_obj,
+                        workspace=response_plan.workspace,
+                    )
+
         return response_plan
 
 
@@ -197,3 +212,60 @@ class PMPLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('name', 'pcode', 'gateway')
+
+
+class PRPRoleUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PRPRole
+        fields = ('role', 'is_active')
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        deactivated = not validated_data.get('is_active', True)
+        instance.send_email_notification(deleted=deactivated)
+        return instance
+
+
+class PRPRoleCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PRPRole
+        fields = ('role', 'workspace', 'cluster')
+
+
+class PRPRoleCreateMultipleSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    prp_roles = PRPRoleCreateSerializer(many=True)
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user_id = validated_data['user_id']
+        roles_created = []
+
+        for prp_roles_data in validated_data['prp_roles']:
+            new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
+            roles_created.append(new_role)
+            transaction.on_commit(lambda role=new_role: role.send_email_notification())
+
+            if prp_roles_data['role'] == PRP_ROLE_TYPES.cluster_system_admin:
+                cluster_roles = (
+                    PRP_ROLE_TYPES.cluster_imo,
+                    PRP_ROLE_TYPES.cluster_member,
+                    PRP_ROLE_TYPES.cluster_viewer,
+                    PRP_ROLE_TYPES.cluster_coordinator
+                )
+                PRPRole.objects.filter(user_id=user_id, role__in=cluster_roles).delete()
+                break
+
+        return {'user_id': user_id, 'prp_roles': roles_created}
+
+    def validate(self, attrs):
+        prp_roles = attrs['prp_roles']
+        clusters, workspaces = set(), set()
+        for prp_role in prp_roles:
+            cluster = prp_role.get('cluster')
+            workspace = prp_role.get('workspace')
+            if (cluster and cluster in clusters) or (workspace and workspace in workspaces):
+                raise ValidationError('User can only have one role in the same cluster or workspace.')
+            clusters.add(cluster)
+            workspaces.add(workspace)
+        return attrs

@@ -58,7 +58,7 @@
       userLogout: function (logoutThunk) {
         return function (dispatch) {
           return logoutThunk()
-            .then(function() {
+            .then(function () {
               dispatch(App.Actions.resetToken());
             });
         };
@@ -67,15 +67,15 @@
       fetchUserProfile: function (profileThunk) {
         return function (dispatch) {
           return profileThunk()
-          .then(function(res) {
-            dispatch(App.Actions.setUserProfile(res.data));
-            dispatch(App.Actions.setAccountType(res.data));
-            dispatch(App.Actions.setPartner(res.data.partner));
-          });
+            .then(function (res) {
+              dispatch(App.Actions.setUserProfile(res.data));
+              dispatch(App.Actions.setAccountType(res.data));
+              dispatch(App.Actions.setPartner(res.data.partner));
+            });
         };
       },
 
-      setUserProfile: function(data) {
+      setUserProfile: function (data) {
         return {
           type: App.Constants.SET_USER_PROFILE,
           data: data,
@@ -93,18 +93,18 @@
       fetchWorkspaces: function (interventionsThunk) {
         return function (dispatch) {
           return interventionsThunk()
-              .then(function (res) {
-                var workspaces = (res.data || [])
-                    .map(function (workspace) {
-                      return {
-                        id: workspace.id,
-                        code: workspace.workspace_code,
-                        name: workspace.title,
-                      };
-                    });
+            .then(function (res) {
+              var workspaces = (res.data || [])
+                .map(function (workspace) {
+                  return {
+                    id: workspace.id,
+                    code: workspace.workspace_code,
+                    name: workspace.title,
+                  };
+                });
 
-                dispatch(App.Actions.setWorkspaces(workspaces));
-              });
+              dispatch(App.Actions.setWorkspaces(workspaces));
+            });
         };
       },
 
@@ -179,11 +179,11 @@
       fetchProgrammeDocuments: function (pdThunk) {
         return function (dispatch) {
           return pdThunk()
-              .then(function (res) {
-                var pdData = res.data;
+            .then(function (res) {
+              var pdData = res.data;
 
-                dispatch(App.Actions.setProgrammeDocuments(pdData));
-              });
+              dispatch(App.Actions.setProgrammeDocuments(pdData));
+            });
         };
       },
 

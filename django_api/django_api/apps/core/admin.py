@@ -14,7 +14,8 @@ from .models import (
     ResponsePlan,
     GatewayType,
     CartoDBTable,
-    Country
+    Country,
+    PRPRole,
 )
 
 
@@ -86,9 +87,16 @@ class ResponsePlanAdmin(admin.ModelAdmin):
     search_fields = ('title',)
 
 
+class PRPRoleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'workspace', 'cluster')
+    list_filter = ('role', )
+    search_fields = ('user__first_name', 'user__last_name', 'user__email')
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
 admin.site.register(GatewayType)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(Country, CountryAdmin)
+admin.site.register(PRPRole, PRPRoleAdmin)

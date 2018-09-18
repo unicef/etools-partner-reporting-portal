@@ -11,11 +11,12 @@
         return App.Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
       },
 
-      _getMode: function (report) {
+      _getMode: function (report, permissions) {
         switch (true) {
-          case this._isReadOnlyReport(report) ||
-              (report.programme_document.status === 'Signed' ||
-              report.programme_document.status === 'Closed'):
+          case this._isReadOnlyReport(report):
+          case report.programme_document.status === 'Signed':
+          case report.programme_document.status === 'Closed':
+          case !permissions.editProgressReport:
             return 'view';
 
           default:
@@ -23,20 +24,11 @@
         }
       },
 
-      _canNavigateToReport: function (permissions, report) {
-        var mode = this._getMode(report);
-
-        switch (true) {
-          case mode === 'view' && !permissions.viewProgressReport:
-          case mode === 'edit' && !permissions.editProgressReport:
-            return false;
-
-          default:
-            return true;
-        }
+      _canNavigateToReport: function () {
+        return true;
       },
 
-      _isFinalReport: function(report) {
+      _isFinalReport: function (report) {
         return report.is_final && report.report_type.toLowerCase() !== 'sr';
       },
     };

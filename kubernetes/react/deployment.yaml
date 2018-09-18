@@ -1,0 +1,41 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: id-management
+  namespace: {{NAMESPACE}}
+spec:
+  ports:
+  - protocol: TCP
+    port: 3000
+    nodePort: 30050
+  type: NodePort
+  selector:
+    app: id-management-container
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: id-management
+  labels:
+    app: id-management
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: id-management-container
+  template:
+    metadata:
+      labels:
+        app: id-management-container
+    spec:
+      containers:
+        - name: id-management
+          ports:
+            - containerPort: 3000
+          image: unicef/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
+          command: ["ash"]
+          args: ["-c", "node express.js"]

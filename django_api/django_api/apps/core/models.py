@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import random
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pycountry
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.core.validators import (
     MinValueValidator,
@@ -28,7 +28,9 @@ from .common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     EXTERNAL_DATA_SOURCES,
+    PRP_ROLE_TYPES,
 )
+from utils.emails import send_email_from_template
 from utils.groups.wrappers import GroupWrapper
 
 
@@ -48,13 +50,6 @@ try:
     IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
     print("Group DB is not ready yet! - Error: %s" % e)
-
-
-def get_random_color():
-    def r():
-        random.randint(0, 255)
-
-    return '#%02X%02X%02X' % (r(), r(), r())
 
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
@@ -123,6 +118,23 @@ class Country(TimeStampedModel):
                 pass
 
 
+class WorkspaceManager(models.Manager):
+    def user_workspaces(self, user, role_list=None):
+        ip_kw = {'prp_roles__user': user}
+        cluster_kw = {'response_plans__clusters__prp_roles__user': user}
+
+        if role_list:
+            ip_kw['prp_roles__role__in'] = role_list
+            cluster_kw['response_plans__clusters__prp_roles__role__in'] = role_list
+
+        if user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
+            q_cluster_admin = Q(response_plans__clusters__isnull=False)
+        else:
+            q_cluster_admin = Q()
+
+        return self.filter(Q(**ip_kw) | Q(**cluster_kw) | q_cluster_admin).distinct()
+
+
 class Workspace(TimeStampedExternalSourceModel):
     """
     Workspace (previously called Workspace, also synonym was
@@ -159,6 +171,8 @@ class Workspace(TimeStampedExternalSourceModel):
     )
     initial_zoom = models.IntegerField(default=8)
 
+    objects = WorkspaceManager()
+
     class Meta:
         ordering = ['title']
 
@@ -182,6 +196,70 @@ class Workspace(TimeStampedExternalSourceModel):
         return any([
             c.details for c in self.countries.all()
         ])
+
+
+class PRPRole(TimeStampedExternalSourceModel):
+    """
+    PRPRole model present a workspace-partner level permission entity
+    with cluster association.
+
+    related models:
+        account.User (ForeignKey): "user"
+    """
+    user = models.ForeignKey(
+        'account.User', related_name="prp_roles"
+    )
+    role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
+    workspace = models.ForeignKey(
+        'core.Workspace', related_name="prp_roles",
+        null=True, blank=True
+    )
+    cluster = models.ForeignKey(
+        'cluster.Cluster', related_name="prp_roles",
+        blank=True, null=True
+    )
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
+
+    def send_email_notification(self, deleted=None):
+        template_data = {
+            'user': self.user,
+            'role': self,
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': None
+        }
+        to_email_list = [self.user.email]
+        content_subtype = 'html'
+
+        if self.role in {PRP_ROLE_TYPES.cluster_system_admin,
+                         PRP_ROLE_TYPES.cluster_imo,
+                         PRP_ROLE_TYPES.cluster_member,
+                         PRP_ROLE_TYPES.cluster_viewer,
+                         PRP_ROLE_TYPES.cluster_coordinator}:
+            template_data['portal'] = 'CLUSTER'
+        elif self.role in {PRP_ROLE_TYPES.ip_authorized_officer,
+                           PRP_ROLE_TYPES.ip_admin,
+                           PRP_ROLE_TYPES.ip_editor,
+                           PRP_ROLE_TYPES.ip_viewer}:
+            template_data['portal'] = 'IP'
+
+        if deleted:
+            subject_template_path = 'emails/on_role_remove_subject.txt'
+            body_template_path = 'emails/on_role_remove.html'
+        else:
+            subject_template_path = 'emails/on_role_assign_change_subject.txt'
+            body_template_path = 'emails/on_role_assign_change.html'
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
 
 
 class ResponsePlan(TimeStampedExternalSourceModel):

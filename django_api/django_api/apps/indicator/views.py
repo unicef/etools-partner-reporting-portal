@@ -18,15 +18,10 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsPartnerEditorOrPartnerAuthorizedOfficer,
-    IsIMO,
-    IsPartnerEditor,
-    IsPartnerViewer,
-    IsPartnerAuthorizedOfficer,
-    AnyPermission,
+    HasAnyRole,
 )
 from core.paginations import SmallPagination
-from core.models import Location
+from core.models import Location, Workspace
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -37,6 +32,7 @@ from core.common import (
     REPORTABLE_PA_CONTENT_OBJECT,
     OVERALL_STATUS,
     REPORTABLE_FREQUENCY_LEVEL,
+    PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
@@ -95,7 +91,7 @@ class PDReportsAPIView(ListAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
-    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PDReportsFilter
 
@@ -103,6 +99,9 @@ class PDReportsAPIView(ListAPIView):
         from unicef.models import ProgrammeDocument
 
         pd = get_object_or_404(ProgrammeDocument, pk=self.pd_id)
+
+        if pd.partner != self.request.user.partner:
+            self.permission_denied(self.request)
 
         pks = pd.reportable_queryset.values_list(
             'indicator_reports__pk', flat=True)
@@ -129,7 +128,13 @@ class PDReportsAPIView(ListAPIView):
 class PDReportsDetailAPIView(RetrieveAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
-    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        pd_id = self.kwargs['pd_id']
+        if not request.user.partner.programmedocument_set.filter(id=pd_id).exists():
+            self.permission_denied(request)
 
     def get_indicator_report(self, report_id):
         try:
@@ -167,7 +172,16 @@ class IndicatorListAPIView(ListAPIView):
      - /api/indicator/<content_object>/?content_object=co,object_id=34    [for cluster objective indicators]
      - /api/indicator/<content_object>/                                   [will throw exception]
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        )
+    )
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
@@ -258,7 +272,17 @@ class ReportableDetailAPIView(RetrieveAPIView):
     """
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_viewer,
+        ),
+    )
     lookup_url_kwarg = 'reportable_id'
 
     def patch(self, request, reportable_id, *args, **kwargs):
@@ -271,8 +295,22 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     Reserved for IMO only.
     """
     serializer_class = ReportableLocationGoalBaselineInNeedSerializer
-    permission_classes = (IsIMO,)
+    permission_classes = (IsAuthenticated,)
     lookup_url_kwarg = 'reportable_id'
+
+    def check_permissions(self, request):
+        super().check_permissions()
+        reportable_id = self.kwargs.get('reportable_id')
+
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+            Q(role=PRP_ROLE_TYPES.cluster_imo),
+            Q(cluster__cluster_objectives__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
+            Q(cluster__partner_projects__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__partner_activities__reportables=reportable_id),
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self, *args, **kwargs):
         reportable_id = self.kwargs.get('reportable_id', None)
@@ -321,7 +359,18 @@ class IndicatorDataAPIView(APIView):
     TODO: check on the GET data being sent / used in the frontend and other
     HTTP operations being opened here.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (IsAuthenticated, )
+
+    def check_indicator_report_permission(self, request, obj):
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
+            Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member)),
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
+            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj)
+        ).exists():
+            self.permission_denied(request)
 
     def get_queryset(self, id):
         queryset = Reportable.objects.filter(
@@ -346,7 +395,7 @@ class IndicatorDataAPIView(APIView):
 
     def get_indicator_report(self, id):
         try:
-            return IndicatorReport.objects.get(id=id)
+            instance = IndicatorReport.objects.get(id=id)
         except IndicatorReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "IndicatorDataAPIView",
@@ -355,6 +404,9 @@ class IndicatorDataAPIView(APIView):
                 "exception": exp,
             })
             return None
+        else:
+            self.check_indicator_report_permission(self.request, instance)
+            return instance
 
     def get_narrative_object(self, id):
         ir = self.get_indicator_report(id)
@@ -463,9 +515,16 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     output in a PD progress report. TODO: move to 'unicef' app?
     """
     serializer_class = OverallNarrativeSerializer
-    permission_classes = (
-        IsPartnerEditorOrPartnerAuthorizedOfficer,
-    )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        pd_progress_report_id = self.kwargs.get('pd_progress_report_id')
+        if not request.user.prp_roles.filter(
+                role__in=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_editor],
+                workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
+        ).exists():
+            self.permission_denied(request)
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """
@@ -508,7 +567,20 @@ class IndicatorReportListAPIView(APIView):
     ideal design, since frontend is sending to this endpoint with irrelevant
     reportable_id many times.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_viewer,
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer
+        )
+    )
 
     def get_queryset(self, *args, **kwargs):
         pks = self.request.query_params.get('pks', None)
@@ -555,11 +627,22 @@ class IndicatorReportReviewAPIView(APIView):
 
     Only a IMO should be allowed to do this action.
     """
-    permission_classes = (IsIMO,)
+    permission_classes = (IsAuthenticated, )
+
+    def check_indicator_report_permission(self, request, obj):
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+            Q(role_=PRP_ROLE_TYPES.cluster_imo),
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
+            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj),
+        ).exists():
+            self.permission_denied(request)
 
     def get_object(self):
         try:
-            return IndicatorReport.objects.get(pk=self.kwargs['pk'])
+            instance = IndicatorReport.objects.get(pk=self.kwargs['pk'])
         except IndicatorReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "IndicatorReportReviewAPIView",
@@ -568,6 +651,9 @@ class IndicatorReportReviewAPIView(APIView):
                 "exception": exp,
             })
             raise Http404
+        else:
+            self.check_indicator_report_permission(self.request, instance)
+            return instance
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -597,7 +683,26 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     """
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (IsAuthenticated, )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        indicator_location_data_id = request.data['id']
+
+        roles_permitted = [
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.cluster_imo,
+        ]
+
+        user_workspaces = Workspace.objects.user_workspaces(request.user, roles_permitted).values_list('id', flat=True)
+
+        if not IndicatorLocationData.objects.filter(
+                id=indicator_location_data_id,
+                indicator_report__progress_report__programme_document__workspace__in=user_workspaces
+        ).exists():
+            self.permission_denied(request)
 
     def get_object(self, request, pk=None):
         return get_object_or_404(IndicatorLocationData, id=pk)
@@ -656,7 +761,14 @@ class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
 
     serializer_class = ClusterIndicatorSerializer
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+        )
+    )
     queryset = Reportable.objects.all()
 
     def get_object(self):
@@ -693,7 +805,11 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     """
 
     permission_classes = (
-        AnyPermission(IsPartnerEditor, IsPartnerAuthorizedOfficer),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_editor,
+        ),
     )
 
     def post(self, request, *args, **kwargs):

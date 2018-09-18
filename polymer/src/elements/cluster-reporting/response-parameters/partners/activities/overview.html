@@ -67,7 +67,7 @@
 
       _canEditActivity: function(permissions, activityData) {
         if (activityData.cluster) {
-          return permissions.createPartnerEntitiesByResponsePlanAsIMO([activityData.cluster]);
+          return permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]);
         }
         return false;
       },

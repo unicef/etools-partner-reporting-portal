@@ -77,7 +77,6 @@ class PMP_API(object):
         else:
             r.raise_for_status()
 
-
     def workspaces(self):
         self.url = self.url_prototype + "/v2/workspaces/"
         data = self._push_request(timeout=30)

@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, GenericAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from rest_framework.views import APIView
@@ -13,16 +13,19 @@ from rest_framework.exceptions import ValidationError
 from djcelery.models import PeriodicTask
 
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
-from .models import Workspace, Location, ResponsePlan
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser, AnyPermission, IsClusterSystemAdmin
+from .models import Workspace, Location, ResponsePlan, PRPRole
 from .serializers import (
     WorkspaceSerializer,
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
     CreateResponsePlanSerializer,
+    PRPRoleUpdateSerializer,
+    PRPRoleCreateMultipleSerializer,
 )
 
 
@@ -31,22 +34,16 @@ class WorkspaceAPIView(ListAPIView):
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Workspace.objects.prefetch_related('countries').distinct()
     serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_fields = ('business_area_code', 'workspace_code')
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
         """
         Only return workspaces that the user is associated with.
         """
-        queryset = request.user.workspaces.all()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
-        )
+        return Workspace.objects.user_workspaces(self.request.user).prefetch_related('countries').distinct()
 
 
 class LocationListAPIView(ListAPIView):
@@ -110,10 +107,10 @@ class ResponsePlanAPIView(ListAPIView):
 
         queryset = ResponsePlan.objects.filter(workspace_id=workspace_id)
 
-        if self.request.user.partner:
-            queryset = queryset.filter(clusters__partners=self.request.user.partner).distinct()
+        if self.request.user.is_cluster_system_admin:
+            return queryset.filter(clusters__isnull=False).distinct()
 
-        return queryset
+        return queryset.filter(clusters__prp_roles__user=self.request.user).distinct()
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):
@@ -122,7 +119,12 @@ class ResponsePlanCreateAPIView(CreateAPIView):
     """
 
     serializer_class = CreateResponsePlanSerializer
-    permission_classes = (IsIMOForCurrentWorkspace, )
+    permission_classes = (
+        AnyPermission(
+            IsClusterSystemAdmin,
+            IsIMOForCurrentWorkspace,
+        ),
+    )
 
 
 class ConfigurationAPIView(APIView):
@@ -197,3 +199,25 @@ class TaskTriggerAPIView(APIView):
             'task_name': task_name,
             'status': 'started'
         })
+
+
+class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView):
+    serializer_class = PRPRoleUpdateSerializer
+    permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
+    queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
+
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+        instance.send_email_notification(deleted=True)
+
+
+class PRPRoleCreateAPIView(CreateAPIView):
+    serializer_class = PRPRoleCreateMultipleSerializer
+    permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
+
+    def perform_create(self, serializer):
+        user_id = serializer.validated_data['user_id']
+
+        for prp_role_data in serializer.validated_data['prp_roles']:
+            self.check_object_permissions(self.request, obj=PRPRole(user_id=user_id, **prp_role_data))
+        super().perform_create(serializer)
