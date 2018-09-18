@@ -106,24 +106,21 @@
               dispatch(App.Actions.setWorkspaces(workspaces));
             });
         };
-      }
-      ,
+      },
 
       setWorkspace: function (newWorkspace) {
         return {
           type: App.Constants.SET_WORKSPACE,
           workspace: newWorkspace,
         };
-      }
-      ,
+      },
 
       setWorkspaces: function (workspaces) {
         return {
           type: App.Constants.SET_WORKSPACES,
           workspaces: workspaces,
         };
-      }
-      ,
+      },
 
       // Gets a list of all response plans for the currently selected location ID.
       fetchResponsePlans: function (responsePlansThunk) {
@@ -133,48 +130,42 @@
               dispatch(App.Actions.setResponsePlans(res.data));
             });
         };
-      }
-      ,
+      },
 
       setResponsePlans: function (plans) {
         return {
           type: App.Constants.SET_RESPONSE_PLANS,
           plans: plans
         };
-      }
-      ,
+      },
 
       setCurrentResponsePlanID: function (newPlanID) {
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
           planID: newPlanID,
         };
-      }
-      ,
+      },
 
       setCurrentResponsePlan: function (newPlan) {
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
           plan: newPlan,
         };
-      }
-      ,
+      },
 
       addResponsePlan: function (newPlan) {
         return {
           type: App.Constants.ADD_RESPONSE_PLAN,
           plan: newPlan,
         };
-      }
-      ,
+      },
 
       setApp: function (app) {
         return {
           type: App.Constants.SET_APP,
           app: app,
         };
-      }
-      ,
+      },
 
       // Partner data
       setPartner: function (partnerData) {
@@ -182,8 +173,7 @@
           type: App.Constants.SET_PARTNER,
           partnerData: partnerData,
         };
-      }
-      ,
+      },
 
       // Programme documents
       fetchProgrammeDocuments: function (pdThunk) {
@@ -195,16 +185,14 @@
               dispatch(App.Actions.setProgrammeDocuments(pdData));
             });
         };
-      }
-      ,
+      },
 
       setProgrammeDocuments: function (data) {
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENTS,
           data: data,
         };
-      }
-      ,
+      },
 
       fetchProgrammeDocumentDetails: function (pdDetailsThunk) {
         return function (dispatch) {
@@ -214,24 +202,21 @@
               dispatch(App.Actions.setProgrammeDocumentDetails(pdDetailsData));
             });
         };
-      }
-      ,
+      },
 
       setProgrammeDocumentDetails: function (pdDetailsData) {
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
           pdDetailsData: pdDetailsData,
         };
-      }
-      ,
+      },
 
       // Master reset
       reset: function () {
         return {
           type: App.Constants.RESET,
         };
-      }
-      ,
+      },
 
     });
   }());

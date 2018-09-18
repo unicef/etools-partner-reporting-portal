@@ -20,11 +20,11 @@
             return params.prpRoles.filter(function (role) {
               return params.responsePlan && params.responsePlan.clusters.some(function (cluster) {
                 return role.cluster && cluster.id === role.cluster.id;
-              })
+              });
             }).some(function (item) {
               return roles.indexOf(item.role) > -1;
-            })
-          }
+            });
+          };
         };
 
         var createClusterEntitiesUsers = [
@@ -76,11 +76,11 @@
                   ((App.Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
                     report.partner_id === (params.partner && params.partner.id) :
                     String(item.cluster.id) === String(report.cluster_id)) &&
-                    (item.role === App.Constants.PRP_ROLE.CLUSTER_COORDINATOR ? !report.cluster_activity : true))
+                    (item.role === App.Constants.PRP_ROLE.CLUSTER_COORDINATOR ?
+                     !report.cluster_activity : true))
                 );
             });
           },
-
 
           editIndicatorReport: function (params, report) {
             var allowedRoles = [
@@ -149,7 +149,7 @@
 
             return params.partner && params.partner.id && params.prpRoles.some(function (item) {
               return allowedRoles.indexOf(item.role) > -1;
-            })
+            });
           },
 
           addPlannedActionProject: [
@@ -275,7 +275,8 @@
                     return params.prpRoles.some(function (role) {
                       return granted.indexOf(role.role) > -1 &&
                         (App.Constants.WORKSPACE_ROLES.indexOf(role.role) > -1 ?
-                          (role.workspace && role.workspace.workspace_code === params.workspace) : true);
+                          (role.workspace &&
+                           role.workspace.workspace_code === params.workspace) : true);
                     });
 
                   case typeof granted === 'function':
@@ -307,8 +308,8 @@
 
           _computeImoClusters: function (profile) {
             return profile.prp_roles ?
-              profile.prp_roles.filter(item => item.role === App.Constants.PRP_ROLE.CLUSTER_IMO)
-                .map(item => item.cluster) : [];
+              profile.prp_roles.filter(function(item) {return item.role === App.Constants.PRP_ROLE.CLUSTER_IMO;})
+                .map(function(item) {return item.cluster;}) : [];
           },
 
           _computeParams: function (prpRoles, imoClusters, partner, workspace, responsePlan) {
@@ -323,7 +324,6 @@
         });
       }
       ()
-    )
-    ;
+    );
   </script>
 </dom-module>

@@ -55,7 +55,7 @@
         permissions: Object,
       },
 
-      _canEdit(permissions, projectData) {
+      _canEdit: function(permissions, projectData) {
         return projectData.clusters ?
             permissions.editPartnerEntities(projectData.clusters) :
             false;

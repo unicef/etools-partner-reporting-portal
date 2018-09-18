@@ -187,17 +187,16 @@
 
       _computePrpRoles: function (profile, portal) {
         return (profile.prp_roles || []).map(function (role) {
-          let result = "";
+          var result = '';
 
           if (role.cluster && portal === 'cluster-reporting') {
             result += role.cluster.full_title;
-          }
-          else if (role.workspace) {
+          } else if (role.workspace) {
             result += role.workspace.title;
           }
 
           if (result) {
-            result += " / ";
+            result += ' / ';
           }
 
           return result + role.role_display;

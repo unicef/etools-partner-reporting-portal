@@ -116,7 +116,7 @@
 
       _computeIsIMOClusters: function (profile) {
         return profile.prp_roles ? profile.prp_roles.some(function (role) {
-          return role.role === App.Constants.PRP_ROLE.CLUSTER_IMO
+          return role.role === App.Constants.PRP_ROLE.CLUSTER_IMO;
         }) : false;
       },
 
