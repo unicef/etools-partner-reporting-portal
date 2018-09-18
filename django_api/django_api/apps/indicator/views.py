@@ -18,12 +18,6 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsIMOForCurrentWorkspace,
-    IsPartnerEditorForCurrentWorkspace,
-    IsPartnerViewerForCurrentWorkspace,
-    IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    IsPartnerAdminForCurrentWorkspace,
-    AnyPermission,
     HasAnyRole,
 )
 from core.paginations import SmallPagination

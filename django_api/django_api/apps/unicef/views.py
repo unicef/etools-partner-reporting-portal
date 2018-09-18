@@ -36,7 +36,7 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsPartnerAdminForCurrentWorkspace,
 )
-from core.models import Location, PartnerAuthorizedOfficerRole
+from core.models import Location
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint, IndicatorLocationData

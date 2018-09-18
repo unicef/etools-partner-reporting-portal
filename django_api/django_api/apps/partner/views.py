@@ -23,14 +23,7 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     AnyPermission,
-    HasAnyRoleCheck,
     HasAnyRole,
-    IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
-    IsIMOForCurrentWorkspace,
-    IsIMOForCurrentWorkspaceCheck,
-    IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    IsPartnerEditorForCurrentWorkspace,
-    IsPartnerViewerForCurrentWorkspace,
     IsIMO,
     IsClusterSystemAdmin,
     has_permission_for_clusters_check

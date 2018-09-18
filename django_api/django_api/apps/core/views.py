@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from djcelery.models import PeriodicTask
 
-from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS, PRP_ROLE_TYPES
+from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from utils.serializers import serialize_choices
 from .filters import LocationFilter

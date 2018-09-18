@@ -25,7 +25,7 @@ from core.common import (
     REPORTING_TYPES,
     PRP_ROLE_TYPES,
 )
-from core.models import TimeStampedExternalSyncModelMixin, PartnerAuthorizedOfficerRole
+from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
 
 

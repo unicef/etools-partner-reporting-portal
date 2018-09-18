@@ -70,7 +70,8 @@ class User(AbstractUser):
             return USER_TYPES.imo
         if {PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.cluster_viewer,
-            PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
+            PRP_ROLE_TYPES.cluster_coordinator} \
+                .intersection(user_prp_roles):
             return USER_TYPES.partner
 
     @cached_property

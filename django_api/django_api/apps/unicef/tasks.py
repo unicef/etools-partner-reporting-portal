@@ -10,7 +10,7 @@ from celery import shared_task
 from rest_framework.exceptions import ValidationError
 
 from core.api import PMP_API
-from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole, PRPRole
+from core.models import Workspace, GatewayType, Location, PRPRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
 
@@ -110,8 +110,8 @@ def process_programme_documents(fast=False, area=False):
         indicators: [ ]
     }
     """
-    # Get/Create Group that will be assigned to persons
-    partner_authorized_officer_group = PartnerAuthorizedOfficerRole.as_group()
+    # # Get/Create Group that will be assigned to persons
+    # partner_authorized_officer_group = PartnerAuthorizedOfficerRole.as_group()
 
     # Iterate over all workspaces
     if fast:
