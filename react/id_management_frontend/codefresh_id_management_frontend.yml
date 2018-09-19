@@ -13,6 +13,7 @@ steps:
         type: push
         title: Pushing id management react image to docker hub
         candidate: ${{build_id_management_react}}
+        registry: unicef-dockerhub
         tags:
             - ${{CF_BRANCH}}
             - ${{CF_SHORT_REVISION}}

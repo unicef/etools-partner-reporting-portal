@@ -13,6 +13,7 @@ steps:
         type: push
         title: Pushing polymer image to docker hub
         candidate: ${{build_polymer}}
+        registry: unicef-dockerhub
         tags:
             - ${{CF_BRANCH}}
             - ${{CF_SHORT_REVISION}}
