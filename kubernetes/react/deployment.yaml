@@ -8,6 +8,7 @@ spec:
   ports:
   - protocol: TCP
     port: 3000
+    nodePort: 30613
   type: NodePort
   selector:
     app: id-management-frontend-container
