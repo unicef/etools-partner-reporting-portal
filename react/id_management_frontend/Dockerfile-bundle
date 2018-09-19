@@ -17,7 +17,5 @@ WORKDIR /code
 EXPOSE 3000
 
 RUN npm run build
-RUN mv build/favicon.ico build/id-management/favicon.ico
-RUN mv build/manifest.json build/id-management/manifest.json
 
 CMD ["node express.js"]
