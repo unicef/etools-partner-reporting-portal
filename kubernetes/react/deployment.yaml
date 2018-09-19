@@ -38,4 +38,4 @@ spec:
             - containerPort: 3000
           image: tivix/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
           command: ["bash"]
-          args: ["-c", "serve -s build"]
+          args: ["-c", "node node_modules/serve/bin/serve.js -s build"]
