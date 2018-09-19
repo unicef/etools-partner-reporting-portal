@@ -2,7 +2,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: id-management
+  name: id_management_frontend
   namespace: {{NAMESPACE}}
 spec:
   ports:
@@ -11,14 +11,14 @@ spec:
     nodePort: 30050
   type: NodePort
   selector:
-    app: id-management-container
+    app: id_management_frontend-container
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: id-management
+  name: id_management_frontend
   labels:
-    app: id-management
+    app: id_management_frontend
   annotations:
     revision: "{{CF_SHORT_REVISION}}"
   namespace: {{NAMESPACE}}
@@ -26,14 +26,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: id-management-container
+      app: id_management_frontend-container
   template:
     metadata:
       labels:
-        app: id-management-container
+        app: id_management_frontend-container
     spec:
       containers:
-        - name: id-management
+        - name: id_management_frontend
           ports:
             - containerPort: 3000
           image: tivix/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
