@@ -72,7 +72,7 @@ services:
       context: ./redis
       dockerfile: ./Dockerfile
 
-  id_management_frontend:
+  id-management-frontend:
     image: unicef/etools-prp-id-management-frontend
     build:
       context: ./react/id_management_frontend
