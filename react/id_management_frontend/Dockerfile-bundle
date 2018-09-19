@@ -12,10 +12,10 @@ RUN npm install
 RUN rm -rf /code/node_modules
 RUN cp -a /tmp/node_modules /code/node_modules
 
+RUN npm run build
+ADD build /code/build
+
 WORKDIR /code
 
 EXPOSE 3000
-
-RUN npm run build
-
 CMD ["node express.js"]
