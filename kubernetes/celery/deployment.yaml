@@ -51,6 +51,8 @@ spec:
 
             - name: POSTGRES_USER
               value: {{POSTGRES_USER}}
+            - name: POSTGRES_PASSWORD
+              value: {{POSTGRES_PASSWORD}}
 
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
@@ -195,6 +197,8 @@ spec:
 
             - name: POSTGRES_USER
               value: {{POSTGRES_USER}}
+            - name: POSTGRES_PASSWORD
+              value: {{POSTGRES_PASSWORD}}
 
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
@@ -266,13 +270,6 @@ spec:
                 secretKeyRef:
                   name: pmp-api-endpoint
                   key: password
-            
-            # - name: POSTGRES_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: eprp-staging
-            #       key: postgres-password
-            
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
