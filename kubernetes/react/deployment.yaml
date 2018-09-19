@@ -37,5 +37,5 @@ spec:
           ports:
             - containerPort: 3000
           image: tivix/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
-          command: ["ash"]
+          command: ["bash"]
           args: ["-c", "node express.js"]
