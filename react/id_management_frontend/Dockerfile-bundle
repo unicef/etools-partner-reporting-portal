@@ -18,4 +18,4 @@ EXPOSE 3000
 
 RUN npm run build
 
-CMD ["node node_modules/serve/bin/serve.js -s build"]
+CMD ["node node_modules/serve/bin/serve.js -s build -l 3000"]
