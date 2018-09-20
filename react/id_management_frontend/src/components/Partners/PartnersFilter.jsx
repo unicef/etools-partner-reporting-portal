@@ -27,7 +27,7 @@ class PartnersFilter extends Component {
                 <form noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={4}>
-                            <TextFieldForm fieldName="full_name" label={labels.search}
+                            <TextFieldForm fieldName="title" label={labels.search}
                                            placeholder={labels.search}
                                            margin="none" optional/>
                         </Grid>
