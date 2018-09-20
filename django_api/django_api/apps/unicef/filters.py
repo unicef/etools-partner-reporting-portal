@@ -35,6 +35,10 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     cp_output = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__external_cp_output_id')
     report_section = CommaSeparatedListFilter(
         name='lower_level_outputs__cp_output__programme_document__sections__external_id')
+    pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
+                              label='PD/Ref # title')
+
+    unicef_focal_points = CharFilter(method='get_unicef_focal_points')
 
     class Meta:
         model = Reportable
@@ -59,6 +63,18 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
         if value == Boolean.TRUE:
             return queryset.filter(lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
         return queryset
+
+    def get_pd_ref_title(self, queryset, name, value):
+        return queryset.filter(
+            Q(lower_level_outputs__cp_output__programme_document__reference_number__icontains=value) |
+            Q(lower_level_outputs__cp_output__programme_document__title__icontains=value)
+        )
+
+    def get_unicef_focal_points(self, queryset, name, value):
+        return queryset.filter(
+            lower_level_outputs__cp_output__programme_document__unicef_focal_point__email__in=parse.unquote(
+                value).split(',')  # noqa: E501
+        ).distinct()
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
