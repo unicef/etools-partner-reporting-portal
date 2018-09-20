@@ -36,6 +36,6 @@ spec:
         - name: id-management-frontend
           ports:
             - containerPort: 3000
-          image: tivix/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
+          image: unicef/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
           command: ["bash"]
           args: ["-c", "npm run build && node express.js"]
