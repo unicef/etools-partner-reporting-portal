@@ -32,9 +32,12 @@ class UserProfileAPIView(RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+    def get_object(self):
+        prefetch_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
+                                                           'cluster__response_plan__workspace')
+        prefetch_prp_roles = Prefetch('prp_roles', queryset=prefetch_queryset)
+        queryset = User.objects.select_related('profile', 'partner').prefetch_related(prefetch_prp_roles)
+        return queryset.get(id=self.request.user.id)
 
 
 class UserLogoutAPIView(APIView):
