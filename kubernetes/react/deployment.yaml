@@ -38,4 +38,4 @@ spec:
             - containerPort: 3000
           image: unicef/etools-prp-id-management-frontend:{{CF_SHORT_REVISION}}
           command: ["bash"]
-          args: ["-c", "npm run build && bash resolve_build_bundle.sh && node express.js"]
+          args: ["-c", "npm run build && cd build/id-management/bundled; mkdir id-management; cp -R bundled id-management && node express.js"]
