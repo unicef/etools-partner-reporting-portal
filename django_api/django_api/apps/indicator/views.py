@@ -299,10 +299,10 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     lookup_url_kwarg = 'reportable_id'
 
     def check_permissions(self, request):
-        super().check_permissions()
+        super().check_permissions(request)
         reportable_id = self.kwargs.get('reportable_id')
 
-        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
             Q(role=PRP_ROLE_TYPES.cluster_imo),
             Q(cluster__cluster_objectives__reportables=reportable_id) |
             Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
@@ -630,7 +630,7 @@ class IndicatorReportReviewAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def check_indicator_report_permission(self, request, obj):
-        if not request.user.is_cluster_system_admin and not request.user.prp_roles(
+        if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
             Q(role_=PRP_ROLE_TYPES.cluster_imo),
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |

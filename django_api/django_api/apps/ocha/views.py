@@ -101,7 +101,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         super().check_permissions(request)
         response_plan_id = self.kwargs['id']
 
-        if not request.user.prp_roles(
+        if not request.user.prp_roles.filter(
             Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
             Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
         ).exists():
@@ -142,7 +142,7 @@ class RPMProjectListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def check_response_plan_permission(self, request, obj):
-        if not request.user.prp_roles(
+        if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
                 Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=obj.id) |
                 Q(role=PRP_ROLE_TYPES.ip_authorized_officer, workspace__response_plans=obj.id)
@@ -185,7 +185,7 @@ class RPMProjectListAPIView(APIView):
         return Response(trim_list(result))
 
     def get_partner(self):
-        if self.request.user.prp_roles(
+        if self.request.user.prp_roles.filter(
                 role__in=(PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo)
         ).exists():
             partner = get_object_or_404(Partner, id=self.request.data.get('partner_id'))
@@ -229,7 +229,7 @@ class RPMProjectDetailAPIView(APIView):
         super().check_permissions(request)
         project_id = self.kwargs['id']
 
-        if not request.user.prp_roles(
+        if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
                 Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__partner_projects=project_id) |
                 Q(role=PRP_ROLE_TYPES.ip_authorized_officer, user__partner__partner_projects=project_id)

@@ -189,6 +189,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
+            partner = get_object_or_404(Partner, pk=partner_id)
             if (not request.user.is_cluster_system_admin and
                     not Cluster.objects.filter(prp_roles__user=request.user, partners=partner_id).exists()):
                 raise ValidationError({
