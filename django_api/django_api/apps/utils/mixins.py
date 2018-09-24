@@ -13,6 +13,7 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsPartnerAdminForCurrentWorkspace,
     IsIMOForCurrentWorkspace,
+    IsUNICEFAPIUser,
 )
 
 
@@ -64,6 +65,7 @@ class ListExportMixin(object):
         if self.get_exporter_class():
             return (
                 AnyPermission(
+                    IsUNICEFAPIUser,
                     IsPartnerAuthorizedOfficerForCurrentWorkspace,
                     IsPartnerEditorForCurrentWorkspace,
                     IsPartnerViewerForCurrentWorkspace,
@@ -95,6 +97,7 @@ class ObjectExportMixin(object):
         if self.get_exporter_class():
             return (
                 AnyPermission(
+                    IsUNICEFAPIUser,
                     IsPartnerAuthorizedOfficerForCurrentWorkspace,
                     IsPartnerEditorForCurrentWorkspace,
                     IsPartnerViewerForCurrentWorkspace,

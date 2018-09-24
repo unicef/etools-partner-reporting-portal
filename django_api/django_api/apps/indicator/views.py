@@ -17,6 +17,8 @@ from rest_framework.views import APIView
 import django_filters.rest_framework
 
 from core.permissions import (
+    AnyPermission,
+    IsUNICEFAPIUser,
     IsAuthenticated,
     HasAnyRole,
 )
@@ -868,7 +870,12 @@ class ReportableReportingFrequencyListAPIView(APIView):
 
     Only a PO (not a partner user) should be allowed to do this action.
     """
-    permission_classes = (UnicefPartnershipManagerOrRead,)
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            UnicefPartnershipManagerOrRead,
+        ),
+    )
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):

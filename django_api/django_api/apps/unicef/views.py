@@ -35,6 +35,7 @@ from core.permissions import (
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
     IsPartnerAdminForCurrentWorkspace,
+    IsUNICEFAPIUser,
 )
 from core.models import Location
 from core.serializers import ShortLocationSerializer
@@ -155,6 +156,7 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
     serializer_class = ProgrammeDocumentProgressSerializer
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
@@ -223,6 +225,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     }
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
@@ -255,6 +258,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
     pagination_class = SmallPagination
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
@@ -319,6 +323,7 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
     queryset = ProgressReport.objects.all()
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
         ),
@@ -392,6 +397,7 @@ class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     serializer_class = ProgressReportSerializer
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerViewerForCurrentWorkspace,
@@ -836,7 +842,12 @@ class ProgressReportReviewAPIView(APIView):
 
     Only a PO (not a partner user) should be allowed to do this action.
     """
-    permission_classes = (UnicefPartnershipManagerOrRead,)
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            UnicefPartnershipManagerOrRead,
+        ),
+    )
 
     def get_object(self):
         try:
@@ -986,6 +997,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 class ProgressReportAttachmentAPIView(APIView):
     permission_classes = (
         AnyPermission(
+            IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
         ),

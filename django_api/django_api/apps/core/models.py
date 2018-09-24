@@ -120,6 +120,9 @@ class Country(TimeStampedModel):
 
 class WorkspaceManager(models.Manager):
     def user_workspaces(self, user, role_list=None):
+        if user.is_unicef:
+            return self.all()
+
         ip_kw = {'prp_roles__user': user}
         cluster_kw = {'response_plans__clusters__prp_roles__user': user}
 
