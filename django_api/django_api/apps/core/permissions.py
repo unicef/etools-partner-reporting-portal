@@ -275,37 +275,37 @@ class IsSuperuser(BasePermission):
 class IsClusterSystemAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return IsClusterSystemAdminCheck(request)
+        return request.user.is_authenticated() and IsClusterSystemAdminCheck(request)
 
 
 class IsIMO(BasePermission):
 
     def has_permission(self, request, view):
-        return IsIMOCheck(request)
+        return request.user.is_authenticated() and IsIMOCheck(request)
 
 
 class IsIPAuthorizedOfficer(BasePermission):
 
     def has_permission(self, request, view):
-        return IsIPAuthorizedOfficerCheck(request)
+        return request.user.is_authenticated() and IsIPAuthorizedOfficerCheck(request)
 
 
 class IsIPAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return IsIPAdminCheck(request)
+        return request.user.is_authenticated() and IsIPAdminCheck(request)
 
 
 class IsIPEditor(BasePermission):
 
     def has_permission(self, request, view):
-        return IsIPEditorCheck(request)
+        return request.user.is_authenticated() and IsIPEditorCheck(request)
 
 
 class IsIPViewer(BasePermission):
 
     def has_permission(self, request, view):
-        return IsIPViewerCheck(request)
+        return request.user.is_authenticated() and IsIPViewerCheck(request)
 
 
 class IsUNICEFAPIUser(BasePermission):
