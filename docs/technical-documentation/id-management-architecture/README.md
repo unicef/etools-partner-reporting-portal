@@ -1,7 +1,3 @@
----
-description: Overview of the technical implementation
----
-
 # ID Management
 
 ID management in PRP should be its own application `id_management`.

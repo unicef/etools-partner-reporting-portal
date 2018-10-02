@@ -1,7 +1,3 @@
----
-description: DRF API's that support the ID management interface
----
-
 # Backend API's
 
 {% api-method method="get" host="/api/id-management" path="/users/" %}

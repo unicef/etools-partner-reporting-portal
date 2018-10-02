@@ -6,11 +6,11 @@ AO details \(name, email\) are retrieved from PMP to ID Management. When AO is i
 
 ### IP Permissions 
 
-![](../.gitbook/assets/permissions_id_management_-_google_sheets.png)
+![](../../.gitbook/assets/permissions_id_management_-_google_sheets.png)
 
 ###  Cluster Permissions
 
-![Cluster Permissions](../.gitbook/assets/screen-shot-2018-07-06-at-4.20.37-pm.png)
+![Cluster Permissions](../../.gitbook/assets/screen-shot-2018-07-06-at-4.20.37-pm.png)
 
 
 

@@ -14,7 +14,7 @@ When button is clicked, following modal windows are displayed to the user:
   
 If user already exists in data base, the following error message will be displayed. Saving changes and continuing is impossible.
 
-![Error message](../../.gitbook/assets/screen-shot-2018-07-10-at-16.15.41.png)
+![Error message](../../../.gitbook/assets/screen-shot-2018-07-10-at-16.15.41.png)
 
 When information is provided, user can press “save and continue” button which will take him to the next modal window, where permissions can be assigned to just added person:
 
@@ -34,7 +34,7 @@ Authorized Officer will have the possibility to add a new CSO user as an IP Admi
   
 ****On the top of the screen person can use filter area to narrow down search results that appear below.
 
-![](../../.gitbook/assets/screen-shot-2018-08-28-at-10.40.52.png)
+![](../../../.gitbook/assets/screen-shot-2018-08-28-at-10.40.52.png)
 
 ## **Search results**
 
@@ -93,7 +93,7 @@ User can select from workspaces he has access to.
 
 User with no permissions assigned is displayed in the UI as shown below:
 
-![](../../.gitbook/assets/screen-shot-2018-08-28-at-17.00.28.png)
+![](../../../.gitbook/assets/screen-shot-2018-08-28-at-17.00.28.png)
 
 
 
@@ -103,7 +103,7 @@ User with no permissions assigned is displayed in the UI as shown below:
 
 If user is logged in as an  AO and there are other AOs in his workspaces, information \(as shown below\) will be displayed:
 
-![](../../.gitbook/assets/screen-shot-2018-08-22-at-19.47.34.png)
+![](../../../.gitbook/assets/screen-shot-2018-08-22-at-19.47.34.png)
 
   
 Clicking on the button "Click here to see them" will filter search results.

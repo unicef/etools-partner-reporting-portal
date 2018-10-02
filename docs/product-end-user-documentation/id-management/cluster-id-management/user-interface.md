@@ -16,7 +16,7 @@ The overall user interface for User Management in Cluster Portal consists of the
 
 ![Header for Partner user](https://lh6.googleusercontent.com/x1ryWGu6nQz9ZvO6utG6j3mag3iwZX0HvaNv8umZ6_hrF98S8uGDQhF13v_GBSD8yfgn215HDQts4klXXNNZULwGGrdhPReIrRvqT7oZZEZZTc7hKRCPgwU7Ja1Kv4MpukGx9m5q)
 
-![](../../.gitbook/assets/screen-shot-2018-08-22-at-10.18.22.png)
+![](../../../.gitbook/assets/screen-shot-2018-08-22-at-10.18.22.png)
 
 **Left navigation** with:
 

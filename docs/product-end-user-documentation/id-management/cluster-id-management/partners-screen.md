@@ -10,7 +10,7 @@ Adding new Partner is possible by clicking button placed in the top right of thi
 
 When button is clicked, following modal window is displayed to the user:
 
-![](../../.gitbook/assets/screen-shot-2018-08-22-at-19.53.46.png)
+![](../../../.gitbook/assets/screen-shot-2018-08-22-at-19.53.46.png)
 
 ## **Filters**
 

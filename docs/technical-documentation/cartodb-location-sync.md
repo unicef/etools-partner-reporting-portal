@@ -45,7 +45,7 @@ beater-prp:
     - PRP_FRONTEND_HOST=localhost:8082
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
-    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_POLICY_NAME=POLICY
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -82,7 +82,7 @@ celerycam-prp:
     - PRP_FRONTEND_HOST=localhost:8082
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
-    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_POLICY_NAME=POLICY
   ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
   image: 'unicef/etools-prp:develop'
   restart: always
@@ -120,7 +120,7 @@ flower-prp:
     - PRP_FRONTEND_HOST=localhost:8082
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
-    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_POLICY_NAME=POLICY
     - VIRTUAL_HOST_WEIGHT=1
   expose:
     - '8082 
@@ -170,7 +170,7 @@ worker-prp:
     - PRP_FRONTEND_HOST=localhost:8082
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
-    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_POLICY_NAME=POLICY
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -182,25 +182,20 @@ worker-prp:
 ### How to sync locations
 
 * Open up a browser and go \`[http://localhost:8082](http://localhost:8082) api/admin/core/cartodbtable/\` and log in.
-* In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Here are the sample working dataset names:
-  * Pakistan
-    * pak\_adm0\_gaul\_1
-    * pak\_adm1\_pco\_20110324\_1
-    * pak\_adm2\_pco\_20150528\_1
-    * pak\_adm3\_pco\_20150528\_1
-    * pak\_adm4\_2010floodaffected\_pco\_20150826\_1\_1
-  * Mali
-    * mli\_admbnda\_adm0\_gov\_1
-    * mli\_admbnda\_adm1\_gov\_ocha\_itos\_1
-    * mli\_admbnda\_adm2\_gov\_ocha\_itos\_1
-    * mli\_admbnda\_adm3\_gov\_ocha\_1
-    * mli\_admbnda\_adm4\_iom\_gov\_1
+* In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Consult UNICEF CartoDB expert to get dataset import metadata.
 * Click "ADD CARTO DB TABLE" button in Django admin and fill the following information:
-  * Domain: [https://etools.carto.com](https://etools.carto.com)
+  * Domain: etools
   * API KEY: \*\*\*\*\*
-  * Table name: \(Use above dataset name\) 
+  * Table name: \(Use above dataset name\)
+  * Display name: Use country name and location type for human readable format
   * Location type: \(Create a new one with right admin level\)
+    * Use this convention for name field: &lt;ISO3 code in uppercase&gt;-Admin Level &lt;LEVEL\_NUMBER&gt;
+    * Ex\) AFG-Admin Level 1
+  * Name Column
+  * Pcode Column
+  * Parent Code Column
   * Parent: \(Choose the parent carto db table object if admin level is not 0\)
+  * Country
 * Repeat Step 4 for each country until every single admin level carto db table is created.
 * After creating a carto db table, select 1 carto db table at a time \(with admin level descending\) and do "Import sites" Django admin action.
 * After that, the new locations should be created if import is successful.
