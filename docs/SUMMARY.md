@@ -26,6 +26,7 @@
     * [Quarterly Progress Reports \(QPR\)](product-end-user-documentation/ip-reporting/progress-reports/quarterly-progress-reports-qpr.md)
     * [Reporting Process](product-end-user-documentation/ip-reporting/progress-reports/reporting-process.md)
   * [Various data exports](product-end-user-documentation/ip-reporting/various-data-exports.md)
+  * [Data Uploader for QPR and HR](product-end-user-documentation/ip-reporting/data-uploader-for-qpr-and-hr.md)
 * [Cluster Reporting](product-end-user-documentation/cluster-reporting/README.md)
   * [Overview](product-end-user-documentation/cluster-reporting/overview.md)
   * [User Authentication, Roles and permissions](product-end-user-documentation/cluster-reporting/user-authentication-roles-and-permissions.md)
