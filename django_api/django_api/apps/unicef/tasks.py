@@ -500,24 +500,19 @@ def process_programme_documents(fast=False, area=False):
                                                         end_date=cai.response_plan.end,
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
+
+                                                    # Grab Cluster Activity instance from
+                                                    # this newly created Partner Activity instance
+                                                    create_pa_reportables_from_ca(partner_activity, cai)
                                                 except Exception as e:
                                                     print(
-                                                        "Cannot associate PartnerActivity to ClusterActivity "
-                                                        "for dual reporting - skipping link!"
+                                                        "Cannot force adopt PartnerActivity from ClusterActivity "
+                                                        "for dual reporting - skipping link!: " + str(e)
                                                     )
-
-                                                # Grab Cluster Activity instance from
-                                                # this newly created Partner Activity instance
-                                                create_pa_reportables_from_ca(partner_activity, cai)
 
                                         except Reportable.DoesNotExist:
                                             print(
                                                 "No ClusterActivity Reportable found "
-                                                "for dual reporting - skipping link!"
-                                            )
-                                        except Exception:
-                                            print(
-                                                "Invalid ClusterActivity Reportable ID "
                                                 "for dual reporting - skipping link!"
                                             )
 
