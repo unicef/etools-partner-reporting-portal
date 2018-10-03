@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react';
-import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, USER_TYPE_ROLES} from "../../constants";
 import SelectForm from "../form/SelectForm";
 import SearchSelectForm from "../form/SearchSelectForm";
 import {Grid, Typography} from "@material-ui/core";
@@ -13,7 +13,7 @@ import {userRoleInCluster, userRoleInWorkspace} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {filterOptionsValues} from "../../helpers/options";
 import withProps from "../hoc/withProps";
-import {clusterOptions, workspaceOptions, portal, user} from "../../helpers/props";
+import {clusterOptions, portal, user, workspaceOptions} from "../../helpers/props";
 
 const title = {
     [PORTALS.IP]: "Role per Workspace",
@@ -33,6 +33,15 @@ const getSelectedOptions = (optionName, fields, index) => {
 };
 
 const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterOptions}) => {
+    let showAdd;
+
+    if (portal === PORTALS.IP) {
+        showAdd = fields.length < workspaceOptions.length;
+    }
+    else {
+        showAdd = fields.length < clusterOptions.length;
+    }
+
     return (
         <div>
             <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
@@ -59,6 +68,12 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
 
                     if (role) {
                         roleOptions = EDITABLE_PRP_ROLE_OPTIONS[role] || [];
+
+                        const userType = selectedUser.user_type || (selectedUser.partner ? USER_TYPE.PARTNER : USER_TYPE.IMO);
+
+                        if (portal === PORTALS.CLUSTER) {
+                            roleOptions = roleOptions.filter(option => USER_TYPE_ROLES[userType].indexOf(option.value) > -1);
+                        }
                     }
 
                     const maxMenuHeight = 120;
@@ -76,7 +91,8 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                 <Grid item md={6}>
                                     {portal === PORTALS.IP &&
                                     <SearchSelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                                      options={filteredWorkspaceOptions} maxMenuHeight={maxMenuHeight}/>}
+                                                      options={filteredWorkspaceOptions}
+                                                      maxMenuHeight={maxMenuHeight}/>}
 
                                     {portal === PORTALS.CLUSTER &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
@@ -93,7 +109,8 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                     )
                 })}
 
-                <FieldsArrayAddButton onClick={() => fields.push({})}/>
+                {showAdd &&
+                <FieldsArrayAddButton onClick={() => fields.push({})}/>}
             </FieldsArrayPanel>
         </div>
     )
