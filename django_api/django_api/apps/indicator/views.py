@@ -812,7 +812,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
 
         reportable = serializer.validated_data['reportable']
         cluster = serializer.validated_data['cluster']
-        imo_user = cluster.imo_users.first()
+        imo_users = cluster.imo_users.all()
 
         imo_frontend_indicators_url = \
             '{}/app/{}/cluster-reporting/plan/{}/response-parameters/clusters/activity/{}/indicators'.format(
@@ -831,7 +831,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             "indicator_name": reportable.blueprint.title,
             "partner_name": request.user.partner.title,
             "sender_user": request.user,
-            "imo_user": imo_user,
+            "imo_user": imo_users,
             "message": serializer.validated_data['message'],
             "target_url": imo_frontend_indicators_url,
             "project_name": project_name,
@@ -843,7 +843,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
             'email/notify_imo_on_cluster_indicator_change_request.html',
             context,
-            to_email_list=[imo_user.email, ],
+            to_email_list=list(imo_users.values_list('email', flat=True)),
             fail_silently=False,
             reply_to=[request.user.email],
             content_subtype='html',
