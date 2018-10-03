@@ -503,7 +503,7 @@ def process_programme_documents(fast=False, area=False):
 
                                                     # Grab Cluster Activity instance from
                                                     # this newly created Partner Activity instance
-                                                    create_pa_reportables_from_ca(partner_activity, cai)
+                                                    create_pa_reportables_from_ca(partner_activity, cai.content_object)
                                                 except Exception as e:
                                                     print(
                                                         "Cannot force adopt PartnerActivity from ClusterActivity "
