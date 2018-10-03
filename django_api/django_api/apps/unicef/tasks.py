@@ -492,7 +492,7 @@ def process_programme_documents(fast=False, area=False):
                                                     # TODO: Figure out what to put for
                                                     # project, start_date, end_date, and status
                                                     partner_activity = PartnerActivity.objects.create(
-                                                        title=cai.title,
+                                                        title=cai.blueprint.title,
                                                         project=pd.partner.partner_projects.first(),
                                                         partner=pd.partner,
                                                         cluster_activity=cai,
