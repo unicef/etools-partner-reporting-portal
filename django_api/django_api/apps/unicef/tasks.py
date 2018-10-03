@@ -495,7 +495,7 @@ def process_programme_documents(fast=False, area=False):
                                                         title=cai.blueprint.title,
                                                         project=pd.partner.partner_projects.first(),
                                                         partner=pd.partner,
-                                                        cluster_activity=cai,
+                                                        cluster_activity=cai.content_object,
                                                         start_date=cai.content_object.response_plan.start,
                                                         end_date=cai.content_object.response_plan.end,
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
