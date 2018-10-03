@@ -32,6 +32,17 @@ In the above example, QPR 1 will be able to pull in aggregated data for high fre
 
 ![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](https://lh5.googleusercontent.com/TP_omlOo1rkfOl04lrsxBSmBiJcM_QWHDLTc-lDKex419eV_wbFJJLUTVJbNKy91VVMrraUKFV6IDxrz3hzmox0V726LDJvwuuwCtEwSYfcHftIAhgvNRqGXvRLJi8agHXB46O18)
 
+  
+Update 10/3/18 [\(\#891](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5b96dbd9b97639001dd69a30)\)
+
+> System must be able to pull disaggregated data from HR to QPR if data is entered for all disaggregations in a HR for all locations for all high frequency indicators
+>
+> System must inform the user that if data for any disaggregation for any location is missing than system will not pull the disaggregated data from HR to QPR, in this scenario only the totals will be pulled.
+>
+> When we pull data from HR to QPR the calculation is always sum. This is because in HR we are reporting “data over the reporting period” and not “cumulative to date” therefore QPR = HR1 + HR2 + HR3.
+
+
+
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 
 QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).  
