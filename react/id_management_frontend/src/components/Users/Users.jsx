@@ -15,10 +15,10 @@ import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
 import {PRP_ROLE, USER_STATUS, USER_TYPE} from "../../constants";
 import withProps from "../hoc/withProps";
-import {user, portal} from "../../helpers/props";
+import {portal, user} from "../../helpers/props";
 import {hasAnyRole} from "../../helpers/user";
 import AoAlert from "./AoAlert";
-import {FETCH_OPTIONS, fetch, fetchInvalidate} from "../../fetch";
+import {fetch, FETCH_OPTIONS, fetchInvalidate} from "../../fetch";
 import {connect} from "react-redux";
 import {PORTALS} from "../../actions";
 
@@ -90,8 +90,8 @@ class Users extends Component {
         this.props.handleDialogOpen("addPermissions");
     }
 
-    openEditPermissionsDialog(permission) {
-        this.setState({selectedPermission: permission});
+    openEditPermissionsDialog(user, permission) {
+        this.setState({selectedUser: user, selectedPermission: permission});
         this.props.handleDialogOpen("editPermission");
     }
 
