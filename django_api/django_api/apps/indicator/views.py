@@ -23,7 +23,7 @@ from core.permissions import (
     HasAnyRole,
 )
 from core.paginations import SmallPagination
-from core.models import Location, Workspace
+from core.models import Location
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -844,7 +844,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
                 'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
                 'email/notify_imo_on_cluster_indicator_change_request.html',
                 context,
-                to_email_list=[imo_user.email,],
+                to_email_list=[imo_user.email, ],
                 fail_silently=False,
                 reply_to=[request.user.email],
                 content_subtype='html',
