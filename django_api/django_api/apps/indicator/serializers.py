@@ -1140,16 +1140,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "cannot be empty"}
             )
 
-        baseline_value = float(validated_data['baseline']['v']) if float(validated_data['baseline']['d']) == 1 else \
-            float(validated_data['baseline']['v']) / float(validated_data['baseline']['d'])
-
         target_value = float(validated_data['target']['v']) if float(validated_data['target']['d']) == 1 else \
             float(validated_data['target']['v']) / float(validated_data['target']['d'])
-
-        if baseline_value > target_value:
-            raise ValidationError(
-                {"baseline": "Cannot be greater than target"}
-            )
 
         if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "":
             if 'd' not in validated_data['in_need']:
