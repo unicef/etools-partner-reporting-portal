@@ -11,6 +11,7 @@ import PlainButton from "../common/PlainButton";
 import withProps from "../hoc/withProps";
 import {permissions} from "../../helpers/props";
 import SmallValue from "../common/SmallText";
+import {USER_TYPE} from "../../constants";
 
 const labels = getLabels({
     userType: "User type",
@@ -53,7 +54,7 @@ class UserRowExpanded extends Component {
             <Fragment>
                 {permissions.editUserPermission(role, row) &&
                 <Fragment>
-                    <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
+                    <LinkButton label={labels.edit} onClick={() => onPermissionEdit(row, role)}/>
                     <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
                 </Fragment>}
 
@@ -78,15 +79,14 @@ class UserRowExpanded extends Component {
     render() {
         const {row, portal, classes, onPermissionsAdd, onMakeSystemAdmin, permissions} = this.props;
         const roles = row.prp_roles;
-        const userTypeLabel = row.user_type ? getUserTypeLabel(row.user_type) : null;
+        const userTypeLabel = getUserTypeLabel(row.user_type || (row.partner ? USER_TYPE.PARTNER : USER_TYPE.IMO));
 
         return (
             <div className={classes.container}>
-                {row.user_type &&
                 <div className={roles.length ? classes.userType : ''}>
                     <Typography variant="caption" gutterBottom>{labels.userType}</Typography>
                     <SmallValue>{userTypeLabel}</SmallValue>
-                </div>}
+                </div>
 
                 {roles.length > 0 &&
                 <Typography variant="caption" gutterBottom>{roleCaption[portal]}</Typography>}

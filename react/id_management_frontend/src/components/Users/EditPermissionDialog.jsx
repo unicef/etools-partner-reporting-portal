@@ -4,7 +4,7 @@ import DialogActions from "../common/DialogActions";
 import {Button, Grid, Typography} from "@material-ui/core";
 import {reduxForm} from 'redux-form';
 import labels from "../../labels";
-import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS, USER_TYPE, USER_TYPE_ROLES} from "../../constants";
 import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
@@ -94,9 +94,10 @@ EditPermissionDialog.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
     const userRole = getUserRole(state.user, ownProps.permission, state.portal);
+    const userType = ownProps.user.user_type || (ownProps.user.partner ? USER_TYPE.PARTNER : USER_TYPE.IMO);
 
     return {
-        roleOptions: EDITABLE_PRP_ROLE_OPTIONS[userRole],
+        roleOptions: EDITABLE_PRP_ROLE_OPTIONS[userRole].filter(option => USER_TYPE_ROLES[userType].indexOf(option.value) > -1),
         initialValues: {
             workspace: ownProps.permission.workspace ? ownProps.permission.workspace.title : null,
             role: ownProps.permission.role,
