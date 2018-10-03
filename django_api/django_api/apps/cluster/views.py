@@ -457,7 +457,6 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
 
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
-    get_queryset = IndicatorReportsListAPIView.get_queryset
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -475,6 +474,33 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
                 Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
+
+    def get_user_check_kwarg(self, key):
+        key = key + 'prp_roles__user'
+        if not self.request.user.is_cluster_system_admin:
+            return {key: self.request.user}
+        return {}
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs['response_plan_id']
+        queryset = IndicatorReport.objects.filter(
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
+            | Q(reportable__partner_activities__isnull=False)
+        ).filter(
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
+                **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))  # noqa: E501
+        ).distinct()
+        return queryset
 
 
 class ClusterReportablesIdListAPIView(ListAPIView):

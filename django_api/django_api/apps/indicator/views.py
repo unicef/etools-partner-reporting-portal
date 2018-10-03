@@ -685,26 +685,15 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     """
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
-    permission_classes = (IsAuthenticated, )
-
-    def check_permissions(self, request):
-        super().check_permissions(request)
-
-        indicator_location_data_id = request.data['id']
-
-        roles_permitted = [
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
-        ]
-
-        user_workspaces = Workspace.objects.user_workspaces(request.user, roles_permitted).values_list('id', flat=True)
-
-        if not IndicatorLocationData.objects.filter(
-                id=indicator_location_data_id,
-                indicator_report__progress_report__programme_document__workspace__in=user_workspaces
-        ).exists():
-            self.permission_denied(request)
+        )
+    )
 
     def get_object(self, request, pk=None):
         return get_object_or_404(IndicatorLocationData, id=pk)
