@@ -831,7 +831,6 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             "indicator_name": reportable.blueprint.title,
             "partner_name": request.user.partner.title,
             "sender_user": request.user,
-            "imo_user": imo_users,
             "message": serializer.validated_data['message'],
             "target_url": imo_frontend_indicators_url,
             "project_name": project_name,
@@ -839,15 +838,17 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             "locations": reportable.locations.all(),
         }
 
-        send_email_from_template(
-            'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
-            'email/notify_imo_on_cluster_indicator_change_request.html',
-            context,
-            to_email_list=list(imo_users.values_list('email', flat=True)),
-            fail_silently=False,
-            reply_to=[request.user.email],
-            content_subtype='html',
-        )
+        for imo_user in imo_users:
+            context["imo_user"] = imo_user
+            send_email_from_template(
+                'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
+                'email/notify_imo_on_cluster_indicator_change_request.html',
+                context,
+                to_email_list=list(imo_user.email),
+                fail_silently=False,
+                reply_to=[request.user.email],
+                content_subtype='html',
+            )
 
         return Response('OK', status=status.HTTP_200_OK)
 
