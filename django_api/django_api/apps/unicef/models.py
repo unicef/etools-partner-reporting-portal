@@ -366,9 +366,9 @@ class ProgressReport(TimeStampedModel):
     Represents a report on multiple lower level outputs by a partner
     for a certain time period, against a PD.
     """
-    partner_contribution_to_date = models.CharField(max_length=256, blank=True, null=True)
-    challenges_in_the_reporting_period = models.CharField(max_length=256, blank=True, null=True)
-    proposed_way_forward = models.CharField(max_length=256, blank=True, null=True)
+    partner_contribution_to_date = models.TextField(blank=True, null=True)
+    challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
+    proposed_way_forward = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="progress_reports",
@@ -407,7 +407,7 @@ class ProgressReport(TimeStampedModel):
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
-    narrative = models.CharField(verbose_name="Narrative", max_length=256, blank=True, null=True)
+    narrative = models.TextField(verbose_name="Narrative", blank=True, null=True)
 
     class Meta:
         ordering = ['-due_date', '-id']
