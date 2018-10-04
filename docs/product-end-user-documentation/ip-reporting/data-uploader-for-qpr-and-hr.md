@@ -12,6 +12,8 @@ For IP, we will be adding the ability to upload data for only 1 specific Quarter
 
 \*\*\*\*[https://docs.google.com/spreadsheets/d/1MxIL5oaC0SFPm\_3ioKKemtnVWPWi9Qq3ougTKcuPgjQ/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1MxIL5oaC0SFPm_3ioKKemtnVWPWi9Qq3ougTKcuPgjQ/edit?usp=sharing)
 
+User also will be able to add or modify text on upload template for QPR _**Other Info**_ section. 
+
 ###  **HR uploader template:**
 
 \*\*\*\*[https://docs.google.com/spreadsheets/d/1o37yK3mbKHYopYF1mr\_6UcsYX2FWKBZKeVsnh6lUjYM/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1o37yK3mbKHYopYF1mr_6UcsYX2FWKBZKeVsnh6lUjYM/edit?usp=sharing)
