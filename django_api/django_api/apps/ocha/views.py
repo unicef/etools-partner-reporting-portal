@@ -14,6 +14,7 @@ from core.permissions import (
     AnyPermission,
     IsClusterSystemAdmin,
     IsAuthenticated,
+    HasAnyRole,
 )
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
@@ -95,17 +96,13 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
 class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
-    permission_classes = (IsAuthenticated, )
-
-    def check_permissions(self, request):
-        super().check_permissions(request)
-        response_plan_id = self.kwargs['id']
-
-        if not request.user.prp_roles.filter(
-            Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-            Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
-        ).exists():
-            self.permission_denied(request)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+        ),
+    )
 
     def get(self, request, *args, **kwargs):
         source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(self.kwargs['id'])
@@ -223,18 +220,14 @@ class RPMProjectListAPIView(APIView):
 
 class RPMProjectDetailAPIView(APIView):
 
-    permission_classes = (IsAuthenticated, )
-
-    def check_permissions(self, request):
-        super().check_permissions(request)
-        project_id = self.kwargs['id']
-
-        if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__partner_projects=project_id) |
-                Q(role=PRP_ROLE_TYPES.ip_authorized_officer, user__partner__partner_projects=project_id)
-        ).exists():
-            self.permission_denied(request)
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.ip_authorized_officer,
+        ),
+    )
 
     def get(self, request, *args, **kwargs):
         details_url = HPC_V2_ROOT_URL + 'project/{}'.format(self.kwargs['id'])
