@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -122,7 +123,9 @@ class Cluster(TimeStampedExternalSourceModel):
 
     @cached_property
     def partner_activity_reportables_queryset(self):
-        return Reportable.objects.filter(partner_activities__partner__clusters=self).distinct()
+        return Reportable.objects.filter(
+            Q(partner_activities__cluster_activity__cluster_objective__cluster=self)
+            | Q(partner_activities__cluster_objective__cluster=self)).distinct()
 
     @cached_property
     def latest_indicator_reports(self):
