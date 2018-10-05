@@ -4,7 +4,7 @@ import django_filters
 from django_filters.filters import CharFilter
 
 from core.common import INDICATOR_REPORT_STATUS
-from indicator.models import IndicatorReport
+from indicator.models import IndicatorReport, Reportable
 from .models import ClusterObjective, ClusterActivity, Cluster
 
 
@@ -110,7 +110,11 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
         ).distinct()
 
     def get_indicator(self, queryset, name, value):
-        return queryset.filter(reportable=value)
+        reportable = Reportable.objects.get(id=value)
+        if isinstance(reportable.content_object, ClusterActivity):
+            return queryset.filter(Q(reportable=reportable) | Q(reportable__parent_indicator=reportable)).distinct()
+        else:
+            return queryset.filter(reportable=reportable)
 
     def get_project(self, queryset, name, value):
         return queryset.filter(

@@ -556,8 +556,6 @@ class ClusterReportablesIdListAPIView(ListAPIView):
                 **self.get_user_check_kwarg('cluster_activities__cluster_objective__cluster__'))
             | Q(partner_projects__clusters__response_plan=response_plan_id,
                 **self.get_user_check_kwarg('partner_projects__clusters__'))
-            | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
             | Q(partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
                 **self.get_user_check_kwarg('partner_activities__cluster_objective__cluster__'))  # noqa: E501
         ).distinct()
