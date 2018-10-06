@@ -486,7 +486,7 @@ def process_programme_documents(fast=False, area=False):
                                             reportable.ca_indicator_used_by_reporting_entity = cai
 
                                             # Force adoption of PartnerActivity from ClusterActivity Indicator
-                                            if pd.partner.id not in cai.partner_activities.values_list(
+                                            if pd.partner.id not in cai.content_object.partner_activities.values_list(
                                                     'partner', flat=True):
                                                 try:
                                                     # TODO: Figure out what to put for
