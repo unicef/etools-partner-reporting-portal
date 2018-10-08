@@ -36,5 +36,21 @@
             "domain": "dev.partnerreportingportal.org",
             "name": "dev.partnerreportingportal.org"
         }
+    },
+    {
+        "model": "sites.site",
+        "pk": 7,
+        "fields": {
+            "domain": "demo.partnerreportingportal.org",
+            "name": "demo.partnerreportingportal.org"
+        }
+    },
+    {
+        "model": "sites.site",
+        "pk": 8,
+        "fields": {
+            "domain": "prod.partnerreportingportal.org",
+            "name": "prod.partnerreportingportal.org"
+        }
     }
 ]
