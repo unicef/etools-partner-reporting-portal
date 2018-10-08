@@ -398,7 +398,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if not clusters or clusters == []:
             clusters = self.all_clusters
 
-        qset = PartnerProject.objects.filter(clusters__in=clusters)
+        qset = PartnerProject.objects.filter(clusters__in=clusters).distinct()
         if partner:
             qset = qset.filter(partner=partner)
         return qset.count()
@@ -481,7 +481,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if not clusters or clusters == []:
             clusters = self.all_clusters
         qset = partner.partner_activities.filter(
-            partner__clusters__in=clusters)
+            partner__clusters__in=clusters).distinct()
         if limit:
             qset = qset[:limit]
         return qset
