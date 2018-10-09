@@ -128,7 +128,7 @@ class ProgressReportListPDFExporter(ProgressReportDetailPDFExporter):
     template_name = 'progress_report_list_pdf_export.html'
 
     def __init__(self, progress_reports):
-        self.progress_reports = progress_reports
+        self.progress_reports = progress_reports or []
         super(ProgressReportListPDFExporter, self).__init__(progress_reports.first())
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Progress Reports Summary'.format(
             timezone.now(), progress_reports.count()
