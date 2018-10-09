@@ -798,7 +798,8 @@ class ProgressReportPullHFDataAPIView(APIView):
         # For each location index
         for loc_id in calculated:
             # Filter IndicatorLocationData instances by this location ID
-            target_hf_ilds_by_loc = target_hf_ilds.filter(location_id=loc_id)
+            target_hf_ilds_by_loc = target_hf_ilds.filter(location_id=loc_id) \
+                .exclude(disaggregation={'()': {'c': 0, 'd': 0, 'v': 0}})
 
             if target_hf_ilds_by_loc.exists():
                 # Set the target disaggregation reported IDs among IndicatorLocationData from first instance
