@@ -196,7 +196,7 @@
 
     <template
       is="dom-if"
-      if="[[permissions.addPartnerToProject]]"
+      if="[[permissions.addPartnerToProject()]]"
       restamp="true">
       <partner-dropdown-content
         partners="{{ partners }}"
@@ -248,7 +248,7 @@
           restamp="true">
           <template
             is="dom-if"
-            if="[[permissions.addPartnerToProject]]"
+            if="[[permissions.addPartnerToProject()]]"
             restamp="true">
             <template
               is="dom-if"
@@ -1062,7 +1062,7 @@
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
-        return permissions.addPartnerToProject && edit;
+        return permissions.addPartnerToProject() && edit;
       },
 
       _validate: function (e) {
@@ -1070,7 +1070,7 @@
       },
 
       _redirectToDetail: function (id) {
-        var path = this.permissions.addPartnerToProject
+        var path = this.permissions.addPartnerToProject()
           ? 'response-parameters/partners/project/' + String(id)
           : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
