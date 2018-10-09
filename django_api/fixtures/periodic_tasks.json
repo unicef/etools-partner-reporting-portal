@@ -12,15 +12,22 @@
     "model": "djcelery.intervalschedule",
     "pk": 1,
     "fields": {
-        "every": 1,
+        "every": 30,
         "period": "minutes"
     }
 }, {
     "model": "djcelery.intervalschedule",
     "pk": 2,
     "fields": {
-        "every": 2,
+        "every": 24,
         "period": "hours"
+    }
+}, {
+    "model": "djcelery.intervalschedule",
+    "pk": 3,
+    "fields": {
+        "every": 5,
+        "period": "minutes"
     }
 }, {
     "model": "djcelery.periodictask",
@@ -28,9 +35,9 @@
     "fields": {
         "name": "Due/Overdue report checker",
         "task": "indicator.tasks.process_due_reports",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
-        "interval": 1
+        "interval": 3
     }
 }, {
     "model": "djcelery.periodictask",
@@ -38,9 +45,9 @@
     "fields": {
         "name": "Report generator",
         "task": "core.tasks.process_period_reports",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
-        "interval": 1
+        "interval": 3
     }
 }, {
     "model": "djcelery.periodictask",
@@ -48,7 +55,7 @@
     "fields": {
         "name": "Workspace sync",
         "task": "core.tasks.process_workspaces",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 2
     }
@@ -58,7 +65,7 @@
     "fields": {
         "name": "Partner sync",
         "task": "partner.tasks.process_partners",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 2
     }
@@ -68,9 +75,9 @@
     "fields": {
         "name": "ProgrammeDocument sync",
         "task": "unicef.tasks.process_programme_documents",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
-        "interval": 2
+        "interval": 1
     }
 }, {
     "model": "djcelery.periodictask",
@@ -78,7 +85,7 @@
     "fields": {
         "name": "celery.backend_cleanup",
         "task": "celery.backend_cleanup",
-        "enabled": true,
+        "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "crontab": 1
     }

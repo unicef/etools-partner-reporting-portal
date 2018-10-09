@@ -372,7 +372,10 @@ def process_period_reports():
 
                 else:
                     # Filter non-Cluster reportables first
-                    queryset = reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=True)
+                    queryset = reportable_queryset.filter(
+                        ca_indicator_used_by_reporting_entity__isnull=True,
+                        is_unicef_hf_indicator=True
+                    )
 
                 ir_list = list()
 
