@@ -417,15 +417,7 @@
       },
 
       _computeMode: function (mode, overrideMode, report, permissions) {
-        var computedMode = overrideMode || mode;
-
-        switch (true) {
-          case report.status === 'Sen' || !permissions.savePdReport:
-            return 'view';
-
-          default:
-            return computedMode;
-        }
+        return permissions.savePdReport ? (overrideMode || mode) : 'view';
       },
 
       _computeReportableData: function (data) {
