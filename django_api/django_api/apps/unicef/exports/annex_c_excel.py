@@ -75,7 +75,7 @@ class ProgressReportsXLSXExporter:
             include_disaggregations=None,
             export_to_single_sheet=None,
     ):
-        self.progress_reports = progress_reports
+        self.progress_reports = progress_reports or list()
         filename = ''.join([
             str(time.time()) + str(random.randint(10000000, 100000000))
         ])
@@ -182,19 +182,20 @@ class ProgressReportsXLSXExporter:
         return general_info_row
 
     def fill_workbook(self):
-        progress_reports = self.progress_reports.select_related(
-            'programme_document'
-        ).prefetch_related('indicator_reports')
+        if self.progress_reports:
+            progress_reports = self.progress_reports.select_related(
+                'programme_document'
+            ).prefetch_related('indicator_reports')
 
-        if self.export_to_single_sheet:
-            self.current_sheet.title = 'PRs Export'
-            self.write_progress_reports_to_current_sheet(progress_reports)
-        else:
-            for progress_report in progress_reports:
-                if not self.current_sheet.max_row == 1:
-                    self.current_sheet = self.workbook.create_sheet()
-                self.current_sheet.title = 'PR{} Export'.format(progress_report.pk)
-                self.write_progress_reports_to_current_sheet([progress_report])
+            if self.export_to_single_sheet:
+                self.current_sheet.title = 'PRs Export'
+                self.write_progress_reports_to_current_sheet(progress_reports)
+            else:
+                for progress_report in progress_reports:
+                    if not self.current_sheet.max_row == 1:
+                        self.current_sheet = self.workbook.create_sheet()
+                    self.current_sheet.title = 'PR{} Export'.format(progress_report.pk)
+                    self.write_progress_reports_to_current_sheet([progress_report])
 
         self.workbook.save(self.file_path)
 
