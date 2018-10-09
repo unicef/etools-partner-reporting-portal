@@ -13,17 +13,16 @@
         display: block;
       }
     </style>
-
-    <template is="dom-if" if="[[canExport]]" restamp="true">
-      <etools-prp-toolbar
-        query="{{ query }}"
-        pd-id="{{ pdId }}"
-        location-id="{{ locationId }}"
-      >
+    <etools-prp-toolbar
+      query="{{ query }}"
+      pd-id="{{ pdId }}"
+      location-id="{{ locationId }}"
+    >
+      <template is="dom-if" if="[[canExport]]" restamp="true">
         <download-button url="[[xlsExportUrl]]">XLS</download-button>
         <download-button url="[[pdfExportUrl]]">PDF</download-button>
-      </etools-prp-toolbar>
-    </template>
+      </template>
+    </etools-prp-toolbar>
   </template>
 
   <script>
