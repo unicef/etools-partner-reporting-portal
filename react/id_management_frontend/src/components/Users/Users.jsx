@@ -70,7 +70,7 @@ class Users extends Component {
         this.setAoFilter = this.setAoFilter.bind(this);
         this.onFilterReset = this.onFilterReset.bind(this);
 
-        if (this.state.isAo) {
+        if (this.state.isAo && props.portal === PORTALS.IP) {
             props.fetchOtherAo();
         }
     }
@@ -167,19 +167,21 @@ class Users extends Component {
     }
 
     patchAo(permission, is_active) {
-        const {fetchOtherAo, invalidateOtherAo} = this.props;
+        const {fetchOtherAo, invalidateOtherAo, portal} = this.props;
 
         api.patch(`id-management/role-group/${permission.id}/`, {is_active})
             .then(this.closeAndReload);
 
-        invalidateOtherAo();
-        fetchOtherAo();
+        if (portal === PORTALS.IP) {
+            invalidateOtherAo();
+            fetchOtherAo();
+        }
     }
 
     render() {
         const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, reload, otherAo, portal} = this.props;
 
-        const showAoAlert = this.state.isAo && otherAo;
+        const showAoAlert = portal === PORTALS.IP && this.state.isAo && otherAo;
         const dialogWidth = portal === PORTALS.IP ? 'sm' : 'md';
 
         return (
