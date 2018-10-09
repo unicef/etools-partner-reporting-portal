@@ -163,8 +163,6 @@
       },
 
       _hasFeedback: function (currentReport) {
-        console.log(currentReport);
-
         return !!(this._equals(currentReport.status, 'Sen') && currentReport.sent_back_feedback);
       },
 
