@@ -167,13 +167,15 @@ class Users extends Component {
     }
 
     patchAo(permission, is_active) {
-        const {fetchOtherAo, invalidateOtherAo} = this.props;
+        const {fetchOtherAo, invalidateOtherAo, portal} = this.props;
 
         api.patch(`id-management/role-group/${permission.id}/`, {is_active})
             .then(this.closeAndReload);
 
-        invalidateOtherAo();
-        fetchOtherAo();
+        if (portal === PORTALS.IP) {
+            invalidateOtherAo();
+            fetchOtherAo();
+        }
     }
 
     render() {

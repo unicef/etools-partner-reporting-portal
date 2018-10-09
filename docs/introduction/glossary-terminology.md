@@ -50,7 +50,7 @@
 
 Some helpful information about the partnership cycle, terminology, reporting cycle, standard forms etc. can be found here:
 
-{% embed data="{\"url\":\"https://www.unicef.org/about/partnerships/index\_60035.html\",\"type\":\"link\",\"title\":\"Partnership Cycle\",\"icon\":{\"type\":\"icon\",\"url\":\"https://www.unicef.org/css/144x144\_iPad\_Retina.png\",\"width\":144,\"height\":144,\"aspectRatio\":1},\"thumbnail\":{\"type\":\"thumbnail\",\"url\":\"https://www.unicef.org/about/partnerships/images/unicef\_facebook\_200x382.png\",\"width\":382,\"height\":200,\"aspectRatio\":0.5235602094240838}}" %}
+{% embed url="https://www.unicef.org/about/partnerships/index\_60035.html" %}
 
 
 

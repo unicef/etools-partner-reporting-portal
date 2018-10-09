@@ -33,13 +33,19 @@ In the above example, QPR 1 will be able to pull in aggregated data for high fre
 ![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](https://lh5.googleusercontent.com/TP_omlOo1rkfOl04lrsxBSmBiJcM_QWHDLTc-lDKex419eV_wbFJJLUTVJbNKy91VVMrraUKFV6IDxrz3hzmox0V726LDJvwuuwCtEwSYfcHftIAhgvNRqGXvRLJi8agHXB46O18)
 
   
-Update 10/3/18 [\(\#891](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5b96dbd9b97639001dd69a30)\)
+Update 10/9/18 [\(\#891](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5b96dbd9b97639001dd69a30)\)
 
-> System must be able to pull disaggregated data from HR to QPR if data is entered for all disaggregations in a HR for all locations for all high frequency indicators
+> Pulling disaggregated data from HR to QPR
 >
-> System must inform the user that if data for any disaggregation for any location is missing than system will not pull the disaggregated data from HR to QPR, in this scenario only the totals will be pulled.
+> There are 3 cases. It will pull totals only, it may pull partial, or may pull full. System looks at the first indicator data on each location and determines what type of data to pull. If the first indicator data on the location has totals only, then it will only pull totals moving forward for that indicator in the location from other HR reports.
 >
-> When we pull data from HR to QPR the calculation is always sum. This is because in HR we are reporting “data over the reporting period” and not “cumulative to date” therefore QPR = HR1 + HR2 + HR3.
+> Example situations below.
+>
+> Indicator has Age, Gender, Height Disaggregation on Location A/B/C. The following steps will happen for each location:
+>
+> * Example 1:  The first report data on a location had only Age disaggregated data, then it will only get Age data from the other two. If the first report data on a location had Age + Gender + Height, then it will pull fully disaggregated data from the other two.
+> * Example 2:  The first report data on a location had only Age + Gender disaggregated data, then it will pull the Age + Gender disaggregation data from the other two.
+> * Example 3: The first report data on a location had only Age + Gender, but the second report data on a location has different disaggregation \(Age disaggregation only or totals only\), we will only pull totals only. In order to pull partial disaggregation, all report data on a location must have partial disaggregation.
 
 
 

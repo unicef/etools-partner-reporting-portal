@@ -16,7 +16,7 @@ import time
 from django.utils import timezone
 
 from indicator.constants import ValueType
-from indicator.models import Disaggregation
+from indicator.models import Disaggregation, IndicatorBlueprint
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.models import ProgressReport
 
@@ -145,7 +145,8 @@ class ProgressReportsXLSXExporter:
             (indicator_report.narrative_assessment, None),
             (indicator_report.reportable.blueprint.title, None),
             (indicator_report.display_type, None),
-            (indicator_target, None),
+            (indicator_target * 100 if indicator_report.display_type == IndicatorBlueprint.PERCENTAGE else
+             indicator_target, None),
             (indicator_report.calculation_formula_across_locations, None),
             (indicator_report.calculation_formula_across_periods, None),
             (previous_location_progress, indicator_report_value_format),
