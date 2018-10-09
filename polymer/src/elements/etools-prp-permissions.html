@@ -8,15 +8,8 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-        function getFunctionName(fun) {
-          var ret = fun.toString();
-          ret = ret.substr('function '.length);
-          ret = ret.substr(0, ret.indexOf('('));
-          return ret;
-        }
-
         var checkInResponsePlan = function (roles) {
-          return function immediate(params) {
+          return function (params) {
             return params.prpRoles.filter(function (role) {
               return params.responsePlan && params.responsePlan.clusters.some(function (cluster) {
                 return role.cluster && cluster.id === role.cluster.id;
@@ -280,10 +273,6 @@
                     });
 
                   case typeof granted === 'function':
-                    if (getFunctionName(granted) === 'immediate') {
-                      return granted(params);
-                    }
-
                     return function () {
                       var args = [].slice.call(arguments);
 

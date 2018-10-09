@@ -56,7 +56,7 @@
 
       <template
           is="dom-if"
-          if="[[permissions.createClusterEntities]]"
+          if="[[permissions.createClusterEntities()]]"
           restamp="true">
         <cluster-activities-modal id="modal"></cluster-activities-modal>
 

@@ -111,7 +111,7 @@
       },
 
       _canEditActivity: function(permissions, clusterId) {
-        if (permissions.createClusterEntities) {
+        if (permissions.createClusterEntities()) {
           return permissions.createClusterEntitiesForCluster(clusterId);
         }
         return false;
