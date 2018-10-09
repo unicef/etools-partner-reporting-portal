@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
 
 <dom-module id="pd-reports-toolbar">
   <template>
@@ -13,14 +14,16 @@
       }
     </style>
 
-    <etools-prp-toolbar
-      query="{{query}}"
-      pd-id="{{pdId}}"
-      location-id="{{locationId}}"
-    >
-      <download-button url="[[xlsExportUrl]]">XLS</download-button>
-      <download-button url="[[pdfExportUrl]]">PDF</download-button>
-    </etools-prp-toolbar>
+    <template is="dom-if" if="[[canExport]]" restamp="true">
+      <etools-prp-toolbar
+        query="{{ query }}"
+        pd-id="{{ pdId }}"
+        location-id="{{ locationId }}"
+      >
+        <download-button url="[[xlsExportUrl]]">XLS</download-button>
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
+      </etools-prp-toolbar>
+    </template>
   </template>
 
   <script>
@@ -29,9 +32,20 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
+        totalResults: {
+          type: Number,
+          statePath: App.Selectors.ProgrammeDocumentReports.count,
+        },
+
+        canExport: {
+          type: Boolean,
+          computed: '_canExport(totalResults)'
+        },
+
         pdReportsUrl: {
           type: String,
           computed: '_computePdReportsUrl(locationId)',
@@ -55,6 +69,10 @@
 
       _computePdReportsUrl: function (locationId) {
         return App.Endpoints.programmeDocumentReports(locationId);
+      },
+
+      _canExport: function (totalResults) {
+        return totalResults > 0;
       },
 
       _computePdQuery: function (pdId) {
