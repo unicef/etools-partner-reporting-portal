@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime
+from itertools import chain
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -47,6 +49,7 @@ from indicator.serializers import (
 )
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
+from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from partner.models import Partner
 from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
 
@@ -786,19 +789,68 @@ class ProgressReportPullHFDataAPIView(APIView):
             time_period_end__lte=self.progress_report.end_date,
             reportable=indicator_report.reportable,
         )
+        target_hf_ilds = IndicatorLocationData.objects.filter(
+            indicator_report__in=target_hf_irs,
+        )
 
-        calculated = {loc_id: {'c': 0, 'v': 0, 'd': 0} for loc_id in locations}
+        calculated = {loc_id: {'total': dict(), 'data': dict()} for loc_id in locations}
 
-        for ir in target_hf_irs:
-            for ild in ir.indicator_location_data.all():
-                calculated[ild.location.id]['c'] += ild.disaggregation['()']['c']
-                calculated[ild.location.id]['v'] += ild.disaggregation['()']['v']
+        # For each location index
+        for loc_id in calculated:
+            # Filter IndicatorLocationData instances by this location ID
+            target_hf_ilds_by_loc = target_hf_ilds.filter(location_id=loc_id) \
+                .exclude(disaggregation={'()': {'c': 0, 'd': 0, 'v': 0}})
 
-                if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                    calculated[ild.location.id]['d'] = 1
+            if target_hf_ilds_by_loc.exists():
+                # Set the target disaggregation reported IDs among IndicatorLocationData from first instance
+                target_disaggregation_reported_on = sorted(target_hf_ilds_by_loc[0].disaggregation_reported_on)
 
+                is_all_empty = all(
+                    map(
+                        lambda x: x == [],
+                        target_hf_ilds_by_loc.values_list('disaggregation_reported_on', flat=True)
+                    )
+                )
+                is_all_matched_up = all(
+                    map(
+                        lambda x: sorted(x) == target_disaggregation_reported_on,
+                        target_hf_ilds_by_loc.values_list('disaggregation_reported_on', flat=True)
+                    )
+                )
+
+                if is_all_empty or not is_all_matched_up:
+                    calculated[loc_id]['total'] = {'c': 0, 'd': 0, 'v': 0}
+
+                    # Store location_totals only for each IndicatorLocationData
+                    for ild in target_hf_ilds_by_loc:
+                        calculated[loc_id]['total']['c'] += ild.disaggregation['()']['c']
+                        calculated[loc_id]['total']['v'] += ild.disaggregation['()']['v']
+
+                        if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                            calculated[loc_id]['total']['d'] = 1
+
+                        else:
+                            calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
                 else:
-                    calculated[ild.location.id]['d'] += ild.disaggregation['()']['d']
+                    target_keys = target_hf_ilds_by_loc[0].disaggregation.keys()
+
+                    # Accumulate disaggregation value per key
+                    for ild in target_hf_ilds_by_loc:
+                        if ild.disaggregation['()'] == {'c': 0, 'd': 0, 'v': 0}:
+                            continue
+
+                        for key in target_keys:
+                            if key not in calculated[loc_id]['data']:
+                                calculated[loc_id]['data'][key] = {'c': 0, 'd': 0, 'v': 0}
+
+                            calculated[loc_id]['data'][key]['c'] += ild.disaggregation[key]['c']
+                            calculated[loc_id]['data'][key]['v'] += ild.disaggregation[key]['v']
+
+                            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                                calculated[loc_id]['data'][key]['d'] = 1
+
+                            else:
+                                calculated[loc_id]['data'][key]['d'] += ild.disaggregation[key]['d']
 
         return calculated
 
@@ -815,24 +867,30 @@ class ProgressReportPullHFDataAPIView(APIView):
     def post(self, request, *args, **kwargs):
         indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
         locations = indicator_report.indicator_location_data.values_list('location', flat=True)
-        loc_totals = {loc_id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc_id in locations}
-
         consolidated_total_per_location_dict = self._calculate_report_location_totals_per_reports(
             indicator_report,
             hf_reports,
             locations
         )
 
-        # Data pull total consolidation
-        for loc_id, total in consolidated_total_per_location_dict.items():
-            loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
-
         # Data pull updates
         for ild in indicator_report.indicator_location_data.all():
-            ild.disaggregation = loc_totals[ild.location.id]
+            data_dict = consolidated_total_per_location_dict[ild.location.id]
+
+            if data_dict['data'] != dict():
+                ild.disaggregation = data_dict['data']
+            else:
+                ild.disaggregation = {'()': data_dict['total']}
+
             ild.save()
 
-        return Response(loc_totals, status=statuses.HTTP_200_OK)
+        if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+            QuantityIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
+
+        if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+            RatioIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
+
+        return Response({'total': indicator_report.total}, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportReviewAPIView(APIView):

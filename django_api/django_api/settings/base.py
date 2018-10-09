@@ -276,7 +276,7 @@ DATE_FORMAT = PRINT_DATA_FORMAT
 
 INPUT_DATA_FORMAT = "%Y-%m-%d"
 
-LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
+# LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
 
 LOGGING = {
     'version': 1,
