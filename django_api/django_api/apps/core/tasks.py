@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -25,6 +26,7 @@ from unicef.models import ProgrammeDocument
 from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport, ReportingEntity
 
 
+logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15
 
 
@@ -37,20 +39,20 @@ def process_workspaces():
     # Create workspaces
     try:
         for data in workspaces_data:
-            print("Create Workspace: %s" % data['name'])
+            logger.info("Create Workspace: %s" % data['name'])
             if not data['country_short_code']:
-                print("\tNo country_short_code - skipping!")
+                logger.warning("\tNo country_short_code - skipping!")
                 continue
             serializer = PMPWorkspaceSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             workspace = serializer.save()
-            print("Create Country for Workspace: {}".format(data['country_short_code']))
+            logger.info("Create Country for Workspace: {}".format(data['country_short_code']))
             country, created = Country.objects.get_or_create(
                 name=workspace.title, country_short_code=data['country_short_code']
             )
             workspace.countries.add(country)
     except Exception as e:
-        print(e)
+        logger.exception(e)
         raise
 
 
@@ -58,9 +60,14 @@ def process_workspaces():
 def process_period_reports():
     # Cluster reporting Indicator report generation first
     for reportable in Reportable.objects.filter(
-            content_type__model__in=['partnerproject', 'partneractivity', 'clusterobjective'], active=True
+        content_type__model__in=[
+            'partnerproject',
+            'partneractivity',
+            'clusterobjective'
+        ],
+        active=True
     ):
-        print("Processing Reportable {}".format(reportable))
+        logger.info("Processing Reportable {}".format(reportable))
 
         if reportable.locations.count() == 0:
             continue
@@ -69,7 +76,7 @@ def process_period_reports():
         latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
 
         if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-            print("Indicator {} frequency is custom specific dates".format(reportable))
+            logger.info("Indicator {} frequency is custom specific dates".format(reportable))
 
             if not latest_indicator_report:
                 date_list = list()
@@ -90,7 +97,7 @@ def process_period_reports():
         else:
             # Get missing date list based on progress report existence
             if latest_indicator_report:
-                print("Indicator {} IndicatorReport Found with period of {} - {} ".format(
+                logger.info("Indicator {} IndicatorReport Found with period of {} - {} ".format(
                     reportable,
                     latest_indicator_report.time_period_start,
                     latest_indicator_report.time_period_end
@@ -102,10 +109,10 @@ def process_period_reports():
                     frequency,
                 )
             else:
-                print("Indicator {} IndicatorReport Not Found".format(reportable))
+                logger.info("Indicator {} IndicatorReport Not Found".format(reportable))
                 date_list = find_missing_frequency_period_dates_for_indicator_report(reportable, None, frequency)
 
-        print("Missing dates: {}".format(date_list))
+        logger.info("Missing dates: {}".format(date_list))
 
         with transaction.atomic():
             last_element_idx = len(date_list) - 1
@@ -121,7 +128,7 @@ def process_period_reports():
                     end_date = calculate_end_date_given_start_date(start_date, frequency)
 
                 if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                    print("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
+                    logger.info("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
                         reportable, start_date, end_date
                     ))
 
@@ -139,7 +146,7 @@ def process_period_reports():
                     )
 
                     for location in reportable.locations.all():
-                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                        logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                             indicator_report, start_date, end_date
                         ))
 
@@ -156,7 +163,7 @@ def process_period_reports():
                         )
 
                 else:
-                    print("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
+                    logger.info("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
                         reportable, start_date, end_date
                     ))
 
@@ -174,7 +181,7 @@ def process_period_reports():
                     )
 
                     for location in reportable.locations.all():
-                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                        logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                             indicator_report, start_date, end_date
                         ))
 
@@ -215,8 +222,8 @@ def process_period_reports():
 
     # PD report generation
     for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
-        print("\nProcessing ProgrammeDocument {}".format(pd.id))
-        print(10 * "****")
+        logger.info("\nProcessing ProgrammeDocument {}".format(pd.id))
+        logger.info(10 * "****")
 
         # Get Active LLO indicators only
         reportable_queryset = pd.reportable_queryset.filter(active=True)
@@ -238,9 +245,9 @@ def process_period_reports():
         if latest_progress_report_sr:
             generate_from_date_sr = latest_progress_report_sr.due_date
 
-        print("Last QPR report: %s for PD %s" % (generate_from_date_qpr, pd))
-        print("Last HR report: %s for PD %s" % (generate_from_date_hr, pd))
-        print("Last SR report: %s for PD %s" % (generate_from_date_sr, pd))
+        logger.info("Last QPR report: %s for PD %s" % (generate_from_date_qpr, pd))
+        logger.info("Last HR report: %s for PD %s" % (generate_from_date_hr, pd))
+        logger.info("Last SR report: %s for PD %s" % (generate_from_date_sr, pd))
 
         def create_pr_for_report_type(reporting_period, generate_from_date):
             """
@@ -260,7 +267,7 @@ def process_period_reports():
             start_date = reporting_period.start_date
 
             # Create ProgressReport first
-            print("Creating ProgressReport for {} - {}".format(start_date, end_date))
+            logger.info("Creating ProgressReport for {} - {}".format(start_date, end_date))
 
             # Re-query latest ProgressReport by report type
             latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)
@@ -289,7 +296,7 @@ def process_period_reports():
 
         def create_pr_ir_for_reportable(reportable, pai_ir_for_period, start_date, end_date, due_date):
             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                print("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
+                logger.info("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
                 indicator_report = QuantityIndicatorReportFactory(
                     reportable=reportable,
                     parent=pai_ir_for_period,
@@ -305,7 +312,7 @@ def process_period_reports():
                 )
 
                 for location in reportable.locations.all():
-                    print("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
+                    logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
                         indicator_report, start_date, end_date
                     ))
                     IndicatorLocationDataFactory(
@@ -321,7 +328,7 @@ def process_period_reports():
                     )
 
             else:
-                print("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
+                logger.info("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
                 indicator_report = RatioIndicatorReportFactory(
                     reportable=reportable,
                     parent=pai_ir_for_period,
@@ -337,7 +344,7 @@ def process_period_reports():
                 )
 
                 for location in reportable.locations.all():
-                    print("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
+                    logger.info("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
                         indicator_report, start_date, end_date
                     ))
                     IndicatorLocationDataFactory(
@@ -417,7 +424,11 @@ def process_period_reports():
                         # given the start & end date
                         if cai_indicator:
                             try:
-                                pai_indicator = cai_indicator.children.get(partner_activities__partner=pd.partner)
+                                # Grabbing first adopted partner activity in case
+                                # multiple adopted partner activities happen, although this is illegal state!
+                                pai_indicator = cai_indicator.children \
+                                    .filter(partner_activities__partner=pd.partner) \
+                                    .first()
                                 pai_ir_for_period = pai_indicator.indicator_reports.get(
                                     time_period_start=start_date,
                                     time_period_end=end_date,
@@ -462,12 +473,12 @@ def process_period_reports():
                                     indicator_report.save()
 
                             except Reportable.DoesNotExist as e:
-                                print(
+                                logger.exception(
                                     "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
                                     "from given ClusterActivity Reportable and PD Partner ID. "
                                     "Skipping link!", e)
                             except IndicatorReport.DoesNotExist as e:
-                                print(
+                                logger.exception(
                                     "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
                                     "linked with LLO Reportable. "
                                     "Skipping link!", e)
@@ -478,12 +489,12 @@ def process_period_reports():
                     'start_date')):
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 # If PR was already generated, skip!
                 if generate_from_date_qpr and reporting_period.start_date <= generate_from_date_qpr:
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
@@ -504,17 +515,17 @@ def process_period_reports():
 
                 # If there is no start and/or end date from reporting period, skip!
                 if not reporting_period.start_date or not reporting_period.end_date:
-                    print("No new reports to generate: No start & end date pair available.")
+                    logger.info("No new reports to generate: No start & end date pair available.")
                     continue
 
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 # If PR was already generated, skip!
                 if generate_from_date_hr and reporting_period.start_date <= generate_from_date_hr:
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
@@ -533,12 +544,12 @@ def process_period_reports():
             for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR").order_by('due_date')):
                 # If PR due date is greater than now, skip!
                 if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 # If PR was already generated, skip!
                 if generate_from_date_sr and reporting_period.due_date <= generate_from_date_sr:
-                    print("No new reports to generate")
+                    logger.info("No new reports to generate")
                     continue
 
                 next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
