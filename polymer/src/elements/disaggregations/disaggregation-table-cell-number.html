@@ -13,20 +13,31 @@
     </style>
 
     <template
-        is="dom-if"
-        if="[[editableBool]]">
+      is="dom-if"
+      if="[[editableBool]]">
       <disaggregation-field
-          key="v"
-          value="[[data.v]]"
-          coords="[[coords]]">
+        key="v"
+        value="[[data.v]]"
+        coords="[[coords]]">
       </disaggregation-field>
     </template>
 
     <template
-        is="dom-if"
-        if="[[!editableBool]]">
+      is="dom-if"
+      if="[[!editableBool]]">
       <span class="cellValue">
-        <etools-prp-number value="[[data.v]]"></etools-prp-number>
+        <template
+          is="dom-if"
+          if="[[_noValue(data)]]"
+          restamp="true">
+          -
+        </template>
+        <template
+          is="dom-if"
+          if="[[!_noValue(data)]]"
+          restamp="true">
+          <etools-prp-number value="[[data.v]]"></etools-prp-number>
+        </template>
       </span>
     </template>
   </template>
@@ -49,6 +60,10 @@
       _computeEditableBool: function (editable) {
         return editable === 1;
       },
+
+      _noValue: function (data) {
+        return !data.c && !data.d && !data.v;
+      }
     });
   </script>
 
