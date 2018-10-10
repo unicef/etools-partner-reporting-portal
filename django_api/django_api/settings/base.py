@@ -61,12 +61,12 @@ FRONTEND_HOST = os.getenv(
 # Sendgrid stuff
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.sendgrid.net')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = os.getenv('EMAIL_HOST_PORT', 587)
+EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', 'true'))
 
 ADMIN_MAIL = os.getenv('ADMIN_MAIL')
 if ADMIN_MAIL:
