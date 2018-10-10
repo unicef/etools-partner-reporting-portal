@@ -441,10 +441,10 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
                 )
             })
         elif PartnerActivity.objects.filter(
-                project=data['project'], partner=data['partner'], cluster_activity=cluster_activity
+            partner=data['partner'], cluster_activity=cluster_activity
         ).exists():
             raise serializers.ValidationError({
-                'cluster_activity': 'Please note that below activity has already been added to this project',
+                'cluster_activity': 'Please note that below activity has already been adopted.',
             })
 
         data['cluster_activity'] = cluster_activity
