@@ -1,7 +1,5 @@
 import logging
 from datetime import datetime
-from itertools import chain
-from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
