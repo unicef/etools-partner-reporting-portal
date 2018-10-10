@@ -59,6 +59,7 @@ steps:
             branch:
                 only:
                     - develop
+                    - master
 
     deploy_backend:
         image: codefresh/cf-deploy-kubernetes
