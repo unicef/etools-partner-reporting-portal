@@ -408,9 +408,8 @@
 
       _canExport: function (report, mode, permissions) {
         switch (true) {
-          case report.status === 'Sub':
+          case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
           case mode === 'edit':
-          case !permissions.exportSubmittedProgressReport:
             return false;
 
           default:

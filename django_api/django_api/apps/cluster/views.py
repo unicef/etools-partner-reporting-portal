@@ -206,7 +206,7 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         response_plan_id = self.kwargs.get('response_plan_id')
 
         queryset = ClusterObjective.objects.select_related('cluster').filter(
-            cluster__response_plan_id=response_plan_id)
+            cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
             queryset = queryset.filter(cluster__prp_roles__user=self.request.user)
@@ -349,7 +349,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         response_plan_id = self.kwargs.get('response_plan_id')
 
         queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
-            cluster_objective__cluster__response_plan_id=response_plan_id)
+            cluster_objective__cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
             queryset = queryset.filter(cluster_objective__cluster__prp_roles__user=self.request.user)
