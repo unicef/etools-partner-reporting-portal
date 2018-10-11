@@ -8,8 +8,6 @@ from .base import *
 RAVEN_CONFIG = {
     'dsn': os.getenv('SENTRY_DSN'),  # noqa: F405
 }
-# Override default client, in order to send extra data to Sentry
-SENTRY_CLIENT = 'etools.applications.utils.sentry.client.EToolsSentryClient'
 INSTALLED_APPS += (  # noqa: F405
     'raven.contrib.django.raven_compat',
 )
