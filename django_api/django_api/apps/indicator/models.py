@@ -10,6 +10,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
 from rest_framework import serializers
 
 from core.common import (
@@ -29,6 +31,7 @@ from indicator.disaggregators import (
     RatioIndicatorDisaggregator
 )
 from indicator.constants import ValueType
+from utils.emails import send_email_from_template
 
 
 class Disaggregation(TimeStampedExternalSourceModel):
@@ -586,6 +589,7 @@ class IndicatorReport(TimeStampedModel):
         'indicator.ReportingEntity', related_name="indicator_reports"
     )
 
+    tracker = FieldTracker(fields=['report_status'])
     objects = IndicatorReportManager()
 
     class Meta:
@@ -716,6 +720,38 @@ class IndicatorReport(TimeStampedModel):
                     output_list))
 
         return output_list
+
+
+@receiver(post_save, sender=IndicatorReport)
+def send_notification_on_status_change(sender, instance, **kwargs):
+    if (instance.tracker.has_changed('report_status') and
+            instance.report_status == INDICATOR_REPORT_STATUS.sent_back and
+            not getattr(instance, 'report_status_synced_from_pr', False)):
+        body_template_path = 'emails/on_indicator_report_status_change_sent_back.html'
+        subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
+        pr = instance.progress_report
+        pd = pr.programme_document
+        part_pr_url = f'/app/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{pr.id}/'
+        pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
+
+        template_data = {
+            'person': None,
+            'pr_url': pr_url,
+            'pd_ref_title': f'{pd.reference_number} ({pd.title})',
+            'status': instance.get_report_status_display()
+        }
+
+        for person in pd.unicef_officers.all():
+            template_data['person'] = person
+            to_email_list = [person.email]
+
+            send_email_from_template(
+                subject_template_path=subject_template_path,
+                body_template_path=body_template_path,
+                template_data=template_data,
+                to_email_list=to_email_list,
+                content_subtype='html',
+            )
 
 
 @receiver(post_save,
