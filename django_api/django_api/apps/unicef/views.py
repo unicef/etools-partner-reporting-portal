@@ -777,6 +777,17 @@ class ProgressReportPullHFDataAPIView(APIView):
             end_date__lte=self.progress_report.end_date,
         )
 
+        target_hf_irs = IndicatorReport.objects.filter(
+            id__in=hf_reports.values_list('indicator_reports', flat=True),
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        if not target_hf_irs.exists():
+            # The passed-in indicator report is non-HF indicator
+            raise ValidationError("This indicator is non-HF indicator. Data pull only works with HF indicator.")
+
         return indicator_report, hf_reports
 
     def _calculate_report_location_totals_per_reports(self, indicator_report, hf_reports, locations):
