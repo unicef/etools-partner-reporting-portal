@@ -784,12 +784,13 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
                 reportable_total['c'] = reportable_total['v']
 
-        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
-        # ratio
+        # if unit is PERCENTAGE, doesn't matter if calc choice was
+        # percent or ratio
         elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-            for indicator_report in accepted_indicator_reports:
-                reportable_total['v'] += indicator_report.total['v']
-                reportable_total['d'] += indicator_report.total['d']
+            latest_accepted_indicator_report = accepted_indicator_reports.order_by('-time_period_start').first()
+
+            reportable_total['v'] = latest_accepted_indicator_report.total['v']
+            reportable_total['d'] = latest_accepted_indicator_report.total['d']
 
             if reportable_total['d'] != 0:
                 reportable_total['c'] = reportable_total['v'] / \
