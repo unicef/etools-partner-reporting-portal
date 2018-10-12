@@ -1340,6 +1340,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         else:
             self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
+            if not partner and reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE \
+                    and validated_data['target']['d'] != reportable.target['d']:
+                error_msg = "Target denominator cannot be updated once the indicator is created"
+
+                raise ValidationError({
+                    "target": error_msg,
+                })
+
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
         validated_data.pop('locations', [])
