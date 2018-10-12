@@ -144,7 +144,7 @@ class ProgressReportXLSXExporter:
 
                 self.sheet.cell(row=start_row_id, column=1).value = \
                     self.progress_report.programme_document.partner.title
-                self.sheet.cell(roqw=start_row_id, column=2).value = \
+                self.sheet.cell(row=start_row_id, column=2).value = \
                     location_data.location.gateway.country.name
                 self.sheet.cell(row=start_row_id, column=3).value = \
                     self.progress_report.programme_document.reference_number
