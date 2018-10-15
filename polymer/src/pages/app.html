@@ -126,6 +126,11 @@
         text="Message sent"
         duration="1500">
     </paper-toast>
+
+    <paper-toast
+        id="error-message"
+        duration="1500">
+    </paper-toast>
   </template>
 
   <script>
@@ -294,6 +299,9 @@
         e.stopPropagation();
 
         try {
+          if (options.text) {
+            this.$[options.type].text = options.text;
+          }
           this.$[options.type].open();
         } catch (err) {}
       },
