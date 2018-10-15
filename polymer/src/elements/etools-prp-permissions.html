@@ -70,7 +70,7 @@
                     report.partner_id === (params.partner && params.partner.id) :
                     String(item.cluster.id) === String(report.cluster_id)) &&
                     (item.role === App.Constants.PRP_ROLE.CLUSTER_COORDINATOR ?
-                     !report.cluster_activity : true))
+                      !report.cluster_activity : true))
                 );
             });
           },
@@ -269,15 +269,19 @@
                       return granted.indexOf(role.role) > -1 &&
                         (App.Constants.WORKSPACE_ROLES.indexOf(role.role) > -1 ?
                           (role.workspace &&
-                           role.workspace.workspace_code === params.workspace) : true);
+                            role.workspace.workspace_code === params.workspace) : true);
                     });
 
                   case typeof granted === 'function':
-                    return function () {
-                      var args = [].slice.call(arguments);
+                    if (granted.length > 1) {
+                      return function () {
+                        var args = [].slice.call(arguments);
 
-                      return granted.apply(null, [params].concat(args));
-                    };
+                        return granted.apply(null, [params].concat(args));
+                      };
+                    }
+
+                    return granted(params);
 
                   case granted === App.Constants.PRP_ROLE.ALL:
                     return true;
@@ -297,8 +301,12 @@
 
           _computeImoClusters: function (profile) {
             return profile.prp_roles ?
-              profile.prp_roles.filter(function(item) {return item.role === App.Constants.PRP_ROLE.CLUSTER_IMO;})
-                .map(function(item) {return item.cluster;}) : [];
+              profile.prp_roles.filter(function (item) {
+                return item.role === App.Constants.PRP_ROLE.CLUSTER_IMO;
+              })
+                .map(function (item) {
+                  return item.cluster;
+                }) : [];
           },
 
           _computeParams: function (prpRoles, imoClusters, partner, workspace, responsePlan) {

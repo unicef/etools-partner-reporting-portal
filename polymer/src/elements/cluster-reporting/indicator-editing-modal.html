@@ -480,7 +480,7 @@
       },
 
       _computeCanEditDetails: function (permissions, data, isPAI) {
-        return (permissions.createClusterEntities() && !isPAI) ||
+        return (permissions.createClusterEntities && !isPAI) ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 
