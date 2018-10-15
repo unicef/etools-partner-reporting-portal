@@ -883,6 +883,8 @@ class ProgressReportPullHFDataAPIView(APIView):
         )
 
         # Data pull updates
+        data_available = True
+
         for ild in indicator_report.indicator_location_data.all():
             data_dict = consolidated_total_per_location_dict[ild.location.id]
 
@@ -892,12 +894,16 @@ class ProgressReportPullHFDataAPIView(APIView):
                 ild.disaggregation = {'()': data_dict['total']}
 
             if ild.disaggregation['()'] == dict():
-                raise ValidationError(
-                    "This indicator does not have available data to pull. "
-                    "Enter data for HR report on this indicator first."
-                )
+                data_available = False
+                ild.disaggregation['()'] = {'c': 0, 'd': 0, 'v': 0}
 
             ild.save()
+
+        if not data_available:
+            raise ValidationError(
+                "This indicator does not have available data to pull. "
+                "Enter data for HR report on this indicator first."
+            )
 
         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
             QuantityIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
