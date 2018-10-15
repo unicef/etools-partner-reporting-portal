@@ -24,7 +24,7 @@
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="status-badge.html">
-
+<link rel="import" href="../behaviors/notifications.html">
 
 <dom-module id="pull-modal">
     <template>
@@ -175,6 +175,7 @@
           App.Behaviors.ReduxBehavior,
           App.Behaviors.UtilsBehavior,
           App.Behaviors.ModalBehavior,
+          App.Behaviors.NotificationsBehavior,
         ],
 
         properties: {
@@ -243,8 +244,8 @@
                 self.set('data', {'reports': res.data});
                 self.set('opened', true);
                 })
-              .catch(function () {
-                //TODO: error handling
+              .catch(function (err) {
+                self._notifyErrorMessage({text: err.data.non_field_errors});
               });
         }
 
