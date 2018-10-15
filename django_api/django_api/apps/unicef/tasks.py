@@ -561,5 +561,5 @@ def process_programme_documents(fast=False, area=False):
                         logger.info("End of workspace")
                         break
             except Exception as e:
-                logger.exception(e.message)
+                logger.exception(e)
                 raise
