@@ -891,6 +891,12 @@ class ProgressReportPullHFDataAPIView(APIView):
             else:
                 ild.disaggregation = {'()': data_dict['total']}
 
+            if ild.disaggregation == dict():
+                raise ValidationError(
+                    "This indicator does not have available data to pull. "
+                    "Enter data for HR report on this indicator first."
+                )
+
             ild.save()
 
         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
