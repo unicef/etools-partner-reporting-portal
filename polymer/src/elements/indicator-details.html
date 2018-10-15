@@ -151,7 +151,7 @@
               <paper-button
                   class="btn-primary"
                   modal-index="[[indicatorId]]"
-                  on-tap="_openPullModal">
+                  on-tap="_openPullModal" disabled="[[disablePull]]">
                 Pull Data from HR
               </paper-button>
             </div>
@@ -426,7 +426,7 @@
 
         currentPD: {
           type: Object,
-          statePath: App.Selectors.ProgrammeDocuments.current,
+          statePath: App.Selectors.ProgrammeDocuments.current
         },
 
         hasPD: {
@@ -446,7 +446,7 @@
 
         data: {
           type: Object,
-          statePath: 'disaggregations.byIndicator',
+          statePath: 'disaggregations.byIndicator'
         },
 
         disaggregations: {
@@ -478,6 +478,15 @@
         reportIsQpr: {
           type: Boolean,
         },
+
+        reportStatus: {
+          type: String
+        },
+
+        disablePull: {
+          type: Boolean,
+          computed: '_computeDisablePull(reportStatus)'
+        }
       },
 
       listeners: {
@@ -630,6 +639,10 @@
 
       _canEnterData: function (mode, isLocked) {
         return mode !== 'view' && !isLocked;
+      },
+
+      _computeDisablePull: function(reportStatus) {
+        return reportStatus === 'Sub' || reportStatus === 'Acc';
       },
 
       attached: function () {

@@ -239,6 +239,7 @@
             no-animation>
           <indicator-details
               report-is-qpr="[[_computeReportIsQpr(currentReport, indicator)]]"
+              report-status="[[currentReport.status]]"
               reportable-id="[[data.id]]"
               indicator-name="[[indicator.reportable.blueprint.title]]"
               indicator-id="[[_computeIndicatorId(indicator)]]"
@@ -313,7 +314,7 @@
 
         currentReport: {
           type: Object,
-          statePath: App.Selectors.ProgrammeDocumentReports.current,
+          statePath: App.Selectors.ProgrammeDocumentReports.current
         },
 
         showMeta: {
