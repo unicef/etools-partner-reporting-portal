@@ -32,6 +32,10 @@
       _notifyMessageSent: function (options) {
         this._notify('message-sent', options);
       },
+
+      _notifyErrorMessage: function (options) {
+        this._notify('error-message', options);
+      }
     };
 
   }());
