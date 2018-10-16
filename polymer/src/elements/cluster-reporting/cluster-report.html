@@ -478,7 +478,7 @@
                     is="dom-if"
                     if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -495,7 +495,7 @@
                     is="dom-if"
                     if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c)]]</dd>
                 </template>
               </dl>
             </div>
