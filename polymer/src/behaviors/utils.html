@@ -99,11 +99,11 @@
       },
 
       _formatIndicatorValue: function(indicatorType, value) {
-        if (value == null) {
+        if (value === null) {
           return value;
         }
 
-        const _value = value.toFixed(2);
+        var _value = value.toFixed(2);
 
         switch (indicatorType) {
           case 'percentage':

@@ -333,7 +333,8 @@
       },
 
       _calculationFormulaAcrossPeriods: function (indicator) {
-        return indicator.reportable.blueprint.display_type === 'ratio' ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+        return indicator.reportable.blueprint.display_type === 'ratio'
+          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
       },
 
       _toggle: function (e) {
