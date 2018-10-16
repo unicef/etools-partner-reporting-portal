@@ -20,7 +20,8 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
-    FINAL_OVERALL_STATUS)
+    FINAL_OVERALL_STATUS,
+    PRP_ROLE_TYPES)
 from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
@@ -727,31 +728,48 @@ def send_notification_on_status_change(sender, instance, **kwargs):
     if (instance.tracker.has_changed('report_status') and
             instance.report_status == INDICATOR_REPORT_STATUS.sent_back and
             not getattr(instance, 'report_status_synced_from_pr', False)):
-        body_template_path = 'emails/on_indicator_report_status_change_sent_back.html'
-        subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
-        pr = instance.progress_report
-        pd = pr.programme_document
-        part_pr_url = f'/app/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{pr.id}/'
-        pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
 
-        template_data = {
-            'person': None,
-            'pr_url': pr_url,
-            'pd_ref_title': f'{pd.reference_number} ({pd.title})',
-            'status': instance.get_report_status_display()
-        }
+        content_object = instance.reportable.content_object
+        content_type_model = instance.reportable.content_type.model
 
-        for person in pd.unicef_officers.all():
-            template_data['person'] = person
-            to_email_list = [person.email]
+        if content_type_model == 'clusterobjective':
+            cluster = content_object.cluster
+            indicator_type = 'cluster_objective'
+        elif content_type_model == 'clusteractivity':
+            cluster = content_object.cluster_objective.cluster
+            indicator_type = 'cluster_activity'
+        else:
+            cluster = None
+            indicator_type = ''
 
-            send_email_from_template(
-                subject_template_path=subject_template_path,
-                body_template_path=body_template_path,
-                template_data=template_data,
-                to_email_list=to_email_list,
-                content_subtype='html',
-            )
+        if cluster:
+            cluster_imos = [role.user for role in cluster.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
+            workspace_code = cluster.response_plan.workspace.workspace_code
+
+            body_template_path = 'emails/on_indicator_report_status_change_sent_back_cluster.html'
+            subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
+
+            url_part = f'/app/{workspace_code}/cluster-reporting/plan/{cluster.response_plan_id}/results/draft'
+            q_params = f'?indicator_type={indicator_type}&cluster_id={cluster.id}&indicator={instance.reportable_id}'
+            ir_url = urljoin(settings.FRONTEND_HOST, url_part) + q_params
+
+            template_data = {
+                'user': None,
+                'ir_url': ir_url,
+                'status': instance.get_report_status_display()
+            }
+
+            for user in cluster_imos:
+                template_data['user'] = user
+                to_email_list = [user.email]
+
+                send_email_from_template(
+                    subject_template_path=subject_template_path,
+                    body_template_path=body_template_path,
+                    template_data=template_data,
+                    to_email_list=to_email_list,
+                    content_subtype='html',
+                )
 
 
 @receiver(post_save,
