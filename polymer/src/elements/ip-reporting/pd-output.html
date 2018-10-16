@@ -173,7 +173,7 @@
 
                   <dl class="layout horizontal">
                     <dt><a href="[[calculationMethodUrl]]">Calculation methods <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
-                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[indicator.reportable.blueprint.calculation_formula_across_periods]]</b> (across reporting periods)</dt>
+                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[_calculationFormulaAcrossPeriods(indicator)]]</b> (across reporting periods)</dt>
                   </dl>
                 </div>
               </div>
@@ -330,6 +330,10 @@
 
       listeners: {
         'reportable-meta-changed': '_updateMeta',
+      },
+
+      _calculationFormulaAcrossPeriods: function (indicator) {
+        return indicator.reportable.blueprint.display_type === 'ratio' ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
       },
 
       _toggle: function (e) {
