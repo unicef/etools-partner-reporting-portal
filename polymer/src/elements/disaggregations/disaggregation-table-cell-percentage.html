@@ -5,6 +5,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="disaggregation-field.html">
+<link rel="import" href="disaggregation-table-cell.html">
 
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
@@ -43,47 +44,43 @@
       }
     </style>
 
-    <template
-        is="dom-if"
-        if="[[editableBool]]"
-        restamp="true">
-      <div class="app-grid">
-        <div class="item">
-          <disaggregation-field
+    <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
+      <editable>
+        <div class="app-grid">
+          <div class="item">
+            <disaggregation-field
               id="v"
               key="v"
               min="0"
               value="[[data.v]]"
               coords="[[coords]]">
-          </disaggregation-field>
-        </div>
-        <div class="item">
-          <disaggregation-field
+            </disaggregation-field>
+          </div>
+          <div class="item">
+            <disaggregation-field
               id="d"
               key="d"
               min="0"
               value="[[data.d]]"
               coords="[[coords]]"
               validator="[[vName]]">
-          </disaggregation-field>
+            </disaggregation-field>
+          </div>
+          <div class="computed-value">[[_toPercentage(localData.c)]]</div>
         </div>
-        <div class="computed-value">[[_toPercentage(localData.c)]]</div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[!editableBool]]">
-      <div class="app-grid">
-        <div class="item">
-          <etools-prp-number value="[[data.v]]"></etools-prp-number>
+      </editable>
+      <non-editable>
+        <div class="app-grid">
+          <div class="item">
+            <etools-prp-number value="[[data.v]]"></etools-prp-number>
+          </div>
+          <div class="item">
+            <etools-prp-number value="[[data.d]]"></etools-prp-number>
+          </div>
+          <div class="computed-value">[[_toPercentage(data.c)]]</div>
         </div>
-        <div class="item">
-          <etools-prp-number value="[[data.d]]"></etools-prp-number>
-        </div>
-        <div class="computed-value">[[_toPercentage(data.c)]]</div>
-      </div>
-    </template>
+      </non-editable>
+    </disaggregation-table-cell>
   </template>
 
   <script>
@@ -108,19 +105,10 @@
           type: String,
           observer: '_bindValidation',
         },
-
-        editableBool: {
-          type: Boolean,
-          computed: '_computeEditableBool(editable)',
-        },
       },
 
       listeners: {
         'field-value-changed': '_handleInput',
-      },
-
-      _computeEditableBool: function (editable) {
-        return editable === 1;
       },
 
       _handleInput: function (e, data) {
