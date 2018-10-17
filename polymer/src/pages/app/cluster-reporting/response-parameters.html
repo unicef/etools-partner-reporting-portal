@@ -23,7 +23,7 @@
     </app-route>
 
     <iron-pages
-      selected={{page}}
+      selected="{{page}}"
       attr-for-selected="name">
         <template is="dom-if" if="[[_equals(page, 'clusters')]]" restamp="true">
           <clusters-response-parameters

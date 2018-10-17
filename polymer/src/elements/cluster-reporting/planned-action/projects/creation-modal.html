@@ -270,8 +270,8 @@
           </template>
           <paper-radio-group
             id="mode"
-            selected={{ mode }}
-              on-change="adjustPosition">
+            selected="{{ mode }}"
+            on-change="adjustPosition">
             <template
               is="dom-if"
               if="[[!edit]]"
@@ -521,7 +521,7 @@
                         <div class="full-width">
                           <labelled-item label="Is this project part of a HRP or FA?">
                             <paper-radio-group
-                              selected={{ data.part }}>
+                              selected="{{ data.part }}">
                               <paper-radio-button name="hrp">HRP</paper-radio-button>
                               <paper-radio-button name="fa">FA</paper-radio-button>
                               <paper-radio-button name="no">No</paper-radio-button>
@@ -728,7 +728,7 @@
         },
 
         data: {
-          type: Object,
+          type: Object
         },
 
         refresh: {
