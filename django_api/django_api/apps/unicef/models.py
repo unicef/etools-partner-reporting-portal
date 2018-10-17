@@ -12,6 +12,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
 
 from core.common import (
     PD_FREQUENCY_LEVEL,
@@ -27,6 +29,7 @@ from core.common import (
 )
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
+from utils.emails import send_email_from_template
 
 
 logger = logging.getLogger(__name__)
@@ -409,6 +412,8 @@ class ProgressReport(TimeStampedModel):
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
     narrative = models.TextField(verbose_name="Narrative", blank=True, null=True)
 
+    tracker = FieldTracker(fields=['status'])
+
     class Meta:
         ordering = ['-due_date', '-id']
         unique_together = ('programme_document', 'report_type', 'report_number')
@@ -448,7 +453,43 @@ def synchronize_ir_status_from_pr(sender, instance, **kwargs):
     # Looping here as .update() on queryset does not invoke signals
     for ir in instance.indicator_reports.all():
         ir.report_status = instance.status
+        setattr(ir, 'report_status_synced_from_pr', True)
         ir.save()
+
+
+@receiver(post_save, sender=ProgressReport)
+def send_notification_on_status_change(sender, instance, **kwargs):
+    if instance.tracker.has_changed('status'):
+        if instance.status == PROGRESS_REPORT_STATUS.accepted:
+            body_template_path = 'emails/on_progress_report_status_change_accepted.html'
+        elif instance.status == PROGRESS_REPORT_STATUS.sent_back:
+            body_template_path = 'emails/on_progress_report_status_change_sent_back.html'
+        else:
+            return
+
+        subject_template_path = 'emails/on_progress_report_status_change_subject.txt'
+        pd = instance.programme_document
+        part_pr_url = f'/app/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{instance.id}/'
+        pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
+
+        template_data = {
+                'person': None,
+                'pr_url': pr_url,
+                'pd_ref_title': f'{pd.reference_number} ({pd.title})',
+                'status': instance.get_status_display()
+            }
+
+        for person in pd.unicef_officers.all():
+            template_data['person'] = person
+            to_email_list = [person.email]
+
+            send_email_from_template(
+                subject_template_path=subject_template_path,
+                body_template_path=body_template_path,
+                template_data=template_data,
+                to_email_list=to_email_list,
+                content_subtype='html',
+            )
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
