@@ -173,7 +173,7 @@
 
                   <dl class="layout horizontal">
                     <dt><a href="[[calculationMethodUrl]]">Calculation methods <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
-                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[indicator.reportable.blueprint.calculation_formula_across_periods]]</b> (across reporting periods)</dt>
+                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[_calculationFormulaAcrossPeriods(indicator)]]</b> (across reporting periods)</dt>
                   </dl>
                 </div>
               </div>
@@ -210,7 +210,7 @@
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.reportable.achieved.c)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -225,7 +225,7 @@
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.total.c)]]</dd>
                 </template>
               </dl>
             </div>
@@ -239,6 +239,7 @@
             no-animation>
           <indicator-details
               report-is-qpr="[[_computeReportIsQpr(currentReport, indicator)]]"
+              report-status="[[currentReport.status]]"
               reportable-id="[[data.id]]"
               indicator-name="[[indicator.reportable.blueprint.title]]"
               indicator-id="[[_computeIndicatorId(indicator)]]"
@@ -313,7 +314,7 @@
 
         currentReport: {
           type: Object,
-          statePath: App.Selectors.ProgrammeDocumentReports.current,
+          statePath: App.Selectors.ProgrammeDocumentReports.current
         },
 
         showMeta: {
@@ -329,6 +330,11 @@
 
       listeners: {
         'reportable-meta-changed': '_updateMeta',
+      },
+
+      _calculationFormulaAcrossPeriods: function (indicator) {
+        return indicator.reportable.blueprint.display_type === 'ratio'
+          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
       },
 
       _toggle: function (e) {

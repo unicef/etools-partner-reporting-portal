@@ -58,7 +58,7 @@
 
       <template
           is="dom-if"
-          if="[[permissions.createClusterEntities()]]"
+          if="[[permissions.createClusterEntities]]"
           restamp="true">
         <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
@@ -89,7 +89,6 @@
       ],
 
       properties: {
-        permissions: Object,
         queryParams: Object,
 
         responsePlanID: {

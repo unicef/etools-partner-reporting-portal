@@ -1,7 +1,5 @@
 import logging
 from datetime import datetime
-from itertools import chain
-from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -781,6 +779,17 @@ class ProgressReportPullHFDataAPIView(APIView):
             end_date__lte=self.progress_report.end_date,
         )
 
+        target_hf_irs = IndicatorReport.objects.filter(
+            id__in=hf_reports.values_list('indicator_reports', flat=True),
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        if not target_hf_irs.exists():
+            # The passed-in indicator report is non-HF indicator
+            raise ValidationError("This indicator is non-HF indicator. Data pull only works with HF indicator.")
+
         return indicator_report, hf_reports
 
     def _calculate_report_location_totals_per_reports(self, indicator_report, hf_reports, locations):
@@ -876,6 +885,8 @@ class ProgressReportPullHFDataAPIView(APIView):
         )
 
         # Data pull updates
+        data_available = True
+
         for ild in indicator_report.indicator_location_data.all():
             data_dict = consolidated_total_per_location_dict[ild.location.id]
 
@@ -884,7 +895,17 @@ class ProgressReportPullHFDataAPIView(APIView):
             else:
                 ild.disaggregation = {'()': data_dict['total']}
 
+            if ild.disaggregation['()'] == dict():
+                data_available = False
+                ild.disaggregation['()'] = {'c': 0, 'd': 0, 'v': 0}
+
             ild.save()
+
+        if not data_available:
+            raise ValidationError(
+                "This indicator does not have available data to pull. "
+                "Enter data for HR report on this indicator first."
+            )
 
         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
             QuantityIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)

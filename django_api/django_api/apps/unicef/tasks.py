@@ -44,7 +44,6 @@ from partner.models import Partner
 
 logger = logging.getLogger(__name__)
 
-
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
@@ -77,7 +76,7 @@ def create_user_for_person(person):
     return user
 
 
-def save_person_and_user(person_data):
+def save_person_and_user(person_data, create_user=False):
     try:
         person = process_model(
             Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
@@ -86,7 +85,10 @@ def save_person_and_user(person_data):
         logger.exception('Error trying to save Person model with {}'.format(person_data))
         return None, None
 
-    user = create_user_for_person(person)
+    if create_user:
+        user = create_user_for_person(person)
+    else:
+        user = None
 
     return person, user
 
@@ -135,29 +137,29 @@ def process_programme_documents(fast=False, area=False):
                             business_area_code=str(
                                 workspace.business_area_code), url=page_url)
                     except Exception as e:
-                        print("API Endpoint error: %s" % e)
+                        logger.exception("API Endpoint error: %s" % e)
                         break
 
-                    print(
+                    logger.info(
                         "Found %s PDs for %s Workspace (%s)" %
                         (list_data['count'],
                          workspace.title,
                          workspace.business_area_code))
 
                     for item in list_data['results']:
-                        print("Processing PD: %s" % item['id'])
+                        logger.info("Processing PD: %s" % item['id'])
 
                         # Get partner data
                         partner_data = item['partner_org']
 
                         # Skip entries without unicef_vendor_number
                         if not partner_data['unicef_vendor_number']:
-                            print("No unicef_vendor_number - skipping!")
+                            logger.warning("No unicef_vendor_number - skipping!")
                             continue
 
                         # Create/Assign Partner
                         if not partner_data['name']:
-                            print("No partner name - skipping!")
+                            logger.warning("No partner name - skipping!")
                             continue
 
                         partner_data['external_id'] = partner_data.get('id', '#')
@@ -172,6 +174,7 @@ def process_programme_documents(fast=False, area=False):
                             )
                         except ValidationError:
                             logger.exception('Error trying to save Partner model with {}'.format(partner_data))
+                            continue
 
                         # Assign partner
                         item['partner'] = partner.id
@@ -184,11 +187,11 @@ def process_programme_documents(fast=False, area=False):
                             item['offices']) if item['offices'] else "N/A"
 
                         if not item['start_date']:
-                            print("Start date is required - skipping!")
+                            logger.warning("Start date is required - skipping!")
                             continue
 
                         if not item['end_date']:
-                            print("End date is required - skipping!")
+                            logger.warning("End date is required - skipping!")
                             continue
 
                         # Create PD
@@ -206,12 +209,7 @@ def process_programme_documents(fast=False, area=False):
                                 {'external_id': item['id'], 'workspace': workspace}
                             )
                         except KeyError as e:
-                            if hasattr(e, 'message'):
-                                print(e.message)
-                            else:
-                                print(e)
-
-                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item))
+                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
                             continue
 
                         # Create unicef_focal_points
@@ -226,7 +224,7 @@ def process_programme_documents(fast=False, area=False):
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
+                            person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
 
@@ -255,15 +253,6 @@ def process_programme_documents(fast=False, area=False):
                                 continue
 
                             pd.partner_focal_point.add(person)
-
-                            user.partner = partner
-                            user.save()
-
-                            is_active = person_data.get('active')
-
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
 
                         # Create sections
                         section_data_list = item['sections']
@@ -344,7 +333,7 @@ def process_programme_documents(fast=False, area=False):
                                             blueprint = Reportable.objects.get(
                                                 id=i['cluster_indicator_id']).blueprint
                                         except Reportable.DoesNotExist:
-                                            print("Blueprint not exists! Skipping!")
+                                            logger.exception("Blueprint not exists! Skipping!")
                                             continue
                                     else:
                                         # Create IndicatorBlueprint
@@ -380,11 +369,11 @@ def process_programme_documents(fast=False, area=False):
                                         l['gateway_country'] = country.id
 
                                         if l['admin_level'] is None:
-                                            print("Admin level empty! Skipping!")
+                                            logger.warning("Admin level empty! Skipping!")
                                             continue
 
                                         if l['pcode'] is None or not l['pcode']:
-                                            print("Location code empty! Skipping!")
+                                            logger.warning("Location code empty! Skipping!")
                                             continue
 
                                         l['location_type'] = '{}-Admin Level {}'.format(
@@ -466,10 +455,6 @@ def process_programme_documents(fast=False, area=False):
                                         {'external_id': i['id']}
                                     )
                                     reportable.active = i['is_active']
-
-                                    # TODO: Update the PMP PD indicator data field
-                                    # for ca_indicator_used_by_reporting_entity
-
                                     partner_activity = None
 
                                     # Associate this LLO Reportable with ClusterActivity Reportable
@@ -483,8 +468,6 @@ def process_programme_documents(fast=False, area=False):
                                             if pd.partner.id not in cai.content_object.partner_activities.values_list(
                                                     'partner', flat=True):
                                                 try:
-                                                    # TODO: Figure out what to put for
-                                                    # project, start_date, end_date, and status
                                                     partner_activity = PartnerActivity.objects.create(
                                                         title=cai.blueprint.title,
                                                         project=pd.partner.partner_projects.first(),
@@ -494,18 +477,31 @@ def process_programme_documents(fast=False, area=False):
                                                         end_date=cai.content_object.response_plan.end,
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
-
-                                                    # Grab Cluster Activity instance from
-                                                    # this newly created Partner Activity instance
-                                                    create_pa_reportables_from_ca(partner_activity, cai.content_object)
                                                 except Exception as e:
-                                                    print(
+                                                    logger.exception(
                                                         "Cannot force adopt PartnerActivity from ClusterActivity "
                                                         "for dual reporting - skipping link!: " + str(e)
                                                     )
+                                                    continue
+                                                else:
+                                                    try:
+                                                        # Grab Cluster Activity instance from
+                                                        # this newly created Partner Activity instance
+                                                        create_pa_reportables_from_ca(
+                                                            partner_activity, cai.content_object
+                                                        )
+                                                    except Exception as e:
+                                                        logger.exception(
+                                                            "Cannot create Reportables for adopted "
+                                                            "PartnerActivity from ClusterActivity "
+                                                            "for dual reporting - skipping link!: " + str(e)
+                                                        )
+
+                                                        partner_activity.delete()
+                                                        continue
 
                                         except Reportable.DoesNotExist:
-                                            print(
+                                            logger.exception(
                                                 "No ClusterActivity Reportable found "
                                                 "for dual reporting - skipping link!"
                                             )
@@ -559,11 +555,11 @@ def process_programme_documents(fast=False, area=False):
 
                     # Check if another page exists
                     if list_data['next']:
-                        print("Found new page")
+                        logger.info("Found new page")
                         page_url = list_data['next']
                     else:
-                        print("End of workspace")
+                        logger.info("End of workspace")
                         break
             except Exception as e:
-                print(e)
+                logger.exception(e)
                 raise
