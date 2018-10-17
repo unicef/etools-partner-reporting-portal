@@ -83,6 +83,7 @@ from .filters import (
 )
 
 from .export_report import ProgressReportXLSXExporter
+from .import_report import ProgressReportXLSXReader
 
 logger = logging.getLogger(__name__)
 
@@ -1219,5 +1220,32 @@ class ProgressReportExcelExportView(RetrieveAPIView):
                                 content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response['Content-Disposition'] = 'attachment; filename=' + file_name
         return response
+
+
+class ProgressReportExcelImportView(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+
+    def post(self, request,  *args, **kwargs):
+
+        up_file = request.FILES['file']
+        filepath = "/tmp/" + up_file.name
+        destination = open(filepath, 'wb+')
+
+        for chunk in up_file.chunks():
+            destination.write(chunk)
+            destination.close()
+
+        reader = ProgressReportXLSXReader(filepath, request.user.partner)
+        result = reader.import_data()
+
+
+
+        if result:
+            return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({}, status=statuses.HTTP_200_OK)
 
 

@@ -19,6 +19,7 @@ from .views import (
     ProgressReportSRSubmitAPIView,
     ProgressReportPullHFDataAPIView,
     ProgressReportExcelExportView,
+    ProgressReportExcelImportView,
     InterventionPMPDocumentView)
 
 
@@ -60,6 +61,9 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/export/$',
         ProgressReportExcelExportView.as_view(),
         name="progress-reports-excel-export"),
+    url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/import/$',
+        ProgressReportExcelImportView.as_view(),
+        name="progress-reports-excel-import"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/submit/$',
         ProgressReportSubmitAPIView.as_view(),
         name="progress-reports-submit"),
