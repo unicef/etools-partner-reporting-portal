@@ -738,6 +738,9 @@ def send_notification_on_status_change(sender, instance, **kwargs):
         elif content_type_model == 'clusteractivity':
             cluster = content_object.cluster_objective.cluster
             indicator_type = 'cluster_activity'
+        elif content_type_model == 'partneractivity' and content_object.cluster_activity:
+            cluster = content_object.cluster_activity.cluster_objective.cluster
+            indicator_type = 'partner_activity'
         else:
             cluster = None
             indicator_type = ''
