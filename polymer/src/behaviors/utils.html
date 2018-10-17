@@ -99,7 +99,7 @@
       },
 
       _formatIndicatorValue: function(indicatorType, value) {
-        if (value === null) {
+        if (value == null /* undefinded & null */) { // jshint ignore:line
           return value;
         }
 
