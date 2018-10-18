@@ -464,6 +464,8 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             body_template_path = 'emails/on_progress_report_status_change_accepted.html'
         elif instance.status == PROGRESS_REPORT_STATUS.sent_back:
             body_template_path = 'emails/on_progress_report_status_change_sent_back.html'
+        elif instance.status == PROGRESS_REPORT_STATUS.submitted:
+            body_template_path = 'emails/on_progress_report_status_change_submitted.html'
         else:
             return
 
