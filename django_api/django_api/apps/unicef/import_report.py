@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import traceback
 from datetime import datetime
-from django.db.models import Q
-from django.db import transaction
 
 from openpyxl.reader.excel import load_workbook
+
+from django.db import transaction
 
 from core import common
 

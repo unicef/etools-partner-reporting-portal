@@ -1,17 +1,14 @@
+import itertools
+import uuid
+
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment, NamedStyle
 from openpyxl.utils import get_column_letter
-from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 
 from django.conf import settings
 from django.db.models import Count
 
-from indicator.models import IndicatorBlueprint
-
-import itertools
-import uuid
-
-from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorReport
+from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"

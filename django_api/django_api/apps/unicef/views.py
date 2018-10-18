@@ -1226,7 +1226,6 @@ class ProgressReportExcelImportView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
-
     def post(self, request,  *args, **kwargs):
 
         up_file = request.FILES['file']
@@ -1240,12 +1239,8 @@ class ProgressReportExcelImportView(APIView):
         reader = ProgressReportXLSXReader(filepath, request.user.partner)
         result = reader.import_data()
 
-
-
         if result:
             return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
 
         else:
             return Response({}, status=statuses.HTTP_200_OK)
-
-
