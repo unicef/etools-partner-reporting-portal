@@ -54,11 +54,13 @@ class ProgressReportXLSXExporter:
         for idx, dt in enumerate(disaggregation_types):
             current_column = self.disaggregations_start_column + idx
 
-            name_cell = self.sheet.cell(row=1, column=current_column, value=dt.name)
+            name_cell = self.sheet.cell(
+                row=1, column=current_column, value=dt.name)
             name_cell.alignment = Alignment(horizontal='center')
             name_cell.font = Font(bold=True)
 
-            id_cell = self.sheet.cell(row=2, column=current_column, value=dt.id)
+            id_cell = self.sheet.cell(
+                row=2, column=current_column, value=dt.id)
             id_cell.alignment = Alignment(horizontal='center')
 
             type_cell = self.sheet.cell(
@@ -90,13 +92,16 @@ class ProgressReportXLSXExporter:
 
         # Generate disaggregation values columns
         for idx, dvs in enumerate(disaggregation_values):
-            current_column = self.disaggregations_start_column + len(disaggregation_types) + idx
+            current_column = self.disaggregations_start_column + \
+                len(disaggregation_types) + idx
 
-            cell = self.sheet.cell(row=1, column=current_column, value=" + ".join([dv.value for dv in dvs]))
+            cell = self.sheet.cell(
+                row=1, column=current_column, value=" + ".join([dv.value for dv in dvs]))
             cell.alignment = Alignment(horizontal='center')
             cell.font = Font(bold=True)
 
-            self.sheet.cell(row=2, column=current_column, value=", ".join([str(dv.id) for dv in dvs]))
+            self.sheet.cell(row=2, column=current_column,
+                            value=", ".join([str(dv.id) for dv in dvs]))
             self.sheet.cell(
                 row=3, column=current_column, value=" + ".join([disaggregation_values_by_type[dv.id] for dv in dvs])
             )
@@ -104,10 +109,13 @@ class ProgressReportXLSXExporter:
                 row=4, column=current_column, value="#indicator+value+" + str("+".join([dv.value for dv in dvs]))
             )
 
-            disaggregation_values_map[", ".join([str(dv.id) for dv in dvs])] = current_column
+            disaggregation_values_map[
+                ", ".join([str(dv.id) for dv in dvs])] = current_column
 
-        totals_column = self.disaggregations_start_column + len(disaggregation_types) + len(disaggregation_values)
-        totals_header_cell = self.sheet.cell(row=1, column=totals_column, value="Total")
+        totals_column = self.disaggregations_start_column + \
+            len(disaggregation_types) + len(disaggregation_values)
+        totals_header_cell = self.sheet.cell(
+            row=1, column=totals_column, value="Total")
         totals_header_cell.alignment = Alignment(horizontal='center')
 
         disaggregation_values_map["()"] = totals_column
@@ -127,17 +135,20 @@ class ProgressReportXLSXExporter:
             for location_data in locations_data.all():
 
                 try:
-                    indicator_target = float(indicator.reportable.calculated_target)
+                    indicator_target = float(
+                        indicator.reportable.calculated_target)
                 except ValueError:
                     indicator_target = indicator.reportable.calculated_target
 
                 if indicator.is_percentage:
-                    achievement_in_reporting_period = indicator.total.get(ValueType.CALCULATED, 0)
+                    achievement_in_reporting_period = indicator.total.get(
+                        ValueType.CALCULATED, 0)
                     total_cumulative_progress = indicator.reportable.achieved.get(
                         ValueType.CALCULATED, 0
                     )
                 else:
-                    achievement_in_reporting_period = indicator.total.get(ValueType.VALUE, 0)
+                    achievement_in_reporting_period = indicator.total.get(
+                        ValueType.VALUE, 0)
                     total_cumulative_progress = indicator.reportable.achieved.get(
                         ValueType.VALUE, 0
                     )
@@ -184,7 +195,8 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=20).value = \
                     indicator.display_type
                 self.sheet.cell(row=start_row_id, column=21).value = \
-                    indicator_target * 100 if indicator.display_type == IndicatorBlueprint.PERCENTAGE else indicator_target
+                    indicator_target * \
+                    100 if indicator.display_type == IndicatorBlueprint.PERCENTAGE else indicator_target
                 self.sheet.cell(row=start_row_id, column=22).value = \
                     indicator.calculation_formula_across_locations
                 self.sheet.cell(row=start_row_id, column=23).value = \
@@ -198,8 +210,10 @@ class ProgressReportXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=24 + admin_level * 2).value = location.p_code
-                    self.sheet.cell(row=start_row_id, column=24 + admin_level * 2 - 1).value = location.gateway.name
+                    self.sheet.cell(row=start_row_id, column=24 +
+                                    admin_level * 2).value = location.p_code
+                    self.sheet.cell(row=start_row_id, column=24 +
+                                    admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
                         location = location.parent
@@ -217,7 +231,6 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=39).value = \
                     location_data.id
 
-
                 # Check location item disaggregation type
                 for reported_disaggregation_type in location_data.disaggregation_reported_on:
                     if reported_disaggregation_type in disaggregation_types_map:
@@ -233,7 +246,7 @@ class ProgressReportXLSXExporter:
                         self.sheet.cell(
                             row=start_row_id,
                             column=disaggregation_values_map['()']).value = v['v'] \
-                                if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+                            if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
 
                     else:
                         for dk, dv in disaggregation_values_map.items():
@@ -243,8 +256,8 @@ class ProgressReportXLSXExporter:
                                     list(int(k) for k in dk.split(","))):
                                 self.sheet.cell(
                                     row=start_row_id, column=dv).value = v['v'] \
-                                        if blueprint.unit == IndicatorBlueprint.NUMBER \
-                                        else "{}/{}".format(v['v'], v['d'])
+                                    if blueprint.unit == IndicatorBlueprint.NUMBER \
+                                    else "{}/{}".format(v['v'], v['d'])
 
                 start_row_id += 1
 
@@ -253,11 +266,14 @@ class ProgressReportXLSXExporter:
 
         # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
         # Partner contribution to date
-        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=10, end_row=start_row_id, end_column=10)
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=10, end_row=start_row_id, end_column=10)
         # Challenges/bottlenecks in the reporting period
-        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=12, end_row=start_row_id, end_column=12)
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=12, end_row=start_row_id, end_column=12)
         # Proposed way forward
-        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=13, end_row=start_row_id, end_column=13)
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=13, end_row=start_row_id, end_column=13)
 
         return True
 
@@ -324,13 +340,16 @@ class ProgressReportXLSXExporter:
             disaggregation_label,
         ) in enumerate(merged_disaggregations):
             current_column = self.disaggregations_start_column + idx
-            name_cell = merged_sheet.cell(column=current_column, row=1, value=disaggregation_name)
+            name_cell = merged_sheet.cell(
+                column=current_column, row=1, value=disaggregation_name)
             name_cell.style = self.bold_center_style
 
-            id_cell = merged_sheet.cell(column=current_column, row=2, value=disaggregation_id)
+            id_cell = merged_sheet.cell(
+                column=current_column, row=2, value=disaggregation_id)
             id_cell.alignment = Alignment(horizontal='center')
 
-            label_cell = merged_sheet.cell(column=current_column, row=4, value=disaggregation_label)
+            label_cell = merged_sheet.cell(
+                column=current_column, row=4, value=disaggregation_label)
             label_cell.alignment = Alignment(horizontal='center')
 
             merged_disaggregations_map[disaggregation_id] = current_column
@@ -371,27 +390,34 @@ class ProgressReportXLSXExporter:
             disaggregation_name,
             disaggregation_label,
         ) in enumerate(merged_disaggregation_values):
-            current_column = self.disaggregations_start_column + len(merged_disaggregations) + idx
-            value_cell = merged_sheet.cell(column=current_column, row=1, value=disaggregation_value)
+            current_column = self.disaggregations_start_column + \
+                len(merged_disaggregations) + idx
+            value_cell = merged_sheet.cell(
+                column=current_column, row=1, value=disaggregation_value)
             value_cell.style = self.bold_center_style
 
-            id_cell = merged_sheet.cell(column=current_column, row=2, value=disaggregation_id)
+            id_cell = merged_sheet.cell(
+                column=current_column, row=2, value=disaggregation_id)
             id_cell.alignment = Alignment(horizontal='center')
 
-            name_cell = merged_sheet.cell(column=current_column, row=3, value=disaggregation_name)
+            name_cell = merged_sheet.cell(
+                column=current_column, row=3, value=disaggregation_name)
             name_cell.alignment = Alignment(horizontal='center')
 
-            label_cell = merged_sheet.cell(column=current_column, row=4, value=disaggregation_label)
+            label_cell = merged_sheet.cell(
+                column=current_column, row=4, value=disaggregation_label)
             label_cell.alignment = Alignment(horizontal='center')
 
-            merged_disaggregation_values_map[disaggregation_id] = current_column
+            merged_disaggregation_values_map[
+                disaggregation_id] = current_column
 
         # Add Total column at the very end
         totals_column = self.disaggregations_start_column + \
             len(merged_disaggregations) + \
             len(merged_disaggregation_values)
 
-        totals_header_cell = merged_sheet.cell(column=totals_column, row=1, value="Total")
+        totals_header_cell = merged_sheet.cell(
+            column=totals_column, row=1, value="Total")
         totals_header_cell.style = self.bold_center_style
 
         # Merge data from all sheets
@@ -422,21 +448,23 @@ class ProgressReportXLSXExporter:
                         # Total has None value as a type
                         if sheet.cell(column=column, row=4).value is None:
                             col = self.disaggregations_start_column + \
-                                  len(merged_disaggregations) + \
-                                  len(merged_disaggregation_values)
+                                len(merged_disaggregations) + \
+                                len(merged_disaggregation_values)
                             merged_sheet.cell(
                                 column=col, row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation type
                         elif sheet.cell(column=column, row=4).value.find("#indicator+type+") > -1:
                             merged_sheet.cell(
-                                column=merged_disaggregations_map[sheet.cell(column=column, row=2).value],
+                                column=merged_disaggregations_map[
+                                    sheet.cell(column=column, row=2).value],
                                 row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation value
                         elif sheet.cell(column=column, row=4).value.find("#indicator+value+") > -1:
                             merged_sheet.cell(
-                                column=merged_disaggregation_values_map[sheet.cell(column=column, row=2).value],
+                                column=merged_disaggregation_values_map[
+                                    sheet.cell(column=column, row=2).value],
                                 row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
 
@@ -472,7 +500,8 @@ class ProgressReportXLSXExporter:
 
     def export_data(self):
         # Prepare list of unique disaggregations for choosed indicators
-        self.indicators = self.progress_report.indicator_reports.filter(reportable__is_cluster_indicator=False)
+        self.indicators = self.progress_report.indicator_reports.filter(
+            reportable__is_cluster_indicator=False)
         disaggregation_types_base_set = set()
         for i in self.indicators:
             for d in i.reportable.disaggregations.all():
@@ -488,7 +517,6 @@ class ProgressReportXLSXExporter:
                 itertools.combinations(
                     disaggregation_types_base, i))
 
-
         # Generate data per spreadsheet
 
         sheet_no = 1
@@ -503,9 +531,11 @@ class ProgressReportXLSXExporter:
                     count=Count('reportable__disaggregations')).filter(
                     count=len(disaggregation_types))
                 for dt in disaggregation_types:
-                    indicators = indicators.filter(reportable__disaggregations=dt)
+                    indicators = indicators.filter(
+                        reportable__disaggregations=dt)
             else:
-                indicators = indicators.filter(reportable__disaggregations__isnull=True)
+                indicators = indicators.filter(
+                    reportable__disaggregations__isnull=True)
 
             indicators = indicators.order_by('reportable__id')
             if not indicators:

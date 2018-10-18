@@ -63,17 +63,21 @@ class ProgressReportXLSXReader(object):
 
             # Other Info columns data retrieve
             # Partner contribution to date
-            partner_contribution = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=10).value
+            partner_contribution = self.sheet.cell(
+                row=COLUMN_HASH_ID + 1, column=10).value
             # Challenges/bottlenecks in the reporting period
-            challenges = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=12).value
+            challenges = self.sheet.cell(
+                row=COLUMN_HASH_ID + 1, column=12).value
             # Proposed way forward
-            proposed_way_forward = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=13).value
+            proposed_way_forward = self.sheet.cell(
+                row=COLUMN_HASH_ID + 1, column=13).value
 
-            #... and assign if is QPR
+            # ... and assign if is QPR
             try:
-                progress_id =  self.sheet.cell(row=COLUMN_HASH_ID + 1, column=progress_column_id).value
+                progress_id = self.sheet.cell(
+                    row=COLUMN_HASH_ID + 1, column=progress_column_id).value
                 pr = ProgressReport.objects.get(pk=progress_id)
-            except:
+            except ProgressReport.DoesNotExist:
                 return "Cannot find Progress Report"
 
             # Iterate over rows and save disaggregation values
@@ -90,7 +94,8 @@ class ProgressReportXLSXReader(object):
 
                 # Get IndicatorLocationData ID
                 try:
-                    ild_id = str(int(self.sheet.cell(row=row, column=location_column_id).value))
+                    ild_id = str(
+                        int(self.sheet.cell(row=row, column=location_column_id).value))
 
                     ind = IndicatorLocationData.objects.filter(pk=ild_id)
 
@@ -109,7 +114,8 @@ class ProgressReportXLSXReader(object):
                             indicator_report__progress_report__programme_document__partner=self.partner).count() == 0:
                         return "Indicator ID " + ild_id + " does not belong to partner " + str(self.partner)
                     indicator = IndicatorLocationData.objects.get(
-                        pk=int(self.sheet.cell(row=row, column=location_column_id).value)
+                        pk=int(self.sheet.cell(
+                            row=row, column=location_column_id).value)
                     )
 
                     # Check if Indicator Report is not able to submit anymore
@@ -120,7 +126,8 @@ class ProgressReportXLSXReader(object):
 
                 except IndicatorLocationData.DoesNotExist:
                     return "Cannot find Indicator Location Data data for ID " \
-                        + str(self.sheet.cell(row=row, column=location_column_id).value)
+                        + str(self.sheet.cell(row=row,
+                                              column=location_column_id).value)
 
                 blueprint = indicator.indicator_report.reportable.blueprint
                 data = indicator.disaggregation
@@ -134,9 +141,11 @@ class ProgressReportXLSXReader(object):
                         if value is not None:
                             # Evaluate ID of Disaggregation Type
                             dis_type_id = "()"
-                            dis_type_value = self.sheet.cell(row=2, column=column).value
+                            dis_type_value = self.sheet.cell(
+                                row=2, column=column).value
                             if dis_type_value:
-                                dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
+                                dis_type_value = sorted(
+                                    list(map(int, str(dis_type_value).split(","))), key=int)
                                 dis_type_id = str(tuple(dis_type_value))
 
                             if dis_type_id not in data:
@@ -146,7 +155,8 @@ class ProgressReportXLSXReader(object):
                                         transaction.rollback()
                                         return "Disaggregation {} does not exists".format(
                                             self.sheet.cell(row=4, column=column).value)
-                                    # Check if filled disaggregation values belongs to their type
+                                    # Check if filled disaggregation values
+                                    # belongs to their type
                                     dv = DisaggregationValue.objects.get(pk=dt)
                                     if dv.disaggregation.id not in indicator.disaggregation_reported_on:
                                         transaction.rollback()
@@ -173,14 +183,18 @@ class ProgressReportXLSXReader(object):
                             # all rows need to updated
 
                             # Evaluate ID of Disaggregation Type
-                            dis_type_value = self.sheet.cell(row=2, column=column).value
+                            dis_type_value = self.sheet.cell(
+                                row=2, column=column).value
                             if dis_type_value:
-                                dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
+                                dis_type_value = sorted(
+                                    list(map(int, str(dis_type_value).split(","))), key=int)
                             if dis_type_value:
                                 if len(dis_type_value) == indicator.level_reported:
-                                    # Check if data is proper disaggregation value
+                                    # Check if data is proper disaggregation
+                                    # value
                                     for dt in dis_type_value:
-                                        dv = DisaggregationValue.objects.get(pk=dt)
+                                        dv = DisaggregationValue.objects.get(
+                                            pk=dt)
                                         if dv.disaggregation.id in indicator.disaggregation_reported_on and \
                                                 already_updated_row_value:
                                             transaction.rollback()
