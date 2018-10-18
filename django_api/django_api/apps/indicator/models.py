@@ -725,9 +725,15 @@ class IndicatorReport(TimeStampedModel):
 
 @receiver(post_save, sender=IndicatorReport)
 def send_notification_on_status_change(sender, instance, **kwargs):
-    if (instance.tracker.has_changed('report_status') and
-            instance.report_status == INDICATOR_REPORT_STATUS.sent_back and
-            not getattr(instance, 'report_status_synced_from_pr', False)):
+    if instance.tracker.has_changed('report_status') and not getattr(instance, 'report_status_synced_from_pr', False):
+        subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
+
+        if instance.report_status == INDICATOR_REPORT_STATUS.sent_back:
+            body_template_path = 'emails/on_indicator_report_status_change_sent_back_cluster.html'
+        elif instance.report_status == INDICATOR_REPORT_STATUS.submitted:
+            body_template_path = 'emails/on_indicator_report_status_change_submitted_cluster.html'
+        else:
+            return
 
         content_object = instance.reportable.content_object
         content_type_model = instance.reportable.content_type.model
@@ -748,9 +754,6 @@ def send_notification_on_status_change(sender, instance, **kwargs):
         if cluster:
             cluster_imos = [role.user for role in cluster.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
             workspace_code = cluster.response_plan.workspace.workspace_code
-
-            body_template_path = 'emails/on_indicator_report_status_change_sent_back_cluster.html'
-            subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
 
             url_part = f'/app/{workspace_code}/cluster-reporting/plan/{cluster.response_plan_id}/results/draft'
             q_params = f'?indicator_type={indicator_type}&cluster_id={cluster.id}&indicator={instance.reportable_id}'
