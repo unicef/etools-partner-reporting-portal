@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
 
@@ -81,6 +81,9 @@ from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
 )
+
+from .export_report import ProgressReportXLSXExporter
+from .import_report import ProgressReportXLSXReader
 
 logger = logging.getLogger(__name__)
 
@@ -1181,3 +1184,68 @@ class InterventionPMPDocumentView(APIView):
             return Response("eTools API seems to have a problem, please try again later")
 
         return Response(document_url)
+
+
+class ProgressReportExcelExportView(RetrieveAPIView):
+    """
+    Progress Report export as excel API - GET
+    Authentication required.
+
+    Used for generating excel file from progress report
+
+    Returns:
+        - GET method - Progress Report data as Excel file
+    """
+    serializer_class = ProgressReportSerializer
+    queryset = ProgressReport.objects.all()
+    # permission_classes = (
+    #     AnyPermission(
+    #         IsUNICEFAPIUser,
+    #         IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    #         IsPartnerEditorForCurrentWorkspace,
+    #     ),
+    # )
+
+    def get(self, request, *args, **kwargs):
+        report = self.get_object()
+        writer = ProgressReportXLSXExporter(report)
+        return self.generate_excel(writer)
+
+    def generate_excel(self, writer):
+        import os.path
+        file_path = writer.export_data()
+        file_name = os.path.basename(file_path)
+        file_content = open(file_path, 'rb').read()
+        response = HttpResponse(file_content,
+                                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = 'attachment; filename=' + file_name
+        return response
+
+
+class ProgressReportExcelImportView(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+
+    def post(self, request,  *args, **kwargs):
+
+        up_file = request.FILES['file']
+        filepath = "/tmp/" + up_file.name
+        destination = open(filepath, 'wb+')
+
+        for chunk in up_file.chunks():
+            destination.write(chunk)
+            destination.close()
+
+        reader = ProgressReportXLSXReader(filepath, request.user.partner)
+        result = reader.import_data()
+
+
+
+        if result:
+            return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({}, status=statuses.HTTP_200_OK)
+
+

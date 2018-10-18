@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
+<link rel="import" href="../upload-button.html">
 
 <dom-module id="pd-output-list-toolbar">
   <template>
@@ -14,12 +15,24 @@
     </style>
 
     <etools-prp-toolbar
-      query="{{query}}"
-      report-id="{{reportId}}"
-      location-id="{{locationId}}"
+      query="{{ query }}"
+      report-id="{{ reportId }}"
+      location-id="{{ locationId }}"
     >
       <download-button url="[[pdfExportUrl]]">PDF</download-button>
       <download-button url="[[xlsExportUrl]]">XLS</download-button>
+
+      <template
+        is="dom-if"
+        if="[[showImportButtons]]"
+        restamp="true">
+        <upload-button
+          url="[[importUrl]]"
+          modal-title="Import Template">
+          Import Template
+        </upload-button>
+        <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
+      </template>
     </etools-prp-toolbar>
   </template>
 
@@ -29,9 +42,30 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior
       ],
 
       properties: {
+        programmeDocument: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+
+        showImportButtons: {
+          type: Boolean,
+          computed: '_computeShowImportButtons(programmeDocument)'
+        },
+
+        importTemplateUrl: {
+          type: String,
+          computed: '_computeImportTemplateUrl(locationId, reportId)',
+        },
+
+        importUrl: {
+          type: String,
+          computed: '_computeImportUrl(locationId, reportId)',
+        },
+
         pdReportUrl: {
           type: String,
           computed: '_computePdReportUrl(locationId, reportId)',
@@ -46,6 +80,18 @@
           type: String,
           computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')',
         },
+      },
+
+      _computeImportTemplateUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentImportTemplate(locationId, reportId);
+      },
+
+      _computeImportUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentImport(locationId, reportId);
+      },
+
+      _computeShowImportButtons: function (programmeDocument) {
+        return programmeDocument.status !== 'Sub' && programmeDocument.status !== 'Acc';
       },
 
       _computePdReportUrl: function (locationId, reportId) {
