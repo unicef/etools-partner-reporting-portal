@@ -6,8 +6,12 @@ from django.db import transaction
 
 from openpyxl.reader.excel import load_workbook
 
+from core import common
+
 from indicator.models import IndicatorLocationData, IndicatorBlueprint, DisaggregationValue
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+
+from .models import ProgressReport
 
 COLUMN_HASH_ID = 4
 MAX_COLUMNS = 1000
@@ -48,10 +52,40 @@ class ProgressReportXLSXReader(object):
                     dis_data_column_start_id = column
                     break
 
+            # Find "Progress" column
+            progress_column_id = None
+            for column in range(1, MAX_COLUMNS):
+                if self.sheet.cell(row=COLUMN_HASH_ID, column=column).value == "#pr+id":
+                    progress_column_id = column
+                    break
+            if not progress_column_id:
+                return "Cannot find Progress ID column"
+
+            # Other Info columns data retrieve
+            # Partner contribution to date
+            partner_contribution = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=10).value
+            # Challenges/bottlenecks in the reporting period
+            challenges = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=12).value
+            # Proposed way forward
+            proposed_way_forward = self.sheet.cell(row=COLUMN_HASH_ID + 1, column=13).value
+
+            #... and assign if is QPR
+            try:
+                progress_id =  self.sheet.cell(row=COLUMN_HASH_ID + 1, column=progress_column_id).value
+                pr = ProgressReport.objects.get(pk=progress_id)
+            except:
+                return "Cannot find Progress Report"
+
             # Iterate over rows and save disaggregation values
             for row in range(COLUMN_HASH_ID + 1, self.sheet.max_row):
                 # If row is empty, end of sheet
                 if not self.sheet.cell(row=row, column=1).value:
+                    # Update Other Info sheet
+                    if pr.report_type == common.QPR_TYPE:
+                        pr.partner_contribution_to_date = partner_contribution
+                        pr.challenges_in_the_reporting_period = challenges
+                        pr.proposed_way_forward = proposed_way_forward
+                        pr.save()
                     break
 
                 # Get IndicatorLocationData ID

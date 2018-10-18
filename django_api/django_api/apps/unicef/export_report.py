@@ -251,6 +251,14 @@ class ProgressReportXLSXExporter:
         # Lock first rows
         self.sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
+        # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
+        # Partner contribution to date
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=10, end_row=start_row_id, end_column=10)
+        # Challenges/bottlenecks in the reporting period
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=12, end_row=start_row_id, end_column=12)
+        # Proposed way forward
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START, start_column=13, end_row=start_row_id, end_column=13)
+
         return True
 
     def merge_sheets(self):

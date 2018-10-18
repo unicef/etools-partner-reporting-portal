@@ -9,8 +9,10 @@ REPORTABLE_CA_CONTENT_OBJECT = 'ca'
 REPORTABLE_PP_CONTENT_OBJECT = 'pp'
 REPORTABLE_PA_CONTENT_OBJECT = 'pa'
 
+QPR_TYPE = 'QPR'
+
 REPORTING_TYPES = Choices(
-    ('QPR', 'Quarterly Progress Report'),
+    (QPR_TYPE, 'Quarterly Progress Report'),
     ('HR', 'Humanitarian Report'),
     ('SR', 'Special Report'),
 )
