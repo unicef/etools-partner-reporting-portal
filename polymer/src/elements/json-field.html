@@ -93,7 +93,7 @@
               type="number"
               allowed-pattern="[[allowedPattern]]"
               required="[[_computeRequired(required, value, 'v')]]"
-              disabled="[[disabled]]"
+              disabled="[[_computeDisabled(disabled, disableDenominator)]]"
               placeholder="Denominator"
               no-label-float>
           </paper-input>
@@ -114,6 +114,11 @@
         allowedPattern: String,
         label: String,
         type: String,
+
+        disableDenominator: {
+          type: Boolean,
+          value: false,
+        },
 
         required: {
           type: Boolean,
@@ -151,6 +156,10 @@
 
       listeners: {
         'value-changed': '_onValueChanged',
+      },
+
+      _computeDisabled: function (disabled, disableDenominator) {
+        return disabled || disableDenominator;
       },
 
       validate: function () {

@@ -190,9 +190,15 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                       restamp="true">
                     <span>[[indicator.reportable.target.v]]%</span>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'ratio')]]"
+                      restamp="true">
+                    <span>[[indicator.reportable.target.v]]/[[indicator.reportable.target.d]]</span>
                   </template>
                 </dd>
               </dl>
