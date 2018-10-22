@@ -801,6 +801,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         HasAnyRole(
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.cluster_member,
         ),
     )
 
