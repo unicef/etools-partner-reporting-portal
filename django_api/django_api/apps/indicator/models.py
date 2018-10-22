@@ -209,13 +209,11 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
 
     if instance.calculation_formula_across_locations in IndicatorBlueprint.QUANTITY_CALC_CHOICE_LIST:
         for ir in irs:
-            if ir.indicator_location_data.count() > 0:
-                QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
+            QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
     elif instance.calculation_formula_across_locations in IndicatorBlueprint.RATIO_CALC_CHOICE_LIST:
         for ir in irs:
-            if ir.indicator_location_data.count() > 0:
-                RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
+            RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
 
 class Reportable(TimeStampedExternalSourceModel):
