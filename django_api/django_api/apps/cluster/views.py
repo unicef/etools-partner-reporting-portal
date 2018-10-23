@@ -1267,7 +1267,8 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
 
         if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id)
+                Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=response_plan_id) |
+                Q(role=PRP_ROLE_TYPES.cluster_member, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -1411,7 +1412,7 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
         super().check_permissions(request)
 
         response_plan_id = self.kwargs.get('response_plan_id')
-        roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
+        roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
 
         if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
