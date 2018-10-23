@@ -21,6 +21,14 @@
   </template>
 
   <script>
+    var options = [
+      {title: 'All', id: ''},
+      {title: 'Partner Activity', id: 'partner_activity'},
+      {title: 'Partner Project', id: 'partner_project'},
+      {title: 'Cluster Objective', id: 'cluster_objective'},
+      {title: 'Cluster Activity', id: 'cluster_activity'},
+    ];
+
     Polymer({
       is: 'cluster-indicator-type-filter',
 
@@ -30,18 +38,22 @@
       ],
 
       properties: {
+        isPartner: Boolean,
         data: {
           type: Array,
-          value: [
-            {title: 'All', id: ''},
-            {title: 'Partner Activity', id: 'partner_activity'},
-            {title: 'Partner Project', id: 'partner_project'},
-            {title: 'Cluster Objective', id: 'cluster_objective'},
-            {title: 'Cluster Activity', id: 'cluster_activity'},
-          ],
+          computed: '_computeData(isPartner)',
         },
         value: String,
       },
+      _computeData: function (isPartner) {
+        if (isPartner) {
+          return options.filter(function (option) {
+            return option.id !== "cluster_objective";
+          });
+        }
+
+        return options;
+      }
     });
   </script>
 </dom-module>
