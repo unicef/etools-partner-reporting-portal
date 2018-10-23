@@ -22,7 +22,7 @@
   "devDependencies": {
     "css-slam": "^1.1.0",
     "del": "^2.2.1",
-    "gulp": "gulpjs/gulp#4.0",
+    "gulp": "^3.9.1",
     "gulp-csslint": "^1.0.0",
     "gulp-html-extract": "^0.2.0",
     "gulp-htmlhint": "^0.3.1",
