@@ -82,6 +82,10 @@
         },
       },
 
+      listeners: {
+        'file-uploaded': '_onFileUploaded',
+      },
+
       _computeImportTemplateUrl: function (locationId, reportId) {
         return App.Endpoints.programmeDocumentImportTemplate(locationId, reportId);
       },
@@ -96,6 +100,12 @@
 
       _computePdReportUrl: function (locationId, reportId) {
         return App.Endpoints.programmeDocumentReport(locationId, reportId);
+      },
+
+      _onFileUploaded: function (e) {
+        e.stopPropagation();
+
+        window.location.reload();
       },
     });
   </script>
