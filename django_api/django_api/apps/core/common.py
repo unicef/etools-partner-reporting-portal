@@ -171,6 +171,7 @@ PD_STATUS = Choices(
 RESPONSE_PLAN_TYPE = Choices(
     ("HRP", "hrp", "HRP"),  # Humanitarian Response Plan
     ("FA", "fa", "FA"),  # Flash Appeal
+    ("OTHER", "other", "Other"),  # Flash Appeal
 )
 
 OVERALL_STATUS = Choices(
