@@ -243,7 +243,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
             if ir_total[ValueType.DENOMINATOR]:
                 ir_total[ValueType.CALCULATED] = ir_total[ValueType.VALUE] / (ir_total[ValueType.DENOMINATOR] * 1.0)
 
-            if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.PERCENTAGE:
+            if indicator_report.reportable.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
                 ir_total[ValueType.CALCULATED] *= 100
 
         indicator_report.total = ir_total
