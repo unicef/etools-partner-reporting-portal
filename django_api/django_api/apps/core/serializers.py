@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from cluster.models import Cluster
-from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES
+from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE
 from utils.serializers import CurrentWorkspaceDefault
 from .models import Workspace, Location, ResponsePlan, Country, GatewayType, PRPRole
 
@@ -120,6 +120,7 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
             'start',
             'end',
             'plan_type',
+            'plan_custom_type_label',
             'clusters',
         )
 
@@ -139,6 +140,13 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
         if validated_data['end'] < validated_data['start']:
             raise serializers.ValidationError({
                 'end': 'Cannot be earlier than Start'
+            })
+
+        if validated_data['plan_type'] == RESPONSE_PLAN_TYPE.other \
+                and ('plan_custom_type_label' not in validated_data
+                     or validated_data['plan_custom_type_label'] == ''):
+            raise serializers.ValidationError({
+                'plan_custom_type_label': 'Plan custom type label is required when the type is other'
             })
 
         return validated_data

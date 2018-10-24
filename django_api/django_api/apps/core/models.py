@@ -274,10 +274,16 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     """
     title = models.CharField(max_length=255, verbose_name='Response Plan')
     plan_type = models.CharField(
-        max_length=3,
+        max_length=5,
         choices=RESPONSE_PLAN_TYPE,
         default=RESPONSE_PLAN_TYPE.hrp,
         verbose_name='Plan Type'
+    )
+    plan_custom_type_label = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='Plan Custom Type Label'
     )
     start = models.DateField(
         null=True,
