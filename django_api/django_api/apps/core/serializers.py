@@ -99,6 +99,7 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'documents',
             'clusters',
             'can_import_ocha_projects',
+            'plan_custom_type_label',
         )
 
     def get_clusters(self, obj):
