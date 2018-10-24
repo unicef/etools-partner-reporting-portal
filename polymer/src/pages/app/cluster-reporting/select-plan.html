@@ -214,7 +214,7 @@
                   [[plan.title]]
                 </div>
                 <div class="table-cell" flex-2>
-                  [[plan.plan_type]]
+                  [[_planType(plan)]]
                 </div>
                 <div class="table-cell" flex-2>
                   [[plan.start]]
@@ -320,6 +320,10 @@
       _confirm: function () {
         this._redirectToPlan(this.selected);
       },
+
+      _planType: function (plan) {
+        return plan.plan_type === 'OTHER' ? plan.plan_custom_type_label : plan.plan_type;
+      }
     });
 
   </script>
