@@ -612,6 +612,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "title",
             "phone_num",
             "email",
+            "active",
         )
         extra_kwargs = {'name': {'required': True}}
 
