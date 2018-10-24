@@ -63,6 +63,7 @@ def create_user_for_person(person):
     })
     if created:
         user.set_unusable_password()
+        user.send_email_notification_on_create('IP')
 
     if person.name:
         name_parts = person.name.split()
@@ -238,6 +239,9 @@ def process_programme_documents(fast=False, area=False):
                                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                                 workspace=workspace,
                             )
+
+                            if created:
+                                obj.send_email_notification()
 
                             is_active = person_data.get('active')
 
@@ -561,5 +565,5 @@ def process_programme_documents(fast=False, area=False):
                         logger.info("End of workspace")
                         break
             except Exception as e:
-                logger.exception(e.message)
+                logger.exception(e)
                 raise

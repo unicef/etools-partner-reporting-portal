@@ -111,24 +111,27 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             ValueType.VALUE: 0
         }
 
+        ilds = indicator_report.indicator_location_data.all()
+        loc_count = ilds.count()
+
         # IndicatorReport total calculation
-        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.MAX:
+        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.MAX \
+                and loc_count > 0:
             max_total_loc = max(
-                indicator_report.indicator_location_data.all(),
+                ilds,
                 key=lambda item: item.disaggregation['()'][ValueType.VALUE]
             )
 
             ir_total = max_total_loc.disaggregation['()']
         else:
-            for loc_data in indicator_report.indicator_location_data.all():
+            for loc_data in ilds:
                 loc_total = loc_data.disaggregation['()']
 
                 ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
                 ir_total[ValueType.CALCULATED] += loc_total[ValueType.CALCULATED]
 
-        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG:
-            loc_count = indicator_report.indicator_location_data.count()
-
+        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG \
+                and loc_count > 0:
             ir_total[ValueType.VALUE] = ir_total[ValueType.VALUE] / (loc_count * 1.0)
             ir_total[ValueType.CALCULATED] = ir_total[ValueType.CALCULATED] / (loc_count * 1.0)
 
@@ -227,17 +230,21 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
             ValueType.VALUE: 0,
         }
 
-        for loc_data in indicator_report.indicator_location_data.all():
+        ilds = indicator_report.indicator_location_data.all()
+        loc_count = ilds.count()
+
+        for loc_data in ilds:
             loc_total = loc_data.disaggregation['()']
 
             ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
             ir_total[ValueType.DENOMINATOR] += loc_total[ValueType.DENOMINATOR]
 
-        if ir_total[ValueType.DENOMINATOR]:
-            ir_total[ValueType.CALCULATED] = ir_total[ValueType.VALUE] / (ir_total[ValueType.DENOMINATOR] * 1.0)
+        if loc_count > 0:
+            if ir_total[ValueType.DENOMINATOR]:
+                ir_total[ValueType.CALCULATED] = ir_total[ValueType.VALUE] / (ir_total[ValueType.DENOMINATOR] * 1.0)
 
-        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.PERCENTAGE:
-            ir_total[ValueType.CALCULATED] *= 100
+            if indicator_report.reportable.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+                ir_total[ValueType.CALCULATED] *= 100
 
         indicator_report.total = ir_total
         indicator_report.save()

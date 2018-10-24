@@ -14,6 +14,7 @@ const path = require('path');
 const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
+const fancylog = require('fancy-log');
 const argv = require('yargs').argv;
 
 // Got problems? Try logging 'em
@@ -78,9 +79,9 @@ const project = require('./gulp-tasks/project.js');
 // Log task end messages
 var log = function(message) {
     return function() {
-        gutil.log(message);
-    }
-}
+        fancylog(message);
+    };
+};
 
 // The source task will split all of your source files into one
 // big ReadableStream. Source files are those in src/** as well as anything

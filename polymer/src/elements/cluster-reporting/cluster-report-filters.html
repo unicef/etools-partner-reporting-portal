@@ -54,6 +54,7 @@
 
         <cluster-indicator-type-filter
             class="item filter-col"
+            is-partner="[[_computeIsPartner(queryParams)]]"
             value="[[_withDefault(queryParams.indicator_type, '')]]">
         </cluster-indicator-type-filter>
 
@@ -91,6 +92,10 @@
           notify: true,
         },
       },
+
+      _computeIsPartner: function (queryParams) {
+        return !!queryParams.partner;
+      }
     });
   </script>
 </dom-module>

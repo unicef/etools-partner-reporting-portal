@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
 
@@ -81,6 +81,9 @@ from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
 )
+
+from .export_report import ProgressReportXLSXExporter
+from .import_report import ProgressReportXLSXReader
 
 logger = logging.getLogger(__name__)
 
@@ -777,6 +780,20 @@ class ProgressReportPullHFDataAPIView(APIView):
             end_date__lte=self.progress_report.end_date,
         )
 
+        target_hf_irs = IndicatorReport.objects.filter(
+            id__in=hf_reports.values_list('indicator_reports', flat=True),
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        if not target_hf_irs.exists():
+            # The passed-in indicator report is non-HF indicator
+            raise ValidationError(
+                "This indicator is not a high frequency indicator. "
+                "Data pull only works with high frequency indicator."
+            )
+
         return indicator_report, hf_reports
 
     def _calculate_report_location_totals_per_reports(self, indicator_report, hf_reports, locations):
@@ -872,6 +889,8 @@ class ProgressReportPullHFDataAPIView(APIView):
         )
 
         # Data pull updates
+        data_available = True
+
         for ild in indicator_report.indicator_location_data.all():
             data_dict = consolidated_total_per_location_dict[ild.location.id]
 
@@ -880,7 +899,17 @@ class ProgressReportPullHFDataAPIView(APIView):
             else:
                 ild.disaggregation = {'()': data_dict['total']}
 
+            if ild.disaggregation['()'] == dict():
+                data_available = False
+                ild.disaggregation['()'] = {'c': 0, 'd': 0, 'v': 0}
+
             ild.save()
+
+        if not data_available:
+            raise ValidationError(
+                "This indicator does not have available data to pull. "
+                "Enter data for HR report on this indicator first."
+            )
 
         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
             QuantityIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
@@ -1158,3 +1187,63 @@ class InterventionPMPDocumentView(APIView):
             return Response("eTools API seems to have a problem, please try again later")
 
         return Response(document_url)
+
+
+class ProgressReportExcelExportView(RetrieveAPIView):
+    """
+    Progress Report export as excel API - GET
+    Authentication required.
+
+    Used for generating excel file from progress report
+
+    Returns:
+        - GET method - Progress Report data as Excel file
+    """
+    serializer_class = ProgressReportSerializer
+    queryset = ProgressReport.objects.all()
+    # permission_classes = (
+    #     AnyPermission(
+    #         IsUNICEFAPIUser,
+    #         IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    #         IsPartnerEditorForCurrentWorkspace,
+    #     ),
+    # )
+
+    def get(self, request, *args, **kwargs):
+        report = self.get_object()
+        writer = ProgressReportXLSXExporter(report)
+        return self.generate_excel(writer)
+
+    def generate_excel(self, writer):
+        import os.path
+        file_path = writer.export_data()
+        file_name = os.path.basename(file_path)
+        file_content = open(file_path, 'rb').read()
+        response = HttpResponse(file_content,
+                                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = 'attachment; filename=' + file_name
+        return response
+
+
+class ProgressReportExcelImportView(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request,  *args, **kwargs):
+
+        up_file = request.FILES['file']
+        filepath = "/tmp/" + up_file.name
+        destination = open(filepath, 'wb+')
+
+        for chunk in up_file.chunks():
+            destination.write(chunk)
+            destination.close()
+
+        reader = ProgressReportXLSXReader(filepath, request.user.partner)
+        result = reader.import_data()
+
+        if result:
+            return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({}, status=statuses.HTTP_200_OK)

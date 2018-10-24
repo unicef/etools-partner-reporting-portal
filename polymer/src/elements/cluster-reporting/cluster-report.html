@@ -191,49 +191,49 @@
     </style>
 
     <etools-prp-permissions
-        permissions="{{permissions}}">
+      permissions="{{ permissions }}">
     </etools-prp-permissions>
 
     <iron-location
-        query="{{query}}">
+      query="{{ query }}">
     </iron-location>
 
     <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
+      params-string="{{ query }}"
+      params-object="{{ queryParams }}">
     </iron-query-params>
 
     <iron-query-params
-        params-string="{{exportQuery}}"
-        params-object="{{exportParams}}">
+      params-string="{{ exportQuery }}"
+      params-object="{{ exportParams }}">
     </iron-query-params>
 
     <etools-prp-ajax
-        id="submit"
-        url="[[reportUrl]]"
-        method="post">
+      id="submit"
+      url="[[reportUrl]]"
+      method="post">
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="update"
-        url="[[reportUrl]]"
-        body="[[reportMeta]]"
-        method="patch"
-        content-type="application/json">
+      id="update"
+      url="[[reportUrl]]"
+      body="[[reportMeta]]"
+      method="patch"
+      content-type="application/json">
     </etools-prp-ajax>
 
     <div class$="report [[containerClassName]]">
       <div class="layout horizontal">
         <div
-            class="report__toggle flex-none layout horizontal center-center"
-            on-tap="_toggle"
-            toggles="[[index]]"
-            role="button"
-            aria-expanded$="[[opened]]"
-            aria-controls$="collapse"
-            tabindex="-1">
+          class="report__toggle flex-none layout horizontal center-center"
+          on-tap="_toggle"
+          toggles="[[index]]"
+          role="button"
+          aria-expanded$="[[opened]]"
+          aria-controls$="collapse"
+          tabindex="-1">
           <iron-icon
-              icon="icons:expand-[[_computeIcon(opened)]]">
+            icon="icons:expand-[[_computeIcon(opened)]]">
           </iron-icon>
         </div>
 
@@ -243,16 +243,16 @@
               <report-status status="[[data.report_status]]"></report-status>
               <dl>
                 <template
-                    is="dom-if"
-                    if="[[!_equals(mode, 'view')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[!_equals(mode, 'view')]]"
+                  restamp="true">
                   <dt>Due date:</dt>
                   <dd>[[data.due_date]]</dd>
                 </template>
                 <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'view')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[_equals(mode, 'view')]]"
+                  restamp="true">
                   <dt>Submission date:</dt>
                   <dd>[[data.submission_date]]</dd>
                 </template>
@@ -265,15 +265,15 @@
                 <dt>Calculation method:</dt>
                 <dd>
                   [[data.reportable.blueprint.calculation_formula_across_locations]] (across locations),
-                  [[data.reportable.blueprint.calculation_formula_across_periods]] (across reporting periods)
+                  [[_calculationFormulaAcrossPeriods(data)]] (across reporting periods)
                 </dd>
               </dl>
             </div>
             <div class="column flex">
               <template
-                  is="dom-if"
-                  if="[[data.partner]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[data.partner]]"
+                restamp="true">
                 <dl>
                   <dt>Partner:</dt>
                   <dd>[[_withDefault(data.partner.title)]]</dd>
@@ -293,9 +293,9 @@
                 </dl>
               </template>
               <template
-                  is="dom-if"
-                  if="[[data.partner_activity]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[data.partner_activity]]"
+                restamp="true">
                 <dl>
                   <dt>Activity:</dt>
                   <dd>
@@ -306,9 +306,9 @@
                 </dl>
               </template>
               <template
-                  is="dom-if"
-                  if="[[data.cluster_objective]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[data.cluster_objective]]"
+                restamp="true">
                 <dl>
                   <dt>Cluster Objective:</dt>
                   <dd>
@@ -319,9 +319,9 @@
                 </dl>
               </template>
               <template
-                  is="dom-if"
-                  if="[[data.cluster_activity]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[data.cluster_activity]]"
+                restamp="true">
                 <dl>
                   <dt>Cluster Activity:</dt>
                   <dd>
@@ -333,45 +333,45 @@
               </template>
             </div>
             <template
-                is="dom-if"
-                if="[[data.is_draft]]"
-                restamp="true">
+              is="dom-if"
+              if="[[data.is_draft]]"
+              restamp="true">
               <div class="column layout horizontal center-center flex-none">
                 <span class="draft-badge">Draft</span>
               </div>
             </template>
             <div class="column layout horizontal center-center flex-none">
               <template
-                  is="dom-if"
-                  if="[[!_equals(submitMode, 'view')]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[!_equals(submitMode, 'view')]]"
+                restamp="true">
                 <paper-button
-                    class="btn-primary"
-                    disabled="[[!canSubmit]]"
-                    on-tap="_submit"
-                    raised>
+                  class="btn-primary"
+                  disabled="[[!canSubmit]]"
+                  on-tap="_submit"
+                  raised>
                   Submit
                 </paper-button>
               </template>
 
               <template
-                  is="dom-if"
-                  if="[[_equals(mode, 'view')]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[_equals(mode, 'view')]]"
+                restamp="true">
                 <send-back-modal
-                    id="sendBackModal"
-                    report="[[data]]">
+                  id="sendBackModal"
+                  report="[[data]]">
                 </send-back-modal>
 
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
                   <paper-menu
-                      id="viewMenu"
-                      class="dropdown-content"
-                      selected="2">
+                    id="viewMenu"
+                    class="dropdown-content"
+                    selected="2">
                     <template
-                        is="dom-if"
-                        if="[[canSendBack]]">
+                      is="dom-if"
+                      if="[[canSendBack]]">
                       <paper-icon-item on-tap="_sendBack">
                         <iron-icon icon="icons:reply" item-icon></iron-icon>
                         Send back to partner
@@ -379,9 +379,9 @@
                     </template>
 
                     <a
-                        href="[[exportUrl]]"
-                        target="_blank"
-                        tabindex="-1">
+                      href="[[exportUrl]]"
+                      target="_blank"
+                      tabindex="-1">
                       <paper-icon-item>
                         <iron-icon icon="icons:file-download" item-icon></iron-icon>
                         Export
@@ -394,20 +394,20 @@
               </template>
 
               <template
-                  is="dom-if"
-                  if="[[showFeedback]]"
-                  restamp="true">
+                is="dom-if"
+                if="[[showFeedback]]"
+                restamp="true">
 
                 <feedback-modal
-                    id="feedbackModal"
-                    report="[[data]]">
+                  id="feedbackModal"
+                  report="[[data]]">
                 </feedback-modal>
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
                   <paper-menu
-                      id="nonViewMenu"
-                      class="dropdown-content"
-                      selected="1">
+                    id="nonViewMenu"
+                    class="dropdown-content"
+                    selected="1">
                     <paper-icon-item on-tap="_viewFeedback">
                       <iron-icon icon="icons:announcement" item-icon></iron-icon>
                       View feedback
@@ -423,13 +423,13 @@
             <div class="reportable__title flex-3 layout vertical center-justified">
               <div class="layout horizontal">
                 <template
-                    is="dom-if"
-                    if="[[!_equals(mode, 'view')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[!_equals(mode, 'view')]]"
+                  restamp="true">
                   <div class="status-badge layout vertical center-justified">
                     <report-status
-                        status="[[_computeCompleteIndicator(data.is_complete)]]"
-                        no-label>
+                      status="[[_computeCompleteIndicator(data.is_complete)]]"
+                      no-label>
                     </report-status>
                   </div>
                 </template>
@@ -441,21 +441,21 @@
                 <dt class="flex-3">Target:</dt>
                 <dd class="flex">
                   <template
-                      is="dom-if"
-                      if="[[_equals(indicatorType, 'number')]]"
-                      restamp="true">
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'number')]]"
+                    restamp="true">
                     <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
                   </template>
                   <template
-                      is="dom-if"
-                      if="[[_equals(indicatorType, 'percentage')]]"
-                      restamp="true">
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'percentage')]]"
+                    restamp="true">
                     <span>[[data.reportable.target.v]]%</span>
                   </template>
                   <template
-                      is="dom-if"
-                      if="[[_equals(indicatorType, 'ratio')]]"
-                      restamp="true">
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'ratio')]]"
+                    restamp="true">
                     <span>
                       <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
                       /
@@ -467,35 +467,35 @@
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Total cumulative progress:</dt>
                 <template
-                    is="dom-if"
-                    if="[[_equals(indicatorType, 'number')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[_equals(indicatorType, 'number')]]"
+                  restamp="true">
                   <dd class="flex">
                     <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
                   </dd>
                 </template>
                 <template
-                    is="dom-if"
-                    if="[[!_equals(indicatorType, 'number')]]"
-                    restamp="true">
-                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
+                  is="dom-if"
+                  if="[[!_equals(indicatorType, 'number')]]"
+                  restamp="true">
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Achievement in reporting period:</dt>
                 <template
-                    is="dom-if"
-                    if="[[_equals(indicatorType, 'number')]]"
-                    restamp="true">
+                  is="dom-if"
+                  if="[[_equals(indicatorType, 'number')]]"
+                  restamp="true">
                   <dd class="flex">
                     <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
                   </dd>
                 </template>
                 <template
-                    is="dom-if"
-                    if="[[!_equals(indicatorType, 'number')]]"
-                    restamp="true">
-                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
+                  is="dom-if"
+                  if="[[!_equals(indicatorType, 'number')]]"
+                  restamp="true">
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c)]]</dd>
                 </template>
               </dl>
             </div>
@@ -505,14 +505,14 @@
 
       <div>
         <iron-collapse
-            id="collapse"
-            opened="{{opened}}"
-            on-opened-changed="_handleOpenedChanged"
-            no-animation>
+          id="collapse"
+          opened="{{ opened }}"
+          on-opened-changed="_handleOpenedChanged"
+          no-animation>
           <reportable-meta
-              data="[[data]]"
-              mode="[[editMode]]"
-              allow-no-status>
+            data="[[data]]"
+            mode="[[editMode]]"
+            allow-no-status>
           </reportable-meta>
 
           <indicator-details
@@ -635,6 +635,11 @@
         'reportable-meta-changed': '_updateMeta',
       },
 
+      _calculationFormulaAcrossPeriods: function (indicator) {
+        return indicator.reportable.blueprint.display_type === 'ratio'
+          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+      },
+
       _computeIcon: function (opened) {
         return opened ? 'less' : 'more';
       },
@@ -705,7 +710,8 @@
 
           try {
             indicatorDetails.init();
-          } catch (err) {}
+          } catch (err) {
+          }
         }
       },
 
@@ -713,8 +719,8 @@
         this.set('busy', true);
 
         this._confirmIntent()
-            .then(this._commit.bind(this))
-            .catch(this._revert.bind(this));
+          .then(this._commit.bind(this))
+          .catch(this._revert.bind(this));
       },
 
       _confirmIntent: function () {
@@ -732,17 +738,17 @@
         return this.dispatch(
           App.Actions.ClusterIndicatorReports.submit(submitThunk)
         )
-            .then(function () {
-              self.set('busy', false);
-              self.fire('report-submitted', self.data.id);
-            })
-            .catch(function (res) {
-              var errors = res.data.non_field_errors;
+          .then(function () {
+            self.set('busy', false);
+            self.fire('report-submitted', self.data.id);
+          })
+          .catch(function (res) {
+            var errors = res.data.non_field_errors;
 
-              return self.$.error.open(errors).then(function () {
-                return Promise.reject(); // Revert
-              });
+            return self.$.error.open(errors).then(function () {
+              return Promise.reject(); // Revert
             });
+          });
       },
 
       _revert: function () {
@@ -777,12 +783,12 @@
         this.dispatch(
           App.Actions.ClusterIndicatorReports.update(updateThunk, this.data.id)
         )
-            .then(function () {
-              self._notifyChangesSaved();
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          .then(function () {
+            self._notifyChangesSaved();
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
       },
 
       _computeExportParams: function (queryParams, data) {
@@ -822,7 +828,7 @@
 
       _computeShowFeedback: function (data, permissions) {
         return data.report_status === 'Sen' &&
-            permissions.editIndicatorReport(data);
+          permissions.editIndicatorReport(data);
       },
 
       _sendBack: function () {

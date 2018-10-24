@@ -305,6 +305,7 @@
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
                   disabled="[[!canEditDetails]]"
+                  disable-denominator
                   required>
               </json-field>
             </div>
@@ -480,7 +481,7 @@
       },
 
       _computeCanEditDetails: function (permissions, data, isPAI) {
-        return (permissions.createClusterEntities() && !isPAI) ||
+        return (permissions.createClusterEntities && !isPAI) ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 

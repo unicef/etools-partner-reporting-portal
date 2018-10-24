@@ -1,0 +1,7 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name }},</p>
+    <p>Your indicator report which is listed here: <a href="{{ ir_url|safe }}">{{ ir_url|safe }}</a> has been submitted.</p>
+    <p>Best Regards,</p>
+{% endblock content %}

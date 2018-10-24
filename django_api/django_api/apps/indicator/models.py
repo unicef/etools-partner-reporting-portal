@@ -10,6 +10,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
 from rest_framework import serializers
 
 from core.common import (
@@ -18,7 +20,8 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
-    FINAL_OVERALL_STATUS)
+    FINAL_OVERALL_STATUS,
+    PRP_ROLE_TYPES)
 from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
@@ -29,6 +32,7 @@ from indicator.disaggregators import (
     RatioIndicatorDisaggregator
 )
 from indicator.constants import ValueType
+from utils.emails import send_email_from_template
 
 
 class Disaggregation(TimeStampedExternalSourceModel):
@@ -586,6 +590,7 @@ class IndicatorReport(TimeStampedModel):
         'indicator.ReportingEntity', related_name="indicator_reports"
     )
 
+    tracker = FieldTracker(fields=['report_status'])
     objects = IndicatorReportManager()
 
     class Meta:
@@ -718,6 +723,61 @@ class IndicatorReport(TimeStampedModel):
         return output_list
 
 
+@receiver(post_save, sender=IndicatorReport)
+def send_notification_on_status_change(sender, instance, **kwargs):
+    if instance.tracker.has_changed('report_status') and not getattr(instance, 'report_status_synced_from_pr', False):
+        subject_template_path = 'emails/on_indicator_report_status_change_subject.txt'
+
+        if instance.report_status == INDICATOR_REPORT_STATUS.sent_back:
+            body_template_path = 'emails/on_indicator_report_status_change_sent_back_cluster.html'
+        elif instance.report_status == INDICATOR_REPORT_STATUS.submitted:
+            body_template_path = 'emails/on_indicator_report_status_change_submitted_cluster.html'
+        else:
+            return
+
+        content_object = instance.reportable.content_object
+        content_type_model = instance.reportable.content_type.model
+
+        if content_type_model == 'clusterobjective':
+            cluster = content_object.cluster
+            indicator_type = 'cluster_objective'
+        elif content_type_model == 'clusteractivity':
+            cluster = content_object.cluster_objective.cluster
+            indicator_type = 'cluster_activity'
+        elif content_type_model == 'partneractivity' and content_object.cluster_activity:
+            cluster = content_object.cluster_activity.cluster_objective.cluster
+            indicator_type = 'partner_activity'
+        else:
+            cluster = None
+            indicator_type = ''
+
+        if cluster:
+            cluster_imos = [role.user for role in cluster.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
+            workspace_code = cluster.response_plan.workspace.workspace_code
+
+            url_part = f'/app/{workspace_code}/cluster-reporting/plan/{cluster.response_plan_id}/results/draft'
+            q_params = f'?indicator_type={indicator_type}&cluster_id={cluster.id}&indicator={instance.reportable_id}'
+            ir_url = urljoin(settings.FRONTEND_HOST, url_part) + q_params
+
+            template_data = {
+                'user': None,
+                'ir_url': ir_url,
+                'status': instance.get_report_status_display()
+            }
+
+            for user in cluster_imos:
+                template_data['user'] = user
+                to_email_list = [user.email]
+
+                send_email_from_template(
+                    subject_template_path=subject_template_path,
+                    body_template_path=body_template_path,
+                    template_data=template_data,
+                    to_email_list=to_email_list,
+                    content_subtype='html',
+                )
+
+
 @receiver(post_save,
           sender=IndicatorReport,
           dispatch_uid="unlock_ild_for_sent_back_cluster_ir")
@@ -784,12 +844,13 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
                 reportable_total['c'] = reportable_total['v']
 
-        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
-        # ratio
+        # if unit is PERCENTAGE, doesn't matter if calc choice was
+        # percent or ratio
         elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-            for indicator_report in accepted_indicator_reports:
-                reportable_total['v'] += indicator_report.total['v']
-                reportable_total['d'] += indicator_report.total['d']
+            latest_accepted_indicator_report = accepted_indicator_reports.order_by('-time_period_start').first()
+
+            reportable_total['v'] = latest_accepted_indicator_report.total['v']
+            reportable_total['d'] = latest_accepted_indicator_report.total['d']
 
             if reportable_total['d'] != 0:
                 reportable_total['c'] = reportable_total['v'] / \

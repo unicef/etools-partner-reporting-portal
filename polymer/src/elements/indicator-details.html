@@ -151,7 +151,7 @@
               <paper-button
                   class="btn-primary"
                   modal-index="[[indicatorId]]"
-                  on-tap="_openPullModal">
+                  on-tap="_openPullModal" disabled="[[disablePull]]">
                 Pull Data from HR
               </paper-button>
             </div>
@@ -287,9 +287,9 @@
                               if="[[!_equals(location.display_type, 'number')]]"
                               restamp="true">
                             <dt>Location progress:</dt>
-                            <dd>[[_toPercentage(location.location_progress.c)]]</dd>
+                            <dd>[[_formatIndicatorValue(location.display_type, location.location_progress.c)]]</dd>
                             <dt>Previous location progress:</dt>
-                            <dd>[[_toPercentage(location.previous_location_progress.c)]]</dd>
+                            <dd>[[_formatIndicatorValue(location.display_type, location.previous_location_progress.c)]]</dd>
                           </template>
                         </dl>
 
@@ -342,7 +342,7 @@
                               is="dom-if"
                               if="[[!_equals(topLevelLocation.byEntity.0.display_type, 'number')]]"
                               restamp="true">
-                            <span>[[_toPercentage(topLevelLocation.byEntity.0.location_progress.c)]]</span>
+                            <span>[[_formatIndicatorValue(topLevelLocation.byEntity.0.display_type, topLevelLocation.byEntity.0.location_progress.c)]]</span>
                           </template>
                         </dd>
                       </dl>
@@ -426,7 +426,7 @@
 
         currentPD: {
           type: Object,
-          statePath: App.Selectors.ProgrammeDocuments.current,
+          statePath: App.Selectors.ProgrammeDocuments.current
         },
 
         hasPD: {
@@ -446,7 +446,7 @@
 
         data: {
           type: Object,
-          statePath: 'disaggregations.byIndicator',
+          statePath: 'disaggregations.byIndicator'
         },
 
         disaggregations: {
@@ -478,6 +478,15 @@
         reportIsQpr: {
           type: Boolean,
         },
+
+        reportStatus: {
+          type: String
+        },
+
+        disablePull: {
+          type: Boolean,
+          computed: '_computeDisablePull(reportStatus)'
+        }
       },
 
       listeners: {
@@ -630,6 +639,10 @@
 
       _canEnterData: function (mode, isLocked) {
         return mode !== 'view' && !isLocked;
+      },
+
+      _computeDisablePull: function(reportStatus) {
+        return reportStatus === 'Sub' || reportStatus === 'Acc';
       },
 
       attached: function () {

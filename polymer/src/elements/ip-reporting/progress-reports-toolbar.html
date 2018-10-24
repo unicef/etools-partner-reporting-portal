@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
+<link rel="import" href="../../redux/store.html">
 
 <dom-module id="progress-reports-toolbar">
   <template>
@@ -14,10 +15,12 @@
     </style>
 
     <etools-prp-toolbar
-      query="{{query}}"
-      location-id="{{locationId}}"
+      query="{{ query }}"
+      location-id="{{ locationId }}"
     >
-      <download-button url="[[xlsExportUrl]]">XLS</download-button>
+      <template is="dom-if" if="[[canExport]]" restamp="true">
+        <download-button url="[[xlsExportUrl]]">XLS</download-button>
+      </template>
     </etools-prp-toolbar>
   </template>
 
@@ -27,9 +30,20 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
+        totalResults: {
+          type: Number,
+          statePath: 'progressReports.count',
+        },
+
+        canExport: {
+          type: Boolean,
+          computed: '_canExport(totalResults)'
+        },
+
         pdReportsUrl: {
           type: String,
           computed: '_computePdReportsUrl(locationId)',
@@ -43,6 +57,10 @@
 
       _computePdReportsUrl: function (locationId) {
         return App.Endpoints.programmeDocumentReports(locationId);
+      },
+
+      _canExport: function (totalResults) {
+        return totalResults > 0;
       },
     });
   </script>

@@ -1,3 +1,6 @@
+import itertools
+import uuid
+
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment, NamedStyle
 from openpyxl.utils import get_column_letter
@@ -5,28 +8,25 @@ from openpyxl.utils import get_column_letter
 from django.conf import settings
 from django.db.models import Count
 
-import itertools
-import uuid
+from indicator.models import DisaggregationValue, IndicatorBlueprint
+from indicator.constants import ValueType
 
-from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorReport
-
-PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
+PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'
 
-DISAGGREGATION_COLUMN_START = 44
+DISAGGREGATION_COLUMN_START = 40
 INDICATOR_DATA_ROW_START = 5
 MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
 
 
-class IndicatorsXLSXExporter:
+class ProgressReportXLSXExporter:
 
     analysis = False
 
-    def __init__(self, indicators, response_plan_id, analysis=None):
+    def __init__(self, progress_report, analysis=None):
         self.wb = load_workbook(PATH)
         self.sheet = self.wb.get_active_sheet()
-        self.indicators = indicators
-        self.response_plan_id = response_plan_id
+        self.progress_report = progress_report
         if analysis is not None:
             self.analysis = analysis
         self.sheets = [self.sheet, ]
@@ -51,11 +51,13 @@ class IndicatorsXLSXExporter:
         for idx, dt in enumerate(disaggregation_types):
             current_column = self.disaggregations_start_column + idx
 
-            name_cell = self.sheet.cell(row=1, column=current_column, value=dt.name)
+            name_cell = self.sheet.cell(
+                row=1, column=current_column, value=dt.name)
             name_cell.alignment = Alignment(horizontal='center')
             name_cell.font = Font(bold=True)
 
-            id_cell = self.sheet.cell(row=2, column=current_column, value=dt.id)
+            id_cell = self.sheet.cell(
+                row=2, column=current_column, value=dt.id)
             id_cell.alignment = Alignment(horizontal='center')
 
             type_cell = self.sheet.cell(
@@ -87,13 +89,16 @@ class IndicatorsXLSXExporter:
 
         # Generate disaggregation values columns
         for idx, dvs in enumerate(disaggregation_values):
-            current_column = self.disaggregations_start_column + len(disaggregation_types) + idx
+            current_column = self.disaggregations_start_column + \
+                len(disaggregation_types) + idx
 
-            cell = self.sheet.cell(row=1, column=current_column, value=" + ".join([dv.value for dv in dvs]))
+            cell = self.sheet.cell(
+                row=1, column=current_column, value=" + ".join([dv.value for dv in dvs]))
             cell.alignment = Alignment(horizontal='center')
             cell.font = Font(bold=True)
 
-            self.sheet.cell(row=2, column=current_column, value=", ".join([str(dv.id) for dv in dvs]))
+            self.sheet.cell(row=2, column=current_column,
+                            value=", ".join([str(dv.id) for dv in dvs]))
             self.sheet.cell(
                 row=3, column=current_column, value=" + ".join([disaggregation_values_by_type[dv.id] for dv in dvs])
             )
@@ -101,10 +106,13 @@ class IndicatorsXLSXExporter:
                 row=4, column=current_column, value="#indicator+value+" + str("+".join([dv.value for dv in dvs]))
             )
 
-            disaggregation_values_map[", ".join([str(dv.id) for dv in dvs])] = current_column
+            disaggregation_values_map[
+                ", ".join([str(dv.id) for dv in dvs])] = current_column
 
-        totals_column = self.disaggregations_start_column + len(disaggregation_types) + len(disaggregation_values)
-        totals_header_cell = self.sheet.cell(row=1, column=totals_column, value="Total")
+        totals_column = self.disaggregations_start_column + \
+            len(disaggregation_types) + len(disaggregation_values)
+        totals_header_cell = self.sheet.cell(
+            row=1, column=totals_column, value="Total")
         totals_header_cell.alignment = Alignment(horizontal='center')
 
         disaggregation_values_map["()"] = totals_column
@@ -120,98 +128,78 @@ class IndicatorsXLSXExporter:
                 all_indicators.append(children_indicator)
 
         for indicator in all_indicators:
-            cluster_objective = indicator.reportable.cluster_objectives.first()
-            cluster_activity = indicator.reportable.cluster_activities.first()
-            partner_project = indicator.reportable.partner_projects.first()
-            partner_activity = indicator.reportable.partner_activities.first()
             locations_data = indicator.indicator_location_data
-
-            cluster = None
-
-            if cluster_objective:
-                cluster = cluster_objective.cluster
-                partner_activity = cluster_objective.cluster_activities.first().partner_activities.first() \
-                    if cluster_objective.cluster_activities.first() else ""
-                partner_project = cluster_objective.cluster.partner_projects.first()
-            elif cluster_activity:
-                cluster = cluster_activity.cluster_objective.cluster
-                cluster_objective = cluster_activity.cluster_objective
-                partner_activity = cluster_activity.partner_activities.first()
-                partner_project = cluster_activity.cluster_objective.cluster.partner_projects.first()
-            elif partner_activity:
-                cluster = partner_activity.cluster_activity.cluster_objective.cluster if \
-                    partner_activity.cluster_activity else partner_activity.cluster_objective.cluster
-                cluster_objective = partner_activity.cluster_activity.cluster_objective if \
-                    partner_activity.cluster_activity else partner_activity.cluster_objective
-                partner_project = partner_activity.project
-            elif partner_project:
-                cluster = partner_project.clusters.first()
-                cluster_objective = cluster.cluster_objectives.first()
-                partner_activity = partner_project.partner.partner_activities.first()
-
             for location_data in locations_data.all():
 
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=1).value = location_data.location.gateway.country.name
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=2).value = location_data.location.gateway.country.country_short_code
-                self.sheet.cell(row=start_row_id,
-                                column=3).value = cluster.response_plan.title if cluster else ""
+                try:
+                    indicator_target = float(
+                        indicator.reportable.calculated_target)
+                except ValueError:
+                    indicator_target = indicator.reportable.calculated_target
 
-                self.sheet.cell(row=start_row_id,
-                                column=4).value = cluster.get_type_display() if cluster else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=5).value = (cluster.partner_projects.first().partner.title if
-                                       cluster.partner_projects.first() else "") if cluster else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=6).value = cluster_objective.title if cluster_objective else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=7).value = partner_activity.title if partner_activity else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=8).value = indicator.reportable.blueprint.title
+                if indicator.is_percentage:
+                    achievement_in_reporting_period = indicator.total.get(
+                        ValueType.CALCULATED, 0)
+                    total_cumulative_progress = indicator.reportable.achieved.get(
+                        ValueType.CALCULATED, 0
+                    )
+                else:
+                    achievement_in_reporting_period = indicator.total.get(
+                        ValueType.VALUE, 0)
+                    total_cumulative_progress = indicator.reportable.achieved.get(
+                        ValueType.VALUE, 0
+                    )
 
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=9).value = indicator.reportable.blueprint.get_unit_display()
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=10).value = indicator.reportable.blueprint.get_calculation_formula_across_locations_display()
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=11).value = indicator.reportable.blueprint.get_calculation_formula_across_periods_display()
-
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=12).value = partner_project.title if partner_project else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=13).value = partner_project.get_status_display() if partner_project else ""
-                self.sheet.cell(row=start_row_id,
-                                column=14).value = partner_activity.start_date if partner_activity else ""
-                self.sheet.cell(row=start_row_id,
-                                column=15).value = partner_activity.end_date if partner_activity else ""
-
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=16).value = indicator.reportable.calculated_baseline
-
-                self.sheet.cell(row=start_row_id,
-                                column=17).value = indicator.reportable.calculated_target
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=18).value = indicator.reportable.total['c']
-
-                self.sheet.cell(row=start_row_id,
-                                column=19).value = location_data.location.title
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=20).value = location_data.location.gateway.name
+                self.sheet.cell(row=start_row_id, column=1).value = \
+                    self.progress_report.programme_document.partner.title
+                self.sheet.cell(row=start_row_id, column=2).value = \
+                    location_data.location.gateway.country.name
+                self.sheet.cell(row=start_row_id, column=3).value = \
+                    self.progress_report.programme_document.reference_number
+                self.sheet.cell(row=start_row_id, column=4).value = \
+                    self.progress_report.programme_document.title
+                self.sheet.cell(row=start_row_id, column=5).value = \
+                    indicator.reportable.content_object.title
+                self.sheet.cell(row=start_row_id, column=6).value = \
+                    self.progress_report.get_reporting_period()
+                self.sheet.cell(row=start_row_id, column=7).value = \
+                    self.progress_report.get_status_display()
+                self.sheet.cell(row=start_row_id, column=8).value = \
+                    self.progress_report.due_date
+                self.sheet.cell(row=start_row_id, column=9).value = \
+                    self.progress_report.submission_date
+                self.sheet.cell(row=start_row_id, column=10).value = \
+                    self.progress_report.partner_contribution_to_date
+                self.sheet.cell(row=start_row_id, column=11).value = \
+                    self.progress_report.programme_document.funds_received_to_date
+                self.sheet.cell(row=start_row_id, column=12).value = \
+                    self.progress_report.challenges_in_the_reporting_period
+                self.sheet.cell(row=start_row_id, column=13).value = \
+                    self.progress_report.proposed_way_forward
+                self.sheet.cell(row=start_row_id, column=14).value = \
+                    self.progress_report.progress_report.submitted_by.display_name if \
+                    self.progress_report.submitted_by else ''
+                self.sheet.cell(row=start_row_id, column=15).value = \
+                    self.progress_report.attachment.url if self.progress_report.attachment else ''
+                self.sheet.cell(row=start_row_id, column=16).value = \
+                    self.progress_report.narrative
+                self.sheet.cell(row=start_row_id, column=17).value = \
+                    indicator.get_overall_status_display()
+                self.sheet.cell(row=start_row_id, column=18).value = \
+                    indicator.narrative_assessment
+                self.sheet.cell(row=start_row_id, column=19).value = \
+                    indicator.reportable.blueprint.title
+                self.sheet.cell(row=start_row_id, column=20).value = \
+                    indicator.display_type
+                self.sheet.cell(row=start_row_id, column=21).value = \
+                    indicator_target * \
+                    100 if indicator.display_type == IndicatorBlueprint.PERCENTAGE else indicator_target
+                self.sheet.cell(row=start_row_id, column=22).value = \
+                    indicator.calculation_formula_across_locations
+                self.sheet.cell(row=start_row_id, column=23).value = \
+                    indicator.calculation_formula_across_periods
+                self.sheet.cell(row=start_row_id, column=24).value = \
+                    location_data.previous_location_progress_value
 
                 # Iterate over location admin references:
                 location = location_data.location
@@ -219,50 +207,26 @@ class IndicatorsXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.p_code
-                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2 - 1).value = location.gateway.name
+                    self.sheet.cell(row=start_row_id, column=24 +
+                                    admin_level * 2).value = location.p_code
+                    self.sheet.cell(row=start_row_id, column=24 +
+                                    admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
                         location = location.parent
                     else:
                         break
 
-                self.sheet.cell(row=start_row_id,
-                                column=31).value = indicator.time_period_start
-                self.sheet.cell(row=start_row_id,
-                                column=32).value = indicator.time_period_end
-
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=33).value = indicator.get_report_status_display()
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=34).value = indicator.get_overall_status_display()
-
-                self.sheet.cell(row=start_row_id,
-                                column=35).value = indicator.submission_date
-                self.sheet.cell(row=start_row_id, column=36).value = cluster.id if cluster else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=37).value = cluster_objective.id if cluster_objective else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=38).value = partner_activity.id if partner_activity else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=39).value = indicator.reportable.blueprint.id
-                self.sheet.cell(row=start_row_id,
-                                column=40).value = partner_project.partner.id if partner_project else \
-                    (partner_activity.partner.id if partner_activity else "")
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=41).value = partner_project.id if partner_project else ""
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=42).value = indicator.id
-                self.sheet.cell(
-                    row=start_row_id,
-                    column=43).value = location_data.id
+                self.sheet.cell(row=start_row_id, column=35).value = \
+                    achievement_in_reporting_period
+                self.sheet.cell(row=start_row_id, column=36).value = \
+                    total_cumulative_progress
+                self.sheet.cell(row=start_row_id, column=37).value = \
+                    self.progress_report.id
+                self.sheet.cell(row=start_row_id, column=38).value = \
+                    indicator.id
+                self.sheet.cell(row=start_row_id, column=39).value = \
+                    location_data.id
 
                 # Check location item disaggregation type
                 for reported_disaggregation_type in location_data.disaggregation_reported_on:
@@ -278,8 +242,8 @@ class IndicatorsXLSXExporter:
                     if k == "()":
                         self.sheet.cell(
                             row=start_row_id,
-                            column=disaggregation_values_map['()']).value = "" if v['d'] == 0 else \
-                            (v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d']))
+                            column=disaggregation_values_map['()']).value = v['v'] \
+                            if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
 
                     else:
                         for dk, dv in disaggregation_values_map.items():
@@ -289,13 +253,24 @@ class IndicatorsXLSXExporter:
                                     list(int(k) for k in dk.split(","))):
                                 self.sheet.cell(
                                     row=start_row_id, column=dv).value = v['v'] \
-                                        if blueprint.unit == IndicatorBlueprint.NUMBER \
-                                        else "{}/{}".format(v['v'], v['d'])
+                                    if blueprint.unit == IndicatorBlueprint.NUMBER \
+                                    else "{}/{}".format(v['v'], v['d'])
 
                 start_row_id += 1
 
         # Lock first rows
         self.sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
+
+        # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
+        # Partner contribution to date
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=10, end_row=start_row_id, end_column=10)
+        # Challenges/bottlenecks in the reporting period
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=12, end_row=start_row_id, end_column=12)
+        # Proposed way forward
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=13, end_row=start_row_id, end_column=13)
 
         return True
 
@@ -362,13 +337,16 @@ class IndicatorsXLSXExporter:
             disaggregation_label,
         ) in enumerate(merged_disaggregations):
             current_column = self.disaggregations_start_column + idx
-            name_cell = merged_sheet.cell(column=current_column, row=1, value=disaggregation_name)
+            name_cell = merged_sheet.cell(
+                column=current_column, row=1, value=disaggregation_name)
             name_cell.style = self.bold_center_style
 
-            id_cell = merged_sheet.cell(column=current_column, row=2, value=disaggregation_id)
+            id_cell = merged_sheet.cell(
+                column=current_column, row=2, value=disaggregation_id)
             id_cell.alignment = Alignment(horizontal='center')
 
-            label_cell = merged_sheet.cell(column=current_column, row=4, value=disaggregation_label)
+            label_cell = merged_sheet.cell(
+                column=current_column, row=4, value=disaggregation_label)
             label_cell.alignment = Alignment(horizontal='center')
 
             merged_disaggregations_map[disaggregation_id] = current_column
@@ -409,27 +387,34 @@ class IndicatorsXLSXExporter:
             disaggregation_name,
             disaggregation_label,
         ) in enumerate(merged_disaggregation_values):
-            current_column = self.disaggregations_start_column + len(merged_disaggregations) + idx
-            value_cell = merged_sheet.cell(column=current_column, row=1, value=disaggregation_value)
+            current_column = self.disaggregations_start_column + \
+                len(merged_disaggregations) + idx
+            value_cell = merged_sheet.cell(
+                column=current_column, row=1, value=disaggregation_value)
             value_cell.style = self.bold_center_style
 
-            id_cell = merged_sheet.cell(column=current_column, row=2, value=disaggregation_id)
+            id_cell = merged_sheet.cell(
+                column=current_column, row=2, value=disaggregation_id)
             id_cell.alignment = Alignment(horizontal='center')
 
-            name_cell = merged_sheet.cell(column=current_column, row=3, value=disaggregation_name)
+            name_cell = merged_sheet.cell(
+                column=current_column, row=3, value=disaggregation_name)
             name_cell.alignment = Alignment(horizontal='center')
 
-            label_cell = merged_sheet.cell(column=current_column, row=4, value=disaggregation_label)
+            label_cell = merged_sheet.cell(
+                column=current_column, row=4, value=disaggregation_label)
             label_cell.alignment = Alignment(horizontal='center')
 
-            merged_disaggregation_values_map[disaggregation_id] = current_column
+            merged_disaggregation_values_map[
+                disaggregation_id] = current_column
 
         # Add Total column at the very end
         totals_column = self.disaggregations_start_column + \
             len(merged_disaggregations) + \
             len(merged_disaggregation_values)
 
-        totals_header_cell = merged_sheet.cell(column=totals_column, row=1, value="Total")
+        totals_header_cell = merged_sheet.cell(
+            column=totals_column, row=1, value="Total")
         totals_header_cell.style = self.bold_center_style
 
         # Merge data from all sheets
@@ -460,21 +445,23 @@ class IndicatorsXLSXExporter:
                         # Total has None value as a type
                         if sheet.cell(column=column, row=4).value is None:
                             col = self.disaggregations_start_column + \
-                                  len(merged_disaggregations) + \
-                                  len(merged_disaggregation_values)
+                                len(merged_disaggregations) + \
+                                len(merged_disaggregation_values)
                             merged_sheet.cell(
                                 column=col, row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation type
                         elif sheet.cell(column=column, row=4).value.find("#indicator+type+") > -1:
                             merged_sheet.cell(
-                                column=merged_disaggregations_map[sheet.cell(column=column, row=2).value],
+                                column=merged_disaggregations_map[
+                                    sheet.cell(column=column, row=2).value],
                                 row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation value
                         elif sheet.cell(column=column, row=4).value.find("#indicator+value+") > -1:
                             merged_sheet.cell(
-                                column=merged_disaggregation_values_map[sheet.cell(column=column, row=2).value],
+                                column=merged_disaggregation_values_map[
+                                    sheet.cell(column=column, row=2).value],
                                 row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value
 
@@ -509,8 +496,9 @@ class IndicatorsXLSXExporter:
         merged_sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
     def export_data(self):
-
         # Prepare list of unique disaggregations for choosed indicators
+        self.indicators = self.progress_report.indicator_reports.filter(
+            reportable__is_cluster_indicator=False)
         disaggregation_types_base_set = set()
         for i in self.indicators:
             for d in i.reportable.disaggregations.all():
@@ -527,21 +515,24 @@ class IndicatorsXLSXExporter:
                     disaggregation_types_base, i))
 
         # Generate data per spreadsheet
+
         sheet_no = 1
         to_remove = list()
         for disaggregation_types in disaggregation_types_list:
             # Check if indicators belongs to this disaggregation_types
             # Skip if not
             indicators = self.indicators
-            indicators = IndicatorReport.objects.filter(pk__in=[i.id for i in indicators])
+            # indicators = IndicatorReport.objects.filter(pk__in=[i.id for i in indicators])
             if disaggregation_types:
                 indicators = indicators.annotate(
                     count=Count('reportable__disaggregations')).filter(
                     count=len(disaggregation_types))
                 for dt in disaggregation_types:
-                    indicators = indicators.filter(reportable__disaggregations=dt)
+                    indicators = indicators.filter(
+                        reportable__disaggregations=dt)
             else:
-                indicators = indicators.filter(reportable__disaggregations__isnull=True)
+                indicators = indicators.filter(
+                    reportable__disaggregations__isnull=True)
 
             indicators = indicators.order_by('reportable__id')
             if not indicators:

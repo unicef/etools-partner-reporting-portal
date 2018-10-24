@@ -24,230 +24,230 @@
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="status-badge.html">
-
+<link rel="import" href="../behaviors/notifications.html">
 
 <dom-module id="pull-modal">
-    <template>
-      <style include="data-table-styles table-styles iron-flex button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
-        :host {
-          display: block;
+  <template>
+    <style
+      include="data-table-styles table-styles iron-flex button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
 
-          --paper-dialog: {
-            width: 800px;
+        --paper-dialog: {
+          width: 800px; & > *{
+        margin: 0;
+      }
+      };
+      }
 
-            & > * {
-              margin: 0;
-            }
-          };
-        }
+      .qpr-header {
+        transform: translate(24px, 48px);
+      }
 
-        .qpr-header {
-          transform: translate(24px, 48px);
-        }
+      .qpr-header h3 {
+        font-size: 18px;
+      }
 
-        .qpr-header h3 {
-          font-size: 18px;
-        }
+      .qpr-header h4 {
+        font-size: 16px;
+      }
 
-        .qpr-header h4 {
-          font-size: 16px;
-        }
+      .overwrite-notification {
+        background-color: #ffcc00;
+        margin: 20px;
+      }
 
-        .overwrite-notification {
-          background-color: #ffcc00;
-          margin: 20px;
-        }
+      .overwrite-notification iron-icon {
+        top: 10px;
+        margin: 12px;
+      }
+    </style>
 
-        .overwrite-notification iron-icon {
-          top: 10px;
-          margin: 12px;
-        }
-      </style>
+    <etools-prp-permissions
+      permissions="{{ permissions }}">
+    </etools-prp-permissions>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+    <etools-prp-ajax
+      id="reports"
+      url="[[pullUrl]]">
+    </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="reports"
-          url="[[pullUrl]]">
-      </etools-prp-ajax>
+    <etools-prp-ajax
+      id="pull"
+      url="[[pullUrl]]"
+      method="post"
+      body=[[postBody]]
+      content-type="application/json">
+    </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="pull"
-          url="[[pullUrl]]"
-          method="post"
-          body=[[postBody]]
-          content-type="application/json">
-      </etools-prp-ajax>
+    <paper-dialog
+      id="dialog"
+      with-backdrop
+      opened="{{ opened }}">
+      <div class="header layout horizontal justified">
+        <h2>Pull data</h2>
+        <div class="layout horizontal">
+          <p>Reporting period: [[reportingPeriod]]</p>
 
-      <paper-dialog
-          id="dialog"
-          with-backdrop
-          opened="{{opened}}">
-        <div class="header layout horizontal justified">
-          <h2>Pull data</h2>
-          <div class="layout horizontal">
-            <p>Reporting period: [[reportingPeriod]]</p>
-
-            <paper-icon-button
-                class="self-center"
-                on-tap="close"
-                icon="icons:close">
-            </paper-icon-button>
-          </div>
+          <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+          </paper-icon-button>
         </div>
+      </div>
 
-        <paper-dialog-scrollable>
-              <div class="qpr-header">
-                <h3>[[indicatorName]]</h3>
-                <h4>For this high frequency indicator data will be pulled from reports matching this time period:</h4>
+      <paper-dialog-scrollable>
+        <div class="qpr-header">
+          <h3>[[indicatorName]]</h3>
+          <h4>For this high frequency indicator data will be pulled from reports matching this time period:</h4>
+        </div>
+        <etools-data-table-header
+          no-collapse
+        >
+          <etools-data-table-column field="report">
+            <div class="table-column">Report #</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="due">
+            <div class="table-column">Due date</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="period">
+            <div class="table-column">Reporting Period</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="progress">
+            <div class="table-column">Total indicator progress across all locations</div>
+          </etools-data-table-column>
+        </etools-data-table-header>
+
+        <template
+          id="list"
+          is="dom-repeat"
+          items="[[data.reports]]"
+          as="report">
+          <etools-data-table-row no-collapse>
+            <div slot="row-data">
+              <div class="table-cell table-cell--text">
+                [[report.report_name]]
               </div>
-              <etools-data-table-header
-                  no-collapse
-                  >
-                <etools-data-table-column field="report">
-                  <div class="table-column">Report #</div>
-                </etools-data-table-column>
-                <etools-data-table-column field="due">
-                  <div class="table-column">Due date</div>
-                </etools-data-table-column>
-                <etools-data-table-column field="period">
-                  <div class="table-column">Reporting Period</div>
-                </etools-data-table-column>
-                <etools-data-table-column field="progress">
-                  <div class="table-column">Total indicator progress across all locations</div>
-                </etools-data-table-column>
-              </etools-data-table-header>
-
-              <template
-                  id="list"
-                  is="dom-repeat"
-                  items="[[data.reports]]"
-                  as="report">
-                <etools-data-table-row no-collapse>
-                  <div slot="row-data">
-                  <div class="table-cell table-cell--text">
-                    [[report.report_name]]
-                  </div>
-                  <div class="table-cell table-cell--text">
-                    [[report.due_date]]
-                  </div>
-                  <div class="table-cell table-cell--text">
-                    [[report.start_date]] - [[report.end_date]]
-                  </div>
-                  <div class="table-cell table-cell--text">
-                    [[report.report_location_total.v]]
-                  </div>
-                  </div>
-                </etools-data-table-row>
-              </template>
-
-            <div class="layout horizontal justified overwrite-notification">
-              <iron-icon icon="icons:info"></iron-icon>
-              <p>In order to keep data intact, aggregated data will be shown as a total progress.
-                Any data provided manually will be overwritten.</p>
+              <div class="table-cell table-cell--text">
+                [[report.due_date]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[report.start_date]] - [[report.end_date]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[report.report_location_total.v]]
+              </div>
             </div>
+          </etools-data-table-row>
+        </template>
 
-        </paper-dialog-scrollable>
-
-        <div class="buttons layout horizontal-reverse">
-          <paper-button
-              class="btn-primary"
-              on-tap="_save"
-              raised>
-            OK
-          </paper-button>
-
+        <div class="layout horizontal justified overwrite-notification">
+          <iron-icon icon="icons:info"></iron-icon>
+          <p>In order to keep data intact, aggregated data will be shown as a total progress.
+            Any data provided manually will be overwritten.</p>
         </div>
 
-        <confirm-box id="confirm"></confirm-box>
+      </paper-dialog-scrollable>
 
-        <etools-loading active="[[updatePending]]"></etools-loading>
-      </paper-dialog>
-    </template>
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+          class="btn-primary"
+          on-tap="_save"
+          raised>
+          OK
+        </paper-button>
 
-    <script>
-      Polymer({
-        is: 'pull-modal',
+      </div>
 
-        behaviors: [
-          App.Behaviors.ReduxBehavior,
-          App.Behaviors.UtilsBehavior,
-          App.Behaviors.ModalBehavior,
-        ],
+      <confirm-box id="confirm"></confirm-box>
 
-        properties: {
-          reportingPeriod: String,
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
 
-          indicatorName: String,
+  <script>
+    Polymer({
+      is: 'pull-modal',
 
-          opened: Boolean,
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ModalBehavior,
+        App.Behaviors.NotificationsBehavior,
+      ],
 
-          updatePending: {
-            type: Boolean,
-            value: false,
-          },
+      properties: {
+        reportingPeriod: String,
 
-          postBody: {
-            type: Object,
-            value: {},
-          },
+        indicatorName: String,
 
-          workspaceId: {
-            type: String,
-            statePath: 'location.id',
-          },
+        opened: Boolean,
 
-          indicatorId: String,
-
-          reportId: String,
-
-          pullUrl: {
-            type: String,
-            computed: '_computePullUrl(workspaceId, reportId, indicatorId)',
-          },
-
-          data: Object,
-
+        updatePending: {
+          type: Boolean,
+          value: false,
         },
 
-        _computePullUrl: function (workspaceId, reportId, indicatorId) {
-          return App.Endpoints.indicatorPullData(workspaceId, reportId, indicatorId);
+        postBody: {
+          type: Object,
+          value: {},
         },
 
-        _save: function () {
-          var self = this;
-          this.$.pull.thunk()()
-              .then(function () {
-                self.close();
-                self.fire('locations-updated');
-              })
-              .catch(function () {
-                //TODO: error handling
-              });
+        workspaceId: {
+          type: String,
+          statePath: 'location.id',
         },
 
-        close: function () {
-          this.set('opened', false);
-          this.set('data', {'reports': []});
+        indicatorId: String,
+
+        reportId: String,
+
+        pullUrl: {
+          type: String,
+          computed: '_computePullUrl(workspaceId, reportId, indicatorId)',
         },
 
-        open: function () {
-          var self = this;
-          this.$.reports.abort();
+        data: Object,
 
-          var thunk = this.$.reports.thunk();
-          thunk()
-              .then(function (res) {
-                self.set('data', {'reports': res.data});
-                self.set('opened', true);
-                })
-              .catch(function () {
-                //TODO: error handling
-              });
-        }
+      },
 
-      });
-    </script>
-  </dom-module>
+      _computePullUrl: function (workspaceId, reportId, indicatorId) {
+        return App.Endpoints.indicatorPullData(workspaceId, reportId, indicatorId);
+      },
+
+      _save: function () {
+        var self = this;
+        this.$.pull.thunk()()
+          .then(function () {
+            self.close();
+            self.fire('locations-updated');
+          })
+          .catch(function (err) {
+            self._notifyErrorMessage({text: err.data.non_field_errors[0]});
+          });
+      },
+
+      close: function () {
+        this.set('opened', false);
+        this.set('data', {'reports': []});
+      },
+
+      open: function () {
+        var self = this;
+        this.$.reports.abort();
+
+        var thunk = this.$.reports.thunk();
+        thunk()
+          .then(function (res) {
+            self.set('data', {'reports': res.data});
+            self.set('opened', true);
+          })
+          .catch(function (err) {
+            self._notifyErrorMessage({text: err.data.non_field_errors[0]});
+          });
+      }
+
+    });
+  </script>
+</dom-module>

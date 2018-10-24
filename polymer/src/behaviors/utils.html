@@ -98,6 +98,23 @@
             value : Math.floor(value * 100) + '%';
       },
 
+      _formatIndicatorValue: function(indicatorType, value) {
+        if (value == null /* undefinded & null */) { // jshint ignore:line
+          return value;
+        }
+
+        var _value = value.toFixed(2);
+
+        switch (indicatorType) {
+          case 'percentage':
+            return _value + '%';
+          case 'ratio':
+            return _value + ':1';
+          default:
+            return _value;
+        }
+      },
+
       _displayClusterHeader: function (subpage, needsHeaderList) {
         if (needsHeaderList.indexOf(subpage) >= 0) {
           return true;

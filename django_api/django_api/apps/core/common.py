@@ -9,8 +9,10 @@ REPORTABLE_CA_CONTENT_OBJECT = 'ca'
 REPORTABLE_PP_CONTENT_OBJECT = 'pp'
 REPORTABLE_PA_CONTENT_OBJECT = 'pa'
 
+QPR_TYPE = 'QPR'
+
 REPORTING_TYPES = Choices(
-    ('QPR', 'Quarterly Progress Report'),
+    (QPR_TYPE, 'Quarterly Progress Report'),
     ('HR', 'Humanitarian Report'),
     ('SR', 'Special Report'),
 )
@@ -169,6 +171,7 @@ PD_STATUS = Choices(
 RESPONSE_PLAN_TYPE = Choices(
     ("HRP", "hrp", "HRP"),  # Humanitarian Response Plan
     ("FA", "fa", "FA"),  # Flash Appeal
+    ("OTHER", "other", "Other"),  # Flash Appeal
 )
 
 OVERALL_STATUS = Choices(

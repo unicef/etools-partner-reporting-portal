@@ -196,7 +196,7 @@
 
     <template
       is="dom-if"
-      if="[[permissions.addPartnerToProject()]]"
+      if="[[permissions.addPartnerToProject]]"
       restamp="true">
       <partner-dropdown-content
         partners="{{ partners }}"
@@ -248,7 +248,7 @@
           restamp="true">
           <template
             is="dom-if"
-            if="[[permissions.addPartnerToProject()]]"
+            if="[[permissions.addPartnerToProject]]"
             restamp="true">
             <template
               is="dom-if"
@@ -270,8 +270,8 @@
           </template>
           <paper-radio-group
             id="mode"
-            selected={{ mode }}
-              on-change="adjustPosition">
+            selected="{{ mode }}"
+            on-change="adjustPosition">
             <template
               is="dom-if"
               if="[[!edit]]"
@@ -521,7 +521,7 @@
                         <div class="full-width">
                           <labelled-item label="Is this project part of a HRP or FA?">
                             <paper-radio-group
-                              selected={{ data.part }}>
+                              selected="{{ data.part }}">
                               <paper-radio-button name="hrp">HRP</paper-radio-button>
                               <paper-radio-button name="fa">FA</paper-radio-button>
                               <paper-radio-button name="no">No</paper-radio-button>
@@ -728,7 +728,7 @@
         },
 
         data: {
-          type: Object,
+          type: Object
         },
 
         refresh: {
@@ -1062,7 +1062,7 @@
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
-        return permissions.addPartnerToProject() && edit;
+        return permissions.addPartnerToProject && edit;
       },
 
       _validate: function (e) {
@@ -1070,7 +1070,7 @@
       },
 
       _redirectToDetail: function (id) {
-        var path = this.permissions.addPartnerToProject()
+        var path = this.permissions.addPartnerToProject
           ? 'response-parameters/partners/project/' + String(id)
           : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
