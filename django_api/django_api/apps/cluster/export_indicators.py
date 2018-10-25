@@ -219,7 +219,7 @@ class IndicatorsXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.p_code
+                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.title
                     self.sheet.cell(row=start_row_id, column=20 + admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
