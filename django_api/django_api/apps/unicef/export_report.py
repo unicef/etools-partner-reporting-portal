@@ -139,7 +139,9 @@ class ProgressReportXLSXExporter:
             for location_data in locations_data.all():
 
                 if indicator.display_type == IndicatorBlueprint.RATIO:
-                    indicator_target = "{} / {}".format(indicator.reportable.target['v'], indicator.reportable.target['d'])
+                    indicator_target = "{} / {}".format(
+                        indicator.reportable.target['v'], indicator.reportable.target['d']
+                    )
                 else:
                     try:
                         indicator_target = float(
