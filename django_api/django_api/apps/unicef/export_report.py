@@ -8,6 +8,8 @@ from openpyxl.utils import get_column_letter
 from django.conf import settings
 from django.db.models import Count
 
+from core import common
+
 from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
 
@@ -66,6 +68,11 @@ class ProgressReportXLSXExporter:
             type_cell.alignment = Alignment(horizontal='center')
 
             disaggregation_types_map[dt.id] = current_column
+
+        # Hide non QPR columns
+        if self.progress_report.report_type != common.QPR_TYPE:
+            for col in ['L', 'M', 'O', 'P']:
+                self.sheet.column_dimensions[col].hidden = True
 
         # Prepare Disaggregation Values for given disaggregation types
         disaggregation_values = list()
@@ -131,11 +138,18 @@ class ProgressReportXLSXExporter:
             locations_data = indicator.indicator_location_data
             for location_data in locations_data.all():
 
-                try:
-                    indicator_target = float(
-                        indicator.reportable.calculated_target)
-                except ValueError:
-                    indicator_target = indicator.reportable.calculated_target
+                if indicator.display_type == IndicatorBlueprint.RATIO:
+                    indicator_target = "{} / {}".format(
+                        indicator.reportable.target['v'], indicator.reportable.target['d']
+                    )
+                else:
+                    try:
+                        indicator_target = float(
+                            indicator.reportable.calculated_target)
+                    except ValueError:
+                        indicator_target = indicator.reportable.calculated_target
+                if indicator.display_type == IndicatorBlueprint.PERCENTAGE:
+                    indicator_target = indicator_target * 100
 
                 if indicator.is_percentage:
                     achievement_in_reporting_period = indicator.total.get(
@@ -177,7 +191,7 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=13).value = \
                     self.progress_report.proposed_way_forward
                 self.sheet.cell(row=start_row_id, column=14).value = \
-                    self.progress_report.progress_report.submitted_by.display_name if \
+                    self.progress_report.submitted_by.display_name if \
                     self.progress_report.submitted_by else ''
                 self.sheet.cell(row=start_row_id, column=15).value = \
                     self.progress_report.attachment.url if self.progress_report.attachment else ''
@@ -192,8 +206,7 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=20).value = \
                     indicator.display_type
                 self.sheet.cell(row=start_row_id, column=21).value = \
-                    indicator_target * \
-                    100 if indicator.display_type == IndicatorBlueprint.PERCENTAGE else indicator_target
+                    indicator_target
                 self.sheet.cell(row=start_row_id, column=22).value = \
                     indicator.calculation_formula_across_locations
                 self.sheet.cell(row=start_row_id, column=23).value = \
@@ -208,7 +221,7 @@ class ProgressReportXLSXExporter:
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
                     self.sheet.cell(row=start_row_id, column=24 +
-                                    admin_level * 2).value = location.p_code
+                                    admin_level * 2).value = location.title
                     self.sheet.cell(row=start_row_id, column=24 +
                                     admin_level * 2 - 1).value = location.gateway.name
 

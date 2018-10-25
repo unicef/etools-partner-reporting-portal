@@ -844,8 +844,6 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
                 reportable_total['c'] = reportable_total['v']
 
-        # if unit is PERCENTAGE, doesn't matter if calc choice was
-        # percent or ratio
         elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
             latest_accepted_indicator_report = accepted_indicator_reports.order_by('-time_period_start').first()
 
@@ -853,8 +851,10 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             reportable_total['d'] = latest_accepted_indicator_report.total['d']
 
             if reportable_total['d'] != 0:
-                reportable_total['c'] = reportable_total['v'] / \
-                    (reportable_total['d'] * 1.0)
+                reportable_total['c'] = (reportable_total['v'] / (reportable_total['d'] * 1.0))
+
+                if blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+                    reportable_total['c'] *= 100
 
     reportable.total = reportable_total
     reportable.save()
@@ -877,8 +877,10 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             new_parent_total['c'] = new_parent_total['v']
 
         else:
-            new_parent_total['c'] = new_parent_total['v'] / \
-                    (new_parent_total['d'] * 1.0)
+            new_parent_total['c'] = new_parent_total['v'] / (new_parent_total['d'] * 1.0)
+
+            if reportable.parent_indicator.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+                new_parent_total['c'] *= 100
 
         reportable.parent_indicator.total = new_parent_total
         reportable.parent_indicator.save()

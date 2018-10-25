@@ -21,7 +21,7 @@ from partner.models import Partner
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
 
 
 class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
@@ -612,6 +612,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "title",
             "phone_num",
             "email",
+            "active",
         )
         extra_kwargs = {'name': {'required': True}}
 

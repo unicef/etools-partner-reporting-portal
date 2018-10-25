@@ -62,6 +62,7 @@ class Person(TimeStampedExternalSyncModelMixin):
         blank=True,
         null=True)
     email = models.EmailField(max_length=255, verbose_name='Email', unique=True)
+    active = models.BooleanField(verbose_name="Is Active", default=True)
 
     def __str__(self):
         return self.name
