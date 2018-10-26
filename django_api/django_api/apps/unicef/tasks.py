@@ -311,14 +311,23 @@ def process_programme_documents(fast=False, area=False):
                                 rl['result_link'] = d['result_link']
                                 pdresultlink = process_model(
                                     PDResultLink, PMPPDResultLinkSerializer,
-                                    rl, {'external_id': rl['result_link'], 'external_cp_output_id': rl['id']}
+                                    rl, {
+                                            'external_id': rl['result_link'],
+                                            'external_cp_output_id': rl['id'],
+                                            'programme_document': pd.id
+                                        }
                                 )
 
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id
                                 llo = process_model(
-                                    LowerLevelOutput, PMPLLOSerializer, d, {'external_id': d['id']}
+                                    LowerLevelOutput, PMPLLOSerializer, d,
+                                    {
+                                        'external_id': d['id'],
+                                        'cp_output__programme_document': pd.id
+                                    }
                                 )
+
                                 # Mark LLO as active
                                 llo.active = True
                                 llo.save()
@@ -360,8 +369,10 @@ def process_programme_documents(fast=False, area=False):
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
-                                            i,
-                                            {'external_id': i['blueprint_id']}
+                                            i, {
+                                                    'external_id': i['blueprint_id'],
+                                                    'reportables__lower_level_outputs__cp_output__programme_document': pd.id
+                                                }
                                         )
 
                                     locations = list()
@@ -428,11 +439,14 @@ def process_programme_documents(fast=False, area=False):
                                             dis['active'] = True
                                             disaggregation = process_model(
                                                 Disaggregation, PMPDisaggregationSerializer,
-                                                dis, {'name': dis['name']}
+                                                dis, {
+                                                        'name': dis['name'],
+                                                        'reportables__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
+                                                    }
                                             )
                                             disaggregations.append(disaggregation)
 
-                                            # Create Disaggregation Values
+                                            # Create Disag1gregation Values
                                             for dv in dis['disaggregation_values']:
                                                 dv['disaggregation'] = disaggregation.id
                                                 process_model(
@@ -457,8 +471,10 @@ def process_programme_documents(fast=False, area=False):
                                     reportable = process_model(
                                         Reportable,
                                         PMPReportableSerializer,
-                                        i,
-                                        {'external_id': i['id']}
+                                        i, {
+                                                'external_id': i['id'],
+                                                'lower_level_outputs__cp_output__programme_document': pd.id
+                                            }
                                     )
                                     reportable.active = i['is_active']
                                     partner_activity = None
