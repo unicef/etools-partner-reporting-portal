@@ -441,7 +441,7 @@ def process_programme_documents(fast=False, area=False):
                                                 Disaggregation, PMPDisaggregationSerializer,
                                                 dis, {
                                                         'name': dis['name'],
-                                                        'reportable_set__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
+                                                        'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
                                                     }
                                             )
                                             disaggregations.append(disaggregation)
