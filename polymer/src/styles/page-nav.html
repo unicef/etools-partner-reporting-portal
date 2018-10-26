@@ -5,8 +5,6 @@
   <template>
     <style>
       :host {
-        display: block;
-
         --paper-item-selected: {
           color: var(--theme-primary-color);
           background: var(--theme-selected-item-background-color);
@@ -80,6 +78,13 @@
 
       .menu-content a {
         padding-left: 50px;
+      }
+
+      .nav-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: calc(100vh - 80px);
       }
     </style>
   </template>
