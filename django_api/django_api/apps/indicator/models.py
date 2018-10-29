@@ -207,11 +207,11 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
     """
     irs = IndicatorReport.objects.filter(reportable__in=instance.reportables.all())
 
-    if instance.calculation_formula_across_locations in IndicatorBlueprint.QUANTITY_CALC_CHOICE_LIST:
+    if instance.unit == IndicatorBlueprint.NUMBER:
         for ir in irs:
             QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
-    elif instance.calculation_formula_across_locations in IndicatorBlueprint.RATIO_CALC_CHOICE_LIST:
+    elif instance.unit == IndicatorBlueprint.PERCENTAGE:
         for ir in irs:
             RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
