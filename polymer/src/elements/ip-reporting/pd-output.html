@@ -216,7 +216,7 @@
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.reportable.achieved.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.reportable.achieved.c, 0)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -231,7 +231,7 @@
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.total.c)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.total.c, 0)]]</dd>
                 </template>
               </dl>
             </div>
