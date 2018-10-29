@@ -903,6 +903,12 @@ class ProgressReportPullHFDataAPIView(APIView):
                 data_available = False
                 ild.disaggregation['()'] = {'c': 0, 'd': 0, 'v': 0}
 
+            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(ild)
+
+            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                RatioIndicatorDisaggregator.post_process(ild)
+
             ild.save()
 
         if not data_available:
