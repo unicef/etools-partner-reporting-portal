@@ -15,4 +15,4 @@ RUN cp -a /tmp/node_modules /code/node_modules
 WORKDIR /code
 
 EXPOSE 3000
-CMD ["npm run build && node express.js"]
+CMD ["npm run build && bash resolve_build_bundle.sh && node express.js"]
