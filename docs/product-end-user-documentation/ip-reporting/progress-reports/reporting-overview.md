@@ -1,6 +1,6 @@
 # Reporting Overview
 
-### Report Types {#report-types}
+### Report Types <a id="report-types"></a>
 
 There are 3 progress report types supported:
 
@@ -8,7 +8,7 @@ There are 3 progress report types supported:
 * [​Humanitarian Reports \(HR\)](humanitarian-reports-hr.md)​
 * ​[Quarterly Progress Reports \(QPR\)​](quarterly-progress-reports-qpr.md)
 
-### Overview {#overview}
+### Overview <a id="overview"></a>
 
 Progress Reports are essentially a **container of one or more indicator reports** \(except for [SR's](special-reports-sr.md)\). The reporting period \(start -&gt; end date\) that this progress report is being submitted would be exactly the same date range for all the included indicator reports.
 
@@ -22,7 +22,7 @@ In IP Reporting the individual indicator reports are not given any prominence, b
 
 ​
 
-### Report due date {#report-due-date}
+### Report due date <a id="report-due-date"></a>
 
 Each progress report for a certain period has a due date. This date is decided as part of the PD setup by UNICEF. A report becomes overdue if not submitted by that date.
 
