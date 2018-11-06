@@ -31,6 +31,8 @@ To account for this workspace endpoint had a `can_import_ocha_response_plans` bo
 | end | endDate |
 | plan\_type | Can be detected from `categories` list in the response |
 
+> Country must have correct 'Country Short Code' when pulling a Response Plan from OCHA. If receiving the error _Countries in the workspace have invalid setup, cannot proceed ;_ check to make sure the Country Short Code is correct in Django Admin page.
+
 {% hint style="info" %}
 For categories id 4 maps to HRP, 5 to FA, there are other types that are ignored and HRP is used as default.
 {% endhint %}
