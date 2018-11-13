@@ -97,12 +97,10 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
         # Timestamp: 2018-11-13 11:37:56Z\r\n']
         error_description = request.GET.get('error_description', None)
 
-        auth_class = CustomAzureADBBCOAuth2()
-        redirect_home = auth_class.get_redirect_uri()
         if error == "access_denied" and error_description is not None:
             if 'AADB2C90118' in error_description:
-                print('WOOOOO')
-
+                auth_class = CustomAzureADBBCOAuth2()
+                redirect_home = auth_class.get_redirect_uri()
                 redirect_url = 'https://login.microsoftonline.com/' + \
                                settings.TENANT_ID + \
                                "/oauth2/v2.0/authorize?p=" + \
