@@ -51,3 +51,9 @@ spec:
       containers:
         - image: quay.io/molecule/route53-kubernetes:v1.3.0
           name: route53-mapper
+      nodeSelector:
+        node-role.kubernetes.io/master: ""      
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
