@@ -169,9 +169,7 @@ class TaskTriggerAPIView(APIView):
             else:
                 business_area_code = int(business_area_code)
 
-        try:
-            PeriodicTask.objects.get(task=task_name)
-        except PeriodicTask.DoesNotExist:
+        if not PeriodicTask.objects.filter(task=task_name).exists():
             raise ValidationError('No task is found with name: ' + task_name)
 
         try:
