@@ -136,7 +136,6 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
 
         response_plan_id = self.kwargs.get('response_plan_id')
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
-        partner_id = self.kwargs.get('partner_id')
 
         if request.method == 'GET':
             roles_permitted.extend([
@@ -145,9 +144,6 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             ])
 
         if request.method == 'POST':
-            if partner_id:
-                roles_permitted = [PRP_ROLE_TYPES.cluster_imo]
-
             cluster_ids = [int(cluster_dict['id']) for cluster_dict in request.data.get('clusters', [])]
             if not has_permission_for_clusters_check(request, cluster_ids, roles_permitted):
                 message = {'clusters': 'You may not have required permission to add some of the clusters.'}
