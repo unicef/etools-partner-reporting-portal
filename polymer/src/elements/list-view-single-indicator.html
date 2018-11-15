@@ -136,7 +136,7 @@
               is="dom-if"
               if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
               restamp="true">
-            <span>[[indicator.baseline.v]]%</span>
+            <span><etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>%</span>
           </template>
           <template
               is="dom-if"
@@ -160,7 +160,7 @@
               is="dom-if"
               if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
               restamp="true">
-            <span>[[indicator.target.v]]%</span>
+            <span><etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>%</span>
           </template>
           <template
               is="dom-if"
@@ -174,7 +174,7 @@
           </template>
         </span>
         <span class="table-cell table-cell--text self-center">
-          [[indicator.achieved.c]]
+          <etools-prp-number value="[[indicator.achieved.c]]"></etools-prp-number>
         </span>
         <span class="table-cell table-cell--text self-center" flex-2>
           <div class="self-center flex-none">
