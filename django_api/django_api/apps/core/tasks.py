@@ -1,5 +1,4 @@
 import logging
-from hashlib import md5
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
