@@ -793,7 +793,7 @@
 
       _computeExportParams: function (queryParams, data) {
         return Object.assign({}, queryParams, {
-          indicator: data.id,
+          indicator: data.reportable.id,
         });
       },
 
