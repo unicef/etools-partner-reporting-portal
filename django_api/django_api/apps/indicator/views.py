@@ -633,7 +633,7 @@ class IndicatorReportReviewAPIView(APIView):
 
     def check_indicator_report_permission(self, request, obj):
         if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
-            Q(role_=PRP_ROLE_TYPES.cluster_imo),
+            Q(role=PRP_ROLE_TYPES.cluster_imo),
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
             Q(cluster__partner_projects__reportables__indicator_reports=obj) |

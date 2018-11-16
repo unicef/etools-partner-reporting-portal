@@ -142,6 +142,7 @@ class RPMProjectListAPIView(APIView):
         if not request.user.prp_roles.filter(
                 Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
                 Q(role=PRP_ROLE_TYPES.cluster_imo, cluster__response_plan_id=obj.id) |
+                Q(role=PRP_ROLE_TYPES.cluster_member, cluster__response_plan_id=obj.id) |
                 Q(role=PRP_ROLE_TYPES.ip_authorized_officer, workspace__response_plans=obj.id)
         ).exists():
             self.permission_denied(request)

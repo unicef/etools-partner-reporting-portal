@@ -117,7 +117,7 @@
                     is="dom-if"
                     if="[[!_equals(report.display_type, 'number')]]"
                     restamp="true">
-                  [[_toPercentage(report.total.c)]]
+                  [[_formatIndicatorValue(report.display_type, report.total.c, 1)]]
                 </template>
               </dd>
             </dl>

@@ -344,6 +344,9 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 

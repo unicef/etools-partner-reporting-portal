@@ -18,7 +18,7 @@ A future use-case that PRP can be extended to support is the ability to be able 
 If a partner has not adopted this cluster activity in PRP-Cluster, but on of the cluster activity indicators is associated with this partner's PD in PMP, then PRP will assume adoption of this activity \(and all its indicators\) by this partner.
 {% endhint %}
 
-### Locations {#locations}
+### Locations <a id="locations"></a>
 
 The locations that show up for these indicator reports are a combination of ones the partner has added in PRP-Cluster and ones that might be configured for this indicator in this partner's PD in PMP.
 

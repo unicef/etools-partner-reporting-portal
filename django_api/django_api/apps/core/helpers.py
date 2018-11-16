@@ -293,6 +293,11 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
                         day_delta_counter = 0
 
                 else:
+                    # For handling a case to start in the middle of month, add this missing date
+                    # only if new date is later than start date
+                    if indicator_start_date <= missing_date and can_add:
+                        date_list.append(missing_date)
+
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.quarterly:
