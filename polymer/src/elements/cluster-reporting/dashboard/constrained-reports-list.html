@@ -39,7 +39,7 @@
         params-object="{{resultsQueryParams}}">
     </iron-query-params>
 
-    <etools-content-panel panel-title="Submitted List of Partner Activity Indicator">
+    <etools-content-panel panel-title="Submitted List of Constrained Partner Activity Indicator">
       <etools-data-table-header
           no-title
           no-collapse>
@@ -69,7 +69,7 @@
               [[item.cluster.title]]
             </div>
             <div class="table-cell table-cell--text" flex-2>
-              <a href="[[_getReportUrl(_baseUrlCluster, item.id, resultsQueryParams)]]">[[item.title]]</a>
+              <a href="[[_getReportUrl(_baseUrlCluster, item.reportable.id, resultsQueryParams)]]">[[item.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[item.partner.title]]
