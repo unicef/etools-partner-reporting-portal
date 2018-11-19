@@ -21,7 +21,10 @@ def social_details(backend, details, response, *args, **kwargs):
     r['details']['idp'] = response.get('idp')
 
     if not r['details'].get('email'):
-        r['details']['email'] = response.get('email')
+        if not response.get('email'):
+            r['details']['email'] = response["signInNames.emailAddress"]
+        else:
+            r['details']['email'] = response.get('email')
 
     return r
 
