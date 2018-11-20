@@ -81,9 +81,7 @@ If the frequency of a report is changed, none of the existing reports will be af
 
 We only generate indicator reports for indicators for Cluster Objective, Partner Activity, and Partner Project indicators in Cluster Reporting.
 
-
-
-
+If the indicator has custom specific dates as frequency type, the first indicator start date will be according to the start date of indicator. The list of custom specific dates specified in the indicator will be the start dates of subsequent reports. 
 
 
 
