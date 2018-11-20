@@ -77,3 +77,13 @@ When a new indicator is added, all reports whose start date + due date before th
 
 After reports are generated, the future reports will be generated on the due date of latest indicator report based on their frequency to prevent partners from reporting early. 
 
+If the frequency of a report is changed, none of the existing reports will be affected. Only the future reports will change to the new frequency. For example, if weekly reports are being generated and partner/imo changes to weekly on the 16th of the month, the report will finish for its intended due date and then switch to monthly after. If the due date is on the 20th, the next report will go from 20th - end of month for monthly report frequency. The following report will go from 1 to end of the month. This is specific for cluster reporting. 
+
+We only generate indicator reports for indicators for Cluster Objective, Partner Activity, and Partner Project indicators in Cluster Reporting.
+
+
+
+
+
+
+
