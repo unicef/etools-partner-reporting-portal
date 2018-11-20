@@ -71,5 +71,9 @@ When looking at an indicator edit/create modal, the user can click on the 'i' fo
 Additionally for calculation method selection we will show a modal similar to in [IP reporting](https://unicef.gitbook.io/prp/product-end-user-documentation/ip-reporting/setting-calculation-methods-for-indicators#demo-indicator-table) where the user will be able to see the impact of that selection.  
 
 
+### Report Generator Logic
 
+When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator. It typically takes around 5 minutes for reports to generate.
+
+After reports are generated, the future reports will be generated on the due date of latest indicator report based on their frequency to prevent partners from reporting early. 
 
