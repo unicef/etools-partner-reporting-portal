@@ -1321,7 +1321,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         elif reportable_object_content_model == PartnerActivity:
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
 
-            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+            if validated_data['start_date_of_reporting_period'] is not None and validated_data['start_date_of_reporting_period'] < content_object.start_date:
                 error_msg = "Start date of reporting period cannot come before the activity's start date"
 
                 raise ValidationError({
