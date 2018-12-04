@@ -207,7 +207,11 @@ def process_programme_documents(fast=False, area=False):
                         try:
                             pd = process_model(
                                 ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                {'external_id': item['id'], 'workspace': workspace}
+                                {
+                                    'external_id': item['id'],
+                                    'workspace': workspace,
+                                    'external_business_area_code': workspace.business_area_code,
+                                }
                             )
                         except KeyError as e:
                             logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
@@ -278,6 +282,7 @@ def process_programme_documents(fast=False, area=False):
                                     'external_id': reporting_requirement['id'],
                                     'report_type': reporting_requirement['report_type'],
                                     'programme_document': pd.id,
+                                    'external_business_area_code': workspace.business_area_code,
                                 },
                             )
 
@@ -294,6 +299,7 @@ def process_programme_documents(fast=False, area=False):
                                     'external_id': special_report['id'],
                                     'report_type': 'SR',
                                     'programme_document': pd.id,
+                                    'external_business_area_code': workspace.business_area_code,
                                 },
                             )
 
@@ -314,7 +320,8 @@ def process_programme_documents(fast=False, area=False):
                                     rl, {
                                             'external_id': rl['result_link'],
                                             'external_cp_output_id': rl['id'],
-                                            'programme_document': pd.id
+                                            'programme_document': pd.id,
+                                            'external_business_area_code': workspace.business_area_code,
                                         }
                                 )
 
@@ -324,7 +331,8 @@ def process_programme_documents(fast=False, area=False):
                                     LowerLevelOutput, PMPLLOSerializer, d,
                                     {
                                         'external_id': d['id'],
-                                        'cp_output__programme_document': pd.id
+                                        'cp_output__programme_document': pd.id,
+                                        'external_business_area_code': workspace.business_area_code,
                                     }
                                 )
 

@@ -68,6 +68,20 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
         abstract = True
 
 
+class TimeStampedExternalBusinessAreaModel(TimeStampedExternalSyncModelMixin):
+    external_business_area_code = models.CharField(
+        help_text='A Workspace business area code as unique constraint factor',
+        blank=True,
+        null=True,
+        max_length=32
+    )
+
+    class Meta:
+        abstract = True
+        unique_together = ('external_id', 'external_business_area_code')
+
+
+
 class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
     external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
 

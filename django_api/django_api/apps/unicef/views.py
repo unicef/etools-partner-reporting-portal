@@ -567,6 +567,13 @@ class ProgressReportSubmitAPIView(APIView):
 
         # QPR report type specific validations
         if progress_report.report_type == "QPR":
+            if ir.overall_status == OVERALL_STATUS.no_status:
+                raise ValidationError(
+                    "You have not selected overall status for one of Outputs ({}).".format(
+                        ir.reportable.content_object
+                    )
+                )
+
             # Check for IndicatorReport narrative assessment for overall status Met or No Progress
             if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
                     and not ir.narrative_assessment:

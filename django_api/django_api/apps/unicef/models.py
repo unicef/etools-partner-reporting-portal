@@ -27,7 +27,7 @@ from core.common import (
     REPORTING_TYPES,
     PRP_ROLE_TYPES,
 )
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
 from utils.emails import send_email_from_template
 
@@ -75,7 +75,7 @@ class Person(TimeStampedExternalSyncModelMixin):
         ).exists()
 
 
-class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
+class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     """
     ProgrammeDocument model describe agreement between UNICEF & Partner to
     realize document and reports are feedback for this assignment. The data
@@ -231,6 +231,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     class Meta:
         ordering = ['-id']
+        unique_together = (
+            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'workspace')
+        )
 
     def __str__(self):
         return self.title
@@ -495,7 +498,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             )
 
 
-class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
+class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """
@@ -506,8 +509,13 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
     description = models.CharField(max_length=512, blank=True, null=True)
 
+    class Meta:
+        unique_together = (
+            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'programme_document')
+        )
 
-class PDResultLink(TimeStampedExternalSyncModelMixin):
+
+class PDResultLink(TimeStampedExternalBusinessAreaModel):
     """
     Represents flattened version of InterventionResultLink in eTools. Instead
     of having 2 models for CP output and result link we have this here.
@@ -526,13 +534,15 @@ class PDResultLink(TimeStampedExternalSyncModelMixin):
 
     class Meta:
         ordering = ['id']
-        unique_together = ('external_id', 'external_cp_output_id')
+        unique_together = (
+            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'external_cp_output_id')
+        )
 
     def __str__(self):
         return self.title
 
 
-class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
+class LowerLevelOutput(TimeStampedExternalBusinessAreaModel):
     """
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 
@@ -550,6 +560,9 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
 
     class Meta:
         ordering = ['id']
+        unique_together = (
+            TimeStampedExternalBusinessAreaModel.Meta.unique_together
+        )
 
     def __str__(self):
         return self.title

@@ -1321,7 +1321,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         elif reportable_object_content_model == PartnerActivity:
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
 
-            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+            if validated_data['start_date_of_reporting_period'] is not None and validated_data['start_date_of_reporting_period'] < content_object.start_date:
                 error_msg = "Start date of reporting period cannot come before the activity's start date"
 
                 raise ValidationError({
@@ -1371,6 +1371,13 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     # Filter out location goal level baseline, in_need
                     loc_goal.pop('baseline', None)
                     loc_goal.pop('in_need', None)
+
+                    # If partner is adding location after adopting this cluster activity indicator,
+                    # copy baseline and target values from its cluster activity indicator at each location goal
+                    if loc_goal['location'] in reportable.parent_indicator.locations.all():
+                        parent_location_goal = reportable.parent_indicator.reportablelocationgoal_set.get(location=loc_goal['location'])
+                        loc_goal['baseline'] = parent_location_goal.baseline
+                        loc_goal['in_need'] = parent_location_goal.in_need
 
                 if not partner:
                     # Location-level progress value validation

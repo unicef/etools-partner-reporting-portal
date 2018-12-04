@@ -41,3 +41,21 @@ For the reporting entity \(UNICEF\) that a part of the cluster indicator progres
 If data for this indicator report \(inside the HR\) has been submitted \(hence "Received"\) already in[ cluster reporting](https://unicef.gitbook.io/prp/product-end-user-documentation/cluster-reporting/reporting-on-results/reporting-to-unicef), then the "ENTER DATA" button data for that indicator report in the HR would not show and hence none of the data will be be editable for it.
 {% endhint %}
 
+### Dual Reporting via Cluster Indicator in IP Reporting
+
+Programme document from PMP may contain cluster indicators as their LLO indicator. Since the indicator is borrowed from PRP cluster reporting, we can reuse the progress indicator report information to report data for both UNICEF and cluster organization at the same time. The prerequisite for enabling Dual Reporting is to have Partner Activity including its indicator and indicator reports already generated in advance before next PD sync triggers. PRP will try to lookup and match Cluster Indicator information between PRP and PMP and will create progress indicator reports with dual reporting flag.  If PRP cannot find cluster indicator information from Cluster Reporting, then the report generator will treat it as UNICEF non-cluster high frequency indicator \(blue color\). 
+
+The way PRP attempts to match cluster indicator information is by the following:
+
+* Cluster Indicator ID from PMP PD Sync must exist in Cluster Activity Indicators in Cluster Portal for that workspace country.
+* The matched cluster activity indicator must have partner activity indicator instance for the PD partner organization. The partner organization must participate in cluster reporting for that workspace country via the matched cluster activity. 
+* The report frequency and start date of indicator from cluster activity indicator must match the corresponding LLO indicator. 
+
+If Cluster Activity Indicator for Dual Reporting ends before the IP LLO indicator then, dual reporting will be disabled and perceived as non-cluster high frequency indicator report. 
+
+
+
+
+
+
+

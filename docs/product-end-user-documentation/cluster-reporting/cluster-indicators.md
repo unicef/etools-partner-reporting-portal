@@ -71,5 +71,17 @@ When looking at an indicator edit/create modal, the user can click on the 'i' fo
 Additionally for calculation method selection we will show a modal similar to in [IP reporting](https://unicef.gitbook.io/prp/product-end-user-documentation/ip-reporting/setting-calculation-methods-for-indicators#demo-indicator-table) where the user will be able to see the impact of that selection.  
 
 
+### Report Generator Logic
+
+When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator. It typically takes around 5 minutes for reports to generate.
+
+After reports are generated, the future reports will be generated on the due date of latest indicator report based on their frequency to prevent partners from reporting early. 
+
+If the frequency of a report is changed, none of the existing reports will be affected. Only the future reports will change to the new frequency. For example, if weekly reports are being generated and partner/imo changes to weekly on the 16th of the month, the report will finish for its intended due date and then switch to monthly after. If the due date is on the 20th, the next report will go from 20th - end of month for monthly report frequency. The following report will go from 1 to end of the month. This is specific for cluster reporting. 
+
+We only generate indicator reports for indicators for Cluster Objective, Partner Activity, and Partner Project indicators in Cluster Reporting.
+
+If the indicator has custom specific dates as frequency type, the first indicator start date will be according to the start date of indicator. The list of custom specific dates specified in the indicator will be the start dates of subsequent reports. 
+
 
 
