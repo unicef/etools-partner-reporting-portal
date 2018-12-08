@@ -197,7 +197,7 @@ def process_programme_documents(fast=False, area=False):
 
                         # Create PD
                         item['status'] = item['status'].title()[:3]
-
+                        item['external_business_area_code'] = workspace.business_area_code
                         # Amendment date formatting
                         for idx in range(len(item['amendments'])):
                             item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
@@ -274,6 +274,7 @@ def process_programme_documents(fast=False, area=False):
                         reporting_requirements = item['reporting_requirements']
                         for reporting_requirement in reporting_requirements:
                             reporting_requirement['programme_document'] = pd.id
+                            reporting_requirement['external_business_area_code'] = workspace.business_area_code
                             process_model(
                                 ReportingPeriodDates,
                                 PMPReportingPeriodDatesSerializer,
@@ -291,6 +292,7 @@ def process_programme_documents(fast=False, area=False):
                         for special_report in special_reports:
                             special_report['programme_document'] = pd.id
                             special_report['report_type'] = 'SR'
+                            special_report['external_business_area_code'] = workspace.business_area_code
                             process_model(
                                 ReportingPeriodDates,
                                 PMPReportingPeriodDatesSRSerializer,
@@ -315,6 +317,7 @@ def process_programme_documents(fast=False, area=False):
                                 rl = d['cp_output']
                                 rl['programme_document'] = pd.id
                                 rl['result_link'] = d['result_link']
+                                rl['external_business_area_code'] = workspace.business_area_code
                                 pdresultlink = process_model(
                                     PDResultLink, PMPPDResultLinkSerializer,
                                     rl, {
@@ -327,6 +330,7 @@ def process_programme_documents(fast=False, area=False):
 
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id
+                                d['external_business_area_code'] = workspace.business_area_code
                                 llo = process_model(
                                     LowerLevelOutput, PMPLLOSerializer, d,
                                     {
