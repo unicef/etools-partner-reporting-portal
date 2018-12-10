@@ -28,6 +28,8 @@ A "PDF" button with download icon will be added to the single Progress Report pa
 
 This export will contain all the data associated with the report including data from the "other info" tab. Each output, its indicators, their progress per location will also be included in this export.
 
+If there are no PD's, system will prevent export \(\#[958](https://github.com/unicef/etools-partner-reporting-portal/issues/958)\)
+
 #### \#3
 
 A "Annex C part 2" button with download icon will be added to the single Progress Report page. This option only shows when the report is either submitted or accepted.

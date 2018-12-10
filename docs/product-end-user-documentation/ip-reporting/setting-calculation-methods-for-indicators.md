@@ -36,3 +36,7 @@ When the IP user goes to set calculation methods, we will enable the user to be 
 
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.17.55-pm.png)
 
+When changing the calculation method and saving, we have a warning modal to that let's user know changing calculation methods will recalculate progress reports for their indicators \([\#875](https://github.com/unicef/etools-partner-reporting-portal/issues/875)\)
+
+![Warning modal for calculation method change](../../.gitbook/assets/44923720-6562ed00-ad49-11e8-97f7-1619530ff646.png)
+
