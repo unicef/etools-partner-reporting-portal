@@ -19,7 +19,7 @@ Clicking a PD will give more details \(shown in mockup below\) about this PD, it
 Additionally we will show a "Reporting Requirements" in a blue box, under which will have all reports in the future. The columns will be:
 
 * Report name
-* Due date
+* Due date - \(DD/MM/YYY \#[740](https://github.com/unicef/etools-partner-reporting-portal/issues/740)\)
 * Reporting period
 
 Nothing in it is clickable.
@@ -51,6 +51,8 @@ By default PD status will be selected to "Active". The user can change this as d
 Unicef/Cluster indicators and show report type. Partners can find high frequency from report type. Dates format should be day/month/year.
 
 Indicator list should only displays the last 2 submitted or accepted reports data \([\#873](https://github.com/unicef/etools-partner-reporting-portal/issues/873)\)
+
+There will be no 'In Need' progress column in IP \([\#769](https://github.com/unicef/etools-partner-reporting-portal/issues/769)\)
 
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.14.34-pm.png)
 
