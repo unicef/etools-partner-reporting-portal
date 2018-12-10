@@ -8,6 +8,8 @@ For IP, we will be adding the ability to upload data for only 1 specific Quarter
 * Generate Uploader Template
 * Import Template
 
+If there is no data, Totals should be blank as opposed to 0 \([\#918](https://github.com/unicef/etools-partner-reporting-portal/issues/918)\)
+
 ### QPR uploader template: ****
 
 \*\*\*\*[https://docs.google.com/spreadsheets/d/1MxIL5oaC0SFPm\_3ioKKemtnVWPWi9Qq3ougTKcuPgjQ/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1MxIL5oaC0SFPm_3ioKKemtnVWPWi9Qq3ougTKcuPgjQ/edit?usp=sharing)
