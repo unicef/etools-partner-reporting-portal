@@ -50,6 +50,8 @@ By default PD status will be selected to "Active". The user can change this as d
 
 Unicef/Cluster indicators and show report type. Partners can find high frequency from report type. Dates format should be day/month/year.
 
+Indicator list should only displays the last 2 submitted or accepted reports data \([\#873](https://github.com/unicef/etools-partner-reporting-portal/issues/873)\)
+
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.14.34-pm.png)
 
 **PD \(UNICEF only\) indicator or High Frequency non-cluster indicator**

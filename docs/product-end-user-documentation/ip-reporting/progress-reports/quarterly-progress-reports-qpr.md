@@ -51,6 +51,9 @@ Update 10/9/18 [\(\#891](https://waffle.io/unicef/etools-partner-reporting-porta
 
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 
-QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).  
-****
+QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).
+
+If the QPR report is submitted or accepted, then the 'Pull HR Data' button should not function and allow the suer to overwrite the data \([\#981](https://github.com/unicef/etools-partner-reporting-portal/issues/981)\)
+
+Annex C form will be generated when the report is submitted ****\([\#964](https://github.com/unicef/etools-partner-reporting-portal/issues/964)\)
 
