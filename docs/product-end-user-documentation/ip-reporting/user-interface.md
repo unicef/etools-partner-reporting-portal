@@ -16,6 +16,8 @@ Clicking a PD will give more details \(shown in mockup below\) about this PD, it
 
 ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-L4c0bvrfEPWnSxYQa0b%2F-L4c0iMbmQhsWwBUj8sx%2FScreen%20Shot%202018-02-05%20at%202.10.21%20PM.png?alt=media&token=f8c9102a-d906-4aa9-9840-938997f333aa)
 
+Amendment section will not display if there are no amendments \(\#[732](https://github.com/unicef/etools-partner-reporting-portal/issues/732)\)
+
 Additionally we will show a "Reporting Requirements" in a blue box, under which will have all reports in the future. The columns will be:
 
 * Report name
