@@ -32,6 +32,9 @@ To add in case a PD is terminated or suspended in middle of the agreement then t
 
 If PD is not active then in PMP we cannot "send back the report" even.
 
-For IP only: Ratio and Percentage Indicators will have labels representing the numerator and denominator. Quantity indicators will not have any labels \(\#[868](https://github.com/unicef/etools-partner-reporting-portal/issues/868)\).  
+### **Miscellaneous Reporting Info**
 
+For IP only: Ratio and Percentage Indicators will have labels representing the numerator and denominator. Quantity indicators will not have any labels \(\#[868](https://github.com/unicef/etools-partner-reporting-portal/issues/868)\).
+
+User can enter decimal data when reporting on indicators \(\#[745](https://github.com/unicef/etools-partner-reporting-portal/issues/745)\)
 
