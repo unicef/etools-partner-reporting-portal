@@ -175,10 +175,9 @@ class IndicatorsXLSXExporter:
                 self.sheet.cell(
                     row=start_row_id,
                     column=8).value = indicator.reportable.blueprint.title
-
                 self.sheet.cell(
                     row=start_row_id,
-                    column=9).value = indicator.reportable.blueprint.get_unit_display()
+                    column=9).value = indicator.reportable.blueprint.display_type
                 self.sheet.cell(
                     row=start_row_id,
                     column=10).value = indicator.reportable.blueprint.get_calculation_formula_across_locations_display()

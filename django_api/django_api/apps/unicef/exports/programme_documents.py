@@ -54,7 +54,7 @@ class ProgrammeDocumentsXLSXExporter:
             'Total UNICEF cash',
             'Total UNICEF supplies',
             'Total Budget',
-            'Cash Transfers to Date ($)',
+            'Cash Transfers to Date',
             'Cash Transfers to Date (%)',
         ]
 
@@ -86,18 +86,18 @@ class ProgrammeDocumentsXLSXExporter:
                 (None, None),  # This field is not calculated anywhere yet
                 (pd.start_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
                 (pd.end_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
-                (pd.cso_contribution, FORMAT_CURRENCY_USD),
-                (pd.total_unicef_cash, FORMAT_CURRENCY_USD),
-                (pd.in_kind_amount, FORMAT_CURRENCY_USD),
-                (pd.budget, FORMAT_CURRENCY_USD),
-                (pd.funds_received_to_date, FORMAT_CURRENCY_USD),
+                (pd.cso_contribution, '#,##0.00_-[${} ]'.format(pd.cso_contribution_currency)),
+                (pd.total_unicef_cash, '#,##0.00_-[${} ]'.format(pd.total_unicef_cash_currency)),
+                (pd.in_kind_amount, '#,##0.00_-[${} ]'.format(pd.in_kind_amount_currency)),
+                (pd.budget, '#,##0.00_-[${} ]'.format(pd.budget_currency)),
+                (pd.funds_received_to_date, '#,##0.00_-[${} ]'.format(pd.funds_received_to_date_currency)),
                 (funds_received_to_date_percentage, FORMAT_PERCENTAGE),
             ]
 
             if not len(headers) == len(data_row):
                 raise Exception('Header and data row length mismatch!')
 
-            for column, (cell_data, cell_format) in enumerate(data_row):
+            for column, (cell_data, cell_format ) in enumerate(data_row):
                 try:
                     column_widths[column] = max(column_widths[column], len(cell_data) + 2)
                 except TypeError:

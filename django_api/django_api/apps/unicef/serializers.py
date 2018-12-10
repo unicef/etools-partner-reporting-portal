@@ -698,6 +698,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "funds_received_currency",
             "workspace",
             "amendments",
+            "external_business_area_code",
         )
 
 
@@ -711,7 +712,8 @@ class PMPLLOSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'cp_output'
+            'cp_output',
+            'external_business_area_code',
         )
 
 
@@ -740,6 +742,7 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
             'due_date',
             'report_type',
             'programme_document',
+            'external_business_area_code',
         )
 
 
@@ -756,6 +759,7 @@ class PMPReportingPeriodDatesSRSerializer(serializers.ModelSerializer):
             'report_type',
             'description',
             'programme_document',
+            'external_business_area_code',
         )
 
 
@@ -772,7 +776,8 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'result_link',
-            'programme_document'
+            'programme_document',
+            'external_business_area_code',
         )
 
 
