@@ -30,6 +30,8 @@ PRP must generate reports for the partners when the PD is in active status. \(as
 
 To add in case a PD is terminated or suspended in middle of the agreement then the final report must be moved to the end / suspended date of the contract and the other pending reports for the rest of the months must no longer be due.
 
-If PD is not active then in PMP we cannot "send back the report" even.  
+If PD is not active then in PMP we cannot "send back the report" even.
+
+For IP only: Ratio and Percentage Indicators will have labels representing the numerator and denominator. Quantity indicators will not have any labels \(\#[868](https://github.com/unicef/etools-partner-reporting-portal/issues/868)\).  
 
 
