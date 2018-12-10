@@ -20,7 +20,7 @@ Once a final report has been generated, no change to the PD reporting periods sh
 
 ### **Acceptance of a report**
 
-The UNICEF PO is responsible for acceptance of a progress reports that are submitted \(There is no workflow following the submission by the IP to UNICEF and Cluster\). This happens in the PMP system. The PO can also **send the report back with a note**, in which case the partner should get an email informing them that should review the note and re-submit the report \(data in the report becomes editable once its been sent back\). In that case the partner can log back in, make any changes recommended and resubmit the report back to UNICEF.
+The UNICEF PO is responsible for acceptance of a progress reports that are submitted \(There is no workflow following the submission by the IP to UNICEF and Cluster\). This happens in the PMP system. The PO can also **send the report back with a note**, in which case the partner should get an email informing them that should review the note and re-submit the report \(data in the report becomes editable once its been sent back\). In that case the partner can log back in, make any changes recommended \(edit data and upload attachment \#[947](https://github.com/unicef/etools-partner-reporting-portal/issues/947)\) and resubmit the report back to UNICEF.
 
 ### **Reporting Restrictions**
 
