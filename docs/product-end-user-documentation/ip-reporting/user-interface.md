@@ -31,6 +31,8 @@ Nothing in it is clickable.
 ![Reporting Requirements](https://lh4.googleusercontent.com/p9SwdJ5o1cX2-McWj1RS0cpfPBoqLhHeajL4jwc8qeWJpQ6o51RnAJJZ3gGV7n-sNS_XiDkS2bS0J_jTA1L5TCiEmn8OSTOqmrohXO8AWSVaY61aFtNZFdyEBsiBN20ljzrrnjq4)
 
 This data comes from the PMP system and displayed to the partner for their information only. It cannot be modified in PRP.
+
+If a PD is suspended, we no longer 'move' the final report date to when it was suspended. The final report will stay the same as previously assigned \(\#[704](https://github.com/unicef/etools-partner-reporting-portal/issues/704)\). Once inside a Suspended PD, we should have the header message "PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement" \(\#[700](https://github.com/unicef/etools-partner-reporting-portal/issues/700)\).  
 {% endtab %}
 
 {% tab title="Progress Reports" %}
