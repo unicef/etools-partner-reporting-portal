@@ -61,6 +61,8 @@ Partner/IMO cannot import submitted/accepted reports. We will validate to make s
 
 The Export Analysis will be similar to the Export Template but also have Cluster ID, Cluster Objective ID, Activity ID, Indicator ID, Partner ID, Project ID, Report ID, Location ID. Here is an example  [https://docs.google.com/spreadsheets/d/1PNFzzN75daFZ\_uHF\_8nB1yjTeGWbv5ec5n0vRS2chac/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1PNFzzN75daFZ_uHF_8nB1yjTeGWbv5ec5n0vRS2chac/edit?usp=sharing)
 
+For IP and Cluster When NO Location Progress data is entered, it should be null \(-\) as opposed to 0. \(\#[966](https://github.com/unicef/etools-partner-reporting-portal/issues/966)\)
+
 ### Workflow of Indicator Reports
 
 By default indicator reports go into accepted state once submitted by a partner. The IMO can decide to "send back" a report for revision.
