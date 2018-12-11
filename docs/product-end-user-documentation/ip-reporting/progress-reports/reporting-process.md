@@ -38,3 +38,5 @@ For IP only: Ratio and Percentage Indicators will have labels representing the n
 
 User can enter decimal data when reporting on indicators \(\#[745](https://github.com/unicef/etools-partner-reporting-portal/issues/745)\)
 
+For IP and Cluster When NO Location Progress data is entered, it should be null \(-\) as opposed to 0. \(\#[966](https://github.com/unicef/etools-partner-reporting-portal/issues/966)\)
+
