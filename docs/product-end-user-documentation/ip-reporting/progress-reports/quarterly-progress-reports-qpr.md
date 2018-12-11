@@ -3,7 +3,7 @@
 In this report, the IP provides the following information:
 
 * Rating the progress against PD output\(s\) \(or SSFA expected result\(s\), if applicable\), including a short narrative assessment;
-* For each PD output \(or SSFA expected result\), report progress against each and all indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable;
+* For each PD output \(or SSFA expected result\), report progress against each and all indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable. Including PD Output is mandatory \(\#[1015](https://github.com/unicef/etools-partner-reporting-portal/issues/1015)\)
 * Other information as defined in the “other info” tab.
 
 The frequency of reporting \(report start and end dates\) and report due dates are generated in PMP and the report is generated in PRP-IP on the first day of the new reporting period. Each report is assigned a number \(Eg. QPR-2\) and the final report is labelled "Final". If new reporting periods are added or changed after the “final” report has been generated, those changes/new reporting periods will be ignored for this PD.
