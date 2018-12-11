@@ -2,7 +2,7 @@
 
 For a particular reporting period a partner will report progress on an indicator for one or more locations. To capture the progress made on that indicator across all locations, we need a way to calculate it. This is referred to as **"calculation method across locations"**.
 
-Once multiple indicator reports have been submitted for a particular indicator then we need a way to calculate  cumulative progress on that indicator. This is referred to as **"calculation method across reporting periods"**.
+Once multiple indicator reports have been **accepted or sent back** \(\#[1040](https://github.com/unicef/etools-partner-reporting-portal/issues/1040)\) for a particular indicator, then we can calculate cumulative progress on that indicator. This is referred to as **"calculation method across reporting periods"**.
 
 There are three methods of calculation that are supported in PRP for both the above:
 
