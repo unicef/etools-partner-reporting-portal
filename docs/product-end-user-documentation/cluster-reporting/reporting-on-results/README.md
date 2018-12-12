@@ -11,7 +11,9 @@ In this section \("Reporting Results" in the left hand navigation\) of the inter
 
 The reports list can be filtered by cluster, partner \(defaults to the partner to whom this user is associated with, if its a partner user\), indicator, indicator type etc.
 
-Indicator type options will be: Partner Activity, Partner Project, Cluster Objective, and Cluster Activity.
+Indicator type options will be: Partner Activity, Partner Project, Cluster Objective, and Cluster Activity. 
+
+If partner filter is used, system will only grab Partner Activity and Partner Project indicators only \(\#[846](https://github.com/unicef/etools-partner-reporting-portal/issues/846)\)
 
 ![](../../../.gitbook/assets/screen-shot-2018-03-07-at-4.56.23-pm.png)
 

@@ -13,7 +13,7 @@ Indicators in a cluster can belong to following entities:
 
 IMOs and partners can create their own indicators. They can choose the type of indicator \(quantity, percent, ratio\) and calculation method for reporting periods/locations.
 
-For _**Quantity indicators**_ IMO's set baseline, target and in-need at the indicator level. If this is a Partner indicator, they can set these too. In-need is optional. If baseline is not set, it defaults to 0.
+For _**Quantity indicators**_ IMO's set baseline, target and in-need at the indicator level. If this is a Partner indicator, they can set these too. In-need is optional. If baseline is not set, it defaults to 0. For all indicator types baseline can be greater than target \(\#[914](https://github.com/unicef/etools-partner-reporting-portal/issues/914)\)
 
 At the location level, IMO can set the admin level and specific location pertaining to the level. In-need is optional to set here. IMOs can add multiple locations and disaggregations too.
 
