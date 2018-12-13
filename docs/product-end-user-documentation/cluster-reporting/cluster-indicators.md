@@ -40,6 +40,8 @@ IMO or Partner can edit an indicator. The location admin level, specific locatio
 
 _**Partners can adopt \(Cluster\) Activity Indicators previously set by the IMO**_. They are able to edit the target and add locations. If the partner adds a location, they will be able to include the administration level, specific location for the level and target.
 
+Editing Partner Activity Indicator modal derived from CAI a should only allow Partner to add new locations or editing targets on locations \(\#[669](https://github.com/unicef/etools-partner-reporting-portal/issues/669)\). 
+
 ![](https://lh6.googleusercontent.com/A-KIeRDMjYPzoFDTDbR3avI1_hxdK9NRB9_ASAU30TphLYbz2VOWWEBAnOAIFJntp8t55qRJXeR0dxh9_cdxSH4kRAm43XFeNeOSiaPyISjshMx6fr0cYAqC-mnJz-3nzphy9_OV)
 
 If the Partner would like to propose a new Baseline and in-need to the IMO, they can send a direct message to the IMO. This will be sent to the IMO's email. We will add  partner users name, email, partner name, indicator, project, plan to the modal and message received by the IMO.
@@ -73,7 +75,7 @@ Additionally for calculation method selection we will show a modal similar to in
 
 ### Report Generator Logic
 
-When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator. It typically takes around 5 minutes for reports to generate.
+When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator \(\#[675](https://github.com/unicef/etools-partner-reporting-portal/issues/675)\). It typically takes around 5 minutes for reports to generate.
 
 After reports are generated, the future reports will be generated on the due date of latest indicator report based on their frequency to prevent partners from reporting early. 
 
