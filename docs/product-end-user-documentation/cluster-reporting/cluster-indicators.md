@@ -54,7 +54,9 @@ In the Indicator Reports, users will be able to see the current progress against
 
 ![](https://lh4.googleusercontent.com/6BHlmxUejYlX_z2LHM56NDumX_8JgAenXKYdkdQluvyvDIruPJOKsEzSsMBB1ydESNW38JROpxSD_uwagHwKUc2z1JpPU0MHS6VR8epeNHTNI_ihE3zS0SHRGnG-Co_63LALOIxX)
 
-For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for specific locations in bulk. In-need is optional and Baseline defaults to 0.
+For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for specific locations in bulk. In-need is optional and Baseline defaults to 0. 
+
+For CAI, once IMO updates baseline and In-need for the specific location from the Locations section, it will get pushed down to the partner for PAI \(\#[1048](https://github.com/unicef/etools-partner-reporting-portal/issues/1048)\).
 
 ![](https://lh3.googleusercontent.com/-4DIgKH4ORiH50vi98SZXGg4--v_w10mSGhr1xliPD3krcx1ndoowFy0O9BILvinqEwPNXQQ8taFTBak0-PwZQqr6EpBC7oYqE9oXNG7Sa-zj2ArGherjN7WmsQeZUTIY0LO_gRb)
 
@@ -65,6 +67,8 @@ For Percent Indicators, IMOs will be able to enter a new Baseline. It defaults t
 For Ratio Indicators, IMOs will be able to enter a new Baseline. The data key specifies the numerator and denominator.
 
 ![](https://lh6.googleusercontent.com/_Ep9SObps2aDSe_FIqv55igZXtoV7ZHZDJmPA1Kdk8yOyR16DksTJJfp6VJtf_HpnjwzwY6Ut5-zz_MRoqPbjmEgdXtWFyfZcIX0QzvQmCCf3LkDVoqjmg8x36zm9rQyubiPyzLD)
+
+When a partner adds a location after adopting a Cluster Activity Indicator, baseline and target will sync from each location from the CAI. \(\#[1055\)](https://github.com/unicef/etools-partner-reporting-portal/issues/1055)
 
 ### Helper Text
 
