@@ -19,7 +19,7 @@ If partner filter is used, system will only grab Partner Activity and Partner Pr
 
 ### Entering data
 
-For each indicator report the partner can enter progress data for each location in which this indicator is being tracked. Additionally they can give an "overall status" and narrative assessment as well.
+For each indicator report the partner can enter progress data for each location in which this indicator is being tracked. Additionally they can give an "overall status" and narrative assessment as well \(\#[696](https://github.com/unicef/etools-partner-reporting-portal/issues/696)\).
 
 We will have a data key to specify the labels of the indicators that are set in the add/edit indicators. The data key will be available when IMO edit’s locations or IMO/Partner reports on data for all indicators \(quantity, ratio, percent\).
 
