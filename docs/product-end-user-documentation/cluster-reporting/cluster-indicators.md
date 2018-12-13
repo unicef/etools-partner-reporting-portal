@@ -52,6 +52,8 @@ If the Partner would like to propose a new Baseline and in-need to the IMO, they
 
 In the Indicator Reports, users will be able to see the current progress against Target and In-Need.
 
+Current Progress =  achievement/in-need \(\#[647](https://github.com/unicef/etools-partner-reporting-portal/issues/647)\).
+
 ![](https://lh4.googleusercontent.com/6BHlmxUejYlX_z2LHM56NDumX_8JgAenXKYdkdQluvyvDIruPJOKsEzSsMBB1ydESNW38JROpxSD_uwagHwKUc2z1JpPU0MHS6VR8epeNHTNI_ihE3zS0SHRGnG-Co_63LALOIxX)
 
 For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for specific locations in bulk. In-need is optional and Baseline defaults to 0. 
