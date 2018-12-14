@@ -45,7 +45,9 @@ On the Reporting Results Page, we will have 3 options for the user
 * Export
 * Import Template
 
-Partner/IMO can download the export template for the indicators they are currently looking at based on the applied filters in xlsx format that includes all of the data pertaining to the indicators. The partner or IMO can enter the proper disaggregation value here instead of on the platform.  
+Partner/IMO can download the export template for the indicators they are currently looking at based on the applied filters in xlsx format that includes all of the data pertaining to the indicators. The partner or IMO can enter the proper disaggregation value here instead of on the platform.
+
+Partners cannot enter data via import/export for indicators that do not belong to them \(\#[636](https://github.com/unicef/etools-partner-reporting-portal/issues/636)\)  
 ****
 
 ![](https://lh6.googleusercontent.com/JdcLPeZVCxZDz76q9a6FwpufirqwDfiEZj1OrRaXz06kMJOmDN81XZZQ2hbHAjT4Rrtn-T1T6BR-xL5DTI77kmupcn2QP_ISM3BrGKnv3DQLloxoWGIY5uiHe7fv8zMK5M-RFTiK)
