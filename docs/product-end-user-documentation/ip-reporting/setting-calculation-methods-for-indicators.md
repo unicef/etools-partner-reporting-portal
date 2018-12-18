@@ -4,7 +4,7 @@ The IP can set the appropriate calculation method for each indicator in a PD. If
 
 ![](../../.gitbook/assets/reporting-ip-pd-calculation_method_03-2x.png)
 
-### Supported calculation methods
+### Supported calculation methods \(Quantity Indicator Type\)
 
 The following calculation methods are supported:
 
@@ -12,15 +12,27 @@ The following calculation methods are supported:
 * Avg - The average of the data.
 * Max - The maximum value in the period being looked at.
 
-### Calculation method across locations
+### Calculation method across locations \(Quantity Indicator Type\)
 
 This represents how the IP would like to aggregate the data entered for all the locations in an indicator. Once applied this helps measure the total progress made on an indicator in a reporting period.
 
-### Calculation method across reporting periods
+### Calculation method across reporting periods \(Quantity Indicator Type\)
 
 This represents how the IP would like to aggregate the data entered across various reporting periods. This is what decides what progress has been made on an indicator at any given point of time.
 
 The calculation method in this case is applied to the total progress made on an indicator in a reporting period \(not location level data at all\).
+
+### Calculation method across locations \(Ratio Indicator Type\) 
+
+Ratio indicators calculation method is different from quantity indicators. For ratio indicators, the system adds the numerators & denominators separately at the location level and then divides them at the end for indicator report total \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\)
+
+### Calculation method across reporting periods \(Ratio Indicator Type\)
+
+Calculation method is always latest for ratio indicator type. This calculation method is used to compute progress against the total for a indicator. This is done by simply grabbing indicator report total from the latest indicator report by the due date. \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\)
+
+### Percentage Display Type for Ratio Indicator Type
+
+If the indicator has percentage display type, calculation methods across location and reporting periods are identical to the above sections. For percentage display type, the indicator report total value is multiplied by 100 so that the value is in percentage format. \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\) 
 
 ### Demo indicator table
 
