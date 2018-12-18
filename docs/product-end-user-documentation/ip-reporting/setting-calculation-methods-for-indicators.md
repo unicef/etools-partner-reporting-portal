@@ -24,7 +24,9 @@ The calculation method in this case is applied to the total progress made on an 
 
 ### Calculation method across locations \(Ratio Indicator Type\) 
 
-Ratio indicators calculation method is different from quantity indicators. For ratio indicators, the system adds the numerators & denominators separately at the location level and then divides them at the end for indicator report total \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\)
+Ratio indicators calculation method is different from quantity indicators. For ratio indicators, the system adds the numerators & denominators separately at the location level and then divides them at the end for indicator report total \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\). 
+
+![Ratio Indicator Progress Formula \(Example \#1044\)](../../.gitbook/assets/screen-shot-2018-12-18-at-2.32.50-pm.png)
 
 ### Calculation method across reporting periods \(Ratio Indicator Type\)
 
@@ -51,4 +53,6 @@ When the IP user goes to set calculation methods, we will enable the user to be 
 When changing the calculation method and saving, we have a warning modal to that let's user know changing calculation methods will recalculate progress reports for their indicators \([\#875](https://github.com/unicef/etools-partner-reporting-portal/issues/875)\). We will send a notification email to UNICEF Focal point if the calculation method is changed for progress reports in PD that was previously submitted or accepted \(\#[462](https://github.com/unicef/etools-partner-reporting-portal/issues/462)\)
 
 ![Warning modal for calculation method change](../../.gitbook/assets/44923720-6562ed00-ad49-11e8-97f7-1619530ff646.png)
+
+
 
