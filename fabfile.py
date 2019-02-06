@@ -21,23 +21,23 @@ def up_recreate():
     local('docker-compose stop && docker-compose up')
 
 
-def up(quick=False):
+def up(rebuild=False):
     """
     Create and start containers.
     """
-    if quick:
-        command = 'docker-compose up'
-    else:
+    if rebuild:
         command = 'docker-compose up --force-recreate --build'
+    else:
+        command = 'docker-compose up'
 
     local(command)
 
 
-def up_with_bundle(quick=True):
+def up_with_bundle(rebuild=True):
     """
     Create and start containers with polymer bundle served.
     """
-    local('docker-compose -f docker-compose.polymer-bundle.yml up %s' % '' if quick else '--build')
+    local('docker-compose -f docker-compose.polymer-bundle.yml up %s' % '' if rebuild else '--build')
 
 
 def restart(service):
@@ -73,14 +73,23 @@ def ps():
     local('docker-compose ps')
 
 
+def kill():
+    """
+    Kill all containers.
+    """
+    local('docker-compose kill')
+
+
 def stop(service):
     """
     Stop service(s).
     """
-    if service:
-        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+    if service == 'all':
+        local('docker-compose stop')
 
-    local('docker-compose stop %s' % service if service else '')
+    elif service:
+        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+        local('docker-compose stop %s' % service)
 
 
 def fixtures():
@@ -132,13 +141,6 @@ def update_real_fixtures(area=False):
     Uses real sync with PMP API to update data.
     """
     local('docker-compose exec django_api python manage.py generate_real_data %s --update' % ("--area %s --fast" % area if area else ""))
-
-
-def remove_untagged_images():
-    """
-    Delete all untagged (<none>) images
-    """
-    local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
 
 
 def backend_lint():

@@ -2,7 +2,17 @@ version: '2.1'
 
 services:
   beater-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-debug}"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-info}"
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+      - redis
+    restart: always
+
+  celerycam-prp:
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celerycam"
     image: 'unicef/etools-prp'
     env_file:
       - .env
@@ -12,7 +22,7 @@ services:
     restart: always
 
   worker-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-info}"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-debug}"
     image: 'unicef/etools-prp'
     env_file:
       - .env
