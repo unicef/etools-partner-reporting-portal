@@ -17,3 +17,7 @@ MIGRATION_MODULES = {
     'unicef': None,
     'guardian': None,
 }
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]

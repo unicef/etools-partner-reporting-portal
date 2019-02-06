@@ -17,8 +17,5 @@ class CustomNoseTestSuiteRunner(NoseTestSuiteRunner):
         # Load fixtures
         call_command('loaddata', 'sites', verbosity=0)
         call_command('loaddata', 'reporting_entities', verbosity=0)
-        call_command('loaddata', 'periodic_tasks', verbosity=0)
 
-        with suppress_stdout():
-            generate_fake_data(2, generate_all_disagg=True)
         return config
