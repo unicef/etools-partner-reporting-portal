@@ -305,18 +305,25 @@ class LocationFactory(factory.django.DjangoModelFactory):
 
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "response plan %d" % n)
-    start = beginning_of_this_year
-    end = beginning_of_this_year + datetime.timedelta(days=364)
+    """
+    Arguments:
+        workspace {Workspace} -- Workspace ORM objects
 
-    cluster = factory.RelatedFactory(
-        'core.factories.ClusterFactory',
-        'response_plan')
-    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
+    Ex) ResponsePlanFactory(workspace=workspace1)
+    """
+    title = factory.LazyAttributeSequence(
+        lambda o, n: "{} Response Plan {}".format(
+            o.workspace.countries.first().name, n + beginning_of_this_year.year
+        )
+    )
+    start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n))
+    end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n) + datetime.timedelta(days=364))
+    plan_type = "HRP"
+    plan_custom_type_label = ""
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory', response_plan=None)
 
     class Meta:
         model = ResponsePlan
-        django_get_or_create = ('title', 'plan_type', 'workspace')
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
