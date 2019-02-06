@@ -1,14 +1,15 @@
 import datetime
 import json
 import random
-
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.models import Group
+
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import signals
 
 import factory
 from factory import fuzzy
+from faker import Faker
 
 from account.models import User, UserProfile
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
@@ -43,6 +44,7 @@ from core.common import (
     PARTNER_PROJECT_STATUS,
     OVERALL_STATUS,
     CLUSTER_TYPES,
+    PRP_ROLE_TYPES,
 )
 from core.models import (
     Country,
@@ -53,8 +55,11 @@ from core.models import (
     CartoDBTable,
     PRPRole,
 )
-from core.countries import COUNTRIES_ALPHA2_CODE
+from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
 
+
+IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item[0].startswith('IP'), PRP_ROLE_TYPES))
+CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item[0].startswith('CLUSTER'), PRP_ROLE_TYPES))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
@@ -77,9 +82,22 @@ CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
+cs_date_1 = datetime.date(today.year, 1, 1)
+cs_date_2 = datetime.date(today.year, 3, 24)
+cs_date_3 = datetime.date(today.year, 5, 15)
+faker = Faker()
 
 
-class RangeGenerator:
+def create_fake_multipolygon():
+    from django.contrib.gis.geos import Polygon, MultiPolygon
+
+    p1 = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
+    p2 = Polygon(((1, 1), (1, 2), (2, 2), (1, 1)))
+
+    return MultiPolygon(p1, p2)
+
+
+class TestDateRangeGenerator:
 
     def __init__(self):
         self.start = beginning_of_this_year
@@ -95,13 +113,7 @@ class RangeGenerator:
         return self
 
 
-REPORTABLE_RANGE_GENERATORS = defaultdict(lambda: iter(RangeGenerator()))
-
-cs_date_1 = datetime.date(today.year, 1, 1)
-
-cs_date_2 = datetime.date(today.year, 3, 24)
-
-cs_date_3 = datetime.date(today.year, 5, 15)
+REPORTABLE_RANGE_GENERATORS = defaultdict(lambda: iter(TestDateRangeGenerator()))
 
 
 # https://stackoverflow.com/a/41154232/2363915
@@ -117,14 +129,204 @@ class JSONFactory(factory.DictFactory):
         return json.dumps(model_class(**kwargs))
 
 
+class AbstractUserFactory(factory.django.DjangoModelFactory):
+    first_name = factory.LazyFunction(faker.first_name)
+    last_name = factory.LazyFunction(faker.last_name)
+    organization = factory.LazyFunction(faker.last_name)
+    email = factory.LazyFunction(faker.safe_email)
+    position = factory.LazyFunction(faker.job)
+    username = factory.LazyFunction(faker.user_name)
+    password = factory.PostGenerationMethodCall('set_password', 'test')
+    profile = factory.RelatedFactory('core.factories.UserProfileFactory', 'user')
+
+    class Meta:
+        model = User
+        django_get_or_create = ('email', 'username')
+        abstract = True
+
+
+@factory.django.mute_signals(signals.post_save)
+class UserProfileFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = UserProfile
+
+    user = factory.SubFactory('core.factories.AbstractUserFactory', profile=None)
+
+
+@factory.django.mute_signals(signals.post_save)
+class PartnerUserFactory(AbstractUserFactory):
+    # We are going to let PartnerFactory create PartnerUser
+    partner = factory.SubFactory('core.factories.PartnerFactory', user=None)
+    prp_role = factory.RelatedFactory('core.factories.IPPRPRoleFactory', 'user')
+
+    class Meta:
+        model = User
+
+
+@factory.django.mute_signals(signals.post_save)
+class NonPartnerUserFactory(AbstractUserFactory):
+    prp_role = factory.RelatedFactory('core.factories.ClusterPRPRoleFactory', 'user')
+
+    class Meta:
+        model = User
+
+
+class AbstractPRPRoleFactory(factory.django.DjangoModelFactory):
+    # We are going to manually fill foreignkeys
+    user = factory.SubFactory('core.factories.UserFactory', prp_role=None)
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory', prp_role=None)
+    is_active = True
+
+    class Meta:
+        model = PRPRole
+        abstract = True
+
+
+class IPPRPRoleFactory(AbstractPRPRoleFactory):
+    role = fuzzy.FuzzyChoice(IP_PRP_ROLE_TYPES_LIST)
+
+    class Meta:
+        model = PRPRole
+
+
+class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
+    cluster = factory.SubFactory('core.factories.ClusterFactory', prp_role=None)
+    role = fuzzy.FuzzyChoice(CLUSTER_PRP_ROLE_TYPES_LIST)
+
+    class Meta:
+        model = PRPRole
+
+
+class CountryFactory(factory.django.DjangoModelFactory):
+    country_short_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
+    name = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.country_short_code])
+    long_name = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.country_short_code])
+
+    class Meta:
+        model = Country
+
+
+class WorkspaceFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        countries {List[Country]} -- a list of Country ORM objects
+
+    Ex) WorkspaceFactory(countries=[country1, country2, ...])
+    """
+
+    title = factory.LazyAttribute(lambda o: o.countries[0].name)
+    workspace_code = factory.LazyAttribute(lambda o: o.countries[0].country_short_code)
+    business_area_code = factory.LazyFunction(lambda: faker.random_number(4, True))
+    latitude = factory.LazyFunction(faker.geo_coordinate)
+    longitude = factory.LazyFunction(faker.geo_coordinate)
+    initial_zoom = 10
+
+    @factory.post_generation
+    def countries(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for country in extracted:
+                self.countries.add(country)
+
+    class Meta:
+        model = Workspace
+        django_get_or_create = ('workspace_code', )
+
+
+class GatewayTypeFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        country {Country} -- Country ORM objects
+
+    Ex) GatewayTypeFactory(country=country1)
+    """
+
+    name = factory.LazyAttribute(lambda o: "{}-Admin Level {}".format(o.country.country_short_code, o.admin_level))
+    admin_level = factory.Sequence(lambda n: "%d" % n)
+
+    # We are going to fill country manually
+    country = factory.SubFactory('core.factories.CountryFactory', gateway_type=None)
+
+    class Meta:
+        model = GatewayType
+        django_get_or_create = ('name', )
+
+
+class CartoDBTableFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        location_type {GatewayType} -- GatewayType ORM objects
+        country {Country} -- Country ORM objects
+
+    Ex) CartoDBTableFactory(location_type=loc_type, country=country1)
+    """
+    domain = 'example'
+    table_name = factory.LazyFunction(faker.uuid4)
+    display_name = factory.LazyFunction(faker.city)
+    # We are going to fill location type manually
+    location_type = factory.SubFactory('core.factories.GatewayTypeFactory', carto_db_table=None)
+    name_col = factory.LazyFunction(faker.word)
+    pcode_col = factory.LazyFunction(faker.word)
+    parent_code_col = ''
+    parent = None
+    # We are going to fill location type manually
+    country = factory.SubFactory('core.factories.CountryFactory', carto_db_table=None)
+
+    class Meta:
+        model = CartoDBTable
+
+
+class LocationFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        gateway {GatewayType} -- GatewayType ORM objects
+        carto_db_table {Country} -- CartoDBTable ORM objects
+
+    Ex) LocationFactory(gateway=b, carto_db_table=c)
+    """
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
+    external_source = factory.LazyFunction(faker.text)
+    title = factory.LazyFunction(faker.city)
+    # We are going to fill location type manually
+    gateway = factory.SubFactory('core.factories.GatewayTypeFactory', location=None)
+    # We are going to fill CartoDBTable manually
+    carto_db_table = factory.SubFactory('core.factories.CartoDBTableFactory', location=None)
+    latitude = factory.LazyFunction(faker.geo_coordinate)
+    longitude = factory.LazyFunction(faker.geo_coordinate)
+    p_code = factory.LazyAttribute(lambda o: "{}{}".format(o.gateway.country.country_short_code, faker.random_number(4)))
+    parent = None
+    geom = factory.LazyFunction(create_fake_multipolygon)
+    point = None
+
+    class Meta:
+        model = Location
+
+
+class ResponsePlanFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "response plan %d" % n)
+    start = beginning_of_this_year
+    end = beginning_of_this_year + datetime.timedelta(days=364)
+
+    cluster = factory.RelatedFactory(
+        'core.factories.ClusterFactory',
+        'response_plan')
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
+
+    class Meta:
+        model = ResponsePlan
+        django_get_or_create = ('title', 'plan_type', 'workspace')
+
+
 class PartnerFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "partner_%d" % n)
-    total_ct_cp = fuzzy.FuzzyInteger(1000, 10000, 100)
-    partner_activity = factory.RelatedFactory(
-        'core.factories.PartnerActivityFactory', 'partner')
-    partner_project = factory.RelatedFactory(
-        'core.factories.PartnerProjectFactory', 'partner')
-    user = factory.RelatedFactory('core.factories.UserFactory', 'partner')
+    title = factory.LazyFunction(faker.company)
+    total_ct_cp = fuzzy.FuzzyInteger(10000, 1000000, 2500)
+    # partner_activity = factory.RelatedFactory(
+    #     'core.factories.PartnerActivityFactory', 'partner')
+    # partner_project = factory.RelatedFactory(
+    #     'core.factories.PartnerProjectFactory', 'partner')
+    # user = factory.RelatedFactory('core.factories.PartnerUserFactory', partner=None)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
@@ -190,61 +392,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PartnerProject
-
-
-class UserProfileFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = UserProfile
-        django_get_or_create = ('user_id', )
-
-
-class GroupFactory(factory.django.DjangoModelFactory):
-    name = "UNICEF User"
-
-    class Meta:
-        model = Group
-
-
-class UserFactory(factory.django.DjangoModelFactory):
-    username = fuzzy.FuzzyText()
-    email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
-    password = factory.PostGenerationMethodCall('set_password', 'test')
-
-    class Meta:
-        model = User
-        django_get_or_create = ('email', )
-
-
-class CountryFactory(factory.django.DjangoModelFactory):
-    country_short_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
-    name = factory.LazyAttribute(lambda o: dict(COUNTRIES_ALPHA2_CODE)[o.country_short_code])
-
-    class Meta:
-        model = Country
-
-
-class WorkspaceFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "workspace_%d" % n)
-    workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
-
-    class Meta:
-        model = Workspace
-        django_get_or_create = ('workspace_code', )
-
-
-class ResponsePlanFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "response plan %d" % n)
-    start = beginning_of_this_year
-    end = beginning_of_this_year + datetime.timedelta(days=364)
-
-    cluster = factory.RelatedFactory(
-        'core.factories.ClusterFactory',
-        'response_plan')
-    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
-
-    class Meta:
-        model = ResponsePlan
-        django_get_or_create = ('title', 'plan_type', 'workspace')
 
 
 class ClusterFactory(factory.django.DjangoModelFactory):
@@ -505,14 +652,6 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
         model = Reportable
 
 
-class LocationFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "location_%d" % n)
-    gateway = factory.SubFactory('core.factories.GatewayTypeFactory')
-
-    class Meta:
-        model = Location
-
-
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
     end_date = start_date + datetime.timedelta(days=30)
@@ -666,25 +805,3 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = IndicatorLocationData
         django_get_or_create = ('indicator_report', 'location')
-
-
-class GatewayTypeFactory(factory.django.DjangoModelFactory):
-    name = factory.Sequence(lambda n: "gateway_type_%d" % n)
-    admin_level = fuzzy.FuzzyInteger(1, 5, 1)
-
-    class Meta:
-        model = GatewayType
-        django_get_or_create = ('name', )
-
-
-class CartoDBTableFactory(factory.django.DjangoModelFactory):
-    domain = factory.Sequence(lambda n: "domain_%d" % n)
-    table_name = factory.Sequence(lambda n: "table_name_%d" % n)
-
-    class Meta:
-        model = CartoDBTable
-
-
-class PRPRoleFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = PRPRole

@@ -31,25 +31,9 @@ from .common import (
     PRP_ROLE_TYPES,
 )
 from utils.emails import send_email_from_template
-from utils.groups.wrappers import GroupWrapper
 
 
 logger = logging.getLogger('locations.models')
-
-# Define groups that UNICEF IP reporting users can belong to
-try:
-    PartnerAuthorizedOfficerRole = GroupWrapper(
-        code='ip_authorized_officer', name='IP Authorized Officer', create_group=False
-    )
-    PartnerEditorRole = GroupWrapper(
-        code='ip_editor', name='IP Editor', create_group=False
-    )
-    PartnerViewerRole = GroupWrapper(
-        code='ip_viewer', name='IP Viewer', create_group=False
-    )
-    IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
-except Exception as e:
-    print("Group DB is not ready yet! - Error: %s" % e)
 
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
@@ -79,7 +63,6 @@ class TimeStampedExternalBusinessAreaModel(TimeStampedExternalSyncModelMixin):
     class Meta:
         abstract = True
         unique_together = ('external_id', 'external_business_area_code')
-
 
 
 class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
