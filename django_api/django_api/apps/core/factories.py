@@ -38,18 +38,33 @@ from unicef.models import (
     ReportingPeriodDates,
 )
 from core.common import (
-    PD_STATUS,
-    PD_FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
-    INDICATOR_REPORT_STATUS,
-    PARTNER_PROJECT_STATUS,
-    OVERALL_STATUS,
-    CLUSTER_TYPES,
+    REPORTING_TYPES,
+    DISPLAY_CLUSTER_TYPES,
+    USER_STATUS_TYPES,
+    USER_TYPES,
     PRP_ROLE_TYPES,
-    RESPONSE_PLAN_TYPE,
+    CLUSTER_TYPES,
+    CLUSTER_TYPE_NAME_DICT,
+    CSO_TYPES,
     PARTNER_TYPE,
     SHARED_PARTNER_TYPE,
-    CSO_TYPES,
+    INTERVENTION_TYPES,
+    INTERVENTION_STATUS,
+    INDICATOR_REPORT_STATUS,
+    FREQUENCY_LEVEL,
+    PD_FREQUENCY_LEVEL,
+    REPORTABLE_FREQUENCY_LEVEL,
+    PD_LIST_REPORT_STATUS,
+    PD_DOCUMENT_TYPE,
+    PROGRESS_REPORT_STATUS,
+    PD_STATUS,
+    RESPONSE_PLAN_TYPE,
+    OVERALL_STATUS,
+    FINAL_OVERALL_STATUS,
+    PARTNER_PROJECT_STATUS,
+    PARTNER_ACTIVITY_STATUS,
+    EXTERNAL_DATA_SOURCES,
+    CURRENCIES,
 )
 from core.models import (
     Country,
@@ -67,6 +82,7 @@ PRP_ROLE_TYPES_LIST = [x[0] for x in PRP_ROLE_TYPES]
 IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('IP'), PRP_ROLE_TYPES_LIST))
 CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('CLUSTER'), PRP_ROLE_TYPES_LIST))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
+PARTNER_ACTIVITY_STATUS_LIST = [x[0] for x in PARTNER_ACTIVITY_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
@@ -510,13 +526,12 @@ class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
         model = PartnerProjectFunding
 
 
-class PartnerActivityFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "partner_activity_%d" % n)
-    project = factory.SubFactory('core.factories.PartnerProjectFactory')
-
+class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
+    project = factory.SubFactory('core.factories.PartnerProjectFactory', partner_activity=None)
+    partner = factory.LazyAttribute(lambda o: o.project.partner)
     start_date = beginning_of_this_year
     end_date = beginning_of_this_year + datetime.timedelta(days=180)
-    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+    status = fuzzy.FuzzyChoice(PARTNER_ACTIVITY_STATUS_LIST)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -526,6 +541,43 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
         if extracted:
             for location in extracted:
                 self.locations.add(location)
+
+    class Meta:
+        model = PartnerActivity
+        abstract = True
+
+
+class ClusterActivityPartnerActivityFactory(AbstractPartnerActivityFactory):
+    """
+    Arguments:
+        cluster_activity {ClusterActivity} -- Cluster Activity ORM object to bind
+
+    Ex) ClusterActivityPartnerActivityFactory(
+            cluster_activity=cluster_activity1,
+        )
+    """
+
+    title = factory.LazyAttribute(lambda o: "{} -- from ClusterActivity {}".format(o.cluster_activity.title))
+    cluster_activity = factory.SubFactory('core.factories.ClusterActivityFactory', partner_activity=None)
+    cluster_objective = None
+
+    class Meta:
+        model = PartnerActivity
+
+
+class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
+    """
+    Arguments:
+        cluster_objective {ClusterObjective} -- Cluster Objective ORM object to bind
+
+    Ex) ClusterActivityPartnerActivityFactory(
+            cluster_objective=cluster_objective1,
+        )
+    """
+
+    title = factory.LazyAttribute(lambda o: "{} -- Custom {}".format(o.project.title))
+    cluster_activity = None
+    cluster_objective = factory.SubFactory('core.factories.ClusterObjectiveFactory', partner_activity=None)
 
     class Meta:
         model = PartnerActivity
