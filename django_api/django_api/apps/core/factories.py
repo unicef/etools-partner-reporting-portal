@@ -17,6 +17,7 @@ from partner.models import (
     Partner,
     PartnerProject,
     PartnerActivity,
+    PartnerProjectFunding,
 )
 from indicator.models import (
     IndicatorBlueprint,
@@ -407,36 +408,53 @@ class PartnerFactory(factory.django.DjangoModelFactory):
         model = Partner
 
 
-class PartnerActivityFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "partner_activity_%d" % n)
-    project = factory.SubFactory('core.factories.PartnerProjectFactory')
+class ClusterFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        response_plan {ResponsePlan} -- ResponsePlan ORM object to bind
 
-    start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=180)
-    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+    Ex) ClusterFactory(response_plan=response_plan)
+    """
 
-    @factory.post_generation
-    def locations(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for location in extracted:
-                self.locations.add(location)
+    type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
+    imported_type = factory.LazyAttribute(lambda o: o.type)
+    response_plan = factory.SubFactory('core.factories.ResponsePlanFactory', cluster=None)
 
     class Meta:
-        model = PartnerActivity
+        model = Cluster
 
 
 class PartnerProjectFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "partner_project_%d" % n)
+    """
+    Arguments:
+        partner {Partner} -- Partner ORM object to bind
+        clusters {Cluster} -- a list of Cluster ORM objects to bind
+        locations {Location} -- a list of Location ORM objects to bind
+        additional_partners {Partner} Optional -- an optional list of Partner ORM objects to bind
+
+    Ex) PartnerProjectFactory(
+            partner=partner1,
+            clusters=[cluster1, cluster2, ...],
+            locations=[loc1, loc2, ...],
+            additional_partners=[partner2, ...]
+        )
+    """
+
+    code = None
+    type = None
+    title = factory.LazyAttributeSequence(lambda o, n: "{} Project {}".format(o.partner.title, n))
+    description = factory.LazyFunction(faker.text)
+    additional_information = factory.LazyFunction(faker.url)
+    custom_fields = list()
     start_date = beginning_of_this_year
     end_date = today
-
-    description = factory.Sequence(lambda n: "description %d" % n)
-    additional_information = factory.Sequence(
-        lambda n: "additional_information %d" % n)
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+    agency_name = None
+    agency_type = None
+    prioritization = None
     total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    funding_source = factory.LazyFunction(faker.company)
+    partner = factory.SubFactory('core.factories.PartnerFactory', partner_project=None)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
@@ -456,17 +474,61 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
             for location in extracted:
                 self.locations.add(location)
 
+    @factory.post_generation
+    def additional_partners(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for additional_partner in extracted:
+                self.additional_partners.add(additional_partner)
+
     class Meta:
         model = PartnerProject
 
 
-class ClusterFactory(factory.django.DjangoModelFactory):
-    type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
+class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        project {PartnerProject} -- Partner Project ORM object to bind
 
-    response_plan = factory.SubFactory(ResponsePlanFactory)
+    Ex) PartnerProjectFundingFactory(
+            project=project1,
+        )
+    """
+
+    project = factory.SubFactory('core.factories.PartnerProjectFactory', partner_project_funding=None)
+    required_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    internal_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    cerf_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    cbpf_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    bilateral_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    unicef_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    wfp_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
 
     class Meta:
-        model = Cluster
+        model = PartnerProjectFunding
+
+
+class PartnerActivityFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "partner_activity_%d" % n)
+    project = factory.SubFactory('core.factories.PartnerProjectFactory')
+
+    start_date = beginning_of_this_year
+    end_date = beginning_of_this_year + datetime.timedelta(days=180)
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
+
+    class Meta:
+        model = PartnerActivity
 
 
 class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
