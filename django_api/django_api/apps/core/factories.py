@@ -551,13 +551,15 @@ class ClusterActivityPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_activity {ClusterActivity} -- Cluster Activity ORM object to bind
+        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_activity=cluster_activity1,
+            project=project1,
         )
     """
 
-    title = factory.LazyAttribute(lambda o: "{} -- from ClusterActivity {}".format(o.cluster_activity.title))
+    title = factory.LazyAttribute(lambda o: "from ClusterActivity {}".format(o.cluster_activity.title))
     cluster_activity = factory.SubFactory('core.factories.ClusterActivityFactory', partner_activity=None)
     cluster_objective = None
 
@@ -569,13 +571,15 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_objective {ClusterObjective} -- Cluster Objective ORM object to bind
+        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_objective=cluster_objective1,
+            project {PartnerProject} -- PartnerProject ORM object to bind
         )
     """
 
-    title = factory.LazyAttribute(lambda o: "{} -- Custom {}".format(o.project.title))
+    title = factory.LazyAttribute(lambda o: "{} -- Custom".format(o.project.title))
     cluster_activity = None
     cluster_objective = factory.SubFactory('core.factories.ClusterObjectiveFactory', partner_activity=None)
 
@@ -584,12 +588,17 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
 
 
 class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "cluster_objective_%d" % n)
+    """
+    Arguments:
+        cluster {Cluster} -- Cluster ORM object to bind
 
-    activity = factory.RelatedFactory(
-        'core.factories.ClusterActivityFactory',
-        'cluster_objective')
-    cluster = factory.SubFactory(ClusterFactory)
+    Ex) ClusterObjectiveFactory(
+            cluster=cluster1,
+            locations=[loc1, loc2, ...]
+        )
+    """
+    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Objective {}".format(o.cluster.type, n))
+    cluster = factory.SubFactory('core.factories.ClusterFactory', cluster_objective=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -605,8 +614,17 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
 
 
 class ClusterActivityFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "cluster_activity_%d" % n)
-    cluster_objective = factory.SubFactory(ClusterObjectiveFactory)
+    """
+    Arguments:
+        cluster_objective {ClusterObjective} -- ClusterObjective ORM object to bind
+
+    Ex) ClusterActivityFactory(
+            cluster_objective=cluster_objective1,
+            locations=[loc1, loc2, ...]
+        )
+    """
+    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Activity {}".format(o.cluster_objective.cluster.type, n))
+    cluster_objective = factory.SubFactory('core.factories.ClusterObjectiveFactory', cluster_activity=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
