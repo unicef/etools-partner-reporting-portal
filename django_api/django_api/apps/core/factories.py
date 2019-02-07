@@ -45,6 +45,10 @@ from core.common import (
     OVERALL_STATUS,
     CLUSTER_TYPES,
     PRP_ROLE_TYPES,
+    RESPONSE_PLAN_TYPE,
+    PARTNER_TYPE,
+    SHARED_PARTNER_TYPE,
+    CSO_TYPES,
 )
 from core.models import (
     Country,
@@ -58,8 +62,9 @@ from core.models import (
 from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
 
 
-IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item[0].startswith('IP'), PRP_ROLE_TYPES))
-CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item[0].startswith('CLUSTER'), PRP_ROLE_TYPES))
+PRP_ROLE_TYPES_LIST = [x[0] for x in PRP_ROLE_TYPES]
+IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('IP'), PRP_ROLE_TYPES_LIST))
+CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('CLUSTER'), PRP_ROLE_TYPES_LIST))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
@@ -79,6 +84,10 @@ REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEV
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
 CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
+RESPONSE_PLAN_TYPE_LIST = [x[0] for x in RESPONSE_PLAN_TYPE]
+PARTNER_TYPE_LIST = [x[0] for x in PARTNER_TYPE]
+SHARED_PARTNER_TYPE_LIST = [x[0] for x in SHARED_PARTNER_TYPE]
+CSO_TYPES_LIST = [x[0] for x in CSO_TYPES]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -155,9 +164,15 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
 
 @factory.django.mute_signals(signals.post_save)
 class PartnerUserFactory(AbstractUserFactory):
+    """
+    Arguments:
+        partner {Partner} -- Partner ORM object
+
+    Ex) PartnerUserFactory(partner=partner1)
+    """
+
     # We are going to let PartnerFactory create PartnerUser
     partner = factory.SubFactory('core.factories.PartnerFactory', user=None)
-    prp_role = factory.RelatedFactory('core.factories.IPPRPRoleFactory', 'user')
 
     class Meta:
         model = User
@@ -165,7 +180,11 @@ class PartnerUserFactory(AbstractUserFactory):
 
 @factory.django.mute_signals(signals.post_save)
 class NonPartnerUserFactory(AbstractUserFactory):
-    prp_role = factory.RelatedFactory('core.factories.ClusterPRPRoleFactory', 'user')
+    """
+    Arguments:
+
+    Ex) NonPartnerUserFactory()
+    """
 
     class Meta:
         model = User
@@ -183,6 +202,15 @@ class AbstractPRPRoleFactory(factory.django.DjangoModelFactory):
 
 
 class IPPRPRoleFactory(AbstractPRPRoleFactory):
+    """
+    Arguments:
+        user {User} -- User ORM object to bind
+        workspace {Workspace} -- Workspace ORM object to bind for specific role on user
+        role {str} Optional -- Argument to override role for Partner user
+
+    Ex) IPPRPRoleFactory(user=user, workspace=workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+    """
+
     role = fuzzy.FuzzyChoice(IP_PRP_ROLE_TYPES_LIST)
 
     class Meta:
@@ -190,6 +218,16 @@ class IPPRPRoleFactory(AbstractPRPRoleFactory):
 
 
 class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
+    """
+    Arguments:
+        user {User} -- User ORM object to bind
+        workspace {Workspace} -- Workspace ORM object to bind for specific role on user
+        cluster {Cluster} -- Cluster ORM object to bind for specific role on user
+        role {str} Optional -- Argument to override role for Cluster user
+
+    Ex) ClusterPRPRoleFactory(user=user, workspace=workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
+    """
+
     cluster = factory.SubFactory('core.factories.ClusterFactory', prp_role=None)
     role = fuzzy.FuzzyChoice(CLUSTER_PRP_ROLE_TYPES_LIST)
 
@@ -318,7 +356,7 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     )
     start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n))
     end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n) + datetime.timedelta(days=364))
-    plan_type = "HRP"
+    plan_type = RESPONSE_PLAN_TYPE.hrp
     plan_custom_type_label = ""
     workspace = factory.SubFactory('core.factories.WorkspaceFactory', response_plan=None)
 
@@ -327,13 +365,34 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        clusters {List[Cluster]} Optional -- an optional list of Cluster ORM objects
+
+    Ex) PartnerFactory(clusters=[cluster1, cluster2, ...])
+    """
+
     title = factory.LazyFunction(faker.company)
+    short_title = factory.LazyAttribute(lambda o: o.title)
+    alternate_title = factory.LazyAttribute(lambda o: o.title)
+    partner_type = PARTNER_TYPE.civil_society_org
+    shared_partner = SHARED_PARTNER_TYPE.no
+    cso_type = fuzzy.FuzzyChoice(CSO_TYPES)
+    email = factory.LazyFunction(faker.ascii_safe_email)
+    phone_number = factory.LazyFunction(faker.phone_number)
+    last_assessment_date = None
+    core_values_assessment_date = None
+    street_address = factory.LazyFunction(faker.street_address)
+    city = factory.LazyFunction(faker.city)
+    postal_code = factory.LazyFunction(faker.postalcode)
+    country_code = factory.LazyFunction(faker.country_code)
     total_ct_cp = fuzzy.FuzzyInteger(10000, 1000000, 2500)
-    # partner_activity = factory.RelatedFactory(
-    #     'core.factories.PartnerActivityFactory', 'partner')
-    # partner_project = factory.RelatedFactory(
-    #     'core.factories.PartnerProjectFactory', 'partner')
-    # user = factory.RelatedFactory('core.factories.PartnerUserFactory', partner=None)
+    total_ct_cy = fuzzy.FuzzyInteger(10000, 500000, 6700)
+    vendor_number = factory.LazyFunction(lambda: "{}".format(faker.random_number(10)))
+    alternate_id = None
+    rating = None
+    basis_for_risk_rating = None
+    ocha_external_id = None
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
