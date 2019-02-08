@@ -83,7 +83,9 @@ IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('IP'), PRP_ROL
 CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('CLUSTER'), PRP_ROLE_TYPES_LIST))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PARTNER_ACTIVITY_STATUS_LIST = [x[0] for x in PARTNER_ACTIVITY_STATUS]
+REPORTING_TYPES_LIST = [x[0] for x in REPORTING_TYPES]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
+PD_DOCUMENT_TYPE_LIST = [x[0] for x in PD_DOCUMENT_TYPE]
 COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
 CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
@@ -371,8 +373,8 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
             o.workspace.countries.first().name, n + beginning_of_this_year.year
         )
     )
-    start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n))
-    end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n) + datetime.timedelta(days=364))
+    start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1))
+    end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1) + datetime.timedelta(days=364))
     plan_type = RESPONSE_PLAN_TYPE.hrp
     plan_custom_type_label = ""
     workspace = factory.SubFactory('core.factories.WorkspaceFactory', response_plan=None)
@@ -651,6 +653,12 @@ class AbstractIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 
 
 class QuantityTypeIndicatorBlueprintFactory(AbstractIndicatorBlueprintFactory):
+    """
+    Arguments:
+
+    Ex) QuantityTypeIndicatorBlueprintFactory()
+    """
+
     title = factory.Sequence(lambda n: "Quantity Indicator {}".format(n))
     unit = IndicatorBlueprint.NUMBER
     calculation_formula_across_locations = fuzzy.FuzzyChoice(
@@ -664,6 +672,12 @@ class QuantityTypeIndicatorBlueprintFactory(AbstractIndicatorBlueprintFactory):
 
 
 class RatioTypeIndicatorBlueprintFactory(AbstractIndicatorBlueprintFactory):
+    """
+    Arguments:
+
+    Ex) QuantityTypeIndicatorBlueprintFactory()
+    """
+
     title = factory.Sequence(lambda n: "Ratio Indicator {}".format(n))
     unit = IndicatorBlueprint.PERCENTAGE
     calculation_formula_across_locations = fuzzy.FuzzyChoice(
@@ -678,6 +692,13 @@ class RatioTypeIndicatorBlueprintFactory(AbstractIndicatorBlueprintFactory):
 
 
 class DisaggregationFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        response_plan {ResponsePlan} -- ResponsePlan ORM object to bind
+
+    Ex) DisaggregationFactory(response_plan=response_plan1)
+    """
+
     active = True
     name = factory.LazyFunction(faker.word)
     response_plan = factory.SubFactory('core.factories.ResponsePlanFactory', disaggregation=None)
@@ -687,6 +708,13 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
 
 class DisaggregationValueFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        disaggregation {Disaggregation} -- Disaggregation ORM object to bind
+
+    Ex) DisaggregationFactory(disaggregation=disaggregation1)
+    """
+
     active = True
     value = factory.LazyFunction(faker.word)
     disaggregation = factory.SubFactory('core.factories.DisaggregationFactory', disaggregation_value=None)
@@ -857,119 +885,159 @@ class RatioReportableToPartnerActivityFactory(RatioReportableBaseFactory):
         model = Reportable
 
 
-class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactory):
-    location = factory.SubFactory('core.factories.LocationFactory')
-    reportable = factory.SubFactory('core.factories.ReportableFactory')
-    target = dict(
-        [('d', 1), ('v', random.randint(1000, 10000))])
-    baseline = dict(
-        [('d', 1), ('v', random.randint(0, 500))])
-    in_need = dict(
-        [('d', 1), ('v', random.randint(20000, 50000))])
-
-    class Meta:
-        model = ReportableLocationGoal
-        django_get_or_create = ('location', 'reportable')
-
-
-class ProgressReportFactory(factory.django.DjangoModelFactory):
-    start_date = beginning_of_this_year
-    end_date = start_date + datetime.timedelta(days=30)
-    due_date = start_date + datetime.timedelta(days=45)
-
-    class Meta:
-        django_get_or_create = (
-            'programme_document', 'report_type', 'report_number'
-        )
-        model = ProgressReport
-
-
 class SectionFactory(factory.django.DjangoModelFactory):
-    name = factory.Sequence(lambda n: "Section %d" % n)
+    """
+    Arguments:
+
+    Ex) SectionFactory()
+    """
+
+    name = factory.LazyFunction(faker.word)
 
     class Meta:
         model = Section
 
 
 class PersonFactory(factory.django.DjangoModelFactory):
-    name = factory.Sequence(lambda n: "Person_%d" % n)
-    title = factory.Sequence(lambda n: "Title_%d" % n)
-    phone_number = factory.Sequence(lambda n: "+12 442-113-1%d" % n)
-    email = factory.Sequence(lambda n: "person_%d@uniceftest.org" % n)
+    """
+    Arguments:
+
+    Ex) PersonFactory()
+    """
+
+    name = factory.LazyFunction(faker.name)
+    title = factory.LazyFunction(faker.job)
+    phone_number = factory.LazyFunction(faker.phone_number)
+    email = factory.LazyFunction(faker.ascii_safe_email)
+    active = True
 
     class Meta:
         model = Person
         django_get_or_create = ('email', )
 
 
-class ReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
-    start_date = beginning_of_this_year
-    end_date = start_date + datetime.timedelta(days=30)
-    due_date = start_date + datetime.timedelta(days=45)
-    programme_document = factory.Iterator(ProgrammeDocument.objects.all())
+class AbstractReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
+    programme_document = factory.SubFactory('core.factories.ProgrammeDocumentFactory', reporting_period_date=None)
+    description = factory.LazyFunction(faker.sentence)
+
+    class Meta:
+        model = ReportingPeriodDates
+
+
+class QPRReportingPeriodDatesFactory(AbstractReportingPeriodDatesFactory):
+    """
+    Arguments:
+
+    Ex) QPRReportingPeriodDatesFactory(programme_document=programme_document1)
+    """
+
+    start_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=3 * (n - 1)))
+    end_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=3 * (n - 1)) + relativedelta(months=3))
+    due_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=3 * (n - 1)) + relativedelta(months=3, days=1))
+    report_type = 'QPR'
+
+    class Meta:
+        model = ReportingPeriodDates
+
+
+class HRReportingPeriodDatesFactory(AbstractReportingPeriodDatesFactory):
+    """
+    Arguments:
+
+    Ex) HRReportingPeriodDatesFactory(programme_document=programme_document1)
+    """
+
+    start_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=1 * (n - 1)))
+    end_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=1 * (n - 1)) + relativedelta(months=1))
+    due_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=1 * (n - 1)) + relativedelta(months=1, days=1))
+    report_type = 'HR'
 
     class Meta:
         model = ReportingPeriodDates
 
 
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "programme_document_%d" % n)
-    agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
-    reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
+    """
+    Arguments:
+        workspace {Workspace} -- Workspace ORM object to bind
+        partner {Partner} -- Partner ORM object to bind
+        sections {Section} -- A list of Section ORM objects to bind
+        unicef_officers {Person} -- A list of Person ORM objects to bind
+        unicef_focal_point {Person} -- A list of Person ORM objects to bind
+        partner_focal_point {Person} -- A list of Person ORM objects to bind
+
+    Ex) ProgrammeDocumentFactory(
+            workspace=workspace1,
+            partner=partner1,
+            sections=[section1, ],
+            unicef_officers=[unicef_officer, ],
+            unicef_focal_point=[unicef_focal_point1, ],
+            partner_focal_point=[partner_focal_point1, ]
+        )
+    """
+
+    agreement = factory.LazyFunction(lambda: faker.uuid4()[:255])
+    document_type = PD_DOCUMENT_TYPE.PD
+    reference_number = factory.LazyFunction(lambda: faker.uuid4()[:255])
+    title = factory.LazyFunction(faker.sentence)
+    unicef_office = factory.LazyFunction(faker.city)
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory', programme_document=None)
+    partner = factory.SubFactory('core.factories.PartnerFactory', programme_document=None)
     start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=364)
+    end_date = datetime.date(today.year, 12, 31)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
+    contributing_to_cluster = True
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
-    unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
     cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     funds_received_to_date = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    partner = factory.SubFactory('core.factories.PartnerFactory')
+    budget_currency = factory.LazyFunction(faker.currency_code)
+    cso_contribution_currency = factory.LazyAttribute(lambda o: o.budget_currency)
+    total_unicef_cash_currency = factory.LazyAttribute(lambda o: o.budget_currency)
+    in_kind_amount_currency = factory.LazyAttribute(lambda o: o.budget_currency)
+    funds_received_to_date_currency = factory.LazyAttribute(lambda o: o.budget_currency)
+    amendments = list()
 
-    cp_output = factory.RelatedFactory(
-        'core.factories.PDResultLinkFactory',
-        'programme_document')
-    workspace = factory.Iterator(Workspace.objects.all())
+    @factory.post_generation
+    def sections(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for section in extracted:
+                self.sections.add(section)
+
+    @factory.post_generation
+    def unicef_officers(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for unicef_officer in extracted:
+                self.unicef_officers.add(unicef_officer)
+
+    @factory.post_generation
+    def unicef_focal_point(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for unicef_focal_point in extracted:
+                self.unicef_focal_point.add(unicef_focal_point)
+
+    @factory.post_generation
+    def partner_focal_point(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for partner_focal_point in extracted:
+                self.partner_focal_point.add(partner_focal_point)
 
     class Meta:
         model = ProgrammeDocument
-
-    @factory.post_generation
-    def create_cpos(self, create, extracted, **kwargs):
-        """
-        Create 1-2 CP outputs per PD
-        """
-        if not create:
-            return
-        for i in range(random.randint(1, 2)):
-            PDResultLinkFactory.create(programme_document=self)
-
-
-class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
-
-    title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
-    time_period_start = factory.LazyAttribute(lambda o: o.time_period[0])
-    time_period_end = factory.LazyAttribute(lambda o: o.time_period[1])
-    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
-    total = dict([('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
-    overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
-    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
-    submission_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
-
-    @factory.lazy_attribute
-    def time_period(self):
-        return next(REPORTABLE_RANGE_GENERATORS[self.reportable.id])
-
-    class Meta:
-        model = IndicatorReport
-        exclude = ('time_period', )
-
-
-class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
-    title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
-    total = dict([('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
 
 class PDResultLinkFactory(factory.django.DjangoModelFactory):
@@ -1000,6 +1068,33 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
         model = LowerLevelOutput
 
 
+class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactory):
+    location = factory.SubFactory('core.factories.LocationFactory')
+    reportable = factory.SubFactory('core.factories.ReportableFactory')
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+
+    class Meta:
+        model = ReportableLocationGoal
+        django_get_or_create = ('location', 'reportable')
+
+
+class ProgressReportFactory(factory.django.DjangoModelFactory):
+    start_date = beginning_of_this_year
+    end_date = start_date + datetime.timedelta(days=30)
+    due_date = start_date + datetime.timedelta(days=45)
+
+    class Meta:
+        django_get_or_create = (
+            'programme_document', 'report_type', 'report_number'
+        )
+        model = ProgressReport
+
+
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     disaggregation = dict()
     num_disaggregation = 3
@@ -1009,3 +1104,28 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = IndicatorLocationData
         django_get_or_create = ('indicator_report', 'location')
+
+
+class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
+
+    title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
+    time_period_start = factory.LazyAttribute(lambda o: o.time_period[0])
+    time_period_end = factory.LazyAttribute(lambda o: o.time_period[1])
+    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
+    total = dict([('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+    overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
+    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
+    submission_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
+
+    @factory.lazy_attribute
+    def time_period(self):
+        return next(REPORTABLE_RANGE_GENERATORS[self.reportable.id])
+
+    class Meta:
+        model = IndicatorReport
+        exclude = ('time_period', )
+
+
+class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
+    title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
+    total = dict([('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
