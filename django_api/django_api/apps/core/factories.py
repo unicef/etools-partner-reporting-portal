@@ -808,6 +808,15 @@ class RatioReportableBaseFactory(AbstractReportableFactory):
 
 
 class QuantityReportableToLowerLevelOutputFactory(QuantityReportableBaseFactory):
+    """
+    Arguments:
+        content_object {LowerLevelOutput} -- LowerLevelOutput ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) QuantityReportableToLowerLevelOutputFactory(
+            content_object=lower_level_output1, blueprint=blueprint1
+        )
+    """
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory', reportable=None)
 
@@ -816,6 +825,16 @@ class QuantityReportableToLowerLevelOutputFactory(QuantityReportableBaseFactory)
 
 
 class QuantityReportableToPartnerProjectFactory(QuantityReportableBaseFactory):
+    """
+    Arguments:
+        content_object {PartnerProject} -- PartnerProject ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) QuantityReportableToLowerLevelOutputFactory(
+            content_object=project1, blueprint=blueprint1
+        )
+    """
+
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
 
     class Meta:
@@ -823,6 +842,15 @@ class QuantityReportableToPartnerProjectFactory(QuantityReportableBaseFactory):
 
 
 class QuantityReportableToClusterObjectiveFactory(QuantityReportableBaseFactory):
+    """
+    Arguments:
+        content_object {ClusterObjective} -- ClusterObjective ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) QuantityReportableToLowerLevelOutputFactory(
+            content_object=objective1, blueprint=blueprint1
+        )
+    """
     content_object = factory.SubFactory(
         'core.factories.ClusterObjectiveFactory', reportable=None)
 
@@ -831,6 +859,15 @@ class QuantityReportableToClusterObjectiveFactory(QuantityReportableBaseFactory)
 
 
 class QuantityReportableToClusterActivityFactory(QuantityReportableBaseFactory):
+    """
+    Arguments:
+        content_object {ClusterActivity} -- ClusterActivity ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) QuantityReportableToClusterActivityFactory(
+            content_object=activity1, blueprint=blueprint1
+        )
+    """
     content_object = factory.SubFactory(
         'core.factories.ClusterActivityFactory', reportable=None)
 
@@ -839,6 +876,16 @@ class QuantityReportableToClusterActivityFactory(QuantityReportableBaseFactory):
 
 
 class QuantityReportableToPartnerActivityFactory(QuantityReportableBaseFactory):
+    """
+    Arguments:
+        content_object {PartnerActivity} -- PartnerActivity ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) QuantityReportableToPartnerActivityFactory(
+            content_object=activity1, blueprint=blueprint1
+        )
+    """
+
     content_object = factory.SubFactory(
         'core.factories.PartnerActivityFactory', reportable=None)
 
@@ -847,6 +894,15 @@ class QuantityReportableToPartnerActivityFactory(QuantityReportableBaseFactory):
 
 
 class RatioReportableToLowerLevelOutputFactory(RatioReportableBaseFactory):
+    """
+    Arguments:
+        content_object {LowerLevelOutput} -- LowerLevelOutput ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) RatioReportableToLowerLevelOutputFactory(
+            content_object=lower_level_output1, blueprint=blueprint1
+        )
+    """
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory', reportable=None)
 
@@ -855,6 +911,15 @@ class RatioReportableToLowerLevelOutputFactory(RatioReportableBaseFactory):
 
 
 class RatioReportableToPartnerProjectFactory(RatioReportableBaseFactory):
+    """
+    Arguments:
+        content_object {PartnerProject} -- PartnerProject ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) RatioReportableToPartnerProjectFactory(
+            content_object=project1, blueprint=blueprint1
+        )
+    """
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
 
     class Meta:
@@ -862,6 +927,16 @@ class RatioReportableToPartnerProjectFactory(RatioReportableBaseFactory):
 
 
 class RatioReportableToClusterObjectiveFactory(RatioReportableBaseFactory):
+    """
+    Arguments:
+        content_object {ClusterObjective} -- ClusterObjective ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) RatioReportableToClusterObjectiveFactory(
+            content_object=objective1, blueprint=blueprint1
+        )
+    """
+
     content_object = factory.SubFactory(
         'core.factories.ClusterObjectiveFactory', reportable=None)
 
@@ -870,6 +945,16 @@ class RatioReportableToClusterObjectiveFactory(RatioReportableBaseFactory):
 
 
 class RatioReportableToClusterActivityFactory(RatioReportableBaseFactory):
+    """
+    Arguments:
+        content_object {ClusterActivity} -- ClusterActivity ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) RatioReportableToClusterActivityFactory(
+            content_object=activity1, blueprint=blueprint1
+        )
+    """
+
     content_object = factory.SubFactory(
         'core.factories.ClusterActivityFactory', reportable=None)
 
@@ -878,6 +963,16 @@ class RatioReportableToClusterActivityFactory(RatioReportableBaseFactory):
 
 
 class RatioReportableToPartnerActivityFactory(RatioReportableBaseFactory):
+    """
+    Arguments:
+        content_object {PartnerActivity} -- PartnerActivity ORM object to bind
+        blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
+
+    Ex) RatioReportableToPartnerActivityFactory(
+            content_object=activity1, blueprint=blueprint1
+        )
+    """
+
     content_object = factory.SubFactory(
         'core.factories.PartnerActivityFactory', reportable=None)
 
@@ -1041,28 +1136,37 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
 
 class PDResultLinkFactory(factory.django.DjangoModelFactory):
-    external_id = factory.Sequence(lambda n: "%d" % n)
-    external_cp_output_id = factory.Sequence(lambda n: "%d" % (n % 4))
-    title = factory.Sequence(lambda n: "result link to country_programme_{}".format(n % 4))
-    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'cp_output')
+    """
+    Arguments:
+        programme_document {ProgrammeDocument} -- ProgrammeDocument ORM object to bind
+
+    Ex) PDResultLinkFactory(
+            programme_document=programme_document1,
+        )
+    """
+
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
+    programme_document = factory.SubFactory('core.factories.ProgrammeDocumentFactory', cp_outputs=None)
+    external_cp_output_id = factory.LazyFunction(lambda: faker.random_number(7, True))
+    title = factory.LazyFunction(faker.sentence)
 
     class Meta:
         model = PDResultLink
         django_get_or_create = ('external_id', 'external_cp_output_id')
 
-    @factory.post_generation
-    def create_llos(self, create, extracted, **kwargs):
-        """
-        Create 2-5 LLO's per Result link
-        """
-        if not create:
-            return
-        for i in range(random.randint(1, 3)):
-            LowerLevelOutputFactory.create(cp_output=self)
-
 
 class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "lower_level_output_%d" % n)
+    """
+    Arguments:
+        cp_output {PDResultLink} -- PDResultLink ORM object to bind
+
+    Ex) LowerLevelOutputFactory(
+            cp_output=cp_output1,
+        )
+    """
+    title = factory.LazyFunction(faker.sentence)
+    cp_output = factory.SubFactory('core.factories.PDResultLinkFactory', lower_level_output=None)
+    active = True
 
     class Meta:
         model = LowerLevelOutput
