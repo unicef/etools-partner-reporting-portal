@@ -14,9 +14,9 @@ urlpatterns = [
     url(r'^user-logout/$', UserLogoutAPIView.as_view(), name="user-logout"),
 
     url(r'^auth/login-with-token/$', LoginUserWithTokenAPIView.as_view(),
-        name='user_auth_email'),
+        name='user-passwordless-login'),
 
     # passwordless urls
     url(r'^auth/get-token/$', ObtainEmailCallbackToken.as_view(),
-        name='user_auth_email'),
+        name='user-passwordless-token'),
 ]
