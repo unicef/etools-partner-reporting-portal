@@ -27,6 +27,7 @@ from indicator.models import (
     Disaggregation,
     DisaggregationValue,
     ReportableLocationGoal,
+    ReportingEntity,
 )
 from unicef.models import (
     Section,
@@ -107,6 +108,8 @@ RESPONSE_PLAN_TYPE_LIST = [x[0] for x in RESPONSE_PLAN_TYPE]
 PARTNER_TYPE_LIST = [x[0] for x in PARTNER_TYPE]
 SHARED_PARTNER_TYPE_LIST = [x[0] for x in SHARED_PARTNER_TYPE]
 CSO_TYPES_LIST = [x[0] for x in CSO_TYPES]
+PROGRESS_REPORT_STATUS_LIST = [x[0] for x in PROGRESS_REPORT_STATUS]
+FREQUENCY_LEVEL_LIST = [x[0] for x in FREQUENCY_LEVEL]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -1173,8 +1176,19 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
 
 class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactory):
-    location = factory.SubFactory('core.factories.LocationFactory')
-    reportable = factory.SubFactory('core.factories.ReportableFactory')
+    """
+    Arguments:
+        location {Location} -- Location ORM object to bind
+        reportable {Reportable} -- Reportable ORM object to bind
+
+    Ex) LocationWithReportableLocationGoalFactory(
+            location=location1,
+            reportable=reportable1,
+        )
+    """
+
+    location = factory.SubFactory('core.factories.LocationFactory', location_goal=None)
+    reportable = factory.SubFactory('core.factories.ReportableFactory', location_goal=None)
     target = dict(
         [('d', 1), ('v', random.randint(1000, 10000))])
     baseline = dict(
@@ -1188,9 +1202,53 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
 
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
-    start_date = beginning_of_this_year
-    end_date = start_date + datetime.timedelta(days=30)
-    due_date = start_date + datetime.timedelta(days=45)
+    """
+    Arguments:
+        start_date {datetime.date} -- Datetime date object for start date
+        end_date {datetime.date} -- Datetime date object for end date
+        due_date {datetime.date} -- Datetime date object for due date
+        report_number {int} -- Report number
+        report_type {str} -- Report type: QPR, HR, SR
+        is_final {bool} -- A flag for final report
+        programme_document {ProgrammeDocument} -- ProgrammeDocument ORM object to bind
+        submitted_by {User} -- User ORM object to bind
+        submitting_user {User} -- User ORM object to bind
+
+    Ex) ProgressReportFactory(
+            start_date=start_date1,
+            end_date=end_date1,
+            due_date=due_date1,
+            report_number=1,
+            report_type="QPR",
+            is_final=False,
+            programme_document=programme_document1,
+            submitted_by=submitted_by1,
+            submitting_user=submitting_user1,
+        )
+    """
+    start_date = factory.LazyAttribute(lambda o: o.time_period[0])
+    end_date = factory.LazyAttribute(lambda o: o.time_period[1])
+    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=15))
+    partner_contribution_to_date = factory.LazyFunction(faker.text)
+    challenges_in_the_reporting_period = factory.LazyFunction(faker.text)
+    proposed_way_forward = factory.LazyFunction(faker.text)
+    review_date = due_date
+    submission_date = due_date
+    programme_document = factory.SubFactory('core.factories.ProgrammeDocument', progress_report=None)
+    submitted_by = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
+    submitting_user = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
+    reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
+    reviewed_by_name = factory.LazyFunction(faker.name)
+    sent_back_feedback = factory.LazyFunction(faker.text)
+    narrative = factory.LazyFunction(faker.text)
+    reviewed_by_external_id = factory.LazyFunction(lambda: faker.random_number(4, True))
+    status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
+    review_overall_status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
+    attachment = None
+
+    @factory.lazy_attribute
+    def time_period(self):
+        return next(REPORTABLE_RANGE_GENERATORS[self.reportable.id])
 
     class Meta:
         django_get_or_create = (
@@ -1199,27 +1257,24 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
         model = ProgressReport
 
 
-class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
-    disaggregation = dict()
-    num_disaggregation = 3
-    level_reported = 3
-    disaggregation_reported_on = list()
-
-    class Meta:
-        model = IndicatorLocationData
-        django_get_or_create = ('indicator_report', 'location')
-
-
-class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
-
-    title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
+class AbstractIndicatorReportFactory(factory.django.DjangoModelFactory):
+    title = factory.LazyAttribute(lambda o: o.reportable.blueprint.title)
     time_period_start = factory.LazyAttribute(lambda o: o.time_period[0])
     time_period_end = factory.LazyAttribute(lambda o: o.time_period[1])
-    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
+    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=1))
+    submission_date = due_date
+    review_date = due_date
     total = dict([('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
     report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
-    submission_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
+    frequency = fuzzy.FuzzyChoice(FREQUENCY_LEVEL_LIST)
+    reportable = factory.SubFactory('core.factories.AbstractReportableFactory', indicator_report=None)
+    remarks = factory.LazyFunction(faker.text)
+    narrative_assessment = factory.LazyFunction(faker.sentence)
+    sent_back_feedback = factory.LazyFunction(faker.text)
+    parent = None
+    progress_report = None
+    reporting_entity = None
 
     @factory.lazy_attribute
     def time_period(self):
@@ -1227,9 +1282,65 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorReport
+        abstract = True
         exclude = ('time_period', )
 
 
-class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
-    title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
-    total = dict([('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
+class ClusterIndicatorReportFactory(AbstractIndicatorReportFactory):
+    """
+    Arguments:
+        reportable {Reportable} -- Reportable ORM object to bind
+
+    Ex) ClusterIndicatorReportFactory(
+            reportable=reportable1,
+        )
+    """
+    progress_report = None
+    reporting_entity = ReportingEntity.objects.get(title="Cluster")
+
+    class Meta:
+        model = IndicatorReport
+        exclude = ('time_period', )
+
+
+class ProgressReportIndicatorReportFactory(AbstractIndicatorReportFactory):
+    """
+    Arguments:
+        reportable {Reportable} -- Reportable ORM object for start date
+        progress_report {ProgressReport} -- ProgressReport ORM object to bind
+
+    Ex) ProgressReportIndicatorReportFactory(
+            reportable=reportable1,
+            progress_report=progress_report1,
+        )
+    """
+    progress_report = factory.SubFactory('core.factories.ProgressReportFactory', indicator_report=None)
+    reporting_entity = ReportingEntity.objects.get(title="UNICEF")
+
+    class Meta:
+        model = IndicatorReport
+        exclude = ('time_period', )
+
+
+class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        indicator_report {IndicatorReport} -- IndicatorReport ORM object to bind
+        location {Location} -- Location ORM object to bind
+
+    Ex) IndicatorLocationDataFactory(
+            indicator_report=indicator_report1,
+            location=location1,
+        )
+    """
+    num_disaggregation = 3
+    level_reported = 3
+    disaggregation = dict()
+    disaggregation_reported_on = list()
+    is_locked = False
+    percentage_allocated = fuzzy.FuzzyDecimal(0, 100)
+    indicator_report = factory.SubFactory('core.factories.IndicatorReportFactory', location_data=None)
+    location = factory.SubFactory('core.factories.LocationFactory', location_data=None)
+
+    class Meta:
+        model = IndicatorLocationData
