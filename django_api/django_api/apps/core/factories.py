@@ -399,7 +399,7 @@ class PartnerFactory(factory.django.DjangoModelFactory):
     alternate_title = factory.LazyAttribute(lambda o: o.title)
     partner_type = PARTNER_TYPE.civil_society_org
     shared_partner = SHARED_PARTNER_TYPE.no
-    cso_type = fuzzy.FuzzyChoice(CSO_TYPES)
+    cso_type = fuzzy.FuzzyChoice(CSO_TYPES_LIST)
     email = factory.LazyFunction(faker.ascii_safe_email)
     phone_number = factory.LazyFunction(faker.phone_number)
     last_assessment_date = None
