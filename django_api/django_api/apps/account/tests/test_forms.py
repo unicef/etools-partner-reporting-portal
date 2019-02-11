@@ -1,34 +1,15 @@
-from django.core import mail
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.db.models import Count
-
-from rest_framework import status
-
-from drfpasswordless.models import CallbackToken
-
 from faker import Faker
 
 from core.factories import (
     PartnerUserFactory,
     PartnerFactory,
-    CountryFactory,
-    WorkspaceFactory,
-    IPPRPRoleFactory,
-    NonPartnerUserFactory,
-    ClusterPRPRoleFactory,
-    ResponsePlanFactory,
-    ClusterFactory,
 )
-from core.common import PRP_ROLE_TYPES
 from core.tests.base import BaseAPITestCase
 
 from account.forms import (
     CustomUserCreationForm,
     UserAdminForm,
 )
-
-User = get_user_model()
 
 
 class CustomUserCreationFormTest(BaseAPITestCase):
