@@ -12,7 +12,7 @@ from account.forms import (
 )
 
 
-class CustomUserCreationFormTest(BaseAPITestCase):
+class CustomUserCreationFormTestcase(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
@@ -41,7 +41,7 @@ class CustomUserCreationFormTest(BaseAPITestCase):
         self.assertFalse(form.is_valid())
 
 
-class UserAdminFormTest(BaseAPITestCase):
+class UserAdminFormTestcase(BaseAPITestCase):
 
     def setUp(self):
         self.partner = PartnerFactory()
