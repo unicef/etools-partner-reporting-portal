@@ -19,6 +19,7 @@ from core.factories import (
     CartoDBTableFactory,
     ClusterObjectiveFactory,
     LocationFactory,
+    ClusterActivityFactory,
 )
 
 from cluster.models import ClusterObjective, Cluster, ClusterActivity
@@ -259,7 +260,6 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
             response.data['id']
         )
 
- 
     def test_update_put_cluster_objective(self):
         """Test the API response to update ClusterObjective object as a whole.
         """
@@ -338,181 +338,291 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         self.assertEqual(new_title, response.data['title'])
 
 
-# class TestClusterActivityAPIView(BaseAPITestCase):
+class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
 
-#     def setUp(self):
-#         super().setUp()
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = NonPartnerUserFactory()
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-#         # Logging in as IMO admin
-#         self.client.login(username='admin_imo', password='Passw0rd!')
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-#     @property
-#     def data(self):
-#         return {
-#             "title": "Water for thirsty",
-#             "standard": "Bottle of water with UNICEF logo.",
-#             "frequency": FREQUENCY_LEVEL.weekly,
-#             "cluster_objective": ClusterObjective.objects.first().id,
-#         }
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
 
-#     def test_list_cluster_activity(self):
-#         """
-#         get list unit test for ClusterActivityAPIView
-#         """
-#         cluster = Cluster.objects.first()
-#         url = reverse('cluster-activity-list',
-#                       kwargs={'response_plan_id': cluster.response_plan_id})
-#         response = self.client.get(url, format='json')
+        super().setUp()
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['count'], ClusterActivity.objects.filter(
-#             cluster_objective__cluster__response_plan_id=cluster.response_plan_id).count())
+    def test_invalid_list_requests(self):
+        """Test the API response for invalid payloads.
+        """
 
-#     def test_filter_list_cluster_activity(self):
-#         """
-#         get list unit test for ClusterActivityAPIView
-#         """
-#         last = ClusterActivity.objects.last()
-#         url = reverse(
-#             'cluster-activity-list',
-#             kwargs={
-#                 'response_plan_id': last.cluster_objective.cluster.response_plan_id})
-#         response = self.client.get(
-#             url + "?title=%s" %
-#             last.title, format='json')
+        # User must have PRP role
+        self.user.prp_roles.all().delete()
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['count'], 1)
-#         self.assertEquals(response.data['results'][0]['id'], last.id)
+        response = self.client.get(reverse('cluster-activity-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-#     def test_create_cluster_activity(self):
-#         """
-#         create unit test for ClusterActivityAPIView
-#         """
-#         base_count = ClusterActivity.objects.all().count()
-#         last = ClusterActivity.objects.last()
-#         url = reverse(
-#             'cluster-activity-list',
-#             kwargs={
-#                 'response_plan_id': last.cluster_objective.cluster.response_plan_id})
+        # User must be logged in
+        self.client.logout()
 
-#         # test for creating object
-#         data = self.data
-#         data['cluster'] = last.cluster.id
+        response = self.client.get(reverse('cluster-activity-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-#         response = self.client.post(url, data=data, format='json')
+    def test_cluster_actvitiy_list_and_filtering_and_ordering(self):
+        """Test the API response and queryset count with ordering.
+        Also, the filtering by ClusterActivityFilter will be tested: partner.
+        """
+        for _ in range(3):
+            ClusterActivityFactory(
+                cluster_objective=self.objective,
+                locations=[self.loc1, self.loc2, ]
+            )
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         created_obj = ClusterActivity.objects.get(id=response.data['id'])
-#         self.assertEquals(created_obj.title, self.data["title"])
-#         self.assertEquals(
-#             ClusterActivity.objects.all().count(),
-#             base_count + 1)
+        url = reverse(
+            'cluster-activity-list',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.objective.cluster_activities.all().count(),
+            response.data['count']
+        )
 
-#     def test_get_cluster_activity(self):
-#         """
-#         get obj unit test for ClusterActivityAPIView
-#         """
-#         first = ClusterActivity.objects.first()
-#         url = reverse('cluster-activity', kwargs={"pk": first.id})
-#         response = self.client.get(url, format='json')
+        # Sorting
+        response = self.client.get(url + '?sort=title.desc')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.objective.cluster_activities.order_by('-title').first().id,
+            response.data['results'][0]['id']
+        )
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['id'], first.id)
-#         self.assertEquals(response.data['title'], first.title)
+        # Filterings
+        target_activity = self.objective.cluster_activities.last()
+        filter_args = '?title={}&cluster_id={}&cluster_objective_id={}'.format(target_activity.title, self.cluster.id, self.objective.id)
 
-#     def test_get_non_existent_cluster_activity(self):
-#         """
-#         get obj unit test for ClusterActivityAPIView
-#         """
-#         url = reverse('cluster-activity', kwargs={"pk": 9999999})
-#         response = self.client.get(url, format='json')
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            target_activity.id,
+            response.data['results'][0]['id']
+        )
 
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+    def test_cluster_activity_create(self):
+        """Test the API response to create ClusterActivity instance.
+        """
+        base_count = self.objective.cluster_activities.all().count()
+        data = {
+            'title': faker.sentence(),
+            'cluster': self.cluster.id,
+            'cluster_objective': self.objective.id,
+        }
 
-#     def test_update_patch_cluster_activity(self):
-#         """
-#         patch object unit test for ClusterActivityAPIView
-#         """
-#         base_count = ClusterActivity.objects.all().count()
-#         last = ClusterActivity.objects.last()
+        url = reverse(
+            'cluster-activity-list',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(
+            self.objective.cluster_activities.all().count(),
+            base_count + 1
+        )
 
-#         data = dict(id=last.id, title='new updated title')
-#         url = reverse('cluster-activity', kwargs={"pk": last.id})
-#         response = self.client.patch(url, data=data, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(ClusterActivity.objects.all().count(), base_count)
-#         self.assertEquals(
-#             ClusterActivity.objects.get(
-#                 id=response.data['id']).title,
-#             data['title'])
+    def test_cluster_activity_create_validation_error(self):
+        """Test the API response to throw a validation error if user has no cluster access.
+        """
+        new_cluster = ClusterFactory(type='education', response_plan=self.response_plan)
 
-#     def test_update_patch_non_existent_cluster_activity(self):
-#         """
-#         patch object unit test for ClusterActivityAPIView
-#         """
-#         last = ClusterActivity.objects.last()
+        data = {
+            'title': faker.sentence(),
+            'cluster': new_cluster.id,
+        }
 
-#         data = dict(id=last.id, title='new updated title')
-#         url = reverse('cluster-activity', kwargs={"pk": 9999999})
-#         response = self.client.patch(url, data=data, format='json')
+        url = reverse(
+            'cluster-activity-list',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
-#     def test_update_put_cluster_activity(self):
-#         """
-#         update object unit test for ClusterActivityAPIView
-#         """
-#         base_count = ClusterActivity.objects.all().count()
-#         last = ClusterActivity.objects.last()
-#         obj = ClusterObjective.objects.last()
+class ClusterActivityAPIViewTestCase(BaseAPITestCase):
 
-#         data = self.data
-#         data.update(dict(id=last.id))
-#         data['title'] = 'new updated title'
-#         data['standard'] = 'new updated standard'
-#         data['cluster_objective'] = obj.id
-#         data['cluster'] = obj.cluster.id
-#         url = reverse('cluster-activity', kwargs={"pk": last.id})
-#         response = self.client.put(url, data=data, format='json')
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = NonPartnerUserFactory()
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(ClusterActivity.objects.all().count(), base_count)
-#         self.assertEquals(
-#             ClusterActivity.objects.get(
-#                 id=response.data['id']).title,
-#             data['title'])
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-#     def test_update_put_non_existent_cluster_activity(self):
-#         """
-#         update object unit test for ClusterActivityAPIView
-#         """
-#         last = ClusterActivity.objects.last()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
 
-#         data = self.data
-#         data.update(dict(id=last.id))
-#         url = reverse('cluster-activity', kwargs={"pk": 9999999})
-#         response = self.client.put(url, data=data, format='json')
+        super().setUp()
 
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+    def test_invalid_requests(self):
+        """Test the API response for invalid payloads.
+        """
+        obj = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
 
-#     def test_delete_cluster_activity(self):
-#         """
-#         delete object unit test for ClusterActivityAPIView
-#         """
-#         base_count = ClusterActivity.objects.all().count()
-#         last = ClusterActivity.objects.last()
-#         url = reverse('cluster-activity', kwargs={"pk": last.id})
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': obj.id}
+        )
 
-#         response = self.client.delete(url, data={"id": last.pk}, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data, None)
-#         self.assertEquals(
-#             ClusterActivity.objects.all().count(),
-#             base_count - 1)
+        # User must have PRP role
+        self.user.prp_roles.all().delete()
 
-#         response = self.client.delete(url, data={"id": last.pk}, format='json')
-#         self.assertEquals(status.HTTP_404_NOT_FOUND, response.status_code)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User must be logged in
+        self.client.logout()
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cluster_activity_detail(self):
+        """Test the API response to get ClusterActivity detail response.
+        """
+        obj = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+
+        # Non-existent cluster activity should throw 404 response
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': 9999999}
+        )
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # API response should return same ClusterActivity ID from database
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': obj.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            obj.id,
+            response.data['id']
+        )
+
+    def test_update_put_cluster_activity(self):
+        """Test the API response to update ClusterActivity object as a whole.
+        """
+        obj = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+            ]
+        )
+
+        new_title = faker.sentence()
+        data = {
+            'title': new_title,
+            'cluster': self.cluster.id,
+            'cluster_objective': self.objective.id,
+        }
+
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': obj.id}
+        )
+        response = self.client.put(url, data=data)
+
+        # id payload field is required
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Non-existent cluster objective should throw 404 response
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': 9999999}
+        )
+
+        data['id'] = 9999999
+        response = self.client.put(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Successful response should return new title
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': obj.id}
+        )
+
+        data['id'] = obj.id
+        response = self.client.put(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(new_title, response.data['title'])
+
+    def test_update_patch_cluster_activity(self):
+        """Test the API response to update ClusterActivity object partially.
+        """
+        obj = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+
+        new_title = faker.sentence()
+        data = {
+            'title': new_title,
+            'cluster': self.cluster.id,
+            'cluster_objective': self.objective.id,
+        }
+
+        # Non-existent cluster activity should throw 404 response
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': 9999999}
+        )
+
+        response = self.client.patch(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Successful response should return new title
+        url = reverse(
+            'cluster-activity',
+            kwargs={'pk': obj.id}
+        )
+        response = self.client.patch(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(new_title, response.data['title'])
 
 
 # class TestClusterDashboardAPIView(BaseAPITestCase):
