@@ -1004,6 +1004,104 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         self.assertEquals(self.clusterobjective_indicator_report.id, response.data['id'])
 
 
+class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+
+        self.p_custom_activity = CustomPartnerActivityFactory(
+            cluster_objective=self.objective,
+            project=self.project,
+        )
+
+        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+            content_object=self.activity, blueprint=self.blueprint
+        )
+        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_custom_activity, blueprint=self.blueprint
+        )
+        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+            content_object=self.objective, blueprint=self.blueprint
+        )
+        self.partnerproject_reportable = QuantityReportableToPartnerProjectFactory(
+            content_object=self.project, blueprint=self.blueprint
+        )
+
+        super().setUp()
+
+    def test_invalid_list_requests(self):
+        """Test the API response for invalid payloads.
+        """
+
+        # User must have PRP role
+        self.user.prp_roles.all().delete()
+
+        response = self.client.get(reverse('cluster-reportable-simple-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User must be logged in
+        self.client.logout()
+
+        response = self.client.get(reverse('cluster-reportable-simple-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cluster_reportable_list_and_filtering_and_ordering(self):
+        """Test the API response and queryset count with ordering.
+        """
+        url = reverse(
+            'cluster-reportable-simple-list',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(4, len(response.data))
+
+        # Cluster system admin should also be able to query cluster reportables
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            4, len(response.data)
+        )
+
+
 # class TestClusterDashboardAPIView(BaseAPITestCase):
 #
 #     def setUp(self):
