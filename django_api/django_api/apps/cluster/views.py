@@ -1447,4 +1447,3 @@ class AssignableClustersListView(ListAPIView):
             return queryset.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_member)
 
         raise PermissionDenied()
-

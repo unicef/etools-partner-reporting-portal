@@ -823,7 +823,7 @@ class QuantityReportableToPartnerProjectFactory(QuantityReportableBaseFactory):
         content_object {PartnerProject} -- PartnerProject ORM object to bind
         blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
 
-    Ex) QuantityReportableToLowerLevelOutputFactory(
+    Ex) QuantityReportableToPartnerProjectFactory(
             content_object=project1, blueprint=blueprint1
         )
     """
@@ -840,7 +840,7 @@ class QuantityReportableToClusterObjectiveFactory(QuantityReportableBaseFactory)
         content_object {ClusterObjective} -- ClusterObjective ORM object to bind
         blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
 
-    Ex) QuantityReportableToLowerLevelOutputFactory(
+    Ex) QuantityReportableToClusterObjectiveFactory(
             content_object=objective1, blueprint=blueprint1
         )
     """

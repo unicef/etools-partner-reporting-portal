@@ -5,7 +5,7 @@ from rest_framework import status
 from faker import Faker
 
 from core.tests.base import BaseAPITestCase
-from core.common import FREQUENCY_LEVEL, PRP_ROLE_TYPES, CLUSTER_TYPES
+from core.common import FREQUENCY_LEVEL, PRP_ROLE_TYPES, CLUSTER_TYPES, INDICATOR_REPORT_STATUS
 from core.factories import (
     NonPartnerUserFactory,
     PartnerFactory,
@@ -20,6 +20,15 @@ from core.factories import (
     ClusterObjectiveFactory,
     LocationFactory,
     ClusterActivityFactory,
+    PartnerProjectFactory,
+    ClusterActivityPartnerActivityFactory,
+    QuantityTypeIndicatorBlueprintFactory,
+    QuantityReportableToClusterActivityFactory,
+    QuantityReportableToPartnerActivityFactory,
+    QuantityReportableToClusterObjectiveFactory,
+    QuantityReportableToPartnerProjectFactory,
+    ClusterIndicatorReportFactory,
+    IndicatorLocationDataFactory,
 )
 
 from cluster.models import ClusterObjective, Cluster, ClusterActivity
@@ -623,6 +632,189 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
         response = self.client.patch(url, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(new_title, response.data['title'])
+
+
+class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+
+        super().setUp()
+
+    def test_invalid_list_requests(self):
+        """Test the API response for invalid payloads.
+        """
+
+        # User must have PRP role
+        self.user.prp_roles.all().delete()
+
+        response = self.client.get(reverse('cluster-indicator-reports-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User must be logged in
+        self.client.logout()
+
+        response = self.client.get(reverse('cluster-indicator-reports-list', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cluster_indicator_reports_list_and_filtering_and_ordering(self):
+        """Test the API response and queryset count with ordering.
+        Also, the filtering by ClusterActivityFilter will be tested: partner.
+        """
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            cluster_activity=self.activity,
+            project=self.project,
+        )
+
+        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+            content_object=self.activity, blueprint=self.blueprint
+        )
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=self.blueprint
+        )
+        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+            content_object=self.objective, blueprint=self.blueprint
+        )
+        self.partnerproject_reportable = QuantityReportableToPartnerProjectFactory(
+            content_object=self.project, blueprint=self.blueprint
+        )
+
+        # Create 4 indicator reports across generic relation
+        self.clusteractivity_indicator_report = ClusterIndicatorReportFactory(
+            reportable=self.clusteractivity_reportable,
+        )
+        self.partneractivity_indicator_report = ClusterIndicatorReportFactory(
+            reportable=self.partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.clusterobjective_indicator_report = ClusterIndicatorReportFactory(
+            reportable=self.clusterobjective_reportable,
+            report_status=INDICATOR_REPORT_STATUS.overdue,
+        )
+        self.partnerproject_indicator_report = ClusterIndicatorReportFactory(
+            reportable=self.partnerproject_reportable,
+        )
+
+        self.loc_data = IndicatorLocationDataFactory(
+            indicator_report=self.partnerproject_indicator_report,
+            location=self.loc1,
+        )
+
+        url = reverse(
+            'cluster-indicator-reports-list',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(4, response.data['count'])
+
+        # Filterings
+        filter_args = '?submitted=1&cluster={}&partner={}&indicator_type={}'.format(
+            self.cluster.id,
+            self.partner.id,
+            'partner_activity',
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.partneractivity_indicator_report.id,
+            response.data['results'][0]['id']
+        )
+
+        filter_args = '?submitted=0&indicator_type={}&cluster_objective={}'.format(
+            'cluster_objective', self.objective.id,
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.clusterobjective_indicator_report.id,
+            response.data['results'][0]['id']
+        )
+
+        filter_args = '?indicator={}&project={}&location={}&indicator_type={}'.format(
+            self.partnerproject_reportable.id, self.project.id, self.loc1.id, 'partner_project'
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.partnerproject_indicator_report.id,
+            response.data['results'][0]['id']
+        )
+
+        filter_args = '?indicator={}&cluster_activity={}&indicator_type={}'.format(
+            self.clusteractivity_reportable.id, self.activity.id, 'cluster_activity'
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.clusteractivity_indicator_report.id,
+            response.data['results'][0]['id']
+        )
+
+        filter_args = '?indicator={}&cluster_activity={}&indicator_type={}'.format(
+            self.clusteractivity_reportable.id, self.activity.id, 'bad_indicator_type'
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.clusteractivity_indicator_report.id,
+            response.data['results'][0]['id']
+        )
+
+        # Cluster system admin should also be able to query indicator reports
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        filter_args = '?indicator={}&cluster_activity={}&indicator_type={}'.format(
+            self.clusteractivity_reportable.id, self.activity.id, 'bad_indicator_type'
+        )
+
+        response = self.client.get(url + filter_args)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            self.clusteractivity_indicator_report.id,
+            response.data['results'][0]['id']
+        )
 
 
 # class TestClusterDashboardAPIView(BaseAPITestCase):
