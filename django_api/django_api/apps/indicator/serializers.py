@@ -1597,8 +1597,6 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
                 return obj.reportable.content_object.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.clusters.first()
-        else:
-            return None
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)
