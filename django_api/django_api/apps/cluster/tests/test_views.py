@@ -1,3 +1,6 @@
+import datetime
+from dateutil.relativedelta import relativedelta
+
 from django.urls import reverse
 
 from rest_framework import status
@@ -5,7 +8,13 @@ from rest_framework import status
 from faker import Faker
 
 from core.tests.base import BaseAPITestCase
-from core.common import FREQUENCY_LEVEL, PRP_ROLE_TYPES, CLUSTER_TYPES, INDICATOR_REPORT_STATUS
+from core.common import (
+    FREQUENCY_LEVEL,
+    PRP_ROLE_TYPES,
+    CLUSTER_TYPES,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+)
 from core.factories import (
     NonPartnerUserFactory,
     PartnerFactory,
@@ -31,6 +40,8 @@ from core.factories import (
     IndicatorLocationDataFactory,
     CustomPartnerActivityFactory,
 )
+
+from indicator.models import IndicatorReport
 
 from cluster.models import ClusterObjective, Cluster, ClusterActivity
 
@@ -1102,42 +1113,216 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
         )
 
 
-# class TestClusterDashboardAPIView(BaseAPITestCase):
-#
-#     def setUp(self):
-#         super().setUp()
-#
-#         # Logging in as IMO admin
-#         self.client.login(username='admin_imo', password='Passw0rd!')
-#         self.user = User.objects.get(username='admin_imo')
-#
-#     def test_get_partner_dashboard(self):
-#         first_cluster = Cluster.objects.first()
-#
-#         url = reverse('response-plan-cluster-dashboard', kwargs={
-#             'response_plan_id': first_cluster.response_plan_id
-#         }) + '?cluster_id=%d' % first_cluster.id
-#
-#         response = self.client.get(url, format='json')
-#
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(
-#             response.data['num_of_partners'],
-#             first_cluster.num_of_partners)
-#         self.assertEquals(
-#             response.data['num_of_met_indicator_reports'],
-#             first_cluster.num_of_met_indicator_reports())
-#         self.assertEquals(
-#             response.data['num_of_constrained_indicator_reports'],
-#             first_cluster.num_of_constrained_indicator_reports())
-#         self.assertEquals(
-#             response.data['num_of_non_cluster_activities'],
-#             first_cluster.num_of_non_cluster_activities())
-#         self.assertEquals(
-#             len(
-#                 response.data['overdue_indicator_reports']),
-#             first_cluster.overdue_indicator_reports.count())
-#         self.assertEquals(
-#             len(
-#                 response.data['constrained_indicator_reports']),
-#             first_cluster.constrained_indicator_reports.count())
+class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = NonPartnerUserFactory()
+        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+
+        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+            content_object=self.activity, blueprint=self.blueprint
+        )
+
+        super().setUp()
+
+    def test_invalid_list_requests(self):
+        """Test the API response for invalid payloads.
+        """
+
+        # 404 on non-existent response plan
+        response = self.client.get(reverse('response-plan-cluster-dashboard', kwargs={'response_plan_id': 9999999}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Bad request when cluster id does not exist for response plan
+        url = reverse('response-plan-cluster-dashboard', kwargs={'response_plan_id': self.response_plan.id})
+        args = '?cluster_id=999999'
+        response = self.client.get(url + args)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # User must have PRP role
+        self.user.prp_roles.all().delete()
+
+        response = self.client.get(reverse('response-plan-cluster-dashboard', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User must be logged in
+        self.client.logout()
+
+        response = self.client.get(reverse('response-plan-cluster-dashboard', kwargs={'response_plan_id': self.response_plan.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_response_details(self):
+        """Test the API response for Cluster dashboard data response.
+        """
+
+        for idx in range(4):
+            partner = PartnerFactory(country_code=self.country.country_short_code)
+            partner.clusters.add(self.cluster)
+
+            project = PartnerProjectFactory(
+                partner=partner,
+                clusters=[self.cluster],
+                locations=[self.loc1, self.loc2],
+            )
+
+            p_activity = ClusterActivityPartnerActivityFactory(
+                cluster_activity=self.activity,
+                project=project,
+            )
+
+            p_custom_activity = CustomPartnerActivityFactory(
+                cluster_objective=self.objective,
+                project=project,
+            )
+
+            partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+                content_object=p_activity, blueprint=self.blueprint,
+                parent_indicator=self.clusteractivity_reportable,
+            )
+            custom_partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+                content_object=p_custom_activity, blueprint=self.blueprint
+            )
+
+            if idx == 0:
+                IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.accepted,
+                        overall_status=OVERALL_STATUS.met,
+                    ),
+                    location=self.loc1,
+                )
+                self.constrained_loc = IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=custom_partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.accepted,
+                        overall_status=OVERALL_STATUS.constrained,
+                    ),
+                    location=self.loc1,
+                )
+            elif idx == 1:
+                IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.accepted,
+                        overall_status=OVERALL_STATUS.on_track,
+                    ),
+                    location=self.loc1,
+                )
+                IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=custom_partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.accepted,
+                        overall_status=OVERALL_STATUS.no_progress,
+                    ),
+                    location=self.loc1,
+                )
+            elif idx == 2:
+                IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=custom_partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.due,
+                        overall_status=OVERALL_STATUS.on_track,
+                    ),
+                    location=self.loc1,
+                )
+                self.overdue_loc = IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=custom_partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.overdue,
+                        overall_status=OVERALL_STATUS.constrained,
+                    ),
+                    location=self.loc1,
+                )
+            elif idx == 3:
+                IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=custom_partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.accepted,
+                        overall_status=OVERALL_STATUS.no_status,
+                    ),
+                    location=self.loc1,
+                )
+                self.upcoming_loc = IndicatorLocationDataFactory(
+                    indicator_report=ClusterIndicatorReportFactory(
+                        reportable=partneractivity_reportable,
+                        report_status=INDICATOR_REPORT_STATUS.due,
+                        overall_status=OVERALL_STATUS.constrained,
+                        time_period_start=datetime.date.today(),
+                        time_period_end=datetime.date.today() + relativedelta(days=10),
+                        due_date=datetime.date.today() + relativedelta(days=11),
+                    ),
+                    location=self.loc1,
+                )
+
+        # Query ClusterActivity indicator report
+        url = reverse(
+            'response-plan-cluster-dashboard',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(4, response.data['num_of_partners'])
+        self.assertEqual(1, response.data['num_of_met_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_constrained_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_on_track_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_no_progress_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_no_status_indicator_reports'])
+        self.assertEqual(3, response.data['num_of_due_overdue_indicator_reports'])
+        self.assertEqual(4, response.data['num_of_non_cluster_activities'])
+        self.assertEqual(1, len(response.data['upcoming_indicator_reports']))
+        self.assertEqual(self.upcoming_loc.indicator_report.id, response.data['upcoming_indicator_reports'][0]['id'])
+        self.assertEqual(1, len(response.data['overdue_indicator_reports']))
+        self.assertEqual(self.overdue_loc.indicator_report.id, response.data['overdue_indicator_reports'][0]['id'])
+        self.assertEqual(1, len(response.data['constrained_indicator_reports']))
+        self.assertEqual(self.constrained_loc.indicator_report.id, response.data['constrained_indicator_reports'][0]['id'])
+
+        # Cluster system admin should also be able to query indicator report details
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        url = reverse(
+            'response-plan-cluster-dashboard',
+            kwargs={'response_plan_id': self.response_plan.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(4, response.data['num_of_partners'])
+        self.assertEqual(1, response.data['num_of_met_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_constrained_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_on_track_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_no_progress_indicator_reports'])
+        self.assertEqual(1, response.data['num_of_no_status_indicator_reports'])
+        self.assertEqual(3, response.data['num_of_due_overdue_indicator_reports'])
+        self.assertEqual(4, response.data['num_of_non_cluster_activities'])
+        self.assertEqual(1, len(response.data['upcoming_indicator_reports']))
+        self.assertEqual(self.upcoming_loc.indicator_report.id, response.data['upcoming_indicator_reports'][0]['id'])
+        self.assertEqual(1, len(response.data['overdue_indicator_reports']))
+        self.assertEqual(self.overdue_loc.indicator_report.id, response.data['overdue_indicator_reports'][0]['id'])
+        self.assertEqual(1, len(response.data['constrained_indicator_reports']))
+        self.assertEqual(self.constrained_loc.indicator_report.id, response.data['constrained_indicator_reports'][0]['id'])
