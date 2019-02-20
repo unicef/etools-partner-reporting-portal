@@ -68,7 +68,6 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             project=self.project,
         )
 
-        # Adding extra IndicatorReport to each QuantityReportable object
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -426,7 +425,6 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             project=self.project,
         )
 
-        # Adding extra IndicatorReport to each QuantityReportable object
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
