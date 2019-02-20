@@ -9,9 +9,7 @@ from faker import Faker
 
 from core.tests.base import BaseAPITestCase
 from core.common import (
-    FREQUENCY_LEVEL,
     PRP_ROLE_TYPES,
-    CLUSTER_TYPES,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
 )
@@ -20,7 +18,6 @@ from core.factories import (
     PartnerFactory,
     CountryFactory,
     WorkspaceFactory,
-    NonPartnerUserFactory,
     ClusterPRPRoleFactory,
     ResponsePlanFactory,
     ClusterFactory,
@@ -40,10 +37,6 @@ from core.factories import (
     IndicatorLocationDataFactory,
     CustomPartnerActivityFactory,
 )
-
-from indicator.models import IndicatorReport
-
-from cluster.models import ClusterObjective, Cluster, ClusterActivity
 
 faker = Faker()
 

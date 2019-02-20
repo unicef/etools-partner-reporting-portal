@@ -267,8 +267,8 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
     title = factory.LazyAttribute(lambda o: o.countries[0].name)
     workspace_code = factory.LazyAttribute(lambda o: o.countries[0].country_short_code)
     business_area_code = factory.LazyFunction(lambda: faker.random_number(4, True))
-    latitude = factory.LazyFunction(faker.geo_coordinate)
-    longitude = factory.LazyFunction(faker.geo_coordinate)
+    latitude = factory.LazyFunction(faker.latitude)
+    longitude = factory.LazyFunction(faker.longitude)
     initial_zoom = 10
 
     @factory.post_generation
@@ -343,8 +343,8 @@ class LocationFactory(factory.django.DjangoModelFactory):
     gateway = factory.SubFactory('core.factories.GatewayTypeFactory', location=None)
     # We are going to fill CartoDBTable manually
     carto_db_table = factory.SubFactory('core.factories.CartoDBTableFactory', location=None)
-    latitude = factory.LazyFunction(faker.geo_coordinate)
-    longitude = factory.LazyFunction(faker.geo_coordinate)
+    latitude = factory.LazyFunction(faker.latitude)
+    longitude = factory.LazyFunction(faker.longitude)
     p_code = factory.LazyAttribute(lambda o: "{}{}".format(o.gateway.country.country_short_code, faker.random_number(4)))
     parent = None
     geom = factory.LazyFunction(create_fake_multipolygon)
@@ -698,6 +698,7 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Disaggregation
+        django_get_or_create = ('name', 'response_plan')
 
 
 class DisaggregationValueFactory(factory.django.DjangoModelFactory):
