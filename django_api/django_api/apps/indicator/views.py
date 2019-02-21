@@ -111,7 +111,7 @@ class PDReportsAPIView(ListAPIView):
 
     def list(self, request, pd_id, *args, **kwargs):
         """
-        Get Programme Document Details by given pk.
+        Get Indicator reports by given Programme Document pk.
         """
         self.pd_id = pd_id
         queryset = self.get_queryset()
@@ -357,9 +357,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
 
 class IndicatorDataAPIView(APIView):
     """
-    Takes an indicator report id to do various operations.
-    TODO: check on the GET data being sent / used in the frontend and other
-    HTTP operations being opened here.
+    Accepts an incoming submitted Cluster indicator report and mark it as accepted if satisfied.
     """
     permission_classes = (IsAuthenticated, )
 
@@ -373,27 +371,6 @@ class IndicatorDataAPIView(APIView):
             Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj)
         ).exists():
             self.permission_denied(request)
-
-    def get_queryset(self, id):
-        queryset = Reportable.objects.filter(
-            indicator_reports__id=id,
-            lower_level_outputs__isnull=False
-        )
-        reportable_id = self.request.query_params.get('reportable_id', None)
-        if reportable_id:
-            queryset = queryset.filter(id=reportable_id)
-
-        location = self.request.query_params.get('location', None)
-        if location:
-            queryset = queryset.filter(
-                indicator_reports__indicator_location_data__location=location)
-
-        incomplete = self.request.query_params.get('incomplete', None)
-        if incomplete == "1":
-            queryset = queryset.exclude(
-                indicator_reports__progress_report__status=PROGRESS_REPORT_STATUS.submitted
-            )
-        return queryset
 
     def get_indicator_report(self, id):
         try:
@@ -409,40 +386,6 @@ class IndicatorDataAPIView(APIView):
         else:
             self.check_indicator_report_permission(self.request, instance)
             return instance
-
-    def get_narrative_object(self, id):
-        ir = self.get_indicator_report(id)
-        return ir and ir.progress_report
-
-    def get(self, request, ir_id, *args, **kwargs):
-        narrative = self.get_narrative_object(ir_id)
-        response = ProgressReportSerializer(narrative).data
-        queryset = self.get_queryset(ir_id)
-        serializer = IndicatorLLoutputsSerializer(queryset, many=True)
-
-        response['outputs'] = serializer.data
-
-        return Response(
-            response,
-            status=status.HTTP_200_OK
-        )
-
-    def put(self, request, ir_id, *args, **kwargs):
-        """TODO: check usage of this"""
-        if 'progress_report' not in request.data:
-            raise ValidationError("No progress_report found in PUT request data.")
-
-        pr = get_object_or_404(ProgressReport, pk=request.data['progress_report'].get('id'))
-        progress_report = ProgressReportUpdateSerializer(
-            instance=pr,
-            data=request.data['progress_report']
-        )
-
-        if progress_report.is_valid():
-            progress_report.save()
-
-        return Response(dict(progress_report=progress_report.data),
-                        status=status.HTTP_200_OK)
 
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
