@@ -8,7 +8,6 @@ from rest_framework import status
 
 from core.models import Location
 from core.common import (
-    PROGRESS_REPORT_STATUS,
     REPORTABLE_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -45,7 +44,6 @@ from core.factories import (CartoDBTableFactory,
                             ResponsePlanFactory,
                             ClusterFactory,
                             NonPartnerUserFactory,
-                            QuantityReportableToClusterActivityFactory,
                             ClusterObjectiveFactory,
                             ClusterActivityFactory,
                             PartnerProjectFactory,
@@ -53,9 +51,8 @@ from core.factories import (CartoDBTableFactory,
                             QuantityReportableToPartnerActivityFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
-from cluster.models import ClusterObjective, ClusterActivity, Cluster
+from cluster.models import ClusterObjective, ClusterActivity
 from partner.models import PartnerProject, PartnerActivity
-from account.models import User
 from unicef.models import (
     ProgrammeDocument
 )
