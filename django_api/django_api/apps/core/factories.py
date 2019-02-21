@@ -701,6 +701,19 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('name', 'response_plan')
 
 
+class IPDisaggregationFactory(factory.django.DjangoModelFactory):
+    """
+    Ex) DisaggregationFactory()
+    """
+
+    active = True
+    name = factory.LazyFunction(faker.word)
+
+    class Meta:
+        model = Disaggregation
+        django_get_or_create = ('name',)
+
+
 class DisaggregationValueFactory(factory.django.DjangoModelFactory):
     """
     Arguments:
@@ -1217,9 +1230,9 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
             submitting_user=submitting_user1,
         )
     """
-    start_date = factory.LazyAttribute(lambda o: o.time_period[0])
-    end_date = factory.LazyAttribute(lambda o: o.time_period[1])
-    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=15))
+    start_date = factory.LazyFunction(faker.date)
+    end_date = factory.LazyFunction(faker.date)
+    due_date = factory.LazyFunction(faker.date)
     partner_contribution_to_date = factory.LazyFunction(faker.text)
     challenges_in_the_reporting_period = factory.LazyFunction(faker.text)
     proposed_way_forward = factory.LazyFunction(faker.text)
@@ -1236,10 +1249,6 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
     review_overall_status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
     attachment = None
-
-    @factory.lazy_attribute
-    def time_period(self):
-        return next(REPORTABLE_RANGE_GENERATORS[self.reportable.id])
 
     class Meta:
         django_get_or_create = (
