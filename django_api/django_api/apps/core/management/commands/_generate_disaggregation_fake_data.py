@@ -244,7 +244,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
     for indicator_report_from_reportable in reportable.indicator_reports.all():
         for location in reportable.locations.all():
             # 3 num_disaggregation & 3 level_reported
-            IndicatorLocationDataFactory(
+            loc_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
                 location=location,
                 num_disaggregation=3,

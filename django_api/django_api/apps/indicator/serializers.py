@@ -1103,7 +1103,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-
         if 'baseline' not in validated_data:
             if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
                     raise ValidationError(
