@@ -6,7 +6,7 @@ from rest_framework import status
 
 from cluster.serializers import ClusterSimpleSerializer
 from core.factories import ClusterObjectiveFactory
-from core.models import ResponsePlan, PartnerAuthorizedOfficerRole, Location
+from core.models import ResponsePlan, Location
 from core.tests.base import BaseAPITestCase
 
 from partner.models import (
@@ -16,9 +16,6 @@ from partner.models import (
 
 
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
-
-    force_login_as_role = PartnerAuthorizedOfficerRole
-
     def setUp(self):
         super(TestPartnerProjectListCreateAPIView, self).setUp()
 
@@ -121,9 +118,6 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
-
-    force_login_as_role = PartnerAuthorizedOfficerRole
-
     def test_get_instance(self):
         first = PartnerProject.objects.first()
         url = reverse('partner-project-details', kwargs={"pk": first.id})
@@ -187,9 +181,6 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
 
 
 class TestPartnerActivityAPIView(BaseAPITestCase):
-
-    force_login_as_role = PartnerAuthorizedOfficerRole
-
     def setUp(self):
         super(TestPartnerActivityAPIView, self).setUp()
 
