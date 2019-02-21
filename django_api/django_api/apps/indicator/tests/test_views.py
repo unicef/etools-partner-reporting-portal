@@ -349,14 +349,188 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 class TestIndicatorListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        super().setUp()
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = NonPartnerUserFactory()
+        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            cluster_activity=self.activity,
+            project=self.project,
+        )
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
 
-        # Logging in as Partner AO
-        self.client.login(username='admin_ao', password='Passw0rd!')
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                    value=value
+                )
+
+        blueprint = QuantityTypeIndicatorBlueprintFactory(
+            unit=IndicatorBlueprint.NUMBER,
+            calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            calculation_formula_across_periods=IndicatorBlueprint.SUM,
+        )
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        self.partneractivity_reportable.disaggregations.clear()
+
+        add_disaggregations_to_reportable(
+            self.partneractivity_reportable,
+            disaggregation_targets=["age", "gender", "height"]
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.partneractivity_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.partneractivity_reportable,
+        )
+
+        for _ in range(2):
+            ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.due,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        for idx in range(2):
+            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        for idx in range(6):
+            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=hr_period.start_date,
+                end_date=hr_period.end_date,
+                due_date=hr_period.due_date,
+                report_number=idx + 1,
+                report_type=hr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        self.llo_reportable.disaggregations.clear()
+
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            for value in values:
+                disagg = IPDisaggregationFactory(name=disagg_name)
+
+                self.llo_reportable.disaggregations.add(disagg)
+                DisaggregationValueFactory(
+                    disaggregation=disagg,
+                    value=value
+                )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.llo_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.llo_reportable,
+        )
+
+        for pr in self.pd.progress_reports.all():
+            ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=self.llo_reportable,
+                report_status=INDICATOR_REPORT_STATUS.due,
+                overall_status=OVERALL_STATUS.met,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.llo_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        super().setUp()
 
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
-            lower_level_outputs__reportables__isnull=False,
+            partner_activities__reportables__isnull=False,
             locations__isnull=False
         ).distinct()
 
@@ -369,11 +543,12 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(self.reports), len(response.data['results']))
+        self.assertEquals(len(self.reports), len(response.data['results']))
 
     def test_list_api_filter_by_pd_ids(self):
         self.reports = Reportable.objects.filter(
-            lower_level_outputs__reportables__isnull=False)
+            lower_level_outputs__reportables__isnull=False,
+            locations__isnull=False).distinct()
 
         pd_ids = map(
             lambda item: str(item),
@@ -387,20 +562,189 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(self.reports), len(response.data['results']))
+        self.assertEquals(len(self.reports), len(response.data['results']))
 
 
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.user = NonPartnerUserFactory()
+        self.partner_user = PartnerUserFactory(partner=self.partner)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            cluster_activity=self.activity,
+            project=self.project,
+        )
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
+
+        blueprint = QuantityTypeIndicatorBlueprintFactory(
+            unit=IndicatorBlueprint.NUMBER,
+            calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            calculation_formula_across_periods=IndicatorBlueprint.SUM,
+        )
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.partneractivity_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.partneractivity_reportable,
+        )
+
+        for _ in range(2):
+            ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.due,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        for idx in range(2):
+            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        for idx in range(6):
+            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=hr_period.start_date,
+                end_date=hr_period.end_date,
+                due_date=hr_period.due_date,
+                report_number=idx + 1,
+                report_type=hr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        self.llo_reportable.disaggregations.clear()
+        self.partneractivity_reportable.disaggregations.clear()
+
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                    value=value
+                )
+
+                disagg = IPDisaggregationFactory(name=disagg_name)
+
+                self.llo_reportable.disaggregations.add(disagg)
+                DisaggregationValueFactory(
+                    disaggregation=disagg,
+                    value=value
+                )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.llo_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.llo_reportable,
+        )
+
+        for pr in self.pd.progress_reports.all():
+            ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=self.llo_reportable,
+                report_status=INDICATOR_REPORT_STATUS.due,
+                overall_status=OVERALL_STATUS.met,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.llo_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
         super().setUp()
 
-        # Logging in as Partner AO
-        self.user = User.objects.get(username='admin_ao')
-        self.client.login(username='admin_ao', password='Passw0rd!')
+        self.client.force_authenticate(self.partner_user)
 
     def test_overall_narrative(self):
-        pr = self.user.partner.programmedocument_set.first() \
+        pr = self.partner_user.partner.programmedocument_set.first() \
             .progress_reports.first()
         ir = pr.indicator_reports.first()
 
@@ -433,10 +777,180 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 class TestIndicatorReportListAPIView(BaseAPITestCase):
 
     def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.user = NonPartnerUserFactory()
+        self.partner_user = PartnerUserFactory(partner=self.partner)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            cluster_activity=self.activity,
+            project=self.project,
+        )
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
+
+        blueprint = QuantityTypeIndicatorBlueprintFactory(
+            unit=IndicatorBlueprint.NUMBER,
+            calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            calculation_formula_across_periods=IndicatorBlueprint.SUM,
+        )
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.partneractivity_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.partneractivity_reportable,
+        )
+
+        for _ in range(2):
+            ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        for idx in range(2):
+            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        for idx in range(6):
+            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=hr_period.start_date,
+                end_date=hr_period.end_date,
+                due_date=hr_period.due_date,
+                report_number=idx + 1,
+                report_type=hr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        self.llo_reportable.disaggregations.clear()
+        self.partneractivity_reportable.disaggregations.clear()
+
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                    value=value
+                )
+
+                disagg = IPDisaggregationFactory(name=disagg_name)
+
+                self.llo_reportable.disaggregations.add(disagg)
+                DisaggregationValueFactory(
+                    disaggregation=disagg,
+                    value=value
+                )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.llo_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.llo_reportable,
+        )
+
+        for pr in self.pd.progress_reports.all():
+            ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=self.llo_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+                overall_status=OVERALL_STATUS.met,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.llo_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
         super().setUp()
 
-        # Logging in as Partner AO
-        self.client.login(username='admin_ao', password='Passw0rd!')
+        self.client.force_authenticate(self.partner_user)
 
     def test_list_api_with_reportable_id(self):
         indicator_report = IndicatorReport.objects.last()
