@@ -19,8 +19,8 @@ from core.helpers import (
 )
 from core.factories import (
     ProgressReportFactory,
-    QuantityIndicatorReportFactory,
-    RatioIndicatorReportFactory,
+    ClusterIndicatorReportFactory,
+    ProgressReportIndicatorReportFactory,
     IndicatorLocationDataFactory,
 )
 from unicef.models import ProgrammeDocument
@@ -138,7 +138,7 @@ def process_period_reports():
                                 reportable, start_date, end_date
                             ))
 
-                            indicator_report = QuantityIndicatorReportFactory(
+                            indicator_report = ClusterIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=start_date,
                                 time_period_end=end_date,
@@ -173,7 +173,7 @@ def process_period_reports():
                                 reportable, start_date, end_date
                             ))
 
-                            indicator_report = RatioIndicatorReportFactory(
+                            indicator_report = ClusterIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=start_date,
                                 time_period_end=end_date,
@@ -303,7 +303,8 @@ def process_period_reports():
                 def create_pr_ir_for_reportable(reportable, pai_ir_for_period, start_date, end_date, due_date):
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                         logger.info("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
-                        indicator_report = QuantityIndicatorReportFactory(
+                        indicator_report = ProgressReportIndicatorReportFactory(
+                            progress_report=None,
                             reportable=reportable,
                             parent=pai_ir_for_period,
                             time_period_start=start_date,
@@ -335,7 +336,8 @@ def process_period_reports():
 
                     else:
                         logger.info("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
-                        indicator_report = RatioIndicatorReportFactory(
+                        indicator_report = ProgressReportIndicatorReportFactory(
+                            progress_report=None,
                             reportable=reportable,
                             parent=pai_ir_for_period,
                             time_period_start=start_date,

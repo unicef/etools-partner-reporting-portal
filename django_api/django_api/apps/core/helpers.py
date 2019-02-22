@@ -77,7 +77,7 @@ def generate_data_combination_entries(
                 if indicator_type == "quantity":
                     output[key] = {
                         'v': random.randint(50, 1000),
-                        'd': 0,
+                        'd': 1,
                         'c': 0
                     }
 
@@ -97,7 +97,7 @@ def generate_data_combination_entries(
         if indicator_type == "quantity":
             output[key] = {
                 'v': random.randint(50, 1000),
-                'd': 0,
+                'd': 1,
                 'c': 0
             }
 

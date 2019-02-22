@@ -617,7 +617,10 @@ class ResponsePlanClusterDashboardAPIView(APIView):
                                               response_plan=response_plan,
                                               **user_kwarg)
             if not clusters:
-                raise Exception('Invalid cluster ids')
+                return Response(
+                    {"message": "Invalid cluster ids"},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
         else:
             if request.user.is_cluster_system_admin:
                 clusters = Cluster.objects.filter(response_plan=response_plan)

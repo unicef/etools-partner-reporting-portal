@@ -1103,7 +1103,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-
         if 'baseline' not in validated_data:
             if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
                     raise ValidationError(
@@ -1597,8 +1596,6 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
                 return obj.reportable.content_object.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.clusters.first()
-        else:
-            return None
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)

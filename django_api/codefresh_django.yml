@@ -12,39 +12,39 @@ steps:
             - env=${{ENV}}
             - requirement_file=${{REQUIREMENT_FILE}}
 
-#    composition_step:
-#        type: composition
-#        composition: 'unicef-prp-unit-tests'
-#        composition_candidates:
-#            test:
-#                image: ${{build_django}}
-#                depends_on:
-#                    - django_api
-#                    - db
-#                command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8"
-#                environment:
-#                    - POSTGRES_DB=etools_prp
-#                    - POSTGRES_USER=etools_prp_user
-#                    - POSTGRES_PASSWORD=
-#                    - POSTGRES_HOST=db
-#                    - SECRET_KEY=asdfqwef124rf
-#                    - ENV=test
-#                    - DJANGO_ALLOWED_HOST="*"
-#                    - DJANGO_SETTINGS_MODULE=django_api.settings.test
-#                    - C_FORCE_ROOT=1
-#                    - CELERY_LOG_LEVEL=info
-#
-#        composition_variables:
-#            - POSTGRES_DB=etools_prp
-#            - POSTGRES_USER=etools_prp_user
-#            - POSTGRES_PASSWORD=
-#            - POSTGRES_HOST=db
-#            - SECRET_KEY=asdfqwef124rf
-#            - ENV=test
-#            - DJANGO_ALLOWED_HOST="*"
-#            - DJANGO_SETTINGS_MODULE=django_api.settings.test
-#            - C_FORCE_ROOT=1
-#            - CELERY_LOG_LEVEL=info
+   composition_step:
+       type: composition
+       composition: 'unicef-prp-unit-tests'
+       composition_candidates:
+           test:
+               image: ${{build_django}}
+               depends_on:
+                   - django_api
+                   - db
+               command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && coverage run --source="." ./manage.py test; coverage report"
+               environment:
+                   - POSTGRES_DB=etools_prp
+                   - POSTGRES_USER=etools_prp_user
+                   - POSTGRES_PASSWORD=
+                   - POSTGRES_HOST=db
+                   - SECRET_KEY=asdfqwef124rf
+                   - ENV=test
+                   - DJANGO_ALLOWED_HOST="*"
+                   - DJANGO_SETTINGS_MODULE=django_api.settings.test
+                   - C_FORCE_ROOT=1
+                   - CELERY_LOG_LEVEL=info
+
+       composition_variables:
+           - POSTGRES_DB=etools_prp
+           - POSTGRES_USER=etools_prp_user
+           - POSTGRES_PASSWORD=
+           - POSTGRES_HOST=db
+           - SECRET_KEY=asdfqwef124rf
+           - ENV=test
+           - DJANGO_ALLOWED_HOST="*"
+           - DJANGO_SETTINGS_MODULE=django_api.settings.test
+           - C_FORCE_ROOT=1
+           - CELERY_LOG_LEVEL=info
 
     push_to_hub:
         type: push

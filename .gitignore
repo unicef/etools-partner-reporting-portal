@@ -13,9 +13,11 @@
 *.pem
 !django_api/django_api/keys/jwt/certificate.pem
 .coverage
+htmlcov
 
 # Frontend
 node_modules/
+package-lock.json
 
 data/
 

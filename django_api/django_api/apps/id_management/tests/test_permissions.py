@@ -1123,7 +1123,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
             (PRP_ROLE_TYPES.cluster_member, False),
             (PRP_ROLE_TYPES.cluster_viewer, False),
             (PRP_ROLE_TYPES.ip_authorized_officer, False),
-            (PRP_ROLE_TYPES.ip_admin, False),
+            (PRP_ROLE_TYPES.ip_admin, True),
             (PRP_ROLE_TYPES.ip_editor, False),  # ip_editor to ip_editor change
             (PRP_ROLE_TYPES.ip_viewer, True),
         ]
@@ -1460,7 +1460,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
             (PRP_ROLE_TYPES.cluster_member, False),
             (PRP_ROLE_TYPES.cluster_viewer, False),
             (PRP_ROLE_TYPES.ip_authorized_officer, False),
-            (PRP_ROLE_TYPES.ip_admin, False),
+            (PRP_ROLE_TYPES.ip_admin, True),
             (PRP_ROLE_TYPES.ip_editor, True),
             (PRP_ROLE_TYPES.ip_viewer, False),  # ip_viewer to ip_viewer change
         ]
