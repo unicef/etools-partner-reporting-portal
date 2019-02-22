@@ -2,7 +2,7 @@ FROM node:8.11.3-jessie
 
 RUN apt-get update
 
-ADD package.json package-lock.json /tmp/
+ADD package.json /tmp/
 
 ADD . /code/
 
