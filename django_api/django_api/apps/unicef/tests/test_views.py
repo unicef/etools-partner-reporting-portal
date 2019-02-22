@@ -43,14 +43,14 @@ from core.factories import (CartoDBTableFactory,
                             QuantityReportableToPartnerActivityFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
-from core.models import Workspace, Location
+from core.models import Location
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
     IndicatorReport,
     IndicatorBlueprint,
     IndicatorLocationData,
 )
-from unicef.models import ProgrammeDocument, ProgressReport
+from unicef.models import ProgressReport
 
 
 class TestProgrammeDocumentListAPIView(BaseAPITestCase):

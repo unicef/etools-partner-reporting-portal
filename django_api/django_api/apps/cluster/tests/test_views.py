@@ -936,13 +936,17 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         # User must have PRP role
         self.user.prp_roles.all().delete()
 
-        response = self.client.get(reverse('cluster-indicator-reports-detail', kwargs={'response_plan_id': self.response_plan.id, 'pk': self.clusteractivity_indicator_report.id}))
+        response = self.client.get(
+            reverse('cluster-indicator-reports-detail', kwargs={'response_plan_id': self.response_plan.id, 'pk': self.clusteractivity_indicator_report.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # User must be logged in
         self.client.logout()
 
-        response = self.client.get(reverse('cluster-indicator-reports-detail', kwargs={'response_plan_id': self.response_plan.id, 'pk': self.clusteractivity_indicator_report.id}))
+        response = self.client.get(
+            reverse('cluster-indicator-reports-detail', kwargs={'response_plan_id': self.response_plan.id, 'pk': self.clusteractivity_indicator_report.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_cluster_indicator_report_details(self):

@@ -9,7 +9,7 @@ from easy_pdf.exceptions import PDFRenderingError
 from easy_pdf.rendering import render_to_pdf, make_response
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
-from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
+from openpyxl.styles.numbers import FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell, HTMLTableHeader
@@ -97,7 +97,7 @@ class ProgrammeDocumentsXLSXExporter:
             if not len(headers) == len(data_row):
                 raise Exception('Header and data row length mismatch!')
 
-            for column, (cell_data, cell_format ) in enumerate(data_row):
+            for column, (cell_data, cell_format) in enumerate(data_row):
                 try:
                     column_widths[column] = max(column_widths[column], len(cell_data) + 2)
                 except TypeError:

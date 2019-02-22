@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from cluster.serializers import ClusterSimpleSerializer
-from core.models import ResponsePlan, Location
+from core.models import Location
 from core.tests.base import BaseAPITestCase
 from core.common import (
     INDICATOR_REPORT_STATUS,
@@ -317,7 +317,6 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
             str(location.id)
         )
 
-        partner = self.cluster.partners.first()
         url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
         url += "?partner=%d" % self.partner.id
         response = self.client.get(url, format='json')

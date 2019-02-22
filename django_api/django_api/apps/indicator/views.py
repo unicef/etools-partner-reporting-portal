@@ -25,7 +25,6 @@ from core.permissions import (
 from core.paginations import SmallPagination
 from core.models import Location
 from core.common import (
-    PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
     REPORTABLE_LLO_CONTENT_OBJECT,
     REPORTABLE_CO_CONTENT_OBJECT,
@@ -37,7 +36,6 @@ from core.common import (
     PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
-from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
@@ -50,7 +48,6 @@ from .serializers import (
     IndicatorListSerializer,
     IndicatorReportListSerializer,
     PDReportContextIndicatorReportSerializer,
-    IndicatorLLoutputsSerializer,
     IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
