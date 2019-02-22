@@ -27,9 +27,9 @@ steps:
                    - POSTGRES_PASSWORD=
                    - POSTGRES_HOST=db
                    - SECRET_KEY=asdfqwef124rf
-                   - ENV=dev
+                   - ENV=staging
                    - DJANGO_ALLOWED_HOST="*"
-                   - DJANGO_SETTINGS_MODULE=django_api.settings.dev
+                   - DJANGO_SETTINGS_MODULE=django_api.settings.staging
                    - C_FORCE_ROOT=1
                    - CELERY_LOG_LEVEL=info
 
@@ -39,9 +39,9 @@ steps:
            - POSTGRES_PASSWORD=
            - POSTGRES_HOST=db
            - SECRET_KEY=asdfqwef124rf
-           - ENV=dev
+           - ENV=staging
            - DJANGO_ALLOWED_HOST="*"
-           - DJANGO_SETTINGS_MODULE=django_api.settings.dev
+           - DJANGO_SETTINGS_MODULE=django_api.settings.staging
            - C_FORCE_ROOT=1
            - CELERY_LOG_LEVEL=info
 
