@@ -5,8 +5,11 @@ omit =
     */migrations/*
     */tests/*
     */urls.py
+    */apps.py
     */__init__.py
     */settings/*
+    */wsgi.py
+    manage.py
 
 [report]
 # Regexes for lines to exclude from consideration
