@@ -20,7 +20,7 @@ steps:
                depends_on:
                    - django_api
                    - db
-               command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && coverage run --source="." ./manage.py test; coverage report"
+               command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && coverage run --source="." ./manage.py test"
                environment:
                    - POSTGRES_DB=etools_prp
                    - POSTGRES_USER=etools_prp_user
@@ -29,7 +29,7 @@ steps:
                    - SECRET_KEY=asdfqwef124rf
                    - ENV=test
                    - DJANGO_ALLOWED_HOST="*"
-                   - DJANGO_SETTINGS_MODULE=django_api.settings.test
+                   - DJANGO_SETTINGS_MODULE=django_api.settings.dev
                    - C_FORCE_ROOT=1
                    - CELERY_LOG_LEVEL=info
 
@@ -41,7 +41,7 @@ steps:
            - SECRET_KEY=asdfqwef124rf
            - ENV=test
            - DJANGO_ALLOWED_HOST="*"
-           - DJANGO_SETTINGS_MODULE=django_api.settings.test
+           - DJANGO_SETTINGS_MODULE=django_api.settings.dev
            - C_FORCE_ROOT=1
            - CELERY_LOG_LEVEL=info
 

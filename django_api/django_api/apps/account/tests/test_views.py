@@ -84,6 +84,7 @@ class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
         token_url = reverse('user-passwordless-token')
 
         response = self.client.post(token_url, data={'email': self.user.email})
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Test that email auth token email has been sent.
