@@ -31,7 +31,6 @@ class BaseDisaggregator(object):
         raise NotImplementedError()
 
 
-# TODO: Write functional test case for QuantityIndicatorDisaggregator
 class QuantityIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Quantity indicator type disaggregation processing.
@@ -87,8 +86,12 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
                     # It is always SUM at IndicatorLocationData level
                     for subkey in subkey_combinations:
-                        ordered_dict[subkey][ValueType.VALUE] += ordered_dict[key][ValueType.VALUE]
-                        ordered_dict[subkey][ValueType.CALCULATED] += ordered_dict[key][ValueType.CALCULATED]
+                        # Ignore zero value entry from total calculation
+                        if ordered_dict[key][ValueType.VALUE] != 0:
+                            ordered_dict[subkey][ValueType.VALUE] += ordered_dict[key][ValueType.VALUE]
+
+                        if ordered_dict[key][ValueType.CALCULATED] != 0:
+                            ordered_dict[subkey][ValueType.CALCULATED] += ordered_dict[key][ValueType.CALCULATED]
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
@@ -139,7 +142,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_report.save()
 
 
-# TODO: Write functional test case for RatioIndicatorDisaggregator
 class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Ratio indicator type disaggregation processing.
@@ -191,11 +193,15 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
                     # It is always SUM at IndicatorLocationData level
                     for subkey in subkey_combinations:
-                        ordered_dict[subkey][ValueType.VALUE] += \
-                            ordered_dict[key][ValueType.VALUE]
+                        # Ignore zero value entry from total calculation
+                        if ordered_dict[key][ValueType.VALUE] != 0:
+                            ordered_dict[subkey][ValueType.VALUE] += \
+                                ordered_dict[key][ValueType.VALUE]
 
-                        ordered_dict[subkey][ValueType.DENOMINATOR] += \
-                            ordered_dict[key][ValueType.DENOMINATOR]
+                        # Ignore zero value entry from total calculation
+                        if ordered_dict[key][ValueType.DENOMINATOR] != 0:
+                            ordered_dict[subkey][ValueType.DENOMINATOR] += \
+                                ordered_dict[key][ValueType.DENOMINATOR]
 
         # Calculating all level_reported N c values
         for key in ordered_dict.keys():
