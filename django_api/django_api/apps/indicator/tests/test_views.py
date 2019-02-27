@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+import copy
 from datetime import date, timedelta
 
 from django.urls import reverse
@@ -1539,6 +1540,81 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             'level_reported cannot be higher than its num_disaggregation',
+            response.data['non_field_errors'][0]
+        )
+
+    def test_update_nonnumeric_data_entry_validation(self):
+        indicator_location_data = self.partneractivity_reportable.indicator_reports.first().indicator_location_data.first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        level_reported_3_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(
+            update_data['disaggregation'])
+
+        for key in tuple_disaggregation:
+            if len(key) == 3:
+                level_reported_3_key = key
+                break
+
+        validated_data = copy.deepcopy(update_data['disaggregation'][str(level_reported_3_key)])
+
+        url = reverse('indicator-location-data-entries-put-api')
+
+        update_data['disaggregation'][str(level_reported_3_key)]['c'] = 'aaaa'
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "c value is not number",
+            response.data['non_field_errors'][0]
+        )
+
+        update_data['disaggregation'][str(level_reported_3_key)] = copy.deepcopy(validated_data)
+        update_data['disaggregation'][str(level_reported_3_key)]['d'] = 'aaaa'
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "d value is not number",
+            response.data['non_field_errors'][0]
+        )
+
+        update_data['disaggregation'][str(level_reported_3_key)] = copy.deepcopy(validated_data)
+        update_data['disaggregation'][str(level_reported_3_key)]['v'] = 'aaaa'
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "v value is not number",
+            response.data['non_field_errors'][0]
+        )
+
+    def test_update_zero_division_data_entry_validation(self):
+        indicator_location_data = self.partneractivity_reportable.indicator_reports.first().indicator_location_data.first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        level_reported_3_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(
+            update_data['disaggregation'])
+
+        for key in tuple_disaggregation:
+            if len(key) == 3:
+                level_reported_3_key = key
+                break
+
+        url = reverse('indicator-location-data-entries-put-api')
+
+        update_data['disaggregation'][str(level_reported_3_key)]['d'] = 0
+        update_data['disaggregation'][str(level_reported_3_key)]['v'] = 100
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "has zero denominator and non-zero numerator",
             response.data['non_field_errors'][0]
         )
 
