@@ -86,12 +86,8 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
                     # It is always SUM at IndicatorLocationData level
                     for subkey in subkey_combinations:
-                        # Ignore zero value entry from total calculation
-                        if ordered_dict[key][ValueType.VALUE] != 0:
-                            ordered_dict[subkey][ValueType.VALUE] += ordered_dict[key][ValueType.VALUE]
-
-                        if ordered_dict[key][ValueType.CALCULATED] != 0:
-                            ordered_dict[subkey][ValueType.CALCULATED] += ordered_dict[key][ValueType.CALCULATED]
+                        ordered_dict[subkey][ValueType.VALUE] += ordered_dict[key][ValueType.VALUE]
+                        ordered_dict[subkey][ValueType.CALCULATED] += ordered_dict[key][ValueType.CALCULATED]
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
