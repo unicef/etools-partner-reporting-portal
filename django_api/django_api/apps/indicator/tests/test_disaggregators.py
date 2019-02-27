@@ -5,7 +5,6 @@ from faker import Faker
 from core.common import INDICATOR_REPORT_STATUS, PRP_ROLE_TYPES, OVERALL_STATUS
 from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
-    get_cast_dictionary_keys_as_string,
 )
 from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             ClusterActivityPartnerActivityFactory,
