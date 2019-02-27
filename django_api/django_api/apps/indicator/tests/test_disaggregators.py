@@ -1,6 +1,12 @@
+import copy
+
 from faker import Faker
 
 from core.common import INDICATOR_REPORT_STATUS, PRP_ROLE_TYPES, OVERALL_STATUS
+from core.helpers import (
+    get_cast_dictionary_keys_as_tuple,
+    get_cast_dictionary_keys_as_string,
+)
 from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             ClusterActivityPartnerActivityFactory,
                             ClusterFactory, ClusterIndicatorReportFactory,
@@ -545,6 +551,64 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         ratio_value = v_total / (d_total * 1.0)
 
         self.assertEquals(ir.total['c'], ratio_value * 100)
+
+    def test_post_process_location_calc_with_zero_value_entry(self):
+        unit_type = IndicatorBlueprint.PERCENTAGE
+        calc_type = IndicatorBlueprint.SUM
+        display_type = IndicatorBlueprint.RATIO
+
+        blueprint = RatioTypeIndicatorBlueprintFactory(
+            unit=unit_type,
+            calculation_formula_across_locations=calc_type,
+            calculation_formula_across_periods=calc_type,
+            display_type=display_type,
+        )
+        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        partneractivity_reportable.disaggregations.clear()
+
+        add_disaggregations_to_reportable(
+            partneractivity_reportable,
+            disaggregation_targets=["age", "gender", "height"]
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=partneractivity_reportable,
+        )
+
+        ir = ClusterIndicatorReportFactory(
+            reportable=partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.due,
+        )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(partneractivity_reportable, indicator_type="ratio")
+
+        loc_data1 = ir.indicator_location_data.first()
+
+        # Mark some data entries on location data 1 to be zero
+        level_reported_3_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(loc_data1.disaggregation)
+
+        for key in tuple_disaggregation:
+            if len(key) == 3:
+                level_reported_3_key = key
+                break
+
+        validated_data = copy.deepcopy(loc_data1.disaggregation)
+
+        old_totals = validated_data['()']
+        loc_data1.disaggregation[str(level_reported_3_key)]['d'] = 0
+        loc_data1.disaggregation[str(level_reported_3_key)]['v'] = 0
+        loc_data1.disaggregation[str(level_reported_3_key)]['c'] = 0
+        loc_data1.save()
+
+        RatioIndicatorDisaggregator.post_process(loc_data1)
+
+        self.assertNotEqual(old_totals['c'], loc_data1.disaggregation['()']['c'])
 
     def test_post_process_reporting_period_ratio_calc(self):
         unit_type = IndicatorBlueprint.PERCENTAGE
