@@ -389,8 +389,6 @@ def process_programme_documents(fast=False, area=False):
 
                                     locations = list()
                                     for l in i['locations']:
-                                        logger.info(l)
-
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API

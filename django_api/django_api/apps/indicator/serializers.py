@@ -694,16 +694,37 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
             # Sanitizing data value
             if isinstance(data['disaggregation'][key]['c'], str):
+                if not data['disaggregation'][key]['c'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} c value is not number".format(data['disaggregation'][key]['c'])
+                    )
+
                 data['disaggregation'][key]['c'] = \
                     int(data['disaggregation'][key]['c'])
 
             if isinstance(data['disaggregation'][key]['d'], str):
+                if not data['disaggregation'][key]['d'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} d value is not number".format(data['disaggregation'][key]['d'])
+                    )
+
                 data['disaggregation'][key]['d'] = \
                     int(data['disaggregation'][key]['d'])
 
             if isinstance(data['disaggregation'][key]['v'], str):
+                if not data['disaggregation'][key]['v'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} v value is not number".format(data['disaggregation'][key]['v'])
+                    )
+
                 data['disaggregation'][key]['v'] = \
                     int(data['disaggregation'][key]['v'])
+
+            # Checking X/0 data entry case
+            if data['disaggregation'][key]['d'] == 0 and data['disaggregation'][key]['v'] != 0:
+                raise serializers.ValidationError(
+                    "Disaggregation key {} has zero denominator and non-zero numerator".format(key)
+                )
 
         if level_reported_key_count != valid_level_reported_key_count:
             raise serializers.ValidationError(

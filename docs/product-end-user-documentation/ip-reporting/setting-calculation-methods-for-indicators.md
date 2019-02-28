@@ -28,6 +28,16 @@ Ratio indicators calculation method is different from quantity indicators. For r
 
 ![Ratio Indicator Progress Formula \(Example \#1044\)](../../.gitbook/assets/screen-shot-2018-12-18-at-2.32.50-pm.png)
 
+It's possible to accept 0 for both numerator and denominator at the indicator location data entry time, indicating the data for corresponding disaggregations is **_no-progress_**. The 0/0 data entry will not affect calculations for subtotals and totals for the location.
+
+![Ratio Indicator with partial data entries \(Example \#1079\)](../../.gitbook/assets/ratio-partial-entry.png)
+
+If the location has all **_no-progress_** data entries, then the total and subtotals will be 0.
+
+![Ratio Indicator with all no-progress data entries in the edit mode \(Example \#1079\)](../../.gitbook/assets/ratio-all-no-progress-entries.png)
+
+![Ratio Indicator with partial no-progress data entries in the view mode \(Example \#1079\)](../../.gitbook/assets/ratio-partial-no-progress-entries-view.png)
+
 ### Calculation method across reporting periods \(Ratio Indicator Type\)
 
 Calculation method is always latest for ratio indicator type. This calculation method is used to compute progress against the total for a indicator. This is done by simply grabbing indicator report total from the latest indicator report by the due date. \(\#[973](https://waffle.io/unicef/etools-partner-reporting-portal/cards/5bbe94b0699120004fb0633d)\)
