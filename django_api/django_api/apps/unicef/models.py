@@ -480,12 +480,34 @@ def send_notification_on_status_change(sender, instance, **kwargs):
 
         template_data = {
                 'person': None,
+                'pr': instance,
                 'pr_url': pr_url,
-                'pd_ref_title': f'{pd.reference_number} ({pd.title})',
                 'status': instance.get_status_display()
             }
 
-        for person in pd.unicef_officers.all():
+        template_data['person'] = instance.submitted_by
+        to_email_list = [template_data['person'].email]
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype='html',
+        )
+
+        template_data['person'] = instance.submitting_user
+        to_email_list = [template_data['person'].email]
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype='html',
+        )
+
+        for person in pd.unicef_focal_point.all():
             template_data['person'] = person
             to_email_list = [person.email]
 
