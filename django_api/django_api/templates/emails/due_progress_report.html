@@ -1,0 +1,16 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+    <p>Dear {{ person.name }},</p>
+    <p>Please note that the following is due in 1 week:</p>
+    <br>
+    <p>Report: {{progress_report.report_type}}{{progress_report.report_number}}</p>
+    <p>Period: {{progress_report.start_date}} - {{progress_report.end_date}}</p>
+    <p>Due Date: {{progress_report.due_date}}</p>
+    <p>Programme Document Ref: {{programme_document.reference_number}}</p>
+    <p>Programme Document Title: {{programme_document.title}}</p>
+    <br>
+    <p>Kind regards,</p>
+    <p>UNICEF</p>
+    <p>-- Please note that replies to this email are not monitored and cannot be replied to --</p>
+{% endblock content %}
