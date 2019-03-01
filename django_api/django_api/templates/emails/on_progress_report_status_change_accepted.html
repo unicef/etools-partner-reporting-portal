@@ -2,6 +2,17 @@
 
 {% block content %}
     <p>Dear {{ person.name }},</p>
-    <p>Your progress report <a href="{{ pr_url }}">{{ pr_url }}</a> for {{ pd_ref_title }}} has been Accepted by UNICEF.</p>
-    <p>Best Regards,</p>
+    <p>Please note that the following was accepted by UNICEF:</p>
+    <br>
+    <p>Report: [{{pr.report_type}}{{pr.report_number}}]</p>
+    <p>Period: {{pr.start_date}} - {{pr.end_date}}</p>
+    <p>Submission Date: {{pr.submission_date}}</p>
+    <p>Due Date: {{pr.due_date}}</p>
+    <p>Link to the report: <a href="{{ pr_url }}">{{ pr_url }}</a></p>
+    <p>Programme Document Ref: {{pr.pd.reference_number}}</p>
+    <p>Programme Document Title: {{pr.pd.title}}</p>
+    <br>
+    <p>Kind regards,</p>
+    <p>UNICEF</p>
+    <p>-- Please note that replies to this email are not monitored and cannot be replied to --</p>
 {% endblock content %}
