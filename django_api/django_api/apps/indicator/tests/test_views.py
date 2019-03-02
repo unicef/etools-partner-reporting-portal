@@ -1591,7 +1591,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             response.data['non_field_errors'][0]
         )
 
-    def test_update_zero_division_data_entry_validation(self):
+    def test_update_zero_division_data_entry_validation_not_on_quantity(self):
         indicator_location_data = self.partneractivity_reportable.indicator_reports.first().indicator_location_data.first()
 
         update_data = IndicatorLocationDataUpdateSerializer(
@@ -1612,11 +1612,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data['disaggregation'][str(level_reported_3_key)]['v'] = 100
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "has zero denominator and non-zero numerator",
-            response.data['non_field_errors'][0]
-        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
 
     def test_update_wrong_disaggregation_reported_on_count_validation(self):
         indicator_location_data = self.partneractivity_reportable.indicator_reports.first().indicator_location_data.first()
