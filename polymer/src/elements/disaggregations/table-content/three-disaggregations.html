@@ -27,6 +27,7 @@
               as="outerRow">
       <disaggregation-table-row
           data="[[outerRow]]"
+          level-reported="[[data.level_reported]]"
           indicator-type="[[data.display_type]]"
           row-type="outerRow">
       </disaggregation-table-row>
@@ -78,7 +79,7 @@
       ],
 
       observers: [
-        '_determineTotals(columns, middleRows, data)'
+        '_determineTotals(columns, middleRows, data)',
       ],
 
       properties: {

@@ -684,7 +684,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space does not " % (key)
                     + "have a correct value dictionary")
 
-            elif list(data['disaggregation'][key].keys()) != ['c', 'd', 'v']:
+            elif set(data['disaggregation'][key].keys()) != {'c', 'd', 'v'}:
                 raise serializers.ValidationError(
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")

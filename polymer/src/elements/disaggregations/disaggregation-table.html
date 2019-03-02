@@ -356,6 +356,10 @@
             break;
         }
 
+        // Re-saving disaggregation data after total calculations
+        // since totals contains entire disaggregation keyspace set
+        this.set(['localData.disaggregation'], totals);
+
         if (totals) {
           this.set('totals', totals);
         }
