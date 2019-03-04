@@ -684,7 +684,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space does not " % (key)
                     + "have a correct value dictionary")
 
-            elif list(data['disaggregation'][key].keys()) != ['c', 'd', 'v']:
+            elif set(data['disaggregation'][key].keys()) != {'c', 'd', 'v'}:
                 raise serializers.ValidationError(
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
@@ -720,10 +720,11 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 data['disaggregation'][key]['v'] = \
                     int(data['disaggregation'][key]['v'])
 
-            # Checking X/0 data entry case
-            if data['disaggregation'][key]['d'] == 0 and data['disaggregation'][key]['v'] != 0:
+            # Checking X/0 data entry case for ratio type only
+            if data['indicator_report'].reportable.blueprint.unit != IndicatorBlueprint.NUMBER \
+                    and data['disaggregation'][key]['d'] == 0 and data['disaggregation'][key]['v'] != 0:
                 raise serializers.ValidationError(
-                    "Disaggregation key {} has zero denominator and non-zero numerator".format(key)
+                    "Ratio Disaggregation key {} has zero denominator and non-zero numerator".format(key)
                 )
 
         if level_reported_key_count != valid_level_reported_key_count:
