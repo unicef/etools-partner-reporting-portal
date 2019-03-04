@@ -24,16 +24,16 @@ steps:
                     - develop
                     - master
 
-    deploy_frontend:
-        image: codefresh/cf-deploy-kubernetes
-        tag: ${{CF_SHORT_REVISION}}
-        working_directory: ${{main_clone}}
-        commands:
-          - /cf-deploy-kubernetes ./kubernetes/react/deployment.yaml
-        environment:
-          - KUBECONTEXT=${{KUBECONTEXT}}
-          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
-        when:
-          branch:
-            only:
-              - develop
+    # deploy_frontend:
+    #     image: codefresh/cf-deploy-kubernetes
+    #     tag: ${{CF_SHORT_REVISION}}
+    #     working_directory: ${{main_clone}}
+    #     commands:
+    #       - /cf-deploy-kubernetes ./kubernetes/react/deployment.yaml
+    #     environment:
+    #       - KUBECONTEXT=${{KUBECONTEXT}}
+    #       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+    #     when:
+    #       branch:
+    #         only:
+    #           - develop
