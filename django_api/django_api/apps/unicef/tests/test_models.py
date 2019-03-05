@@ -2,7 +2,6 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from django.core import mail
-from django.conf import settings
 from django.db.models import Q
 
 from core.common import (
