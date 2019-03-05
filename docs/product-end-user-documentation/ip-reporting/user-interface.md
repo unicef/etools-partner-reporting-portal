@@ -16,10 +16,12 @@ Clicking a PD will give more details \(shown in mockup below\) about this PD, it
 
 ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-L4c0bvrfEPWnSxYQa0b%2F-L4c0iMbmQhsWwBUj8sx%2FScreen%20Shot%202018-02-05%20at%202.10.21%20PM.png?alt=media&token=f8c9102a-d906-4aa9-9840-938997f333aa)
 
+Amendment section will not display if there are no amendments \(\#[732](https://github.com/unicef/etools-partner-reporting-portal/issues/732)\)
+
 Additionally we will show a "Reporting Requirements" in a blue box, under which will have all reports in the future. The columns will be:
 
 * Report name
-* Due date
+* Due date - \(DD/MM/YYY \#[740](https://github.com/unicef/etools-partner-reporting-portal/issues/740)\)
 * Reporting period
 
 Nothing in it is clickable.
@@ -29,6 +31,8 @@ Nothing in it is clickable.
 ![Reporting Requirements](https://lh4.googleusercontent.com/p9SwdJ5o1cX2-McWj1RS0cpfPBoqLhHeajL4jwc8qeWJpQ6o51RnAJJZ3gGV7n-sNS_XiDkS2bS0J_jTA1L5TCiEmn8OSTOqmrohXO8AWSVaY61aFtNZFdyEBsiBN20ljzrrnjq4)
 
 This data comes from the PMP system and displayed to the partner for their information only. It cannot be modified in PRP.
+
+If a PD is suspended, we no longer 'move' the final report date to when it was suspended. The final report will stay the same as previously assigned \(\#[704](https://github.com/unicef/etools-partner-reporting-portal/issues/704)\). Once inside a Suspended PD, we should have the header message "PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement" \(\#[700](https://github.com/unicef/etools-partner-reporting-portal/issues/700)\).  
 {% endtab %}
 
 {% tab title="Progress Reports" %}
@@ -49,6 +53,10 @@ Filterable list of all the indicators associated with all the PD's for this part
 By default PD status will be selected to "Active". The user can change this as desired.
 
 Unicef/Cluster indicators and show report type. Partners can find high frequency from report type. Dates format should be day/month/year.
+
+Indicator list should only displays the last 2 submitted or accepted reports data \([\#873](https://github.com/unicef/etools-partner-reporting-portal/issues/873)\)
+
+There will be no 'In Need' progress column in IP \([\#769](https://github.com/unicef/etools-partner-reporting-portal/issues/769)\)
 
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.14.34-pm.png)
 

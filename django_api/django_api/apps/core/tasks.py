@@ -17,14 +17,8 @@ from core.helpers import (
     calculate_end_date_given_start_date,
     find_missing_frequency_period_dates_for_indicator_report,
 )
-from core.factories import (
-    ProgressReportFactory,
-    QuantityIndicatorReportFactory,
-    RatioIndicatorReportFactory,
-    IndicatorLocationDataFactory,
-)
-from unicef.models import ProgrammeDocument
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport, ReportingEntity
+from unicef.models import ProgrammeDocument, ProgressReport
+from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport, ReportingEntity, IndicatorLocationData
 
 
 logger = logging.getLogger(__name__)
@@ -138,7 +132,7 @@ def process_period_reports():
                                 reportable, start_date, end_date
                             ))
 
-                            indicator_report = QuantityIndicatorReportFactory(
+                            indicator_report = IndicatorReport.objects.create(
                                 reportable=reportable,
                                 time_period_start=start_date,
                                 time_period_end=end_date,
@@ -156,7 +150,7 @@ def process_period_reports():
                                     indicator_report, start_date, end_date
                                 ))
 
-                                IndicatorLocationDataFactory(
+                                IndicatorLocationData.objects.create(
                                     indicator_report=indicator_report,
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
@@ -173,7 +167,7 @@ def process_period_reports():
                                 reportable, start_date, end_date
                             ))
 
-                            indicator_report = RatioIndicatorReportFactory(
+                            indicator_report = IndicatorReport.objects.create(
                                 reportable=reportable,
                                 time_period_start=start_date,
                                 time_period_end=end_date,
@@ -191,7 +185,7 @@ def process_period_reports():
                                     indicator_report, start_date, end_date
                                 ))
 
-                                IndicatorLocationDataFactory(
+                                IndicatorLocationData.objects.create(
                                     indicator_report=indicator_report,
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
@@ -288,7 +282,7 @@ def process_period_reports():
                         report_type = reporting_period.report_type
                         is_final = False
 
-                    next_progress_report = ProgressReportFactory(
+                    next_progress_report = ProgressReport.objects.create(
                         start_date=start_date,
                         end_date=end_date,
                         due_date=due_date,
@@ -303,7 +297,8 @@ def process_period_reports():
                 def create_pr_ir_for_reportable(reportable, pai_ir_for_period, start_date, end_date, due_date):
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                         logger.info("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
-                        indicator_report = QuantityIndicatorReportFactory(
+                        indicator_report = IndicatorReport.objects.create(
+                            progress_report=None,
                             reportable=reportable,
                             parent=pai_ir_for_period,
                             time_period_start=start_date,
@@ -321,7 +316,7 @@ def process_period_reports():
                             logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
                                 indicator_report, start_date, end_date
                             ))
-                            IndicatorLocationDataFactory(
+                            IndicatorLocationData.objects.create(
                                 indicator_report=indicator_report,
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
@@ -335,7 +330,8 @@ def process_period_reports():
 
                     else:
                         logger.info("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
-                        indicator_report = RatioIndicatorReportFactory(
+                        indicator_report = IndicatorReport.objects.create(
+                            progress_report=None,
                             reportable=reportable,
                             parent=pai_ir_for_period,
                             time_period_start=start_date,
@@ -353,7 +349,7 @@ def process_period_reports():
                             logger.info("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
                                 indicator_report, start_date, end_date
                             ))
-                            IndicatorLocationDataFactory(
+                            IndicatorLocationData.objects.create(
                                 indicator_report=indicator_report,
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
@@ -461,7 +457,7 @@ def process_period_reports():
                                             if not indicator_report.progress_report:
                                                 # Otherwise, create a brand new HR progress report
                                                 # for this cluster LLO Indicator report
-                                                new_cluster_hr_progress_report = ProgressReportFactory(
+                                                new_cluster_hr_progress_report = ProgressReport.objects.create(
                                                     start_date=indicator_report.time_period_start,
                                                     end_date=indicator_report.time_period_end,
                                                     due_date=indicator_report.due_date,

@@ -3,7 +3,7 @@
 In this report, the IP provides the following information:
 
 * Rating the progress against PD output\(s\) \(or SSFA expected result\(s\), if applicable\), including a short narrative assessment;
-* For each PD output \(or SSFA expected result\), report progress against each and all indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable;
+* For each PD output \(or SSFA expected result\), report progress against each and all indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable. Including PD Output is mandatory \(\#[1015](https://github.com/unicef/etools-partner-reporting-portal/issues/1015)\)
 * Other information as defined in the “other info” tab.
 
 The frequency of reporting \(report start and end dates\) and report due dates are generated in PMP and the report is generated in PRP-IP on the first day of the new reporting period. Each report is assigned a number \(Eg. QPR-2\) and the final report is labelled "Final". If new reporting periods are added or changed after the “final” report has been generated, those changes/new reporting periods will be ignored for this PD.
@@ -26,7 +26,9 @@ If the PD includes high frequency humanitarian response indicators \(cluster or 
 
 **​**
 
-In the above example, QPR 1 will be able to pull in aggregated data for high frequency and cluster indicators from Hum1 and Hum2. QPR 2 would be able to pull in data for the high frequency and cluster indicators from Hum3 and Hum4 and Hum5.
+In the above example, QPR 1 will be able to pull in aggregated data for high frequency and cluster indicators from Hum1 and Hum2. QPR 2 would be able to pull in data for the high frequency and cluster indicators from Hum3 and Hum4 and Hum5. 
+
+When a user 'Pulls Data From HR' and QPR has non high frequency indicators, the backend will throw error message "This indicator is non-HF indicator. Data pull only works with HF indicator" \(\#[980](https://github.com/unicef/etools-partner-reporting-portal/issues/980)\).
 
 ![A UNICEF non-cluster high frequency indicator \(above\) and a cluster high frequency indicator \(below\)](https://lh4.googleusercontent.com/AIjUf8gP5DJb1-S2S3Vl3OIJCY1BEGRNZ_pR915_jPSwSz92eJmKIN7NglbP-xxYjhatRjDk5Myhcj9pgYFVTUiBSUpUnULB19uh6-_e1WvL8IIw5ZQ5HHNqtyP9YBdglweLriy7)
 
@@ -51,6 +53,11 @@ Update 10/9/18 [\(\#891](https://waffle.io/unicef/etools-partner-reporting-porta
 
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 
-QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).  
-****
+QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).
+
+If the QPR report is submitted or accepted, then the 'Pull HR Data' button should not function and allow the suer to overwrite the data \([\#981](https://github.com/unicef/etools-partner-reporting-portal/issues/981)\)
+
+Annex C form will be generated when the report is submitted ****\([\#964](https://github.com/unicef/etools-partner-reporting-portal/issues/964)\)
+
+
 

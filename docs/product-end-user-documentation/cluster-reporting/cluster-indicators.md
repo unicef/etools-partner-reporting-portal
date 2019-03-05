@@ -13,7 +13,7 @@ Indicators in a cluster can belong to following entities:
 
 IMOs and partners can create their own indicators. They can choose the type of indicator \(quantity, percent, ratio\) and calculation method for reporting periods/locations.
 
-For _**Quantity indicators**_ IMO's set baseline, target and in-need at the indicator level. If this is a Partner indicator, they can set these too. In-need is optional. If baseline is not set, it defaults to 0.
+For _**Quantity indicators**_ IMO's set baseline, target and in-need at the indicator level. If this is a Partner indicator, they can set these too. In-need is optional. If baseline is not set, it defaults to 0. For all indicator types baseline can be greater than target \(\#[914](https://github.com/unicef/etools-partner-reporting-portal/issues/914)\)
 
 At the location level, IMO can set the admin level and specific location pertaining to the level. In-need is optional to set here. IMOs can add multiple locations and disaggregations too.
 
@@ -40,6 +40,8 @@ IMO or Partner can edit an indicator. The location admin level, specific locatio
 
 _**Partners can adopt \(Cluster\) Activity Indicators previously set by the IMO**_. They are able to edit the target and add locations. If the partner adds a location, they will be able to include the administration level, specific location for the level and target.
 
+Editing Partner Activity Indicator modal derived from CAI a should only allow Partner to add new locations or editing targets on locations \(\#[669](https://github.com/unicef/etools-partner-reporting-portal/issues/669)\). 
+
 ![](https://lh6.googleusercontent.com/A-KIeRDMjYPzoFDTDbR3avI1_hxdK9NRB9_ASAU30TphLYbz2VOWWEBAnOAIFJntp8t55qRJXeR0dxh9_cdxSH4kRAm43XFeNeOSiaPyISjshMx6fr0cYAqC-mnJz-3nzphy9_OV)
 
 If the Partner would like to propose a new Baseline and in-need to the IMO, they can send a direct message to the IMO. This will be sent to the IMO's email. We will add  partner users name, email, partner name, indicator, project, plan to the modal and message received by the IMO.
@@ -50,9 +52,13 @@ If the Partner would like to propose a new Baseline and in-need to the IMO, they
 
 In the Indicator Reports, users will be able to see the current progress against Target and In-Need.
 
+Current Progress =  achievement/in-need \(\#[647](https://github.com/unicef/etools-partner-reporting-portal/issues/647)\).
+
 ![](https://lh4.googleusercontent.com/6BHlmxUejYlX_z2LHM56NDumX_8JgAenXKYdkdQluvyvDIruPJOKsEzSsMBB1ydESNW38JROpxSD_uwagHwKUc2z1JpPU0MHS6VR8epeNHTNI_ihE3zS0SHRGnG-Co_63LALOIxX)
 
-For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for specific locations in bulk. In-need is optional and Baseline defaults to 0.
+For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for specific locations in bulk. In-need is optional and Baseline defaults to 0. 
+
+For CAI, once IMO updates baseline and In-need for the specific location from the Locations section, it will get pushed down to the partner for PAI \(\#[1048](https://github.com/unicef/etools-partner-reporting-portal/issues/1048)\).
 
 ![](https://lh3.googleusercontent.com/-4DIgKH4ORiH50vi98SZXGg4--v_w10mSGhr1xliPD3krcx1ndoowFy0O9BILvinqEwPNXQQ8taFTBak0-PwZQqr6EpBC7oYqE9oXNG7Sa-zj2ArGherjN7WmsQeZUTIY0LO_gRb)
 
@@ -64,6 +70,8 @@ For Ratio Indicators, IMOs will be able to enter a new Baseline. The data key sp
 
 ![](https://lh6.googleusercontent.com/_Ep9SObps2aDSe_FIqv55igZXtoV7ZHZDJmPA1Kdk8yOyR16DksTJJfp6VJtf_HpnjwzwY6Ut5-zz_MRoqPbjmEgdXtWFyfZcIX0QzvQmCCf3LkDVoqjmg8x36zm9rQyubiPyzLD)
 
+When a partner adds a location after adopting a Cluster Activity Indicator, baseline and target will sync from each location from the CAI. \(\#[1055\)](https://github.com/unicef/etools-partner-reporting-portal/issues/1055)
+
 ### Helper Text
 
 When looking at an indicator edit/create modal, the user can click on the 'i' for helper text associated with the field.  
@@ -73,7 +81,7 @@ Additionally for calculation method selection we will show a modal similar to in
 
 ### Report Generator Logic
 
-When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator. It typically takes around 5 minutes for reports to generate.
+When a new indicator is added, all reports whose start date + due date before the day of report generation will be created. Indicator reports are created as soon as locations are added to the indicator \(\#[675](https://github.com/unicef/etools-partner-reporting-portal/issues/675)\). It typically takes around 5 minutes for reports to generate.
 
 After reports are generated, the future reports will be generated on the due date of latest indicator report based on their frequency to prevent partners from reporting early. 
 

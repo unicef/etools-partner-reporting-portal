@@ -68,6 +68,10 @@
         'field.input': '_handleInput',
       },
 
+      ready: function () {
+        this.$.field.validate();
+      },
+
       attached: function () {
         this.fire('register-field', this);
       },

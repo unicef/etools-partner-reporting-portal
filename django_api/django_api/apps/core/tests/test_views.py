@@ -1,83 +1,219 @@
 from django.urls import reverse
 
-# from rest_framework imports status
-
-# from core.models imports ResponsePlan
-# from core.models imports Location, Workspace
 from rest_framework import status
 
 from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES
-from core.models import Workspace
-from core.factories import PRPRoleFactory
+from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
+                            ClusterFactory,
+                            ClusterObjectiveFactory, ClusterPRPRoleFactory,
+                            CountryFactory, DisaggregationFactory,
+                            DisaggregationValueFactory, GatewayTypeFactory,
+                            LocationFactory,
+                            LocationWithReportableLocationGoalFactory,
+                            NonPartnerUserFactory,
+                            QuantityTypeIndicatorBlueprintFactory,
+                            ResponsePlanFactory, WorkspaceFactory, QuantityReportableToClusterActivityFactory)
+from core.management.commands._generate_disaggregation_fake_data import add_disaggregations_to_reportable
 from core.tests.base import BaseAPITestCase
+from core.models import Workspace, Location, ResponsePlan
 
 
-# class TestWorkspaceListAPIView(BaseAPITestCase):
+class TestWorkspaceListAPIView(BaseAPITestCase):
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.user = NonPartnerUserFactory()
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-#     def test_list_api(self):
-#         url = reverse('workspace')
-#         response = self.client.get(url, format='json')
+        super().setUp()
 
-#         self.assertEquals(response.status_code, status.HTTP_200_OK)
-#         self.assertEquals(
-#             len(response.data),
-#             Workspace.objects.prefetch_related('locations').filter(
-#                 locations__isnull=False).distinct().count()
-#         )
+    def test_list_api_by_user(self):
+        url = reverse('workspace')
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data),
+            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
+                countries__gateway_types__locations__isnull=False).distinct().count()
+        )
+
+        # Cluster system admin should also be able to query workspaces
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        url = reverse('workspace')
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data),
+            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
+                countries__gateway_types__locations__isnull=False).distinct().count()
+        )
+
+    def test_api_filtering(self):
+        url = reverse('workspace')
+        args = "?business_area_code={}&workspace_code={}".format(self.workspace.business_area_code, self.workspace.workspace_code)
+        response = self.client.get(url + args, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data),
+            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
+                countries__gateway_types__locations__isnull=False,
+                business_area_code=self.workspace.business_area_code,
+                workspace_code=self.workspace.workspace_code).distinct().count()
+        )
 
 
-# class TestLocationListAPIView(BaseAPITestCase):
+class TestLocationListAPIView(BaseAPITestCase):
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.user = NonPartnerUserFactory()
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-#     def test_list_api(self):
-#         response_plan_id = ResponsePlan.objects.first().id
-#         url = reverse(
-#             'location', kwargs={
-#                 'response_plan_id': response_plan_id})
-#         response = self.client.get(url, format='json')
+        for _ in range(2):
+            obj = ClusterObjectiveFactory(
+                cluster=self.cluster,
+                locations=[
+                    self.loc1,
+                    self.loc2,
+                ]
+            )
 
-#         result = ResponsePlan.objects.filter(id=response_plan_id).values_list(
-#             'clusters__cluster_objectives__reportables__locations',
-#             'clusters__cluster_objectives__cluster_activities__reportables__locations',
-#             'clusters__partner_projects__reportables__locations',
-#             'clusters__partner_projects__partner_activities__reportables__locations',
-#         ).distinct()
-#         pks = []
-#         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
-#         expected = Location.objects.filter(pk__in=pks).count()
+            activity = ClusterActivityFactory(
+                cluster_objective=obj,
+                locations=[
+                    self.loc1, self.loc2
+                ]
+            )
 
-#         self.assertEquals(response.status_code, status.HTTP_200_OK)
-#         self.assertEquals(len(response.data), expected)
+            blueprint = QuantityTypeIndicatorBlueprintFactory()
+            clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+                content_object=activity, blueprint=blueprint
+            )
 
+            clusteractivity_reportable.disaggregations.clear()
 
-# class TestResponsePlanAPIView(BaseAPITestCase):
+            self.sample_disaggregation_value_map = {
+                "height": ["tall", "medium", "short", "extrashort"],
+                "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+                "gender": ["male", "female", "other"],
+            }
 
-#     def test_response_plan(self):
-#         workspace = Workspace.objects.first()
-#         response_plan_count = ResponsePlan.objects.filter(
-#             workspace=workspace).count()
-#         url = reverse("response-plan", kwargs={'workspace_id': workspace.id})
-#         response = self.client.get(url, format='json')
+            # Create the disaggregations and values in the db for all response plans
+            # including one for no response plan as well
+            for disagg_name, values in self.sample_disaggregation_value_map.items():
+                for value in values:
+                    DisaggregationValueFactory(
+                        disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                        value=value
+                    )
 
-#         self.assertEquals(response.status_code, status.HTTP_200_OK)
-#         self.assertEquals(len(response.data), response_plan_count)
-#         self.assertTrue(response.data[0].get('id') in
-#                         ResponsePlan.objects.filter(
-#                             workspace=workspace).values_list('id', flat=True))
-#         self.assertEquals(response.data[0].get('workspace'), workspace.id)
+            add_disaggregations_to_reportable(
+                clusteractivity_reportable,
+                disaggregation_targets=["age", "gender", "height"]
+            )
+
+            LocationWithReportableLocationGoalFactory(
+                location=self.loc1,
+                reportable=clusteractivity_reportable,
+            )
+
+            LocationWithReportableLocationGoalFactory(
+                location=self.loc2,
+                reportable=clusteractivity_reportable,
+            )
+
+        super().setUp()
+
+    def test_list_api(self):
+        url = reverse(
+            'location', kwargs={
+                'response_plan_id': self.response_plan.id})
+        response = self.client.get(url, format='json')
+
+        result = ResponsePlan.objects.filter(id=self.response_plan.id).values_list(
+            'clusters__cluster_objectives__reportables__locations',
+            'clusters__cluster_objectives__cluster_activities__reportables__locations',
+            'clusters__partner_projects__reportables__locations',
+            'clusters__partner_projects__partner_activities__reportables__locations',
+        ).distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        expected = Location.objects.filter(pk__in=pks).count()
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), expected)
+
+    def test_api_filtering(self):
+        url = reverse(
+            'location', kwargs={
+                'response_plan_id': self.response_plan.id})
+        objective_ids = list(map(lambda x: str(x), self.cluster.cluster_objectives.values_list('id', flat=True)))
+        args = "?loc_type={}&cluster_objectives={}".format(self.loc_type.admin_level, ",".join(objective_ids))
+        response = self.client.get(url + args, format='json')
+
+        result = ResponsePlan.objects.filter(id=self.response_plan.id).values_list(
+            'clusters__cluster_objectives__reportables__locations',
+            'clusters__cluster_objectives__cluster_activities__reportables__locations',
+            'clusters__partner_projects__reportables__locations',
+            'clusters__partner_projects__partner_activities__reportables__locations',
+        ).distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        expected = Location.objects.filter(
+            pk__in=pks,
+            gateway__admin_level=self.loc_type.admin_level,
+            cluster_objectives__in=objective_ids).count()
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), expected)
 
 
 class TestResponsePlanAPIView(BaseAPITestCase):
 
     def setUp(self):
-        super(TestResponsePlanAPIView, self).setUp()
-        self.workspace = Workspace.objects.first()
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.user = NonPartnerUserFactory()
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        PRPRoleFactory(
-            user=self.user,
-            role=PRP_ROLE_TYPES.imo_cluster,
-        )
+        super().setUp()
 
-    def test_response_plan(self):
+    def test_list_response_plan(self):
+        url = reverse("response-plan", kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), self.workspace.response_plans.count())
+
+        # Cluster system admin should also be able to query response plans
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), self.workspace.response_plans.count())
+
+    def test_create_response_plan(self):
         rp_data = {
             'title': 'Test Response Plan',
             'plan_type': 'HRP',
@@ -91,7 +227,15 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
+        # Cluster system admin should also be able to create response plan
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        rp_data['title'] += ' 2'
+        response = self.client.post(url, data=rp_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
     def test_end_lt_start(self):
@@ -108,5 +252,13 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
 
+        # Cluster system admin should also be able to create response plan
+        self.admin_user = NonPartnerUserFactory()
+        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.client.force_authenticate(self.admin_user)
+
+        rp_data['title'] += ' 2'
+        response = self.client.post(url, data=rp_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)

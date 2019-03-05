@@ -684,7 +684,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space does not " % (key)
                     + "have a correct value dictionary")
 
-            elif list(data['disaggregation'][key].keys()) != ['c', 'd', 'v']:
+            elif set(data['disaggregation'][key].keys()) != {'c', 'd', 'v'}:
                 raise serializers.ValidationError(
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
@@ -694,16 +694,38 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
             # Sanitizing data value
             if isinstance(data['disaggregation'][key]['c'], str):
+                if not data['disaggregation'][key]['c'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} c value is not number".format(data['disaggregation'][key]['c'])
+                    )
+
                 data['disaggregation'][key]['c'] = \
                     int(data['disaggregation'][key]['c'])
 
             if isinstance(data['disaggregation'][key]['d'], str):
+                if not data['disaggregation'][key]['d'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} d value is not number".format(data['disaggregation'][key]['d'])
+                    )
+
                 data['disaggregation'][key]['d'] = \
                     int(data['disaggregation'][key]['d'])
 
             if isinstance(data['disaggregation'][key]['v'], str):
+                if not data['disaggregation'][key]['v'].isnumeric():
+                    raise serializers.ValidationError(
+                        "Disaggregation key {} v value is not number".format(data['disaggregation'][key]['v'])
+                    )
+
                 data['disaggregation'][key]['v'] = \
                     int(data['disaggregation'][key]['v'])
+
+            # Checking X/0 data entry case for ratio type only
+            if data['indicator_report'].reportable.blueprint.unit != IndicatorBlueprint.NUMBER \
+                    and data['disaggregation'][key]['d'] == 0 and data['disaggregation'][key]['v'] != 0:
+                raise serializers.ValidationError(
+                    "Ratio Disaggregation key {} has zero denominator and non-zero numerator".format(key)
+                )
 
         if level_reported_key_count != valid_level_reported_key_count:
             raise serializers.ValidationError(
@@ -1103,7 +1125,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-
         if 'baseline' not in validated_data:
             if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
                     raise ValidationError(
@@ -1597,8 +1618,6 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
                 return obj.reportable.content_object.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.clusters.first()
-        else:
-            return None
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)

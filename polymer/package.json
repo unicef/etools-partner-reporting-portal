@@ -41,7 +41,7 @@
     "jshint-stylish": "^2.2.1",
     "lazypipe": "^1.0.1",
     "deep-extend": "0.5.1",
-    "lodash": "4.17.5",
+    "lodash": "^4.17.11",
     "lite-server": "^2.3.0",
     "merge-stream": "^1.0.0",
     "plylog": "^0.4.0",

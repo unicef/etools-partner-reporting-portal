@@ -9,6 +9,8 @@ The Partner will be shown the following:
 * Number and list of due/overdue indicator reports
 * Indicators by Progress Status
 
+Partners will only see their reports on the dashboard \(\#[919](https://github.com/unicef/etools-partner-reporting-portal/issues/919)\)
+
 ![](../../.gitbook/assets/screen-shot-2018-03-07-at-4.10.55-pm.png)
 
 ### IMO Dashboard

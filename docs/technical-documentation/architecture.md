@@ -10,7 +10,7 @@ The diagram below represents the integration between PRP and PMP. Arrows represe
 
 ![Arrows represent the direction of data flow](../.gitbook/assets/prp-documentation-data-flow.png)
 
-
+PD Sync in Dev environment happens every 30 minutes \([\#994](https://github.com/unicef/etools-partner-reporting-portal/issues/994)\). Demo is 45 minutes. These can be configured/changed if needed. 
 
 ## Services
 
