@@ -1,13 +1,8 @@
 import logging
-from datetime import date
-from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
-from core.common import PROGRESS_REPORT_STATUS
-from unicef.models import ProgressReport
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +48,10 @@ def send_due_progress_report_email():
     """send_due_progress_report_email sends email notifications to
     UNICEF Authorized Officers and Focal Points about reports due in 1 week.
     """
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+    from core.common import PROGRESS_REPORT_STATUS
+    from unicef.models import ProgressReport
 
     logger.info("Notifying IP due progress reports")
     notified = list()
@@ -95,6 +94,8 @@ def send_overdue_progress_report_email(progress_report):
     """send_overdue_progress_report_email sends email notifications to
     UNICEF Authorized Officers and Focal Points about overdue reports.
     """
+    from core.common import PROGRESS_REPORT_STATUS
+    from unicef.models import ProgressReport
 
     logger.info("Notifying IP overdue progress reports")
     notified = list()
