@@ -85,12 +85,12 @@ def send_due_progress_report_email():
                 content_subtype='html'
             )
 
-        notified.append(progress_report.id)
+        notified.append(str(progress_report.id))
 
-    return "Sent emails for %s Due Report IDs: %s" % (len(notified), ", ".join(notified)) if notified else "---"
+    return "Sent emails for {} Due Report IDs: {}".format(len(notified), ", ".join(notified)) if notified else "---"
 
 
-def send_overdue_progress_report_email(progress_report):
+def send_overdue_progress_report_email():
     """send_overdue_progress_report_email sends email notifications to
     UNICEF Authorized Officers and Focal Points about overdue reports.
     """
@@ -105,7 +105,7 @@ def send_overdue_progress_report_email(progress_report):
         status=PROGRESS_REPORT_STATUS.overdue,
     )
 
-    for report in unsubmitted_overdue_reports:
+    for progress_report in unsubmitted_overdue_reports:
         pd = progress_report.programme_document
 
         template_data = {
@@ -127,6 +127,6 @@ def send_overdue_progress_report_email(progress_report):
                 content_subtype='html'
             )
 
-        notified.append(report.id)
+        notified.append(str(progress_report.id))
 
-    return "Sent emails for %s Overdue Report IDs: %s" % (len(notified), ", ".join(notified)) if notified else "---"
+    return "Sent emails for {} Overdue Report IDs: {}".format(len(notified), ", ".join(notified)) if notified else "---"

@@ -1,3 +1,6 @@
+from datetime import date
+from dateutil.relativedelta import relativedelta
+
 from django.core import mail
 from django.conf import settings
 from django.db.models import Q
@@ -43,6 +46,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
 from core.models import Location
+from utils.emails import send_due_progress_report_email, send_overdue_progress_report_email
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
     IndicatorBlueprint,
@@ -251,6 +255,8 @@ class TestProgressReportModel(BaseAPITestCase):
     def test_send_notification_on_status_change_post_save_signal_for_submitted(self):
         mail.outbox = []
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
+        report.status = PROGRESS_REPORT_STATUS.due
+        report.save()
 
         report.status = PROGRESS_REPORT_STATUS.submitted
         report.save()
@@ -261,12 +267,12 @@ class TestProgressReportModel(BaseAPITestCase):
         sent_mail = mail.outbox[-1]
 
         self.assertIn("Please note that the following was submitted to UNICEF:", sent_mail.body)
-        report.status = PROGRESS_REPORT_STATUS.due
-        report.save()
 
     def test_send_notification_on_status_change_post_save_signal_for_sent_back(self):
         mail.outbox = []
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
+        report.status = PROGRESS_REPORT_STATUS.due
+        report.save()
 
         report.status = PROGRESS_REPORT_STATUS.sent_back
         report.save()
@@ -280,12 +286,12 @@ class TestProgressReportModel(BaseAPITestCase):
         self.assertIn(
             "Please log in to the UNICEF Partner Reporting Portal to see the reason "
             + "and contact details of the person that sent the report back.", sent_mail.body)
-        report.status = PROGRESS_REPORT_STATUS.due
-        report.save()
 
     def test_send_notification_on_status_change_post_save_signal_for_accepted(self):
         mail.outbox = []
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
+        report.status = PROGRESS_REPORT_STATUS.due
+        report.save()
 
         report.status = PROGRESS_REPORT_STATUS.accepted
         report.save()
@@ -296,5 +302,41 @@ class TestProgressReportModel(BaseAPITestCase):
         sent_mail = mail.outbox[-1]
 
         self.assertIn("Please note that the following was accepted by UNICEF:", sent_mail.body)
+
+    def test_send_due_progress_report_email(self):
+        mail.outbox = []
+        today = date.today()
+
+        report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
+        report.due_date = today + relativedelta(days=7)
+        report.submission_date = None
         report.save()
+
+        send_due_progress_report_email()
+
+        # Match # of emails sent by unicef_officer and unicef_focal_point
+        self.assertEqual(len(mail.outbox), 2)
+
+        sent_mail = mail.outbox[-1]
+
+        self.assertIn("Please note that the following is due in 1 week:", sent_mail.body)
+
+    def test_send_overdue_progress_report_email(self):
+        mail.outbox = []
+        today = date.today()
+
+        report = ProgressReport.objects.get(report_type="QPR", report_number=1)
+        report.status = PROGRESS_REPORT_STATUS.overdue
+        report.due_date = today - relativedelta(days=30)
+        report.submission_date = None
+        report.save()
+
+        send_overdue_progress_report_email()
+
+        # Match # of emails sent by unicef_officer and unicef_focal_point
+        self.assertEqual(len(mail.outbox), 2)
+
+        sent_mail = mail.outbox[-1]
+
+        self.assertIn("Please note that the following is overdue:", sent_mail.body)
