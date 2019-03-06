@@ -25,6 +25,7 @@ from core.common import (
     CURRENCIES,
     OVERALL_STATUS,
     REPORTING_TYPES,
+    PR_ATTACHMENT_TYPES,
     PRP_ROLE_TYPES,
 )
 from core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
@@ -508,6 +509,7 @@ class ProgressReportAttachment(TimeStampedModel):
     file = models.FileField(
         upload_to=get_pr_attachment_upload_to,
     )
+    type = models.CharField(verbose_name="Attachment type", choices=PR_ATTACHMENT_TYPES, max_length=5)
 
     class Meta:
         ordering = ['id']
