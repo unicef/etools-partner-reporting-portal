@@ -958,3 +958,175 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
         self.assertEquals(response.data['size'], data['path'].size)
 
         os.remove('test.txt')
+
+
+class TestProgressReportAttachmentAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner_user = PartnerUserFactory(partner=self.partner)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
+
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        for idx in range(2):
+            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            pr = ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
+        for idx in range(6):
+            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+            pr = ProgressReportFactory(
+                start_date=hr_period.start_date,
+                end_date=hr_period.end_date,
+                due_date=hr_period.due_date,
+                report_number=idx + 1,
+                report_type=hr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        self.llo_reportable.disaggregations.clear()
+
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            disagg = IPDisaggregationFactory(name=disagg_name)
+
+            self.llo_reportable.disaggregations.add(disagg)
+
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=disagg,
+                    value=value
+                )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.llo_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.llo_reportable,
+        )
+
+        for pr in self.pd.progress_reports.all():
+            ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=self.llo_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+                overall_status=OVERALL_STATUS.met,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.llo_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        super().setUp()
+
+        # Logging in as Partner AO
+        self.client.force_authenticate(self.partner_user)
+
+        self.location_id = self.loc1.id
+        self.pr = self.pd.progress_reports.first()
+        self.attachment = self.pr.attachments.first()
+
+        settings.MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        for attachment in ProgressReportAttachment.objects.all():
+            attachment.file.delete()
+            attachment.delete()
+
+    def test_detail_api(self):
+        url = reverse(
+            'progress-reports-attachment',
+            kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['id'], self.attachment.id)
+
+    def test_update_api(self):
+        f = open('test.txt', 'w')
+        f.write(faker.text() + faker.text() + faker.text())
+        f.close()
+
+        file = File(open('test.txt', 'rb'))
+        upload_file = SimpleUploadedFile('test', file.read(), content_type="multipart/form-data")
+
+        data = {'type': 'Other', 'path': upload_file}
+        url = reverse(
+            'progress-reports-attachment',
+            kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
+        response = self.client.put(url, data, format="multipart")
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['size'], data['path'].size)
+
+        os.remove('test.txt')
+
+    def test_delete_api(self):
+        url = reverse(
+            'progress-reports-attachment',
+            kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
+        response = self.client.delete(url, format='multipart')
+
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
