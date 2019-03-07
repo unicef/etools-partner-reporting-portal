@@ -311,6 +311,9 @@ def process_programme_documents(fast=False, area=False):
                             llos.update(active=False)
                             Reportable.objects.filter(lower_level_outputs__in=llos).update(active=False)
 
+                            # Mark all ReportableLocationGoal instances referred in LLO Reportables as inactive
+                            ReportableLocationGoal.objects.filter(reportable__lower_level_outputs__in=llos).update(is_active=False)
+
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
                                 # Create PDResultLink
@@ -552,6 +555,7 @@ def process_programme_documents(fast=False, area=False):
                                             ReportableLocationGoal(
                                                 reportable=reportable,
                                                 location=l,
+                                                is_active=True,
                                             ) for l in Location.objects.filter(id__in=new_locs)
                                         ]
 
@@ -561,10 +565,13 @@ def process_programme_documents(fast=False, area=False):
                                             ReportableLocationGoal(
                                                 reportable=reportable,
                                                 location=l,
+                                                is_active=True,
                                             ) for l in locations
                                         ]
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
+                                    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
 
                                     if partner_activity:
                                         # Force update on PA Reportable instance for location update
@@ -580,10 +587,14 @@ def process_programme_documents(fast=False, area=False):
                                                     ReportableLocationGoal(
                                                         reportable=reportable,
                                                         location=l,
+                                                        is_active=True,
                                                     ) for l in loc_diff
                                                 ]
 
                                                 ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
+                                                # We don't overwrite is_active flag on PartnerActivity reportable from LLO locations here
+                                                # since Cluster may use those locations
 
                     # Check if another page exists
                     if list_data['next']:
