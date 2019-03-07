@@ -10,7 +10,7 @@ from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,6 +25,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
+    PR_ATTACHMENT_TYPES,
     PRP_ROLE_TYPES,
 )
 from core.paginations import SmallPagination
@@ -72,7 +73,7 @@ from .serializers import (
     ProgressReportSRUpdateSerializer,
     ProgressReportPullHFDataSerializer,
 )
-from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput
+from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput, ProgressReportAttachment
 from .permissions import (
     CanChangePDCalculationMethod,
     UnicefPartnershipManagerOrRead
@@ -1092,6 +1093,38 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
+class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
+    serializer_class = ProgressReportAttachmentSerializer
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+        ),
+    )
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get_queryset(self):
+        return ProgressReportAttachment.objects.filter(
+            progress_report_id=self.kwargs['progress_report_id'],
+            progress_report__programme_document__workspace_id=self.kwargs['workspace_id'],
+        )
+
+    def perform_create(self, serializer):
+        if self.get_queryset().count() == 3:
+            raise ValidationError('This progress report already has 3 attachments')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
+            raise ValidationError('This progress report already has 1 FACE attachment')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 2:
+            raise ValidationError('This progress report already has 2 Other attachments')
+
+        serializer.save(progress_report_id=self.kwargs['progress_report_id'])
+
+
 class ProgressReportAttachmentAPIView(APIView):
     permission_classes = (
         AnyPermission(
@@ -1103,17 +1136,18 @@ class ProgressReportAttachmentAPIView(APIView):
 
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
-    def get(self, request, workspace_id, progress_report_id):
-        progress_report = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id
+    def get(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
         )
 
         try:
             # lookup just so the possible FileNotFoundError can be triggered
-            progress_report.attachment
-            serializer = ProgressReportAttachmentSerializer(progress_report)
+            attachment.file
+            serializer = ProgressReportAttachmentSerializer(attachment)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         except FileNotFoundError:
             pass
@@ -1121,16 +1155,18 @@ class ProgressReportAttachmentAPIView(APIView):
         return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
-    def delete(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id
+    def delete(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
         )
 
-        if pr.attachment:
+        if attachment.file:
             try:
-                pr.attachment.delete()
+                attachment.file.delete()
+                attachment.delete()
                 return Response({}, status=statuses.HTTP_204_NO_CONTENT)
             except ValueError:
                 pass
@@ -1138,21 +1174,23 @@ class ProgressReportAttachmentAPIView(APIView):
             return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
-    def put(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+    def put(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
+        )
 
         serializer = ProgressReportAttachmentSerializer(
-            instance=pr,
+            instance=attachment,
             data=request.data
         )
 
         serializer.is_valid(raise_exception=True)
-        if pr.attachment:
+        if attachment.file:
             try:
-                pr.attachment.delete()
+                attachment.file.delete()
             except ValueError:
                 pass
 
