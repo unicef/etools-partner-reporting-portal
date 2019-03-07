@@ -587,7 +587,6 @@ class Location(MPTTModel):
 
     geom = models.MultiPolygonField(null=True, blank=True)
     point = models.PointField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
     objects = LocationManager()
 
     class Meta:
