@@ -1,56 +1,43 @@
 import datetime
+
 from django.conf import settings
 from django.db.models import Q
 from django.urls import reverse
 from rest_framework import status
-from core.common import (
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    PROGRESS_REPORT_STATUS,
-    PRP_ROLE_TYPES,
-)
-from core.management.commands._generate_disaggregation_fake_data import (
-    generate_3_num_disagg_data,
-)
-from core.factories import (CartoDBTableFactory,
-                            ProgressReportIndicatorReportFactory,
-                            IPPRPRoleFactory,
+
+from core.common import (INDICATOR_REPORT_STATUS, OVERALL_STATUS,
+                         PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES, PR_ATTACHMENT_TYPES)
+from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
+                            ClusterActivityPartnerActivityFactory,
+                            ClusterFactory, ClusterIndicatorReportFactory,
+                            ClusterObjectiveFactory, ClusterPRPRoleFactory,
                             CountryFactory, DisaggregationFactory,
                             DisaggregationValueFactory, GatewayTypeFactory,
+                            HRReportingPeriodDatesFactory,
+                            IPDisaggregationFactory, IPPRPRoleFactory,
                             LocationFactory,
                             LocationWithReportableLocationGoalFactory,
-                            PartnerUserFactory, PartnerFactory,
+                            LowerLevelOutputFactory, NonPartnerUserFactory,
+                            PartnerFactory, PartnerProjectFactory,
+                            PartnerUserFactory, PDResultLinkFactory,
+                            PersonFactory, ProgrammeDocumentFactory,
+                            ProgressReportAttachmentFactory,
                             ProgressReportFactory,
-                            QuantityReportableToLowerLevelOutputFactory,
-                            QuantityTypeIndicatorBlueprintFactory,
-                            WorkspaceFactory,
-                            SectionFactory,
-                            PersonFactory,
-                            IPDisaggregationFactory,
-                            ProgrammeDocumentFactory,
+                            ProgressReportIndicatorReportFactory,
                             QPRReportingPeriodDatesFactory,
-                            HRReportingPeriodDatesFactory,
-                            PDResultLinkFactory,
-                            LowerLevelOutputFactory,
-                            ClusterPRPRoleFactory,
-                            ResponsePlanFactory,
-                            ClusterFactory,
-                            NonPartnerUserFactory,
-                            ClusterObjectiveFactory,
-                            ClusterActivityFactory,
-                            PartnerProjectFactory,
-                            ClusterActivityPartnerActivityFactory,
+                            QuantityReportableToLowerLevelOutputFactory,
                             QuantityReportableToPartnerActivityFactory,
-                            ClusterIndicatorReportFactory)
-from core.tests.base import BaseAPITestCase
+                            QuantityTypeIndicatorBlueprintFactory,
+                            ResponsePlanFactory, SectionFactory,
+                            WorkspaceFactory)
+from core.management.commands._generate_disaggregation_fake_data import \
+    generate_3_num_disagg_data
 from core.models import Location
+from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import (
-    IndicatorReport,
-    IndicatorBlueprint,
-    IndicatorLocationData,
-)
-from unicef.models import ProgressReport
+from indicator.models import (IndicatorBlueprint, IndicatorLocationData,
+                              IndicatorReport)
+from unicef.models import ProgressReport, ProgressReportAttachment
 
 
 class TestProgrammeDocumentListAPIView(BaseAPITestCase):
@@ -131,7 +118,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
         for idx in range(2):
             qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -143,9 +130,14 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
         for idx in range(6):
             hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -155,6 +147,11 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
                 programme_document=self.pd,
                 submitted_by=self.user,
                 submitting_user=self.user,
+            )
+
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
             )
 
         self.cp_output = PDResultLinkFactory(
@@ -233,6 +230,11 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
         # Logging in as Partner AO
         self.client.force_authenticate(self.partner_user)
+
+    def tearDown(self):
+        for attachment in ProgressReportAttachment.objects.all():
+            attachment.file.delete()
+            attachment.delete()
 
     def test_list_api(self):
         url = reverse(
@@ -370,7 +372,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         for idx in range(2):
             qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -382,9 +384,14 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
         for idx in range(6):
             hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -394,6 +401,11 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
                 programme_document=self.pd,
                 submitted_by=self.user,
                 submitting_user=self.user,
+            )
+
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
             )
 
         self.cp_output = PDResultLinkFactory(
@@ -472,6 +484,11 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         # Logging in as Partner AO
         self.client.force_authenticate(self.partner_user)
+
+    def tearDown(self):
+        for attachment in ProgressReportAttachment.objects.all():
+            attachment.file.delete()
+            attachment.delete()
 
     def test_detail_api(self):
         url = reverse(
@@ -564,7 +581,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
         for idx in range(2):
             qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -576,9 +593,14 @@ class TestProgressReportAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
         for idx in range(6):
             hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            pr = ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -588,6 +610,11 @@ class TestProgressReportAPIView(BaseAPITestCase):
                 programme_document=self.pd,
                 submitted_by=self.user,
                 submitting_user=self.user,
+            )
+
+            ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
             )
 
         self.cp_output = PDResultLinkFactory(
@@ -669,6 +696,11 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
         self.location_id = self.loc1.id
         self.queryset = self.get_queryset()
+
+    def tearDown(self):
+        for attachment in ProgressReportAttachment.objects.all():
+            attachment.file.delete()
+            attachment.delete()
 
     def get_queryset(self):
         pd_ids = Location.objects.filter(
