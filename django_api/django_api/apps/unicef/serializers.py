@@ -1,8 +1,6 @@
 from django.conf import settings
-from django.db import transaction
 
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.serializers import ShortLocationSerializer
 from utils.filters.constants import Boolean
