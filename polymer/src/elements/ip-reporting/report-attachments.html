@@ -37,7 +37,21 @@
 
     <etools-file
         files="{{files}}"
-        label="Attachment"
+        label="FACE Attachment"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+    <etools-file
+        files="{{files}}"
+        label="Other Attachment #1"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+    <etools-file
+        files="{{files}}"
+        label="Other Attachment #2"
         disabled="[[pending]]"
         readonly="[[readonly]]"
         use-delete-events>
