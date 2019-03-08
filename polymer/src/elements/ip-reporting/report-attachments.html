@@ -36,7 +36,7 @@
     </etools-prp-ajax>
 
     <etools-file
-        files="{{files}}"
+        files="{{faceFiles}}"
         label="FACE Form"
         disabled="[[pending]]"
         readonly="[[readonly]]"
@@ -44,7 +44,7 @@
     </etools-file>
 
     <etools-file
-        files="{{files}}"
+        files="{{otherFilesOne}}"
         label="Other Attachment #1"
         disabled="[[pending]]"
         readonly="[[readonly]]"
@@ -52,7 +52,7 @@
     </etools-file>
 
     <etools-file
-        files="{{files}}"
+        files="{{otherFilesTwo}}"
         label="Other Attachment #2"
         disabled="[[pending]]"
         readonly="[[readonly]]"
@@ -75,7 +75,9 @@
       },
 
       properties: {
-        files: Array,
+        faceFiles: Array,
+        otherFilesOne: Array,
+        otherFilesTwo: Array,
         readonly: Boolean,
 
         pending: {
