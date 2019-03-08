@@ -69,7 +69,7 @@ def process_period_reports():
             ):
                 logger.info("Processing Reportable {}".format(reportable))
 
-                if reportable.locations.count() == 0:
+                if reportable.reportablelocationgoal_set.count() == 0:
                     continue
 
                 frequency = reportable.frequency
@@ -145,14 +145,14 @@ def process_period_reports():
                                 reporting_entity=ReportingEntity.objects.get(title="Cluster"),
                             )
 
-                            for location in reportable.locations.all():
+                            for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
                                 logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                                     indicator_report, start_date, end_date
                                 ))
 
                                 IndicatorLocationData.objects.create(
                                     indicator_report=indicator_report,
-                                    location=location,
+                                    location=location_goal.location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
@@ -180,14 +180,14 @@ def process_period_reports():
                                 reporting_entity=ReportingEntity.objects.get(title="Cluster"),
                             )
 
-                            for location in reportable.locations.all():
+                            for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
                                 logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                                     indicator_report, start_date, end_date
                                 ))
 
                                 IndicatorLocationData.objects.create(
                                     indicator_report=indicator_report,
-                                    location=location,
+                                    location=location_goal.location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
@@ -312,13 +312,13 @@ def process_period_reports():
                             reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
                         )
 
-                        for location in reportable.locations.all():
+                        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
                             logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
                                 indicator_report, start_date, end_date
                             ))
                             IndicatorLocationData.objects.create(
                                 indicator_report=indicator_report,
-                                location=location,
+                                location=location_goal.location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
@@ -345,13 +345,13 @@ def process_period_reports():
                             reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
                         )
 
-                        for location in reportable.locations.all():
+                        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
                             logger.info("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
                                 indicator_report, start_date, end_date
                             ))
                             IndicatorLocationData.objects.create(
                                 indicator_report=indicator_report,
-                                location=location,
+                                location=location_goal.location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
