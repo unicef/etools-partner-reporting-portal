@@ -12,7 +12,7 @@ import unicef.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('unicef', '0006_auto_20181204_0013'),
+        ('unicef', '0007_auto_20190311_1900'),
     ]
 
     operations = [

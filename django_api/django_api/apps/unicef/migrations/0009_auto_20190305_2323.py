@@ -50,7 +50,7 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('unicef', '0007_progressreportattachment'),
+        ('unicef', '0008_progressreportattachment'),
     ]
 
     operations = [
