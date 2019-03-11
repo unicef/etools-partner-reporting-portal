@@ -511,7 +511,7 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
 
     class Meta:
         unique_together = (
-            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'programme_document')
+            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'report_type', 'programme_document')
         )
 
 
