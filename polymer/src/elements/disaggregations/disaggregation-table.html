@@ -352,7 +352,11 @@
             break;
 
           default:
-            // noop
+            // For zero disaggregated data reporting, re-assign updated component totals
+            // with local copy of totals.
+            // Otherwise component totals get overwritten
+            // by undefined local copy of totals
+            totals = this.get(['totals']);
             break;
         }
 
