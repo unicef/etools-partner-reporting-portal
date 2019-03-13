@@ -36,26 +36,11 @@
     </etools-prp-ajax>
 
     <etools-file
-        files="{{faceFiles}}"
-        label="FACE Form"
+        files="{{files}}"
+        label="Attachments"
         disabled="[[pending]]"
         readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
-
-    <etools-file
-        files="{{otherFilesOne}}"
-        label="Other Attachment #1"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
-
-    <etools-file
-        files="{{otherFilesTwo}}"
-        label="Other Attachment #2"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
+        multiple
         use-delete-events>
     </etools-file>
   </template>
@@ -75,9 +60,7 @@
       },
 
       properties: {
-        faceFiles: Array,
-        otherFilesOne: Array,
-        otherFilesTwo: Array,
+        files: Array,
         readonly: Boolean,
 
         pending: {
@@ -85,7 +68,7 @@
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.pending,
         },
 
-        attachment: {
+        attachments: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
           observer: '_setFiles',
@@ -136,12 +119,17 @@
             });
       },
 
-      _setFiles: function (attachment) {
-        if (attachment && !attachment.path) {
-          return;
-        }
+      _setFiles: function (attachments) {
+        attachments.forEach(attachment => {
+          if(attachment && !attachment.path) return;
+        })
+        this.set('files', attachments.filter(Boolean));
+        // if (attachment && !attachment.path) {
+        //   return;
+        // }
 
-        this.set('files', [attachment].filter(Boolean));
+        // this.set('files', [attachment].filter(Boolean));
+        // console.log(files)
       },
 
       _filesChanged: function (change) {
