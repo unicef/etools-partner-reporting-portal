@@ -504,6 +504,11 @@ class ReportableReportingFrequencyIdSerializer(serializers.Serializer):
     )
 
 
+class ReportRefreshSerializer(serializers.Serializer):
+    report_id = serializers.IntegerField(min_value=1)
+    report_type = serializers.ChoiceField(choices=['PR', 'IR'])
+
+
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = LocationSerializer(read_only=True)
