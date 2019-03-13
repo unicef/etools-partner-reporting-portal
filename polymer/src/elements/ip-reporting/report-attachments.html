@@ -36,11 +36,26 @@
     </etools-prp-ajax>
 
     <etools-file
-        files="{{files}}"
-        label="Attachments"
+        files="{{faceFile}}"
+        label="FACE File"
         disabled="[[pending]]"
         readonly="[[readonly]]"
-        multiple
+        use-delete-events>
+    </etools-file>
+
+    <etools-file
+        files="{{otherOne}}"
+        label="Other #1"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+
+    <etools-file
+        files="{{otherTwo}}"
+        label="Other #2"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
         use-delete-events>
     </etools-file>
   </template>
@@ -60,7 +75,9 @@
       },
 
       properties: {
-        files: Array,
+        faceFile: Object,
+        otherOne: Object,
+        otherTwo: Object,
         readonly: Boolean,
 
         pending: {
@@ -69,7 +86,7 @@
         },
 
         attachments: {
-          type: Object,
+          type: Array,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
           observer: '_setFiles',
         },
@@ -95,7 +112,7 @@
       ],
 
       _computeAttachmentsUrl: function (locationId, reportId) {
-        return App.Endpoints.progressReportAttachment(locationId, reportId);
+        return App.Endpoints.progressReportAttachments(locationId, reportId);
       },
 
       _onDeleteFile: function (e) {
@@ -120,16 +137,17 @@
       },
 
       _setFiles: function (attachments) {
+        console.log(attachments)
         attachments.forEach(attachment => {
-          if(attachment && !attachment.path) return;
-        })
-        this.set('files', attachments.filter(Boolean));
-        // if (attachment && !attachment.path) {
-        //   return;
-        // }
 
-        // this.set('files', [attachment].filter(Boolean));
-        // console.log(files)
+          if(attachment && !attachment.path) return;
+
+          if(attachment.type === 'FACE') this.set('faceFile', [attachment].filter(Boolean));
+
+          if(attachment.type === 'Other') {
+            this.otherOne.length === 0 ? this.set('otherOne', [attachment].filter(Boolean)) : this.set('otherTwo', [attachment].filter(Boolean));
+          };
+        });
       },
 
       _filesChanged: function (change) {
