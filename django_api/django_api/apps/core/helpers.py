@@ -14,8 +14,6 @@ from core.common import (
     PD_FREQUENCY_LEVEL,
 )
 
-from unicef.models import ProgressReport
-
 logger = logging.getLogger("django")
 
 
@@ -383,6 +381,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
         - Newly generated ProgressReport & 3 datetime objects
     """
+    from unicef.models import ProgressReport
 
     end_date = reporting_period.end_date
     due_date = reporting_period.due_date
@@ -510,6 +509,8 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
         IndicatorReport,
         Reportable,
     )
+
+    from unicef.models import ProgressReport
 
     if next_progress_report.report_type != "SR":
         if next_progress_report.report_type == "QPR":
