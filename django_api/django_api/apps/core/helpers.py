@@ -14,13 +14,6 @@ from core.common import (
     PD_FREQUENCY_LEVEL,
 )
 
-from indicator.models import (
-    IndicatorBlueprint,
-    IndicatorReport,
-    IndicatorLocationData,
-    ReportingEntity,
-    Reportable,
-)
 from unicef.models import ProgressReport
 
 logger = logging.getLogger("django")
@@ -425,6 +418,13 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
 
 
 def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, end_date, due_date):
+    from indicator.models import (
+        IndicatorBlueprint,
+        IndicatorReport,
+        IndicatorLocationData,
+        ReportingEntity,
+    )
+
     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
         logger.info("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
         indicator_report = IndicatorReport.objects.create(
@@ -506,6 +506,10 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
         end_date {datetime.datetime} -- End date for reporting
         due_date {datetime.datetime} -- due date for reporting
     """
+    from indicator.models import (
+        IndicatorReport,
+        Reportable,
+    )
 
     if next_progress_report.report_type != "SR":
         if next_progress_report.report_type == "QPR":
