@@ -70,7 +70,7 @@ from .models import (
     Disaggregation,
     ReportableLocationGoal
 )
-from .utilities import delete_all_ilds_for_ir, delete_all_irs_for_pr
+from .utilities import reset_indicator_report_data, reset_progress_report_data
 from functools import reduce
 
 logger = logging.getLogger(__name__)
@@ -852,10 +852,13 @@ class ReportRefreshAPIView(APIView):
 
         if serializer.validated_data['report_type'] == 'PR':
             report = get_object_or_404(ProgressReport, id=serializer.validated_data['report_id'])
+            reset_progress_report_data(report)
         else:
             report = get_object_or_404(IndicatorReport, id=serializer.validated_data['report_id'])
 
             if report.progress_report:
                 raise ValidationError("This indicator report is linked to a progress report. Use the progress report ID instead.")
+
+            reset_indicator_report_data(report)
 
         return Response({"response": "OK"}, status=status.HTTP_200_OK)

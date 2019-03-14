@@ -23,7 +23,7 @@ from indicator.models import (
 )
 from unicef.models import ProgressReport
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django")
 
 
 @contextmanager

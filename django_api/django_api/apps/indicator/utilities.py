@@ -1,8 +1,16 @@
 from babel.numbers import format_number, format_percent
+
 from django.utils.translation import to_locale, get_language
+from django.db import transaction
+
+from core.helpers import (
+    create_ir_and_ilds_for_pr,
+)
 
 from indicator.constants import ValueType
-from indicator.models import IndicatorLocationData, IndicatorReport
+from indicator.models import (
+    IndicatorLocationData,
+)
 
 
 def format_total_value_to_string(total, is_percentage=False):
@@ -55,32 +63,19 @@ def reset_progress_report_data(progress_report):
         progress_report {ProgressReport} -- ProgressReport instance to delete its indicator reports from
     """
 
-    for ir in progress_report.indicator_reports.all():
-        reportable = ir.reportable
-        time_period_start = ir.time_period_start
-        time_period_end = ir.time_period_end
-        due_date = ir.due_date
-        title = ir.title
-        total = {'c': 0, 'd': 0, 'v': 0}
-        overall_status = "NoS"
-        report_status = "Due"
-        submission_date = None
-        reporting_entity = ir.reporting_entity
+    # Delete all current indicator reports and their indicator location data will be deleted in cascade
+    progress_report.indicator_reports.all().delete()
 
-        # Delete current indicator report and its indicator location data will be deleted in cascade
-        ir.delete()
+    pd = progress_report.programme_document
 
-        indicator_report = IndicatorReport.objects.create(
-            reportable=reportable,
-            time_period_start=time_period_start,
-            time_period_end=time_period_end,
-            due_date=due_date,
-            title=title,
-            total=total,
-            overall_status=overall_status,
-            report_status=report_status,
-            submission_date=submission_date,
-            reporting_entity=reporting_entity,
+    # Get Active LLO indicators only
+    reportable_queryset = pd.reportable_queryset.filter(active=True)
+
+    with transaction.atomic():
+        create_ir_and_ilds_for_pr(
+            reportable_queryset,
+            progress_report,
+            progress_report.start_date,
+            progress_report.end_date,
+            progress_report.due_date
         )
-
-        reset_indicator_report_data(indicator_report)
