@@ -417,6 +417,22 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
 
 
 def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, end_date, due_date):
+    """Create an IndicatorReport instance for ProgressReport instance later to attach.
+    If PartnerActivity IndicatorReport is present, the new IndicatorReport instance will associate
+    it as parent IndicatorReport instance, enabling dual-reporting feature.
+
+    Arguments:
+        pd {ProgrammeDocument} -- ProgrammeDocument instance for logger
+        reportable {Reportable} -- Reportable instance to associate with new IndicatorReport instance
+        pai_ir_for_period {IndicatorReport} -- An optional IndicatorReport instance from PartnerActivity Reportable
+        start_date {datetime.date} -- Date object as report start date
+        end_date {datetime.date} -- Date object as report end date
+        due_date {datetime.date} -- Date object as report due date
+
+    Returns:
+        IndicatorReport -- A newly created IndicatorReport instance
+    """
+
     from indicator.models import (
         IndicatorBlueprint,
         IndicatorReport,
@@ -497,6 +513,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
     """
     Create a set of new IndicatorReports and IndicatorLocationData instances per
     IndicatorReport instance, with passed-in new dates and new ProgressReport instance
+
     Arguments:
         pd {ProgrammeDocument} -- ProgrammeDocument instnace
         reportable_queryset {django.Queryset[Reportable]} -- Reportable queryset on LLO
