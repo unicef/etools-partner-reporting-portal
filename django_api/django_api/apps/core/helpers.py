@@ -527,6 +527,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
 
         for reportable in queryset:
             indicator_report = create_pr_ir_for_reportable(
+                pd,
                 reportable,
                 None,
                 start_date,
@@ -575,6 +576,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
 
                         if pai_ir_for_period:
                             indicator_report = create_pr_ir_for_reportable(
+                                pd,
                                 reportable,
                                 pai_ir_for_period,
                                 pai_ir_for_period.time_period_start,
