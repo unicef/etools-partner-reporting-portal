@@ -73,6 +73,7 @@ def reset_progress_report_data(progress_report):
 
     with transaction.atomic():
         create_ir_and_ilds_for_pr(
+            pd,
             reportable_queryset,
             progress_report,
             progress_report.start_date,

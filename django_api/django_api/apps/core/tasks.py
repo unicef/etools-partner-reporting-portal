@@ -244,10 +244,11 @@ def process_period_reports():
                             continue
 
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
-                            reporting_period, generate_from_date_qpr
+                            pd, idx, reporting_period, generate_from_date_qpr
                         )
 
                         create_ir_and_ilds_for_pr(
+                            pd,
                             reportable_queryset,
                             next_progress_report,
                             start_date,
@@ -275,10 +276,11 @@ def process_period_reports():
                             continue
 
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
-                            reporting_period, generate_from_date_hr
+                            pd, idx, reporting_period, generate_from_date_hr
                         )
 
                         create_ir_and_ilds_for_pr(
+                            pd,
                             reportable_queryset,
                             next_progress_report,
                             start_date,
@@ -299,10 +301,11 @@ def process_period_reports():
                             continue
 
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
-                            reporting_period, generate_from_date_sr
+                            pd, idx, reporting_period, generate_from_date_sr
                         )
 
                         create_ir_and_ilds_for_pr(
+                            pd,
                             reportable_queryset,
                             next_progress_report,
                             start_date,
