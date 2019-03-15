@@ -36,26 +36,13 @@
     </etools-prp-ajax>
 
     <etools-file
-        files="{{faceFile}}"
-        label="FACE File"
+        files="{{attachments}}"
+        label="Attachments"
+        fileTypes="{{fileTypes}}"
         disabled="[[pending]]"
         readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
-
-    <etools-file
-        files="{{otherOne}}"
-        label="Other #1"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
-
-    <etools-file
-        files="{{otherTwo}}"
-        label="Other #2"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
+        multiple
+        activate-file-types
         use-delete-events>
     </etools-file>
   </template>
@@ -75,17 +62,19 @@
       },
 
       properties: {
-        faceFile: Object,
-        otherOne: Object,
-        otherTwo: Object,
         readonly: Boolean,
+
+        fileTypes: {
+          type: Array,
+          computed: '_computeFileTypesArray()'
+        },
 
         pending: {
           type: Boolean,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.pending,
         },
 
-        attachments: {
+        attachments: {  
           type: Array,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
           observer: '_setFiles',
@@ -93,12 +82,11 @@
 
         attachmentsListUrl: {
           type: String,
-          computed: '_computeAttachmentsUrl(locationId, reportId)',
+          computed: '_computeListUrl(locationId, reportId)',
         },
 
         attachmentDeleteUrl: {
-          type: String,
-          computed: '_computeAttachmentsUrl(locationId, reportId)',
+          type: String
         },
 
         locationId: {
@@ -116,18 +104,28 @@
         '_filesChanged(files.*)',
       ],
 
-      _computeAttachmentsUrl: function (locationId, reportId) {
+      _computeFileTypesArray: function () {
+        return ['FACE', 'Other'];
+      },
+
+      _computeListUrl: function (locationId, reportId) {
         return App.Endpoints.progressReportAttachments(locationId, reportId);
+      },
+
+      _getDeleteUrl: function (locationId, reportId, attachmentId) {
+        return App.Endpoints.progressReportAttachmentDetail(locationId, reportId, attachmentId);
       },
 
       _onDeleteFile: function (e) {
         var self = this;
         var deleteThunk;
+        var deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
+
+        this.set('attachmentDeleteUrl', deleteUrl);
 
         e.stopPropagation();
 
         deleteThunk = this.$.delete.thunk();
-        console.log(deleteThunk);
 
         this.$.delete.abort();
 
@@ -136,6 +134,7 @@
         )
             .then(function () {
               self._notifyFileDeleted();
+              this.set('attachmentDeleteUrl', undefined);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -143,9 +142,7 @@
       },
 
       _setFiles: function (attachments) {
-        console.log(attachments)
         attachments.forEach(attachment => {
-
           if(attachment && !attachment.path) return;
 
           if(attachment.type === 'FACE') this.set('faceFile', [attachment].filter(Boolean));
