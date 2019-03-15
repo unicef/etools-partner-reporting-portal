@@ -837,9 +837,14 @@ class ReportableReportingFrequencyListAPIView(APIView):
 class ReportRefreshAPIView(APIView):
 
     permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace),
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_editor,
+        ),
     )
 
     @transaction.atomic
