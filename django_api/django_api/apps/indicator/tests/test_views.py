@@ -2071,3 +2071,40 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             "This indicator report is linked to a progress report. Use the progress report ID instead.",
             response.data['non_field_errors'][0]
         )
+
+    def test_progress_report_reset(self):
+        url = reverse('report-refresh-api')
+        data = {"report_type": "PR", "report_id": self.progress_report.id}
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['response'], "OK")
+
+        # All indicator reports should be blank state
+        for ir in self.progress_report.indicator_reports.all():
+            self.assertEquals(ir.total['c'], 0)
+            self.assertEquals(ir.overall_status, "NoS")
+            self.assertEquals(ir.report_status, "Due")
+            self.assertEquals(ir.submission_date, None)
+
+    def test_cluster_indicator_report_reset(self):
+        ir = self.partneractivity_reportable.indicator_reports.first()
+        url = reverse('report-refresh-api')
+        data = {"report_type": "IR", "report_id": ir.id}
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['response'], "OK")
+
+        ir = IndicatorReport.objects.get(id=ir.id)
+
+        # All indicator report information should be initial state
+        self.assertEquals(ir.submission_date, None)
+        self.assertEquals(ir.overall_status, "NoS")
+        self.assertEquals(ir.report_status, "Due")
+        self.assertEquals(ir.total['c'], 0)
+
+        for ild in ir.indicator_location_data.all():
+            self.assertEquals(ild.disaggregation['()']['c'], 0)
+            self.assertEquals(ild.disaggregation['()']['d'], 0)
+            self.assertEquals(ild.disaggregation['()']['v'], 0)
