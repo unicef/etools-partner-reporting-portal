@@ -295,6 +295,10 @@
         return this.progressReports(locationId) + reportId + '/attachments/';
       },
 
+      progressReportAttachmentDetail: function (locationId, reportId, attachmentId) {
+        return this.progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
+      },
+
       analysisOperationalPresence: function (responsePlanId, type) {
         return this._buildUrl(
           '/cluster/cluster-analysis/' + responsePlanId + '/operational-presence/' + type

@@ -26,13 +26,13 @@
     <etools-prp-ajax
         id="download"
         method="get"
-        url="[[attachmentsUrl]]">
+        url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
         id="delete"
         method="delete"
-        url="[[attachmentsUrl]]">
+        url="[[attachmentDeleteUrl]]">
     </etools-prp-ajax>
 
     <etools-file
@@ -91,7 +91,12 @@
           observer: '_setFiles',
         },
 
-        attachmentsUrl: {
+        attachmentsListUrl: {
+          type: String,
+          computed: '_computeAttachmentsUrl(locationId, reportId)',
+        },
+
+        attachmentDeleteUrl: {
           type: String,
           computed: '_computeAttachmentsUrl(locationId, reportId)',
         },
@@ -122,6 +127,7 @@
         e.stopPropagation();
 
         deleteThunk = this.$.delete.thunk();
+        console.log(deleteThunk);
 
         this.$.delete.abort();
 
