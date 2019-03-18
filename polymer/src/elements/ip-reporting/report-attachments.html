@@ -170,11 +170,6 @@
           };
         });
 
-        // Loop through and find the file that null raw
-        // if path null and raw undefined, use that file and exit loop
-        // if replacing existing file, if path is defined and has a raw, that's the one to replace
-        // create file and pass down to debounce
-
         this.debounce('files-changed', function () {
           var self = this;
           var uploadThunk;
