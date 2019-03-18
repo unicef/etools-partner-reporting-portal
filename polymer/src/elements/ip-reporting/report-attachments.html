@@ -19,8 +19,8 @@
 
     <etools-prp-ajax
         id="upload"
-        method="put"
-        url="[[attachmentsUrl]]">
+        method="post"
+        url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -161,13 +161,11 @@
       },
 
       _filesChanged: function (change) {
-        console.log('hellooooooo');
-        console.log(change);
-
         var files = [];
 
         change.base.forEach(function(attachment) {
           if(!attachment.path) {
+            attachment.type = 'Other';
             files.push(attachment);
           };
         });
@@ -178,7 +176,6 @@
         // create file and pass down to debounce
 
         this.debounce('files-changed', function () {
-          var file = this.files[0];
           var self = this;
           var uploadThunk;
           var data;
@@ -193,11 +190,10 @@
 
           data = new FormData();
 
-          if (files.length) {
-            files.forEach(function(file) {
-              data.append('path', file.raw, file.file_name);
-            })
-          }
+          files.forEach(function(file) {
+            data.append('path', file.raw, file.file_name);
+            data.append('type', file.type);
+          });
 
           this.$.upload.body = data;
 
@@ -208,6 +204,7 @@
                 self._notifyFileUploaded();
               })
               .catch(function (err) { // jshint ignore:line
+                console.log(err);
                 // TODO: error handling
               });
         });
