@@ -106,6 +106,14 @@
         method="post">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="refreshReport"
+        url="[[refreshUrl]]"
+        body="[[refreshData]]"
+        method="post"
+        content-type="application/json">
+    </etools-prp-ajax>
+
     <page-header
         title="[[headingPrefix]]"
         back="[[backLink]]">
@@ -116,7 +124,7 @@
 
       <pd-reports-report-title
         class="above-title"
-        report=[[currentReport]]>
+        report="[[currentReport]]">
       </pd-reports-report-title>
 
       <a
@@ -143,6 +151,19 @@
             if="[[_canExport(currentReport, mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[canRefresh]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_refresh"
+              disabled="[[busy]]"
+              raised>
+            Refresh
+          </paper-button>
         </template>
 
         <template
@@ -302,6 +323,11 @@
           statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(currentReport.id)',
+        },
+
         headingPrefix: {
           type: String,
           computed: '_computeHeadingPrefix(mode)',
@@ -318,6 +344,12 @@
           computed: '_computeCanSubmit(mode, currentReport, permissions)',
         },
 
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(mode, currentReport, permissions)',
+        },
+
         submittedOnBehalf: {
           type: Boolean,
           computed: '_computeSubmittedOnBehalf(currentReport)',
@@ -326,6 +358,13 @@
         submitUrl: {
           type: String,
           computed: '_computeSubmitUrl(locationId, currentReport.id, currentReport.report_type)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
         },
 
         busy: {
@@ -353,6 +392,10 @@
           default:
             return App.Endpoints.programmeDocumentReportSubmit(locationId, reportId);
         }
+      },
+
+      _computeRefreshData: function (reportId) {
+        return {"report_id": reportId, "report_type": "PR"};
       },
 
       _onReportChanged: function (reportId, mode) {
@@ -431,6 +474,21 @@
         }
       },
 
+      _computeCanRefresh: function (mode, report, permissions) {
+        switch (true) {
+          case mode === 'view':
+          case report.programme_document &&
+            (report.programme_document.status === 'Sig'
+            || report.programme_document.status === 'Clo'):
+          case report.programme_document && report.report_type === 'SR':
+          case !permissions.editProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
       _computeSubmittedOnBehalf: function(currentReport) {
         return currentReport.submitted_by !== currentReport.submitting_user;
       },
@@ -475,6 +533,23 @@
                 return self.$.officer.open();
               }
               return self.$.error.open(res.data.non_field_errors);
+            });
+      },
+
+      _refresh: function () {
+        var self = this;
+
+        this.set('busy', true);
+
+        var refreshThunk = this.$.refreshReport.thunk();
+
+        refreshThunk()
+            .then(function (res) {
+              window.location.reload();
+            })
+            .catch(function (res) {
+              console.log(res);
+              self.set('busy', false);
             });
       },
 

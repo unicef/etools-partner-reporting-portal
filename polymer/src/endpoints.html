@@ -73,6 +73,10 @@
         return this.programmeDocumentReportSubmit(workspaceId, reportId) + 'sr/';
       },
 
+      reportProgressReset: function () {
+        return this._buildUrl('/indicator/report-refresh/');
+      },
+
       programmeDocumentReportUpdate: function (workspaceId, reportId) {
         return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
       },
