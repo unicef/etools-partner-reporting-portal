@@ -15,12 +15,10 @@
 
           return attachmentsThunk()
               .then(function (res) {
-                console.log('RESPONSE', res);
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
                 dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
               })
               .catch(function (err) {
-                console.log('ERRORRRRR', err)
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
 
                 return Promise.reject(err);

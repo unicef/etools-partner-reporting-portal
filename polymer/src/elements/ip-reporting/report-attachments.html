@@ -200,13 +200,13 @@
           this.dispatch(
             App.Actions.PDReportsAttachments.sync(uploadThunk, this.reportId)
           )
-              .then(function () {
-                self._notifyFileUploaded();
-              })
-              .catch(function (err) { // jshint ignore:line
-                console.log(err);
-                // TODO: error handling
-              });
+            .then(function () {
+              self._notifyFileUploaded();
+            })
+            .catch(function (err) { // jshint ignore:line
+              console.log(err);
+              // TODO: error handling
+            });
         });
       },
 
