@@ -27,6 +27,7 @@
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../elements/ip-reporting/authorized-officer-modal.html">
+<link rel="import" href="../../../../elements/refresh-report-modal.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="pd-report-sr.html">
@@ -257,6 +258,12 @@
     <pd-modal id="pdDetails"></pd-modal>
 
     <error-modal id="error"></error-modal>
+
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
 
     <authorized-officer-modal
         id="officer"
@@ -537,20 +544,7 @@
       },
 
       _refresh: function () {
-        var self = this;
-
-        this.set('busy', true);
-
-        var refreshThunk = this.$.refreshReport.thunk();
-
-        refreshThunk()
-            .then(function (res) {
-              window.location.reload();
-            })
-            .catch(function (res) {
-              console.log(res);
-              self.set('busy', false);
-            });
+        this.$.refresh.open();
       },
 
       detached: function () {
@@ -561,6 +555,7 @@
         this.$.report.abort();
         this.$.error.close();
         this.$.officer.close();
+        this.$.refresh.close();
       },
     });
   </script>
