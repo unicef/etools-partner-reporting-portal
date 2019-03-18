@@ -22,6 +22,7 @@
 <link rel="import" href="send-back-modal.html">
 <link rel="import" href="feedback-modal.html">
 <link rel="import" href="../error-modal.html">
+<link rel="import" href="../refresh-report-modal.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-number.html">
@@ -342,6 +343,18 @@
             </template>
             <div class="column layout horizontal center-center flex-none">
               <template
+                  is="dom-if"
+                  if="[[canRefresh]]"
+                  restamp="true">
+                <paper-button
+                    class="btn-primary"
+                    on-tap="_refresh"
+                    disabled="[[busy]]"
+                    raised>
+                  Refresh
+                </paper-button>
+              </template>
+              <template
                 is="dom-if"
                 if="[[!_equals(submitMode, 'view')]]"
                 restamp="true">
@@ -527,6 +540,11 @@
     </div>
 
     <error-modal id="error"></error-modal>
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
   </template>
 
   <script>
@@ -555,6 +573,24 @@
         busy: {
           type: Boolean,
           value: false,
+        },
+
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(data.id)',
+        },
+
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(data, busy)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
         },
 
         responsePlanId: {
@@ -646,6 +682,18 @@
 
       _computeCanSubmit: function (data, busy) {
         return data.can_submit && !busy;
+      },
+
+      _computeRefreshData: function (reportId) {
+          return {"report_id": reportId, "report_type": "IR"};
+        },
+
+      _computeCanRefresh: function (data, busy) {
+        return data.can_submit && !busy;
+      },
+
+      _refresh: function () {
+        this.$.refresh.open();
       },
 
       _computeClusterObjectiveDetailUrl: function (baseUrl, coId) {
@@ -864,6 +912,7 @@
         this.$.submit.abort();
         this.$.error.close();
         this.$.update.abort();
+        this.$.refresh.close();
       },
     });
   </script>
