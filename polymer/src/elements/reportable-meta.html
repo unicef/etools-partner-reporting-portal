@@ -7,11 +7,13 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="labelled-item.html">
+<link rel="import" href="refresh-report-modal.html">
 <link rel="import" href="../behaviors/progressReportUtils.html">
+<link rel="import" href="../styles/buttons.html">
 
 <dom-module id="reportable-meta">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
       }
@@ -32,7 +34,25 @@
         position: relative;
         top: -2px;
       }
+
+      #refresh-button {
+        margin-block-end: 1rem;
+      }
     </style>
+
+    <template
+      is="dom-if"
+      if="[[canRefresh]]"
+      restamp="true">
+      <paper-button
+        id="refresh-button"
+        class="btn-primary"
+        on-tap="_refresh"
+        disabled="[[busy]]"
+        raised>
+        Refresh
+      </paper-button>
+    </template>
 
     <labelled-item label="Overall status">
       <template
@@ -92,6 +112,11 @@
         [[data.narrative_assessment]]
       </template>
     </labelled-item>
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
   </template>
 
   <script>
@@ -115,10 +140,34 @@
           reflectToAttribute: true,
         },
 
+        isCluster: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
+
         completed: {
           type: Boolean,
           value: false,
           reflectToAttribute: true,
+        },
+
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(data.id)',
+        },
+
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(isCluster, data)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
         },
       },
 
@@ -164,6 +213,18 @@
         }, 2000);
       },
 
+      _computeRefreshData: function (reportId) {
+        return {"report_id": reportId, "report_type": "IR"};
+      },
+
+      _computeCanRefresh: function (isCluster, data) {
+        return isCluster && data.can_submit;
+      },
+
+      _refresh: function () {
+        this.$.refresh.open();
+      },
+
       attached: function () {
         this.set('localData', {});
       },
@@ -172,6 +233,7 @@
         if (this.isDebouncerActive('local-data-changed')) {
           this.cancelDebouncer('local-data-changed');
         }
+        this.$.refresh.close();
       },
     });
   </script>
