@@ -8,6 +8,8 @@
 
     App.Actions = App.Actions || {};
 
+    var test;
+
     App.Actions.PDReportsAttachments = {
       sync: function (attachmentsThunk, reportId) {
         return function (dispatch) {
@@ -15,8 +17,16 @@
 
           return attachmentsThunk()
               .then(function (res) {
-                dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
-                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
+                console.log('RES', res);
+                if(res.status === 204) {
+                  console.log('hello!!!')
+                  dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
+                  dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
+                }
+                else {
+                  dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
+                  dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
+                }
               })
               .catch(function (err) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
@@ -27,11 +37,24 @@
       },
 
       set: function (reportId, data) {
-        return {
-          type: App.Constants.SET_PD_REPORT_ATTACHMENT,
-          reportId: reportId,
-          data: data,
-        };
+        if(!data.length) {
+          console.log('DATA IS AN OBJECT!');
+          console.log('TEST', test);
+          test.push(data);
+          return {
+            type: App.Constants.SET_PD_REPORT_ATTACHMENT,
+            reportId: reportId,
+            data: test
+          };
+        }
+        else {
+          test = data;
+          return {
+            type: App.Constants.SET_PD_REPORT_ATTACHMENT,
+            reportId: reportId,
+            data: data
+          };
+        }
       },
 
       loadingStart: function (reportId) {
