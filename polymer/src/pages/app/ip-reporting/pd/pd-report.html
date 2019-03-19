@@ -27,7 +27,6 @@
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../elements/ip-reporting/authorized-officer-modal.html">
-<link rel="import" href="../../../../elements/refresh-report-modal.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="pd-report-sr.html">
@@ -107,14 +106,6 @@
         method="post">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="refreshReport"
-        url="[[refreshUrl]]"
-        body="[[refreshData]]"
-        method="post"
-        content-type="application/json">
-    </etools-prp-ajax>
-
     <page-header
         title="[[headingPrefix]]"
         back="[[backLink]]">
@@ -152,19 +143,6 @@
             if="[[_canExport(currentReport, mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
-        </template>
-
-        <template
-            is="dom-if"
-            if="[[canRefresh]]"
-            restamp="true">
-          <paper-button
-              class="btn-primary"
-              on-tap="_refresh"
-              disabled="[[busy]]"
-              raised>
-            Refresh
-          </paper-button>
         </template>
 
         <template
@@ -259,12 +237,6 @@
 
     <error-modal id="error"></error-modal>
 
-    <refresh-report-modal
-        id="refresh"
-        data="[[refreshData]]"
-        refresh-url="[[refreshUrl]]">
-    </refresh-report-modal>
-
     <authorized-officer-modal
         id="officer"
         pd-id="[[pdId]]"
@@ -330,11 +302,6 @@
           statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
-        refreshData: {
-          type: Object,
-          computed: '_computeRefreshData(currentReport.id)',
-        },
-
         headingPrefix: {
           type: String,
           computed: '_computeHeadingPrefix(mode)',
@@ -349,12 +316,6 @@
           type: Boolean,
           value: false,
           computed: '_computeCanSubmit(mode, currentReport, permissions)',
-        },
-
-        canRefresh: {
-          type: Boolean,
-          value: false,
-          computed: '_computeCanRefresh(mode, currentReport, permissions)',
         },
 
         submittedOnBehalf: {
@@ -399,10 +360,6 @@
           default:
             return App.Endpoints.programmeDocumentReportSubmit(locationId, reportId);
         }
-      },
-
-      _computeRefreshData: function (reportId) {
-        return {"report_id": reportId, "report_type": "PR"};
       },
 
       _onReportChanged: function (reportId, mode) {
@@ -481,21 +438,6 @@
         }
       },
 
-      _computeCanRefresh: function (mode, report, permissions) {
-        switch (true) {
-          case mode === 'view':
-          case report.programme_document &&
-            (report.programme_document.status === 'Sig'
-            || report.programme_document.status === 'Clo'):
-          case report.programme_document && report.report_type === 'SR':
-          case !permissions.editProgressReport:
-            return false;
-
-          default:
-            return true;
-        }
-      },
-
       _computeSubmittedOnBehalf: function(currentReport) {
         return currentReport.submitted_by !== currentReport.submitting_user;
       },
@@ -543,10 +485,6 @@
             });
       },
 
-      _refresh: function () {
-        this.$.refresh.open();
-      },
-
       detached: function () {
         this._cancelDebouncers([
           'fetch-report',
@@ -555,7 +493,6 @@
         this.$.report.abort();
         this.$.error.close();
         this.$.officer.close();
-        this.$.refresh.close();
       },
     });
   </script>
