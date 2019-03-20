@@ -17,7 +17,6 @@
 
           return attachmentsThunk()
               .then(function (res) {
-                console.log('RES', res);
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
                 dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data, res));
               })

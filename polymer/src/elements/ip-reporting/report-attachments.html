@@ -141,7 +141,6 @@
       },
 
       _setFiles: function (attachments) {
-        console.log('ATTACHMENTS IN SETFILES', attachments)
         this.set('faceAttachment', []);
         this.set('otherOneAttachment', []);
         this.set('otherTwoAttachment', []);
@@ -161,9 +160,7 @@
 
       _onDeleteFile: function (e) {
         var self = this;
-        console.log('** E **', e);
         var deleteThunk;
-        
         var deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
 
         this.set('attachmentDeleteUrl', deleteUrl);
@@ -256,7 +253,6 @@
             .then(function () {
               self._notifyFileUploaded();
               var attachments = self.get('attachments');
-              console.log('ATTACHMENTS', attachments);
 
               attachments.forEach(function(item) {
                 if(attachment.id !== null && item.id === attachment.id) {
@@ -274,8 +270,6 @@
                     return item.file_name.indexOf(tokens[0]) !== -1;
                   }
                 });
-
-                console.log('DUPES', duplicates);
 
                 if(duplicates.length === 1) {
                   self.set(attachmentPropertyName, [duplicates[0]]);
