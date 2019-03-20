@@ -30,7 +30,6 @@
 
       set: function (reportId, data, res) {
         if(res.status === 204) {
-          console.log('204 HEREEEE')
           var resUrl = res.xhr.responseURL.split('/');
           var deletedAttachmentId = resUrl[resUrl.length - 2];
 
