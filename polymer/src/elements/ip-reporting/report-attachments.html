@@ -24,6 +24,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+        id="replace"
+        method="put"
+        url="[[attachmentDeleteUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="download"
         method="get"
         url="[[attachmentsListUrl]]">
@@ -36,16 +42,32 @@
     </etools-prp-ajax>
 
     <etools-file
-        files="{{attachments}}"
-        label="Attachments"
-        file-types="[[fileTypes]]"
+        id="faceAttachmentComponent"
+        files="{{faceAttachment}}"
+        label="FACE"
         disabled="[[pending]]"
         readonly="[[readonly]]"
-        file-model="[[fileModel]]"
-        multiple
-        activate-file-types
         use-delete-events>
     </etools-file>
+
+    <etools-file
+        id="otherOneAttachmentComponent"
+        files="{{otherOneAttachment}}"
+        label="Other #1"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+
+    <etools-file
+        id="otherTwoAttachmentComponent"
+        files="{{otherTwoAttachment}}"
+        label="Other #2"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+
   </template>
 
   <script>
@@ -65,32 +87,16 @@
       properties: {
         readonly: Boolean,
 
-        fileTypes: {
+        faceAttachment: {
           type: Array,
-          value: [
-            {
-              "id": 0,
-              "name": "FACE"
-            },
-            {
-              "id": 1,
-              "name": "Other"
-            }
-          ],
-          notify: true
         },
 
-        fileModel: {
-          type: Object,
-          value: {
-            id: null,
-            file_name: null,
-            path: null,
-            size: null,
-            raw: null,
-            type: null
-          },
-          notify: true
+        otherOneAttachment: {
+          type: Array,
+        },
+
+        otherTwoAttachment: {
+          type: Array,
         },
 
         pending: {
@@ -101,6 +107,7 @@
         attachments: {  
           type: Array,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
+          observer: '_setFiles',
         },
 
         attachmentsListUrl: {
@@ -124,11 +131,28 @@
       },
 
       observers: [
-        '_filesChanged(attachments.*)',
+        '_filesChanged(faceAttachment.*)',
+        '_filesChanged(otherOneAttachment.*)',
+        '_filesChanged(otherTwoAttachment.*)',
       ],
 
       _computeListUrl: function (locationId, reportId) {
         return App.Endpoints.progressReportAttachments(locationId, reportId);
+      },
+
+      _setFiles: function (attachments) {
+        console.log('ATTACHMENTS IN SETFILES', attachments)
+        this.set('faceAttachment', []);
+        this.set('otherOneAttachment', []);
+        this.set('otherTwoAttachment', []);
+
+        attachments.forEach(attachment => {
+          if(attachment && !attachment.path) return;
+          if(attachment.type === 'FACE') this.set('faceAttachment', [attachment]);
+          if(attachment.type === 'Other') {
+            this.get('otherOneAttachment').length === 0 ? this.set('otherOneAttachment', [attachment]) : this.set('otherTwoAttachment', [attachment]);
+          };
+        });
       },
 
       _getDeleteUrl: function (locationId, reportId, attachmentId) {
@@ -137,7 +161,9 @@
 
       _onDeleteFile: function (e) {
         var self = this;
+        console.log('** E **', e);
         var deleteThunk;
+        
         var deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
 
         this.set('attachmentDeleteUrl', deleteUrl);
@@ -153,7 +179,22 @@
         )
             .then(function () {
               self._notifyFileDeleted();
-              this.set('attachmentDeleteUrl', undefined);
+              self.set('attachmentDeleteUrl', undefined);
+
+              if(self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
+                self.$.faceAttachmentComponent.fileInput.value = null;
+                self.$.faceAttachmentComponent.set('files', []);
+              }
+
+              else if(self.get('otherOneAttachment').length !== 0 && e.detail.file.id === self.get('otherOneAttachment')[0].id) {
+                self.$.otherOneAttachmentComponent.fileInput.value = null;
+                self.$.otherOneAttachmentComponent.set('files', []);
+              }
+
+              else if(self.get('otherTwoAttachment').length !== 0 && e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
+                self.$.otherTwoAttachmentComponent.fileInput.value = null;
+                self.$.otherTwoAttachmentComponent.set('files', []);
+              }
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -161,42 +202,98 @@
       },
 
       _filesChanged: function (change) {
-        var files = [];
+        var attachmentPropertyName = change.path.replace('.length', '');
+        var isEmpty = change.value === 0 ? true : false;
+        var attachment = isEmpty ? undefined : change.base[0];
+        var self = this;
 
-        change.base.forEach(function(attachment) {
-          if(!attachment.path) {
-            attachment.type = 'Other';
-            files.push(attachment);
-          };
-        });
+        if(attachment === undefined) {
+          return;
+        }
+
+        var files = isEmpty ? [] : change.base;
+
+        var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
+
+        if(isEmpty || (!isEmpty && attachment.path !== null)) {
+          return;
+        }
 
         this.debounce('files-changed', function () {
-          var self = this;
-          var uploadThunk;
+          var thunk;
           var data;
 
           if (change.path.split('.').length < 2 || !files.length) {
             return;
           }
 
-          uploadThunk = this.$.upload.thunk();
-
-          this.$.upload.abort();
-
           data = new FormData();
 
           files.forEach(function(file) {
             data.append('path', file.raw, file.file_name);
-            data.append('type', file.type);
+            data.append('type', attachmentType);
           });
 
-          this.$.upload.body = data;
+          if(attachment.id === null) {
+            thunk = this.$.upload.thunk();
+            this.$.upload.abort();
+            this.$.upload.body = data;
+          }
+          else {
+            var replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
+            this.set('attachmentDeleteUrl', replaceUrl);
+
+            thunk = this.$.replace.thunk();
+            this.$.replace.abort();
+            this.$.replace.body = data;
+
+            attachmentPropertyName = attachmentPropertyName.split('.')[0];
+          }
 
           this.dispatch(
-            App.Actions.PDReportsAttachments.sync(uploadThunk, this.reportId)
+            App.Actions.PDReportsAttachments.sync(thunk, this.reportId)
           )
             .then(function () {
               self._notifyFileUploaded();
+              var attachments = self.get('attachments');
+              console.log('ATTACHMENTS', attachments);
+
+              attachments.forEach(function(item) {
+                if(attachment.id !== null && item.id === attachment.id) {
+                  self.set(attachmentPropertyName, [item]);
+                  return;
+                }
+              });
+
+              if (attachment.id === null) {
+                var duplicates = attachments.filter(function(item) {
+                  var tokens = attachment.file_name.split('.');
+                  if(tokens.length === 0) {
+                    return item.file_name.indexOf(attachment.file_name) !== -1;
+                  } else {
+                    return item.file_name.indexOf(tokens[0]) !== -1;
+                  }
+                });
+
+                console.log('DUPES', duplicates);
+
+                if(duplicates.length === 1) {
+                  self.set(attachmentPropertyName, [duplicates[0]]);
+                } else {
+                  var correctedItem = undefined;
+
+                  duplicates.forEach(function(item) { 
+                    if(item.file_name !== attachment.file_name) {
+                      correctedItem = item;
+                      return;
+                    }
+                  });
+
+                  self.set(attachmentPropertyName, [correctedItem]);
+                }
+              }
+
+              self.set('attachmentDeleteUrl', undefined);
             })
             .catch(function (err) { // jshint ignore:line
               console.log(err);

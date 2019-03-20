@@ -787,6 +787,7 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
+    # type_id = serializers.SerializerMethodField(read_only=True)
     file_name = serializers.SerializerMethodField()
     path = serializers.FileField(source='file')
 
@@ -795,6 +796,9 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
 
     def get_size(self, obj):
         return obj.file.size if obj.file else None
+    
+    # def get_type_id(self, obj):
+    #     return 0 if obj.type == 'FACE' else 1
 
     def to_representation(self, instance):
         representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
@@ -812,4 +816,5 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
             'size',
             'file_name',
             'type',
+            # 'type_id',
         )

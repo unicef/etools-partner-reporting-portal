@@ -18,15 +18,8 @@
           return attachmentsThunk()
               .then(function (res) {
                 console.log('RES', res);
-                if(res.status === 204) {
-                  console.log('hello!!!')
-                  dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
-                  dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
-                }
-                else {
-                  dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
-                  dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
-                }
+                dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
+                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data, res));
               })
               .catch(function (err) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
@@ -36,19 +29,20 @@
         };
       },
 
-      set: function (reportId, data) {
-        if(!data.length) {
-          console.log('DATA IS AN OBJECT!');
-          console.log('TEST', test);
-          test.push(data);
+      set: function (reportId, data, res) {
+        if(res.status === 204) {
+          console.log('204 HEREEEE')
+          var resUrl = res.xhr.responseURL.split('/');
+          var deletedAttachmentId = resUrl[resUrl.length - 2];
+
           return {
             type: App.Constants.SET_PD_REPORT_ATTACHMENT,
             reportId: reportId,
-            data: test
+            data: {'id': parseInt(deletedAttachmentId, 10), 'action': 'delete'}
           };
         }
+        
         else {
-          test = data;
           return {
             type: App.Constants.SET_PD_REPORT_ATTACHMENT,
             reportId: reportId,
