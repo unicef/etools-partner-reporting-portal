@@ -104,7 +104,7 @@
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.pending,
         },
 
-        attachments: {  
+        attachments: {
           type: Array,
           statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
           observer: '_setFiles',
@@ -145,12 +145,20 @@
         this.set('otherOneAttachment', []);
         this.set('otherTwoAttachment', []);
 
-        attachments.forEach(attachment => {
-          if(attachment && !attachment.path) return;
-          if(attachment.type === 'FACE') this.set('faceAttachment', [attachment]);
-          if(attachment.type === 'Other') {
-            this.get('otherOneAttachment').length === 0 ? this.set('otherOneAttachment', [attachment]) : this.set('otherTwoAttachment', [attachment]);
-          };
+        attachments.forEach(function(attachment) {
+          if (attachment && !attachment.path) {
+            return;
+          }
+          if (attachment.type === 'FACE') {
+            this.set('faceAttachment', [attachment]);
+          }
+          if (attachment.type === 'Other') {
+            if (this.get('otherOneAttachment').length === 0) {
+              this.set('otherOneAttachment', [attachment]);
+             } else {
+               this.set('otherTwoAttachment', [attachment]);
+             }
+          }
         });
       },
 
@@ -178,17 +186,15 @@
               self._notifyFileDeleted();
               self.set('attachmentDeleteUrl', undefined);
 
-              if(self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
+              if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
                 self.$.faceAttachmentComponent.fileInput.value = null;
                 self.$.faceAttachmentComponent.set('files', []);
-              }
-
-              else if(self.get('otherOneAttachment').length !== 0 && e.detail.file.id === self.get('otherOneAttachment')[0].id) {
+              } else if (self.get('otherOneAttachment').length !== 0
+                && e.detail.file.id === self.get('otherOneAttachment')[0].id) {
                 self.$.otherOneAttachmentComponent.fileInput.value = null;
                 self.$.otherOneAttachmentComponent.set('files', []);
-              }
-
-              else if(self.get('otherTwoAttachment').length !== 0 && e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
+              } else if (self.get('otherTwoAttachment').length !== 0
+                && e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
                 self.$.otherTwoAttachmentComponent.fileInput.value = null;
                 self.$.otherTwoAttachmentComponent.set('files', []);
               }
@@ -204,7 +210,7 @@
         var attachment = isEmpty ? undefined : change.base[0];
         var self = this;
 
-        if(attachment === undefined) {
+        if (attachment === undefined) {
           return;
         }
 
@@ -212,7 +218,7 @@
 
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
-        if(isEmpty || (!isEmpty && attachment.path !== null)) {
+        if (isEmpty || (!isEmpty && attachment.path !== null)) {
           return;
         }
 
@@ -231,12 +237,11 @@
             data.append('type', attachmentType);
           });
 
-          if(attachment.id === null) {
+          if (attachment.id === null) {
             thunk = this.$.upload.thunk();
             this.$.upload.abort();
             this.$.upload.body = data;
-          }
-          else {
+          } else {
             var replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
             this.set('attachmentDeleteUrl', replaceUrl);
 
@@ -255,7 +260,7 @@
               var attachments = self.get('attachments');
 
               attachments.forEach(function(item) {
-                if(attachment.id !== null && item.id === attachment.id) {
+                if (attachment.id !== null && item.id === attachment.id) {
                   self.set(attachmentPropertyName, [item]);
                   return;
                 }
@@ -264,20 +269,20 @@
               if (attachment.id === null) {
                 var duplicates = attachments.filter(function(item) {
                   var tokens = attachment.file_name.split('.');
-                  if(tokens.length === 0) {
+                  if (tokens.length === 0) {
                     return item.file_name.indexOf(attachment.file_name) !== -1;
                   } else {
                     return item.file_name.indexOf(tokens[0]) !== -1;
                   }
                 });
 
-                if(duplicates.length === 1) {
+                if (duplicates.length === 1) {
                   self.set(attachmentPropertyName, [duplicates[0]]);
                 } else {
-                  var correctedItem = undefined;
+                  var correctedItem;
 
-                  duplicates.forEach(function(item) { 
-                    if(item.file_name !== attachment.file_name) {
+                  duplicates.forEach(function(item) {
+                    if (item.file_name !== attachment.file_name) {
                       correctedItem = item;
                       return;
                     }

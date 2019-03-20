@@ -8,8 +8,6 @@
 
     App.Actions = App.Actions || {};
 
-    var test;
-
     App.Actions.PDReportsAttachments = {
       sync: function (attachmentsThunk, reportId) {
         return function (dispatch) {
@@ -29,7 +27,7 @@
       },
 
       set: function (reportId, data, res) {
-        if(res.status === 204) {
+        if (res.status === 204) {
           var resUrl = res.xhr.responseURL.split('/');
           var deletedAttachmentId = resUrl[resUrl.length - 2];
 
@@ -38,9 +36,7 @@
             reportId: reportId,
             data: {'id': parseInt(deletedAttachmentId, 10), 'action': 'delete'}
           };
-        }
-        
-        else {
+        } else {
           return {
             type: App.Constants.SET_PD_REPORT_ATTACHMENT,
             reportId: reportId,
