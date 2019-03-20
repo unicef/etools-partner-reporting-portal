@@ -8,6 +8,8 @@
 
     App.Actions = App.Actions || {};
 
+    var test;
+
     App.Actions.PDReportsAttachments = {
       sync: function (attachmentsThunk, reportId) {
         return function (dispatch) {
@@ -16,7 +18,7 @@
           return attachmentsThunk()
               .then(function (res) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
-                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
+                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data, res));
               })
               .catch(function (err) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
@@ -26,12 +28,25 @@
         };
       },
 
-      set: function (reportId, data) {
-        return {
-          type: App.Constants.SET_PD_REPORT_ATTACHMENT,
-          reportId: reportId,
-          data: data,
-        };
+      set: function (reportId, data, res) {
+        if(res.status === 204) {
+          var resUrl = res.xhr.responseURL.split('/');
+          var deletedAttachmentId = resUrl[resUrl.length - 2];
+
+          return {
+            type: App.Constants.SET_PD_REPORT_ATTACHMENT,
+            reportId: reportId,
+            data: {'id': parseInt(deletedAttachmentId, 10), 'action': 'delete'}
+          };
+        }
+        
+        else {
+          return {
+            type: App.Constants.SET_PD_REPORT_ATTACHMENT,
+            reportId: reportId,
+            data: data
+          };
+        }
       },
 
       loadingStart: function (reportId) {

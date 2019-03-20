@@ -291,8 +291,12 @@
         return this._buildUrl('/account/user-profile/');
       },
 
-      progressReportAttachment: function (locationId, reportId) {
-        return this.progressReports(locationId) + reportId + '/attachment/';
+      progressReportAttachments: function (locationId, reportId) {
+        return this.progressReports(locationId) + reportId + '/attachments/';
+      },
+
+      progressReportAttachmentDetail: function (locationId, reportId, attachmentId) {
+        return this.progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
       },
 
       analysisOperationalPresence: function (responsePlanId, type) {

@@ -2,74 +2,43 @@ import datetime
 import json
 import random
 from collections import defaultdict
+
+import factory
 from dateutil.relativedelta import relativedelta
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.base import ContentFile
 from django.db.models import signals
 
-import factory
 from factory import fuzzy
 from faker import Faker
 
 from account.models import User, UserProfile
-from cluster.models import Cluster, ClusterObjective, ClusterActivity
-from partner.models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-    PartnerProjectFunding,
-)
-from indicator.models import (
-    IndicatorBlueprint,
-    Reportable,
-    IndicatorReport,
-    IndicatorLocationData,
-    Disaggregation,
-    DisaggregationValue,
-    ReportableLocationGoal,
-    ReportingEntity,
-)
-from unicef.models import (
-    Section,
-    Person,
-    ProgressReport,
-    ProgrammeDocument,
-    PDResultLink,
-    LowerLevelOutput,
-    ReportingPeriodDates,
-)
-from core.common import (
-    REPORTING_TYPES,
-    PRP_ROLE_TYPES,
-    CLUSTER_TYPES,
-    CSO_TYPES,
-    PARTNER_TYPE,
-    SHARED_PARTNER_TYPE,
-    INDICATOR_REPORT_STATUS,
-    FREQUENCY_LEVEL,
-    PD_FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
-    PD_DOCUMENT_TYPE,
-    PROGRESS_REPORT_STATUS,
-    PD_STATUS,
-    RESPONSE_PLAN_TYPE,
-    OVERALL_STATUS,
-    PARTNER_PROJECT_STATUS,
-    PARTNER_ACTIVITY_STATUS,
-)
-from core.models import (
-    Country,
-    Workspace,
-    Location,
-    ResponsePlan,
-    GatewayType,
-    CartoDBTable,
-    PRPRole,
-)
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from core.common import (CLUSTER_TYPES, CSO_TYPES, FREQUENCY_LEVEL,
+                         INDICATOR_REPORT_STATUS, OVERALL_STATUS,
+                         PARTNER_ACTIVITY_STATUS, PARTNER_PROJECT_STATUS,
+                         PARTNER_TYPE, PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL,
+                         PD_STATUS, PR_ATTACHMENT_TYPES,
+                         PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES,
+                         REPORTABLE_FREQUENCY_LEVEL, REPORTING_TYPES,
+                         RESPONSE_PLAN_TYPE, SHARED_PARTNER_TYPE)
 from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-
+from core.models import (CartoDBTable, Country, GatewayType, Location, PRPRole,
+                         ResponsePlan, Workspace)
+from indicator.models import (Disaggregation, DisaggregationValue,
+                              IndicatorBlueprint, IndicatorLocationData,
+                              IndicatorReport, Reportable,
+                              ReportableLocationGoal, ReportingEntity)
+from partner.models import (Partner, PartnerActivity, PartnerProject,
+                            PartnerProjectFunding)
+from unicef.models import (LowerLevelOutput, PDResultLink, Person,
+                           ProgrammeDocument, ProgressReport,
+                           ProgressReportAttachment, ReportingPeriodDates,
+                           Section)
 
 PRP_ROLE_TYPES_LIST = [x[0] for x in PRP_ROLE_TYPES]
+PR_ATTACHMENT_TYPES_LIST = [x[0] for x in PR_ATTACHMENT_TYPES]
 IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('IP'), PRP_ROLE_TYPES_LIST))
 CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('CLUSTER'), PRP_ROLE_TYPES_LIST))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
@@ -107,6 +76,8 @@ cs_date_1 = datetime.date(today.year, 1, 1)
 cs_date_2 = datetime.date(today.year, 3, 24)
 cs_date_3 = datetime.date(today.year, 5, 15)
 faker = Faker()
+fake_file = ContentFile(bytes(faker.text(), 'utf-8'))
+fake_file.name = faker.file_name()
 
 
 def create_fake_multipolygon():
@@ -1248,13 +1219,32 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     reviewed_by_external_id = factory.LazyFunction(lambda: faker.random_number(4, True))
     status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
     review_overall_status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
-    attachment = None
 
     class Meta:
         django_get_or_create = (
             'programme_document', 'report_type', 'report_number'
         )
         model = ProgressReport
+
+
+class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        type {str} -- Attachment type: FACE or Other
+        progress_report {ProgressReport} -- ProgressReport ORM object to bind
+
+    Ex) ProgressReportAttachmentFactory(
+            progress_report=progress_report1,
+            type=PR_ATTACHMENT_TYPES.face,
+            file=fake_file # ContentFile object with name attribute defined. Make sure file and ORM is deleted after usage.
+        )
+    """
+    progress_report = factory.SubFactory('core.factories.ProgressReportFactory', attachment=None)
+    type = fuzzy.FuzzyChoice(PR_ATTACHMENT_TYPES_LIST)
+    file = fake_file
+
+    class Meta:
+        model = ProgressReportAttachment
 
 
 class AbstractIndicatorReportFactory(factory.django.DjangoModelFactory):

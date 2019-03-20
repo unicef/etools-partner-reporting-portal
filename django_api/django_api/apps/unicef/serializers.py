@@ -1,10 +1,14 @@
 from django.conf import settings
+
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
 from utils.filters.constants import Boolean
-from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput, PDResultLink, ReportingPeriodDates
+from .models import (
+    ProgrammeDocument, Section, ProgressReport, Person,
+    LowerLevelOutput, PDResultLink, ReportingPeriodDates,
+    ProgressReportAttachment,
+)
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace, Location
@@ -784,26 +788,28 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
     file_name = serializers.SerializerMethodField()
-    path = serializers.FileField(source='attachment')
+    path = serializers.FileField(source='file')
 
     def get_file_name(self, obj):
-        return obj.attachment.name.split('/')[-1] if obj.attachment else None
+        return obj.file.name.split('/')[-1] if obj.file else None
 
     def get_size(self, obj):
-        return obj.attachment.size if obj.attachment else None
-
+        return obj.file.size if obj.file else None
+    
     def to_representation(self, instance):
         representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
 
-        if instance.attachment and "http" not in instance.attachment.url:
-            representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
+        if instance.file and "http" not in instance.file.url:
+            representation['path'] = settings.WWW_ROOT[:-1] + instance.file.url
 
         return representation
 
     class Meta:
-        model = ProgressReport
+        model = ProgressReportAttachment
         fields = (
+            'id',
             'path',
             'size',
-            'file_name'
+            'file_name',
+            'type',
         )

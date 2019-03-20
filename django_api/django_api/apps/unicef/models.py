@@ -25,6 +25,7 @@ from core.common import (
     CURRENCIES,
     OVERALL_STATUS,
     REPORTING_TYPES,
+    PR_ATTACHMENT_TYPES,
     PRP_ROLE_TYPES,
 )
 from core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
@@ -406,11 +407,6 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
-    attachment = models.FileField(
-        upload_to="unicef/progress_reports/",
-        blank=True,
-        null=True
-    )
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
@@ -496,6 +492,30 @@ def send_notification_on_status_change(sender, instance, **kwargs):
                 to_email_list=to_email_list,
                 content_subtype='html',
             )
+
+
+def get_pr_attachment_upload_to(instance, filename):
+    return f"unicef/progress_reports/{instance.progress_report.id}/{filename}"
+
+
+class ProgressReportAttachment(TimeStampedModel):
+    """
+    ProgressReportAttachment represents an attachment file for ProgressReport.
+
+    related models:
+        unicef.ProgressReport (ForeignKey): "progress_report"
+    """
+    progress_report = models.ForeignKey('unicef.ProgressReport', related_name="attachments")
+    file = models.FileField(
+        upload_to=get_pr_attachment_upload_to,
+    )
+    type = models.CharField(verbose_name="Attachment type", choices=PR_ATTACHMENT_TYPES, max_length=5)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.file.name
 
 
 class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):

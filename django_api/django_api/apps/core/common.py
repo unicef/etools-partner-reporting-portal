@@ -174,6 +174,11 @@ RESPONSE_PLAN_TYPE = Choices(
     ("OTHER", "other", "Other"),  # Flash Appeal
 )
 
+PR_ATTACHMENT_TYPES = Choices(
+    ("FACE", "face", "FACE"),
+    ("Other", "other", "Other"),
+)
+
 OVERALL_STATUS = Choices(
     ("Met", "met", "Met"),
     ("OnT", "on_track", "On Track"),

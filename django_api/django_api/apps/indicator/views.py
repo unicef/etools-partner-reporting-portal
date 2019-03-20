@@ -131,7 +131,11 @@ class PDReportsDetailAPIView(RetrieveAPIView):
 
     def check_permissions(self, request):
         super().check_permissions(request)
-        pd_id = self.kwargs['pd_id']
+        pd_id = self.kwargs.get('pd_id', None)
+
+        if not pd_id:
+            self.permission_denied(request)
+
         if not request.user.partner.programmedocument_set.filter(id=pd_id).exists():
             self.permission_denied(request)
 
