@@ -795,7 +795,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
 
     def get_size(self, obj):
         return obj.file.size if obj.file else None
-    
+
     def to_representation(self, instance):
         representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
 
