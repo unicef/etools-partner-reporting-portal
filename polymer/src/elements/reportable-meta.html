@@ -152,6 +152,8 @@
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
+            this.set('toggle', 'Edit');
+            narrativeTextInput.disabled = true;
             break;
 
           case 'narrative_assessment':
@@ -187,7 +189,7 @@
 
         this.debounce('local-data-changed', function () {
           this.fire('reportable-meta-changed', this.localData);
-        }, 2000);
+        }, 1000);
       },
 
       attached: function () {
