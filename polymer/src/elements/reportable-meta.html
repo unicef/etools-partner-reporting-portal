@@ -83,6 +83,9 @@
               maxlength="2000">
           <paper-input-char-counter></paper-input-char-counter>
         </paper-input-container>
+        <paper-button class="btn-primary" on-tap="_handleInput" raised>
+          Save
+        </paper-button>
       </template>
 
       <template
@@ -123,7 +126,10 @@
       },
 
       _handleInput: function () {
-        var field = Polymer.dom(event).rootTarget;
+        var field = Polymer.dom(event).path.find(function(node) {
+          return node.label === 'Narrative assessment';
+        });
+        console.log('FIELD', Polymer.dom(field).lastChild);
         var id = field.id;
         switch (id) {
           case 'overall_status':
