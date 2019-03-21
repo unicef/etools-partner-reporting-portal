@@ -78,12 +78,11 @@
             no-label-float>
           <input
               id="narrative_assessment"
-              on-input="_handleTextInput(e)"
               value="[[data.narrative_assessment]]"
               maxlength="2000">
           <paper-input-char-counter></paper-input-char-counter>
         </paper-input-container>
-        <paper-button class="btn-primary" on-tap="_handleTextInput" raised>
+        <paper-button class="btn-primary" on-tap="_handleInput" raised>
           Save
         </paper-button>
       </template>
@@ -125,19 +124,26 @@
         },
       },
 
-      _handleInput: function () {
-        var field = Polymer.dom(event).rootTarget;
-        var id = field.id;
-        this.set(['localData', id], field.selected);
-      },
+      _handleInput: function (e) {
+        var field = e.path[0];
 
-      _handleTextInput: function (e) {
-        var field = Polymer.dom(event).path.find(function(node) {
-          return node.label === 'Narrative assessment';
-        });
-        var target = field.querySelector('paper-input-container').querySelector('input');
-        // console.log('FIELD', field.childNodes);
-        console.log('target', target);
+        if(field.id === '') {
+          var parent = Polymer.dom(event).path.find(function(node) {
+            return node.label === 'Narrative assessment';
+          });
+
+          field = parent.querySelector('paper-input-container').querySelector('input');
+        }
+        var id = field.id;
+        switch (id) {
+          case 'overall_status':
+            this.set(['localData', id], field.selected);
+            break;
+
+          case 'narrative_assessment':
+            this.set(['localData', id], field.value.trim());
+            break;
+        }
       },
 
       observers: [
