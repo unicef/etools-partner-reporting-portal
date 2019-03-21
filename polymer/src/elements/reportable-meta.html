@@ -79,11 +79,12 @@
           <input
               id="narrative_assessment"
               value="[[data.narrative_assessment]]"
+              disabled
               maxlength="2000">
           <paper-input-char-counter></paper-input-char-counter>
         </paper-input-container>
         <paper-button class="btn-primary" on-tap="_handleInput" raised>
-          Save
+          {{toggle}}
         </paper-button>
       </template>
 
@@ -107,6 +108,11 @@
       properties: {
         mode: String,
 
+        toggle: {
+          type: String,
+          value: 'Edit'
+        },
+
         data: Object,
 
         localData: Object,
@@ -124,8 +130,15 @@
         },
       },
 
-      _handleInput: function (e) {
-        var field = e.path[0];
+      _handleInput: function () {
+        var field = Polymer.dom(event).rootTarget;
+
+        var narrativeTextInput = Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('input');
+        if(field.textContent.trim() === 'Edit') {
+          narrativeTextInput.disabled = false;
+          this.set('toggle', 'Save');
+          return;
+        }
 
         if(field.id === '') {
           var parent = Polymer.dom(event).path.find(function(node) {
@@ -134,6 +147,7 @@
 
           field = parent.querySelector('paper-input-container').querySelector('input');
         }
+
         var id = field.id;
         switch (id) {
           case 'overall_status':
@@ -142,6 +156,8 @@
 
           case 'narrative_assessment':
             this.set(['localData', id], field.value.trim());
+            this.set('toggle', 'Edit');
+            narrativeTextInput.disabled = true;
             break;
         }
       },
