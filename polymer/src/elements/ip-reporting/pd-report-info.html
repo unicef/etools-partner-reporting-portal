@@ -29,6 +29,26 @@
         --app-grid-expandible-item-columns: 7;
       }
 
+      .app-grid {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      .toggle-button-container {
+        max-width: calc((100% - 0.1px) / 8 * 7 - 25px) ;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      
+      #toggle-button {
+        background-color: #0099ff;
+        color: #fff;
+        font-size: 14px;
+      }
+
       .row {
         @apply --app-grid-expandible-item;
       }
@@ -127,9 +147,11 @@
           </labelled-item>
         </div>
 
-        <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-          Save
-        </paper-button>
+        <div class="toggle-button-container">
+          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+            Save
+          </paper-button>
+        </div>
 
         <div class="row">
           <report-attachments
@@ -232,25 +254,23 @@
           return;
         }
 
-        this.debounce('update-data', function () {
-          var updateThunk = this.$.update.thunk();
+        var updateThunk = this.$.update.thunk();
 
-          this.$.update.abort();
+        this.$.update.abort();
 
-          this.dispatch(
-            App.Actions.PDReports.update(
-              updateThunk,
-              this.pdId,
-              this.reportId
-            )
+        this.dispatch(
+          App.Actions.PDReports.update(
+            updateThunk,
+            this.pdId,
+            this.reportId
           )
-              .then(function () {
-                self._notifyChangesSaved();
-              })
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        }, 1000);
+        )
+            .then(function () {
+              self._notifyChangesSaved();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
       _computeUpdateUrl: function (locationId, reportId) {
