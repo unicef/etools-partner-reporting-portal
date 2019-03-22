@@ -208,12 +208,19 @@
       _handleInput: function () {
         var self = this;
         var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
+
         textInputs.forEach(function(inputContainer) {
-          console.log(inputContainer.querySelector('input'));
           var field = inputContainer.querySelector('input');
           var id = field.id;
-
-          self.set(['localData', id], field.value.trim());
+          
+          if(field.value.trim() === self.data.partner_contribution_to_date 
+          || field.value.trim() === self.data.challenges_in_the_reporting_period 
+          || field.value.trim() === self.data.proposed_way_forward) {
+            return;
+          }
+          else {
+            self.set(['localData', id], field.value.trim());
+          }
         });
       },
 

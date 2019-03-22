@@ -212,9 +212,7 @@
           return;
         }
 
-        this.debounce('local-data-changed', function () {
-          this.fire('reportable-meta-changed', this.localData);
-        }, 1000);
+        this.fire('reportable-meta-changed', this.localData);
       },
 
       attached: function () {
