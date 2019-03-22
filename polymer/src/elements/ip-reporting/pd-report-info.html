@@ -69,7 +69,6 @@
                   no-label-float>
                 <input
                     id="partner_contribution_to_date"
-                    on-input="_handleInput"
                     value="[[data.partner_contribution_to_date]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
@@ -95,7 +94,6 @@
                   no-label-float>
                 <input
                     id="challenges_in_the_reporting_period"
-                    on-input="_handleInput"
                     value="[[data.challenges_in_the_reporting_period]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
@@ -121,7 +119,6 @@
                   no-label-float>
                 <input
                     id="proposed_way_forward"
-                    on-input="_handleInput"
                     value="[[data.proposed_way_forward]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
@@ -129,6 +126,10 @@
             </template>
           </labelled-item>
         </div>
+
+        <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+          Save
+        </paper-button>
 
         <div class="row">
           <report-attachments
@@ -205,10 +206,15 @@
       ],
 
       _handleInput: function () {
-        var field = Polymer.dom(event).rootTarget;
-        var id = field.id;
+        var self = this;
+        var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
+        textInputs.forEach(function(inputContainer) {
+          console.log(inputContainer.querySelector('input'));
+          var field = inputContainer.querySelector('input');
+          var id = field.id;
 
-        this.set(['localData', id], field.value.trim());
+          self.set(['localData', id], field.value.trim());
+        });
       },
 
       _updateData: function (change) {
