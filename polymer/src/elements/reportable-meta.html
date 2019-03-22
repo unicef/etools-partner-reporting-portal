@@ -28,6 +28,13 @@
         margin-left: -12px;
       }
 
+      #toggle-button {
+        background-color: #0099ff;
+        color: #fff;
+        height: 40px;
+        width: 70px;
+      }
+
       status-badge {
         position: relative;
         top: -2px;
@@ -83,7 +90,7 @@
               maxlength="2000">
           <paper-input-char-counter></paper-input-char-counter>
         </paper-input-container>
-        <paper-button class="btn-primary" on-tap="_handleInput" raised>
+        <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
           {{toggle}}
         </paper-button>
       </template>
@@ -132,15 +139,15 @@
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
-
         var narrativeTextInput = Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('input');
+
         if(field.textContent.trim() === 'Edit') {
           narrativeTextInput.disabled = false;
           this.set('toggle', 'Save');
           return;
         }
 
-        if(field.id === '') {
+        if(field.id === 'toggle-button') {
           var parent = Polymer.dom(event).path.find(function(node) {
             return node.label === 'Narrative assessment';
           });
@@ -157,6 +164,11 @@
             break;
 
           case 'narrative_assessment':
+            if(this.data.narrative_assessment === field.value.trim()) {
+              this.set('toggle', 'Edit');
+              narrativeTextInput.disabled = true;
+              break;
+            }
             this.set(['localData', id], field.value.trim());
             this.set('toggle', 'Edit');
             narrativeTextInput.disabled = true;
