@@ -24,6 +24,17 @@
         margin-bottom: 25px;
       }
 
+      #input-button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-direction: row;
+      }
+
+      paper-input-container {
+        width: 87%;
+      }
+
       paper-radio-group {
         margin-left: -12px;
       }
@@ -31,8 +42,7 @@
       #toggle-button {
         background-color: #0099ff;
         color: #fff;
-        height: 40px;
-        width: 70px;
+        font-size: 14px;
       }
 
       status-badge {
@@ -81,18 +91,20 @@
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
           restamp="true">
-        <paper-input-container
-            no-label-float>
-          <input
-              id="narrative_assessment"
-              value="[[data.narrative_assessment]]"
-              disabled
-              maxlength="2000">
-          <paper-input-char-counter></paper-input-char-counter>
-        </paper-input-container>
-        <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-          {{toggle}}
-        </paper-button>
+        <div id="input-button-container">
+          <paper-input-container
+              no-label-float>
+            <input
+                id="narrative_assessment"
+                value="[[data.narrative_assessment]]"
+                disabled
+                maxlength="2000">
+            <paper-input-char-counter></paper-input-char-counter>
+          </paper-input-container>
+          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+            {{toggle}}
+          </paper-button>
+        </div>
       </template>
 
       <template
@@ -143,6 +155,7 @@
 
         if(field.textContent.trim() === 'Edit') {
           narrativeTextInput.disabled = false;
+          narrativeTextInput.focus();
           this.set('toggle', 'Save');
           return;
         }
