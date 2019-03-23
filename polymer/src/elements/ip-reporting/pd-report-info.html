@@ -29,6 +29,26 @@
         --app-grid-expandible-item-columns: 7;
       }
 
+      .app-grid {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      .toggle-button-container {
+        max-width: calc((100% - 0.1px) / 8 * 7 - 25px) ;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      
+      #toggle-button {
+        background-color: #0099ff;
+        color: #fff;
+        font-size: 14px;
+      }
+
       .row {
         @apply --app-grid-expandible-item;
       }
@@ -69,7 +89,6 @@
                   no-label-float>
                 <input
                     id="partner_contribution_to_date"
-                    on-input="_handleInput"
                     value="[[data.partner_contribution_to_date]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
@@ -95,7 +114,6 @@
                   no-label-float>
                 <input
                     id="challenges_in_the_reporting_period"
-                    on-input="_handleInput"
                     value="[[data.challenges_in_the_reporting_period]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
@@ -121,13 +139,18 @@
                   no-label-float>
                 <input
                     id="proposed_way_forward"
-                    on-input="_handleInput"
                     value="[[data.proposed_way_forward]]"
                     maxlength="2000">
                 <paper-input-char-counter></paper-input-char-counter>
               </paper-input-container>
             </template>
           </labelled-item>
+        </div>
+
+        <div class="toggle-button-container">
+          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+            Save
+          </paper-button>
         </div>
 
         <div class="row">
@@ -205,10 +228,22 @@
       ],
 
       _handleInput: function () {
-        var field = Polymer.dom(event).rootTarget;
-        var id = field.id;
+        var self = this;
+        var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
 
-        this.set(['localData', id], field.value.trim());
+        textInputs.forEach(function(inputContainer) {
+          var field = inputContainer.querySelector('input');
+          var id = field.id;
+          
+          if(field.value.trim() === self.data.partner_contribution_to_date 
+          || field.value.trim() === self.data.challenges_in_the_reporting_period 
+          || field.value.trim() === self.data.proposed_way_forward) {
+            return;
+          }
+          else {
+            self.set(['localData', id], field.value.trim());
+          }
+        });
       },
 
       _updateData: function (change) {
@@ -219,25 +254,23 @@
           return;
         }
 
-        this.debounce('update-data', function () {
-          var updateThunk = this.$.update.thunk();
+        var updateThunk = this.$.update.thunk();
 
-          this.$.update.abort();
+        this.$.update.abort();
 
-          this.dispatch(
-            App.Actions.PDReports.update(
-              updateThunk,
-              this.pdId,
-              this.reportId
-            )
+        this.dispatch(
+          App.Actions.PDReports.update(
+            updateThunk,
+            this.pdId,
+            this.reportId
           )
-              .then(function () {
-                self._notifyChangesSaved();
-              })
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        }, 1000);
+        )
+            .then(function () {
+              self._notifyChangesSaved();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
       _computeUpdateUrl: function (locationId, reportId) {

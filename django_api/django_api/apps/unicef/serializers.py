@@ -404,9 +404,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    partner_contribution_to_date = serializers.CharField(required=False, allow_blank=True)
-    challenges_in_the_reporting_period = serializers.CharField(required=False, allow_blank=True)
-    proposed_way_forward = serializers.CharField(required=False, allow_blank=True)
+    partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
     class Meta:
         model = ProgressReport
@@ -420,7 +420,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
 class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
 
-    narrative = serializers.CharField()
+    narrative = serializers.CharField(max_length=2000)
 
     class Meta:
         model = ProgressReport

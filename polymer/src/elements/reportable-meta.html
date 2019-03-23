@@ -24,8 +24,25 @@
         margin-bottom: 25px;
       }
 
+      #input-button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-direction: row;
+      }
+
+      paper-input-container {
+        width: 87%;
+      }
+
       paper-radio-group {
         margin-left: -12px;
+      }
+
+      #toggle-button {
+        background-color: #0099ff;
+        color: #fff;
+        font-size: 14px;
       }
 
       status-badge {
@@ -74,15 +91,20 @@
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
           restamp="true">
-        <paper-input-container
-            no-label-float>
-          <input
-              id="narrative_assessment"
-              on-input="_handleInput"
-              value="[[data.narrative_assessment]]"
-              maxlength="2000">
-          <paper-input-char-counter></paper-input-char-counter>
-        </paper-input-container>
+        <div id="input-button-container">
+          <paper-input-container
+              no-label-float>
+            <input
+                id="narrative_assessment"
+                value="[[data.narrative_assessment]]"
+                disabled
+                maxlength="2000">
+            <paper-input-char-counter></paper-input-char-counter>
+          </paper-input-container>
+          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+            {{toggle}}
+          </paper-button>
+        </div>
       </template>
 
       <template
@@ -105,6 +127,11 @@
       properties: {
         mode: String,
 
+        toggle: {
+          type: String,
+          value: 'Edit'
+        },
+
         data: Object,
 
         localData: Object,
@@ -124,14 +151,40 @@
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
+        var narrativeTextInput = Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('input');
+
+        if(field.textContent.trim() === 'Edit') {
+          narrativeTextInput.disabled = false;
+          narrativeTextInput.focus();
+          this.set('toggle', 'Save');
+          return;
+        }
+
+        if(field.id === 'toggle-button') {
+          var parent = Polymer.dom(event).path.find(function(node) {
+            return node.label === 'Narrative assessment';
+          });
+
+          field = parent.querySelector('paper-input-container').querySelector('input');
+        }
+
         var id = field.id;
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
+            this.set('toggle', 'Edit');
+            narrativeTextInput.disabled = true;
             break;
 
           case 'narrative_assessment':
+            if(this.data.narrative_assessment === field.value.trim()) {
+              this.set('toggle', 'Edit');
+              narrativeTextInput.disabled = true;
+              break;
+            }
             this.set(['localData', id], field.value.trim());
+            this.set('toggle', 'Edit');
+            narrativeTextInput.disabled = true;
             break;
         }
       },
@@ -159,9 +212,7 @@
           return;
         }
 
-        this.debounce('local-data-changed', function () {
-          this.fire('reportable-meta-changed', this.localData);
-        }, 2000);
+        this.fire('reportable-meta-changed', this.localData);
       },
 
       attached: function () {
