@@ -108,7 +108,26 @@
       }
 
       #tabs-list-container {
-        width: 20%;
+        width: 30%;
+      }
+
+      #tab-item {
+        padding-left: 10%;
+      }
+
+      #pages-container {
+        width: 70%;
+      }
+
+      #reporting-tabs-list {
+        display: flex;
+        justify-content: center;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      #reporting-tabs-container {
+        text-align: center;
+        border-bottom: none;
       }
 
       .location {
@@ -217,7 +236,7 @@
     
               <div class="printme" style="margin-bottom: 2em;"></div>
             </div>
-            
+
             <paper-listbox
                 selected="{{selected}}"
                 hide-scroll-buttons
@@ -227,7 +246,7 @@
                   is="dom-repeat"
                   items="[[locationData]]"
                   as="topLevelLocation">
-                <paper-item>
+                <paper-item id="tab-item">
                   <status-badge type="[[_computeLocationStatus(topLevelLocation)]]"></status-badge>
                   [[topLevelLocation.title]]
                 </paper-item>
@@ -235,7 +254,7 @@
             </paper-listbox>
           </div>
   
-          <iron-pages selected="{{selected}}" id="pages-view">
+          <iron-pages selected="{{selected}}" id="pages-container">
             <template
                 is="dom-repeat"
                 items="[[locationData]]"
@@ -259,17 +278,19 @@
                   </div>
                 </template>
   
-                <paper-tabs
-                    selected="{{topLevelLocation.selected}}"
-                    hide-scroll-buttons
-                    scrollable>
-                  <template
-                      is="dom-repeat"
-                      items="[[topLevelLocation.byEntity]]"
-                      as="location">
-                    <paper-tab>[[location.reporting_entity.title]]</paper-tab>
-                  </template>
-                </paper-tabs>
+                <div id="reporting-tabs-list">
+                  <paper-tabs
+                      selected="{{topLevelLocation.selected}}"
+                      hide-scroll-buttons
+                      id="reporting-tabs-container">
+                    <template
+                        is="dom-repeat"
+                        items="[[topLevelLocation.byEntity]]"
+                        as="location">
+                      <paper-tab>[[location.reporting_entity.title]]</paper-tab>
+                    </template>
+                  </paper-tabs>
+                </div>
   
                 <iron-pages selected="{{topLevelLocation.selected}}">
                   <template
