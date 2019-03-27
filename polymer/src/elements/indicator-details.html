@@ -40,6 +40,11 @@
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
 
+
+        --paper-item-selected: {
+          background-color: #0099ff;
+        };
+
         --paper-tabs: {
           padding-left: 12px;
           border-bottom: 1px solid var(--paper-grey-300);
@@ -245,9 +250,7 @@
 
             <paper-listbox
                 selected="{{selected}}"
-                hide-scroll-buttons
-                id="tabs-list"
-                scrollable>
+                id="tabs-list">
               <template
                   is="dom-repeat"
                   items="[[locationData]]"
