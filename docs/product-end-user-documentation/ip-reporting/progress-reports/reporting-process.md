@@ -18,6 +18,15 @@ Once a final report has been generated, no change to the PD reporting periods sh
 
 **Edge case** \(to be handled in a future release\): Super-users in PMP can make changes that might not be in alignment with above restrictions. If that were to happen then a manual administrative data fix might be required on the PRP side as well.
 
+### **Refreshing report**
+It is possible that Programme Document may get updated for locations which become deactivated over the course of the program period, and generated Progress Reports may not reflect such location changes. PRP provides a **"resetting"** mechanism for target Progress Report to destroy its Indicator Reports along with their location data entries in order to regenerate the Indicator Reports from current state of Programme Document in PRP system at given time.
+
+![Progress Report Refresh button action](../../.gitbook/assets/progress_report_refresh.png)
+
+Upon clicking `Refresh` button, a warning modal will be opened to show possible consequences by refreshing current Progress Report. When the user agrees to do so, PRP will perform an irreversible action to delete and regenerate Indicator Reports based on current state of Programme Document which may have up-to-date location information, pertinent to current reporting purposes.
+
+![Progress Report Refresh modal](../../.gitbook/assets/progress_report_refresh_modal.png)
+
 ### **Acceptance of a report**
 
 The UNICEF PO is responsible for acceptance of a progress reports that are submitted \(There is no workflow following the submission by the IP to UNICEF and Cluster\). This happens in the PMP system. The PO can also **send the report back with a note**, in which case the partner should get an email informing them that should review the note and re-submit the report \(data in the report becomes editable once its been sent back\). In that case the partner can log back in, make any changes recommended \(edit data and upload attachment \#[947](https://github.com/unicef/etools-partner-reporting-portal/issues/947)\) and resubmit the report back to UNICEF.

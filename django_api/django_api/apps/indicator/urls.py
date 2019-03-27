@@ -16,6 +16,7 @@ from .views import (
     ReportableLocationGoalBaselineInNeedAPIView,
     ClusterIndicatorSendIMOMessageAPIView,
     ReportableReportingFrequencyListAPIView,
+    ReportRefreshAPIView,
 )
 
 
@@ -74,4 +75,8 @@ urlpatterns = [
     url(r'^reporting-frequencies/$',
         ReportableReportingFrequencyListAPIView.as_view(),
         name='reportable-reporting-frequency-list-api'),
+
+    url(r'^report-refresh/$',
+        ReportRefreshAPIView.as_view(),
+        name='report-refresh-api'),
 ]

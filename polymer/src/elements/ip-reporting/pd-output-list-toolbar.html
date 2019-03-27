@@ -1,18 +1,36 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-toolbar.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../refresh-report-modal.html">
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../upload-button.html">
+<link rel="import" href="../../styles/buttons.html">
 
 <dom-module id="pd-output-list-toolbar">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
       }
     </style>
+
+    <etools-prp-ajax
+      id="refreshReport"
+      url="[[refreshUrl]]"
+      body="[[refreshData]]"
+      method="post"
+      content-type="application/json">
+    </etools-prp-ajax>
+
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
 
     <etools-prp-toolbar
       query="{{ query }}"
@@ -32,6 +50,18 @@
           Import Template
         </upload-button>
         <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
+        <template
+            is="dom-if"
+            if="[[canRefresh]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_refresh"
+              disabled="[[busy]]"
+              raised>
+            Refresh
+          </paper-button>
+        </template>
       </template>
     </etools-prp-toolbar>
   </template>
@@ -42,7 +72,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -80,6 +110,29 @@
           type: String,
           computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')',
         },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(reportId)',
+        },
+
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(currentReport, programmeDocument)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
+        },
       },
 
       listeners: {
@@ -102,10 +155,35 @@
         return App.Endpoints.programmeDocumentReport(locationId, reportId);
       },
 
+      _computeRefreshData: function (reportId) {
+        return {"report_id": reportId, "report_type": "PR"};
+      },
+
+      _computeCanRefresh: function (report, programmeDocument) {
+        switch (true) {
+          case programmeDocument &&
+            (programmeDocument.status === 'Sig'
+            || programmeDocument.status === 'Clo'):
+          case programmeDocument && report.report_type === 'SR':
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
+      _refresh: function () {
+        this.$.refresh.open();
+      },
+
       _onFileUploaded: function (e) {
         e.stopPropagation();
 
         window.location.reload();
+      },
+
+      detached: function () {
+        this.$.refresh.close();
       },
     });
   </script>

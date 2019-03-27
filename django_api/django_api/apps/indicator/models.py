@@ -517,6 +517,7 @@ class ReportableLocationGoal(TimeStampedModel):
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
     in_need = JSONField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('reportable', 'location')

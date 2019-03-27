@@ -116,7 +116,7 @@
 
       <pd-reports-report-title
         class="above-title"
-        report=[[currentReport]]>
+        report="[[currentReport]]">
       </pd-reports-report-title>
 
       <a
@@ -326,6 +326,13 @@
         submitUrl: {
           type: String,
           computed: '_computeSubmitUrl(locationId, currentReport.id, currentReport.report_type)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
         },
 
         busy: {

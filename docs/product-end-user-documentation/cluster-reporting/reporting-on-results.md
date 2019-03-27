@@ -27,6 +27,15 @@ We will have a data key to specify the labels of the indicators.
 
 Once all the data for all locations has been entered the indicator report can be submitted. Once submitted the indicator report goes under "Submitted Reports" tab, and can be reviewed by the IMO. Once submitted, none of the report data can be modified by anyone. The IMO may send back the report if they would like to see changes or incorrect data was entered, in which case the partner can re-submit after making the appropriate changes.
 
+### **Refreshing report**
+It is possible that Cluster Indicator may get updated by Cluster IMO for locations which become deactivated over the course of the year period, and generated Cluster Indicator Reports may not reflect such location changes. PRP provides a **"resetting"** mechanism for target Cluster Indicator Report to destroy its location data entries in order to regenerate clean location data entries from current state of Cluster Indicator in PRP system at given time.
+
+![Cluster Indicator Report Refresh button action](../../.gitbook/assets/cluster_indicator_refresh.png)
+
+Upon clicking `Refresh` button, a warning modal will be opened to show possible consequences by refreshing current Cluster Indicator Report. When the user agrees to do so, PRP will perform an irreversible action to delete and regenerate Indicator Location Data based on current state of Cluster Indicator which may have up-to-date location information, pertinent to current reporting purposes.
+
+![Cluster Indicator Report Refresh modal](../../.gitbook/assets/cluster_indicator_refresh_modal.png)
+
 ### Import / Export of data
 
 Users will be able to export data they see here. Additionally they will be able to export an "import template" which they can then use to import data back into the system.
