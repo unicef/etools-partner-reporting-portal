@@ -40,9 +40,13 @@
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
 
+        --paper-item-min-height: 56px;
+        --paper-item: {
+          cursor: pointer;
+        };
 
         --paper-item-selected: {
-          background-color: #0099ff;
+          background-color: #44b4ff;
         };
 
         --paper-tabs: {
@@ -54,6 +58,7 @@
       .header {
         padding: 20px 75px 0 25px;
         position: relative;
+        height: 40px;
       }
 
       .locations-heading {
@@ -117,6 +122,12 @@
       #tabs-list-container {
         width: 30%;
         height: inherit;
+        /* overflow: auto; */
+      }
+
+      #tabs-list {
+        padding: 0;
+        height: 300px;
         overflow: auto;
       }
 
@@ -127,7 +138,6 @@
       #pages-container {
         width: 70%;
         height: inherit;
-        overflow: auto;
       }
 
       #reporting-tabs-list {
@@ -139,6 +149,11 @@
       #reporting-tabs-container {
         text-align: center;
         border-bottom: none;
+      }
+
+      #page-view-container {
+        height: 220px;
+        overflow: auto;
       }
 
       .location {
@@ -206,46 +221,48 @@
         
         <div id="tabs-pages-container">
           <div id="tabs-list-container">
-            <div class="header">
-              <h3 class="locations-heading">Data for locations</h3>
-    
-              <paper-icon-button
-                  class="print-btn"
-                  icon="icons:print">
-              </paper-icon-button>
-            </div>
-    
-            <div hidden aria-hidden="true">
-              <template
-                  is="dom-if"
-                  if="[[currentPD.title]]">
-                <dl class="printme" style="margin: 0;">
-                  <dt style="display: inline;">Programme document:</dt>
-                  <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
-                </dl>
-              </template>
-    
-              <template
-                  is="dom-if"
-                  if="[[indicatorName]]">
-                <dl class="printme" style="margin: 0;">
-                  <dt style="display: inline;">Indicator:</dt>
-                  <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
-                </dl>
-              </template>
-    
-              <template
-                  is="dom-if"
-                  if="[[indicatorStatus]]">
-                <span class="printme" style="margin-right: .5em;">Indicator status:</span>
-                <report-status
-                    class="printme"
-                    status="[[indicatorStatus]]"
-                    report-type="[[reportType]]">
-                </report-status>
-              </template>
-    
-              <div class="printme" style="margin-bottom: 2em;"></div>
+            <div class="tabs-header-container">
+              <div class="header">
+                <h3 class="locations-heading">Data for locations</h3>
+      
+                <paper-icon-button
+                    class="print-btn"
+                    icon="icons:print">
+                </paper-icon-button>
+              </div>
+      
+              <div hidden aria-hidden="true">
+                <template
+                    is="dom-if"
+                    if="[[currentPD.title]]">
+                  <dl class="printme" style="margin: 0;">
+                    <dt style="display: inline;">Programme document:</dt>
+                    <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+                  </dl>
+                </template>
+      
+                <template
+                    is="dom-if"
+                    if="[[indicatorName]]">
+                  <dl class="printme" style="margin: 0;">
+                    <dt style="display: inline;">Indicator:</dt>
+                    <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
+                  </dl>
+                </template>
+      
+                <template
+                    is="dom-if"
+                    if="[[indicatorStatus]]">
+                  <span class="printme" style="margin-right: .5em;">Indicator status:</span>
+                  <report-status
+                      class="printme"
+                      status="[[indicatorStatus]]"
+                      report-type="[[reportType]]">
+                  </report-status>
+                </template>
+      
+                <div class="printme" style="margin-bottom: 2em;"></div>
+              </div>
             </div>
 
             <paper-listbox
@@ -270,38 +287,40 @@
                 as="topLevelLocation"
                 index-as="topLevelLocationIndex">
               <div>
-                <template
-                    is="dom-if"
-                    if="[[_canEnterData(computedMode, topLevelLocation.byEntity.0.is_locked)]]">
-                  <div class="tab-header layout horizontal justified">
-                    <div class="self-center">Enter data for this location</div>
-                    <div>
-                      <paper-button
-                          class="btn-primary"
-                          modal-index="[[topLevelLocationIndex]]"
-                          on-tap="_openModal"
-                          raised>
-                        Enter data
-                      </paper-button>
+                <div id="page-header-container">
+                  <template
+                      is="dom-if"
+                      if="[[_canEnterData(computedMode, topLevelLocation.byEntity.0.is_locked)]]">
+                    <div class="tab-header layout horizontal justified">
+                      <div class="self-center">Enter data for this location</div>
+                      <div>
+                        <paper-button
+                            class="btn-primary"
+                            modal-index="[[topLevelLocationIndex]]"
+                            on-tap="_openModal"
+                            raised>
+                          Enter data
+                        </paper-button>
+                      </div>
                     </div>
+                  </template>
+    
+                  <div id="reporting-tabs-list">
+                    <paper-tabs
+                        selected="{{topLevelLocation.selected}}"
+                        hide-scroll-buttons
+                        id="reporting-tabs-container">
+                      <template
+                          is="dom-repeat"
+                          items="[[topLevelLocation.byEntity]]"
+                          as="location">
+                        <paper-tab>[[location.reporting_entity.title]]</paper-tab>
+                      </template>
+                    </paper-tabs>
                   </div>
-                </template>
-  
-                <div id="reporting-tabs-list">
-                  <paper-tabs
-                      selected="{{topLevelLocation.selected}}"
-                      hide-scroll-buttons
-                      id="reporting-tabs-container">
-                    <template
-                        is="dom-repeat"
-                        items="[[topLevelLocation.byEntity]]"
-                        as="location">
-                      <paper-tab>[[location.reporting_entity.title]]</paper-tab>
-                    </template>
-                  </paper-tabs>
                 </div>
   
-                <iron-pages selected="{{topLevelLocation.selected}}">
+                <iron-pages selected="{{topLevelLocation.selected}}" id="page-view-container">
                   <template
                       is="dom-repeat"
                       items="[[topLevelLocation.byEntity]]"
