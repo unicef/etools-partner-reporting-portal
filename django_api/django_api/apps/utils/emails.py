@@ -1,6 +1,11 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import get_template
+from django.template.loader import render_to_string
+
+
+logger = logging.getLogger(__name__)
 
 
 def send_email_from_template(
@@ -29,11 +34,99 @@ def send_email_from_template(
     """
 
     message = EmailMultiAlternatives(
-        get_template(subject_template_path).render(template_data).strip(),
-        get_template(body_template_path).render(template_data),
+        render_to_string(subject_template_path, template_data).strip(),
+        render_to_string(body_template_path, template_data),
         from_email,
         to_email_list,
         **kwargs
     )
     message.content_subtype = content_subtype
     message.send(fail_silently=fail_silently)
+
+
+def send_due_progress_report_email():
+    """send_due_progress_report_email sends email notifications to
+    UNICEF Authorized Officers and Focal Points about reports due in 1 week.
+    """
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+    from core.common import PROGRESS_REPORT_STATUS
+    from unicef.models import ProgressReport
+
+    logger.info("Notifying IP due progress reports")
+    notified = list()
+
+    today = date.today()
+    unsubmitted_due_reports = ProgressReport.objects.filter(
+        submission_date__isnull=True,
+        status=PROGRESS_REPORT_STATUS.due,
+        due_date=today + relativedelta(days=7),
+    )
+
+    for progress_report in unsubmitted_due_reports:
+        pd = progress_report.programme_document
+
+        template_data = {
+            'person': None,
+            'progress_report': progress_report,
+            'programme_document': pd,
+        }
+
+        to_emails = set()
+        to_emails |= set(map(lambda person: person, pd.unicef_officers.all()))
+        to_emails |= set(map(lambda person: person, pd.unicef_focal_point.all()))
+
+        for person in to_emails:
+            send_email_from_template(
+                subject_template_path='emails/due_progress_report_subject.txt',
+                body_template_path='emails/due_progress_report.html',
+                template_data=template_data,
+                to_email_list=[person.email, ],
+                content_subtype='html'
+            )
+
+        notified.append(str(progress_report.id))
+
+    return "Sent emails for {} Due Report IDs: {}".format(len(notified), ", ".join(notified)) if notified else "---"
+
+
+def send_overdue_progress_report_email():
+    """send_overdue_progress_report_email sends email notifications to
+    UNICEF Authorized Officers and Focal Points about overdue reports.
+    """
+    from core.common import PROGRESS_REPORT_STATUS
+    from unicef.models import ProgressReport
+
+    logger.info("Notifying IP overdue progress reports")
+    notified = list()
+
+    unsubmitted_overdue_reports = ProgressReport.objects.filter(
+        submission_date__isnull=True,
+        status=PROGRESS_REPORT_STATUS.overdue,
+    )
+
+    for progress_report in unsubmitted_overdue_reports:
+        pd = progress_report.programme_document
+
+        template_data = {
+            'person': None,
+            'progress_report': progress_report,
+            'programme_document': pd,
+        }
+
+        to_emails = set()
+        to_emails |= set(map(lambda person: person, pd.unicef_officers.all()))
+        to_emails |= set(map(lambda person: person, pd.unicef_focal_point.all()))
+
+        for person in to_emails:
+            send_email_from_template(
+                subject_template_path='emails/overdue_progress_report_subject.txt',
+                body_template_path='emails/overdue_progress_report.html',
+                template_data=template_data,
+                to_email_list=[person.email, ],
+                content_subtype='html'
+            )
+
+        notified.append(str(progress_report.id))
+
+    return "Sent emails for {} Overdue Report IDs: {}".format(len(notified), ", ".join(notified)) if notified else "---"

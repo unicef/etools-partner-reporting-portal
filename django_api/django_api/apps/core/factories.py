@@ -1176,6 +1176,7 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
         django_get_or_create = ('location', 'reportable')
 
 
+@factory.django.mute_signals(signals.post_save)
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     """
     Arguments:

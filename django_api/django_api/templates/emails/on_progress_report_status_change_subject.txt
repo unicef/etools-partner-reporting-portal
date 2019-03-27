@@ -1,1 +1,1 @@
-[Partner Reporting Portal] Progress Report {{ status }}
+[UNICEF Partner Reporting Portal] Report {{ status }}
