@@ -28,7 +28,7 @@ def social_details(backend, details, response, *args, **kwargs):
 
     email = r['details'].get('email')
     if isinstance(email, str):
-        r['details']['email'] = email.lower()
+        r['details']['email'] = email.lower().strip()
     return r
 
 
