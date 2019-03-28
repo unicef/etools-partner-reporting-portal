@@ -141,6 +141,7 @@
       },
 
       _setFiles: function (attachments) {
+        var self = this;
         this.set('faceAttachment', []);
         this.set('otherOneAttachment', []);
         this.set('otherTwoAttachment', []);
@@ -150,13 +151,13 @@
             return;
           }
           if (attachment.type === 'FACE') {
-            this.set('faceAttachment', [attachment]);
+            self.set('faceAttachment', [attachment]);
           }
           if (attachment.type === 'Other') {
-            if (this.get('otherOneAttachment').length === 0) {
-              this.set('otherOneAttachment', [attachment]);
+            if (self.get('otherOneAttachment').length === 0) {
+              self.set('otherOneAttachment', [attachment]);
              } else {
-               this.set('otherTwoAttachment', [attachment]);
+               self.set('otherTwoAttachment', [attachment]);
              }
           }
         });
