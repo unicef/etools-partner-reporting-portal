@@ -24,10 +24,6 @@
         url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
     
-    <template is="dom-if" if="{{loading}}">
-      <paper-spinner active></paper-spinner>
-    </template>
-
     <etools-prp-ajax
         id="replace"
         method="put"
@@ -54,6 +50,9 @@
         readonly="[[readonly]]"
         use-delete-events>
     </etools-file>
+    <template is="dom-if" if="{{loading}}">
+      <paper-spinner active></paper-spinner>
+    </template>
 
     <etools-file
         id="otherOneAttachmentComponent"
