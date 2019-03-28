@@ -20,8 +20,6 @@ from core.permissions import (
     AnyPermission,
     IsUNICEFAPIUser,
     IsAuthenticated,
-    IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    IsPartnerEditorForCurrentWorkspace,
     HasAnyRole,
 )
 from core.paginations import SmallPagination
