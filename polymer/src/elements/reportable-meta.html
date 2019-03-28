@@ -203,14 +203,14 @@
         var field = Polymer.dom(event).rootTarget;
         var narrativeTextInput = Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('input');
 
-        if(field.textContent.trim() === 'Edit') {
+        if (field.textContent.trim() === 'Edit') {
           narrativeTextInput.disabled = false;
           narrativeTextInput.focus();
           this.set('toggle', 'Save');
           return;
         }
 
-        if(field.id === 'toggle-button') {
+        if (field.id === 'toggle-button') {
           var parent = Polymer.dom(event).path.find(function(node) {
             return node.label === 'Narrative assessment';
           });
@@ -227,7 +227,7 @@
             break;
 
           case 'narrative_assessment':
-            if(this.data.narrative_assessment === field.value.trim()) {
+            if (this.data.narrative_assessment === field.value.trim()) {
               this.set('toggle', 'Edit');
               narrativeTextInput.disabled = true;
               break;
@@ -266,7 +266,7 @@
       },
 
       _computeRefreshData: function (reportId) {
-        return {"report_id": reportId, "report_type": "IR"};
+        return {'report_id': reportId, 'report_type': 'IR'};
       },
 
       _computeCanRefresh: function (isCluster, data) {

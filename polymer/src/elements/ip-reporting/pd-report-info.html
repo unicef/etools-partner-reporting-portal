@@ -42,7 +42,7 @@
         justify-content: flex-end;
         align-items: center;
       }
-      
+
       #toggle-button {
         background-color: #0099ff;
         color: #fff;
@@ -234,13 +234,12 @@
         textInputs.forEach(function(inputContainer) {
           var field = inputContainer.querySelector('input');
           var id = field.id;
-          
-          if(field.value.trim() === self.data.partner_contribution_to_date 
-          || field.value.trim() === self.data.challenges_in_the_reporting_period 
+
+          if (field.value.trim() === self.data.partner_contribution_to_date
+          || field.value.trim() === self.data.challenges_in_the_reporting_period
           || field.value.trim() === self.data.proposed_way_forward) {
             return;
-          }
-          else {
+          } else {
             self.set(['localData', id], field.value.trim());
           }
         });

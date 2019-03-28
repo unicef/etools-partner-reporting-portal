@@ -121,7 +121,7 @@
         var refreshThunk = this.$.refreshReport.thunk();
 
         refreshThunk()
-            .then(function (res) {
+            .then(function () {
               window.location.reload();
             })
             .catch(function (res) {
