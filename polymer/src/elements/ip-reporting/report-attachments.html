@@ -20,8 +20,13 @@
     <etools-prp-ajax
         id="upload"
         method="post"
+        loading="{{loading}}"
         url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
+    
+    <template is="dom-if" if="{{loading}}">
+      <paper-spinner active></paper-spinner>
+    </template>
 
     <etools-prp-ajax
         id="replace"
