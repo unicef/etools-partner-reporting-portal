@@ -17,7 +17,7 @@
         display: block;
       }
 
-      #face-container {
+      #face-container, #other-one-container, #other-two-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -60,7 +60,7 @@
           use-delete-events>
       </etools-file>
 
-      <template is="dom-if" if="{{loading}}">
+      <template is="dom-if" if="{{faceLoading}}">
         <paper-spinner active></paper-spinner>
       </template>
     </div>
@@ -69,23 +69,35 @@
       number="[[progressPercentage]]">
     </etools-prp-progress-bar> -->
 
-    <etools-file
-        id="otherOneAttachmentComponent"
-        files="{{otherOneAttachment}}"
-        label="Other #1"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+    <div id="other-one-container">
+      <etools-file
+          id="otherOneAttachmentComponent"
+          files="{{otherOneAttachment}}"
+          label="Other #1"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
 
-    <etools-file
-        id="otherTwoAttachmentComponent"
-        files="{{otherTwoAttachment}}"
-        label="Other #2"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+      <template is="dom-if" if="{{otherOneLoading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
+
+    <div id="other-two-container">
+      <etools-file
+          id="otherTwoAttachmentComponent"
+          files="{{otherTwoAttachment}}"
+          label="Other #2"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
+
+      <template is="dom-if" if="{{otherTwoLoading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
 
   </template>
 
@@ -129,6 +141,18 @@
         //   type: Number,
         //   computed: '_computeProgressPercent(attachmentProgress)',
         // },
+
+        faceLoading: {
+          type: Boolean,
+        },
+
+        otherOneLoading: {
+          type: Boolean,
+        },
+
+        otherTwoLoading: {
+          type: Boolean,
+        },
 
         pending: {
           type: Boolean,
@@ -292,6 +316,15 @@
             thunk = this.$.upload.thunk();
             this.$.upload.abort();
             this.$.upload.body = data;
+            console.log('attachmentType', attachmentType);
+
+            if(attachmentPropertyName === 'faceAttachment') {
+              this.set('faceLoading', true);
+            } else if(attachmentPropertyName === 'otherOneAttachment') {
+              this.set('otherOneLoading', true);
+            } else if(attachmentPropertyName === 'otherTwoAttachment') {
+              this.set('otherTwoLoading', true);
+            }
           } else {
             var replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
             this.set('attachmentDeleteUrl', replaceUrl);
@@ -308,6 +341,11 @@
           )
             .then(function () {
               self._notifyFileUploaded();
+
+              self.set('faceLoading', false);
+              self.set('otherOneLoading', false);
+              self.set('otherTwoLoading', false);
+
               var attachments = self.get('attachments');
 
               attachments.forEach(function(item) {
