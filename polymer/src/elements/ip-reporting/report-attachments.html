@@ -16,6 +16,13 @@
       :host {
         display: block;
       }
+
+      #face-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+      }
     </style>
 
     <etools-prp-ajax
@@ -43,18 +50,20 @@
         url="[[attachmentDeleteUrl]]">
     </etools-prp-ajax>
 
-    <etools-file
-        id="faceAttachmentComponent"
-        files="{{faceAttachment}}"
-        label="FACE"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+    <div id="face-container">
+      <etools-file
+          id="faceAttachmentComponent"
+          files="{{faceAttachment}}"
+          label="FACE"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
 
-    <template is="dom-if" if="{{loading}}">
-      <paper-spinner active></paper-spinner>
-    </template>
+      <template is="dom-if" if="{{loading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
 
     <!-- <etools-prp-progress-bar
       number="[[progressPercentage]]">
