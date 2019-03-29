@@ -8,7 +8,6 @@
 <link rel="import" href="../../redux/actions/pdReportsAttachments.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
 <link rel="import" href="../etools-prp-ajax.html">
-<!-- <link rel="import" href="../etools-prp-progress-bar.html"> -->
 
 <dom-module id="report-attachments">
   <template>
@@ -64,10 +63,6 @@
         <paper-spinner active></paper-spinner>
       </template>
     </div>
-
-    <!-- <etools-prp-progress-bar
-      number="[[progressPercentage]]">
-    </etools-prp-progress-bar> -->
 
     <div id="other-one-container">
       <etools-file
@@ -131,17 +126,6 @@
           type: Array,
         },
 
-        // attachmentProgress: {
-        //   type: Object,
-        //   notify: true,
-        //   readOnly: true,
-        // },
-
-        // progressPercentage: {
-        //   type: Number,
-        //   computed: '_computeProgressPercent(attachmentProgress)',
-        // },
-
         faceLoading: {
           type: Boolean,
         },
@@ -190,16 +174,6 @@
         '_filesChanged(otherOneAttachment.*)',
         '_filesChanged(otherTwoAttachment.*)',
       ],
-
-      // _computeProgressPercent: function(value) {
-      //   console.log('VALUE', value);
-
-      //   if(isNaN(value)) {
-      //     return 0;
-      //   } else {
-      //     return value.loaded / value.total;
-      //   }
-      // },
 
       _computeListUrl: function (locationId, reportId) {
         return App.Endpoints.progressReportAttachments(locationId, reportId);
@@ -270,15 +244,6 @@
             });
       },
 
-      // _onProgressChanged: function (e) {
-      //   var self = this;
-
-      //   e.stopPropagation();
-
-      //   this._setAttachmentProgress(e.detail.progress.value);
-      //   console.log('AttachmentProgress', this.attachmentProgress);
-      // },
-
       _filesChanged: function (change) {
         var attachmentPropertyName = change.path.replace('.length', '');
         var isEmpty = change.value === 0 ? true : false;
@@ -316,7 +281,6 @@
             thunk = this.$.upload.thunk();
             this.$.upload.abort();
             this.$.upload.body = data;
-            console.log('attachmentType', attachmentType);
 
             if(attachmentPropertyName === 'faceAttachment') {
               this.set('faceLoading', true);

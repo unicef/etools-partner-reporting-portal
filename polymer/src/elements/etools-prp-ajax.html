@@ -108,27 +108,6 @@
         'ajax.error': '_handleError',
       },
 
-      // observers: [
-      //   '_notifyFileProgressChanged(lastProgress.*)',
-      // ],
-
-      // created: function() {
-      //   this._boundOnProgressChanged = this._onProgressChanged.bind(this);
-      // },
-
-      // _onProgressChanged: function(event) {
-      //   console.log('onProgressChanged', event);
-      //   this._setLastProgress(event.detail.value);
-      // },
-
-      // _notifyFileProgressChanged: function(progress) {
-      //   this.fire(
-      //     'prp-file-progress-changed',
-      //     {progress: progress},
-      //     {bubbles: this.bubbles, composed: true},
-      //   );
-      // },
-
       _computeHeaders: function (headers, token) {
         return Object.assign({}, {
           Authorization: 'Bearer ' + token,
@@ -185,8 +164,6 @@
       thunk: function () {
         return (function () {
           var req = this.generateRequest();
-
-          // req.addEventListener('progress-changed', this._boundOnProgressChanged);
 
           var self = this;
 
