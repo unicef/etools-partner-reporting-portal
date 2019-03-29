@@ -8,6 +8,7 @@
 <link rel="import" href="../../redux/actions/pdReportsAttachments.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<!-- <link rel="import" href="../etools-prp-progress-bar.html"> -->
 
 <dom-module id="report-attachments">
   <template>
@@ -50,9 +51,14 @@
         readonly="[[readonly]]"
         use-delete-events>
     </etools-file>
+
     <template is="dom-if" if="{{loading}}">
       <paper-spinner active></paper-spinner>
     </template>
+
+    <!-- <etools-prp-progress-bar
+      number="[[progressPercentage]]">
+    </etools-prp-progress-bar> -->
 
     <etools-file
         id="otherOneAttachmentComponent"
@@ -86,6 +92,7 @@
 
       listeners: {
         'delete-file': '_onDeleteFile',
+        'prp-file-progress-changed': '_onProgressChanged',
       },
 
       properties: {
@@ -102,6 +109,17 @@
         otherTwoAttachment: {
           type: Array,
         },
+
+        // attachmentProgress: {
+        //   type: Object,
+        //   notify: true,
+        //   readOnly: true,
+        // },
+
+        // progressPercentage: {
+        //   type: Number,
+        //   computed: '_computeProgressPercent(attachmentProgress)',
+        // },
 
         pending: {
           type: Boolean,
@@ -139,6 +157,16 @@
         '_filesChanged(otherOneAttachment.*)',
         '_filesChanged(otherTwoAttachment.*)',
       ],
+
+      // _computeProgressPercent: function(value) {
+      //   console.log('VALUE', value);
+
+      //   if(isNaN(value)) {
+      //     return 0;
+      //   } else {
+      //     return value.loaded / value.total;
+      //   }
+      // },
 
       _computeListUrl: function (locationId, reportId) {
         return App.Endpoints.progressReportAttachments(locationId, reportId);
@@ -208,6 +236,15 @@
               // TODO: error handling
             });
       },
+
+      // _onProgressChanged: function (e) {
+      //   var self = this;
+
+      //   e.stopPropagation();
+
+      //   this._setAttachmentProgress(e.detail.progress.value);
+      //   console.log('AttachmentProgress', this.attachmentProgress);
+      // },
 
       _filesChanged: function (change) {
         var attachmentPropertyName = change.path.replace('.length', '');
