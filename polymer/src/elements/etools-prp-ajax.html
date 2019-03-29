@@ -37,6 +37,7 @@
         active-requests="{{activeRequests}}"
         debounce-duration="{{debounceDuration}}"
         last-error="{{lastError}}"
+        last-progress="{{lastProgress}}"
         last-request="{{lastRequest}}"
         last-response="{{lastResponse}}">
     </iron-ajax>
@@ -77,6 +78,10 @@
           type: String,
           value: 'GET',
           computed: '_computeFormattedMethod(method)',
+        },
+
+        lastProgress: {
+          notify: true,
         },
 
         lastRequest: {
