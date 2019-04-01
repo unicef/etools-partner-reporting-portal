@@ -91,6 +91,12 @@
           notify: true,
         },
 
+        lastProgress: {
+          notify: true,
+          readOnly: true,
+          type: Object,
+        },
+
         activeRequests: {
           notify: true,
         },
@@ -158,6 +164,7 @@
       thunk: function () {
         return (function () {
           var req = this.generateRequest();
+
           var self = this;
 
           return req.completes

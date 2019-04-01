@@ -15,14 +15,22 @@
       :host {
         display: block;
       }
+
+      #face-container, #other-one-container, #other-two-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+      }
     </style>
 
     <etools-prp-ajax
         id="upload"
         method="post"
+        loading="{{loading}}"
         url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
-
+    
     <etools-prp-ajax
         id="replace"
         method="put"
@@ -41,32 +49,50 @@
         url="[[attachmentDeleteUrl]]">
     </etools-prp-ajax>
 
-    <etools-file
-        id="faceAttachmentComponent"
-        files="{{faceAttachment}}"
-        label="FACE"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+    <div id="face-container">
+      <etools-file
+          id="faceAttachmentComponent"
+          files="{{faceAttachment}}"
+          label="FACE"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
 
-    <etools-file
-        id="otherOneAttachmentComponent"
-        files="{{otherOneAttachment}}"
-        label="Other #1"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+      <template is="dom-if" if="{{faceLoading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
 
-    <etools-file
-        id="otherTwoAttachmentComponent"
-        files="{{otherTwoAttachment}}"
-        label="Other #2"
-        disabled="[[pending]]"
-        readonly="[[readonly]]"
-        use-delete-events>
-    </etools-file>
+    <div id="other-one-container">
+      <etools-file
+          id="otherOneAttachmentComponent"
+          files="{{otherOneAttachment}}"
+          label="Other #1"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
+
+      <template is="dom-if" if="{{otherOneLoading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
+
+    <div id="other-two-container">
+      <etools-file
+          id="otherTwoAttachmentComponent"
+          files="{{otherTwoAttachment}}"
+          label="Other #2"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events>
+      </etools-file>
+
+      <template is="dom-if" if="{{otherTwoLoading}}">
+        <paper-spinner active></paper-spinner>
+      </template>
+    </div>
 
   </template>
 
@@ -82,6 +108,7 @@
 
       listeners: {
         'delete-file': '_onDeleteFile',
+        'prp-file-progress-changed': '_onProgressChanged',
       },
 
       properties: {
@@ -97,6 +124,18 @@
 
         otherTwoAttachment: {
           type: Array,
+        },
+
+        faceLoading: {
+          type: Boolean,
+        },
+
+        otherOneLoading: {
+          type: Boolean,
+        },
+
+        otherTwoLoading: {
+          type: Boolean,
         },
 
         pending: {
@@ -141,6 +180,7 @@
       },
 
       _setFiles: function (attachments) {
+        var self = this;
         this.set('faceAttachment', []);
         this.set('otherOneAttachment', []);
         this.set('otherTwoAttachment', []);
@@ -150,13 +190,13 @@
             return;
           }
           if (attachment.type === 'FACE') {
-            this.set('faceAttachment', [attachment]);
+            self.set('faceAttachment', [attachment]);
           }
           if (attachment.type === 'Other') {
-            if (this.get('otherOneAttachment').length === 0) {
-              this.set('otherOneAttachment', [attachment]);
+            if (self.get('otherOneAttachment').length === 0) {
+              self.set('otherOneAttachment', [attachment]);
              } else {
-               this.set('otherTwoAttachment', [attachment]);
+               self.set('otherTwoAttachment', [attachment]);
              }
           }
         });
@@ -241,6 +281,14 @@
             thunk = this.$.upload.thunk();
             this.$.upload.abort();
             this.$.upload.body = data;
+
+            if(attachmentPropertyName === 'faceAttachment') {
+              this.set('faceLoading', true);
+            } else if(attachmentPropertyName === 'otherOneAttachment') {
+              this.set('otherOneLoading', true);
+            } else if(attachmentPropertyName === 'otherTwoAttachment') {
+              this.set('otherTwoLoading', true);
+            }
           } else {
             var replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
             this.set('attachmentDeleteUrl', replaceUrl);
@@ -257,6 +305,11 @@
           )
             .then(function () {
               self._notifyFileUploaded();
+
+              self.set('faceLoading', false);
+              self.set('otherOneLoading', false);
+              self.set('otherTwoLoading', false);
+
               var attachments = self.get('attachments');
 
               attachments.forEach(function(item) {
