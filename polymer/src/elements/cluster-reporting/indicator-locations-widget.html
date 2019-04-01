@@ -452,7 +452,7 @@
             this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
                   self._setPending(loc_type, false);
-                  self._setLocations(loc_type, res.data);
+                  self._setLocations(loc_type, res.data.results);
                 })
                 .catch(function () {
                   self._setPending(loc_type, false);
@@ -471,14 +471,7 @@
         },
 
         _getLocations: function (locations, loc_type) {
-          console.log('LOCATIONS', locations);
-          console.log('loc_type', loc_type);
-          if(locations[loc_type] !== undefined) {
-            console.log('NEXT', locations[loc_type].next);
-            return locations[loc_type].results;
-          } else {
-            return [];
-          }
+          return locations[loc_type] || [];
         },
 
         _getLocationTitle: function (locations, loc_type, locationId) {
