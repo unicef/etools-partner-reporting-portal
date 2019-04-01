@@ -1,0 +1,294 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/etools-ajax/etools-ajax.html">
+
+<link rel="import" href="es6-polyfills.html">
+<link rel="import" href="../../behaviors/single-selection-menu-missing-options-behavior.html">
+<link rel="import" href="../../behaviors/single-selection-menu-common-behavior.html">
+<link rel="import" href="../../behaviors/single-selection-menu-split-label-behavior.html">
+<link rel="import" href="etools-prp-single-selection-menu-dropdown-shared-styles.html">
+
+
+<!--
+`etools-single-selection-menu`
+Dropdown with search and single selection capabilities
+
+@demo demo/index.html
+-->
+
+<dom-module id="etools-single-selection-menu">
+  <template>
+    <style include="etools-dropdown-shared-styles">
+
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+      }
+      :host([capitalize-input-shown]) .paper-input-input,
+      :host([capitalize-options]) paper-listbox paper-item {
+        text-transform: capitalize;
+      }
+
+      .content-wrapper {
+        min-height: 24px;
+      }
+
+
+    </style>
+    <etools-ajax id="missingOptionsAjax"
+                 params="[[ajaxParams]]"
+                 on-success="_handleMissingOptionsReqResponse"
+                 on-fail="_handleMissingOptionsReqError"></etools-ajax>
+
+    <paper-input-container id="main"
+                           tabindex="0"
+                           class="external-wrapper"
+                           always-float-label
+                           disabled$="[[disabled]]"
+                           invalid$="[[invalid]]"
+                           no-label-float="[[noLabelFloat]]"
+                           on-focus="_onFocusInputContainer"
+                           on-tap="_handleClickOrTap"
+                           on-click="_handleClickOrTap">
+
+      <label hidden$=[[!label]] aria-hidden="true">[[label]]</label>
+      <div class="content-wrapper">
+        <input class="paper-input-input"
+               type="text" readonly
+               placeholder="[[placeholder]]"
+               value="[[_getLabel(selectedItem)]]">
+      </div>
+      <paper-menu-button
+          id="dropdownMenu"
+          horizontal-align="right"
+          ignore-select
+          restore-focus-on-close$="[[restoreFocusOnClose]]"
+          allow-outside-scroll="[[allowOutsideScroll]]"
+          dynamic-align$="[[dynamicAlign]]"
+          on-paper-dropdown-open="_onDropdownOpen"
+          on-paper-dropdown-close="_onPaperDropdownClose"
+          disabled$="[[_menuBtnIsDisabled(disabled, readonly)]]"
+          hidden$="[[readonly]]"
+          opened="{{opened}}">
+
+        <iron-icon icon="arrow-drop-down" class="dropdown-trigger"
+                   on-tap="_handleClickOrTap"
+                   on-click="_handleClickOrTap"></iron-icon>
+
+        <div class="dropdown-content">
+          <div class="search-input-wrapper" hidden$="{{hideSearch}}">
+            <paper-input
+                id="searchInput"
+                no-label-float
+                class="search-input"
+                placeholder="Search"
+                type="text"
+                value="{{search}}"
+                auto-focus
+                tabindex="0">
+              <iron-icon icon="search" prefix></iron-icon>
+            </paper-input>
+          </div>
+          <div class="list-wrapper">
+            <paper-listbox attr-for-selected="internal-id"
+                           selected=[[selected]]>
+              <template is="dom-repeat" items="[[shownOptions]]">
+                <paper-item
+                    item=[[item]]
+                    internal-id$="[[_getValue(item)]]"
+                    on-click="_itemSelected"
+                    on-tap="_itemSelected"
+                    class$="[[item.cssClass]][[_getSelectedClass(item)]]"
+                    title$="[[_getLabel(item)]]">
+
+                  <iron-icon class="tick-icon" icon="check"></iron-icon>
+                  <template is="dom-if" if="[[twoLinesLabel]]">
+                    <div class="primary-label">[[getPrimaryLabel(item.label)]]</div>
+                    <div class="secondary-label">[[getSecondaryLabel(item.label)]]</div>
+                  </template>
+                  <template is="dom-if" if="[[!twoLinesLabel]]">
+                    <span>[[_getLabel(item)]]</span>
+                  </template>
+                </paper-item>
+              </template>
+
+              <paper-item hidden$="[[!showNoSearchResultsWarning]]"
+                          class="warning" disabled>
+                No results found. Try other keywords.
+              </paper-item>
+
+              <paper-item hidden$="[[!showLimitWarning]]" class="warning" disabled>
+                More than [[shownOptionsLimit]] items, use the search function to reveal more.
+              </paper-item>
+
+              <paper-item hidden$="[[!noOptionsAvailable]]" class="warning" disabled>
+                No options available.
+              </paper-item>
+            </paper-listbox>
+          </div>
+        </div>
+      </paper-menu-button>
+
+      <template is="dom-if" if="[[invalid]]">
+        <paper-input-error aria-live="assertive">[[errorMessage]]</paper-input-error>
+      </template>
+
+    </paper-input-container>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'etools-prp-single-selection-menu',
+      behaviors: [
+        etoolsSearchableDropdown.MissingOptionsBehavior, // eslint-disable-line no-undef
+        etoolsSearchableDropdown.CommonBehavior, // eslint-disable-line no-undef
+        etoolsSearchableDropdown.SplitLabelBehavior// eslint-disable-line no-undef
+      ],
+      properties: {
+        selected: {
+          type: Number,
+          notify: true,
+          observer: '_selectedChanged'
+        },
+        selectedItem: {
+          type: Object,
+          value: null,
+          notify: true
+        },
+        notFoundOption: {
+          type: String
+        },
+        title: {
+          type: String,
+          reflectToAttribute: true,
+          computed: '_getLabel(selectedItem)'
+        }
+      },
+      observers: [
+        '_selectedAndOptionsChanged(selected, options)',
+        '_notFoundOptionAndUrlChanged(notFoundOption, url)'
+      ],
+
+      // This observer makes sure request for missing option is triggered only after the url is set also.
+      // notFoundOption is actually this.selected
+      _notFoundOptionAndUrlChanged: function() {
+        if (this.notFoundOption) {
+          this._handleSelectedNotFoundInOptions(this.notFoundOption);
+        }
+      },
+      _onPaperDropdownClose: function() {
+        this._resetSearch();
+        if (this.autoValidate) {
+          this.validate(this.selected);
+        }
+      },
+      _handleClickOrTap: function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this._openMenu(e);
+      },
+
+      _openMenu: function(e) {
+        var dropdown = this.$.dropdownMenu;
+        if (!dropdown.opened) {
+          dropdown.open();
+        }
+      },
+
+      _selectedAndOptionsChanged: function() {
+        this._setSelectedItem();
+      },
+      _selectedChanged: function(selected, oldSelected) {
+        if (this.autoValidate) {
+          this.validate(selected);
+        }
+        if (!selected) {
+          this.set('selectedItem', null);
+          return;
+        }
+      },
+      _setSelectedItem: function(selected, selectedItem) {
+        this.set('notFoundOption', null);
+        if (selectedItem) {
+          this.set('selectedItem', selectedItem);
+          return;
+        }
+
+        selected = selected || this.selected;
+
+        if (!selected && this._noOptions()) {
+          this.set('selectedItem', null);
+          return;
+        }
+
+        if (selected && this._noOptions()) {
+          this.set('notFoundOption', this.selected);
+          this.set('selectedItem', null);
+          return;
+        }
+
+        selectedItem = this._getItemFromOptions(selected);
+        if (!selectedItem) {
+          this.set('notFoundOption', this.selected);
+          this.set('selectedItem', null);
+        } else {
+          this.set('selectedItem', selectedItem);
+        }
+      },
+      _updateAfterMissingOptionsReceived: function(detail) {
+        var selectedItem;
+        if (this.arrayNotEmpty(detail)) {
+          selectedItem = detail[0];
+        } else {
+          selectedItem = detail;
+        }
+        this._setSelectedItem(this.selected, selectedItem);
+      },
+      _getItemFromOptions: function(value) {
+        if (this._noOptions()) {
+          return null;
+        }
+        return this.options.find(function(item) {
+          return item[this.optionValue] == value;
+        }.bind(this));
+      },
+      _handleSelectedNotFoundInOptions: function(selected) {
+        this._requestMissingOptions([selected]);
+        // show console warning
+        var warnMsg = '[etools-esmm ' + this.label + '] Selected value ';
+
+        warnMsg += selected + ' not found in dropdown\'s options!';
+        // eslint-disable-next-line no-console
+        console.warn(warnMsg);
+      },
+      validate: function(selected) {
+        if (!this.hasAttribute('required') || this.readonly) {
+          this.set('invalid', false);
+          return true;
+        }
+        selected = selected || this.selected;
+        this.set('invalid', !selected);
+        return !!selected;
+      },
+
+      _itemSelected: function(e) {
+        e.stopImmediatePropagation();
+        this.debounce('select-action', function() {
+          this.set('selected', e.model.item[this.optionValue]);
+          this._closeMenu();
+        }.bind(this), 5);
+      },
+      // Use of this method covers a corner case
+      _getSelectedClass: function(item) {
+        return (this.selected === item[this.optionValue]) ? 'iron-selected' : '';
+      }
+    });
+  </script>
+</dom-module>

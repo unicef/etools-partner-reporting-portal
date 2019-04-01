@@ -4,9 +4,10 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
+<!-- <link rel="import" href="etools-prp-single-selection-menu.html"> -->
 <link rel="import" href="../../settings.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -218,6 +219,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.location}}"
+                  search="{{search}}"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
                   required>
@@ -288,6 +290,12 @@
           locations: Object,
           pending: Object,
           isPai: Boolean,
+          searchLocationType: String,
+
+          search: {
+            type: String,
+            observer: '_getNewSearch',
+          },
 
           editing: {
             type: Boolean,
@@ -355,6 +363,34 @@
             type: Boolean,
             computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
           },
+        },
+
+        _getNewSearch: function (value, oldValue) {
+          console.log('VALUE', value);
+          if(value === '' || value === oldValue) {
+            console.log('HELLO');
+            return;
+          }
+
+          var loc_type = this.get('searchLocationType');
+
+          this.debounce('fetch-locations-' + loc_type, function () {
+            var self = this;
+
+            this._setPending(loc_type, true);
+
+            getThunk = this.$$('#locations' + loc_type).thunk()();
+            console.log('GETTHUNK', getThunk);
+
+          //   this.$$('#locations' + loc_type).thunk()()
+          //       .then(function (res) {
+          //         self._setPending(loc_type, false);
+          //         self._setLocations(loc_type, res.data.results);
+          //       })
+          //       .catch(function () {
+          //         self._setPending(loc_type, false);
+          //       });
+          }, 100);
         },
 
         _computeIsNumber: function (type) {
@@ -463,6 +499,7 @@
         _fetchInitialLocations: function (lockedItems) {
           lockedItems.forEach(function (item) {
             this._fetchLocations(item.loc_type);
+            this.set('searchLocationType', item.loc_type);
           }, this);
         },
 
