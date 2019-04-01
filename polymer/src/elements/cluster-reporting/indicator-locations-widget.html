@@ -471,7 +471,14 @@
         },
 
         _getLocations: function (locations, loc_type) {
-          return locations[loc_type] || [];
+          console.log('LOCATIONS', locations);
+          console.log('loc_type', loc_type);
+          if(locations[loc_type] !== undefined) {
+            console.log('NEXT', locations[loc_type].next);
+            return locations[loc_type].results;
+          } else {
+            return [];
+          }
         },
 
         _getLocationTitle: function (locations, loc_type, locationId) {
