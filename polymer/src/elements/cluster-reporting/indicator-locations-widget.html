@@ -368,7 +368,41 @@
           },
         },
 
+        _next: function(search, filteredSet) {
+          var self = this;
+
+          var loc_type = this.get('searchLocationType');
+
+          var thunk = this.$$('#search');
+          thunk.url = this.get('nextUrl');
+
+          return thunk.thunk()()
+            .then(function(res) {
+              console.log('INSIDE RES')
+              self.set('nextUrl', res.data.next);
+
+              var matches = res.data.results.filter(function(location) {
+                return location.title.toLowerCase().includes(search.toLowerCase());
+              });
+
+              var newSet = filteredSet.concat(matches);
+
+              if(newSet.length < 20) {
+                self._next(search, newSet);
+              } else {
+                console.log('NEW SET', newSet);
+                self._setLocations(loc_type, newSet);
+                self._getLocations(newSet, loc_type);
+                return;
+              }
+              // console.log('OUTSIDE IFS FILTERED', filteredSet);
+              // return filteredSet;
+            });
+        },
+
         _getNewSearch: function (value, oldValue) {
+          var self = this;
+
           console.log('OLD VALUE?', oldValue);
 
           var search = value.detail.value;
@@ -378,28 +412,67 @@
             return;
           }
 
-
           var loc_type = this.get('searchLocationType');
-          var filteredSet = [];
+          var filteredSet = this.get('locations')[loc_type].filter(function(location) {
+            if(location.title.includes(search)) {
+              return location;
+            };
+          });
+          // console.log('FILTERED SET', filteredSet);
 
-          this.debounce('fetch-locations-' + loc_type, function () {
-            var self = this;
-            var thunk;
+          this.debounce('fetch-locations-' + loc_type, function() {
+            self._next(search, filteredSet)
+              .then(function(res) {
+                return;
+              });
+          }, 2000);
+
+          // this.debounce('fetch-locations-' + loc_type, function() {
+            // var self = this;
+
+            // var thunk = this.$.search;
+            // thunk.url = nextPage;
+
+            // console.log('THUNK', thunk);
+
+            // var doneso = this._next(search, filteredSet)
+            //   .then(function(res) {
+            //     console.log('RES IN NEW SEARCH', res);
+            //   });
+
+            // console.log('DONESO?', doneso);
+            
+            // thunk.thunk()()
+            //   .then(function(res) {
+            //     self.set('nextUrl', res.data.next);
+            //     res.data.results.forEach(function(location) {
+            //       if(location.title.toLowerCase().includes(search.toLowerCase())) {
+            //         filteredSet.push(location);
+            //       }
+            //     });
+            //     console.log('FILTERED SET AFTER', filteredSet)
+            //   });
+          // }, 1000)
+
+
+          // this.debounce('fetch-locations-' + loc_type, function () {
+          //   var self = this;
+          //   var thunk;
 
             // this._setPending(loc_type, true);
 
             // thunk = this.$$('#locations' + loc_type);
             // console.log(thunk.url);
 
-            thunk = this.$.search;
-            thunk.url = this.get('nextUrl');
+            // thunk = this.$.search;
+            // thunk.url = this.get('nextUrl');
 
-            thunk.thunk()()
-              .then(function(res) {
-                console.log(res);
-              })
+            // thunk.thunk()()
+            //   .then(function(res) {
+            //     console.log(res);
+            //   })
 
-            console.log(thunk.thunk()());
+            // console.log(thunk.thunk()());
 
             // this.$$('#locations' + loc_type).thunk()()
             //   .then(function (res) {
@@ -427,7 +500,7 @@
           //       .catch(function () {
           //         self._setPending(loc_type, false);
           //       });
-          }, 1000);
+          // }, 1000);
           // this._getLocations(this.get('locations'), loc_type);
         },
 
