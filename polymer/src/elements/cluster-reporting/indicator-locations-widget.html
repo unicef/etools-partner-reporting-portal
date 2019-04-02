@@ -372,13 +372,11 @@
           var self = this;
 
           var loc_type = this.get('searchLocationType');
-
           var thunk = this.$$('#search');
           thunk.url = this.get('nextUrl');
 
           return thunk.thunk()()
             .then(function(res) {
-              console.log('INSIDE RES')
               self.set('nextUrl', res.data.next);
 
               var matches = res.data.results.filter(function(location) {
@@ -390,7 +388,6 @@
               if(newSet.length < 20) {
                 self._next(search, newSet);
               } else {
-                console.log('NEW SET', newSet);
                 self._setLocations(loc_type, newSet);
                 self._getLocations(newSet, loc_type);
                 return;
@@ -408,7 +405,6 @@
           var search = value.detail.value;
           var oldSearch = oldValue.value;
           if(search === '') {
-            console.log('HELLO');
             return;
           }
 
@@ -418,7 +414,6 @@
               return location;
             };
           });
-          // console.log('FILTERED SET', filteredSet);
 
           this.debounce('fetch-locations-' + loc_type, function() {
             self._next(search, filteredSet)
@@ -426,82 +421,6 @@
                 return;
               });
           }, 2000);
-
-          // this.debounce('fetch-locations-' + loc_type, function() {
-            // var self = this;
-
-            // var thunk = this.$.search;
-            // thunk.url = nextPage;
-
-            // console.log('THUNK', thunk);
-
-            // var doneso = this._next(search, filteredSet)
-            //   .then(function(res) {
-            //     console.log('RES IN NEW SEARCH', res);
-            //   });
-
-            // console.log('DONESO?', doneso);
-            
-            // thunk.thunk()()
-            //   .then(function(res) {
-            //     self.set('nextUrl', res.data.next);
-            //     res.data.results.forEach(function(location) {
-            //       if(location.title.toLowerCase().includes(search.toLowerCase())) {
-            //         filteredSet.push(location);
-            //       }
-            //     });
-            //     console.log('FILTERED SET AFTER', filteredSet)
-            //   });
-          // }, 1000)
-
-
-          // this.debounce('fetch-locations-' + loc_type, function () {
-          //   var self = this;
-          //   var thunk;
-
-            // this._setPending(loc_type, true);
-
-            // thunk = this.$$('#locations' + loc_type);
-            // console.log(thunk.url);
-
-            // thunk = this.$.search;
-            // thunk.url = this.get('nextUrl');
-
-            // thunk.thunk()()
-            //   .then(function(res) {
-            //     console.log(res);
-            //   })
-
-            // console.log(thunk.thunk()());
-
-            // this.$$('#locations' + loc_type).thunk()()
-            //   .then(function (res) {
-            //     console.log('RES', res);
-                // res.data.results.forEach(function (location) {
-                //   if(location.title.includes(search) && search !== '') {
-                //     console.log('LOCATION TO BE PUSHED', location.title);
-                //     filteredSet.push(location);
-                //   } else {
-                //     filteredSet = res.data.results;
-                //   }
-                // });
-
-                // self._setLocations(loc_type, filteredSet);
-              // })
-              // .catch(function () {
-              //   self._setPending(loc_type, false);
-              // });
-
-          //   this.$$('#locations' + loc_type).thunk()()
-          //       .then(function (res) {
-          //         self._setPending(loc_type, false);
-          //         self._setLocations(loc_type, res.data.results);
-          //       })
-          //       .catch(function () {
-          //         self._setPending(loc_type, false);
-          //       });
-          // }, 1000);
-          // this._getLocations(this.get('locations'), loc_type);
         },
 
         _computeIsNumber: function (type) {
