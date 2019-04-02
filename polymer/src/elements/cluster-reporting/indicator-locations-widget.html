@@ -219,7 +219,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.location}}"
-                  search="{{search}}"
+                  on-value-changed="_getNewSearch"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
                   required>
@@ -292,11 +292,6 @@
           isPai: Boolean,
           searchLocationType: String,
 
-          search: {
-            type: String,
-            observer: '_getNewSearch',
-          },
-
           editing: {
             type: Boolean,
             value: false,
@@ -366,7 +361,7 @@
         },
 
         _getNewSearch: function (value, oldValue) {
-          console.log('VALUE', value);
+          console.log('VALUE', event.detail.value);
           if(value === '' || value === oldValue) {
             console.log('HELLO');
             return;
