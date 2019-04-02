@@ -109,6 +109,10 @@
       </etools-prp-ajax>
     </template>
 
+    <etools-prp-ajax
+      id="search">
+    </etools-prp-ajax>
+
     <template
         is="dom-if"
         if="[[canMessageIMO]]"
@@ -313,6 +317,10 @@
             observer: '_lockItems',
           },
 
+          nextUrl: {
+            type: String
+          },
+
           valueInitialized: {
             type: Boolean,
             value: false,
@@ -361,21 +369,55 @@
         },
 
         _getNewSearch: function (value, oldValue) {
-          console.log('VALUE', event.detail.value);
-          if(value === '' || value === oldValue) {
+          console.log('OLD VALUE?', oldValue);
+
+          var search = value.detail.value;
+          var oldSearch = oldValue.value;
+          if(search === '') {
             console.log('HELLO');
             return;
           }
 
+
           var loc_type = this.get('searchLocationType');
+          var filteredSet = [];
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
+            var thunk;
 
-            this._setPending(loc_type, true);
+            // this._setPending(loc_type, true);
 
-            getThunk = this.$$('#locations' + loc_type).thunk()();
-            console.log('GETTHUNK', getThunk);
+            // thunk = this.$$('#locations' + loc_type);
+            // console.log(thunk.url);
+
+            thunk = this.$.search;
+            thunk.url = this.get('nextUrl');
+
+            thunk.thunk()()
+              .then(function(res) {
+                console.log(res);
+              })
+
+            console.log(thunk.thunk()());
+
+            // this.$$('#locations' + loc_type).thunk()()
+            //   .then(function (res) {
+            //     console.log('RES', res);
+                // res.data.results.forEach(function (location) {
+                //   if(location.title.includes(search) && search !== '') {
+                //     console.log('LOCATION TO BE PUSHED', location.title);
+                //     filteredSet.push(location);
+                //   } else {
+                //     filteredSet = res.data.results;
+                //   }
+                // });
+
+                // self._setLocations(loc_type, filteredSet);
+              // })
+              // .catch(function () {
+              //   self._setPending(loc_type, false);
+              // });
 
           //   this.$$('#locations' + loc_type).thunk()()
           //       .then(function (res) {
@@ -385,7 +427,8 @@
           //       .catch(function () {
           //         self._setPending(loc_type, false);
           //       });
-          }, 100);
+          }, 1000);
+          // this._getLocations(this.get('locations'), loc_type);
         },
 
         _computeIsNumber: function (type) {
@@ -413,6 +456,7 @@
                   id: 'locations' + index,
                   params: {
                     loc_type: String(index),
+                    page: 1,
                   },
                 };
               });
@@ -474,6 +518,7 @@
           if (this.get('locations')[loc_type]) {
             return;
           }
+          this.set('searchLocationType', loc_type);
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
@@ -482,7 +527,9 @@
 
             this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
+                  console.log('fetch res', res);
                   self._setPending(loc_type, false);
+                  self.set('nextUrl', res.data.next);
                   self._setLocations(loc_type, res.data.results);
                 })
                 .catch(function () {
@@ -494,7 +541,6 @@
         _fetchInitialLocations: function (lockedItems) {
           lockedItems.forEach(function (item) {
             this._fetchLocations(item.loc_type);
-            this.set('searchLocationType', item.loc_type);
           }, this);
         },
 
