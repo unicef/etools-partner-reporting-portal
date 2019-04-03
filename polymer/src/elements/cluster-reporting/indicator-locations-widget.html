@@ -374,8 +374,9 @@
         _onValueChanged: function(event) {
           var loc_type = this.get('searchLocationType');
 
-          var self = this;
           this.debounce('fetch-locations-' + loc_type, function() {
+            var self = this;
+
             if(event.detail.value === '') {
               this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
@@ -388,7 +389,6 @@
                 });
               return;
             } else {
-              var self = this;
               var thunk = self.$.search;
               thunk.url = self.get('url');
 
