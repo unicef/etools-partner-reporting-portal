@@ -4,9 +4,10 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
+<!-- <link rel="import" href="etools-prp-single-selection-menu.html"> -->
 <link rel="import" href="../../settings.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -32,6 +33,9 @@
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 2;
+        --esmm-list-wrapper: {
+          height: 350px;
+        };
       }
 
       .app-grid {
@@ -107,6 +111,10 @@
           params="[[item.params]]">
       </etools-prp-ajax>
     </template>
+
+    <etools-prp-ajax
+      id="search">
+    </etools-prp-ajax>
 
     <template
         is="dom-if"
@@ -218,6 +226,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.location}}"
+                  on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
                   required>
@@ -288,6 +297,7 @@
           locations: Object,
           pending: Object,
           isPai: Boolean,
+          searchLocationType: String,
 
           editing: {
             type: Boolean,
@@ -302,6 +312,10 @@
           isNumber: {
             type: Boolean,
             computed: '_computeIsNumber(indicatorType)',
+          },
+
+          url: {
+            type: String,
           },
 
           value: {
@@ -355,6 +369,44 @@
             type: Boolean,
             computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
           },
+        },
+
+        _onValueChanged: function(event) {
+          var loc_type = this.get('searchLocationType');
+
+          this.debounce('fetch-locations-' + loc_type, function() {
+            var self = this;
+
+            if(event.detail.value === '') {
+              this.$$('#locations' + loc_type).thunk()()
+                .then(function (res) {
+                  self.set('url', res.xhr.responseURL);
+                  self._setPending(loc_type, false);
+                  self._setLocations(loc_type, res.data.results);
+                })
+                .catch(function () {
+                  self._setPending(loc_type, false);
+                });
+              return;
+            } else {
+              var thunk = self.$.search;
+              thunk.url = self.get('url');
+
+              thunk.params = {
+                loc_type: loc_type,
+                title: event.detail.value
+              };
+
+              thunk.thunk()()
+                .then(function(res) {
+                  self._setLocations(loc_type, res.data.results);
+                })
+                .catch(function (err) {
+                  console.log(err);
+                  self._setPending(loc_type, false);
+                });
+            }
+          }, 1000);
         },
 
         _computeIsNumber: function (type) {
@@ -443,6 +495,7 @@
           if (this.get('locations')[loc_type]) {
             return;
           }
+          this.set('searchLocationType', loc_type);
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
@@ -450,13 +503,14 @@
             this._setPending(loc_type, true);
 
             this.$$('#locations' + loc_type).thunk()()
-                .then(function (res) {
-                  self._setPending(loc_type, false);
-                  self._setLocations(loc_type, res.data);
-                })
-                .catch(function () {
-                  self._setPending(loc_type, false);
-                });
+              .then(function (res) {
+                self.set('url', res.xhr.responseURL);
+                self._setPending(loc_type, false);
+                self._setLocations(loc_type, res.data.results);
+              })
+              .catch(function () {
+                self._setPending(loc_type, false);
+              });
           }, 100);
         },
 

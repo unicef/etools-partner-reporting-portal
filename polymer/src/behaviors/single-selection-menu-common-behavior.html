@@ -1,0 +1,425 @@
+<script>
+  (function () {
+    'use strict';
+
+    window.etoolsSearchableDropdown = window.etoolsSearchableDropdown || {};
+    /** @polymerBehavior etoolsSearchableDropdown.CommonBehavior */
+    etoolsSearchableDropdown.CommonBehavior = { // eslint-disable-line no-undef
+      properties: {
+        label: {
+          type: String
+        },
+        noLabelFloat: Boolean,
+        required: {
+          type: Boolean,
+          observer: '_requiredChanged'
+        },
+        search: {
+          type: String,
+          observer: '_searchValueChanged'
+        },
+        options: {
+          type: Array
+        },
+        shownOptions: {
+          type: Array,
+          computed: '_computeShownOptions(options, search, showEmptyValue, options.length)'
+        },
+        optionValue: {
+          type: String,
+          value: 'value'
+        },
+        optionLabel: {
+          type: String,
+          value: 'label'
+        },
+        dynamicAlign: {
+          type: Boolean,
+          value: true
+        },
+        allowOutsideScroll: {
+          type: Boolean
+        },
+        showEmptyValue: {
+          type: Boolean,
+          value: false
+        },
+        hideSearch: {
+          type: Boolean,
+          value: false
+        },
+        disabled: {
+          type: Boolean,
+          value: false
+        },
+        readonly: {
+          type: Boolean,
+          value: function() {
+            return false;
+          },
+          reflectToAttribute: true,
+          observer: '_readonlyChanged'
+        },
+        invalid: {
+          type: Boolean,
+          value: function() {
+            return false;
+          },
+          reflectToAttribute: true
+        },
+        errorMessage: {
+          type: String
+        },
+        shownOptionsLimit: {
+          type: Number,
+          value: 50
+        },
+        noOptionsAvailable: {
+          type: Boolean,
+          value: true,
+          computed: '_computeNoOptionsAvailable(options, options.length)'
+        },
+        showLimitWarning: {
+          type: Boolean,
+          value: false,
+          computed: '_computeShowLimitWarning(shownOptionsLimit, shownOptions)'
+        },
+        showNoSearchResultsWarning: {
+          type: Boolean,
+          value: false,
+          computed: '_showNoSearchResultsWarning(noOptionsAvailable, shownOptions.length, options.length)'
+        },
+        autoValidate: {
+          type: Boolean
+        },
+        placeholder: {
+          type: String,
+          value: '—'
+        },
+        restoreFocusOnClose: {
+          type: Boolean,
+          value: function() {
+            return false;
+          }
+        },
+        twoLinesLabel: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        opened: {
+          type: Boolean
+        },
+        disableOnFocusHandling: {
+          type: Boolean,
+          value: function() {
+            return this.disableOnFocusHandling || this.isIEBrowser();
+          },
+          reflectToAttribute: true
+        },
+        fitInto: Object, // element that will prevent dropdown to overflow outside it's margins
+        viewportEdgeMargin: {
+          type: Number,
+          value: 20
+        }
+      },
+  
+      listeners: {
+        'blur': '_closeMenu'
+      },
+  
+      attached: function() {
+        let ironDropdown = this._getIronDropdown();
+        if (ironDropdown) {
+          // fitInto element will not let the dropdown to overlap it's margins
+          if (!this.fitInto) {
+            this.fitInto = window.EtoolsEsmmFitIntoEl;
+          }
+          if (this.fitInto) {
+            ironDropdown.set('fitInto', this.fitInto);
+          }
+          // set position target to align dropdown content properly
+          ironDropdown.set('positionTarget', this);
+  
+          let ironDrContent = this._getIronDropdownContent();
+          ironDrContent.style.overflow = 'hidden';
+          ironDropdown.addEventListener('iron-overlay-closed', this.resetIronDropdownSize.bind(this));
+        }
+      },
+  
+      /**
+       * Reset previous calculated maxHeight,
+       * in this way on each dropdown open action we'll get the same calculated new height.
+       */
+      resetIronDropdownSize: function() {
+        let ironDrContent = this._getIronDropdownContent();
+        let listWrapper = this._getListWrapper();
+        ironDrContent.style.maxHeight = 'none';
+        listWrapper.style.maxHeight = 'none';
+      },
+  
+      _dropdownOpenedDownwards: function(overlayCoord) {
+        let paperContainerCoords = this.$.main.getBoundingClientRect();
+        return Math.abs(overlayCoord.top - paperContainerCoords.top) <= 10;
+      },
+  
+      _noOptions: function() {
+        return (!this.options || !this.options.length);
+      },
+  
+      _menuBtnIsDisabled: function(disabled, readonly) {
+        return disabled || readonly;
+      },
+  
+      _getValue: function(item) {
+        return item ? item[this.optionValue] : null;
+      },
+  
+      _getLabel: function(item) {
+        if (!item) {
+          return null;
+        }
+        if (this.twoLinesLabel) {
+          return this.getPrimaryLabel(item[this.optionLabel]);
+        }
+        return item[this.optionLabel];
+      },
+  
+      resetInvalidState: function() {
+        this.set('invalid', false);
+      },
+  
+      _computeNoOptionsAvailable: function(options, optionsLength) {
+        return !Array.isArray(options) || !optionsLength;
+      },
+  
+      _readonlyChanged: function(newValue, oldValue) {
+        if (newValue) {
+          this.invalid = false;
+        }
+        this._attributeRepaintNeeded(newValue, oldValue);
+      },
+  
+      _requiredChanged: function(newValue, oldValue) {
+        if (!newValue) {
+          this.invalid = false;
+        }
+        this._attributeRepaintNeeded(newValue, oldValue);
+      },
+  
+      _attributeRepaintNeeded: function(newValue, oldValue) {
+        if (newValue !== undefined && newValue !== oldValue) {
+          this.updateStyles();
+        }
+      },
+  
+      _computeShownOptions: function(options, search, showEmptyValue) {
+        let shownOptions = JSON.parse(JSON.stringify(options));
+  
+        if (search) {
+          shownOptions = options.filter(this._itemContainsSearchString.bind(this));
+          shownOptions = this._trimByShownOptionsLimit(shownOptions);
+        } else if (options.length > this.shownOptionsLimit) {
+          shownOptions = this._trimByShownOptionsLimit(options);
+        }
+  
+        if (showEmptyValue) {
+          let emptyOption = {cssClass: 'emptyValue'};
+          emptyOption[this.optionValue] = null;
+          emptyOption[this.optionLabel] = '-- None --';
+          shownOptions.unshift(emptyOption);
+        }
+        return shownOptions;
+      },
+  
+      _trimByShownOptionsLimit: function(options) {
+        return options.slice(0, Math.min(this.shownOptionsLimit, options.length));
+      },
+  
+      _itemContainsSearchString: function(item) {
+        return item[this.optionLabel] &&
+            item[this.optionLabel].toString().toLowerCase().indexOf(this.search.toLowerCase()) > -1;
+      },
+  
+      _computeShowLimitWarning: function(limit, shownOptions) {
+        return shownOptions.length >= limit;
+      },
+  
+      _showNoSearchResultsWarning: function(noOptionsAvailable, shownOptionsLength, optionsLength) {
+        if (noOptionsAvailable) {
+          return false;
+        }
+        return (optionsLength > 0 && shownOptionsLength === 0) ||
+            (shownOptionsLength === 1 && this.shownOptions[0][this.optionValue] === null);
+      },
+  
+      _validCoordinates: function(coords) {
+        return !(coords.x === 0 && coords.y === 0 &&
+            coords.width === 0 && coords.height === 0 &&
+            coords.left === 0 && coords.right === 0 &&
+            coords.top === 0 && coords.bottom === 0);
+      },
+  
+      _bottomTooCloseToViewportEdge: function(dropdownBottom) {
+        let viewportH = this._getViewportHeight();
+        return (viewportH - dropdownBottom) < 10;
+      },
+  
+      _dropdownBottomOutsideViewPort: function(openedDropdownCoord) {
+        let viewportH = this._getViewportHeight();
+        let dropdownBottomY = openedDropdownCoord.top + openedDropdownCoord.height;
+        let diff = viewportH - dropdownBottomY;
+        return diff <= 0;
+      },
+  
+      _getViewportHeight: function() {
+        return Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      },
+  
+      _recalculateOptionsListHeightForIE11: function(newComputedHeight, openedDropdownCoord, searchInputWrapperHeight) {
+        if (this.isIEBrowser()) {
+          let viewportH = this._getViewportHeight();
+          /**
+           * - if newComputedHeight is bigger than IE11 viewport we need to recalculate list height
+           * or
+           * - recheck bottom margin if it's visible, it might still be under viewport bottom limit in IE11
+           * possible dynamicAlign issue in IE11
+           */
+          if (this._dropdownOpenedDownwards(openedDropdownCoord) &&
+              (newComputedHeight > viewportH || this._dropdownBottomOutsideViewPort(openedDropdownCoord))) {
+            newComputedHeight = viewportH - openedDropdownCoord.top - searchInputWrapperHeight - this.viewportEdgeMargin;
+          }
+  
+          /**
+           * There is another case when the top coordinate of the dropdown is negative
+           * and the height is bigger than the viewport height
+           */
+          if (!this._dropdownOpenedDownwards(openedDropdownCoord) && newComputedHeight > viewportH) {
+            let maxDropdownHeight = viewportH - openedDropdownCoord.bottom;
+            newComputedHeight = viewportH - maxDropdownHeight - searchInputWrapperHeight - 60;
+            let ironDropdown = this._getIronDropdown();
+            ironDropdown.style.top = '60px'; // adjust iron dropdown top to be able to see it, ugly
+          }
+        }
+        return newComputedHeight;
+      },
+  
+      _getSearchFieldHeight: function() {
+        let searchInputWrapperHeight = 0;
+        if (!this.hideSearch) {
+          let searchInputWrapper = this.$$('.search-input-wrapper');
+          searchInputWrapperHeight = Number(window.getComputedStyle(searchInputWrapper).height.replace('px', ''));
+        }
+        return searchInputWrapperHeight;
+      },
+  
+      _resizeOptionsListHeight: function() {
+        let ironDrContent = this._getIronDropdownContent();
+  
+        let dropdownContentHeightCheck = setInterval(function() {
+          // opened dropdown coordinates
+          let openedDropdownCoord = ironDrContent.getBoundingClientRect();
+  
+          // don't do anything until maxHeight is set and the dropdown has been opened
+          if (ironDrContent.style.maxHeight && this._validCoordinates(openedDropdownCoord)) {
+            clearInterval(dropdownContentHeightCheck);
+            let drMaxHeight = Number(ironDrContent.style.maxHeight.replace('px', ''));
+            let searchInputWrapperHeight = this._getSearchFieldHeight();
+  
+            // for browsers
+            let listOptionsComputedHeight = drMaxHeight - searchInputWrapperHeight;
+            if (this._dropdownOpenedDownwards(openedDropdownCoord) &&
+                this._bottomTooCloseToViewportEdge(drMaxHeight + openedDropdownCoord.top)) {
+              listOptionsComputedHeight -= this.viewportEdgeMargin;
+            }
+  
+            // check if height is correctly calculated for IE11 and recalculate if needed
+            listOptionsComputedHeight = this._recalculateOptionsListHeightForIE11(listOptionsComputedHeight,
+                openedDropdownCoord, searchInputWrapperHeight);
+  
+            let listWrapper = this._getListWrapper();
+            listWrapper.style.maxHeight = listOptionsComputedHeight + 'px';
+          }
+        }.bind(this), 0);
+      },
+  
+      _onDropdownOpen: function() {
+        let ironDropdown = this._getIronDropdown();
+        if (ironDropdown) {
+          ironDropdown.style.width = this.offsetWidth + 'px';
+          ironDropdown.focusTarget = this.$$('#searchInput');
+  
+          this._resizeOptionsListHeight();
+        }
+      },
+  
+      _getIronDropdown: function() {
+        console.log('THIS IN COMMON', this.$)
+        return this.$.dropdownMenu.$.dropdown;
+      },
+  
+      _getIronDropdownContent: function() {
+        return this.$.dropdownMenu.$$('.dropdown-content');
+      },
+  
+      _getListWrapper: function() {
+        return this.$$('.list-wrapper');
+      },
+  
+      _closeMenu: function() {
+        this.$.dropdownMenu.close();
+      },
+  
+      _resetSearch: function() {
+        this.set('search', '');
+      },
+  
+      /**
+       * Sometimes the dropdown doesn't resize when search is changed and we need to force the resize
+       */
+      _searchValueChanged: function(search, oldSearch) {
+        if (oldSearch === undefined && search === '') {
+          // prevent resizing at search property init
+          return;
+        }
+        if (search === '' && !this.opened) {
+          // the search string is being reset when closed, so no need to do anything
+          return;
+        }
+        this.resetIronDropdownSize();
+        this.notifyDropdownResize();
+        this.async(function() {
+          this._resizeOptionsListHeight();
+        });
+      },
+  
+      notifyDropdownResize: function() {
+        let ironDropdown = this._getIronDropdown();
+        if (ironDropdown) {
+          ironDropdown.notifyResize();
+        }
+      },
+  
+      _onFocusInputContainer: function() {
+        if (this.disableOnFocusHandling) {
+          return;
+        }
+        this._openMenu();
+      },
+  
+      isIEBrowser: function() {
+        let userAgent = window.navigator.userAgent;
+        if (userAgent.indexOf('Trident/') > -1) {
+          // IE 11
+          return true;
+        }
+        return false;
+      },
+  
+      arrayNotEmpty: function(arr) {
+        return Array.isArray(arr) && arr.length;
+      }
+  
+    };
+  }());
+  </script>
