@@ -375,8 +375,8 @@
           var loc_type = this.get('searchLocationType');
 
           var self = this;
-          if(event.detail.value === '') {
-            this.debounce('fetch-locations-' + loc_type, function() {
+          this.debounce('fetch-locations-' + loc_type, function() {
+            if(event.detail.value === '') {
               this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
                   self.set('url', res.xhr.responseURL);
@@ -387,9 +387,7 @@
                   self._setPending(loc_type, false);
                 });
               return;
-            }, 1000);
-          } else {
-            this.debounce('fetch-locations-' + loc_type, function() {
+            } else {
               var self = this;
               var thunk = self.$.search;
               thunk.url = self.get('url');
@@ -407,9 +405,8 @@
                   console.log(err);
                   self._setPending(loc_type, false);
                 });
-
-            }, 1000);
-          }
+            }
+          }, 1000);
         },
 
         _computeIsNumber: function (type) {
