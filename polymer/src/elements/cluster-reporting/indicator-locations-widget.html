@@ -376,38 +376,40 @@
 
           var self = this;
           if(event.detail.value === '') {
-            this.$$('#locations' + loc_type).thunk()()
-              .then(function (res) {
-                self.set('url', res.xhr.responseURL);
-                self._setPending(loc_type, false);
-                self._setLocations(loc_type, res.data.results);
-              })
-              .catch(function () {
-                self._setPending(loc_type, false);
-              });
-            return;
+            this.debounce('fetch-locations-' + loc_type, function() {
+              this.$$('#locations' + loc_type).thunk()()
+                .then(function (res) {
+                  self.set('url', res.xhr.responseURL);
+                  self._setPending(loc_type, false);
+                  self._setLocations(loc_type, res.data.results);
+                })
+                .catch(function () {
+                  self._setPending(loc_type, false);
+                });
+              return;
+            }, 1000);
+          } else {
+            this.debounce('fetch-locations-' + loc_type, function() {
+              var self = this;
+              var thunk = self.$.search;
+              thunk.url = self.get('url');
+
+              thunk.params = {
+                loc_type: loc_type,
+                title: event.detail.value
+              };
+
+              thunk.thunk()()
+                .then(function(res) {
+                  self._setLocations(loc_type, res.data.results);
+                })
+                .catch(function (err) {
+                  console.log(err);
+                  self._setPending(loc_type, false);
+                });
+
+            }, 1000);
           }
-
-          this.debounce('fetch-locations-' + loc_type, function() {
-            var self = this;
-            var thunk = self.$.search;
-            thunk.url = self.get('url');
-
-            thunk.params = {
-              loc_type: loc_type,
-              title: event.detail.value
-            };
-
-            thunk.thunk()()
-              .then(function(res) {
-                self._setLocations(loc_type, res.data.results);
-              })
-              .catch(function (err) {
-                console.log(err);
-                self._setPending(loc_type, false);
-              });
-
-          }, 1000);
         },
 
         _computeIsNumber: function (type) {
