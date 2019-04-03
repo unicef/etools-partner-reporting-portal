@@ -223,7 +223,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.location}}"
-                  on-value-changed="_getNewSearch"
+                  on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
                   required>
@@ -311,14 +311,14 @@
             computed: '_computeIsNumber(indicatorType)',
           },
 
+          url: {
+            type: String,
+          },
+
           value: {
             type: Array,
             notify: true,
             observer: '_lockItems',
-          },
-
-          nextUrl: {
-            type: String
           },
 
           valueInitialized: {
@@ -368,59 +368,32 @@
           },
         },
 
-        _next: function(search, filteredSet) {
-          var self = this;
-
-          var loc_type = this.get('searchLocationType');
-          var thunk = this.$$('#search');
-          thunk.url = this.get('nextUrl');
-
-          return thunk.thunk()()
-            .then(function(res) {
-              self.set('nextUrl', res.data.next);
-
-              var matches = res.data.results.filter(function(location) {
-                return location.title.toLowerCase().includes(search.toLowerCase());
-              });
-
-              var newSet = filteredSet.concat(matches);
-
-              if(newSet.length < 20) {
-                self._next(search, newSet);
-              } else {
-                self._setLocations(loc_type, newSet);
-                self._getLocations(newSet, loc_type);
-                return;
-              }
-              // console.log('OUTSIDE IFS FILTERED', filteredSet);
-              // return filteredSet;
-            });
-        },
-
-        _getNewSearch: function (value, oldValue) {
-          var self = this;
-
-          console.log('OLD VALUE?', oldValue);
-
-          var search = value.detail.value;
-          var oldSearch = oldValue.value;
-          if(search === '') {
+        _onValueChanged: function(event) {
+          if(event.detail.value === '') {
             return;
           }
 
           var loc_type = this.get('searchLocationType');
-          var filteredSet = this.get('locations')[loc_type].filter(function(location) {
-            if(location.title.includes(search)) {
-              return location;
-            };
-          });
 
           this.debounce('fetch-locations-' + loc_type, function() {
-            self._next(search, filteredSet)
+            var self = this;
+            var thunk = self.$.search;
+            thunk.url = self.get('url');
+
+            thunk.params = {
+              loc_type: loc_type,
+              title: event.detail.value
+            };
+
+            console.log(thunk);
+
+            thunk.thunk()()
               .then(function(res) {
-                return;
-              });
-          }, 2000);
+                console.log(res.data.results);
+                self._setLocations(loc_type, res.data.results);
+              })
+
+          }, 1000);
         },
 
         _computeIsNumber: function (type) {
@@ -448,7 +421,6 @@
                   id: 'locations' + index,
                   params: {
                     loc_type: String(index),
-                    page: 1,
                   },
                 };
               });
@@ -519,9 +491,8 @@
 
             this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
-                  console.log('fetch res', res);
+                  self.set('url', res.xhr.responseURL);
                   self._setPending(loc_type, false);
-                  self.set('nextUrl', res.data.next);
                   self._setLocations(loc_type, res.data.results);
                 })
                 .catch(function () {
