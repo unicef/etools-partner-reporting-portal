@@ -369,11 +369,23 @@
         },
 
         _onValueChanged: function(event) {
+          var loc_type = this.get('searchLocationType');
+
+          var self = this;
           if(event.detail.value === '') {
+            this.$$('#locations' + loc_type).thunk()()
+              .then(function (res) {
+
+                self.set('url', res.xhr.responseURL);
+                self._setPending(loc_type, false);
+                self._setLocations(loc_type, res.data.results);
+              })
+              .catch(function () {
+                self._setPending(loc_type, false);
+              });
             return;
           }
 
-          var loc_type = this.get('searchLocationType');
 
           this.debounce('fetch-locations-' + loc_type, function() {
             var self = this;
@@ -389,9 +401,12 @@
 
             thunk.thunk()()
               .then(function(res) {
-                console.log(res.data.results);
                 self._setLocations(loc_type, res.data.results);
               })
+              .catch(function (err) {
+                console.log(err);
+                self._setPending(loc_type, false);
+              });
 
           }, 1000);
         },
@@ -490,14 +505,14 @@
             this._setPending(loc_type, true);
 
             this.$$('#locations' + loc_type).thunk()()
-                .then(function (res) {
-                  self.set('url', res.xhr.responseURL);
-                  self._setPending(loc_type, false);
-                  self._setLocations(loc_type, res.data.results);
-                })
-                .catch(function () {
-                  self._setPending(loc_type, false);
-                });
+              .then(function (res) {
+                self.set('url', res.xhr.responseURL);
+                self._setPending(loc_type, false);
+                self._setLocations(loc_type, res.data.results);
+              })
+              .catch(function () {
+                self._setPending(loc_type, false);
+              });
           }, 100);
         },
 
