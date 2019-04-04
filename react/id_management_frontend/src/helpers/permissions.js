@@ -21,6 +21,7 @@ const _permissions = {
 
         switch (userRole) {
             case PRP_ROLE.IP_ADMIN:
+            case PRP_ROLE.IP_AUTHORIZED_OFFICER:
             case PRP_ROLE.CLUSTER_IMO:
             case PRP_ROLE.CLUSTER_MEMBER:
             case PRP_ROLE.CLUSTER_SYSTEM_ADMIN:
