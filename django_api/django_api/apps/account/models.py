@@ -70,7 +70,11 @@ class User(AbstractUser):
             return USER_TYPES.imo
         if {PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.cluster_viewer,
-            PRP_ROLE_TYPES.cluster_coordinator} \
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.ip_viewer,
+            PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_admin,
+            PRP_ROLE_TYPES.ip_authorized_officer} \
                 .intersection(user_prp_roles):
             return USER_TYPES.partner
 
