@@ -119,12 +119,17 @@ function dependencies() {
         .pipe(project.rejoin());
 }
 
-
+// Run tests!
 gulp.task('specs', function() {
-    return gulp.src('test/unit/test.js')
+    return gulp.src('test/unit/**.js')
         // gulp-jasmine works on filepaths so you can't have any plugins before it
         .pipe(jasmine())
 });
+
+gulp.task('spec-watch', function() {
+    gulp.watch('test/unit/**.js', gulp.series('specs'));
+});
+
 
 // Clean the build directory, split all source and dependency files into streams
 // and process them, and output bundled and unbundled versions of the project

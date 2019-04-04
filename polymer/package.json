@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "./node_modules/lite-server/bin/lite-server",
     "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
-    "test": "wct"
+    "test": "gulp spec-watch"
   },
   "private": true,
   "devDependencies": {
@@ -40,6 +40,7 @@
     "htmlhint-stylish": "^1.0.3",
     "http-server": "^0.10.0",
     "jasmine": "^3.4.0",
+    "jasmine-ajax": "^4.0.0",
     "jshint": "^2.9.3",
     "jshint-stylish": "^2.2.1",
     "lazypipe": "^1.0.1",
