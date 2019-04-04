@@ -16,6 +16,7 @@ const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const fancylog = require('fancy-log');
 const argv = require('yargs').argv;
+const jasmine = require('gulp-jasmine');
 
 // Got problems? Try logging 'em
 // use -l to activate plylogs
@@ -117,6 +118,13 @@ function dependencies() {
     return project.splitDependencies()
         .pipe(project.rejoin());
 }
+
+
+gulp.task('specs', function() {
+    return gulp.src('test/unit/test.js')
+        // gulp-jasmine works on filepaths so you can't have any plugins before it
+        .pipe(jasmine())
+});
 
 // Clean the build directory, split all source and dependency files into streams
 // and process them, and output bundled and unbundled versions of the project

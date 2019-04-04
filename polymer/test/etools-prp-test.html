@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>etools-prp Test</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../src/elements/etools-prp-ajax.html">
+</head>
+<body>
+  <test-fixture id="basic">
+    <template>
+      <etools-prp-ajax></etools-prp-ajax>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('etools-ajax', function() {
+      test('instantiating the element works', function() {
+        var element = fixture('basic');
+        expect(element).to.not.equal(undefined);
+      });
+    });
+  </script>
+</body>
+</html>
