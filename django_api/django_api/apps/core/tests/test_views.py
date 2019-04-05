@@ -159,7 +159,7 @@ class TestLocationListAPIView(BaseAPITestCase):
         expected = Location.objects.filter(pk__in=pks).count()
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), expected)
+        self.assertEquals(len(response.data['results']), expected)
 
     def test_api_filtering(self):
         url = reverse(
