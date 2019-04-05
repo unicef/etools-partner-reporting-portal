@@ -123,7 +123,7 @@ function dependencies() {
 gulp.task('specs', function() {
     return gulp.src('test/unit/**.js')
         // gulp-jasmine works on filepaths so you can't have any plugins before it
-        .pipe(jasmine())
+        .pipe(jasmine());
 });
 
 gulp.task('spec-watch', function() {
