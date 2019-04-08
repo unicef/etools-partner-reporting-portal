@@ -126,8 +126,8 @@ gulp.task('specs', function() {
         .pipe(jasmine());
 });
 
-gulp.task('spec-watch', function() {
-    gulp.watch('test/unit/**.js', gulp.series('specs'));
+gulp.task('watch', function() {
+    gulp.watch('test/unit/**.js', { ignoreInitial: false }, gulp.series('specs'));
 });
 
 
