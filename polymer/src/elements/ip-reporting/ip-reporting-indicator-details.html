@@ -190,6 +190,7 @@
     </iron-pages>
   </template>
 
+  <script type="module" src="./ip-reporting-indicator-details.js"></script>
   <script>
     Polymer({
       is: 'ip-reporting-indicator-details',
@@ -253,7 +254,7 @@
       },
 
       observers: [
-        '_getDataByKey(dataDict)'
+        'getDataByKey(dataDict)'
       ],
 
       _computeParams: function (isClusterApp) {
@@ -324,11 +325,11 @@
         this.dispatch(App.Actions.setIndicatorDisaggregations(data));
       },
 
-      _getDataByKey: function(dataDict) {
-        if (dataDict.details) {
-          this.data = dataDict.details[this.indicator.id];
-        }
-      },
+      // _getDataByKey: function(dataDict) {
+      //   if (dataDict.details) {
+      //     this.data = dataDict.details[this.indicator.id];
+      //   }
+      // },
 
       _computeHidden: function (data, loading) {
         return !loading || data.length;
