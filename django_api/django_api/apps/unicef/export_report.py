@@ -27,11 +27,11 @@ class ProgressReportXLSXExporter:
 
     def __init__(self, progress_report, analysis=None):
         self.wb = load_workbook(PATH)
-        self.sheet = self.wb.get_active_sheet()
+        self.sheet = self.wb.get_sheet_by_name('PR Template')
         self.progress_report = progress_report
         if analysis is not None:
             self.analysis = analysis
-        self.sheets = [self.sheet, ]
+        self.sheets = [self.wb.get_sheet_by_name('README'), self.sheet, ]
         self.disaggregations_start_column = DISAGGREGATION_COLUMN_START
 
         self.bold_center_style = NamedStyle(name="Bold and Center")
@@ -569,19 +569,19 @@ class ProgressReportXLSXExporter:
             if not indicators:
                 continue
 
-            self.sheets.append(self.duplicate_sheet(self.sheets[0]))
+            self.sheets.append(self.duplicate_sheet(self.sheets[1]))
             self.sheet = self.sheets[sheet_no]
 
             if not self.fill_sheet(disaggregation_types, indicators):
                 to_remove.append(self.sheets[sheet_no])
             sheet_no += 1
 
-        to_remove.append(self.sheets[0])
+        to_remove.append(self.sheets[1])
 
         # Remove empty spreadsheets
         for s in to_remove:
-            # Spreadsheet need atleast 1 sheet
-            if len(self.sheets) > 1:
+            # Spreadsheet need at least 2 sheets
+            if len(self.sheets) > 2:
                 self.sheets.remove(s)
                 self.wb.remove_sheet(s)
 
