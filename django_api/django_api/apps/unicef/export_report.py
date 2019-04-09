@@ -588,6 +588,9 @@ class ProgressReportXLSXExporter:
         if self.analysis:
             self.merge_sheets()
 
-        file_path = SAVE_PATH + 'export_' + uuid.uuid4().hex + '.xlsx'
+        report_name = self.progress_report.report_type + str(self.progress_report.report_number)
+        ref_num = self.progress_report.programme_document.reference_number.split('/')[-1]
+
+        file_path = SAVE_PATH + f'{report_name}_{ref_num}.xlsx'
         self.wb.save(file_path)
         return file_path
