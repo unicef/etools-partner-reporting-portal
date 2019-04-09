@@ -259,15 +259,7 @@
       ],
 
       _computeParams: function (isClusterApp) {
-        var params = {};
-
-        if (isClusterApp === true) {
-          params = Object.assign({}, params, {
-            hide_children: 1,
-          });
-        }
-
-        return params;
+        computeParams(isClusterApp);
       },
 
       _computeIsClusterApp: function(appName) {

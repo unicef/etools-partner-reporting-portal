@@ -7,3 +7,15 @@ function getDataByKey(dataDict, indicator) {
 function computeIsClusterApp(name) {
     return name === 'cluster-reporting';
 }
+
+function computeParams(boolean) {
+    var params = {};
+
+    if (boolean === true) {
+        params = Object.assign({}, params, {
+            hide_children: 1,
+        });
+    }
+
+    return params;
+}
