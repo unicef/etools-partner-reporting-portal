@@ -16,7 +16,7 @@ from indicator.constants import ValueType
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'
 
-DISAGGREGATION_COLUMN_START = 40
+DISAGGREGATION_COLUMN_START = 43
 INDICATOR_DATA_ROW_START = 5
 MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
 
@@ -252,11 +252,11 @@ class ProgressReportXLSXExporter:
                     achievement_in_reporting_period
                 self.sheet.cell(row=start_row_id, column=39).value = \
                     total_cumulative_progress
-                self.sheet.cell(row=start_row_id, column=41).value = \
+                self.sheet.cell(row=start_row_id, column=40).value = \
                     self.progress_report.id
-                self.sheet.cell(row=start_row_id, column=42).value = \
+                self.sheet.cell(row=start_row_id, column=41).value = \
                     indicator.id
-                self.sheet.cell(row=start_row_id, column=43).value = \
+                self.sheet.cell(row=start_row_id, column=42).value = \
                     location_data.id
 
                 # Check location item disaggregation type
