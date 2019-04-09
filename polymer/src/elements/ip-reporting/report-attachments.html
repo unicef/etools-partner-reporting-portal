@@ -30,7 +30,7 @@
         loading="{{loading}}"
         url="[[attachmentsListUrl]]">
     </etools-prp-ajax>
-    
+
     <etools-prp-ajax
         id="replace"
         method="put"
@@ -282,11 +282,11 @@
             this.$.upload.abort();
             this.$.upload.body = data;
 
-            if(attachmentPropertyName === 'faceAttachment') {
+            if (attachmentPropertyName === 'faceAttachment') {
               this.set('faceLoading', true);
-            } else if(attachmentPropertyName === 'otherOneAttachment') {
+            } else if (attachmentPropertyName === 'otherOneAttachment') {
               this.set('otherOneLoading', true);
-            } else if(attachmentPropertyName === 'otherTwoAttachment') {
+            } else if (attachmentPropertyName === 'otherTwoAttachment') {
               this.set('otherTwoLoading', true);
             }
           } else {
