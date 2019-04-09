@@ -6,6 +6,7 @@ describe('frontend tests', function() {
 });
 
 describe('IP Reporting indicator details observer', function() {
+    // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     function getDataByKey(dataDict, indicator) {
         if (dataDict.details) {
             this.data = dataDict.details[indicator.id];
