@@ -12,39 +12,18 @@ def forwards_func(apps, schema_editor):
 
     for item in ProgressReport.objects.all():
         try:
-            new_file = ContentFile(item.attachment.read())
-            new_file.name = item.attachment.name.split('/')[-1]
-            new_file.path = f"unicef/progress_reports/{item.id}/{new_file.name}"
-
             ProgressReportAttachment.objects.create(
                 progress_report=item,
-                file=new_file,
+                file=item.attachment,
+                type="Other",
             )
-
-            item.attachment.delete()
 
         except ValueError:
             pass
 
 
 def reverse_func(apps, schema_editor):
-    ProgressReportAttachment = apps.get_model("unicef", "ProgressReportAttachment")
-
-    for item in ProgressReportAttachment.objects.all():
-        try:
-            # Only do overwrite if ProgressReport's attachment field is None
-            new_file = ContentFile(item.file.read())
-            new_file.name = item.file.name.split('/')[-1]
-            new_file.path = f"unicef/progress_reports/{new_file.name}"
-
-            item.progress_report.attachment = new_file
-            item.progress_report.save()
-
-            item.file.delete()
-        except ValueError:
-            pass
-
-    ProgressReportAttachment.objects.all().delete()
+    pass
 
 
 class Migration(migrations.Migration):
