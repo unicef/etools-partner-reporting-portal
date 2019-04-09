@@ -1,6 +1,5 @@
-function getDataByKey(dataDict) {
+function getDataByKey(dataDict, indicator) {
     if (dataDict.details) {
-        this.data = dataDict.details[this.indicator.id];
+        this.data = dataDict.details[indicator.id];
     }
-    console.log('IS THIS ON?????');
 }

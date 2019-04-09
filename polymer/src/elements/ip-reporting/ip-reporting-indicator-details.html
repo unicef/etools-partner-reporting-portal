@@ -15,6 +15,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
 
+<script src="ip-reporting-indicator-details.js"></script>
+
 <dom-module id="ip-reporting-indicator-details">
   <template>
     <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
@@ -190,7 +192,6 @@
     </iron-pages>
   </template>
 
-  <script type="module" src="./ip-reporting-indicator-details.js"></script>
   <script>
     Polymer({
       is: 'ip-reporting-indicator-details',
@@ -254,7 +255,7 @@
       },
 
       observers: [
-        'getDataByKey(dataDict)'
+        '_getDataByKey(dataDict)'
       ],
 
       _computeParams: function (isClusterApp) {
@@ -325,11 +326,9 @@
         this.dispatch(App.Actions.setIndicatorDisaggregations(data));
       },
 
-      // _getDataByKey: function(dataDict) {
-      //   if (dataDict.details) {
-      //     this.data = dataDict.details[this.indicator.id];
-      //   }
-      // },
+      _getDataByKey: function(dataDict) {
+        getDataByKey(dataDict, this.indicator);
+      },
 
       _computeHidden: function (data, loading) {
         return !loading || data.length;
