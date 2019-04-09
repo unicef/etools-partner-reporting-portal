@@ -8,5 +8,4 @@
   "requireOperatorBeforeLineBreak": null,
   "requireCamelCaseOrUpperCaseIdentifiers": null,
   "excludeFiles": ["node_modules/**"],
-  "esnext": true
 }
