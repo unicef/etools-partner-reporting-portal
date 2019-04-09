@@ -86,3 +86,32 @@ describe('IP reporting indicator details computeParams function', function() {
         expect(computeParams(isClusterApp)).toEqual(trueParams);
     });
 });
+
+describe('IP reporting indicator details computeIndicatorReportsUrl function', function() {
+    function _buildUrl(tail) {
+        return '/api' + tail;
+    }
+
+    function indicatorReports(reportableId) {
+        return _buildUrl('/indicator/' + reportableId + '/indicator-reports/');
+    }
+
+    function computeIndicatorReportsUrl(indicator) {
+        var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
+            ? indicator.cluster_partner_indicator_reportable_id
+            : indicator.id;
+        return indicatorReports(target_indicator_id) + '?limit=2';
+    }
+
+    var indicator = { id: 1489 };
+    var clusterIndicator = { cluster_partner_indicator_reportable_id: 1489, id: 1490 };
+
+    it('should return correct URL with id', function() {
+        expect(computeIndicatorReportsUrl(indicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2');
+    });
+
+    it('should use cluster_partner_indicator_reportable_id rather than just id if it exists', function() {
+        expect(computeIndicatorReportsUrl(clusterIndicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2')
+        expect(computeIndicatorReportsUrl(clusterIndicator)).not.toBe('/api/indicator/1490/indicator-reports/?limit=2')
+    });
+});
