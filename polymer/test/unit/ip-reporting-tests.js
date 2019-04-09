@@ -41,6 +41,7 @@ describe('IP reporting indicator details observer', function() {
 });
 
 describe('IP reporting indicator details clusterApp function', function() {
+    // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     function computeIsClusterApp(name) {
         return name === 'cluster-reporting';
     }
@@ -62,6 +63,7 @@ describe('IP reporting indicator details clusterApp function', function() {
 });
 
 describe('IP reporting indicator details computeParams function', function() {
+    // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     function computeParams(boolean) {
         var params = {};
     
@@ -88,14 +90,17 @@ describe('IP reporting indicator details computeParams function', function() {
 });
 
 describe('IP reporting indicator details computeIndicatorReportsUrl function', function() {
+    // found in polymer/src/endpoints.html
     function _buildUrl(tail) {
         return '/api' + tail;
     }
 
+    // found in polymer/src/endpoints.html
     function indicatorReports(reportableId) {
         return _buildUrl('/indicator/' + reportableId + '/indicator-reports/');
     }
 
+    // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     function computeIndicatorReportsUrl(indicator) {
         var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
             ? indicator.cluster_partner_indicator_reportable_id
