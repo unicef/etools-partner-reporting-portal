@@ -71,7 +71,7 @@ class ProgressReportXLSXExporter:
 
         # Hide non QPR columns
         if self.progress_report.report_type != common.QPR_TYPE:
-            for col in ['L', 'M', 'O', 'P']:
+            for col in ['L', 'M', 'O', 'P', 'Q']:
                 self.sheet.column_dimensions[col].hidden = True
 
         # Prepare Disaggregation Values for given disaggregation types
@@ -212,22 +212,20 @@ class ProgressReportXLSXExporter:
                     self.sheet.cell(row=start_row_id, column=17).value = ''
 
                 self.sheet.cell(row=start_row_id, column=18).value = \
-                    self.progress_report.narrative
-                self.sheet.cell(row=start_row_id, column=19).value = \
                     indicator.get_overall_status_display()
-                self.sheet.cell(row=start_row_id, column=20).value = \
+                self.sheet.cell(row=start_row_id, column=19).value = \
                     indicator.narrative_assessment
-                self.sheet.cell(row=start_row_id, column=21).value = \
+                self.sheet.cell(row=start_row_id, column=20).value = \
                     indicator.reportable.blueprint.title
-                self.sheet.cell(row=start_row_id, column=22).value = \
+                self.sheet.cell(row=start_row_id, column=21).value = \
                     indicator.display_type
-                self.sheet.cell(row=start_row_id, column=23).value = \
+                self.sheet.cell(row=start_row_id, column=22).value = \
                     indicator_target
-                self.sheet.cell(row=start_row_id, column=24).value = \
+                self.sheet.cell(row=start_row_id, column=23).value = \
                     indicator.calculation_formula_across_locations
-                self.sheet.cell(row=start_row_id, column=25).value = \
+                self.sheet.cell(row=start_row_id, column=24).value = \
                     indicator.calculation_formula_across_periods
-                self.sheet.cell(row=start_row_id, column=26).value = \
+                self.sheet.cell(row=start_row_id, column=25).value = \
                     location_data.previous_location_progress_value
 
                 # Iterate over location admin references:
@@ -236,9 +234,9 @@ class ProgressReportXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=26 +
+                    self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2).value = location.title
-                    self.sheet.cell(row=start_row_id, column=26 +
+                    self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
@@ -246,15 +244,19 @@ class ProgressReportXLSXExporter:
                     else:
                         break
 
+                self.sheet.cell(row=start_row_id, column=36).value = \
+                    indicator.reportable.numerator_label
                 self.sheet.cell(row=start_row_id, column=37).value = \
-                    achievement_in_reporting_period
+                    indicator.reportable.denominator_label
                 self.sheet.cell(row=start_row_id, column=38).value = \
-                    total_cumulative_progress
+                    achievement_in_reporting_period
                 self.sheet.cell(row=start_row_id, column=39).value = \
-                    self.progress_report.id
-                self.sheet.cell(row=start_row_id, column=40).value = \
-                    indicator.id
+                    total_cumulative_progress
                 self.sheet.cell(row=start_row_id, column=41).value = \
+                    self.progress_report.id
+                self.sheet.cell(row=start_row_id, column=42).value = \
+                    indicator.id
+                self.sheet.cell(row=start_row_id, column=43).value = \
                     location_data.id
 
                 # Check location item disaggregation type
