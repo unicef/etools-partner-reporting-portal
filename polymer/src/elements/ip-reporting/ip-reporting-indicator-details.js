@@ -19,3 +19,10 @@ function computeParams(boolean) {
 
     return params;
 }
+
+function computeIndicatorReportsUrl(indicator) {
+    var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
+        ? indicator.cluster_partner_indicator_reportable_id
+        : indicator.id;
+    return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
+}

@@ -267,10 +267,7 @@
       },
 
       _computeIndicatorReportsUrl: function (indicator) {
-        var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
-          ? indicator.cluster_partner_indicator_reportable_id
-          : indicator.id;
-        return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
+        return computeIndicatorReportsUrl(indicator);
       },
 
       _bucketByLocation: function(data) {
