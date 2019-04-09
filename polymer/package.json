@@ -16,7 +16,8 @@
   "scripts": {
     "dev": "./node_modules/lite-server/bin/lite-server",
     "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
-    "test": "gulp watch"
+    "test": "gulp specs",
+    "test:watch": "gulp watch"
   },
   "private": true,
   "devDependencies": {
