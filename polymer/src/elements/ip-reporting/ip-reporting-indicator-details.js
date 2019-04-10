@@ -26,3 +26,10 @@ function computeIndicatorReportsUrl(indicator) {
         : indicator.id;
     return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
 }
+
+module.exports = {
+    getDataByKey,
+    computeIsClusterApp,
+    computeParams,
+    computeIndicatorReportsUrl
+}
