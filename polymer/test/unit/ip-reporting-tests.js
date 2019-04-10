@@ -1,4 +1,4 @@
-var IndicatorDetailsUtils = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
+var IndicatorDetailsUtils = require('../../src/elements/ip-reporting/js/ip-reporting-indicator-details.js');
 
 var { getDataByKey,
     computeIsClusterApp,
