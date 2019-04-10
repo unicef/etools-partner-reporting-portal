@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('file', models.FileField(upload_to=unicef.models.get_pr_attachment_upload_to)),
+                ('type', models.CharField(choices=[('FACE', 'FACE'), ('Other', 'Other')], default='Other', max_length=5, verbose_name='Attachment type')),
                 ('progress_report', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attachments', to='unicef.ProgressReport')),
             ],
             options={

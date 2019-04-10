@@ -89,7 +89,7 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                 return True
 
             if (obj_roles_set.issubset({ROLES.ip_editor, ROLES.ip_viewer}) and
-                    user.prp_roles.filter(role=ROLES.ip_admin, **workspace_kwargs).exists()):
+                    user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs).exists()):
                 return True
 
         return False

@@ -193,25 +193,41 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=14).value = \
                     self.progress_report.submitted_by.display_name if \
                     self.progress_report.submitted_by else ''
+
+                attachments = self.progress_report.attachments.all()
+                other_attachments = attachments.filter(type="Other")
+
                 self.sheet.cell(row=start_row_id, column=15).value = \
-                    self.progress_report.attachment.url if self.progress_report.attachment else ''
-                self.sheet.cell(row=start_row_id, column=16).value = \
-                    self.progress_report.narrative
-                self.sheet.cell(row=start_row_id, column=17).value = \
-                    indicator.get_overall_status_display()
+                    attachments.filter(type="FACE").first().file.url if attachments.filter(type="FACE").exists() else ''
+
+                if other_attachments.exists():
+                    if other_attachments.count() == 1:
+                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=17).value = ''
+                    elif other_attachments.count() > 1:
+                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=17).value = other_attachments.last().file.url
+                else:
+                    self.sheet.cell(row=start_row_id, column=16).value = ''
+                    self.sheet.cell(row=start_row_id, column=17).value = ''
+
                 self.sheet.cell(row=start_row_id, column=18).value = \
-                    indicator.narrative_assessment
+                    self.progress_report.narrative
                 self.sheet.cell(row=start_row_id, column=19).value = \
-                    indicator.reportable.blueprint.title
+                    indicator.get_overall_status_display()
                 self.sheet.cell(row=start_row_id, column=20).value = \
-                    indicator.display_type
+                    indicator.narrative_assessment
                 self.sheet.cell(row=start_row_id, column=21).value = \
-                    indicator_target
+                    indicator.reportable.blueprint.title
                 self.sheet.cell(row=start_row_id, column=22).value = \
-                    indicator.calculation_formula_across_locations
+                    indicator.display_type
                 self.sheet.cell(row=start_row_id, column=23).value = \
-                    indicator.calculation_formula_across_periods
+                    indicator_target
                 self.sheet.cell(row=start_row_id, column=24).value = \
+                    indicator.calculation_formula_across_locations
+                self.sheet.cell(row=start_row_id, column=25).value = \
+                    indicator.calculation_formula_across_periods
+                self.sheet.cell(row=start_row_id, column=26).value = \
                     location_data.previous_location_progress_value
 
                 # Iterate over location admin references:
@@ -220,9 +236,9 @@ class ProgressReportXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=24 +
+                    self.sheet.cell(row=start_row_id, column=26 +
                                     admin_level * 2).value = location.title
-                    self.sheet.cell(row=start_row_id, column=24 +
+                    self.sheet.cell(row=start_row_id, column=26 +
                                     admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
@@ -230,15 +246,15 @@ class ProgressReportXLSXExporter:
                     else:
                         break
 
-                self.sheet.cell(row=start_row_id, column=35).value = \
-                    achievement_in_reporting_period
-                self.sheet.cell(row=start_row_id, column=36).value = \
-                    total_cumulative_progress
                 self.sheet.cell(row=start_row_id, column=37).value = \
-                    self.progress_report.id
+                    achievement_in_reporting_period
                 self.sheet.cell(row=start_row_id, column=38).value = \
-                    indicator.id
+                    total_cumulative_progress
                 self.sheet.cell(row=start_row_id, column=39).value = \
+                    self.progress_report.id
+                self.sheet.cell(row=start_row_id, column=40).value = \
+                    indicator.id
+                self.sheet.cell(row=start_row_id, column=41).value = \
                     location_data.id
 
                 # Check location item disaggregation type
