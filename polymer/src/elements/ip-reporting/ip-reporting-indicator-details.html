@@ -15,7 +15,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
 
-<script src="ip-reporting-indicator-details.js"></script>
+<link rel="import" href="ip-reporting-indicator-details-functions.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
@@ -259,19 +259,19 @@
       ],
 
       _computeParams: function (isClusterApp) {
-        computeParams(isClusterApp);
+        IndicatorDetailsUtils.computeParams(isClusterApp);
       },
 
       _computeIsClusterApp: function(appName) {
-        computeIsClusterApp(appName);
+        IndicatorDetailsUtils.computeIsClusterApp(appName);
       },
 
       _computeIndicatorReportsUrl: function (indicator) {
-        return computeIndicatorReportsUrl(indicator);
+        return IndicatorDetailsUtils.computeIndicatorReportsUrl(indicator);
       },
 
       _bucketByLocation: function(data) {
-        return bucketByLocation(data);
+        return IndicatorDetailsUtils.bucketByLocation(data);
       },
 
       _updateDisaggregationStore: function(data) {
@@ -279,11 +279,11 @@
       },
 
       _getDataByKey: function(dataDict) {
-        getDataByKey(dataDict, this.indicator);
+        IndicatorDetailsUtils.getDataByKey(dataDict, this.indicator);
       },
 
       _computeHidden: function (data, loading) {
-        return computeHidden(data, loading);
+        return IndicatorDetailsUtils.computeHidden(data, loading);
       },
 
       _openChanged: function() {

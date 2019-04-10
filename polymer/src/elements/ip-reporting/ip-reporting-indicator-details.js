@@ -1,14 +1,18 @@
-function getDataByKey(dataDict, indicator) {
+function IndicatorDetailsUtils() {
+        
+}
+
+IndicatorDetailsUtils.getDataByKey = function (dataDict, indicator) {
     if (dataDict.details) {
         this.data = dataDict.details[indicator.id];
     }
 }
 
-function computeIsClusterApp(name) {
+IndicatorDetailsUtils.computeIsClusterApp = function (name) {
     return name === 'cluster-reporting';
 }
 
-function computeParams(boolean) {
+IndicatorDetailsUtils.computeParams = function (boolean) {
     var params = {};
 
     if (boolean === true) {
@@ -20,18 +24,18 @@ function computeParams(boolean) {
     return params;
 }
 
-function computeIndicatorReportsUrl(indicator) {
+IndicatorDetailsUtils.computeIndicatorReportsUrl = function (indicator) {
     var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
         ? indicator.cluster_partner_indicator_reportable_id
         : indicator.id;
     return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
 }
 
-function computeHidden(data, loading) {
+IndicatorDetailsUtils.computeHidden = function (data, loading) {
     return !loading || data.length;
 }
 
-function bucketByLocation(data) {
+IndicatorDetailsUtils.bucketByLocation = function (data) {
     //API gives us two objects, one for current reporting period and
     //one for previous. We want to create a list of locations, each with a
     //current and/or previous report.
@@ -72,11 +76,6 @@ function bucketByLocation(data) {
     return locationList;
 }
 
-module.exports = {
-    getDataByKey,
-    computeIsClusterApp,
-    computeParams,
-    computeIndicatorReportsUrl,
-    computeHidden,
-    bucketByLocation
-}
+try {
+    module.exports = exports = IndicatorDetailsUtils;
+} catch (e) {}

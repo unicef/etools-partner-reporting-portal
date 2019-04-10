@@ -1,8 +1,11 @@
+var IndicatorDetailsUtils = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
+
 var { getDataByKey,
     computeIsClusterApp,
     computeParams,
     computeHidden,
-    bucketByLocation } = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
+    bucketByLocation } = IndicatorDetailsUtils;
+
 
 describe('frontend tests', function() {
     it('should pass', function() {
@@ -135,7 +138,7 @@ describe('IP reporting indicator details bucketByLocation function', function() 
         }]
     }];
 
-    var bigExpect = [{
+    var greatExpectations = [{
         reportInfo: {
             previous: {
                 id: 1,
@@ -181,6 +184,6 @@ describe('IP reporting indicator details bucketByLocation function', function() 
     });
 
     it('should return locationList array when given bigData', function() {
-        expect(bucketByLocation(bigData)).toEqual(bigExpect);
-    })
+        expect(bucketByLocation(bigData)).toEqual(greatExpectations);
+    });
 });
