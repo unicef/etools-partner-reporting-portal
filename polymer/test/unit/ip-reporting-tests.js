@@ -1,7 +1,8 @@
 var { getDataByKey,
     computeIsClusterApp,
     computeParams,
-    computeHidden } = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
+    computeHidden,
+    bucketByLocation } = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
 
 describe('frontend tests', function() {
     it('should pass', function() {
@@ -16,12 +17,9 @@ describe('IP reporting indicator details observer', function() {
             1: 'hello'
         }
     }
-    var ind = {
-        id: 1
-    }
-    var badObj = {
-        deets: 'howdy'
-    }
+
+    var ind = { id: 1 }
+    var badObj = { deets: 'howdy' }
     var nullObj = '';
 
     xit('should equal hello', function() {
@@ -114,4 +112,75 @@ describe('IP reporting indicator details computeHidden function', function() {
     it('should return length of data array when loading is true', function() {
         expect(computeHidden(data, definedLoading)).toBe(2);
     });
+});
+
+describe('IP reporting indicator details bucketByLocation function', function() {
+    var data;
+    var bigData = [{
+        id: 0,
+        indicator_location_data: [{ 
+            location: { 
+                id: 81,
+                title: 'title1'
+            }
+        }]
+    },
+    {
+        id: 1,
+        indicator_location_data: [{
+            location: {
+                id: 25,
+                title: 'title4'
+            }
+        }]
+    }];
+
+    var bigExpect = [{
+        reportInfo: {
+            previous: {
+                id: 1,
+                indicator_location_data: [{ 
+                    location: { 
+                        id: 25,
+                        title: 'title4'
+                    }
+                }]
+            },
+        },
+        previous: { 
+            location: { 
+                id: 25,
+                title: 'title4'
+            }
+        },
+        name: 'title4'
+    },
+    {
+        reportInfo: {
+            current: {
+                id: 0,
+                indicator_location_data: [{ 
+                    location: { 
+                        id: 81,
+                        title: 'title1'
+                    }
+                }]
+            },
+        },
+        current: { 
+            location: { 
+                id: 81,
+                title: 'title1'
+            }
+        },
+        name: 'title1'
+    }];
+
+    it('should return an empty array', function() {
+        expect(bucketByLocation(data)).toEqual([]);
+    });
+
+    it('should return locationList object when given bigData', function() {
+        expect(bucketByLocation(bigData)).toEqual(bigExpect);
+    })
 });

@@ -36,7 +36,6 @@ function bucketByLocation(data) {
     //one for previous. We want to create a list of locations, each with a
     //current and/or previous report.
     var locations = {};
-    console.log('DATA IN FUNCTION', data);
 
     if (!data) {
         return [];
@@ -78,5 +77,6 @@ module.exports = {
     computeIsClusterApp,
     computeParams,
     computeIndicatorReportsUrl,
-    computeHidden
+    computeHidden,
+    bucketByLocation
 }
