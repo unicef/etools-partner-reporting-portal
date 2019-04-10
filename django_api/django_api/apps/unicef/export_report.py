@@ -1,5 +1,4 @@
 import itertools
-import uuid
 
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment, NamedStyle
