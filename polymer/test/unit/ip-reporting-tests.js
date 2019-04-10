@@ -1,6 +1,7 @@
 var { getDataByKey,
     computeIsClusterApp,
-    computeParams } = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
+    computeParams,
+    computeHidden } = require('../../src/elements/ip-reporting/ip-reporting-indicator-details.js');
 
 describe('frontend tests', function() {
     it('should pass', function() {
@@ -98,5 +99,19 @@ describe('IP reporting indicator details computeIndicatorReportsUrl function', f
     it('should use cluster_partner_indicator_reportable_id rather than just id if it exists', function() {
         expect(computeIndicatorReportsUrl(clusterIndicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2')
         expect(computeIndicatorReportsUrl(clusterIndicator)).not.toBe('/api/indicator/1490/indicator-reports/?limit=2')
+    });
+});
+
+describe('IP reporting indicator details computeHidden function', function() {
+    var data = ['test', 'test2'];
+    var loading = undefined;
+    var definedLoading = true;
+
+    it('should return true', function() {
+        expect(computeHidden(data, loading)).toBe(true);
+    });
+
+    it('should return length of data array when loading is true', function() {
+        expect(computeHidden(data, definedLoading)).toBe(2);
     });
 });

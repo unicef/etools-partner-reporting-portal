@@ -35,5 +35,6 @@ module.exports = {
     getDataByKey,
     computeIsClusterApp,
     computeParams,
-    computeIndicatorReportsUrl
+    computeIndicatorReportsUrl,
+    computeHidden
 }
