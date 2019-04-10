@@ -320,7 +320,7 @@
       },
 
       _computeHidden: function (data, loading) {
-        return !loading || data.length;
+        return computeHidden(data, loading);
       },
 
       _openChanged: function() {

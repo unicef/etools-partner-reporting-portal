@@ -27,6 +27,10 @@ function computeIndicatorReportsUrl(indicator) {
     return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
 }
 
+function computeHidden(data, loading) {
+    return !loading || data.length;
+}
+
 module.exports = {
     getDataByKey,
     computeIsClusterApp,
