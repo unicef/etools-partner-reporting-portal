@@ -180,7 +180,7 @@ describe('IP reporting indicator details bucketByLocation function', function() 
         expect(bucketByLocation(data)).toEqual([]);
     });
 
-    it('should return locationList object when given bigData', function() {
+    it('should return locationList array when given bigData', function() {
         expect(bucketByLocation(bigData)).toEqual(bigExpect);
     })
 });
