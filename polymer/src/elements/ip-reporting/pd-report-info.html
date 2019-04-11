@@ -148,9 +148,13 @@
         </div>
 
         <div class="toggle-button-container row">
-          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-            Save
-          </paper-button>
+          <template
+              is="dom-if"
+              if="[[!_equals(computeMode, 'view')]]">
+            <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+              Save
+            </paper-button>
+          </template>
         </div>
 
         <div class="row">
