@@ -205,7 +205,7 @@
       },
 
       _getDeleteUrl: function (locationId, reportId, attachmentId) {
-        return App.Endpoints.progressReportAttachmentDetail(locationId, reportId, attachmentId);
+        return ReportAttachmentsUtils.getDeleteUrl(locationId, reportId, attachmentId);
       },
 
       _onDeleteFile: function (e) {
