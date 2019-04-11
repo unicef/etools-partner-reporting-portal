@@ -9,6 +9,8 @@
 <link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
 <link rel="import" href="../etools-prp-ajax.html">
 
+<link rel="import" href="js/report-attachments-functions.html">
+
 <dom-module id="report-attachments">
   <template>
     <style>
@@ -176,7 +178,7 @@
       ],
 
       _computeListUrl: function (locationId, reportId) {
-        return App.Endpoints.progressReportAttachments(locationId, reportId);
+        return ReportAttachmentsUtils.computeListUrl(locationId, reportId);
       },
 
       _setFiles: function (attachments) {
