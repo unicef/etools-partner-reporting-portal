@@ -25,6 +25,9 @@ class ProgressReportXLSXReader(object):
 
     def import_data(self):
         for self.sheet in self.wb.worksheets:
+            if self.sheet.title.lower() == 'readme':
+                continue
+
             # Find "Location ID" column
             location_column_id = None
             for column in range(1, MAX_COLUMNS):
