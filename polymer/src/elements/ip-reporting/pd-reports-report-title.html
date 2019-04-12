@@ -88,7 +88,7 @@
       },
 
       _getReportTitle: function (report) {
-        return report.report_type + report.report_number;
+        return PdReportsReportTitleUtils.getReportTitle(report);
       },
 
       _getReportLink: function (report, permissions) {

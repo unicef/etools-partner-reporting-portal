@@ -18,6 +18,10 @@ PdReportsReportTitleUtils.getReportTitleFull = function (report) {
     return title;
 }
 
+PdReportsReportTitleUtils.getReportTitle = function (report) {
+    return report.report_type + report.report_number;
+}
+
 try {
     module.exports = exports = PdReportsReportTitleUtils;
 } catch (e) {}
