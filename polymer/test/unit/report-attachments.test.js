@@ -1,5 +1,7 @@
 const ReportAttachmentsUtils = require('../../src/elements/ip-reporting/js/report-attachments.js');
 
+const { setFiles } = ReportAttachmentsUtils;
+
 // Functions for testing endpoints - TODO: FIX THIS so it's actually importing
 // found in polymer/src/endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -46,5 +48,14 @@ describe('Report attachments getDeleteUrl function', () => {
 
     it('builds the delete URL correctly', () => {
         expect(getDeleteUrl(locationId, reportId, attachmentId)).toBe('/api/unicef/1/progress-reports/2/attachments/3/')
+    });
+});
+
+describe('Report attachments setFiles function', () => {
+    const list = [{ id: 1, path: 'hello' }, { id: 2 }, { id: 3, path: 'howdy' }];
+    const newList = [{ id: 1, path: 'hello' }, undefined, { id: 3, path: 'howdy' }];
+
+    it('returns array with same objects as long as they have a path property', () => {
+        expect(setFiles(list)).toEqual(newList);
     });
 });
