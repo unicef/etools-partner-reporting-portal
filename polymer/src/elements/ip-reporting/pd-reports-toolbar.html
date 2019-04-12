@@ -73,13 +73,11 @@
       },
 
       _canExport: function (totalResults) {
-        return totalResults > 0;
+        return PdReportsToolbarUtils.canExport(totalResults);
       },
 
       _computePdQuery: function (pdId) {
-        return {
-          programme_document: pdId,
-        };
+        return PdReportsToolbarUtils.computePdQuery(pdId);
       },
     });
   </script>
