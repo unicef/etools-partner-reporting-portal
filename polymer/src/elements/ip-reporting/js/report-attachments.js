@@ -10,6 +10,15 @@ ReportAttachmentsUtils.getDeleteUrl = function(locationId, reportId, attachmentI
     return App.Endpoints.progressReportAttachmentDetail(locationId, reportId, attachmentId);
 }
 
+ReportAttachmentsUtils.setFiles = function(attachments) {
+    return attachments.map(function(attachment) {
+        if (attachment && !attachment.path) {
+            return;
+        }
+        return attachment;
+    });
+}
+
 try {
     module.exports = exports = ReportAttachmentsUtils;
 } catch (e) {}

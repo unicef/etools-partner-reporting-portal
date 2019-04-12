@@ -187,21 +187,16 @@
         this.set('otherOneAttachment', []);
         this.set('otherTwoAttachment', []);
 
-        attachments.forEach(function(attachment) {
-          if (attachment && !attachment.path) {
-            return;
-          }
-          if (attachment.type === 'FACE') {
-            self.set('faceAttachment', [attachment]);
-          }
-          if (attachment.type === 'Other') {
-            if (self.get('otherOneAttachment').length === 0) {
+        ReportAttachmentsUtils.setFiles(this.attachments)
+          .forEach(function (attachment) {
+            if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
+              self.set('otherTwoAttachment', [attachment]);
+            } else if (attachment.type === 'Other') {
               self.set('otherOneAttachment', [attachment]);
-             } else {
-               self.set('otherTwoAttachment', [attachment]);
-             }
-          }
-        });
+            } else {
+              self.set('faceAttachment', [attachment]);
+            }
+          });
       },
 
       _getDeleteUrl: function (locationId, reportId, attachmentId) {
@@ -224,26 +219,26 @@
         this.dispatch(
           App.Actions.PDReportsAttachments.sync(deleteThunk, this.reportId)
         )
-            .then(function () {
-              self._notifyFileDeleted();
-              self.set('attachmentDeleteUrl', undefined);
+          .then(function () {
+            self._notifyFileDeleted();
+            self.set('attachmentDeleteUrl', undefined);
 
-              if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-                self.$.faceAttachmentComponent.fileInput.value = null;
-                self.$.faceAttachmentComponent.set('files', []);
-              } else if (self.get('otherOneAttachment').length !== 0
+            if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
+              self.$.faceAttachmentComponent.fileInput.value = null;
+              self.$.faceAttachmentComponent.set('files', []);
+            } else if (self.get('otherOneAttachment').length !== 0
                 && e.detail.file.id === self.get('otherOneAttachment')[0].id) {
-                self.$.otherOneAttachmentComponent.fileInput.value = null;
-                self.$.otherOneAttachmentComponent.set('files', []);
-              } else if (self.get('otherTwoAttachment').length !== 0
+              self.$.otherOneAttachmentComponent.fileInput.value = null;
+              self.$.otherOneAttachmentComponent.set('files', []);
+            } else if (self.get('otherTwoAttachment').length !== 0
                 && e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
-                self.$.otherTwoAttachmentComponent.fileInput.value = null;
-                self.$.otherTwoAttachmentComponent.set('files', []);
-              }
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+              self.$.otherTwoAttachmentComponent.fileInput.value = null;
+              self.$.otherTwoAttachmentComponent.set('files', []);
+            }
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
       },
 
       _filesChanged: function (change) {
