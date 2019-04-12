@@ -7,6 +7,8 @@
 
 <link rel="import" href="../etools-prp-permissions.html">
 
+<link rel="import" href="js/pd-reports-report-title-functions.html">
+
 <dom-module id="pd-reports-report-title">
   <template>
     <style>
@@ -78,7 +80,7 @@
       },
 
       _shouldDisplayLink: function(displayLink, report, permissions) {
-        return displayLink && this._canNavigateToReport(permissions, report);
+        return PdReportsReportTitleUtils.shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
       },
 
       _getReportTitleFull: function (report) {
