@@ -93,10 +93,7 @@
 
       _getReportLink: function (report, permissions) {
         var suffix = this._getMode(report, permissions);
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
-        );
+        return PdReportsReportTitleUtils.getReportLink(report, suffix, this.buildUrl, this._baseUrl);
       },
     });
   </script>
