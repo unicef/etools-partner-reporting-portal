@@ -1,5 +1,7 @@
 const PdOutputUtils = require('../../src/elements/ip-reporting/js/pd-output.js');
-const {calculationFormulaAcrossPeriods, computeIcon} = PdOutputUtils;
+const {calculationFormulaAcrossPeriods,
+    computeIcon,
+    computeCompleteIndicator} = PdOutputUtils;
 
 describe('PdOutput calculationFormulaAcrossPeriods function', () => {
     const indicator = {
@@ -38,5 +40,18 @@ describe('PdOutput computeIcon function', () => {
     
     it('returns less if opened is truthy', () => {
         expect(computeIcon(openedTrue)).toBe('less');
+    });
+});
+
+describe('PdOutput computeCompleteIndicator function', () => {
+    const complete = false;
+    const completeTrue = true;
+
+    it('returns more if opened is falsy', () => {
+        expect(computeCompleteIndicator(complete)).toBe('Ove');
+    });
+    
+    it('returns less if opened is truthy', () => {
+        expect(computeCompleteIndicator(completeTrue)).toBe('Met');
     });
 });

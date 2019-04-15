@@ -355,7 +355,7 @@
       },
 
       _computeCompleteIndicator: function (complete) {
-        return complete ? 'Met' : 'Ove';
+        return PdOutputUtils.computeCompleteIndicator(complete);
       },
 
       _computeReportableUrl: function (reportId, data) {
@@ -364,9 +364,9 @@
 
       _computeCalculationMethodUrl: function (baseUrl, pdId) {
         return this.buildUrl(
-                baseUrl,
-                'pd/' + pdId + '/view/calculation-methods'
-              );
+          baseUrl,
+          'pd/' + pdId + '/view/calculation-methods'
+        );
       },
 
       _computeReportIsQpr: function (currentReport, indicator) {

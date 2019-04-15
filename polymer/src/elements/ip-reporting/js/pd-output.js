@@ -22,6 +22,10 @@ PdOutputUtils.computeIcon = function (opened) {
     return opened ? 'less' : 'more';
 };
 
+PdOutputUtils.computeCompleteIndicator = function (complete) {
+    return complete ? 'Met' : 'Ove';
+};
+
 try {
     module.exports = exports = PdOutputUtils;
 } catch (e) {}
