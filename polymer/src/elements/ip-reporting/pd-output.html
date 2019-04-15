@@ -22,6 +22,8 @@
 <link rel="import" href="../indicator-details.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
 
+<link rel="import" href="js/pd-output-functions.html">
+
 <dom-module id="pd-output">
   <template>
     <style include="iron-flex iron-flex-factors">
@@ -339,8 +341,7 @@
       },
 
       _calculationFormulaAcrossPeriods: function (indicator) {
-        return indicator.reportable.blueprint.display_type === 'ratio'
-          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+        return PdOutputUtils.calculationFormulaAcrossPeriods(indicator);
       },
 
       _toggle: function (e) {
