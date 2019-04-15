@@ -19,6 +19,7 @@
 <link rel="import" href="pd-reports-report-title.html">
 
 <link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="js/pd-reports-list.js">
 
 <dom-module id="pd-reports-list">
   <template>
@@ -160,11 +161,7 @@
 
       _getLink: function (report, permissions) {
         var suffix = this._getMode(report, permissions);
-
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + this.pdId + '/report/' + report.id + '/' + suffix
-        );
+        return PdReportsListUtils.getLink(report, suffix, this.buildUrl, this._baseUrl);
       },
     });
   </script>
