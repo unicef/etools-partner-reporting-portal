@@ -27,7 +27,6 @@ PdOutputUtils.computeCompleteIndicator = function (complete) {
 };
 
 PdOutputUtils.computeReportableUrl = function (reportId, data) {
-    console.log('reportable Url EXT', App.Endpoints.reportable(reportId, data.id));
     return App.Endpoints.reportable(reportId, data.id);
 };
 
