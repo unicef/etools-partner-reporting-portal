@@ -1,22 +1,22 @@
 const ProgressReportsToolbarUtil = require('../../src/elements/ip-reporting/js/progress-reports-toolbar.js');
 
-const { canExport } = ProgressReportsToolbarUtil;
+const {canExport} = ProgressReportsToolbarUtil;
 
 describe('Progress Reports Toolbar computePdReportsUrl function', () => {
     // found in polymer/src/endpoints.html
     const _buildUrl = tail => {
         return '/api' + tail;
-    }
+    };
 
     // found in polymer/src/endpoints.html
     const programmeDocumentReports = workspaceId => {
         return _buildUrl('/unicef/' + workspaceId + '/progress-reports/');
-    }
+    };
 
     // found in polymer/src/elements/ip-reporting/js/progress-reports-toolbar.js
     const computePdReportsUrl = function (locationId) {
         return programmeDocumentReports(locationId);
-    }
+    };
 
     const locationId = 5;
 

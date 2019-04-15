@@ -1,14 +1,14 @@
 const PdReportsReportTitleUtils = require('../../src/elements/ip-reporting/js/pd-reports-report-title.js');
 
-const { shouldDisplayLink,
+const {shouldDisplayLink,
     getReportTitleFull,
     getReportTitle,
-    getReportLink } = PdReportsReportTitleUtils;
+    getReportLink} = PdReportsReportTitleUtils;
 
 describe('Pd Reports Report Title shouldDisplayLink function', () => {
     const link = true;
-    const report = { id: 111 };
-    const permissions = { editPermissions: true };
+    const report = {id: 111};
+    const permissions = {editPermissions: true};
     const fn = () => true;
 
     it('returns true when provided with truthy values', () => {
@@ -17,9 +17,9 @@ describe('Pd Reports Report Title shouldDisplayLink function', () => {
 });
 
 describe('Pd Reports Report Title getReportTitleFull function', () => {
-    const reportQpr = { report_type: 'QPR', report_number: 1138 };
-    const reportHr = { report_type: 'HR', report_number: 667 };
-    const reportSr = { report_type: 'SR', report_number: 451 };
+    const reportQpr = {report_type: 'QPR', report_number: 1138};
+    const reportHr = {report_type: 'HR', report_number: 667};
+    const reportSr = {report_type: 'SR', report_number: 451};
 
     it('returns the correct full report title', () => {
         expect(getReportTitleFull(reportQpr)).toBe('QPR1138 (Quarterly Progress Report)');
@@ -32,7 +32,7 @@ describe('Pd Reports Report Title getReportTitleFull function', () => {
 });
 
 describe('Pd Reports Report Title getReportTitle function', () => {
-    const report = { report_type: 'QPR', report_number: 7 };
+    const report = {report_type: 'QPR', report_number: 7};
 
     it('returns the correct report title', () => {
         expect(getReportTitle(report)).toBe('QPR7');
@@ -40,7 +40,7 @@ describe('Pd Reports Report Title getReportTitle function', () => {
 });
 
 describe('Pd Reports Report Title getReportLink function', () => {
-    const report = { id: 491, programme_document: { id: 528 }};
+    const report = {id: 491, programme_document: {id: 528}};
     const suffix = 'view';
     const baseUrl = '/app/SDN/ip-reporting';
 
@@ -49,7 +49,7 @@ describe('Pd Reports Report Title getReportLink function', () => {
             tail = '/' + tail;
         }
         return baseUrl + tail;
-    }
+    };
 
     it('builds the correct URL', () => {
         expect(getReportLink(report, suffix, buildUrl, baseUrl)).toBe('/app/SDN/ip-reporting/pd/528/report/491/view');
