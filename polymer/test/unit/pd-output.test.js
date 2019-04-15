@@ -3,6 +3,8 @@ const {calculationFormulaAcrossPeriods,
     computeIcon,
     computeCompleteIndicator} = PdOutputUtils;
 
+const _buildUrl = tail => '/api' + tail;
+
 describe('PdOutput calculationFormulaAcrossPeriods function', () => {
     const indicator = {
         reportable: {
@@ -53,5 +55,30 @@ describe('PdOutput computeCompleteIndicator function', () => {
     
     it('returns less if opened is truthy', () => {
         expect(computeCompleteIndicator(completeTrue)).toBe('Met');
+    });
+});
+
+describe('PdOutput computeReportableUrl function', () => {
+    const reportable = (programmeDocumentProgressReportId, lowerLevelOutputId) => {
+        return _buildUrl(
+            '/indicator/pd-progress-report/' +
+            programmeDocumentProgressReportId +
+            '/llo/' +
+            lowerLevelOutputId +
+            '/'
+        );
+    };
+
+    const reportId = 11;
+    const data = {
+        id: 38
+    };
+
+    const computeReportableUrl = function (reportId, data) {
+        return reportable(reportId, data.id);
+    };
+
+    it('returns correct url', () => {
+        expect(computeReportableUrl(reportId, data)).toBe('/api/indicator/pd-progress-report/11/llo/38/');
     });
 });

@@ -359,7 +359,7 @@
       },
 
       _computeReportableUrl: function (reportId, data) {
-        return App.Endpoints.reportable(reportId, data.id);
+        return PdOutputUtils.computeReportableUrl(reportId, data);
       },
 
       _computeCalculationMethodUrl: function (baseUrl, pdId) {

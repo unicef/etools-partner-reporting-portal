@@ -26,6 +26,11 @@ PdOutputUtils.computeCompleteIndicator = function (complete) {
     return complete ? 'Met' : 'Ove';
 };
 
+PdOutputUtils.computeReportableUrl = function (reportId, data) {
+    console.log('reportable Url EXT', App.Endpoints.reportable(reportId, data.id));
+    return App.Endpoints.reportable(reportId, data.id);
+};
+
 try {
     module.exports = exports = PdOutputUtils;
 } catch (e) {}
