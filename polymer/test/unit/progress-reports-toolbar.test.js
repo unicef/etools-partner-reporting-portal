@@ -2,7 +2,7 @@ const ProgressReportsToolbarUtil = require('../../src/elements/ip-reporting/js/p
 
 const {canExport} = ProgressReportsToolbarUtil;
 
-describe('Progress Reports Toolbar computePdReportsUrl function', () => {
+describe('ProgressReportsToolbar computePdReportsUrl function', () => {
     // found in polymer/src/endpoints.html
     const _buildUrl = tail => {
         return '/api' + tail;
@@ -25,7 +25,7 @@ describe('Progress Reports Toolbar computePdReportsUrl function', () => {
     });
 });
 
-describe('Progress Reports Toolbar canExport function', () => {
+describe('ProgressReportsToolbar canExport function', () => {
     const totalResults = 10;
     const zeroResults = 0;
     const negResults = -1;

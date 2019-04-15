@@ -2,6 +2,8 @@ function PdReportInfoUtils() {
     
 }
 
+// No unit test for this one because it involves DOM manipulation
+// and not currently sure how to implement that in Jasmine
 PdReportInfoUtils.handleInput = function (inputs, fieldPartner, fieldChallenges, fieldProposed) {
     return inputs.map(function(inputContainer) {
         var field = inputContainer.querySelector('input');

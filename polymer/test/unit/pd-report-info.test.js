@@ -3,7 +3,7 @@ const {computeMode} = PdReportInfoUtils;
 
 const _buildUrl = tail => '/api' + tail;
 
-describe('Pd Report Info updateUrl function', () => {
+describe('PdReportInfo updateUrl function', () => {
     // found in polymer/src/endpoints.html
     programmeDocumentReports = (workspaceId) => {
         return _buildUrl('/unicef/' + workspaceId + '/progress-reports/');
@@ -30,7 +30,7 @@ describe('Pd Report Info updateUrl function', () => {
     });
 });
 
-describe('Pd Report Info computeMode function', () => {
+describe('PdReportInfo computeMode function', () => {
     const permissions = {savePdReport: true};
     const falsyPermissions = {savePdReport: false};
     const mode = 'edit';

@@ -1,11 +1,10 @@
 const IndicatorDetailsUtils = require('../../src/elements/ip-reporting/js/ip-reporting-indicator-details.js');
 
-const { getDataByKey,
+const {getDataByKey,
     computeIsClusterApp,
     computeParams,
     computeHidden,
-    bucketByLocation } = IndicatorDetailsUtils;
-
+    bucketByLocation} = IndicatorDetailsUtils;
 
 describe('frontend tests', () => {
     it('should pass', () => {
@@ -13,16 +12,16 @@ describe('frontend tests', () => {
     });
 });
 
-describe('IP reporting indicator details observer', () => {
+describe('IpReportingIndicatorDetails observer', () => {
     // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     const dataObj = {
         details: {
             1: 'hello'
         }
-    }
+    };
 
-    const ind = { id: 1 }
-    const badObj = { deets: 'howdy' }
+    const ind = {id: 1};
+    const badObj = {deets: 'howdy'};
     const nullObj = '';
 
     xit('should equal hello', () => {
@@ -38,7 +37,7 @@ describe('IP reporting indicator details observer', () => {
     });
 });
 
-describe('IP reporting indicator details clusterApp function', () => {
+describe('IpReportingIndicatorDetails clusterApp function', () => {
     // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     const appName = 'cluster-reporting';
     const ipName = 'ip-reporting';
@@ -56,11 +55,11 @@ describe('IP reporting indicator details clusterApp function', () => {
     });
 });
 
-describe('IP reporting indicator details computeParams function', () => {
+describe('IpReportingIndicatorDetails computeParams function', () => {
     // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
     const isClusterApp = true;
     const isNotClusterApp = false;
-    const trueParams = { hide_children: 1 };
+    const trueParams = {hide_children: 1};
 
     it('should return empty params object if boolean is false', () => {
         expect(computeParams(isNotClusterApp)).toEqual({});
@@ -71,7 +70,7 @@ describe('IP reporting indicator details computeParams function', () => {
     });
 });
 
-describe('IP reporting indicator details computeIndicatorReportsUrl function', () => {
+describe('IpReportingIndicatorDetails computeIndicatorReportsUrl function', () => {
     // found in polymer/src/endpoints.html
     const _buildUrl = tail => '/api' + tail;
 
@@ -84,22 +83,22 @@ describe('IP reporting indicator details computeIndicatorReportsUrl function', (
             ? indicator.cluster_partner_indicator_reportable_id
             : indicator.id;
         return indicatorReports(target_indicator_id) + '?limit=2';
-    }
+    };
 
-    const indicator = { id: 1489 };
-    const clusterIndicator = { cluster_partner_indicator_reportable_id: 1489, id: 1490 };
+    const indicator = {id: 1489};
+    const clusterIndicator = {cluster_partner_indicator_reportable_id: 1489, id: 1490};
 
     it('should return correct URL with id', () => {
         expect(computeIndicatorReportsUrl(indicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2');
     });
 
     it('should use cluster_partner_indicator_reportable_id rather than just id if it exists', () => {
-        expect(computeIndicatorReportsUrl(clusterIndicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2')
-        expect(computeIndicatorReportsUrl(clusterIndicator)).not.toBe('/api/indicator/1490/indicator-reports/?limit=2')
+        expect(computeIndicatorReportsUrl(clusterIndicator)).toBe('/api/indicator/1489/indicator-reports/?limit=2');
+        expect(computeIndicatorReportsUrl(clusterIndicator)).not.toBe('/api/indicator/1490/indicator-reports/?limit=2');
     });
 });
 
-describe('IP reporting indicator details computeHidden function', () => {
+describe('IpReportingIndicatorDetails computeHidden function', () => {
     const data = ['test', 'test2'];
     const loading = undefined;
     const definedLoading = true;
@@ -113,7 +112,7 @@ describe('IP reporting indicator details computeHidden function', () => {
     });
 });
 
-describe('IP reporting indicator details bucketByLocation function', () => {
+describe('IpReportingIndicatorDetails bucketByLocation function', () => {
     let data;
     const bigData = [{
         id: 0,

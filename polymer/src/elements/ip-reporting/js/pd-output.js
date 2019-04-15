@@ -7,6 +7,20 @@ PdOutputUtils.calculationFormulaAcrossPeriods = function (indicator) {
         ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
 };
 
+// No unit test for this one because it involves DOM manipulation
+// and not currently sure how to implement that in Jasmine
+PdOutputUtils.toggle = function (e) {
+    var node = e.target;
+    console.log('node', node);
+    console.log('node.toggles', node.toggles);
+    console.log('node.parentNode', node.parentNode);
+
+    while (node && typeof node.toggles === 'undefined') {
+      node = node.parentNode;
+    }
+    return node;
+};
+
 try {
     module.exports = exports = PdOutputUtils;
 } catch (e) {}

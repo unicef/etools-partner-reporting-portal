@@ -11,7 +11,7 @@ const progressReports = locationId => {
     return _buildUrl('/unicef/' + locationId + '/progress-reports/');
 };
 
-describe('Report attachments computeListUrl function', () => {
+describe('ReportAttachments computeListUrl function', () => {
     // found in polymer/src/endpoints.html
     const progressReportAttachments = (locationId, reportId) => {
         return progressReports(locationId) + reportId + '/attachments/';
@@ -30,7 +30,7 @@ describe('Report attachments computeListUrl function', () => {
     });
 });
 
-describe('Report attachments getDeleteUrl function', () => {
+describe('ReportAttachments getDeleteUrl function', () => {
     // found in polymer/src/endpoints.html
     const progressReportAttachmentDetail = (locationId, reportId, attachmentId) => {
         return progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
@@ -51,7 +51,7 @@ describe('Report attachments getDeleteUrl function', () => {
     });
 });
 
-describe('Report attachments setFiles function', () => {
+describe('ReportAttachments setFiles function', () => {
     const list = [{id: 1, path: 'hello'}, {id: 2}, {id: 3, path: 'howdy'}];
     const newList = [{id: 1, path: 'hello'}, undefined, {id: 3, path: 'howdy'}];
 

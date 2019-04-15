@@ -1,7 +1,7 @@
 const PdReportsListUtils = require('../../src/elements/ip-reporting/js/pd-reports-list.js');
 const {getLink} = PdReportsListUtils;
 
-describe('Pd Reports List getLink function', () => {
+describe('PdReportsList getLink function', () => {
     const report = {id: 51, programme_document: {id: 4}};
     const suffix = 'view';
     const baseUrl = '/app/SDN/ip-reporting';

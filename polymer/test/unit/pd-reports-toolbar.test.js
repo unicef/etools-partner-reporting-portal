@@ -2,7 +2,7 @@ const PdReportsToolbarUtils = require('../../src/elements/ip-reporting/js/pd-rep
 
 const {canExport, computePdQuery} = PdReportsToolbarUtils;
 
-describe('Pd Reports Toolbar computePdReportsUrl function', () => {
+describe('PdReportsToolbar computePdReportsUrl function', () => {
     // found in polymer/src/endpoints.html
     const _buildUrl = tail => {
         return '/api' + tail;
@@ -25,7 +25,7 @@ describe('Pd Reports Toolbar computePdReportsUrl function', () => {
     });
 });
 
-describe('Pd Reports Toolbar canExport function', () => {
+describe('PdReportsToolbar canExport function', () => {
     const totalResults = 5;
     const zeroResults = 0;
 
@@ -38,7 +38,7 @@ describe('Pd Reports Toolbar canExport function', () => {
     });
 });
 
-describe('Pd Reports Toolbar computePdQuery function', () => {
+describe('PdReportsToolbar computePdQuery function', () => {
     const id = '800';
 
     it('returns an object with the correct id', () => {

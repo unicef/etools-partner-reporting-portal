@@ -1,7 +1,7 @@
 const PdOutputUtils = require('../../src/elements/ip-reporting/js/pd-output.js');
 const {calculationFormulaAcrossPeriods} = PdOutputUtils;
 
-describe('Pd Output calculationFormulaAcrossPeriods function', () => {
+describe('PdOutput calculationFormulaAcrossPeriods function', () => {
     const indicator = {
         reportable: {
             blueprint: {

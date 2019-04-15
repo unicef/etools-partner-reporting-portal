@@ -2,7 +2,7 @@ const ProgressReportsListUtils = require('../../src/elements/ip-reporting/js/pro
 
 const {getReportTitle} = ProgressReportsListUtils;
 
-describe('Progress reports list getReportTitle function', () => {
+describe('ProgressReportsList getReportTitle function', () => {
     const report = {report_type: 'Cool', report_number: 20};
 
     it('returns correct title string', () => {

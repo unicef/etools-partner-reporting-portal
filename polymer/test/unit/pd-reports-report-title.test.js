@@ -5,7 +5,7 @@ const {shouldDisplayLink,
     getReportTitle,
     getReportLink} = PdReportsReportTitleUtils;
 
-describe('Pd Reports Report Title shouldDisplayLink function', () => {
+describe('PdReportsReportTitle shouldDisplayLink function', () => {
     const link = true;
     const report = {id: 111};
     const permissions = {editPermissions: true};
@@ -16,7 +16,7 @@ describe('Pd Reports Report Title shouldDisplayLink function', () => {
     });
 });
 
-describe('Pd Reports Report Title getReportTitleFull function', () => {
+describe('PdReportsReportTitle getReportTitleFull function', () => {
     const reportQpr = {report_type: 'QPR', report_number: 1138};
     const reportHr = {report_type: 'HR', report_number: 667};
     const reportSr = {report_type: 'SR', report_number: 451};
@@ -31,7 +31,7 @@ describe('Pd Reports Report Title getReportTitleFull function', () => {
     });
 });
 
-describe('Pd Reports Report Title getReportTitle function', () => {
+describe('PdReportsReportTitle getReportTitle function', () => {
     const report = {report_type: 'QPR', report_number: 7};
 
     it('returns the correct report title', () => {
@@ -39,7 +39,7 @@ describe('Pd Reports Report Title getReportTitle function', () => {
     });
 });
 
-describe('Pd Reports Report Title getReportLink function', () => {
+describe('PdReportsReportTitle getReportLink function', () => {
     const report = {id: 491, programme_document: {id: 528}};
     const suffix = 'view';
     const baseUrl = '/app/SDN/ip-reporting';

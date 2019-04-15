@@ -345,11 +345,7 @@
       },
 
       _toggle: function (e) {
-        var node = e.target;
-
-        while (node && typeof node.toggles === 'undefined') {
-          node = node.parentNode;
-        }
+        var node = PdOutputUtils.toggle(e);
 
         this.$$('#collapse-' + node.toggles).toggle();
       },
