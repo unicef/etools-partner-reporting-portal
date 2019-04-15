@@ -6,11 +6,11 @@ IndicatorDetailsUtils.getDataByKey = function (dataDict, indicator) {
     if (dataDict.details) {
         this.data = dataDict.details[indicator.id];
     }
-}
+};
 
 IndicatorDetailsUtils.computeIsClusterApp = function (name) {
     return name === 'cluster-reporting';
-}
+};
 
 IndicatorDetailsUtils.computeParams = function (boolean) {
     var params = {};
@@ -22,18 +22,18 @@ IndicatorDetailsUtils.computeParams = function (boolean) {
     }
 
     return params;
-}
+};
 
 IndicatorDetailsUtils.computeIndicatorReportsUrl = function (indicator) {
     var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
         ? indicator.cluster_partner_indicator_reportable_id
         : indicator.id;
     return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
-}
+};
 
 IndicatorDetailsUtils.computeHidden = function (data, loading) {
     return !loading || data.length;
-}
+};
 
 IndicatorDetailsUtils.bucketByLocation = function (data) {
     //API gives us two objects, one for current reporting period and
@@ -74,7 +74,7 @@ IndicatorDetailsUtils.bucketByLocation = function (data) {
     });
 
     return locationList;
-}
+};
 
 try {
     module.exports = exports = IndicatorDetailsUtils;

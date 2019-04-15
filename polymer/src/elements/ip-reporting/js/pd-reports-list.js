@@ -7,7 +7,7 @@ PdReportsListUtils.getLink = function (report, suffix, buildUrlFn, baseUrl) {
         baseUrl,
         '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
     );
-}
+};
 
 try {
     module.exports = exports = PdReportsListUtils;

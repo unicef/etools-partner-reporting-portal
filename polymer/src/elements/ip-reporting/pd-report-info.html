@@ -275,7 +275,7 @@
       },
 
       _computeUpdateUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
+        return PdReportInfoUtils.computeUpdateUrl(locationId, reportId);
       },
 
       _computeMode: function (mode, overrideMode, report, permissions) {

@@ -16,6 +16,10 @@ PdReportInfoUtils.handleInput = function (inputs, fieldPartner, fieldChallenges,
     });
 };
 
+PdReportInfoUtils.computeUpdateUrl = function (locationId, reportId) {
+    return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
+};
+
 try {
     module.exports = exports = PdReportInfoUtils;
 } catch (e) {}

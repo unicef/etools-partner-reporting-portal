@@ -1,10 +1,10 @@
-function PdReportsReportTitleUtils () {
+function PdReportsReportTitleUtils() {
 
 }
 
 PdReportsReportTitleUtils.shouldDisplayLink = function (displayLink, report, permissions, fn) {
     return displayLink && fn(permissions, report);
-}
+};
 
 PdReportsReportTitleUtils.getReportTitleFull = function (report) {
     var title =  report.report_type + report.report_number;
@@ -16,18 +16,18 @@ PdReportsReportTitleUtils.getReportTitleFull = function (report) {
         title += ' (Special Report)';
     }
     return title;
-}
+};
 
 PdReportsReportTitleUtils.getReportTitle = function (report) {
     return report.report_type + report.report_number;
-}
+};
 
 PdReportsReportTitleUtils.getReportLink = function (report, suffix, buildUrlFn, baseUrl) {
     return buildUrlFn(
         baseUrl,
         '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
     );
-}
+};
 
 try {
     module.exports = exports = PdReportsReportTitleUtils;
