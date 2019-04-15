@@ -1,5 +1,5 @@
 const PdReportInfoUtils = require('../../src/elements/ip-reporting/js/pd-report-info.js');
-const {computeUpdateUrl} = PdReportInfoUtils;
+const {computeMode} = PdReportInfoUtils;
 
 const _buildUrl = tail => '/api' + tail;
 
@@ -27,5 +27,21 @@ describe('Pd Report Info updateUrl function', () => {
 
     it('builds the attachment URL correctly', () => {
         expect(computeUpdateUrl(locationId, reportId)).toBe('/api/unicef/1/progress-reports/2/update/');
+    });
+});
+
+describe('Pd Report Info computeMode function', () => {
+    const permissions = {savePdReport: true};
+    const falsyPermissions = {savePdReport: false};
+    const mode = 'edit';
+    const overrideMode = '';
+    const report = '';
+
+    it('returns edit mode when savePdReport is truthy', () => {
+        expect(computeMode(mode, overrideMode, report, permissions)).toBe('edit');
+    });
+
+    it('returns view mode when savePdReport is falsy', () => {
+        expect(computeMode(mode, overrideMode, report, falsyPermissions)).toBe('view');
     });
 });

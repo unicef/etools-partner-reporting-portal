@@ -279,7 +279,7 @@
       },
 
       _computeMode: function (mode, overrideMode, report, permissions) {
-        return permissions.savePdReport ? (overrideMode || mode) : 'view';
+        return PdReportInfoUtils.computeMode(mode, overrideMode, report, permissions);
       },
 
       attached: function () {
