@@ -1,5 +1,5 @@
 const PdOutputUtils = require('../../src/elements/ip-reporting/js/pd-output.js');
-const {calculationFormulaAcrossPeriods} = PdOutputUtils;
+const {calculationFormulaAcrossPeriods, computeIcon} = PdOutputUtils;
 
 describe('PdOutput calculationFormulaAcrossPeriods function', () => {
     const indicator = {
@@ -25,5 +25,18 @@ describe('PdOutput calculationFormulaAcrossPeriods function', () => {
 
     it('returns latest if display_type is ratio', () => {
         expect(calculationFormulaAcrossPeriods(indicatorRatio)).toBe('latest');
+    });
+});
+
+describe('PdOutput computeIcon function', () => {
+    const opened = undefined;
+    const openedTrue = true;
+
+    it('returns more if opened is falsy', () => {
+        expect(computeIcon(opened)).toBe('more');
+    });
+    
+    it('returns less if opened is truthy', () => {
+        expect(computeIcon(openedTrue)).toBe('less');
     });
 });

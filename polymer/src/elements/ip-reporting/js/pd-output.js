@@ -11,14 +11,15 @@ PdOutputUtils.calculationFormulaAcrossPeriods = function (indicator) {
 // and not currently sure how to implement that in Jasmine
 PdOutputUtils.toggle = function (e) {
     var node = e.target;
-    console.log('node', node);
-    console.log('node.toggles', node.toggles);
-    console.log('node.parentNode', node.parentNode);
 
     while (node && typeof node.toggles === 'undefined') {
       node = node.parentNode;
     }
     return node;
+};
+
+PdOutputUtils.computeIcon = function (opened) {
+    return opened ? 'less' : 'more';
 };
 
 try {
