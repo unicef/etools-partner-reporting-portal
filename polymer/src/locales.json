@@ -1,48 +1,44 @@
-[
-  {
-    "en": {
-      "ip_reporting": "IP Reporting",
-      "cluster_reporting": "Cluster Reporting",
-      "change": "change",
-      "profile": "Profile",
-      "sign_in": "Sign In",
-      "sign_out": "Sign out",
-      "dashboard": "Dashboard",
-      "response_parameters": "Response Parameters",
-      "clusters": "Clusters",
-      "partners": "Partners",
-      "my_planned_action": "My Planned Action",
-      "reporting_results": "Reporting Results",
-      "analysis": "Analysis",
-      "overview": "Overview",
-      "programme_documents": "Programme Documents",
-      "progress_reports": "Progress Reports",
-      "indicators": "Indicators",
-      "id_management": "ID Management",
-      "knowledge_base": "Knowledge Base"
-    }
+{
+  "en": {
+    "ip_reporting": "IP Reporting",
+    "cluster_reporting": "Cluster Reporting",
+    "change": "change",
+    "profile": "Profile",
+    "sign_in": "Sign In",
+    "sign_out": "Sign out",
+    "dashboard": "Dashboard",
+    "response_parameters": "Response Parameters",
+    "clusters": "Clusters",
+    "partners": "Partners",
+    "my_planned_action": "My Planned Action",
+    "reporting_results": "Reporting Results",
+    "analysis": "Analysis",
+    "overview": "Overview",
+    "programme_documents": "Programme Documents",
+    "progress_reports": "Progress Reports",
+    "indicators": "Indicators",
+    "id_management": "ID Management",
+    "knowledge_base": "Knowledge Base"
   },
-  {
-    "fr": {
-      "ip_reporting": "Rapport de IP",
-      "cluster_reporting": "Rapport de Cluster",
-      "change": "change",
-      "profile": "Le profil",
-      "sign_in": "Se connecter",
-      "sign_out": "Déconnexion",
-      "dashboard": "Tableau de bord",
-      "response_parameters": "Paramètres de réponse",
-      "clusters": "Les clusters",
-      "partners": "Les partenaires",
-      "my_planned_action": "Mon action prévue",
-      "reporting_results": "Rapport des résultats",
-      "analysis": "L'analyse",
-      "overview": "Vue d'ensemble",
-      "programme_documents": "Documents de programme",
-      "progress_reports": "Rapports d'avancement",
-      "indicators": "Des indicateurs",
-      "id_management": "Gestion des identifiants",
-      "knowledge_base": "Base de connaissances"
-    }
+  "fr": {
+    "ip_reporting": "Rapport de IP",
+    "cluster_reporting": "Rapport de Cluster",
+    "change": "change",
+    "profile": "Le profil",
+    "sign_in": "Se connecter",
+    "sign_out": "Déconnexion",
+    "dashboard": "Tableau de bord",
+    "response_parameters": "Paramètres de réponse",
+    "clusters": "Les clusters",
+    "partners": "Les partenaires",
+    "my_planned_action": "Mon action prévue",
+    "reporting_results": "Rapport des résultats",
+    "analysis": "L'analyse",
+    "overview": "Vue d'ensemble",
+    "programme_documents": "Documents de programme",
+    "progress_reports": "Rapports d'avancement",
+    "indicators": "Des indicateurs",
+    "id_management": "Gestion des identifiants",
+    "knowledge_base": "Base de connaissances"
   }
-]
+}
