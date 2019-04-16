@@ -10,6 +10,8 @@
 <link rel="import" href="../upload-button.html">
 <link rel="import" href="../../styles/buttons.html">
 
+<link rel="import" href="js/pd-output-list-toolbar-functions.html">
+
 <dom-module id="pd-output-list-toolbar">
   <template>
     <style include="button-styles">
@@ -140,11 +142,11 @@
       },
 
       _computeImportTemplateUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentImportTemplate(locationId, reportId);
+        return PdOutputListToolbarUtils.computeImportTemplateUrl(locationId, reportId);
       },
 
       _computeImportUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentImport(locationId, reportId);
+        return PdOutputListToolbarUtils.computeImportUrl(locationId, reportId);
       },
 
       _computeShowImportButtons: function (programmeDocument) {
@@ -152,7 +154,7 @@
       },
 
       _computePdReportUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentReport(locationId, reportId);
+        return PdOutputListToolbarUtils.computePdReportUrl(locationId, reportId);
       },
 
       _computeRefreshData: function (reportId) {
