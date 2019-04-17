@@ -75,10 +75,6 @@
         </div>
 
         <div>
-          <paper-button id="switch" on-click="_toggle">Switch to [[otherLanguage]]</paper-button>
-        </div>
-
-        <div>
           <paper-divider></paper-divider>
           <paper-item name="indicators">
             <a href="https://prphelp.zendesk.com/" target="_blank">
@@ -162,15 +158,6 @@
           },
         },
       },
-
-      _toggle: function () {
-        var oldLang = this.language;
-        var newLang = this.language === 'en' ? 'fr' : 'en';
-        this.set('language', newLang);
-        this.set('otherLanguage', oldLang);
-
-        this.dispatch(App.Actions.Localize.set(newLang));
-      }
     });
   </script>
 </dom-module>
