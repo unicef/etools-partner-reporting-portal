@@ -1,0 +1,122 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="language-dropdown">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        cursor: pointer;
+        @apply --select-plan-languages-offset;
+      }
+
+      paper-dropdown-menu {
+        width: 160px;
+        @apply --languages-dropdown-width;
+
+
+        --paper-input-container-underline: {
+          display: none;
+          @apply --underline-shown;
+        };
+
+        --paper-input-container-underline-focus: {
+          display: none;
+        };
+
+        --paper-input-container-underline-disabled: {
+          display: none;
+        };
+
+        --paper-input-container-input: {
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-dropdown-menu-icon: {
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-input-container-label: {
+          top: 4px;
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-input-container-input: {
+          margin-bottom: 2px;
+          color: var(--theme-primary-text-color-medium);
+          @apply --language-dropdown-input;
+        }
+      }
+
+      paper-item {
+        font-size: 15px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+    </style>
+
+    <paper-dropdown-menu label="[[language]]" noink no-label-float>
+      <paper-listbox
+          class="dropdown-content"
+          on-iron-select="_languageSelected"
+          selected="[[selected]]">
+        <template id="repeat" is="dom-repeat" items="[[data]]">
+          <paper-item>[[item]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'language-dropdown',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+        language: {
+          type: String,
+          computed: '_computelanguage(data, current)',
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+          computed: '_computeSelected(data, language)',
+        },
+
+        current: String,
+
+        data: Array,
+      },
+
+      _languageSelected: function(e) {
+        var newCode = this.$.repeat.itemForElement(e.detail.item);
+
+        if (newCode === this.current) {
+          return;
+        }
+
+        // this.dispatch(App.Actions.setlanguage(newCode));
+
+        // window.location.href = this.buildUrl(this._baseUrl, '/');
+      },
+
+      _computelanguage: function (data, current) {
+        return data.filter(function (language) {
+          return language === current;
+        })[0];
+      },
+
+      _computeSelected: function (data, language) {
+        return data.indexOf(language);
+      },
+    });
+  </script>
+</dom-module>

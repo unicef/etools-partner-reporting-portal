@@ -1,0 +1,31 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../redux/store.html">
+
+<dom-module id="etools-prp-languages">
+  <template></template>
+
+  <script>
+    Polymer({
+      is: 'etools-prp-languages',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        // State-linked properties can't notify
+        current: {
+          type: String,
+          notify: true,
+          value: 'en',
+        },
+
+        all: {
+          type: Array,
+          notify: true,
+          value: ['en', 'fr']
+        },
+      },
+    });
+  </script>
+</dom-module>
