@@ -14,6 +14,7 @@
 <link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../constants.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../etools-prp-permissions.html">
 
 <link rel="import" href="../../styles/page-nav.html">
@@ -167,6 +168,8 @@
         var newLang = this.language === 'en' ? 'fr' : 'en';
         this.set('language', newLang);
         this.set('otherLanguage', oldLang);
+
+        this.dispatch(App.Actions.Localize.set(newLang));
       }
     });
   </script>
