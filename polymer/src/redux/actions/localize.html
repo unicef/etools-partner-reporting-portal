@@ -9,10 +9,10 @@
     App.Actions = App.Actions || {};
 
     App.Actions.Localize = {
-      set: function (data) {
+      set: function (language) {
         return {
           type: App.Constants.SET_LANGUAGE,
-          data: data
+          language: language
         }
       }
     }

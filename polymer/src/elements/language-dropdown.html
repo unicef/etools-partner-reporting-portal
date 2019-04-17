@@ -2,6 +2,10 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 
 <dom-module id="language-dropdown">
   <template>
@@ -76,13 +80,15 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
         language: {
           type: String,
-          computed: '_computelanguage(data, current)',
+          value: 'en',
+          computed: '_computeLanguage(data, current)',
         },
 
         selected: {
@@ -92,23 +98,20 @@
         },
 
         current: String,
-
         data: Array,
       },
 
       _languageSelected: function(e) {
-        var newCode = this.$.repeat.itemForElement(e.detail.item);
+        var newLanguage = this.$.repeat.itemForElement(e.detail.item);
 
-        if (newCode === this.current) {
+        if (newLanguage === this.current) {
           return;
         }
 
-        // this.dispatch(App.Actions.setlanguage(newCode));
-
-        // window.location.href = this.buildUrl(this._baseUrl, '/');
+        this.dispatch(App.Actions.Localize.set(newLanguage));
       },
 
-      _computelanguage: function (data, current) {
+      _computeLanguage: function (data, current) {
         return data.filter(function (language) {
           return language === current;
         })[0];

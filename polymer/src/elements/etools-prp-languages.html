@@ -13,18 +13,36 @@
       ],
 
       properties: {
+        _current: {
+          type: String,
+          statePath: 'localize.language',
+        },
+
+        _all: {
+          type: Object,
+          statePath: 'localize.resources',
+        },
+
         // State-linked properties can't notify
         current: {
           type: String,
           notify: true,
-          value: 'en',
+          computed: '_computeCurrent(_current)',
         },
 
         all: {
           type: Array,
           notify: true,
-          value: ['en', 'fr']
+          computed: '_computeAll(_all)'
         },
+      },
+
+      _computeCurrent: function (_current) {
+        return _current;
+      },
+
+      _computeAll: function (_all) {
+        return Object.keys(_all).slice();
       },
     });
   </script>

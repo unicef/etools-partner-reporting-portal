@@ -3,6 +3,7 @@
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../constants.html">
 <link rel="import" href="actions/location.html">
+<link rel="import" href="actions/localize.html">
 <link rel="import" href="actions/pd.html">
 <link rel="import" href="actions/pdIndicators.html">
 <link rel="import" href="actions/pdReports.html">
@@ -32,6 +33,14 @@
         return {
           type: App.Constants.SET_L11N_RESOURCES,
           resources: resources,
+        };
+      },
+
+      // Localization
+      setLanguage: function (language) {
+        return {
+          type: App.Constants.SET_LANGUAGE,
+          language: language
         };
       },
 
