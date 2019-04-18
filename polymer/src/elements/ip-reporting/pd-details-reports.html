@@ -9,6 +9,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 
+<link rel="import" href="js/pd-details-reports-functions.html">
+
 <dom-module id="pd-details-reports">
   <template>
     <style include="data-table-styles table-styles">
@@ -75,7 +77,7 @@
       ],
 
       _computePDReportsUrl: function (locationId) {
-        return locationId ? App.Endpoints.programmeDocumentReports(locationId) : '';
+        return PdDetailsReportsUtils.computePDReportsUrl(locationId);
       },
 
       _computePDReportsParams: function (pdId, queryParams) {
