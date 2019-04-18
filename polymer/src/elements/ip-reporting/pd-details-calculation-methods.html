@@ -347,7 +347,7 @@
       },
 
       _canSave: function (permissions) {
-        return permissions.changeProgrammeDocumentCalculationMethod;
+        return PdDetailsCalculationMethodsUtils.canSave(permissions);
       },
 
       detached: function () {

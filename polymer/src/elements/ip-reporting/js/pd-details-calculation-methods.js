@@ -62,6 +62,10 @@ PdDetailsCalculationMethodsUtils.canEdit = function(item, permissions) {
         permissions.changeProgrammeDocumentCalculationMethod;
 };
 
+PdDetailsCalculationMethodsUtils.canSave = function(permissions) {
+    return permissions.changeProgrammeDocumentCalculationMethod;
+};
+
 try {
     module.exports = exports = PdDetailsCalculationMethodsUtils;
 } catch (e) {}

@@ -4,7 +4,8 @@ const {
     computeSelected,
     computeDisabled,
     onValueChanged,
-    canEdit} = PdDetailsCalculationMethodsUtils;
+    canEdit,
+    canSave} = PdDetailsCalculationMethodsUtils;
 
 // These functions are from endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -106,6 +107,19 @@ describe('PdDetailsCalculationMethods functions', () => {
 
         it('should return false if one of the properties is false', () => {
             expect(canEdit(item, otherPermissions)).toBe(false);
+        });
+    });
+
+    describe('canSave function', () => {
+        const permissions = {changeProgrammeDocumentCalculationMethod: true};
+        const otherPermissions = {changeProgrammeDocumentCalculationMethod: false};
+
+        it('should return true if the property is true', () => {
+            expect(canSave(permissions)).toBe(true);
+        });
+
+        it('should return false if the property is false', () => {
+            expect(canSave(otherPermissions)).toBe(false);
         });
     });
 });
