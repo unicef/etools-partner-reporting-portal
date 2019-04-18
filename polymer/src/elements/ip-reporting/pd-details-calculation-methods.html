@@ -302,24 +302,13 @@
       _onValueChanged: function (e) {
         var newValue = e.target.selected;
         var data = e.target.dataset;
-
-        // Here's what the lack of expression interpolation in polymer makes people do:
-
-        var lloIndex = this.localData.ll_outputs_and_indicators
-            .findIndex(function (item) {
-              return Number(item.ll_output.id) === Number(data.lloId);
-            });
-
-        var indicatorIndex = this.localData.ll_outputs_and_indicators[lloIndex].indicators
-            .findIndex(function (item) {
-              return Number(item.id) === Number(data.id);
-            });
+        var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
 
         this.set([
           'localData.ll_outputs_and_indicators',
-          lloIndex,
+          indices.lloIndex,
           'indicators',
-          indicatorIndex,
+          indices.indicatorIndex,
           data.scope,
         ], newValue);
       },

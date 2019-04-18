@@ -2,7 +2,8 @@ const PdDetailsCalculationMethodsUtils = require('../../src/elements/ip-reportin
 const {
     computeFormattedData,
     computeSelected,
-    computeDisabled} = PdDetailsCalculationMethodsUtils;
+    computeDisabled,
+    onValueChanged} = PdDetailsCalculationMethodsUtils;
 
 // These functions are from endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -67,6 +68,28 @@ describe('PdDetailsCalculationMethods functions', () => {
 
         it('returns true when display_type is either a ratio or a percentage', () => {
             expect(computeDisabled(other_display_type)).toBe(true);
+        });
+    });
+
+    describe('onValueChanged function', () => {
+        const data = {scope: 'test text', lloId: '352', id: '1414'};
+        const localData = {
+            ll_outputs_and_indicators: [
+                {
+                    indicators: [{id: 1414}, {id: 1415}],
+                    ll_output: {id: 351}
+                },
+                {
+                    indicators: [{id: 1414}, {id: 1415}],
+                    ll_output: {id: 352}
+                },
+            ]
+        };
+
+        const indices = {lloIndex: 1, indicatorIndex: 0};
+
+        it('returns properly-built object', () => {
+            expect(onValueChanged(data, localData)).toEqual(indices);
         });
     });
 });

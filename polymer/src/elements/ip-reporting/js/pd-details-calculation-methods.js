@@ -39,6 +39,24 @@ PdDetailsCalculationMethodsUtils.computeDisabled = function(display_type) {
     return ['percentage', 'ratio'].indexOf(display_type) !== -1;
 };
 
+PdDetailsCalculationMethodsUtils.onValueChanged = function(data, localData) {
+    var indices = {};
+
+    // Here's what the lack of expression interpolation in polymer makes people do:
+
+    indices.lloIndex = localData.ll_outputs_and_indicators
+        .findIndex(function (item) {
+            return Number(item.ll_output.id) === Number(data.lloId);
+        });
+
+    indices.indicatorIndex = localData.ll_outputs_and_indicators[indices.lloIndex].indicators
+        .findIndex(function (item) {
+            return Number(item.id) === Number(data.id);
+        });
+    
+    return indices;
+};
+
 try {
     module.exports = exports = PdDetailsCalculationMethodsUtils;
 } catch (e) {}
