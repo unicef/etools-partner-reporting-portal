@@ -1,7 +1,8 @@
 const PdDetailsCalculationMethodsUtils = require('../../src/elements/ip-reporting/js/pd-details-calculation-methods');
 const {
     computeFormattedData,
-    computeSelected} = PdDetailsCalculationMethodsUtils;
+    computeSelected,
+    computeDisabled} = PdDetailsCalculationMethodsUtils;
 
 // These functions are from endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -53,6 +54,19 @@ describe('PdDetailsCalculationMethods functions', () => {
 
         it('gets the correct value', () => {
             expect(computeSelected(data, scope)).toBe('sum');
+        });
+    });
+
+    describe('computeDisabled function', () => {
+        const display_type = 'number';
+        const other_display_type = 'percentage';
+
+        it('returns false when display_type is neither a ratio or a percentage', () => {
+            expect(computeDisabled(display_type)).toBe(false);
+        });
+
+        it('returns true when display_type is either a ratio or a percentage', () => {
+            expect(computeDisabled(other_display_type)).toBe(true);
         });
     });
 });

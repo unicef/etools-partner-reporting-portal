@@ -35,6 +35,10 @@ PdDetailsCalculationMethodsUtils.computeSelected = function(data, scope) {
     return data[scope];
 };
 
+PdDetailsCalculationMethodsUtils.computeDisabled = function(display_type) {
+    return ['percentage', 'ratio'].indexOf(display_type) !== -1;
+};
+
 try {
     module.exports = exports = PdDetailsCalculationMethodsUtils;
 } catch (e) {}
