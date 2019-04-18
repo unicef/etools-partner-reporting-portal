@@ -81,9 +81,7 @@
       },
 
       _computePDReportsParams: function (pdId, queryParams) {
-        return Object.assign({}, queryParams, {
-          programme_document: pdId,
-        });
+        return PdDetailsReportsUtils.computePDReportsParams(pdId, queryParams);
       },
 
       _handleInputChange: function (url) {
