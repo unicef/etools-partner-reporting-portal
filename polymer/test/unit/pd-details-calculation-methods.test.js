@@ -3,7 +3,8 @@ const {
     computeFormattedData,
     computeSelected,
     computeDisabled,
-    onValueChanged} = PdDetailsCalculationMethodsUtils;
+    onValueChanged,
+    canEdit} = PdDetailsCalculationMethodsUtils;
 
 // These functions are from endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -90,6 +91,21 @@ describe('PdDetailsCalculationMethods functions', () => {
 
         it('returns properly-built object', () => {
             expect(onValueChanged(data, localData)).toEqual(indices);
+        });
+    });
+
+    describe('canEdit function', () => {
+        const item = {data: {editable: true}};
+        const permissions = {changeProgrammeDocumentCalculationMethod: true};
+        const otherItem = {data: {editable: false}};
+        const otherPermissions = {changeProgrammeDocumentCalculationMethod: false};
+
+        it('should return true if both properties are true', () => {
+            expect(canEdit(item, permissions)).toBe(true);
+        });
+
+        it('should return false if one of the properties is false', () => {
+            expect(canEdit(item, otherPermissions)).toBe(false);
         });
     });
 });

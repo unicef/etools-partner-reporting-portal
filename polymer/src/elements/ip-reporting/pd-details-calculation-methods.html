@@ -343,8 +343,7 @@
       },
 
       _canEdit: function (item, permissions) {
-        return item.data.editable &&
-            permissions.changeProgrammeDocumentCalculationMethod;
+        return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
       },
 
       _canSave: function (permissions) {

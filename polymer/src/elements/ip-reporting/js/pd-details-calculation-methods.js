@@ -57,6 +57,11 @@ PdDetailsCalculationMethodsUtils.onValueChanged = function(data, localData) {
     return indices;
 };
 
+PdDetailsCalculationMethodsUtils.canEdit = function(item, permissions) {
+    return item.data.editable &&
+        permissions.changeProgrammeDocumentCalculationMethod;
+};
+
 try {
     module.exports = exports = PdDetailsCalculationMethodsUtils;
 } catch (e) {}
