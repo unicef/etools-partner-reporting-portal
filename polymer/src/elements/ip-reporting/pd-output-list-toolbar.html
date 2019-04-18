@@ -150,7 +150,7 @@
       },
 
       _computeShowImportButtons: function (programmeDocument) {
-        return programmeDocument.status !== 'Sub' && programmeDocument.status !== 'Acc';
+        return PdOutputListToolbarUtils.computeShowImportButtons(programmeDocument);
       },
 
       _computePdReportUrl: function (locationId, reportId) {
@@ -158,20 +158,11 @@
       },
 
       _computeRefreshData: function (reportId) {
-        return {'report_id': reportId, 'report_type': 'PR'};
+        return PdOutputListToolbarUtils.computeRefreshData(reportId);
       },
 
       _computeCanRefresh: function (report, programmeDocument) {
-        switch (true) {
-          case programmeDocument &&
-            (programmeDocument.status === 'Sig'
-            || programmeDocument.status === 'Clo'):
-          case programmeDocument && report.report_type === 'SR':
-            return false;
-
-          default:
-            return true;
-        }
+        return PdOutputListToolbarUtils.computeCanRefresh(report, programmeDocument);
       },
 
       _refresh: function () {
