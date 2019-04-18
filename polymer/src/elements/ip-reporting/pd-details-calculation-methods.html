@@ -23,6 +23,8 @@
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../calculation-methods-info-bar.html">
 
+<link rel="import" href="js/pd-details-calculation-methods-functions.html">
+
 <dom-module id="pd-details-calculation-methods">
   <template>
     <style include="button-styles data-table-styles table-styles iron-flex iron-flex-reverse">
@@ -265,7 +267,7 @@
       },
 
       _computeIndicatorsUrl: function (locationId, pdId) {
-        return locationId ? App.Endpoints.calculationMethods(locationId, pdId) : '';
+        return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
       },
 
       _computeFormattedData: function (data) {
