@@ -310,28 +310,7 @@
       },
 
       _computeReportingRequirements: function (reportingPeriods) {
-        var byType = (reportingPeriods || []).reduce(function (acc, curr) {
-          var type = curr.report_type.toLowerCase();
-
-          if (!acc[type]) {
-            acc[type] = [];
-          }
-
-          acc[type].push(curr);
-
-          return acc;
-        }, {});
-
-        Object.keys(byType).forEach(function (type) {
-          byType[type].sort(function (a, b) {
-            var dateA = moment(a.start_date, App.Settings.dateFormat).toDate();
-            var dateB = moment(b.start_date, App.Settings.dateFormat).toDate();
-
-            return dateA - dateB;
-          });
-        });
-
-        return byType;
+        return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, App.Settings.dateFormat);
       },
     });
   </script>
