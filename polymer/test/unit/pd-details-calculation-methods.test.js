@@ -1,5 +1,7 @@
 const PdDetailsCalculationMethodsUtils = require('../../src/elements/ip-reporting/js/pd-details-calculation-methods');
-const {computeFormattedData} = PdDetailsCalculationMethodsUtils;
+const {
+    computeFormattedData,
+    computeSelected} = PdDetailsCalculationMethodsUtils;
 
 // These functions are from endpoints.html
 const _buildUrl = tail => '/api' + tail;
@@ -42,6 +44,15 @@ describe('PdDetailsCalculationMethods functions', () => {
 
         it('builds the correct array from a given object', () => {
             expect(computeFormattedData(data)).toEqual(formatted);
+        });
+    });
+
+    describe('computeSelected function', () => {
+        const data = {calculation: 'sum'};
+        const scope = 'calculation';
+
+        it('gets the correct value', () => {
+            expect(computeSelected(data, scope)).toBe('sum');
         });
     });
 });

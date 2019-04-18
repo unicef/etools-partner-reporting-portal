@@ -31,6 +31,10 @@ PdDetailsCalculationMethodsUtils.computeFormattedData = function(data) {
     }, []);
 };
 
+PdDetailsCalculationMethodsUtils.computeSelected = function(data, scope) {
+    return data[scope];
+};
+
 try {
     module.exports = exports = PdDetailsCalculationMethodsUtils;
 } catch (e) {}
