@@ -19,6 +19,8 @@
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../endpoints.html">
 
+<link rel="import" href="js/pd-details-doc-download-functions.html">
+
 <dom-module id="pd-details-doc-download">
   <template>
     <style>
@@ -78,7 +80,7 @@
       },
 
       _computeDocUrl: function (locationId, pdId) {
-        return pdId ? App.Endpoints.programmeDocumentDocDownload(locationId, pdId) : '';
+        return PdDetailsDocDownloadUtils.computeDocUrl(locationId, pdId);
       },
 
       _openDoc: function (e) {
