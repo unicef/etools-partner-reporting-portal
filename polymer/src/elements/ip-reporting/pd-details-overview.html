@@ -20,6 +20,8 @@
 <link rel="import" href="../../elements/labelled-item.html">
 <link rel="import" href="../../styles/table-styles.html">
 
+<link rel="import" href="js/pd-details-overview-functions.html">
+
 <dom-module id="pd-details-overview">
   <template>
     <style include="app-grid-style data-table-styles table-styles">
@@ -296,7 +298,7 @@
       },
 
       _computeLoaded: function (pd) {
-        return !!pd.id;
+        return PdDetailsOverviewUtils.computeLoaded(pd);
       },
 
       _formatFocalPoint: function (items) {
