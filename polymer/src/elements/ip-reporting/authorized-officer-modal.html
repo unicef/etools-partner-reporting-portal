@@ -19,6 +19,7 @@
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/routing.html">
 
+<link rel="import" href="js/authorized-officer-modal-functions.html">
 
 <dom-module id="authorized-officer-modal">
   <template>
@@ -146,9 +147,7 @@
       },
 
       _computePostBody: function (selectedFocalPoint) {
-        return {
-          submitted_by_email: selectedFocalPoint,
-        };
+        return AuthorizedOfficerModalUtils.computePostBody(selectedFocalPoint);
       },
 
       _computeAuthorizedPartners: function (pd) {
