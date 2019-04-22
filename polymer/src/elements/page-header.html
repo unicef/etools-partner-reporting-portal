@@ -3,7 +3,9 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
 <link rel="import" href="../styles/shared-styles.html">
@@ -65,7 +67,7 @@
               <paper-icon-button icon="chevron-left"></paper-icon-button>
             </a>
           </template>
-          <h1>[[title]]<content select=".in-title"></content></h1>
+          <h1>[[localize(title)]]<content select=".in-title"></content></h1>
         </div>
       </div>
 
@@ -90,6 +92,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

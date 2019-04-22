@@ -1,0 +1,20 @@
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.Localize = {
+      set: function (language) {
+        return {
+          type: App.Constants.SET_LANGUAGE,
+          language: language
+        }
+      }
+    }
+  }());
+</script>
