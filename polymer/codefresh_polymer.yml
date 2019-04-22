@@ -11,7 +11,7 @@ steps:
 
     composition_step:
        type: composition
-       composition: 'unicef-prp-polymer-unit-tests'
+       composition: 'unicef-prp-unit-tests'
        composition_candidates:
            test:
                image: ${{build_polymer}}
