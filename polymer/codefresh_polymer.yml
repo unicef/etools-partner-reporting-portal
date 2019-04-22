@@ -15,7 +15,7 @@ steps:
        composition_candidates:
            test:
                image: ${{build_polymer}}
-               command: bash -c "npm run test"
+               command: ash -c "npm run test"
 
     push_to_hub:
         type: push
