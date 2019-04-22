@@ -8,3 +8,5 @@ yarn-error.log
 *.sublime-project
 *.sublime-workspace
 debug/*
+.coverdata/*
+.coverrun
