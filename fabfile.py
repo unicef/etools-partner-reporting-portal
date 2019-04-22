@@ -7,7 +7,7 @@ def ssh(service):
     ssh into running service container
     :param service: ['django_api', 'polymer', 'proxy', 'db']
     """
-    assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+    assert service in ['django_api', 'polymer', 'proxy', 'db', 'id-management-frontend'], "%s is unrecognized service"
     if service == 'polymer':
         local('docker-compose exec polymer ash')
     else:
