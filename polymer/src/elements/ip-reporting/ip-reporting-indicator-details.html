@@ -15,6 +15,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
 
+<link rel="import" href="js/ip-reporting-indicator-details-functions.html">
+
 <dom-module id="ip-reporting-indicator-details">
   <template>
     <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
@@ -257,67 +259,19 @@
       ],
 
       _computeParams: function (isClusterApp) {
-        var params = {};
-
-        if (isClusterApp === true) {
-          params = Object.assign({}, params, {
-            hide_children: 1,
-          });
-        }
-
-        return params;
+        IndicatorDetailsUtils.computeParams(isClusterApp);
       },
 
       _computeIsClusterApp: function(appName) {
-        return appName === 'cluster-reporting';
+        IndicatorDetailsUtils.computeIsClusterApp(appName);
       },
 
       _computeIndicatorReportsUrl: function (indicator) {
-        var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
-          ? indicator.cluster_partner_indicator_reportable_id
-          : indicator.id;
-        return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
+        return IndicatorDetailsUtils.computeIndicatorReportsUrl(indicator);
       },
 
       _bucketByLocation: function(data) {
-        //API gives us two objects, one for current reporting period and
-        //one for previous. We want to create a list of locations, each with a
-        //current and/or previous report.
-        var locations = {};
-
-        if (!data) {
-          return [];
-        }
-
-        data.forEach(function(report, index) {
-          var timeframe = 'current';
-          if (index === 1) {
-            timeframe = 'previous';
-          }
-
-          report.indicator_location_data.forEach(function(locationReport) {
-            if (locations[locationReport.location.id]) {
-              var toUpdate = locations[locationReport.location.id];
-              toUpdate[timeframe] = locationReport;
-              toUpdate.reportInfo[timeframe] = report;
-              locations[locationReport.location.id] = toUpdate;
-            } else {
-              var newDict = {reportInfo: {}};
-              newDict[timeframe] = locationReport;
-              newDict.name = locationReport.location.title;
-              newDict.reportInfo[timeframe] = report;
-              locations[locationReport.location.id] = newDict;
-            }
-          });
-        });
-
-        var locationList = [];
-
-        Object.keys(locations).forEach(function(i) {
-          locationList.push(locations[i]);
-        });
-
-        return locationList;
+        return IndicatorDetailsUtils.bucketByLocation(data);
       },
 
       _updateDisaggregationStore: function(data) {
@@ -325,13 +279,11 @@
       },
 
       _getDataByKey: function(dataDict) {
-        if (dataDict.details) {
-          this.data = dataDict.details[this.indicator.id];
-        }
+        IndicatorDetailsUtils.getDataByKey(dataDict, this.indicator);
       },
 
       _computeHidden: function (data, loading) {
-        return !loading || data.length;
+        return IndicatorDetailsUtils.computeHidden(data, loading);
       },
 
       _openChanged: function() {

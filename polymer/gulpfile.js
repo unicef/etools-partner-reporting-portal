@@ -16,14 +16,15 @@ const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const fancylog = require('fancy-log');
 const argv = require('yargs').argv;
+const jasmine = require('gulp-jasmine');
+const cover = require('gulp-coverage');
 
 // Got problems? Try logging 'em
 // use -l to activate plylogs
 if (argv.l) {
     const logging = require('plylog');
     logging.setVerbose();
-}
-
+};
 
 // !!! IMPORTANT !!! //
 // Keep the global.config above any of the gulp-tasks that depend on it
@@ -75,7 +76,6 @@ const html = require('./gulp-tasks/html.js'); //Any processing on html
 const css = require('./gulp-tasks/css.js'); //Any processing on css
 const project = require('./gulp-tasks/project.js');
 
-
 // Log task end messages
 var log = function(message) {
     return function() {
@@ -118,6 +118,23 @@ function dependencies() {
         .pipe(project.rejoin());
 }
 
+// Run tests!
+gulp.task('specs', function() {
+    return gulp.src('test/unit/*.js')
+        .pipe(cover.instrument({
+            pattern: ['src/*/*/js/*.js']
+        }))
+        // gulp-jasmine works on filepaths so you can't have any plugins before it
+        .pipe(jasmine())
+        .pipe(cover.gather())
+        .pipe(cover.format())
+        .pipe(gulp.dest('test/reports'));
+});
+
+gulp.task('watch', function() {
+    gulp.watch('test/unit/**.js', {ignoreInitial: false}, gulp.series('specs'));
+});
+
 // Clean the build directory, split all source and dependency files into streams
 // and process them, and output bundled and unbundled versions of the project
 // with their own service workers
@@ -130,7 +147,6 @@ gulp.task('default', gulp.series([
     project.merge(source, dependencies),
     project.serviceWorker
 ]));
-
 
 // DO NOT RUN
 // Fully builds project

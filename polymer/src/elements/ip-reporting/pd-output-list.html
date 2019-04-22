@@ -9,6 +9,8 @@
 <link rel="import" href="../../redux/selectors/llos.html">
 <link rel="import" href="pd-output.html">
 
+<link rel="import" href="js/pd-output-list-functions.html">
+
 <dom-module id="pd-output-list">
   <template>
     <style include="iron-flex iron-flex-alignment">
@@ -109,9 +111,7 @@
       },
 
       _computeViewData: function (data) {
-        return data.filter(function (item) {
-          return Boolean(item.indicator_reports.length);
-        });
+        return PdOutputListUtils.computeViewData(data);
       },
     });
   </script>

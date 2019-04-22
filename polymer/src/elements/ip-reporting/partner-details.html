@@ -10,6 +10,8 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../labelled-item.html">
 
+<link rel="import" href="js/partner-details-functions.html">
+
 <dom-module id="partner-details">
   <template>
     <style include="app-grid-style">
@@ -138,12 +140,7 @@
       },
 
       _computePartnerType: function (partner) {
-        var chunks = [
-          partner.cso_type_display,
-          partner.partner_type_display,
-        ].filter(Boolean);
-
-        return this._withDefault(chunks.length ? chunks.join(' ') : null);
+        return PartnerDetailsUtils.computePartnerType(partner, this._withDefault);
       },
     });
   </script>

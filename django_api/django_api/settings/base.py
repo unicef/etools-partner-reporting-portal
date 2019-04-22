@@ -139,13 +139,13 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').replace(' ', '').strip().split(',') or [
     'etools.unicef.org',
     'etools-demo.unicef.org',
     'etools-test.unicef.org',
     'etools-staging.unicef.org',
     'etools-dev.unicef.org',
-)
+]
 
 ROOT_URLCONF = 'django_api.urls'
 

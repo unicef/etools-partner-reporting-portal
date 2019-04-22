@@ -20,6 +20,8 @@
 <link rel="import" href="../../elements/labelled-item.html">
 <link rel="import" href="../../styles/table-styles.html">
 
+<link rel="import" href="js/pd-details-overview-functions.html">
+
 <dom-module id="pd-details-overview">
   <template>
     <style include="app-grid-style data-table-styles table-styles">
@@ -296,7 +298,7 @@
       },
 
       _computeLoaded: function (pd) {
-        return !!pd.id;
+        return PdDetailsOverviewUtils.computeLoaded(pd);
       },
 
       _formatFocalPoint: function (items) {
@@ -304,32 +306,11 @@
       },
 
       _hasAmendments: function (pd) {
-        return pd.amendments && !!pd.amendments.length;
+        return PdDetailsOverviewUtils.hasAmendments(pd);
       },
 
       _computeReportingRequirements: function (reportingPeriods) {
-        var byType = (reportingPeriods || []).reduce(function (acc, curr) {
-          var type = curr.report_type.toLowerCase();
-
-          if (!acc[type]) {
-            acc[type] = [];
-          }
-
-          acc[type].push(curr);
-
-          return acc;
-        }, {});
-
-        Object.keys(byType).forEach(function (type) {
-          byType[type].sort(function (a, b) {
-            var dateA = moment(a.start_date, App.Settings.dateFormat).toDate();
-            var dateB = moment(b.start_date, App.Settings.dateFormat).toDate();
-
-            return dateA - dateB;
-          });
-        });
-
-        return byType;
+        return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, App.Settings.dateFormat);
       },
     });
   </script>

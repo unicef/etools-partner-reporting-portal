@@ -7,6 +7,8 @@
 
 <link rel="import" href="../etools-prp-permissions.html">
 
+<link rel="import" href="js/pd-reports-report-title-functions.html">
+
 <dom-module id="pd-reports-report-title">
   <template>
     <style>
@@ -20,9 +22,7 @@
         margin-left: 5px;
         font-weight: bold;
       }
-
     </style>
-
 
     <etools-prp-permissions
       permissions="{{permissions}}">
@@ -46,8 +46,6 @@
       restamp="true">
       <div class="final-badge">final</div>
     </template>
-
-
   </template>
 
   <script>
@@ -78,31 +76,20 @@
       },
 
       _shouldDisplayLink: function(displayLink, report, permissions) {
-        return displayLink && this._canNavigateToReport(permissions, report);
+        return PdReportsReportTitleUtils.shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
       },
 
       _getReportTitleFull: function (report) {
-        var title =  report.report_type + report.report_number;
-        if (report.report_type === 'QPR') {
-          title += ' (Quarterly Progress Report)';
-        } else if (report.report_type === 'HR') {
-          title += ' (Humanitarian Report)';
-        } else if (report.report_type === 'SR') {
-          title += ' (Special Report)';
-        }
-        return title;
+        return PdReportsReportTitleUtils.getReportTitleFull(report);
       },
 
       _getReportTitle: function (report) {
-        return report.report_type + report.report_number;
+        return PdReportsReportTitleUtils.getReportTitle(report);
       },
 
       _getReportLink: function (report, permissions) {
         var suffix = this._getMode(report, permissions);
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
-        );
+        return PdReportsReportTitleUtils.getReportLink(report, suffix, this.buildUrl, this._baseUrl);
       },
     });
   </script>

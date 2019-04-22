@@ -22,6 +22,8 @@
 <link rel="import" href="../indicator-details.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
 
+<link rel="import" href="js/pd-output-functions.html">
+
 <dom-module id="pd-output">
   <template>
     <style include="iron-flex iron-flex-factors">
@@ -339,37 +341,32 @@
       },
 
       _calculationFormulaAcrossPeriods: function (indicator) {
-        return indicator.reportable.blueprint.display_type === 'ratio'
-          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+        return PdOutputUtils.calculationFormulaAcrossPeriods(indicator);
       },
 
       _toggle: function (e) {
-        var node = e.target;
-
-        while (node && typeof node.toggles === 'undefined') {
-          node = node.parentNode;
-        }
+        var node = PdOutputUtils.toggle(e);
 
         this.$$('#collapse-' + node.toggles).toggle();
       },
 
       _computeIcon: function (opened) {
-        return opened ? 'less' : 'more';
+        return PdOutputUtils.computeIcon(opened);
       },
 
       _computeCompleteIndicator: function (complete) {
-        return complete ? 'Met' : 'Ove';
+        return PdOutputUtils.computeCompleteIndicator(complete);
       },
 
       _computeReportableUrl: function (reportId, data) {
-        return App.Endpoints.reportable(reportId, data.id);
+        return PdOutputUtils.computeReportableUrl(reportId, data);
       },
 
       _computeCalculationMethodUrl: function (baseUrl, pdId) {
         return this.buildUrl(
-                baseUrl,
-                'pd/' + pdId + '/view/calculation-methods'
-              );
+          baseUrl,
+          'pd/' + pdId + '/view/calculation-methods'
+        );
       },
 
       _computeReportIsQpr: function (currentReport, indicator) {
