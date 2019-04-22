@@ -7,5 +7,5 @@
   "validateIndentation": null,
   "requireOperatorBeforeLineBreak": null,
   "requireCamelCaseOrUpperCaseIdentifiers": null,
-  "excludeFiles": ["node_modules/**"],
+  "excludeFiles": ["node_modules/**"]
 }

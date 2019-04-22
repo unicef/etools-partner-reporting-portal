@@ -6,6 +6,8 @@
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../../redux/store.html">
 
+<link rel="import" href="js/progress-reports-toolbar-functions.html">
+
 <dom-module id="progress-reports-toolbar">
   <template>
     <style>
@@ -56,11 +58,11 @@
       },
 
       _computePdReportsUrl: function (locationId) {
-        return App.Endpoints.programmeDocumentReports(locationId);
+        return ProgressReportsToolbarUtils.computePdReportsUrl(locationId);
       },
 
       _canExport: function (totalResults) {
-        return totalResults > 0;
+        return ProgressReportsToolbarUtils.canExport(totalResults);
       },
     });
   </script>

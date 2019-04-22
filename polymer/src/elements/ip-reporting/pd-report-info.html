@@ -16,6 +16,8 @@
 <link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../ip-reporting/report-attachments.html">
 
+<link rel="import" href="js/pd-report-info-functions.html">
+
 <dom-module id="pd-report-info">
   <template>
     <style include="app-grid-style">
@@ -235,16 +237,16 @@
         var self = this;
         var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
 
-        textInputs.forEach(function(inputContainer) {
-          var field = inputContainer.querySelector('input');
-          var id = field.id;
+        var changedFields = PdReportInfoUtils.handleInput(
+          textInputs,
+          self.data.partner_contribution_to_date,
+          self.data.challenges_in_the_reporting_period,
+          self.data.proposed_way_forward
+        );
 
-          if (field.value.trim() === self.data.partner_contribution_to_date
-          || field.value.trim() === self.data.challenges_in_the_reporting_period
-          || field.value.trim() === self.data.proposed_way_forward) {
-            return;
-          } else {
-            self.set(['localData', id], field.value.trim());
+        changedFields.forEach(function(field) {
+          if (field !== undefined) {
+            self.set(['localData', field.id], field.value.trim());
           }
         });
       },
@@ -277,11 +279,11 @@
       },
 
       _computeUpdateUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
+        return PdReportInfoUtils.computeUpdateUrl(locationId, reportId);
       },
 
       _computeMode: function (mode, overrideMode, report, permissions) {
-        return permissions.savePdReport ? (overrideMode || mode) : 'view';
+        return PdReportInfoUtils.computeMode(mode, overrideMode, report, permissions);
       },
 
       attached: function () {

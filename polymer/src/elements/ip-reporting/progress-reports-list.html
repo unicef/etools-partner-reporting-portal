@@ -21,6 +21,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
+<link rel="import" href="js/progress-reports-list-functions.html">
+
 <dom-module id="progress-reports-list">
   <template>
     <style include="data-table-styles table-styles">
@@ -30,6 +32,7 @@
         --ecp-content: {
           padding: 0;
         };
+      }
     </style>
 
     <iron-location
@@ -159,7 +162,7 @@
       },
 
       _getReportTitle: function (report) {
-        return report.report_type + report.report_number;
+        return ProgressReportsListUtils.getReportTitle(report);
       },
     });
   </script>

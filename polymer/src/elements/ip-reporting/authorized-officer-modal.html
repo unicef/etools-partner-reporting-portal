@@ -19,6 +19,7 @@
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/routing.html">
 
+<link rel="import" href="js/authorized-officer-modal-functions.html">
 
 <dom-module id="authorized-officer-modal">
   <template>
@@ -146,22 +147,11 @@
       },
 
       _computePostBody: function (selectedFocalPoint) {
-        return {
-          submitted_by_email: selectedFocalPoint,
-        };
+        return AuthorizedOfficerModalUtils.computePostBody(selectedFocalPoint);
       },
 
       _computeAuthorizedPartners: function (pd) {
-        var partners = (pd.unicef_officers || []).filter(function(partner) {
-          return partner.is_authorized_officer && partner.active;
-        });
-        var formattedPartners = partners.map(function (partner) {
-          return {
-            value: partner.email,
-            title: partner.name + ' ' + partner.title
-          };
-        });
-        return formattedPartners;
+        return AuthorizedOfficerModalUtils.computeAuthorizedPartners(pd);
       },
 
       _validate: function (e) {

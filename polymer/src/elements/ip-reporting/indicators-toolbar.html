@@ -5,6 +5,8 @@
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
 
+<link rel="import" href="js/indicators-toolbar-functions.html">
+
 <dom-module id="indicators-toolbar">
   <template>
     <style>
@@ -48,7 +50,7 @@
       },
 
       _computeIndicatorsUrl: function (locationId) {
-        return App.Endpoints.allPDIndicators(locationId);
+        return IndicatorsToolbarUtils.computeIndicatorsUrl(locationId);
       },
     });
   </script>
