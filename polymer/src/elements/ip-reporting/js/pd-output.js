@@ -1,6 +1,6 @@
 function PdOutputUtils() {
 
-};
+}
 
 PdOutputUtils.calculationFormulaAcrossPeriods = function (indicator) {
     return indicator.reportable.blueprint.display_type === 'ratio'

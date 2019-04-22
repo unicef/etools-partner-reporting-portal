@@ -1,6 +1,6 @@
 function PdDetailsCalculationMethodsUtils() {
 
-};
+}
 
 PdDetailsCalculationMethodsUtils.computeIndicatorsUrl = function(locationId, pdId) {
     return locationId ? App.Endpoints.calculationMethods(locationId, pdId) : '';

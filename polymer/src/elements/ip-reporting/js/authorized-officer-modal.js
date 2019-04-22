@@ -1,6 +1,6 @@
 function AuthorizedOfficerModalUtils() {
 
-};
+}
 
 AuthorizedOfficerModalUtils.computePostBody = function(selectedFocalPoint) {
     return {

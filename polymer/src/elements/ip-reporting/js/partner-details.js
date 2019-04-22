@@ -1,6 +1,6 @@
 function PartnerDetailsUtils() {
 
-};
+}
 
 PartnerDetailsUtils.computePartnerType = function(partner, withDefaultFn) {
     var chunks = [

@@ -1,6 +1,6 @@
 function PdDetailsReportsUtils() {
 
-};
+}
 
 PdDetailsReportsUtils.computePDReportsUrl = function(locationId) {
     return locationId ? App.Endpoints.programmeDocumentReports(locationId) : '';

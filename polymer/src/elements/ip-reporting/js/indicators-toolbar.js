@@ -1,6 +1,6 @@
 function IndicatorsToolbarUtils() {
 
-};
+}
 
 IndicatorsToolbarUtils.computeIndicatorsUrl = function(locationId) {
     return App.Endpoints.allPDIndicators(locationId);

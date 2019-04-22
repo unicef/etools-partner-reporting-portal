@@ -1,6 +1,6 @@
 function PdDetailsDocDownloadUtils() {
 
-};
+}
 
 PdDetailsDocDownloadUtils.computeDocUrl = function(locationId, pdId) {
     return pdId ? App.Endpoints.programmeDocumentDocDownload(locationId, pdId) : '';

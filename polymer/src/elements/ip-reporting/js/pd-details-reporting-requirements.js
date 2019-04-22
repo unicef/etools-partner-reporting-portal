@@ -1,6 +1,6 @@
 function PdDetailsReportingRequirementsUtils() {
 
-};
+}
 
 PdDetailsReportingRequirementsUtils.getReportName = function(type, index) {
     return type + (index + 1);

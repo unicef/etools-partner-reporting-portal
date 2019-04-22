@@ -1,6 +1,6 @@
 function PdDetailsOverviewUtils() {
 
-};
+}
 
 PdDetailsOverviewUtils.computeLoaded = function(pd) {
     return !!pd.id;
