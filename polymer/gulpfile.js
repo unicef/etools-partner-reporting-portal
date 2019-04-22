@@ -24,8 +24,7 @@ const cover = require('gulp-coverage');
 if (argv.l) {
     const logging = require('plylog');
     logging.setVerbose();
-}
-
+};
 
 // !!! IMPORTANT !!! //
 // Keep the global.config above any of the gulp-tasks that depend on it
@@ -129,8 +128,7 @@ gulp.task('specs', function() {
         .pipe(jasmine())
         .pipe(cover.gather())
         .pipe(cover.format())
-        .pipe(gulp.dest('./testoutput'));
-
+        .pipe(gulp.dest('test/reports'));
 });
 
 gulp.task('watch', function() {
