@@ -43,9 +43,9 @@ def up_with_bundle(rebuild=True):
 def restart(service):
     """
     restart a service container
-    :param service: ['django_api', 'polymer', 'proxy', 'db']
+    :param service: ['django_api', 'polymer', 'proxy', 'db', 'id-management-frontend']
     """
-    assert service in ['django_api', 'polymer', 'proxy', 'db', 'beater-prp', 'worker-prp'], "%s is unrecognized service"
+    assert service in ['django_api', 'polymer', 'proxy', 'db', 'beater-prp', 'worker-prp', 'id-management-frontend'], "%s is unrecognized service"
     local('docker-compose restart %s' % service)
 
 
@@ -61,7 +61,7 @@ def rebuild(service):
     Re-build docker images for containers.
     """
     if service:
-        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+        assert service in ['django_api', 'polymer', 'proxy', 'db', 'id-management-frontend'], "%s is unrecognized service"
 
     local('docker-compose build %s' % service if service else '')
 
@@ -88,7 +88,7 @@ def stop(service):
         local('docker-compose stop')
 
     elif service:
-        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+        assert service in ['django_api', 'polymer', 'proxy', 'db', 'id-management-frontend'], "%s is unrecognized service"
         local('docker-compose stop %s' % service)
 
 
