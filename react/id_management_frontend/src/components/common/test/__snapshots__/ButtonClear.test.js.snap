@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Clear button component renders clear button 1`] = `
+exports[`Clear button component renders clear button and calls click 1`] = `
 <WithStyles(Button)
   color="primary"
   onClick={[Function]}
