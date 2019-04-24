@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import {Button, CircularProgress} from "@material-ui/core";
 import ButtonSubmit from '../ButtonSubmit';
@@ -11,8 +11,8 @@ describe('ButtonSubmit component', () => {
         const label = 'Submit';
 
         const wrapper = shallow(<ButtonSubmit
-            className={classes.wrapper}
-            disabled={loading}
+            classes={classes}
+            loading={loading}
             buttonLabel={label}
         />);
 
@@ -25,30 +25,18 @@ describe('ButtonSubmit component', () => {
 
     it('renders Loading component when loading is true', () => {
         const classes = {wrapper: 'wrapper', buttonProgress: 'buttonProgress'};
-        let loading = false;
-        const label = false;
+        const loading = true;
+        const label = null;
 
-        const wrapper = shallow(<ButtonSubmit
-            className={classes.wrapper}
-            disabled={loading}
-            buttonLabel={label}
+        const wrapper = mount(<ButtonSubmit
+            classes={classes}
+            label={label}
+            loading={loading}
         />);
 
+        const node = wrapper.containsMatchingElement([<CircularProgress/>]);
+
+        expect(node).toBe(true);
         expect(toJSON(wrapper)).toMatchSnapshot();
-
-        loading = true;
-
-        const newWrapper = shallow(<ButtonSubmit
-            className={classes.wrapper}
-            disabled={loading}
-            buttonLabel={label}
-        />);
-
-        expect(newWrapper.contains([
-            <Button disabled="true">Save</Button>,
-            <CircularProgress className={classes.buttonProgress}/>
-        ]));
-
-        expect(toJSON(newWrapper)).toMatchSnapshot();
     });
 });
