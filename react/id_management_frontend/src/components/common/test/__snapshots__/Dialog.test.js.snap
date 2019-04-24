@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dialog component renders component correctly and calls click 1`] = `
+<Dialog
+  caption="yay"
+  classes={
+    Object {
+      "appBar": "Dialog-appBar-1",
+      "caption": "Dialog-caption-5",
+      "close": "Dialog-close-3",
+      "content": "Dialog-content-4",
+      "dialogLoading": "Dialog-dialogLoading-6",
+      "toolbar": "Dialog-toolbar-2",
+    }
+  }
+  loading={true}
+  onClose={[Function]}
+  title="hello"
+>
+  <Component />
+</Dialog>
+`;
