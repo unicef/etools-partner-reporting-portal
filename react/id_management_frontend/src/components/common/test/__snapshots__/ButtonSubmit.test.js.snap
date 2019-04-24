@@ -13,3 +13,17 @@ exports[`ButtonSubmit component renders ButtonSubmit component and calls click p
   disabled={false}
 />
 `;
+
+exports[`ButtonSubmit component renders Loading component when loading is true 1`] = `
+<ButtonSubmit
+  buttonLabel={false}
+  className="wrapper"
+  classes={
+    Object {
+      "buttonProgress": "ButtonSubmit-buttonProgress-2",
+      "wrapper": "ButtonSubmit-wrapper-1",
+    }
+  }
+  disabled={true}
+/>
+`;
