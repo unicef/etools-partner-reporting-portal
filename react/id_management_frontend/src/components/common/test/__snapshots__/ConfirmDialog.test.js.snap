@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmDialog component passes 1`] = `
+<ConfirmDialog
+  classes={
+    Object {
+      "text": "ConfirmDialog-text-1",
+    }
+  }
+  message="some message"
+  onClose={[Function]}
+  onConfirm={[Function]}
+  open={true}
+  title="hello"
+/>
+`;
