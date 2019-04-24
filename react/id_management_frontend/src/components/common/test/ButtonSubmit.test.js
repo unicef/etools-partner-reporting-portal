@@ -25,7 +25,7 @@ describe('ButtonSubmit component', () => {
 
     it('renders Loading component when loading is true', () => {
         const classes = {wrapper: 'wrapper', buttonProgress: 'buttonProgress'};
-        const loading = true;
+        let loading = false;
         const label = false;
 
         const wrapper = shallow(<ButtonSubmit
@@ -34,11 +34,21 @@ describe('ButtonSubmit component', () => {
             buttonLabel={label}
         />);
 
-        console.log(wrapper.prop('buttonLabel'))
-
-        expect(loading).toBe(true);
-        expect(wrapper.find('CircularProgress')).toBeTruthy();
-        expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
+
+        loading = true;
+
+        const newWrapper = shallow(<ButtonSubmit
+            className={classes.wrapper}
+            disabled={loading}
+            buttonLabel={label}
+        />);
+
+        expect(newWrapper.contains([
+            <Button disabled="true">Save</Button>,
+            <CircularProgress className={classes.buttonProgress}/>
+        ]));
+
+        expect(toJSON(newWrapper)).toMatchSnapshot();
     });
 });
