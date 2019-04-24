@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DialogActions component renders properly 1`] = `
+<DialogActions
+  classes={
+    Object {
+      "actions": "DialogActions-actions-1",
+    }
+  }
+>
+  <Component />
+</DialogActions>
+`;
