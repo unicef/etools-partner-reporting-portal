@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ConfirmDialog component passes 1`] = `
+exports[`ConfirmDialog component renders component properly 1`] = `
 <ConfirmDialog
   classes={
     Object {

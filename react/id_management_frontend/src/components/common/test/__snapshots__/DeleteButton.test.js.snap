@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeleteButton component renders component properly and calls click 1`] = `
+<DeleteButton
+  className={Object {}}
+  classes={
+    Object {
+      "icon": "DeleteButton-icon-1",
+    }
+  }
+  onClick={[Function]}
+/>
+`;

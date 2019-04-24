@@ -4,7 +4,7 @@ import toJSON from 'enzyme-to-json';
 import ConfirmDialog from '../ConfirmDialog';
 
 describe('ConfirmDialog component', () => {
-    it('passes', () => {
+    it('renders component properly', () => {
         const open = true;
         const onClose = jest.fn();
         const title = 'hello';
