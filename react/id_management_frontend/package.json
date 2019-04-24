@@ -84,7 +84,7 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
-    "collectCoverage": false,
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
     ],

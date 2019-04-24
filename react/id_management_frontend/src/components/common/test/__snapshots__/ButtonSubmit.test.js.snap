@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonSubmit component renders ButtonSubmit component and calls click properly 1`] = `
+<ButtonSubmit
+  buttonLabel="Submit"
+  className="wrapper"
+  classes={
+    Object {
+      "buttonProgress": "ButtonSubmit-buttonProgress-2",
+      "wrapper": "ButtonSubmit-wrapper-1",
+    }
+  }
+  disabled={false}
+/>
+`;

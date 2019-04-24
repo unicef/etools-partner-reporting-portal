@@ -6,17 +6,17 @@ import ButtonNew from '../ButtonNew';
 describe('ButtonNew component', () => {
     it('renders ButtonNew component and calls click', () => {
         const onClick = jest.fn();
-        const classes = {};
+        const classes = {icon: "ButtonNew-icon-1"};
 
         const wrapper = shallow(<ButtonNew
             onClick={onClick}
-            classes={classes}
         />);
 
         wrapper.simulate('click');
         const calls = onClick.mock.calls;
 
+        expect(wrapper.dive()).toBeTruthy();
         expect(calls.length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
-    })
-})
+    });
+});
