@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FilterButtons component renders component properly 1`] = `
+<FilterButtons
+  classes={
+    Object {
+      "filterButtons": "FilterButtons-filterButtons-1",
+    }
+  }
+  onClear={[Function]}
+/>
+`;

@@ -13,8 +13,6 @@ describe('FieldsArrayPanel component', () => {
             classes={classes}
         />);
 
-        console.log(wrapper.debug());
-
         expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });
