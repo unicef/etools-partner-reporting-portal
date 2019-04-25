@@ -1,7 +1,6 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
-import {MenuItem} from "@material-ui/core";
 import MenuSelect from '../MenuSelect';
 
 describe('MenuSelect component', () => {
