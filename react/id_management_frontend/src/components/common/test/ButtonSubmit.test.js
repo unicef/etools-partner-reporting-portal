@@ -21,7 +21,6 @@ describe('ButtonSubmit component', () => {
         const node = wrapper.exists(CircularProgress);
 
         expect(node).toBeFalsy();
-        // expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });
 

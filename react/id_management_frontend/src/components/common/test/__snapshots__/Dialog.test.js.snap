@@ -1,22 +1,265 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Dialog component renders component correctly and calls click 1`] = `
-<Dialog
+<WithStyles(Dialog)
   caption="yay"
   classes={
     Object {
-      "appBar": "Dialog-appBar-1",
-      "caption": "Dialog-caption-5",
-      "close": "Dialog-close-3",
-      "content": "Dialog-content-4",
-      "dialogLoading": "Dialog-dialogLoading-6",
-      "toolbar": "Dialog-toolbar-2",
+      "close": "iconButton",
+      "dialogLoading": "dialog",
     }
   }
   loading={true}
   onClose={[Function]}
   title="hello"
 >
-  <Component />
-</Dialog>
+  <Dialog
+    caption="yay"
+    classes={
+      Object {
+        "appBar": "Dialog-appBar-1",
+        "caption": "Dialog-caption-5",
+        "close": "Dialog-close-3 iconButton",
+        "content": "Dialog-content-4",
+        "dialogLoading": "Dialog-dialogLoading-6 dialog",
+        "toolbar": "Dialog-toolbar-2",
+      }
+    }
+    loading={true}
+    onClose={[Function]}
+    title="hello"
+  >
+    <WithStyles(Dialog)
+      className="Dialog-dialogLoading-6 dialog"
+      disableBackdropClick={true}
+      disableEscapeKeyDown={true}
+      fullWidth={true}
+      maxWidth="sm"
+      onClose={[Function]}
+      open={false}
+    >
+      <Dialog
+        TransitionComponent={[Function]}
+        className="Dialog-dialogLoading-6 dialog"
+        classes={
+          Object {
+            "paper": "MuiDialog-paper-10",
+            "paperFullScreen": "MuiDialog-paperFullScreen-17",
+            "paperFullWidth": "MuiDialog-paperFullWidth-16",
+            "paperScrollBody": "MuiDialog-paperScrollBody-12",
+            "paperScrollPaper": "MuiDialog-paperScrollPaper-11",
+            "paperWidthMd": "MuiDialog-paperWidthMd-15",
+            "paperWidthSm": "MuiDialog-paperWidthSm-14",
+            "paperWidthXs": "MuiDialog-paperWidthXs-13",
+            "root": "MuiDialog-root-7",
+            "scrollBody": "MuiDialog-scrollBody-9",
+            "scrollPaper": "MuiDialog-scrollPaper-8",
+          }
+        }
+        disableBackdropClick={true}
+        disableEscapeKeyDown={true}
+        fullScreen={false}
+        fullWidth={true}
+        maxWidth="sm"
+        onClose={[Function]}
+        open={false}
+        scroll="paper"
+        transitionDuration={
+          Object {
+            "enter": 225,
+            "exit": 195,
+          }
+        }
+      >
+        <WithStyles(Modal)
+          BackdropProps={
+            Object {
+              "transitionDuration": Object {
+                "enter": 225,
+                "exit": 195,
+              },
+            }
+          }
+          className="MuiDialog-root-7 MuiDialog-scrollPaper-8 Dialog-dialogLoading-6 dialog"
+          disableBackdropClick={true}
+          disableEscapeKeyDown={true}
+          onClose={[Function]}
+          open={false}
+          role="dialog"
+        >
+          <Modal
+            BackdropComponent={[Function]}
+            BackdropProps={
+              Object {
+                "transitionDuration": Object {
+                  "enter": 225,
+                  "exit": 195,
+                },
+              }
+            }
+            className="MuiDialog-root-7 MuiDialog-scrollPaper-8 Dialog-dialogLoading-6 dialog"
+            classes={
+              Object {
+                "hidden": "MuiModal-hidden-19",
+                "root": "MuiModal-root-18",
+              }
+            }
+            disableAutoFocus={false}
+            disableBackdropClick={true}
+            disableEnforceFocus={false}
+            disableEscapeKeyDown={true}
+            disablePortal={false}
+            disableRestoreFocus={false}
+            hideBackdrop={false}
+            keepMounted={false}
+            manager={
+              ModalManager {
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "modals": Array [],
+              }
+            }
+            onClose={[Function]}
+            open={false}
+            role="dialog"
+          />
+        </WithStyles(Modal)>
+      </Dialog>
+    </WithStyles(Dialog)>
+  </Dialog>
+</WithStyles(Dialog)>
+`;
+
+exports[`Dialog component renders properly when loading is false 1`] = `
+<WithStyles(Dialog)
+  caption="yay"
+  classes={
+    Object {
+      "close": "iconButton",
+      "dialogLoading": "dialog",
+    }
+  }
+  loading={false}
+  onClose={[Function]}
+  title="hello"
+>
+  <Dialog
+    caption="yay"
+    classes={
+      Object {
+        "appBar": "Dialog-appBar-1",
+        "caption": "Dialog-caption-5",
+        "close": "Dialog-close-3 iconButton",
+        "content": "Dialog-content-4",
+        "dialogLoading": "Dialog-dialogLoading-6 dialog",
+        "toolbar": "Dialog-toolbar-2",
+      }
+    }
+    loading={false}
+    onClose={[Function]}
+    title="hello"
+  >
+    <WithStyles(Dialog)
+      className=""
+      disableBackdropClick={false}
+      disableEscapeKeyDown={false}
+      fullWidth={true}
+      maxWidth="sm"
+      onClose={[Function]}
+      open={false}
+    >
+      <Dialog
+        TransitionComponent={[Function]}
+        className=""
+        classes={
+          Object {
+            "paper": "MuiDialog-paper-10",
+            "paperFullScreen": "MuiDialog-paperFullScreen-17",
+            "paperFullWidth": "MuiDialog-paperFullWidth-16",
+            "paperScrollBody": "MuiDialog-paperScrollBody-12",
+            "paperScrollPaper": "MuiDialog-paperScrollPaper-11",
+            "paperWidthMd": "MuiDialog-paperWidthMd-15",
+            "paperWidthSm": "MuiDialog-paperWidthSm-14",
+            "paperWidthXs": "MuiDialog-paperWidthXs-13",
+            "root": "MuiDialog-root-7",
+            "scrollBody": "MuiDialog-scrollBody-9",
+            "scrollPaper": "MuiDialog-scrollPaper-8",
+          }
+        }
+        disableBackdropClick={false}
+        disableEscapeKeyDown={false}
+        fullScreen={false}
+        fullWidth={true}
+        maxWidth="sm"
+        onClose={[Function]}
+        open={false}
+        scroll="paper"
+        transitionDuration={
+          Object {
+            "enter": 225,
+            "exit": 195,
+          }
+        }
+      >
+        <WithStyles(Modal)
+          BackdropProps={
+            Object {
+              "transitionDuration": Object {
+                "enter": 225,
+                "exit": 195,
+              },
+            }
+          }
+          className="MuiDialog-root-7 MuiDialog-scrollPaper-8"
+          disableBackdropClick={false}
+          disableEscapeKeyDown={false}
+          onClose={[Function]}
+          open={false}
+          role="dialog"
+        >
+          <Modal
+            BackdropComponent={[Function]}
+            BackdropProps={
+              Object {
+                "transitionDuration": Object {
+                  "enter": 225,
+                  "exit": 195,
+                },
+              }
+            }
+            className="MuiDialog-root-7 MuiDialog-scrollPaper-8"
+            classes={
+              Object {
+                "hidden": "MuiModal-hidden-19",
+                "root": "MuiModal-root-18",
+              }
+            }
+            disableAutoFocus={false}
+            disableBackdropClick={false}
+            disableEnforceFocus={false}
+            disableEscapeKeyDown={false}
+            disablePortal={false}
+            disableRestoreFocus={false}
+            hideBackdrop={false}
+            keepMounted={false}
+            manager={
+              ModalManager {
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "modals": Array [],
+              }
+            }
+            onClose={[Function]}
+            open={false}
+            role="dialog"
+          />
+        </WithStyles(Modal)>
+      </Dialog>
+    </WithStyles(Dialog)>
+  </Dialog>
+</WithStyles(Dialog)>
 `;

@@ -1,18 +1,20 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
+import {IconButton} from "@material-ui/core/";
 import Dialog from '../Dialog';
 
 describe('Dialog component', () => {
+    const children = {};
+    const classes = {dialogLoading: 'dialog', close: 'iconButton'};
+    const onClose = jest.fn();
+    const title = 'hello';
+    const caption = 'yay';
+    
     it('renders component correctly and calls click', () => {
-        const children = {};
-        const classes = {};
-        const onClose = jest.fn();
-        const title = 'hello';
         const loading = true;
-        const caption = 'yay';
 
-        const wrapper = shallow(<Dialog
+        const wrapper = mount(<Dialog
             onClose={onClose}
             children={children}
             classes={classes}
@@ -21,7 +23,25 @@ describe('Dialog component', () => {
             caption={caption}
         />);
 
+        expect(wrapper.exists('.dialog')).toBe(true);
+        expect(wrapper.exists(IconButton)).toBe(false);
         expect(toJSON(wrapper)).toMatchSnapshot();
-        expect(wrapper.dive().length).toBe(1);
+    });
+
+    it('renders properly when loading is false', () => {
+        const loading = false;
+
+        const wrapper = mount(<Dialog
+            onClose={onClose}
+            children={children}
+            classes={classes}
+            title={title}
+            loading={loading}
+            caption={caption}
+        />);
+
+        expect(wrapper.exists('.dialog')).toBe(false);
+        // expect(wrapper.exists('.iconButton')).toBe(true);
+        expect(toJSON(wrapper)).toMatchSnapshot();
     });
 });
