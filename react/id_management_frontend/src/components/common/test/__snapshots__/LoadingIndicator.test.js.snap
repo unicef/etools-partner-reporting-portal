@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoadingIndicator component renders the component 1`] = `
+<LoadingIndicator
+  absolute={true}
+  classes={
+    Object {
+      "absolute": "LoadingIndicator-absolute-1 test",
+    }
+  }
+/>
+`;
