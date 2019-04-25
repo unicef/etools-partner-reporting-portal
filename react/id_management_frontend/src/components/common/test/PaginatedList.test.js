@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow, mockStore} from 'enzyme';
+import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import {PaginatedList, mapStateToProps} from '../PaginatedList';
 
