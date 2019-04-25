@@ -10,7 +10,7 @@ describe('ButtonSubmit component', () => {
         const loading = false;
         const label = 'Submit';
 
-        const wrapper = shallow(<ButtonSubmit
+        const wrapper = mount(<ButtonSubmit
             classes={classes}
             loading={loading}
             buttonLabel={label}
@@ -18,8 +18,10 @@ describe('ButtonSubmit component', () => {
 
         wrapper.simulate('submit');
 
-        expect(loading).toBe(false);
-        expect(wrapper.dive().length).toBe(1);
+        const node = wrapper.exists(CircularProgress);
+
+        expect(node).toBeFalsy();
+        // expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });
 
@@ -34,7 +36,7 @@ describe('ButtonSubmit component', () => {
             loading={loading}
         />);
 
-        const node = wrapper.containsMatchingElement([<CircularProgress/>]);
+        const node = wrapper.exists(CircularProgress);
 
         expect(node).toBe(true);
         expect(toJSON(wrapper)).toMatchSnapshot();

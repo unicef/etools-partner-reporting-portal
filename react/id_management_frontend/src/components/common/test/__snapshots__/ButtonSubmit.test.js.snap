@@ -1,16 +1,161 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ButtonSubmit component renders ButtonSubmit component and calls click properly 1`] = `
-<ButtonSubmit
+<WithStyles(ButtonSubmit)
   buttonLabel="Submit"
   classes={
     Object {
-      "buttonProgress": "ButtonSubmit-buttonProgress-2 buttonProgress",
-      "wrapper": "ButtonSubmit-wrapper-1 wrapper",
+      "buttonProgress": "buttonProgress",
+      "wrapper": "wrapper",
     }
   }
   loading={false}
-/>
+>
+  <ButtonSubmit
+    buttonLabel="Submit"
+    classes={
+      Object {
+        "buttonProgress": "ButtonSubmit-buttonProgress-2 buttonProgress",
+        "wrapper": "ButtonSubmit-wrapper-1 wrapper",
+      }
+    }
+    loading={false}
+  >
+    <div
+      className="ButtonSubmit-wrapper-1 wrapper"
+    >
+      <WithStyles(Button)
+        color="primary"
+        disabled={false}
+        type="submit"
+        variant="contained"
+      >
+        <Button
+          classes={
+            Object {
+              "colorInherit": "MuiButton-colorInherit-22",
+              "contained": "MuiButton-contained-12",
+              "containedPrimary": "MuiButton-containedPrimary-13",
+              "containedSecondary": "MuiButton-containedSecondary-14",
+              "disabled": "MuiButton-disabled-21",
+              "extendedFab": "MuiButton-extendedFab-19",
+              "fab": "MuiButton-fab-18",
+              "flat": "MuiButton-flat-8",
+              "flatPrimary": "MuiButton-flatPrimary-9",
+              "flatSecondary": "MuiButton-flatSecondary-10",
+              "focusVisible": "MuiButton-focusVisible-20",
+              "fullWidth": "MuiButton-fullWidth-26",
+              "label": "MuiButton-label-4",
+              "mini": "MuiButton-mini-23",
+              "outlined": "MuiButton-outlined-11",
+              "raised": "MuiButton-raised-15",
+              "raisedPrimary": "MuiButton-raisedPrimary-16",
+              "raisedSecondary": "MuiButton-raisedSecondary-17",
+              "root": "MuiButton-root-3",
+              "sizeLarge": "MuiButton-sizeLarge-25",
+              "sizeSmall": "MuiButton-sizeSmall-24",
+              "text": "MuiButton-text-5",
+              "textPrimary": "MuiButton-textPrimary-6",
+              "textSecondary": "MuiButton-textSecondary-7",
+            }
+          }
+          color="primary"
+          component="button"
+          disableFocusRipple={false}
+          disabled={false}
+          fullWidth={false}
+          mini={false}
+          size="medium"
+          type="submit"
+          variant="contained"
+        >
+          <WithStyles(ButtonBase)
+            className="MuiButton-root-3 MuiButton-contained-12 MuiButton-containedPrimary-13 MuiButton-raised-15 MuiButton-raisedPrimary-16"
+            component="button"
+            disabled={false}
+            focusRipple={true}
+            focusVisibleClassName="MuiButton-focusVisible-20"
+            type="submit"
+          >
+            <ButtonBase
+              centerRipple={false}
+              className="MuiButton-root-3 MuiButton-contained-12 MuiButton-containedPrimary-13 MuiButton-raised-15 MuiButton-raisedPrimary-16"
+              classes={
+                Object {
+                  "disabled": "MuiButtonBase-disabled-28",
+                  "focusVisible": "MuiButtonBase-focusVisible-29",
+                  "root": "MuiButtonBase-root-27",
+                }
+              }
+              component="button"
+              disableRipple={false}
+              disableTouchRipple={false}
+              disabled={false}
+              focusRipple={true}
+              focusVisibleClassName="MuiButton-focusVisible-20"
+              tabIndex="0"
+              type="submit"
+            >
+              <button
+                className="MuiButtonBase-root-27 MuiButton-root-3 MuiButton-contained-12 MuiButton-containedPrimary-13 MuiButton-raised-15 MuiButton-raisedPrimary-16"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex="0"
+                type="submit"
+              >
+                <span
+                  className="MuiButton-label-4"
+                >
+                  Save
+                </span>
+                <WithStyles(TouchRipple)
+                  center={false}
+                  innerRef={[Function]}
+                >
+                  <TouchRipple
+                    center={false}
+                    classes={
+                      Object {
+                        "child": "MuiTouchRipple-child-34",
+                        "childLeaving": "MuiTouchRipple-childLeaving-35",
+                        "childPulsate": "MuiTouchRipple-childPulsate-36",
+                        "ripple": "MuiTouchRipple-ripple-31",
+                        "ripplePulsate": "MuiTouchRipple-ripplePulsate-33",
+                        "rippleVisible": "MuiTouchRipple-rippleVisible-32",
+                        "root": "MuiTouchRipple-root-30",
+                      }
+                    }
+                  >
+                    <TransitionGroup
+                      childFactory={[Function]}
+                      className="MuiTouchRipple-root-30"
+                      component="span"
+                      enter={true}
+                      exit={true}
+                    >
+                      <span
+                        className="MuiTouchRipple-root-30"
+                      />
+                    </TransitionGroup>
+                  </TouchRipple>
+                </WithStyles(TouchRipple)>
+              </button>
+            </ButtonBase>
+          </WithStyles(ButtonBase)>
+        </Button>
+      </WithStyles(Button)>
+    </div>
+  </ButtonSubmit>
+</WithStyles(ButtonSubmit)>
 `;
 
 exports[`ButtonSubmit component renders Loading component when loading is true 1`] = `
@@ -143,15 +288,15 @@ exports[`ButtonSubmit component renders Loading component when loading is true 1
           className="ButtonSubmit-buttonProgress-2 buttonProgress"
           classes={
             Object {
-              "circle": "MuiCircularProgress-circle-36",
-              "circleIndeterminate": "MuiCircularProgress-circleIndeterminate-38",
-              "circleStatic": "MuiCircularProgress-circleStatic-37",
-              "colorPrimary": "MuiCircularProgress-colorPrimary-33",
-              "colorSecondary": "MuiCircularProgress-colorSecondary-34",
-              "indeterminate": "MuiCircularProgress-indeterminate-32",
-              "root": "MuiCircularProgress-root-30",
-              "static": "MuiCircularProgress-static-31",
-              "svg": "MuiCircularProgress-svg-35",
+              "circle": "MuiCircularProgress-circle-43",
+              "circleIndeterminate": "MuiCircularProgress-circleIndeterminate-45",
+              "circleStatic": "MuiCircularProgress-circleStatic-44",
+              "colorPrimary": "MuiCircularProgress-colorPrimary-40",
+              "colorSecondary": "MuiCircularProgress-colorSecondary-41",
+              "indeterminate": "MuiCircularProgress-indeterminate-39",
+              "root": "MuiCircularProgress-root-37",
+              "static": "MuiCircularProgress-static-38",
+              "svg": "MuiCircularProgress-svg-42",
             }
           }
           color="primary"
@@ -161,7 +306,7 @@ exports[`ButtonSubmit component renders Loading component when loading is true 1
           variant="indeterminate"
         >
           <div
-            className="MuiCircularProgress-root-30 MuiCircularProgress-colorPrimary-33 MuiCircularProgress-indeterminate-32 ButtonSubmit-buttonProgress-2 buttonProgress"
+            className="MuiCircularProgress-root-37 MuiCircularProgress-colorPrimary-40 MuiCircularProgress-indeterminate-39 ButtonSubmit-buttonProgress-2 buttonProgress"
             role="progressbar"
             style={
               Object {
@@ -171,11 +316,11 @@ exports[`ButtonSubmit component renders Loading component when loading is true 1
             }
           >
             <svg
-              className="MuiCircularProgress-svg-35"
+              className="MuiCircularProgress-svg-42"
               viewBox="22 22 44 44"
             >
               <circle
-                className="MuiCircularProgress-circle-36 MuiCircularProgress-circleIndeterminate-38"
+                className="MuiCircularProgress-circle-43 MuiCircularProgress-circleIndeterminate-45"
                 cx={44}
                 cy={44}
                 fill="none"
