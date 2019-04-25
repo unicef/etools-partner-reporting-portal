@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageContent component renders properly 1`] = `
+<PageContent
+  classes={
+    Object {
+      "content": "PageContent-content-1",
+    }
+  }
+>
+  <div />
+</PageContent>
+`;
