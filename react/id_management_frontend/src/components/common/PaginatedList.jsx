@@ -78,7 +78,7 @@ const RestoreButton = ({onClick}) => (
     </IconButton>
 );
 
-class PaginatedList extends Component {
+export class PaginatedList extends Component {
     constructor(props) {
         super(props);
 
@@ -278,7 +278,7 @@ PaginatedList.propTypes = {
     classes: PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => {
+export const mapStateToProps = (state) => {
     const {expandedRowIds} = state;
 
     return {
@@ -286,7 +286,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = dispatch => {
+export const mapDispatchToProps = dispatch => {
     return {
         dispatchExpandedRowIds: ids => dispatch(expandedRowIds(ids))
     }
