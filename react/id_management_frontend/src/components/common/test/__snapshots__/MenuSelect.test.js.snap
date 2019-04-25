@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MenuSelect component renders properly 1`] = `
+<WithStyles(FilterInput)>
+  <WithStyles(InputLabel)
+    htmlFor="Florence"
+  >
+    test
+  </WithStyles(InputLabel)>
+  <WithStyles(Select)
+    inputProps={
+      Object {
+        "id": "Florence",
+        "name": "Florence",
+      }
+    }
+    onChange={[Function]}
+    value={1138}
+  >
+    <WithStyles(MenuItem)
+      value=""
+    >
+      <em>
+        None
+      </em>
+    </WithStyles(MenuItem)>
+    <WithStyles(MenuItem)
+      key="0"
+      value={528}
+    >
+      dreamy
+    </WithStyles(MenuItem)>
+  </WithStyles(Select)>
+</WithStyles(FilterInput)>
+`;

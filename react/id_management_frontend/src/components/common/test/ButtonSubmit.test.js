@@ -1,7 +1,7 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
-import {Button, CircularProgress} from "@material-ui/core";
+import {CircularProgress} from "@material-ui/core";
 import ButtonSubmit from '../ButtonSubmit';
 
 describe('ButtonSubmit component', () => {
