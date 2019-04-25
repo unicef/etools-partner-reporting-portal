@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GreyPanel component renders properly 1`] = `
+<GreyPanel
+  classes={
+    Object {
+      "panel": "GreyPanel-panel-1",
+    }
+  }
+>
+  <div />
+</GreyPanel>
+`;
