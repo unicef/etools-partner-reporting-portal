@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FieldsArrayAddButton component renders component properly and calls click 1`] = `
+<FieldsArrayPanel
+  classes={
+    Object {
+      "button": "FieldsArrayPanel-button-1 buttony",
+    }
+  }
+  onClick={[Function]}
+/>
+`;
