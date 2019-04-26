@@ -220,6 +220,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+        id="objectives"
+        params="[[objectivesParams]]"
+        url="[[objectivesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
       id="projectDetails"
       url="[[ochaProjectDetailsUrl]]"
       body="[[ochaProjectRequestId]]"
@@ -268,6 +274,7 @@
               </etools-single-selection-menu>
             </template>
           </template>
+
           <paper-radio-group
             id="mode"
             selected="{{ mode }}"
@@ -283,10 +290,11 @@
                 <paper-radio-button
                   disabled="[[fromOchaDisabled]]"
                   name="ocha">
-                  <strong>From OCHA</strong>
+                  <strong>Adopt from Cluster Objective</strong>
                 </paper-radio-button>
               </template>
             </template>
+
             <div
               class="fields"
               empty$="[[!_equals(mode, 'ocha')]]">
@@ -294,19 +302,33 @@
                 is="dom-if"
                 if="[[_equals(mode, 'ocha')]]"
                 restamp="true">
-                <div>
-                  <etools-single-selection-menu
-                    class="item validate full-width"
-                    label="Project"
-                    options="[[formattedProjects]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{ selectedProject }}"
-                    on-iron-activate="_validate"
-                    disabled="[[projectsLoading]]"
-                    trigger-value-change-event
-                    required>
-                  </etools-single-selection-menu>
+                <div class="app-grid">
+                  <div class="item">
+                    <etools-single-selection-menu
+                      class="validate"
+                      label="Clusters *"
+                      options="[[formattedClusters]]"
+                      selected-values="{{ selectedClusters }}"
+                      on-selected-values-changed="_validate"
+                      trigger-value-change-event
+                      required>
+                    </etools-single-selection-menu>
+                  </div>
+
+                  <div class="item">
+                    <etools-single-selection-menu
+                        class="validate"
+                        label="Objective *"
+                        options="[[objectives]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{data.custom.cluster_objective}}"
+                        on-iron-activate="_validate"
+                        disabled="[[_equals(objectives.length, 0)]]"
+                        trigger-value-change-event
+                        required>
+                    </etools-single-selection-menu>
+                  </div>
 
                   <template
                     is="dom-if"
@@ -317,16 +339,10 @@
                       There are no OCHA projects assigned to this partner.
                     </message-box>
                   </template>
-
-                  <creation-modal-project-details
-                    id="details"
-                    project-data="[[projectDetails]]"
-                    loading="[[projectDetailsLoading]]">
-                  </creation-modal-project-details>
-                  <etools-loading active$="[[projectsLoading]]"></etools-loading>
                 </div>
               </template>
             </div>
+
             <template
               is="dom-if"
               if="[[!edit]]"
@@ -342,6 +358,7 @@
                 </paper-radio-button>
               </template>
             </template>
+
             <div
               empty$="[[!_equals(mode, 'custom')]]">
               <template
@@ -357,10 +374,12 @@
                     <h4>Fields required</h4>
                   </span>
                 </div>
+
                 <div class="app-grid">
                   <div class="item full-width">
                     <error-box errors="[[errors]]"></error-box>
                   </div>
+
                   <paper-input
                     class="item validate full-width"
                     id="title"
@@ -404,6 +423,7 @@
                       no-init>
                     </etools-prp-date-input>
                   </div>
+
                   <div class="row">
                     <paper-dropdown-menu
                       class="item validate"
@@ -482,6 +502,7 @@
                         </div>
                       </paper-button>
                     </div>
+
                     <iron-collapse
                       id="collapse"
                       opened="{{ detailsOpened }}">
@@ -653,9 +674,10 @@
                           edit="[[edit]]">
                         </custom-fields-widget>
 
-                        <div>
+                      </div>
                     </iron-collapse>
                   </div>
+                </div>
               </template>
 
               <div class="buttons layout horizontal-reverse">
@@ -669,17 +691,11 @@
               </div>
 
               <etools-loading active="[[updatePending]]"></etools-loading>
-
-
             </div>
+          </paper-radio-group>
         </template>
-        </div>
-        </paper-radio-group>
-  </template>
-  </paper-dialog-scrollable>
-
-
-  </paper-dialog>
+      </paper-dialog-scrollable>
+    </paper-dialog>
   </template>
 
   <script>
@@ -764,6 +780,23 @@
         clusters: {
           format: Array,
           value: [],
+        },
+
+        objectives: {
+          type: Array,
+          value: [],
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        objectivesUrl: {
+          type: String,
+          computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
         partner: {
@@ -882,6 +915,7 @@
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
+        '_fetchObjectives(data.objectives)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -913,6 +947,10 @@
 
       _computeOchaProjectsUrl: function (responsePlanID) {
         return App.Endpoints.ochaProjectsList(responsePlanID);
+      },
+
+      _computeObjectivesUrl: function (responsePlanId) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
       _computeOchaProjectsParams: function (partner, selectedPartner) {
@@ -1049,6 +1087,28 @@
           });
       },
 
+      _fetchObjectives: function (clusterId) {
+        var self = this;
+
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+
+        this.set('objectivesParams.cluster_id', clusterId);
+        this.set('objectives', []);
+        this.set('data.cluster.objective', undefined);
+
+        this.$.objectives.abort();
+
+        this.$.objectives.thunk()()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       _computeFormattedProjects: function (projects) {
         return projects.map(function (project) {
           return {id: project.id, title: project.name};
@@ -1095,8 +1155,10 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
+          'objectives': [],
           'custom_fields': [],
-          'funding': {}
+          'funding': {},
+          'cluster': {}
         });
         this.set('projectDetails', {});
         this.set('errors', {});
