@@ -1183,7 +1183,6 @@
           this.$.objectives.abort();
           this.$.objectives.thunk()()
             .then(function (res) {
-              console.log('objectives', res);
               self.set('objectives', res.data.results);
               self.fire('details-loaded');
             })
@@ -1214,7 +1213,6 @@
           this.$.indicators.abort();
           this.$.indicators.thunk()()
             .then(function (res) {
-              console.log(res);
               self.set('indicators', res.data);
               self.fire('details-loaded');
             })
