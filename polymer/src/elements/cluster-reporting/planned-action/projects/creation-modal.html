@@ -228,6 +228,13 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+      id="indicators"
+      timeout="100000"
+      url="[[indicatorsUrl]]"
+      params=[[indicatorsParams]]>
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
       id="projectDetails"
       url="[[ochaProjectDetailsUrl]]"
       body="[[ochaProjectRequestId]]"
@@ -320,7 +327,7 @@
                     <etools-single-selection-menu
                         class="validate"
                         label="Objective *"
-                        options="[[formattedObjectives]]"
+                        options="[[objectives]]"
                         option-value="id"
                         option-label="title"
                         selected="{{ selectedObjective }}"
@@ -334,8 +341,10 @@
                     <etools-single-selection-menu
                       class="validate"
                       label="Indicator *"
-                      options="[[]]"
-                      selected="{{  }}"
+                      options="[[indicators]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{ selectedIndicator }}"
                       on-iron-select="_validate"
                       disabled="[[indicatorDisabled]]"
                       required>
@@ -839,9 +848,14 @@
           value: [],
         },
 
-        formattedObjectives: {
+        indicators: {
           type: Array,
-          computed: '_computeFormattedObjectives(objectives)',
+          value: [],
+        },
+
+        indicatorsUrl: {
+          type: String,
+          computed: '_computeIndicatorsUrl(responsePlanID)',
         },
 
         objectivesUrl: {
@@ -950,6 +964,13 @@
           },
         },
 
+        selectedIndicator: {
+          type: Object,
+          value: function () {
+            return {};
+          },
+        },
+
         fromOchaDisabled: {
           type: Boolean,
           computed: '_computeFromOchaDisabled(partner, selectedPartner)',
@@ -973,6 +994,7 @@
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
         '_fetchObjectivesList(partner, selectedPartner)',
+        '_fetchIndicatorsList(partner, selectedPartner)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -1161,6 +1183,7 @@
           this.$.objectives.abort();
           this.$.objectives.thunk()()
             .then(function (res) {
+              console.log('objectives', res);
               self.set('objectives', res.data.results);
               self.fire('details-loaded');
             })
@@ -1170,8 +1193,35 @@
         }, 100);
       },
 
-      _computeFormattedObjectives: function (objectives) {
-        return objectives;
+      _computeIndicatorsUrl: function (responsePlanID) {
+        return App.Endpoints.clusterIndicatorNames(responsePlanID);
+      },
+
+      _fetchIndicatorsList: function (partner, selectedPartner) {
+        this.debounce('fetch-indicators', function () {
+          if (
+            (!partner || !partner.ocha_external_id)
+            &&
+            (!selectedPartner || !selectedPartner.ocha_external_id)
+          ) {
+            return;
+          }
+
+          var self = this;
+
+          this.set('indicators', []);
+
+          this.$.indicators.abort();
+          this.$.indicators.thunk()()
+            .then(function (res) {
+              console.log(res);
+              self.set('indicators', res.data);
+              self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
       },
 
       _computeFormattedProjects: function (projects) {
@@ -1193,8 +1243,12 @@
       _validate: function (e) {
         if(e.detail.item.title !== undefined && this.objectiveDisabled === false) {
           this.set('indicatorDisabled', false);
-        } else {
+        } else if (e.detail.item.title !== undefined) {
           this.set('objectiveDisabled', false);
+          this.set('indicatorDisabled', true);
+        } else {
+          this.set('objectiveDisabled', true);
+          this.set('indicatorDisabled', true);
         }
 
         e.target.validate();
@@ -1268,6 +1322,7 @@
         this._cancelDebouncers([
           'fetch-ocha-projects',
           'fetch-objectives',
+          'fetch-indicators',
           'set-mode',
         ]);
       },
