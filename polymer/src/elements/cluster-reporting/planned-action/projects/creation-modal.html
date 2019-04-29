@@ -221,9 +221,10 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="objectives"
-        params="[[objectivesParams]]"
-        url="[[objectivesUrl]]">
+      id="objectives"
+      timeout="100000"
+      url="[[objectivesUrl]]"
+      params=[[objectivesParams]]>
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -290,7 +291,7 @@
                 restamp="true">
                 <paper-radio-button
                   disabled="[[fromOchaDisabled]]"
-                  name="ocha">
+                  name="objectives">
                   <strong>Adopt from Cluster Objective</strong>
                 </paper-radio-button>
               </template>
@@ -298,10 +299,10 @@
 
             <div
               class="fields"
-              empty$="[[!_equals(mode, 'ocha')]]">
+              empty$="[[!_equals(mode, 'objectives')]]">
               <template
                 is="dom-if"
-                if="[[_equals(mode, 'ocha')]]"
+                if="[[_equals(mode, 'objectives')]]"
                 restamp="true">
                 <div class="app-grid">
                   <div class="item">
@@ -320,11 +321,11 @@
                     <etools-single-selection-menu
                         class="validate"
                         label="Objective *"
-                        options="[[objectives]]"
+                        options="[[formattedObjectives]]"
                         option-value="id"
                         option-label="title"
-                        selected="{{data.custom.cluster_objective}}"
-                        on-iron-activate="_validate"
+                        selected="{{ selectedObjective }}"
+                        on-selected-values-changed="_validate"
                         disabled="[[_equals(objectives.length, 0)]]"
                         trigger-value-change-event
                         required>
@@ -379,7 +380,7 @@
                     restamp="true">
                     <message-box
                       type="warning">
-                      There are no OCHA projects assigned to this partner.
+                      There are no objectives projects assigned to this partner.
                     </message-box>
                   </template>
                 </div>
@@ -830,16 +831,14 @@
           value: [],
         },
 
-        objectivesParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
+        formattedObjectives: {
+          type: Array,
+          computed: '_computeFormattedObjectives(objectives)',
         },
 
         objectivesUrl: {
           type: String,
-          computed: '_computeObjectivesUrl(responsePlanId)',
+          computed: '_computeObjectivesUrl(responsePlanID)',
         },
 
         partner: {
@@ -936,6 +935,13 @@
           },
         },
 
+        selectedObjective: {
+          type: Object,
+          value: function () {
+            return {};
+          },
+        },
+
         fromOchaDisabled: {
           type: Boolean,
           computed: '_computeFromOchaDisabled(partner, selectedPartner)',
@@ -958,7 +964,7 @@
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
-        '_fetchObjectives(data.objectives)',
+        '_fetchObjectivesList(partner, selectedPartner)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -983,8 +989,8 @@
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
           return App.Endpoints.plannedActions(responsePlanID);
-        } else if (mode === 'ocha') {
-          return App.Endpoints.ochaProjectsList(responsePlanID);
+        } else if (mode === 'objectives') {
+          return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
         }
       },
 
@@ -992,8 +998,8 @@
         return App.Endpoints.ochaProjectsList(responsePlanID);
       },
 
-      _computeObjectivesUrl: function (responsePlanId) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      _computeObjectivesUrl: function (responsePlanID) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
       _computeOchaProjectsParams: function (partner, selectedPartner) {
@@ -1130,26 +1136,34 @@
           });
       },
 
-      _fetchObjectives: function (clusterId) {
-        var self = this;
+      _fetchObjectivesList: function (partner, selectedPartner) {
+        this.debounce('fetch-objectives', function () {
+          if (
+            (!partner || !partner.ocha_external_id)
+            &&
+            (!selectedPartner || !selectedPartner.ocha_external_id)
+          ) {
+            return;
+          }
 
-        if (typeof clusterId === 'undefined') {
-          return;
-        }
+          var self = this;
 
-        this.set('objectivesParams.cluster_id', clusterId);
-        this.set('objectives', []);
-        this.set('data.cluster.objective', undefined);
+          this.set('objectives', []);
 
-        this.$.objectives.abort();
-
-        this.$.objectives.thunk()()
+          this.$.objectives.abort();
+          this.$.objectives.thunk()()
             .then(function (res) {
               self.set('objectives', res.data.results);
+              self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+        }, 100);
+      },
+
+      _computeFormattedObjectives: function (objectives) {
+        return objectives;
       },
 
       _computeFormattedProjects: function (projects) {
@@ -1212,7 +1226,7 @@
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }
-        if (this.mode === 'ocha') {
+        if (this.mode === 'objectives') {
           this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {
           this.$.projectAjax.body = Object.assign({}, this.data);
@@ -1239,6 +1253,7 @@
       detached: function () {
         this._cancelDebouncers([
           'fetch-ocha-projects',
+          'fetch-objectives',
           'set-mode',
         ]);
       },
