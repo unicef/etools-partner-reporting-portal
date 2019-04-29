@@ -311,8 +311,7 @@
                       label="Clusters *"
                       options="[[formattedClusters]]"
                       selected-values="{{ selectedClusters }}"
-                      on-selected-values-changed="_validate"
-                      trigger-value-change-event
+                      on-iron-select="_validate"
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -325,9 +324,8 @@
                         option-value="id"
                         option-label="title"
                         selected="{{ selectedObjective }}"
-                        on-selected-values-changed="_validate"
-                        disabled="[[_equals(objectives.length, 0)]]"
-                        trigger-value-change-event
+                        on-iron-select="_validate"
+                        disabled="[[objectiveDisabled]]"
                         required>
                     </etools-single-selection-menu>
                   </div>
@@ -336,10 +334,10 @@
                     <etools-single-selection-menu
                       class="validate"
                       label="Indicator *"
-                      options="[[formattedClusters]]"
-                      selected-values="{{ selectedClusters }}"
-                      on-selected-values-changed="_validate"
-                      trigger-value-change-event
+                      options="[[]]"
+                      selected="{{  }}"
+                      on-iron-select="_validate"
+                      disabled="[[indicatorDisabled]]"
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -787,6 +785,16 @@
           observer: '_setDefaults',
         },
 
+        objectiveDisabled: {
+          type: Boolean,
+          value: true,
+        },
+
+        indicatorDisabled: {
+          type: Boolean,
+          value: true,
+        },
+
         data: {
           type: Object
         },
@@ -1183,6 +1191,12 @@
       },
 
       _validate: function (e) {
+        if(e.detail.item.title !== undefined && this.objectiveDisabled === false) {
+          this.set('indicatorDisabled', false);
+        } else {
+          this.set('objectiveDisabled', false);
+        }
+
         e.target.validate();
       },
 
