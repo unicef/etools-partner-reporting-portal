@@ -317,8 +317,9 @@
                       class="validate"
                       label="Clusters *"
                       options="[[formattedClusters]]"
-                      selected-values="{{ selectedClusters }}"
-                      on-iron-select="_validate"
+                      selected="{{ selectedCluster }}"
+                      on-iron-activate="_validate"
+                      trigger-value-change-event
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -332,7 +333,7 @@
                         option-label="title"
                         selected="{{ selectedObjective }}"
                         on-iron-select="_validate"
-                        disabled="[[objectiveDisabled]]"
+                        disabled="[[_equals(objectives.length, 0)]]"
                         required>
                     </etools-single-selection-menu>
                   </div>
@@ -373,7 +374,7 @@
                     on-input="_validate">
                   </paper-input>
 
-                  <div class="row">
+                  <div class="item full-width">
                     <indicator-locations-widget
                       class="validate"
                       indicator-type="[[data.blueprint.display_type]]"
@@ -848,6 +849,11 @@
           value: [],
         },
 
+        objectivesParams: {
+          type: Object,
+          value: {}
+        },
+
         indicators: {
           type: Array,
           value: [],
@@ -941,8 +947,9 @@
           ]
         },
 
-        selectedClusters: {
-          type: Array,
+        selectedCluster: {
+          type: String,
+          value: '',
         },
 
         edit: {
@@ -991,9 +998,9 @@
         '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
-        '_saveClusters(selectedClusters.splices)',
+        '_saveClusters(selectedCluster)',
         '_updateMode(fromOchaDisabled, customDisabled)',
-        '_fetchObjectivesList(partner, selectedPartner)',
+        '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(partner, selectedPartner)',
       ],
 
@@ -1055,16 +1062,16 @@
       open: function () {
         if (this.edit && this.editData) {
           this.set('data', Object.assign({}, this.editData));
-          this.selectedClusters = this.editData.clusters.map(function (cluster) {
-            return cluster.id;
-          });
+          // this.selectedCluster = this.editData.clusters.map(function (cluster) {
+          //   return cluster.id;
+          // });
           this.set('mode', 'custom');
         } else {
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
           this.data = {'custom_fields': [], 'funding': {}};
-          this.selectedClusters = [];
+          this.selectedCluster = '';
         }
         this.set('opened', true);
         this.set('refresh', true);
@@ -1166,19 +1173,15 @@
           });
       },
 
-      _fetchObjectivesList: function (partner, selectedPartner) {
+      _fetchObjectivesList: function (selectedClusterId) {
+        if (selectedClusterId === '') {
+          return;
+        }
         this.debounce('fetch-objectives', function () {
-          if (
-            (!partner || !partner.ocha_external_id)
-            &&
-            (!selectedPartner || !selectedPartner.ocha_external_id)
-          ) {
-            return;
-          }
-
           var self = this;
 
           this.set('objectives', []);
+          this.set('objectivesParams.cluster_id', selectedClusterId);
 
           this.$.objectives.abort();
           this.$.objectives.thunk()()
@@ -1229,9 +1232,7 @@
       },
 
       _saveClusters: function () {
-        this.set('data.clusters', this.selectedClusters.map(function (cluster) {
-          return {'id': cluster};
-        }));
+        this.set('data.cluster', this.selectedCluster);
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -1239,16 +1240,6 @@
       },
 
       _validate: function (e) {
-        if(e.detail.item.title !== undefined && this.objectiveDisabled === false) {
-          this.set('indicatorDisabled', false);
-        } else if (e.detail.item.title !== undefined) {
-          this.set('objectiveDisabled', false);
-          this.set('indicatorDisabled', true);
-        } else {
-          this.set('objectiveDisabled', true);
-          this.set('indicatorDisabled', true);
-        }
-
         e.target.validate();
       },
 
@@ -1278,10 +1269,14 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
-          'objectives': [],
+          objectives: [],
           'custom_fields': [],
           'funding': {},
-          'cluster': {}
+          cluster: {},
+          locations: [],
+          blueprint: {
+            display_type: 'number',
+          },
         });
         this.set('projectDetails', {});
         this.set('errors', {});
@@ -1319,7 +1314,6 @@
       detached: function () {
         this._cancelDebouncers([
           'fetch-ocha-projects',
-          'fetch-objectives',
           'fetch-indicators',
           'set-mode',
         ]);
