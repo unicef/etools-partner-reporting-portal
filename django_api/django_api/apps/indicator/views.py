@@ -897,6 +897,8 @@ class ClusterObjectiveIndicatorAdoptAPIView(APIView):
 
         co_reportable = Reportable.objects.get(id=serializer.data['reportable_id'])
         pp = PartnerProject.objects.get(id=serializer.data['partner_project_id'])
-        create_reportable_for_pp_from_co_reportable(pp, co_reportable)
+        pp_reportable = create_reportable_for_pp_from_co_reportable(pp, co_reportable)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        result_serializer = ClusterIndicatorSerializer(instance=pp_reportable)
+
+        return Response(result_serializer.data, status=status.HTTP_200_OK)
