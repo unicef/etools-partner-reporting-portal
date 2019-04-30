@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from unicef.models import LowerLevelOutput, ProgressReport
-from partner.models import PartnerProject, PartnerActivity
+from partner.models import PartnerProject, PartnerActivity, Partner
 from cluster.models import ClusterObjective, ClusterActivity, Cluster
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
@@ -1087,6 +1087,8 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
+    partner_id = serializers.IntegerField()
+    partner_project_id = serializers.IntegerField()
     cluster_id = serializers.IntegerField()
     cluster_objective_id = serializers.IntegerField()
     reportable_id = serializers.IntegerField()
@@ -1106,6 +1108,16 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
         if not isinstance(data['baseline'], dict):
             raise serializers.ValidationError({
                 'baseline': 'Baseline value needs to be a dictionary format'
+            })
+
+        if not Partner.objects.filter(id=data['partner_id']).exists():
+            raise serializers.ValidationError({
+                'partner_id': 'Partner does not exist'
+            })
+
+        if not PartnerProject.objects.filter(id=data['partner_project_id']).exists():
+            raise serializers.ValidationError({
+                'partner_project_id': 'PartnerProject does not exist'
             })
 
         if not Cluster.objects.filter(id=data['cluster_id']).exists():
