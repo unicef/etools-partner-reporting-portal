@@ -332,7 +332,7 @@
                         option-label="title"
                         selected="{{ selectedObjective }}"
                         on-iron-select="_validate"
-                        disabled="[[objectiveDisabled]]"
+                        disabled="[[_equals(objectives.length, 0)]]"
                         required>
                     </etools-single-selection-menu>
                   </div>
@@ -993,7 +993,7 @@
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
-        '_fetchObjectivesList(partner, selectedPartner)',
+        '_fetchObjectivesList(selectedClusters)',
         '_fetchIndicatorsList(partner, selectedPartner)',
       ],
 
@@ -1042,6 +1042,7 @@
       },
 
       _computeOchaProjectDetailsUrl: function (selectedProject) {
+        console.log(selectedProject);
         return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
@@ -1065,6 +1066,7 @@
           }
           this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
+          console.log('clusters', this.formattedClusters)
         }
         this.set('opened', true);
         this.set('refresh', true);
@@ -1166,16 +1168,8 @@
           });
       },
 
-      _fetchObjectivesList: function (partner, selectedPartner) {
+      _fetchObjectivesList: function (selectedClusters) {
         this.debounce('fetch-objectives', function () {
-          if (
-            (!partner || !partner.ocha_external_id)
-            &&
-            (!selectedPartner || !selectedPartner.ocha_external_id)
-          ) {
-            return;
-          }
-
           var self = this;
 
           this.set('objectives', []);
@@ -1239,17 +1233,9 @@
       },
 
       _validate: function (e) {
-        if(e.detail.item.title !== undefined && this.objectiveDisabled === false) {
-          this.set('indicatorDisabled', false);
-        } else if (e.detail.item.title !== undefined) {
-          this.set('objectiveDisabled', false);
-          this.set('indicatorDisabled', true);
-        } else {
-          this.set('objectiveDisabled', true);
-          this.set('indicatorDisabled', true);
-        }
-
         e.target.validate();
+
+        console.log('E', e.detail.item.item.id);
       },
 
       _redirectToDetail: function (id) {
@@ -1323,7 +1309,6 @@
       detached: function () {
         this._cancelDebouncers([
           'fetch-ocha-projects',
-          'fetch-objectives',
           'fetch-indicators',
           'set-mode',
         ]);
