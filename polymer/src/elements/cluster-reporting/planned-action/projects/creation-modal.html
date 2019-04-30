@@ -347,7 +347,7 @@
                       option-label="title"
                       selected="{{ selectedIndicator }}"
                       on-iron-select="_validate"
-                      disabled="[[indicatorDisabled]]"
+                      disabled="[[_equals(indicators.length, 0)]]"
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -965,10 +965,8 @@
         },
 
         selectedObjective: {
-          type: Object,
-          value: function () {
-            return {};
-          },
+          type: String,
+          value: '',
         },
 
         selectedIndicator: {
@@ -1001,7 +999,7 @@
         '_saveClusters(selectedCluster)',
         '_updateMode(fromOchaDisabled, customDisabled)',
         '_fetchObjectivesList(selectedCluster)',
-        '_fetchIndicatorsList(partner, selectedPartner)',
+        '_fetchIndicatorsList(selectedObjective)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -1198,16 +1196,11 @@
         return App.Endpoints.clusterIndicatorNames(responsePlanID);
       },
 
-      _fetchIndicatorsList: function (partner, selectedPartner) {
+      _fetchIndicatorsList: function (selectedObjectiveId) {
+        if (selectedObjectiveId === '') {
+          return;
+        }
         this.debounce('fetch-indicators', function () {
-          if (
-            (!partner || !partner.ocha_external_id)
-            &&
-            (!selectedPartner || !selectedPartner.ocha_external_id)
-          ) {
-            return;
-          }
-
           var self = this;
 
           this.set('indicators', []);
