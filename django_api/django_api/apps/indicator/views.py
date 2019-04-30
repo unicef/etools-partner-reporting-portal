@@ -36,6 +36,8 @@ from core.common import (
     PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
+from cluster.models import ClusterObjective
+from partner.models import PartnerProject
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
@@ -55,6 +57,7 @@ from .serializers import (
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer,
     ReportRefreshSerializer,
+    ClusterObjectiveIndicatorAdoptSerializer,
     ReportableLocationGoalBaselineInNeedSerializer,
     ClusterIndicatorIMOMessageSerializer,
     ReportableReportingFrequencyIdSerializer,
@@ -66,7 +69,8 @@ from .models import (
     Reportable,
     IndicatorLocationData,
     Disaggregation,
-    ReportableLocationGoal
+    ReportableLocationGoal,
+    create_reportable_for_pp_from_co_reportable,
 )
 from .utilities import reset_indicator_report_data, reset_progress_report_data
 from functools import reduce
@@ -869,3 +873,30 @@ class ReportRefreshAPIView(APIView):
             reset_indicator_report_data(report)
 
         return Response({"response": "OK"}, status=status.HTTP_200_OK)
+
+
+class ClusterObjectiveIndicatorAdoptAPIView(APIView):
+    """
+    Create a PartnerProject Reportable from ClusterObjective Reportable.
+
+    Only a IMO should be allowed to do this action.
+    """
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+        )
+    )
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = ClusterObjectiveIndicatorAdoptSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        co_reportable = Reportable.objects.get(id=serializer.data['reportable_id'])
+        pp = PartnerProject.objects.get(id=serializer.data['partner_project_id'])
+        create_reportable_for_pp_from_co_reportable(pp, co_reportable)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

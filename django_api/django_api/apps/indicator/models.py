@@ -449,6 +449,9 @@ def create_reportable_for_pp_from_co_reportable(pp, co_reportable):
 
     Raises:
         ValidationError -- Django Exception
+    
+    Returns:
+        Reportable -- PartnerProject type Reportable ORM instance
     """
 
     # TODO: Add Cluster objective to have only one PartnerProject for a Partner
@@ -460,6 +463,8 @@ def create_reportable_for_pp_from_co_reportable(pp, co_reportable):
     pp_reportable = Reportable.objects.create(**reportable_data_to_sync)
 
     pp_reportable.disaggregations.add(*co_reportable.disaggregations.all())
+
+    return pp_reportable
 
 
 def create_pa_reportables_from_ca(pa, ca):
