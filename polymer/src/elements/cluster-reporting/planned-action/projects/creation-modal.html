@@ -317,8 +317,9 @@
                       class="validate"
                       label="Clusters *"
                       options="[[formattedClusters]]"
-                      selected-values="{{ selectedClusters }}"
-                      on-iron-select="_validate"
+                      selected="{{ selectedCluster }}"
+                      on-iron-activate="_validate"
+                      trigger-value-change-event
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -848,6 +849,11 @@
           value: [],
         },
 
+        objectivesParams: {
+          type: Object,
+          value: {}
+        },
+
         indicators: {
           type: Array,
           value: [],
@@ -941,8 +947,9 @@
           ]
         },
 
-        selectedClusters: {
-          type: Array,
+        selectedCluster: {
+          type: String,
+          value: '',
         },
 
         edit: {
@@ -991,9 +998,9 @@
         '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
-        '_saveClusters(selectedClusters.splices)',
+        '_saveClusters(selectedCluster)',
         '_updateMode(fromOchaDisabled, customDisabled)',
-        '_fetchObjectivesList(selectedClusters)',
+        '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(partner, selectedPartner)',
       ],
 
@@ -1042,7 +1049,6 @@
       },
 
       _computeOchaProjectDetailsUrl: function (selectedProject) {
-        console.log(selectedProject);
         return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
@@ -1056,17 +1062,16 @@
       open: function () {
         if (this.edit && this.editData) {
           this.set('data', Object.assign({}, this.editData));
-          this.selectedClusters = this.editData.clusters.map(function (cluster) {
-            return cluster.id;
-          });
+          // this.selectedCluster = this.editData.clusters.map(function (cluster) {
+          //   return cluster.id;
+          // });
           this.set('mode', 'custom');
         } else {
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
           this.data = {'custom_fields': [], 'funding': {}};
-          this.selectedClusters = [];
-          console.log('clusters', this.formattedClusters)
+          this.selectedCluster = '';
         }
         this.set('opened', true);
         this.set('refresh', true);
@@ -1168,11 +1173,15 @@
           });
       },
 
-      _fetchObjectivesList: function (selectedClusters) {
+      _fetchObjectivesList: function (selectedClusterId) {
+        if (selectedClusterId === '') {
+          return;
+        }
         this.debounce('fetch-objectives', function () {
           var self = this;
 
           this.set('objectives', []);
+          this.set('objectivesParams.cluster_id', selectedClusterId);
 
           this.$.objectives.abort();
           this.$.objectives.thunk()()
@@ -1223,9 +1232,7 @@
       },
 
       _saveClusters: function () {
-        this.set('data.clusters', this.selectedClusters.map(function (cluster) {
-          return {'id': cluster};
-        }));
+        this.set('data.cluster', this.selectedCluster);
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -1234,8 +1241,6 @@
 
       _validate: function (e) {
         e.target.validate();
-
-        console.log('E', e.detail.item.item.id);
       },
 
       _redirectToDetail: function (id) {
