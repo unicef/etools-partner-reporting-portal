@@ -373,7 +373,7 @@
                     on-input="_validate">
                   </paper-input>
 
-                  <div class="row">
+                  <div class="item full-width">
                     <indicator-locations-widget
                       class="validate"
                       indicator-type="[[data.blueprint.display_type]]"
@@ -1278,10 +1278,14 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
-          'objectives': [],
+          objectives: [],
           'custom_fields': [],
           'funding': {},
-          'cluster': {}
+          cluster: {},
+          locations: [],
+          blueprint: {
+            display_type: 'number',
+          },
         });
         this.set('projectDetails', {});
         this.set('errors', {});
