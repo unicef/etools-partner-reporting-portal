@@ -1104,11 +1104,35 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'target': 'Target value needs to be a dictionary format'
             })
+        else:
+            if 'd' not in data['target']:
+                data['target']['d'] = 1
+
+            elif data['target']['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
+
+            if 'v' not in data['target']:
+                raise serializers.ValidationError("key 'v' must exist")
+
+            if 'c' not in data['target']:
+                data['target']['c'] = float(data['target']['v']) / data['target']['d']
 
         if not isinstance(data['baseline'], dict):
             raise serializers.ValidationError({
                 'baseline': 'Baseline value needs to be a dictionary format'
             })
+        else:
+            if 'd' not in data['baseline']:
+                data['baseline']['d'] = 1
+
+            elif data['baseline']['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
+
+            if 'v' not in data['baseline']:
+                raise serializers.ValidationError("key 'v' must exist")
+
+            if 'c' not in data['baseline']:
+                data['baseline']['c'] = float(data['baseline']['v']) / data['baseline']['d']
 
         if not Partner.objects.filter(id=data['partner_id']).exists():
             raise serializers.ValidationError({
