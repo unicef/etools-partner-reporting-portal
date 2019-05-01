@@ -1,24 +1,11 @@
 import logging
 
 from django.conf import settings
-from django.template.loader import get_template
-from post_office.models import EmailTemplate
-from unicef_notification.models import Notification
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 
 logger = logging.getLogger(__name__)
-
-
-def scrub_template_path(template_path):
-    """Take full template path and generate a template name
-
-    e.g.
-    'email/notify_partner_on_calculation_method_change_subject.txt'
-    ->
-    'notify_partner_on_calculation_method_change_subject'
-    """
-    __, name_ext = template_path.rsplit("/", 1)
-    name, __ = name_ext.split(".", 1)
-    return name
 
 
 def send_email_from_template(
@@ -29,6 +16,7 @@ def send_email_from_template(
         to_email_list=(),
         fail_silently=True,
         content_subtype='plain',
+        **kwargs
 ):
     """
     send_email_from_template simplifies Django's send_email API
@@ -45,31 +33,15 @@ def send_email_from_template(
         fail_silently {bool} -- A flag to mute exception if it fails (default: {True})
     """
 
-    template_name = scrub_template_path(body_template_path)
-    subject_template = get_template(subject_template_path)
-    subject = subject_template.template.source.strip()
-    defaults = {"subject": subject}
-    message = get_template(body_template_path).template.source
-    if content_subtype == "plain":
-        defaults["content"] = message
-    else:
-        defaults["html_content"] = message
-
-    EmailTemplate.objects.update_or_create(
-        name=template_name,
-        defaults=defaults,
+    message = EmailMultiAlternatives(
+        render_to_string(subject_template_path, template_data).strip(),
+        render_to_string(body_template_path, template_data),
+        from_email,
+        to_email_list,
+        **kwargs
     )
-    notification = Notification(
-        method_type=Notification.TYPE_EMAIL,
-        sender=None,
-        from_address=from_email,
-        recipients=to_email_list,
-        template_name=template_name,
-        template_data=template_data,
-    )
-    notification.full_clean()
-    notification.save()
-    notification.send_notification()
+    message.content_subtype = content_subtype
+    message.send(fail_silently=fail_silently)
 
 
 def send_due_progress_report_email():
