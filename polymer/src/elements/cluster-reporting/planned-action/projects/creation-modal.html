@@ -231,7 +231,13 @@
       id="indicators"
       timeout="100000"
       url="[[indicatorsUrl]]"
-      params=[[indicatorsParams]]>
+      params="[[indicatorsParams]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="indicatorDetail"
+      timeout="100000"
+      url="[[selectedIndicatorUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -378,8 +384,8 @@
                   <div class="item full-width">
                     <indicator-locations-widget
                       class="validate"
-                      indicator-type="number"
-                      value="{{locations}}">
+                      indicator-type="[[selectedIndicatorDetailType]]"
+                      value="{{ locations }}">
                     </indicator-locations-widget>
                   </div>
 
@@ -860,6 +866,16 @@
           value: [],
         },
 
+        selectedIndicatorDetailType: {
+          type: String,
+          value: ''
+        },
+
+        selectedIndicatorUrl: {
+          type: String,
+          computed: '_computeSelectedIndicatorUrl(responsePlanID, selectedIndicator)'
+        },
+
         indicatorsUrl: {
           type: String,
           computed: '_computeIndicatorsUrl(responsePlanID)',
@@ -999,6 +1015,7 @@
         '_updateMode(fromOchaDisabled, customDisabled)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
+        '_fetchSelectedIndicatorDetailType(selectedIndicatorUrl)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -1026,6 +1043,11 @@
         } else if (mode === 'objectives') {
           return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
         }
+      },
+
+      _computeSelectedIndicatorUrl: function(responsePlanID, selectedIndicatorId) {
+        console.log('url', App.Endpoints.analysisIndicator(responsePlanID, selectedIndicatorId));
+        return App.Endpoints.analysisIndicator(responsePlanID, selectedIndicatorId);
       },
 
       _computeOchaProjectsUrl: function (responsePlanID) {
@@ -1209,6 +1231,28 @@
             .then(function (res) {
               self.set('indicators', res.data);
               self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
+      },
+
+      _fetchSelectedIndicatorDetailType: function (selectedIndicatorUrl) {
+        if (selectedIndicatorUrl === undefined) {
+          return;
+        }
+
+        this.debounce('fetch-selected-indicator', function () {
+          var self = this;
+
+          this.set('selectedIndicatorDetailType', '');
+
+          this.$.indicatorDetail.abort();
+          this.$.indicatorDetail.thunk()()
+            .then(function (res) {
+              console.log('res data', res.data);
+              self.set('selectedIndicatorDetailType', res.data.display_type)
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
