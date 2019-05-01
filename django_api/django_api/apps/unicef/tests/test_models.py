@@ -2,8 +2,8 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from unittest.mock import Mock, patch
 
-from django.core import mail
 from django.db.models import Q
+from unicef_notification.models import Notification
 
 from core.common import (
     INDICATOR_REPORT_STATUS,
