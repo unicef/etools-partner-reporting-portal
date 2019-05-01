@@ -381,13 +381,18 @@
                     on-input="_validate">
                   </paper-input>
 
-                  <div class="item full-width">
-                    <indicator-locations-widget
-                      class="validate"
-                      indicator-type="[[selectedIndicatorDetailType]]"
-                      value="{{ locations }}">
-                    </indicator-locations-widget>
-                  </div>
+                  <template
+                    is="dom-if"
+                    if="[[selectedIndicatorDetailType]]"
+                    restamp="true">
+                    <div class="item full-width">
+                      <indicator-locations-widget
+                        class="validate"
+                        indicator-type="[[selectedIndicatorDetailType]]"
+                        value="{{ locations }}">
+                      </indicator-locations-widget>
+                    </div>
+                  </template>
 
                   <template
                     is="dom-if"
@@ -1046,7 +1051,6 @@
       },
 
       _computeSelectedIndicatorUrl: function(responsePlanID, selectedIndicatorId) {
-        console.log('url', App.Endpoints.analysisIndicator(responsePlanID, selectedIndicatorId));
         return App.Endpoints.analysisIndicator(responsePlanID, selectedIndicatorId);
       },
 
@@ -1073,6 +1077,8 @@
 
       close: function () {
         this.set('data', {});
+        this.set('selectedIndicator', '');
+        this.set('selectedIndicatorDetailType', '');
         this.set('opened', false);
         this.set('refresh', false);
         this.set('detailsOpened', false);
@@ -1251,7 +1257,6 @@
           this.$.indicatorDetail.abort();
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
-              console.log('res data', res.data);
               self.set('selectedIndicatorDetailType', res.data.display_type)
             })
             .catch(function (err) { // jshint ignore:line
@@ -1275,7 +1280,6 @@
       },
 
       _validate: function (e) {
-        console.log(this.selectedIndicator);
         e.target.validate();
       },
 
