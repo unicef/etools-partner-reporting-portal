@@ -1,5 +1,6 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from unittest.mock import Mock, patch
 
 from django.db.models import Q
 from unicef_notification.models import Notification
@@ -45,7 +46,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from utils.emails import send_due_progress_report_email, send_overdue_progress_report_email
+from utils.emails import send_due_progress_report_email
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
     IndicatorBlueprint,
@@ -205,10 +206,11 @@ class TestProgressReportModel(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -251,7 +253,15 @@ class TestProgressReportModel(BaseAPITestCase):
         )
         return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
 
-    def test_send_notification_on_status_change_post_save_signal_for_submitted(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_send_notification_on_status_change_post_save_signal_for_submitted(
+            self,
+            mock_create,
+            mock_clean,
+            mock_send,
+    ):
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -259,14 +269,19 @@ class TestProgressReportModel(BaseAPITestCase):
         report.status = PROGRESS_REPORT_STATUS.submitted
         report.save()
 
-        # Match # of emails sent by submitting_user (also identical to submitted_by), and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.count(), 2)
 
-        sent_mail = Notification.objects.last().sent_email
+        self.assertTrue(mock_create.called)
 
-        self.assertIn("Please note that the following was submitted to UNICEF:", sent_mail.html_message)
-
-    def test_send_notification_on_status_change_post_save_signal_for_sent_back(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_send_notification_on_status_change_post_save_signal_for_sent_back(
+            self,
+            mock_create,
+            mock_clean,
+            mock_send,
+    ):
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -275,16 +290,19 @@ class TestProgressReportModel(BaseAPITestCase):
         report.save()
 
         # Match # of emails sent by submitting_user (also identical to submitted_by), and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.count(), 2)
 
-        sent_mail = Notification.objects.last().sent_email
+        self.assertTrue(mock_create.called)
 
-        self.assertIn("Please note that the following was sent back by UNICEF:", sent_mail.html_message)
-        self.assertIn(
-            "Please log in to the UNICEF Partner Reporting Portal to see the reason "
-            + "and contact details of the person that sent the report back.", sent_mail.html_message)
-
-    def test_send_notification_on_status_change_post_save_signal_for_accepted(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_send_notification_on_status_change_post_save_signal_for_accepted(
+            self,
+            mock_create,
+            mock_clean,
+            mock_send,
+    ):
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -293,13 +311,14 @@ class TestProgressReportModel(BaseAPITestCase):
         report.save()
 
         # Match # of emails sent by submitting_user (also identical to submitted_by), and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.count(), 2)
 
-        sent_mail = Notification.objects.last().sent_email
+        self.assertTrue(mock_create.called)
 
-        self.assertIn("Please note that the following was accepted by UNICEF:", sent_mail.html_message)
-
-    def test_send_due_progress_report_email(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_send_due_progress_report_email(self, mock_create, mock_clean, mock_send):
         today = date.today()
 
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
@@ -311,17 +330,14 @@ class TestProgressReportModel(BaseAPITestCase):
         send_due_progress_report_email()
 
         # Match # of emails sent by unicef_officer and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 4)
+        self.assertEqual(Notification.objects.count(), 2)
 
-        sent_mail = Notification.objects.last().sent_email
-        print(sent_mail.pk)
+        self.assertTrue(mock_create.called)
 
-        self.assertIn(
-            "Please note that the following is due in 1 week:",
-            sent_mail.html_message,
-        )
-
-    def test_send_overdue_progress_report_email(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_send_overdue_progress_report_email(self, mock_create, mock_clean, mock_send):
         today = date.today()
 
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
@@ -330,11 +346,4 @@ class TestProgressReportModel(BaseAPITestCase):
         report.submission_date = None
         report.save()
 
-        send_overdue_progress_report_email()
-
-        # Match # of emails sent by unicef_officer and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 4)
-
-        sent_mail = Notification.objects.last().sent_email
-
-        self.assertIn("Please note that the following is overdue:", sent_mail.html_message)
+        self.assertTrue(mock_send.create)
