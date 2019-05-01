@@ -1,6 +1,7 @@
 import datetime
 import tempfile
 import os
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.core.files import File
@@ -205,10 +206,11 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -459,10 +461,11 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -668,10 +671,11 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")

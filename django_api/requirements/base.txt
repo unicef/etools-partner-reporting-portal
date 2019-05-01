@@ -30,6 +30,7 @@ Babel==2.5.3
 pycountry==18.2.23
 aiohttp==3.0.8
 pyrestcli==0.6.6
+unicef-notification==0.2.1
 
 # Storages
 boto3==1.7.0
