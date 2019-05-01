@@ -46,7 +46,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from utils.emails import send_due_progress_report_email, send_overdue_progress_report_email
+from utils.emails import send_due_progress_report_email
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
     IndicatorBlueprint,
