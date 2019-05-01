@@ -316,10 +316,11 @@
                     <etools-single-selection-menu
                       class="validate"
                       label="Clusters *"
-                      options="[[formattedClusters]]"
+                      options="[[clusters]]"
+                      option-value="id"
+                      option-label="title"
                       selected="{{ selectedCluster }}"
                       on-iron-activate="_validate"
-                      trigger-value-change-event
                       required>
                     </etools-single-selection-menu>
                   </div>
@@ -377,8 +378,8 @@
                   <div class="item full-width">
                     <indicator-locations-widget
                       class="validate"
-                      indicator-type="[[data.blueprint.display_type]]"
-                      value="{{data.locations}}">
+                      indicator-type="number"
+                      value="{{locations}}">
                     </indicator-locations-widget>
                   </div>
 
@@ -879,11 +880,6 @@
           statePath: 'partner.current.id',
         },
 
-        formattedClusters: {
-          type: Array,
-          computed: '_formatForMultiselect(clusters)',
-        },
-
         statuses: {
           type: Array,
           value: [
@@ -952,6 +948,11 @@
           value: '',
         },
 
+        locations: {
+          type: Array,
+          value: [],
+        },
+
         edit: {
           type: Boolean,
           value: false,
@@ -970,10 +971,8 @@
         },
 
         selectedIndicator: {
-          type: Object,
-          value: function () {
-            return {};
-          },
+          type: String,
+          value: '',
         },
 
         fromOchaDisabled: {
@@ -1232,6 +1231,7 @@
       },
 
       _validate: function (e) {
+        console.log(this.selectedIndicator);
         e.target.validate();
       },
 
@@ -1241,16 +1241,6 @@
           : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
-      },
-
-      _formatForMultiselect: function (list) {
-        return list.map(function (item) {
-          return {
-            id: item.id,
-            value: item.id,
-            label: item.title,
-          };
-        });
       },
 
       _setDefaults: function (edit) {
