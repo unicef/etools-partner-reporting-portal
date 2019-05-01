@@ -567,6 +567,9 @@
         this._setDisaggregations();
         this.$.indicators.body = this._processData(this.data);
 
+        console.log(this.$.indicators.body);
+        return;
+
         this.$.indicators.thunk()()
           .then(function (res) {
             self.fire('indicator-added', res.data);

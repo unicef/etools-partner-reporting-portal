@@ -206,7 +206,7 @@
     </template>
 
     <etools-prp-ajax
-      id="projectAjax"
+      id="indicatorAjax"
       url="[[url]]"
       body="[[data]]"
       content-type="application/json"
@@ -361,23 +361,21 @@
 
                   <paper-input
                     class="item validate"
-                    id="total_budget"
+                    id="target"
                     label="Target"
                     value="{{ data.target }}"
                     type="number"
                     allowed-pattern="[+\-\d.]"
-                    step="0.01"
                     on-input="_validate">
                   </paper-input>
 
                   <paper-input
                     class="item validate"
-                    id="total_budget"
+                    id="total"
                     label="Total"
-                    value="{{ data.total_budget }}"
+                    value="{{ data.baseline }}"
                     type="number"
                     allowed-pattern="[+\-\d.]"
-                    step="0.01"
                     on-input="_validate">
                   </paper-input>
 
@@ -389,7 +387,7 @@
                       <indicator-locations-widget
                         class="validate"
                         indicator-type="[[selectedIndicatorDetailType]]"
-                        value="{{ locations }}">
+                        value="{{ data.locations }}">
                       </indicator-locations-widget>
                     </div>
                   </template>
@@ -828,7 +826,8 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, mode, edit, data)',
+          value: 'http://localhost:8082/api/indicator/partner-project-indicator-adopt/'
+          // computed: '_computeUrl(responsePlanID, mode, edit, data)',
         },
 
         ochaProjectsUrl: {
@@ -980,10 +979,8 @@
         },
 
         selectedPartner: {
-          type: Object,
-          value: function () {
-            return {};
-          },
+          type: String,
+          value: '',
         },
 
         selectedObjective: {
@@ -1016,7 +1013,7 @@
         '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
-        '_saveClusters(selectedCluster)',
+        '_saveCluster(selectedCluster)',
         '_updateMode(fromOchaDisabled, customDisabled)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
@@ -1095,7 +1092,18 @@
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
-          this.data = {'custom_fields': [], 'funding': {}};
+          // this.data = {'custom_fields': [], 'funding': {}};
+          this.set('data', {
+            partner_id: '',
+            partner_project_id: '',
+            cluster_id: '',
+            cluster_objective_id: '',
+            reportable_id: '',
+            locations: [],
+            target: {},
+            baseline: {}
+          });
+          console.log(this.data);
         }
         this.set('opened', true);
         this.set('refresh', true);
@@ -1201,6 +1209,11 @@
         if (selectedClusterId === '') {
           return;
         }
+        this.set('data.partner_id', this.partnerID);
+        this.set('data.cluster_id', selectedClusterId);
+
+        console.log('data from fetchObjectives', this.data);
+
         this.debounce('fetch-objectives', function () {
           var self = this;
 
@@ -1227,6 +1240,9 @@
         if (selectedObjectiveId === '') {
           return;
         }
+        this.set('data.cluster_objective_id', selectedObjectiveId);
+        console.log('data from fetchObjectives', this.data);
+
         this.debounce('fetch-indicators', function () {
           var self = this;
 
@@ -1271,8 +1287,8 @@
         });
       },
 
-      _saveClusters: function () {
-        this.set('data.cluster', this.selectedCluster);
+      _saveCluster: function () {
+        this.set('data.cluster_id', this.selectedCluster);
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -1299,14 +1315,14 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
-          objectives: [],
-          'custom_fields': [],
-          'funding': {},
-          cluster: {},
+          partner_id: '',
+          partner_project_id: '',
+          cluster_id: '',
+          cluster_objective_id: '',
+          reportable_id: '',
           locations: [],
-          blueprint: {
-            display_type: 'number',
-          },
+          target: {},
+          baseline: {}
         });
         this.set('projectDetails', {});
         this.set('errors', {});
@@ -1318,12 +1334,13 @@
           this.data.partner_id = this.partnerID;
         }
         if (this.mode === 'objectives') {
-          this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
+          this.$.indicatorAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {
-          this.$.projectAjax.body = Object.assign({}, this.data);
+          this.$.indicatorAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
-        var thunk = this.$.projectAjax.thunk();
+
+        var thunk = this.$.indicatorAjax.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
