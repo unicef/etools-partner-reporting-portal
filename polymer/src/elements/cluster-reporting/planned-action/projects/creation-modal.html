@@ -41,7 +41,6 @@
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
 <link rel="import" href="../../../error-box.html">
-<link rel="import" href="../../indicator-locations-widget.html">
 
 
 <dom-module id="planned-action-projects-modal">
@@ -206,11 +205,11 @@
     </template>
 
     <etools-prp-ajax
-      id="indicatorAjax"
+      id="projectAjax"
       url="[[url]]"
       body="[[data]]"
       content-type="application/json"
-      method="post">
+      method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -218,26 +217,6 @@
       timeout="100000"
       url="[[ochaProjectsUrl]]"
       params="[[ochaProjectsParams]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-      id="objectives"
-      timeout="100000"
-      url="[[objectivesUrl]]"
-      params=[[objectivesParams]]>
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-      id="indicators"
-      timeout="100000"
-      url="[[indicatorsUrl]]"
-      params="[[indicatorsParams]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-      id="indicatorDetail"
-      timeout="100000"
-      url="[[selectedIndicatorUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -289,7 +268,6 @@
               </etools-single-selection-menu>
             </template>
           </template>
-
           <paper-radio-group
             id="mode"
             selected="{{ mode }}"
@@ -304,93 +282,31 @@
                 restamp="true">
                 <paper-radio-button
                   disabled="[[fromOchaDisabled]]"
-                  name="objectives">
-                  <strong>Adopt from Cluster Objective</strong>
+                  name="ocha">
+                  <strong>From OCHA</strong>
                 </paper-radio-button>
               </template>
             </template>
-
             <div
               class="fields"
-              empty$="[[!_equals(mode, 'objectives')]]">
+              empty$="[[!_equals(mode, 'ocha')]]">
               <template
                 is="dom-if"
-                if="[[_equals(mode, 'objectives')]]"
+                if="[[_equals(mode, 'ocha')]]"
                 restamp="true">
-                <div class="app-grid">
-                  <div class="item">
-                    <etools-single-selection-menu
-                      class="validate"
-                      label="Clusters *"
-                      options="[[clusters]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{ selectedCluster }}"
-                      on-iron-activate="_validate"
-                      required>
-                    </etools-single-selection-menu>
-                  </div>
-
-                  <div class="item">
-                    <etools-single-selection-menu
-                        class="validate"
-                        label="Objective *"
-                        options="[[objectives]]"
-                        option-value="id"
-                        option-label="title"
-                        selected="{{ selectedObjective }}"
-                        on-iron-select="_validate"
-                        disabled="[[_equals(objectives.length, 0)]]"
-                        required>
-                    </etools-single-selection-menu>
-                  </div>
-
-                  <div class="item full-width">
-                    <etools-single-selection-menu
-                      class="validate"
-                      label="Indicator *"
-                      options="[[indicators]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{ selectedIndicator }}"
-                      on-iron-select="_validate"
-                      disabled="[[_equals(indicators.length, 0)]]"
-                      required>
-                    </etools-single-selection-menu>
-                  </div>
-
-                  <paper-input
-                    class="item validate"
-                    id="target"
-                    label="Target"
-                    value="{{ data.target.v }}"
-                    type="number"
-                    allowed-pattern="[+\-\d.]"
-                    on-input="_validate">
-                  </paper-input>
-
-                  <paper-input
-                    class="item validate"
-                    id="total"
-                    label="Total"
-                    value="{{ data.baseline.v }}"
-                    type="number"
-                    allowed-pattern="[+\-\d.]"
-                    on-input="_validate">
-                  </paper-input>
-
-                  <template
-                    is="dom-if"
-                    if="[[selectedIndicatorDetailType]]"
-                    restamp="true">
-                    <div class="item full-width">
-                      <indicator-locations-widget
-                        class="validate"
-                        indicator-type="[[selectedIndicatorDetailType]]"
-                        value="{{ data.locations }}">
-                      </indicator-locations-widget>
-                    </div>
-                  </template>
+                <div>
+                  <etools-single-selection-menu
+                    class="item validate full-width"
+                    label="Project"
+                    options="[[formattedProjects]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{ selectedProject }}"
+                    on-iron-activate="_validate"
+                    disabled="[[projectsLoading]]"
+                    trigger-value-change-event
+                    required>
+                  </etools-single-selection-menu>
 
                   <template
                     is="dom-if"
@@ -398,13 +314,19 @@
                     restamp="true">
                     <message-box
                       type="warning">
-                      There are no objectives projects assigned to this partner.
+                      There are no OCHA projects assigned to this partner.
                     </message-box>
                   </template>
+
+                  <creation-modal-project-details
+                    id="details"
+                    project-data="[[projectDetails]]"
+                    loading="[[projectDetailsLoading]]">
+                  </creation-modal-project-details>
+                  <etools-loading active$="[[projectsLoading]]"></etools-loading>
                 </div>
               </template>
             </div>
-
             <template
               is="dom-if"
               if="[[!edit]]"
@@ -420,7 +342,6 @@
                 </paper-radio-button>
               </template>
             </template>
-
             <div
               empty$="[[!_equals(mode, 'custom')]]">
               <template
@@ -436,12 +357,10 @@
                     <h4>Fields required</h4>
                   </span>
                 </div>
-
                 <div class="app-grid">
                   <div class="item full-width">
                     <error-box errors="[[errors]]"></error-box>
                   </div>
-
                   <paper-input
                     class="item validate full-width"
                     id="title"
@@ -485,7 +404,6 @@
                       no-init>
                     </etools-prp-date-input>
                   </div>
-
                   <div class="row">
                     <paper-dropdown-menu
                       class="item validate"
@@ -564,7 +482,6 @@
                         </div>
                       </paper-button>
                     </div>
-
                     <iron-collapse
                       id="collapse"
                       opened="{{ detailsOpened }}">
@@ -736,10 +653,9 @@
                           edit="[[edit]]">
                         </custom-fields-widget>
 
-                      </div>
+                        <div>
                     </iron-collapse>
                   </div>
-                </div>
               </template>
 
               <div class="buttons layout horizontal-reverse">
@@ -753,11 +669,17 @@
               </div>
 
               <etools-loading active="[[updatePending]]"></etools-loading>
+
+
             </div>
-          </paper-radio-group>
         </template>
-      </paper-dialog-scrollable>
-    </paper-dialog>
+        </div>
+        </paper-radio-group>
+  </template>
+  </paper-dialog-scrollable>
+
+
+  </paper-dialog>
   </template>
 
   <script>
@@ -805,16 +727,6 @@
           observer: '_setDefaults',
         },
 
-        objectiveDisabled: {
-          type: Boolean,
-          value: true,
-        },
-
-        indicatorDisabled: {
-          type: Boolean,
-          value: true,
-        },
-
         data: {
           type: Object
         },
@@ -826,8 +738,7 @@
 
         url: {
           type: String,
-          value: 'http://localhost:8082/api/indicator/partner-project-indicator-adopt/'
-          // computed: '_computeUrl(responsePlanID, mode, edit, data)',
+          computed: '_computeUrl(responsePlanID, mode, edit, data)',
         },
 
         ochaProjectsUrl: {
@@ -855,36 +766,6 @@
           value: [],
         },
 
-        objectives: {
-          type: Array,
-          value: [],
-        },
-
-        objectivesParams: {
-          type: Object,
-          value: {}
-        },
-
-        indicators: {
-          type: Array,
-          value: [],
-        },
-
-        selectedIndicatorDetailType: {
-          type: String,
-          value: ''
-        },
-
-        indicatorsUrl: {
-          type: String,
-          computed: '_computeIndicatorsUrl(responsePlanID)',
-        },
-
-        objectivesUrl: {
-          type: String,
-          computed: '_computeObjectivesUrl(responsePlanID)',
-        },
-
         partner: {
           type: String,
           statePath: 'partner.current',
@@ -893,6 +774,11 @@
         partnerID: {
           type: String,
           statePath: 'partner.current.id',
+        },
+
+        formattedClusters: {
+          type: Array,
+          computed: '_formatForMultiselect(clusters)',
         },
 
         statuses: {
@@ -958,14 +844,8 @@
           ]
         },
 
-        selectedCluster: {
-          type: String,
-          value: '',
-        },
-
-        locations: {
+        selectedClusters: {
           type: Array,
-          value: [],
         },
 
         edit: {
@@ -974,18 +854,10 @@
         },
 
         selectedPartner: {
-          type: String,
-          value: '',
-        },
-
-        selectedObjective: {
-          type: String,
-          value: '',
-        },
-
-        selectedIndicator: {
-          type: String,
-          value: '',
+          type: Object,
+          value: function () {
+            return {};
+          },
         },
 
         fromOchaDisabled: {
@@ -1008,11 +880,8 @@
         '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
-        '_saveCluster(selectedCluster)',
+        '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
-        '_fetchObjectivesList(selectedCluster)',
-        '_fetchIndicatorsList(selectedObjective)',
-        '_fetchSelectedIndicatorDetailType(responsePlanID, selectedIndicator)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -1037,17 +906,13 @@
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
           return App.Endpoints.plannedActions(responsePlanID);
-        } else if (mode === 'objectives') {
-          return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+        } else if (mode === 'ocha') {
+          return App.Endpoints.ochaProjectsList(responsePlanID);
         }
       },
 
       _computeOchaProjectsUrl: function (responsePlanID) {
         return App.Endpoints.ochaProjectsList(responsePlanID);
-      },
-
-      _computeObjectivesUrl: function (responsePlanID) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
       _computeOchaProjectsParams: function (partner, selectedPartner) {
@@ -1065,8 +930,6 @@
 
       close: function () {
         this.set('data', {});
-        this.set('selectedIndicator', '');
-        this.set('selectedIndicatorDetailType', '');
         this.set('opened', false);
         this.set('refresh', false);
         this.set('detailsOpened', false);
@@ -1075,26 +938,16 @@
       open: function () {
         if (this.edit && this.editData) {
           this.set('data', Object.assign({}, this.editData));
-          // this.selectedCluster = this.editData.clusters.map(function (cluster) {
-          //   return cluster.id;
-          // });
+          this.selectedClusters = this.editData.clusters.map(function (cluster) {
+            return cluster.id;
+          });
           this.set('mode', 'custom');
         } else {
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
-          // this.data = {'custom_fields': [], 'funding': {}};
-          this.set('data', {
-            partner_id: '',
-            partner_project_id: '',
-            cluster_id: '',
-            cluster_objective_id: '',
-            reportable_id: '',
-            locations: [],
-            target: {},
-            baseline: {}
-          });
-          console.log(this.data);
+          this.data = {'custom_fields': [], 'funding': {}};
+          this.selectedClusters = [];
         }
         this.set('opened', true);
         this.set('refresh', true);
@@ -1196,93 +1049,16 @@
           });
       },
 
-      _fetchObjectivesList: function (selectedClusterId) {
-        if (selectedClusterId === '') {
-          return;
-        }
-        this.set('data.partner_id', this.partnerID);
-        this.set('data.cluster_id', selectedClusterId);
-
-        console.log('data from fetchObjectives', this.data);
-
-        this.debounce('fetch-objectives', function () {
-          var self = this;
-
-          this.set('objectives', []);
-          this.set('objectivesParams.cluster_id', selectedClusterId);
-
-          this.$.objectives.abort();
-          this.$.objectives.thunk()()
-            .then(function (res) {
-              self.set('objectives', res.data.results);
-              self.fire('details-loaded');
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-        }, 100);
-      },
-
-      _computeIndicatorsUrl: function (responsePlanID) {
-        return App.Endpoints.clusterIndicatorNames(responsePlanID);
-      },
-
-      _fetchIndicatorsList: function (selectedObjectiveId) {
-        if (selectedObjectiveId === '') {
-          return;
-        }
-        this.set('data.cluster_objective_id', selectedObjectiveId);
-        console.log('data from fetchObjectives', this.data);
-
-        this.debounce('fetch-indicators', function () {
-          var self = this;
-
-          this.set('indicators', []);
-
-          this.$.indicators.abort();
-          this.$.indicators.thunk()()
-            .then(function (res) {
-              self.set('indicators', res.data);
-              self.fire('details-loaded');
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-        }, 100);
-      },
-
-      _fetchSelectedIndicatorDetailType: function (responsePlanID, selectedIndicator) {
-        if (selectedIndicator === undefined) {
-          return;
-        }
-
-        this.debounce('fetch-selected-indicator', function () {
-          var self = this;
-
-          this.set('selectedIndicatorDetailType', '');
-          this.set('data.reportable_id', selectedIndicator);
-
-          this.$.indicatorDetail.url = App.Endpoints.analysisIndicator(responsePlanID, selectedIndicator);
-
-          this.$.indicatorDetail.abort();
-          this.$.indicatorDetail.thunk()()
-            .then(function (res) {
-              self.set('selectedIndicatorDetailType', res.data.display_type)
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-        }, 100);
-      },
-
       _computeFormattedProjects: function (projects) {
         return projects.map(function (project) {
           return {id: project.id, title: project.name};
         });
       },
 
-      _saveCluster: function () {
-        this.set('data.cluster_id', this.selectedCluster);
+      _saveClusters: function () {
+        this.set('data.clusters', this.selectedClusters.map(function (cluster) {
+          return {'id': cluster};
+        }));
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -1301,6 +1077,16 @@
         this.set('path', url);
       },
 
+      _formatForMultiselect: function (list) {
+        return list.map(function (item) {
+          return {
+            id: item.id,
+            value: item.id,
+            label: item.title,
+          };
+        });
+      },
+
       _setDefaults: function (edit) {
         if (edit) {
           return;
@@ -1309,14 +1095,8 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
-          partner_id: null,
-          partner_project_id: null,
-          cluster_id: null,
-          cluster_objective_id: null,
-          reportable_id: null,
-          locations: [],
-          target: {},
-          baseline: {}
+          'custom_fields': [],
+          'funding': {}
         });
         this.set('projectDetails', {});
         this.set('errors', {});
@@ -1324,22 +1104,16 @@
 
       _save: function () {
         var self = this;
-        this.data.partner_project_id = 5;
-
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }
-        if (this.mode === 'objectives') {
-          this.$.indicatorAjax.body = Object.assign({}, this.ochaProjectRequestId);
+        if (this.mode === 'ocha') {
+          this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {
-          this.$.indicatorAjax.body = Object.assign({}, this.data);
+          this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
-
-        console.log('body', this.data);
-        this.$.indicatorAjax.body = this.data;
-
-        var thunk = this.$.indicatorAjax.thunk();
+        var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
@@ -1360,7 +1134,6 @@
       detached: function () {
         this._cancelDebouncers([
           'fetch-ocha-projects',
-          'fetch-indicators',
           'set-mode',
         ]);
       },
