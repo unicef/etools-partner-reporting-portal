@@ -1144,7 +1144,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 'partner_project_id': 'PartnerProject does not exist'
             })
 
-        if not PartnerProject.objects.get(id=data['partner_project_id']).partner.id != data['partner_id']:
+        if PartnerProject.objects.get(id=data['partner_project_id']).partner.id != data['partner_id']:
             raise serializers.ValidationError({
                 'partner_project_id': 'This partner project does not belong to the partner'
             })
@@ -1159,7 +1159,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 'cluster_objective_id': 'ClusterObjective does not exist'
             })
 
-        if not ClusterObjective.objects.get(id=data['cluster_objective_id']).cluster.id != data['cluster_id']:
+        if ClusterObjective.objects.get(id=data['cluster_objective_id']).cluster.id != data['cluster_id']:
             raise serializers.ValidationError({
                 'cluster_objective_id': 'This objective does not belong to the cluster'
             })
