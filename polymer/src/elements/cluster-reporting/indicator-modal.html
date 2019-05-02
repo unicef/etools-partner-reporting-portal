@@ -101,13 +101,14 @@
       id="objectives"
       timeout="100000"
       url="[[objectivesUrl]]"
-      params=[[objectivesParams]]>
+      params="[[objectivesParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
       id="indicatorsList"
       timeout="100000"
-      url="[[indicatorsListUrl]]">
+      url="[[indicatorsListUrl]]"
+      params="[[indicatorsListParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -505,7 +506,12 @@
 
         indicatorsListUrl: {
           type: String,
-          computed: '_computeIndicatorsListUrl(responsePlanId)',
+          value: App.Endpoints.indicators('co') + '/',
+        },
+
+        indicatorsListParams: {
+          type: Object,
+          value: {},
         },
 
         clusters: {
@@ -685,14 +691,14 @@
           return;
         } else if (this.mode === 'objectives') {
           this.set('data', {
-            partner_id: null,
-            partner_project_id: null,
-            cluster_id: null,
-            cluster_objective_id: null,
-            reportable_id: null,
+            partner_id: '',
+            partner_project_id: '',
+            cluster_id: '',
+            cluster_objective_id: '',
+            reportable_id: '',
             locations: [],
-            target: {},
-            baseline: {}
+            target: {d: 1},
+            baseline: {d: 1}
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
@@ -726,10 +732,6 @@
 
       _computeDisaggregationsUrl: function(responsePlanId) {
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
-      },
-
-      _computeIndicatorsListUrl: function (responsePlanId) {
-        return App.Endpoints.clusterIndicatorNames(responsePlanId);
       },
 
       _computeMinDate: function (date) {
@@ -783,7 +785,9 @@
           return;
         }
         this.set('data.cluster_objective_id', selectedObjectiveId);
-        console.log('data from fetchObjectives', this.data);
+        this.set('indicatorsListParams', {object_id: selectedObjectiveId});
+
+        console.log('url', this.indicatorsListUrl);
 
         this.debounce('fetch-indicators', function () {
           var self = this;
@@ -793,7 +797,17 @@
           this.$.indicatorsList.abort();
           this.$.indicatorsList.thunk()()
             .then(function (res) {
-              self.set('indicators', res.data);
+              var simpleIndicatorsList = [];
+
+              res.data.results.forEach(function (indicator) {
+                var simpleIndicator = {};
+                simpleIndicator.id = indicator.id;
+                simpleIndicator.title = indicator.blueprint.title;
+
+                simpleIndicatorsList.push(simpleIndicator);
+              });
+
+              self.set('indicators', simpleIndicatorsList);
               self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
@@ -867,9 +881,23 @@
         }
 
         if(this.mode === 'objectives') {
+          this._setDisaggregations();
+
+          this.data.baseline.v = parseInt(this.data.baseline.v);
+          this.data.target.v = parseInt(this.data.target.v);
+          this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
+          this.data.target.c = this.data.target.v / this.data.target.d;
+
+          this.data.locations.forEach(function (location) {
+            location.id = location.loc_type;
+            delete location.loc_type;
+          });
+
+          this.$.indicators.body = this._processData(this.data);
+
           console.log('objectives saved');
           console.log('objectives url', this.$.indicators.url);
-          console.log('data', this.data);
+          console.log('adopt data', this.data);
 
           this.$.indicators.thunk()()
             .then(function (res) {
@@ -886,6 +914,8 @@
           this.set('updatePending', true);
           this._setDisaggregations();
           this.$.indicators.body = this._processData(this.data);
+
+          console.log('custom data', this.$.indicators.body);
 
           this.$.indicators.thunk()()
             .then(function (res) {
