@@ -875,11 +875,6 @@
           value: ''
         },
 
-        selectedIndicatorUrl: {
-          type: String,
-          computed: '_computeSelectedIndicatorUrl(responsePlanID, selectedIndicator)'
-        },
-
         indicatorsUrl: {
           type: String,
           computed: '_computeIndicatorsUrl(responsePlanID)',
@@ -1017,7 +1012,7 @@
         '_updateMode(fromOchaDisabled, customDisabled)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
-        '_fetchSelectedIndicatorDetailType(selectedIndicatorUrl)',
+        '_fetchSelectedIndicatorDetailType(responsePlanID, selectedIndicator)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -1045,10 +1040,6 @@
         } else if (mode === 'objectives') {
           return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
         }
-      },
-
-      _computeSelectedIndicatorUrl: function(responsePlanID, selectedIndicatorId) {
-        return App.Endpoints.analysisIndicator(responsePlanID, selectedIndicatorId);
       },
 
       _computeOchaProjectsUrl: function (responsePlanID) {
@@ -1260,8 +1251,8 @@
         }, 100);
       },
 
-      _fetchSelectedIndicatorDetailType: function (selectedIndicatorUrl) {
-        if (selectedIndicatorUrl === undefined) {
+      _fetchSelectedIndicatorDetailType: function (responsePlanID, selectedIndicator) {
+        if (selectedIndicator === undefined) {
           return;
         }
 
@@ -1269,6 +1260,9 @@
           var self = this;
 
           this.set('selectedIndicatorDetailType', '');
+          this.set('data.reportable_id', selectedIndicator);
+
+          this.$.indicatorDetail.url = App.Endpoints.analysisIndicator(responsePlanID, selectedIndicator);
 
           this.$.indicatorDetail.abort();
           this.$.indicatorDetail.thunk()()
@@ -1315,11 +1309,11 @@
         this.set('projectLoading', false);
         this.set('selectedPartner', {});
         this.set('data', {
-          partner_id: '',
-          partner_project_id: '',
-          cluster_id: '',
-          cluster_objective_id: '',
-          reportable_id: '',
+          partner_id: null,
+          partner_project_id: null,
+          cluster_id: null,
+          cluster_objective_id: null,
+          reportable_id: null,
           locations: [],
           target: {},
           baseline: {}
@@ -1331,13 +1325,6 @@
       _save: function () {
         var self = this;
         this.data.partner_project_id = 5;
-        this.data.reportable_id = 2000;
-        this.data.baseline.d = 1;
-        this.data.target.d = 1;
-        this.data.baseline.v = parseInt(this.data.baseline.v);
-        this.data.target.v = parseInt(this.data.target.v);
-        this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
-        this.data.target.c = this.data.target.v / this.data.target.d;
 
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
@@ -1351,7 +1338,6 @@
 
         console.log('body', this.data);
         this.$.indicatorAjax.body = this.data;
-        // return;
 
         var thunk = this.$.indicatorAjax.thunk();
         thunk()

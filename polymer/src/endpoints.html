@@ -242,6 +242,10 @@
         return this._buildUrl('/indicator/cluster-indicator/');
       },
 
+      adoptedClusterIndicators: function () {
+        return this._buildUrl('/indicator/partner-project-indicator-adopt/')
+      },
+
       partnerActivity: function (responsePlanId, mode) {
         return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
       },
