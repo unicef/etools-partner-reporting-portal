@@ -895,9 +895,19 @@ class ClusterObjectiveIndicatorAdoptAPIView(APIView):
         serializer = ClusterObjectiveIndicatorAdoptSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        co_reportable = Reportable.objects.get(id=serializer.data['reportable_id'])
-        pp = PartnerProject.objects.get(id=serializer.data['partner_project_id'])
+        co_reportable = Reportable.objects.get(id=serializer.validated_data['reportable_id'])
+        pp = PartnerProject.objects.get(id=serializer.validated_data['partner_project_id'])
         pp_reportable = create_reportable_for_pp_from_co_reportable(pp, co_reportable)
+        pp_reportable.target = serializer.validated_data['target']
+        pp_reportable.baseline = serializer.validated_data['baseline']
+
+        for item in serializer.validated_data['locations']:
+            ReportableLocationGoal.objects.create(
+                reportable=pp_reportable,
+                location=item['location'],
+                target=item['target'],
+                baseline=item['baseline'],
+            )
 
         result_serializer = ClusterIndicatorSerializer(instance=pp_reportable)
 
