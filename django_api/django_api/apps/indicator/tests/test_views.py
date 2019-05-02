@@ -2371,3 +2371,37 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
         data['reportable_id'] = self.clusterobjective_reportable2.id
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_client_error(response.status_code))
+
+    def test_valid_serializer_values(self):
+        url = reverse('partner-project-indicator-adopt')
+
+        # Start with valid data payload
+        data = {
+            'partner_id': self.partner.id,
+            'partner_project_id': self.project.id,
+            'cluster_id': self.cluster.id,
+            'cluster_objective_id': self.objective.id,
+            'reportable_id': self.clusterobjective_reportable.id,
+            'locations': [
+                {
+                    'id': self.reportable_loc_1.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc1.id,
+                },
+                {
+                    'id': self.reportable_loc_2.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc2.id,
+                }
+            ],
+            'target': {'d': 1, 'v': 1, 'c': 1},
+            'baseline': {'d': 1, 'v': 1, 'c': 1},
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertTrue(Reportable.objects.filter(id=response.data['id']).exists())
