@@ -197,25 +197,25 @@
                     </etools-single-selection-menu>
                   </div>
 
-                  <paper-input
+                  <json-field
                     class="item validate"
                     id="target"
                     label="Target"
-                    value="{{ data.target.v }}"
-                    type="number"
+                    value="{{ data.target }}"
+                    type="[[selectedIndicatorDetailType]]"
                     allowed-pattern="[+\-\d.]"
                     on-input="_validate">
-                  </paper-input>
+                  </json-field>
 
-                  <paper-input
+                  <json-field
                     class="item validate"
                     id="total"
                     label="Total"
-                    value="{{ data.baseline.v }}"
-                    type="number"
+                    value="{{ data.baseline }}"
+                    type="[[selectedIndicatorDetailType]]"
                     allowed-pattern="[+\-\d.]"
                     on-input="_validate">
-                  </paper-input>
+                  </json-field>
 
                   <template
                     is="dom-if"
@@ -757,10 +757,7 @@
         }
         this.set('data.partner_id', this.partnerID);
         this.set('data.cluster_id', selectedClusterId);
-
-        this.set('data.partner_project_id', 5);  // REMOVE AND FIX
-
-        console.log('data from fetchObjectives', this.data);
+        this.set('data.partner_project_id', parseInt(this.objectId));
 
         this.debounce('fetch-objectives', function () {
           var self = this;
@@ -786,8 +783,6 @@
         }
         this.set('data.cluster_objective_id', selectedObjectiveId);
         this.set('indicatorsListParams', {object_id: selectedObjectiveId});
-
-        console.log('url', this.indicatorsListUrl);
 
         this.debounce('fetch-indicators', function () {
           var self = this;
@@ -883,17 +878,20 @@
         if(this.mode === 'objectives') {
           this._setDisaggregations();
 
-          this.data.baseline.v = parseInt(this.data.baseline.v);
-          this.data.target.v = parseInt(this.data.target.v);
           this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
           this.data.target.c = this.data.target.v / this.data.target.d;
 
           this.data.locations.forEach(function (location) {
-            location.id = location.loc_type;
-            delete location.loc_type;
+            if (location.baseline.d === undefined) {
+              location.baseline.d = 1;
+              location.target.d = 1;
+            }
+
+            location.baseline.c = location.baseline.v / location.baseline.d;
+            location.target.c = location.target.v / location.target.d;
           });
 
-          this.$.indicators.body = this._processData(this.data);
+          this.$.indicators.body = this.data;
 
           console.log('objectives saved');
           console.log('objectives url', this.$.indicators.url);
@@ -901,6 +899,7 @@
 
           this.$.indicators.thunk()()
             .then(function (res) {
+              console.log('res data', res.data);
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
               self.set('errors', {});
