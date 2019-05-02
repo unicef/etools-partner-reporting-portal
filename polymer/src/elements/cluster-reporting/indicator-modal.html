@@ -728,17 +728,6 @@
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
       },
 
-      _computeIndicatorsUrl: function (mode) {
-        if (mode === 'objectives') {
-          console.log('HERE')
-          return App.Endpoints.adoptedClusterIndicators();
-        } else if (mode === 'custom') {
-          return App.Endpoints.clusterIndicators();
-        } else {
-          return;
-        }
-      },
-
       _computeIndicatorsListUrl: function (responsePlanId) {
         return App.Endpoints.clusterIndicatorNames(responsePlanId);
       },
@@ -749,10 +738,6 @@
 
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
-      },
-
-      _computeIndicatorsUrl: function (responsePlanId) {
-        return App.Endpoints.clusterIndicatorNames(responsePlanId);
       },
 
       _fetchDisaggregations: function() {
@@ -881,7 +866,7 @@
           return;
         }
 
-        if(this.mode = 'objectives') {
+        if(this.mode === 'objectives') {
           console.log('objectives saved');
           console.log('objectives url', this.$.indicators.url);
           console.log('data', this.data);
@@ -897,15 +882,10 @@
               self.set('errors', err.data);
               self.set('updatePending', false);
             });
-
-          return;
         } else {
           this.set('updatePending', true);
           this._setDisaggregations();
           this.$.indicators.body = this._processData(this.data);
-
-          console.log(this.$.indicators.body);
-          return;
 
           this.$.indicators.thunk()()
             .then(function (res) {
