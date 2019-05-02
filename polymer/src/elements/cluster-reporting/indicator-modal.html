@@ -200,8 +200,8 @@
                   <json-field
                     class="item validate"
                     id="target"
-                    label="Target"
-                    value="{{ data.target }}"
+                    label="Baseline"
+                    value="{{ data.baseline }}"
                     type="[[selectedIndicatorDetailType]]"
                     allowed-pattern="[+\-\d.]"
                     on-input="_validate">
@@ -210,8 +210,8 @@
                   <json-field
                     class="item validate"
                     id="total"
-                    label="Total"
-                    value="{{ data.baseline }}"
+                    label="Target"
+                    value="{{ data.target }}"
                     type="[[selectedIndicatorDetailType]]"
                     allowed-pattern="[+\-\d.]"
                     on-input="_validate">
@@ -878,15 +878,28 @@
         if(this.mode === 'objectives') {
           this._setDisaggregations();
 
+          if (this.selectedIndicatorDetailType === 'percentage') {
+            this.data.baseline.d = 100;
+            this.data.target.d = 100;
+
+            this.data.locations.forEach(function (location) {
+              location.baseline.d = 100;
+              location.target.d = 100;
+            });
+          } else if (this.selectedIndicatorDetailType === 'number') {
+            this.data.baseline.d = 1;
+            this.data.target.d = 1;
+
+            this.data.locations.forEach(function (location) {
+              location.baseline.d = 1;
+              location.target.d = 1;
+            });
+          }
+
           this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
           this.data.target.c = this.data.target.v / this.data.target.d;
 
           this.data.locations.forEach(function (location) {
-            if (location.baseline.d === undefined) {
-              location.baseline.d = 1;
-              location.target.d = 1;
-            }
-
             location.baseline.c = location.baseline.v / location.baseline.d;
             location.target.c = location.target.v / location.target.d;
           });
