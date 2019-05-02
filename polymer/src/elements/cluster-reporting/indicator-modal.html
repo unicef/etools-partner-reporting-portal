@@ -757,10 +757,7 @@
         }
         this.set('data.partner_id', this.partnerID);
         this.set('data.cluster_id', selectedClusterId);
-
         this.set('data.partner_project_id', this.objectId);
-
-        console.log('data from fetchObjectives', this.data);
 
         this.debounce('fetch-objectives', function () {
           var self = this;
@@ -786,8 +783,6 @@
         }
         this.set('data.cluster_objective_id', selectedObjectiveId);
         this.set('indicatorsListParams', {object_id: selectedObjectiveId});
-
-        console.log('url', this.indicatorsListUrl);
 
         this.debounce('fetch-indicators', function () {
           var self = this;
