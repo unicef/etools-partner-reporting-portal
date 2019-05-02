@@ -900,6 +900,7 @@ class ClusterObjectiveIndicatorAdoptAPIView(APIView):
         pp_reportable = create_reportable_for_pp_from_co_reportable(pp, co_reportable)
         pp_reportable.target = serializer.validated_data['target']
         pp_reportable.baseline = serializer.validated_data['baseline']
+        pp_reportable.save()
 
         for item in serializer.validated_data['locations']:
             ReportableLocationGoal.objects.create(
