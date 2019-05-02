@@ -757,7 +757,7 @@
         }
         this.set('data.partner_id', this.partnerID);
         this.set('data.cluster_id', selectedClusterId);
-        this.set('data.partner_project_id', this.objectId);
+        this.set('data.partner_project_id', parseInt(this.objectId));
 
         this.debounce('fetch-objectives', function () {
           var self = this;
@@ -888,7 +888,7 @@
             delete location.loc_type;
           });
 
-          this.$.indicators.body = this._processData(this.data);
+          this.$.indicators.body = this.data;
 
           console.log('objectives saved');
           console.log('objectives url', this.$.indicators.url);
