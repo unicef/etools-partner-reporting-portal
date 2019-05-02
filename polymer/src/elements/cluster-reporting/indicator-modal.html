@@ -29,6 +29,7 @@
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../error-box.html">
+<link rel="import" href="../form-fields/cluster-dropdown-content.html">
 
 <dom-module id="indicator-modal">
   <template>
@@ -80,6 +81,8 @@
       }
     </style>
 
+    <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
+
     <etools-prp-ajax
       id="disaggregations"
       url="[[disaggregationsUrl]]"
@@ -92,6 +95,25 @@
       method="post"
       body="[[data]]"
       content-type="application/json">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="objectives"
+      timeout="100000"
+      url="[[objectivesUrl]]"
+      params="[[objectivesParams]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="indicatorsList"
+      timeout="100000"
+      url="[[indicatorsListUrl]]"
+      params="[[indicatorsListParams]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="indicatorDetail"
+      timeout="100000">
     </etools-prp-ajax>
 
     <paper-dialog
@@ -116,200 +138,310 @@
           restamp="true">
           <error-box errors="[[errors]]"></error-box>
 
-          <div class="row">
-            <paper-input
-              class="validate"
-              label="Title"
-              on-input="_validate"
-              value="{{data.blueprint.title}}"
-              always-float-label
-              required>
-            </paper-input>
-          </div>
+          <paper-radio-group
+            id="mode"
+            selected="{{ mode }}"
+            on-change="adjustPosition">
 
-          <div class="row">
-            <labelled-item label="Type">
-              <paper-radio-group
-                  selected="{{data.blueprint.display_type}}">
-                <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-                <paper-radio-button name="percentage">Percent</paper-radio-button>
-                <paper-radio-button name="ratio">Ratio</paper-radio-button>
-              </paper-radio-group>
-            </labelled-item>
-          </div>
+            <paper-radio-button
+              name="objectives">
+              <strong>Adopt from Cluster Objective</strong>
+            </paper-radio-button>
 
-          <div class="row">
-            <div class="layout horizontal">
-              <labelled-item
-                class="calculation-method"
-                label="Calculation method across locations">
-                <calculation-method
-                  value="{{data.blueprint.calculation_formula_across_locations}}"
-                  disabled="[[!isNumber]]">
-                </calculation-method>
-              </labelled-item>
-
-              <labelled-item
-                class="calculation-method"
-                label="Calculation method across reporting periods">
-                <calculation-method
-                  value="{{data.blueprint.calculation_formula_across_periods}}"
-                  disabled="[[!isNumber]]">
-                </calculation-method>
-              </labelled-item>
-            </div>
-          </div>
-
-          <div class="row">
-            <paper-input
-              class="validate"
-              label="Comments (optional)"
-              on-input="_validate"
-              value="{{data.comments}}"
-              always-float-label>
-            </paper-input>
-          </div>
-
-          <div class="row">
-            <paper-input
-              class="validate"
-              label="Measurement specifications (optional)"
-              on-input="_validate"
-              value="{{data.measurement_specifications}}"
-              always-float-label>
-            </paper-input>
-          </div>
-
-          <div class="row">
-            <div class="app-grid">
-              <etools-single-selection-menu
-                class="item validate"
-                label="Frequency of reporting"
-                options="[[frequencies]]"
-                option-value="id"
-                option-label="title"
-                selected="{{data.frequency}}"
-                on-iron-activate="_validate"
-                trigger-value-change-event
-                hide-search
-                required>
-              </etools-single-selection-menu>
-
+            <div
+              class="fields"
+              empty$="[[!_equals(mode, 'objectives')]]">
               <template
-                  is="dom-if"
-                  if="[[_showCSD(data.frequency)]]"
-                  restamp="true">
-                <etools-prp-chips
-                  class="item validate"
-                  value="{{data.cs_dates}}"
-                  label="Due date of report"
-                  on-selected-chips-updated="_validate"
-                  required>
-                  <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
-                </etools-prp-chips>
+                is="dom-if"
+                if="[[_equals(mode, 'objectives')]]"
+                restamp="true">
+                <div class="app-grid">
+                  <div class="item">
+                    <etools-single-selection-menu
+                      class="validate"
+                      label="Clusters *"
+                      options="[[clusters]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{ selectedCluster }}"
+                      on-iron-activate="_validate"
+                      required>
+                    </etools-single-selection-menu>
+                  </div>
+
+                  <div class="item">
+                    <etools-single-selection-menu
+                        class="validate"
+                        label="Objective *"
+                        options="[[objectives]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedObjective }}"
+                        on-iron-select="_validate"
+                        disabled="[[_equals(objectives.length, 0)]]"
+                        required>
+                    </etools-single-selection-menu>
+                  </div>
+
+                  <div class="item full-width">
+                    <etools-single-selection-menu
+                      class="validate"
+                      label="Indicator *"
+                      options="[[indicators]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{ selectedIndicator }}"
+                      on-iron-select="_validate"
+                      disabled="[[_equals(indicators.length, 0)]]"
+                      required>
+                    </etools-single-selection-menu>
+                  </div>
+
+                  <paper-input
+                    class="item validate"
+                    id="target"
+                    label="Target"
+                    value="{{ data.target.v }}"
+                    type="number"
+                    allowed-pattern="[+\-\d.]"
+                    on-input="_validate">
+                  </paper-input>
+
+                  <paper-input
+                    class="item validate"
+                    id="total"
+                    label="Total"
+                    value="{{ data.baseline.v }}"
+                    type="number"
+                    allowed-pattern="[+\-\d.]"
+                    on-input="_validate">
+                  </paper-input>
+
+                  <template
+                    is="dom-if"
+                    if="[[selectedIndicatorDetailType]]"
+                    restamp="true">
+                    <div class="item full-width">
+                      <indicator-locations-widget
+                        class="validate"
+                        indicator-type="[[selectedIndicatorDetailType]]"
+                        value="{{ data.locations }}">
+                      </indicator-locations-widget>
+                    </div>
+                  </template>
+                </div>
               </template>
-
-              <etools-prp-date-input
-                class="item validate"
-                label="Start date of reporting period"
-                value="{{data.start_date_of_reporting_period}}"
-                error-message=""
-                format="[[dateFormat]]"
-                no-init>
-              </etools-prp-date-input>
             </div>
-          </div>
 
-          <div class="row">
-            <template
-              is="dom-if"
-              if="[[isNumber]]"
-              restamp="true">
-              <paper-input
-                class="validate"
-                label="Label"
-                on-input="_validate"
-                value="{{data.label}}"
-                always-float-label>
-              </paper-input>
-            </template>
+            <paper-radio-button
+              name="custom">
+              <strong>Custom</strong>
+            </paper-radio-button>
 
-            <template
-              is="dom-if"
-              if="[[!isNumber]]"
-              restamp="true">
-              <div class="app-grid">
-                <paper-input
-                  class="item validate"
-                  label="Numerator Label"
-                  on-input="_validate"
-                  value="{{data.numerator_label}}"
-                  always-float-label>
-                </paper-input>
-
-                <paper-input
-                  class="item validate"
-                  label="Denominator Label"
-                  on-input="_validate"
-                  value="{{data.denominator_label}}"
-                  always-float-label>
-                </paper-input>
-              </div>
-            </template>
-          </div>
-
-          <div class="row">
-            <div class="app-grid">
-              <json-field
-                class="item validate"
-                type="[[data.blueprint.display_type]]"
-                label="Baseline"
-                on-input="_validate"
-                value="{{data.baseline}}"
-                allowed-pattern="[+\-\d]">
-              </json-field>
-
+            <div
+              class="fields"
+              empty$="[[!_equals(mode, 'custom')]]">
               <template
-                  is="dom-if"
-                  if="[[isNumber]]"
-                  restamp="true">
-                <json-field
-                  class="item validate"
-                  type="[[data.blueprint.display_type]]"
-                  label="In need (optional)"
-                  on-input="_validate"
-                  value="{{data.in_need}}"
-                  allowed-pattern="[+\-\d]">
-                </json-field>
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+                <div class="row">
+                  <paper-input
+                    class="validate"
+                    label="Title"
+                    on-input="_validate"
+                    value="{{data.blueprint.title}}"
+                    always-float-label
+                    required>
+                  </paper-input>
+                </div>
+
+                <div class="row">
+                  <labelled-item label="Type">
+                    <paper-radio-group
+                        selected="{{data.blueprint.display_type}}">
+                      <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                      <paper-radio-button name="percentage">Percent</paper-radio-button>
+                      <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                    </paper-radio-group>
+                  </labelled-item>
+                </div>
+
+                <div class="row">
+                  <div class="layout horizontal">
+                    <labelled-item
+                      class="calculation-method"
+                      label="Calculation method across locations">
+                      <calculation-method
+                        value="{{data.blueprint.calculation_formula_across_locations}}"
+                        disabled="[[!isNumber]]">
+                      </calculation-method>
+                    </labelled-item>
+
+                    <labelled-item
+                      class="calculation-method"
+                      label="Calculation method across reporting periods">
+                      <calculation-method
+                        value="{{data.blueprint.calculation_formula_across_periods}}"
+                        disabled="[[!isNumber]]">
+                      </calculation-method>
+                    </labelled-item>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <paper-input
+                    class="validate"
+                    label="Comments (optional)"
+                    on-input="_validate"
+                    value="{{data.comments}}"
+                    always-float-label>
+                  </paper-input>
+                </div>
+
+                <div class="row">
+                  <paper-input
+                    class="validate"
+                    label="Measurement specifications (optional)"
+                    on-input="_validate"
+                    value="{{data.measurement_specifications}}"
+                    always-float-label>
+                  </paper-input>
+                </div>
+
+                <div class="row">
+                  <div class="app-grid">
+                    <etools-single-selection-menu
+                      class="item validate"
+                      label="Frequency of reporting"
+                      options="[[frequencies]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.frequency}}"
+                      on-iron-activate="_validate"
+                      trigger-value-change-event
+                      hide-search
+                      required>
+                    </etools-single-selection-menu>
+
+                    <template
+                        is="dom-if"
+                        if="[[_showCSD(data.frequency)]]"
+                        restamp="true">
+                      <etools-prp-chips
+                        class="item validate"
+                        value="{{data.cs_dates}}"
+                        label="Due date of report"
+                        on-selected-chips-updated="_validate"
+                        required>
+                        <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                      </etools-prp-chips>
+                    </template>
+
+                    <etools-prp-date-input
+                      class="item validate"
+                      label="Start date of reporting period"
+                      value="{{data.start_date_of_reporting_period}}"
+                      error-message=""
+                      format="[[dateFormat]]"
+                      no-init>
+                    </etools-prp-date-input>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <template
+                    is="dom-if"
+                    if="[[isNumber]]"
+                    restamp="true">
+                    <paper-input
+                      class="validate"
+                      label="Label"
+                      on-input="_validate"
+                      value="{{data.label}}"
+                      always-float-label>
+                    </paper-input>
+                  </template>
+
+                  <template
+                    is="dom-if"
+                    if="[[!isNumber]]"
+                    restamp="true">
+                    <div class="app-grid">
+                      <paper-input
+                        class="item validate"
+                        label="Numerator Label"
+                        on-input="_validate"
+                        value="{{data.numerator_label}}"
+                        always-float-label>
+                      </paper-input>
+
+                      <paper-input
+                        class="item validate"
+                        label="Denominator Label"
+                        on-input="_validate"
+                        value="{{data.denominator_label}}"
+                        always-float-label>
+                      </paper-input>
+                    </div>
+                  </template>
+                </div>
+
+                <div class="row">
+                  <div class="app-grid">
+                    <json-field
+                      class="item validate"
+                      type="[[data.blueprint.display_type]]"
+                      label="Baseline"
+                      on-input="_validate"
+                      value="{{data.baseline}}"
+                      allowed-pattern="[+\-\d]">
+                    </json-field>
+
+                    <template
+                        is="dom-if"
+                        if="[[isNumber]]"
+                        restamp="true">
+                      <json-field
+                        class="item validate"
+                        type="[[data.blueprint.display_type]]"
+                        label="In need (optional)"
+                        on-input="_validate"
+                        value="{{data.in_need}}"
+                        allowed-pattern="[+\-\d]">
+                      </json-field>
+                    </template>
+
+                    <json-field
+                      class="item validate"
+                      type="[[data.blueprint.display_type]]"
+                      label="Target"
+                      on-input="_validate"
+                      value="{{data.target}}"
+                      allowed-pattern="[+\-\d]"
+                      required>
+                    </json-field>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <indicator-locations-widget
+                    class="validate"
+                    indicator-type="[[data.blueprint.display_type]]"
+                    value="{{data.locations}}">
+                  </indicator-locations-widget>
+                </div>
+
+                <div class="row">
+                  <disaggregations-dropdown-widget
+                    class="validate"
+                    value="{{selectedDisaggregations}}"
+                    disaggregations="[[disaggregations]]">
+                  </disaggregations-dropdown-widget>
+                </div>
               </template>
-
-              <json-field
-                class="item validate"
-                type="[[data.blueprint.display_type]]"
-                label="Target"
-                on-input="_validate"
-                value="{{data.target}}"
-                allowed-pattern="[+\-\d]"
-                required>
-              </json-field>
             </div>
-          </div>
-
-          <div class="row">
-            <indicator-locations-widget
-              class="validate"
-              indicator-type="[[data.blueprint.display_type]]"
-              value="{{data.locations}}">
-            </indicator-locations-widget>
-          </div>
-
-          <div class="row">
-            <disaggregations-dropdown-widget
-              class="validate"
-              value="{{selectedDisaggregations}}"
-              disaggregations="[[disaggregations]]">
-            </disaggregations-dropdown-widget>
-          </div>
+          </paper-radio-group>
         </template>
       </paper-dialog-scrollable>
 
@@ -352,6 +484,11 @@
           computed: '_computeIsNumber(data.blueprint.display_type)',
         },
 
+        mode: {
+          type: String,
+          observer: '_setDefaults',
+        },
+
         responsePlanId: {
           type: String,
           statePath: 'responsePlans.currentID',
@@ -364,7 +501,67 @@
 
         indicatorsUrl: {
           type: String,
-          value: App.Endpoints.clusterIndicators(),
+          value: '',
+        },
+
+        indicatorsListUrl: {
+          type: String,
+          value: App.Endpoints.indicators('co') + '/',
+        },
+
+        indicatorsListParams: {
+          type: Object,
+          value: {},
+        },
+
+        clusters: {
+          format: Array,
+          value: [],
+        },
+
+        selectedCluster: {
+          type: String,
+          value: '',
+        },
+
+        objectives: {
+          type: Array,
+          value: [],
+        },
+
+        selectedObjective: {
+          type: String,
+          value: '',
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {}
+        },
+
+        indicators: {
+          type: Array,
+          value: [],
+        },
+
+        selectedIndicator: {
+          type: String,
+          value: '',
+        },
+
+        selectedIndicatorDetailType: {
+          type: String,
+          value: ''
+        },
+
+        objectivesUrl: {
+          type: String,
+          computed: '_computeObjectivesUrl(responsePlanId)',
+        },
+
+        partnerID: {
+          type: String,
+          statePath: 'partner.current.id',
         },
 
         updatePending: {
@@ -433,6 +630,10 @@
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
+        '_saveCluster(selectedCluster)',
+        '_fetchObjectivesList(selectedCluster)',
+        '_fetchIndicatorsList(selectedObjective)',
+        '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
 
       _computeIsNumber: function (type) {
@@ -486,20 +687,39 @@
           return;
         }
 
-        this.set('selectedDisaggregations', []);
-        this.set('errors', {});
-        this.set('data', {
-          blueprint: {
-            display_type: 'number',
-            calculation_formula_across_locations: 'sum',
-            calculation_formula_across_periods: 'sum',
-          },
-          cs_dates: [],
-          locations: [],
-          disaggregations: [],
-        });
+        if (this.mode === undefined) {
+          return;
+        } else if (this.mode === 'objectives') {
+          this.set('data', {
+            partner_id: '',
+            partner_project_id: '',
+            cluster_id: '',
+            cluster_objective_id: '',
+            reportable_id: '',
+            locations: [],
+            target: {d: 1},
+            baseline: {d: 1}
+          });
 
-        this._fetchDisaggregations();
+          this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
+        } else {
+          this.set('selectedDisaggregations', []);
+          this.set('errors', {});
+          this.set('data', {
+            blueprint: {
+              display_type: 'number',
+              calculation_formula_across_locations: 'sum',
+              calculation_formula_across_periods: 'sum',
+            },
+            cs_dates: [],
+            locations: [],
+            disaggregations: [],
+          });
+
+          this.set('indicatorsUrl', App.Endpoints.clusterIndicators());
+
+          this._fetchDisaggregations();
+        }
       },
 
       _validate: function (e) {
@@ -518,6 +738,10 @@
         return date ? this._normalizeDate(date) : null;
       },
 
+      _computeObjectivesUrl: function (responsePlanId) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      },
+
       _fetchDisaggregations: function() {
         var self = this;
 
@@ -525,6 +749,99 @@
           .then(function(res) {
             self.set('disaggregations', res.data.results);
           });
+      },
+
+      _fetchObjectivesList: function (selectedClusterId) {
+        if (selectedClusterId === '') {
+          return;
+        }
+        this.set('data.partner_id', this.partnerID);
+        this.set('data.cluster_id', selectedClusterId);
+
+        this.set('data.partner_project_id', 5);  // REMOVE AND FIX
+
+        console.log('data from fetchObjectives', this.data);
+
+        this.debounce('fetch-objectives', function () {
+          var self = this;
+
+          this.set('objectives', []);
+          this.set('objectivesParams.cluster_id', selectedClusterId);
+
+          this.$.objectives.abort();
+          this.$.objectives.thunk()()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+              self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
+      },
+
+      _fetchIndicatorsList: function (selectedObjectiveId) {
+        if (selectedObjectiveId === '') {
+          return;
+        }
+        this.set('data.cluster_objective_id', selectedObjectiveId);
+        this.set('indicatorsListParams', {object_id: selectedObjectiveId});
+
+        console.log('url', this.indicatorsListUrl);
+
+        this.debounce('fetch-indicators', function () {
+          var self = this;
+
+          this.set('indicators', []);
+
+          this.$.indicatorsList.abort();
+          this.$.indicatorsList.thunk()()
+            .then(function (res) {
+              var simpleIndicatorsList = [];
+
+              res.data.results.forEach(function (indicator) {
+                var simpleIndicator = {};
+                simpleIndicator.id = indicator.id;
+                simpleIndicator.title = indicator.blueprint.title;
+
+                simpleIndicatorsList.push(simpleIndicator);
+              });
+
+              self.set('indicators', simpleIndicatorsList);
+              self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
+      },
+
+      _fetchSelectedIndicatorDetailType: function (responsePlanId, selectedIndicator) {
+        if (selectedIndicator === undefined) {
+          return;
+        }
+
+        this.debounce('fetch-selected-indicator', function () {
+          var self = this;
+
+          this.set('selectedIndicatorDetailType', '');
+          this.set('data.reportable_id', selectedIndicator);
+
+          this.$.indicatorDetail.url = App.Endpoints.analysisIndicator(responsePlanId, selectedIndicator);
+
+          this.$.indicatorDetail.abort();
+          this.$.indicatorDetail.thunk()()
+            .then(function (res) {
+              self.set('selectedIndicatorDetailType', res.data.display_type)
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
+      },
+
+      _saveCluster: function () {
+        this.set('data.cluster_id', this.selectedCluster);
       },
 
       _processData: function (rawData) {
@@ -563,24 +880,55 @@
           return;
         }
 
-        this.set('updatePending', true);
-        this._setDisaggregations();
-        this.$.indicators.body = this._processData(this.data);
+        if(this.mode === 'objectives') {
+          this._setDisaggregations();
 
-        console.log(this.$.indicators.body);
-        return;
+          this.data.baseline.v = parseInt(this.data.baseline.v);
+          this.data.target.v = parseInt(this.data.target.v);
+          this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
+          this.data.target.c = this.data.target.v / this.data.target.d;
 
-        this.$.indicators.thunk()()
-          .then(function (res) {
-            self.fire('indicator-added', res.data);
-            self.set('updatePending', false);
-            self.set('errors', {});
-            self.close();
-          })
-          .catch(function (err) {
-            self.set('errors', err.data);
-            self.set('updatePending', false);
+          this.data.locations.forEach(function (location) {
+            location.id = location.loc_type;
+            delete location.loc_type;
           });
+
+          this.$.indicators.body = this._processData(this.data);
+
+          console.log('objectives saved');
+          console.log('objectives url', this.$.indicators.url);
+          console.log('adopt data', this.data);
+
+          this.$.indicators.thunk()()
+            .then(function (res) {
+              self.fire('indicator-added', res.data);
+              self.set('updatePending', false);
+              self.set('errors', {});
+              self.close();
+            })
+            .catch(function (err) {
+              self.set('errors', err.data);
+              self.set('updatePending', false);
+            });
+        } else {
+          this.set('updatePending', true);
+          this._setDisaggregations();
+          this.$.indicators.body = this._processData(this.data);
+
+          console.log('custom data', this.$.indicators.body);
+
+          this.$.indicators.thunk()()
+            .then(function (res) {
+              self.fire('indicator-added', res.data);
+              self.set('updatePending', false);
+              self.set('errors', {});
+              self.close();
+            })
+            .catch(function (err) {
+              self.set('errors', err.data);
+              self.set('updatePending', false);
+            });
+        }
       },
     });
   </script>
