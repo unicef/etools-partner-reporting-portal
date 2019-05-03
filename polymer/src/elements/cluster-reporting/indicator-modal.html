@@ -896,12 +896,12 @@
             });
           }
 
-          this.data.baseline.c = this.data.baseline.v / this.data.baseline.d;
-          this.data.target.c = this.data.target.v / this.data.target.d;
+          this.data.baseline.c = parseInt(this.data.baseline.v) / parseInt(this.data.baseline.d);
+          this.data.target.c = parseInt(this.data.target.v) / parseInt(this.data.target.d);
 
           this.data.locations.forEach(function (location) {
-            location.baseline.c = location.baseline.v / location.baseline.d;
-            location.target.c = location.target.v / location.target.d;
+            location.baseline.c = parseInt(location.baseline.v) / parseInt(location.baseline.d);
+            location.target.c = parseInt(location.target.v) / parseInt(location.target.d);
           });
 
           this.$.indicators.body = this.data;
