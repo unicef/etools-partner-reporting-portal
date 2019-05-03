@@ -1114,6 +1114,9 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 else:
                     raise serializers.ValidationError("key 'd' for target needs to be number")
 
+            if 'v' not in data['target']:
+                raise serializers.ValidationError("key 'v' must exist")
+
             if isinstance(data['target']['v'], str):
                 if data['target']['v'].isnumeric():
                     data['target']['v'] = int(data['target']['v'])
@@ -1122,9 +1125,6 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
 
             if data['target']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
-
-            if 'v' not in data['target']:
-                raise serializers.ValidationError("key 'v' must exist")
 
             if 'c' not in data['target']:
                 data['target']['c'] = float(data['target']['v']) / data['target']['d']
@@ -1143,6 +1143,9 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 else:
                     raise serializers.ValidationError("key 'd' for baseline needs to be number")
 
+            if 'v' not in data['baseline']:
+                raise serializers.ValidationError("key 'v' must exist")
+
             if isinstance(data['baseline']['v'], str):
                 if data['baseline']['v'].isnumeric():
                     data['baseline']['v'] = int(data['baseline']['v'])
@@ -1151,9 +1154,6 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
 
             if data['baseline']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
-
-            if 'v' not in data['baseline']:
-                raise serializers.ValidationError("key 'v' must exist")
 
             if 'c' not in data['baseline']:
                 data['baseline']['c'] = float(data['baseline']['v']) / data['baseline']['d']
