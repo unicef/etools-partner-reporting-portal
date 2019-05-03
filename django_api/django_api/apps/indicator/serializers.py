@@ -12,8 +12,8 @@ from rest_framework.exceptions import ValidationError
 
 from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from unicef.models import LowerLevelOutput, ProgressReport
-from partner.models import PartnerProject, PartnerActivity
-from cluster.models import ClusterObjective, ClusterActivity
+from partner.models import PartnerProject, PartnerActivity, Partner
+from cluster.models import ClusterObjective, ClusterActivity, Cluster
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.serializers import LocationSerializer, IdLocationSerializer
@@ -1084,6 +1084,128 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
             'calculation_formula_across_locations',
             'display_type',
         )
+
+
+class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
+    partner_id = serializers.IntegerField()
+    partner_project_id = serializers.IntegerField()
+    cluster_id = serializers.IntegerField()
+    cluster_objective_id = serializers.IntegerField()
+    reportable_id = serializers.IntegerField()
+    locations = ReportableLocationGoalSerializer(many=True, write_only=True)
+    target = serializers.JSONField()
+    baseline = serializers.JSONField()
+
+    def validate(self, data):
+        """
+        Make sure cluster objects exist by their IDs and basic validations on target and baseline.
+        """
+        if not isinstance(data['target'], dict):
+            raise serializers.ValidationError({
+                'target': 'Target value needs to be a dictionary format'
+            })
+        else:
+            if 'd' not in data['target']:
+                data['target']['d'] = 1
+
+            if isinstance(data['target']['d'], str):
+                if data['target']['d'].isnumeric():
+                    data['target']['d'] = int(data['target']['d'])
+                else:
+                    raise serializers.ValidationError("key 'd' for target needs to be number")
+
+            if isinstance(data['target']['v'], str):
+                if data['target']['v'].isnumeric():
+                    data['target']['v'] = int(data['target']['v'])
+                else:
+                    raise serializers.ValidationError("key 'v' for target needs to be number")
+
+            if data['target']['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
+
+            if 'v' not in data['target']:
+                raise serializers.ValidationError("key 'v' must exist")
+
+            if 'c' not in data['target']:
+                data['target']['c'] = float(data['target']['v']) / data['target']['d']
+
+        if not isinstance(data['baseline'], dict):
+            raise serializers.ValidationError({
+                'baseline': 'Baseline value needs to be a dictionary format'
+            })
+        else:
+            if 'd' not in data['baseline']:
+                data['baseline']['d'] = 1
+
+            if isinstance(data['baseline']['d'], str):
+                if data['baseline']['d'].isnumeric():
+                    data['baseline']['d'] = int(data['baseline']['d'])
+                else:
+                    raise serializers.ValidationError("key 'd' for baseline needs to be number")
+
+            if isinstance(data['baseline']['v'], str):
+                if data['baseline']['v'].isnumeric():
+                    data['baseline']['v'] = int(data['baseline']['v'])
+                else:
+                    raise serializers.ValidationError("key 'v' for baseline needs to be number")
+
+            if data['baseline']['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
+
+            if 'v' not in data['baseline']:
+                raise serializers.ValidationError("key 'v' must exist")
+
+            if 'c' not in data['baseline']:
+                data['baseline']['c'] = float(data['baseline']['v']) / data['baseline']['d']
+
+        if not Partner.objects.filter(id=data['partner_id']).exists():
+            raise serializers.ValidationError({
+                'partner_id': 'Partner does not exist'
+            })
+
+        if not PartnerProject.objects.filter(id=data['partner_project_id']).exists():
+            raise serializers.ValidationError({
+                'partner_project_id': 'PartnerProject does not exist'
+            })
+
+        if PartnerProject.objects.get(id=data['partner_project_id']).partner.id != data['partner_id']:
+            raise serializers.ValidationError({
+                'partner_project_id': 'This partner project does not belong to the partner'
+            })
+
+        if not Cluster.objects.filter(id=data['cluster_id']).exists():
+            raise serializers.ValidationError({
+                'cluster_id': 'Cluster does not exist'
+            })
+
+        if not ClusterObjective.objects.filter(id=data['cluster_objective_id']).exists():
+            raise serializers.ValidationError({
+                'cluster_objective_id': 'ClusterObjective does not exist'
+            })
+
+        if ClusterObjective.objects.get(id=data['cluster_objective_id']).cluster.id != data['cluster_id']:
+            raise serializers.ValidationError({
+                'cluster_objective_id': 'This objective does not belong to the cluster'
+            })
+
+        reportables = Reportable.objects.filter(id=data['reportable_id'])
+
+        if not reportables.exists():
+            raise serializers.ValidationError({
+                'reportable_id': 'Reportable does not exist'
+            })
+
+        if not isinstance(reportables.first().content_object, ClusterObjective):
+            raise serializers.ValidationError({
+                'reportable_id': 'Reportable type is not ClusterObjective'
+            })
+
+        if reportables.first().content_object.id != data['cluster_objective_id']:
+            raise serializers.ValidationError({
+                'reportable_id': 'Reportable does not belong to this ClusterObjective'
+            })
+
+        return data
 
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):

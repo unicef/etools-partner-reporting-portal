@@ -18,7 +18,7 @@ RUN apk --update --no-cache \
 		libjpeg-turbo \
 		libjpeg-turbo-dev
 
-RUN npm install -g bower polymer-cli gulp-cli
+RUN npm install -g bower polymer-cli gulp-cli --unsafe-perm
 
 ADD bower.json /tmp/
 ADD package.json /tmp/

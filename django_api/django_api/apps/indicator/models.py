@@ -439,6 +439,34 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
     pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
 
 
+def create_reportable_for_pp_from_co_reportable(pp, co_reportable):
+    """
+    Copies one CO reportable instance to a partner project.
+
+    Arguments:
+        pp {partner.models.PartnerProject} -- PartnerProject to copy to
+        co_reportable {indicator.models.Reportable} -- ClusterObjective Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    
+    Returns:
+        Reportable -- PartnerProject type Reportable ORM instance
+    """
+
+    # TODO: Add Cluster objective to have only one PartnerProject for a Partner
+    reportable_data_to_sync = get_reportable_data_to_clone(co_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pp
+    reportable_data_to_sync["blueprint"] = co_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = None
+    pp_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pp_reportable.disaggregations.add(*co_reportable.disaggregations.all())
+
+    return pp_reportable
+
+
 def create_pa_reportables_from_ca(pa, ca):
     """
     Creates a set of PartnerActivity Reportable instances from
