@@ -918,19 +918,12 @@
             location.target.c = location.target.v / location.target.d;
           });
 
-          console.log('raw data', data);
-
           this.set('data', data);
 
           this.$.indicators.body = this.data;
 
-          console.log('objectives saved');
-          console.log('objectives url', this.$.indicators.url);
-          console.log('adopt data', this.data);
-
           this.$.indicators.thunk()()
             .then(function (res) {
-              console.log('res data', res.data);
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
               self.set('errors', {});
@@ -944,8 +937,6 @@
           this.set('updatePending', true);
           this._setDisaggregations();
           this.$.indicators.body = this._processData(this.data);
-
-          console.log('custom data', this.$.indicators.body);
 
           this.$.indicators.thunk()()
             .then(function (res) {
