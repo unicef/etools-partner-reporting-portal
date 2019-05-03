@@ -449,7 +449,7 @@ def create_reportable_for_pp_from_co_reportable(pp, co_reportable):
 
     Raises:
         ValidationError -- Django Exception
-    
+
     Returns:
         Reportable -- PartnerProject type Reportable ORM instance
     """
