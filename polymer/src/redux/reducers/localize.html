@@ -14,7 +14,7 @@
 
     function languageReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = navigator.language;
+        state = navigator.language === 'en-US' ? 'en' : navigator.language;
       }
 
       switch (action.type) {
