@@ -147,6 +147,7 @@
     <paper-dialog
       id="dialog"
       with-backdrop
+      on-iron-overlay-closed="_close"
       opened="{{opened}}">
 
       <div class="header layout horizontal justified">
@@ -984,8 +985,11 @@
         }
       },
 
-      _close: function () {
-        console.log('closed!');
+      _close: function (e) {
+        if (e.target.nodeName !== 'PAPER-DIALOG') {
+          return;
+        }
+
         this.set('mode', '');
 
         this.set('selectedCluster', '');
