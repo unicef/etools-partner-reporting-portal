@@ -860,7 +860,7 @@
           this.$.indicatorDetail.abort();
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
-              self.set('selectedIndicatorDetailType', res.data.display_type)
+              self.set('selectedIndicatorDetailType', res.data.display_type);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -908,7 +908,7 @@
           return;
         }
 
-        if(this.mode === 'objectives') {
+        if (this.mode === 'objectives') {
           this._setDisaggregations();
 
           var data = this.get('data');
