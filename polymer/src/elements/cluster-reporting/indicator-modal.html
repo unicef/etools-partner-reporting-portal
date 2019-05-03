@@ -37,10 +37,10 @@
       :host {
         display: block;
 
-        --app-grid-columns: 3;
+        --app-grid-columns: 2;
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+        --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
           width: 800px;
@@ -57,15 +57,43 @@
 
       .full-width {
         @apply --app-grid-expandible-item;
+        padding-top: 12px;
       }
 
       .app-grid {
         padding-top: 0;
-        margin: 0 -var(--app-grid-gutter);
+      }
+
+      .double {
+        padding-left: 0;
+        justify-content: space-between;
+      }
+
+      .title {
+        padding-top: 0;
+      }
+
+      .freq, .start {
+        margin-right: 0;
+      }
+
+      .app-grid-triple {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+      }
+
+      .app-grid-triple .item {
+        width: 210px;
       }
 
       .item {
         margin-bottom: 0;
+      }
+
+      #mode {
+        padding-top: 24px;
       }
 
       .calculation-method:not(:first-child) {
@@ -126,7 +154,7 @@
 
         <paper-icon-button
           class="self-center"
-          on-tap="close"
+          on-tap="_close"
           icon="icons:close">
         </paper-icon-button>
       </div>
@@ -143,8 +171,7 @@
             selected="{{ mode }}"
             on-change="adjustPosition">
 
-            <paper-radio-button
-              name="objectives">
+            <paper-radio-button name="objectives">
               <strong>Adopt from Cluster Objective</strong>
             </paper-radio-button>
 
@@ -155,6 +182,7 @@
                 is="dom-if"
                 if="[[_equals(mode, 'objectives')]]"
                 restamp="true">
+                
                 <div class="app-grid">
                   <div class="item">
                     <etools-single-selection-menu
@@ -229,12 +257,12 @@
                       </indicator-locations-widget>
                     </div>
                   </template>
+                  
                 </div>
               </template>
             </div>
 
-            <paper-radio-button
-              name="custom">
+            <paper-radio-button name="custom">
               <strong>Custom</strong>
             </paper-radio-button>
 
@@ -245,200 +273,204 @@
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
-                <div class="row">
-                  <paper-input
-                    class="validate"
-                    label="Title"
-                    on-input="_validate"
-                    value="{{data.blueprint.title}}"
-                    always-float-label
-                    required>
-                  </paper-input>
-                </div>
 
-                <div class="row">
-                  <labelled-item label="Type">
-                    <paper-radio-group
-                        selected="{{data.blueprint.display_type}}">
-                      <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-                      <paper-radio-button name="percentage">Percent</paper-radio-button>
-                      <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                    </paper-radio-group>
-                  </labelled-item>
-                </div>
-
-                <div class="row">
-                  <div class="layout horizontal">
-                    <labelled-item
-                      class="calculation-method"
-                      label="Calculation method across locations">
-                      <calculation-method
-                        value="{{data.blueprint.calculation_formula_across_locations}}"
-                        disabled="[[!isNumber]]">
-                      </calculation-method>
-                    </labelled-item>
-
-                    <labelled-item
-                      class="calculation-method"
-                      label="Calculation method across reporting periods">
-                      <calculation-method
-                        value="{{data.blueprint.calculation_formula_across_periods}}"
-                        disabled="[[!isNumber]]">
-                      </calculation-method>
-                    </labelled-item>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <paper-input
-                    class="validate"
-                    label="Comments (optional)"
-                    on-input="_validate"
-                    value="{{data.comments}}"
-                    always-float-label>
-                  </paper-input>
-                </div>
-
-                <div class="row">
-                  <paper-input
-                    class="validate"
-                    label="Measurement specifications (optional)"
-                    on-input="_validate"
-                    value="{{data.measurement_specifications}}"
-                    always-float-label>
-                  </paper-input>
-                </div>
-
-                <div class="row">
-                  <div class="app-grid">
-                    <etools-single-selection-menu
-                      class="item validate"
-                      label="Frequency of reporting"
-                      options="[[frequencies]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.frequency}}"
-                      on-iron-activate="_validate"
-                      trigger-value-change-event
-                      hide-search
-                      required>
-                    </etools-single-selection-menu>
-
-                    <template
-                        is="dom-if"
-                        if="[[_showCSD(data.frequency)]]"
-                        restamp="true">
-                      <etools-prp-chips
-                        class="item validate"
-                        value="{{data.cs_dates}}"
-                        label="Due date of report"
-                        on-selected-chips-updated="_validate"
-                        required>
-                        <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
-                      </etools-prp-chips>
-                    </template>
-
-                    <etools-prp-date-input
-                      class="item validate"
-                      label="Start date of reporting period"
-                      value="{{data.start_date_of_reporting_period}}"
-                      error-message=""
-                      format="[[dateFormat]]"
-                      no-init>
-                    </etools-prp-date-input>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <template
-                    is="dom-if"
-                    if="[[isNumber]]"
-                    restamp="true">
+                <div class="app-grid">
+                  <div class="item full-width title">
                     <paper-input
                       class="validate"
-                      label="Label"
+                      label="Title"
                       on-input="_validate"
-                      value="{{data.label}}"
+                      value="{{data.blueprint.title}}"
+                      always-float-label
+                      required>
+                    </paper-input>
+                  </div>
+  
+                  <div class="item full-width">
+                    <labelled-item label="Type">
+                      <paper-radio-group
+                          selected="{{data.blueprint.display_type}}">
+                        <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                        <paper-radio-button name="percentage">Percent</paper-radio-button>
+                        <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                      </paper-radio-group>
+                    </labelled-item>
+                  </div>
+  
+                  <div class="item full-width">
+                    <div class="layout horizontal">
+                      <labelled-item
+                        class="calculation-method"
+                        label="Calculation method across locations">
+                        <calculation-method
+                          value="{{data.blueprint.calculation_formula_across_locations}}"
+                          disabled="[[!isNumber]]">
+                        </calculation-method>
+                      </labelled-item>
+  
+                      <labelled-item
+                        class="calculation-method"
+                        label="Calculation method across reporting periods">
+                        <calculation-method
+                          value="{{data.blueprint.calculation_formula_across_periods}}"
+                          disabled="[[!isNumber]]">
+                        </calculation-method>
+                      </labelled-item>
+                    </div>
+                  </div>
+  
+                  <div class="item full-width">
+                    <paper-input
+                      class="validate"
+                      label="Comments (optional)"
+                      on-input="_validate"
+                      value="{{data.comments}}"
                       always-float-label>
                     </paper-input>
-                  </template>
-
-                  <template
-                    is="dom-if"
-                    if="[[!isNumber]]"
-                    restamp="true">
-                    <div class="app-grid">
-                      <paper-input
-                        class="item validate"
-                        label="Numerator Label"
-                        on-input="_validate"
-                        value="{{data.numerator_label}}"
-                        always-float-label>
-                      </paper-input>
-
-                      <paper-input
-                        class="item validate"
-                        label="Denominator Label"
-                        on-input="_validate"
-                        value="{{data.denominator_label}}"
-                        always-float-label>
-                      </paper-input>
-                    </div>
-                  </template>
-                </div>
-
-                <div class="row">
-                  <div class="app-grid">
-                    <json-field
-                      class="item validate"
-                      type="[[data.blueprint.display_type]]"
-                      label="Baseline"
+                  </div>
+  
+                  <div class="item full-width">
+                    <paper-input
+                      class="validate"
+                      label="Measurement specifications (optional)"
                       on-input="_validate"
-                      value="{{data.baseline}}"
-                      allowed-pattern="[+\-\d]">
-                    </json-field>
-
+                      value="{{data.measurement_specifications}}"
+                      always-float-label>
+                    </paper-input>
+                  </div>
+  
+                  <div class="item full-width">
+                    <div class="app-grid double">
+                      <etools-single-selection-menu
+                        class="item validate freq"
+                        label="Frequency of reporting"
+                        options="[[frequencies]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{data.frequency}}"
+                        on-iron-activate="_validate"
+                        trigger-value-change-event
+                        hide-search
+                        required>
+                      </etools-single-selection-menu>
+  
+                      <template
+                          is="dom-if"
+                          if="[[_showCSD(data.frequency)]]"
+                          restamp="true">
+                        <etools-prp-chips
+                          class="item validate"
+                          value="{{data.cs_dates}}"
+                          label="Due date of report"
+                          on-selected-chips-updated="_validate"
+                          required>
+                          <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                        </etools-prp-chips>
+                      </template>
+  
+                      <etools-prp-date-input
+                        class="item validate start"
+                        label="Start date of reporting period"
+                        value="{{data.start_date_of_reporting_period}}"
+                        error-message=""
+                        format="[[dateFormat]]"
+                        no-init>
+                      </etools-prp-date-input>
+                    </div>
+                  </div>
+  
+                  <div class="item full-width">
                     <template
-                        is="dom-if"
-                        if="[[isNumber]]"
-                        restamp="true">
+                      is="dom-if"
+                      if="[[isNumber]]"
+                      restamp="true">
+                      <paper-input
+                        class="validate"
+                        label="Label"
+                        on-input="_validate"
+                        value="{{data.label}}"
+                        always-float-label>
+                      </paper-input>
+                    </template>
+  
+                    <template
+                      is="dom-if"
+                      if="[[!isNumber]]"
+                      restamp="true">
+                      <div class="app-grid">
+                        <paper-input
+                          class="item validate"
+                          label="Numerator Label"
+                          on-input="_validate"
+                          value="{{data.numerator_label}}"
+                          always-float-label>
+                        </paper-input>
+  
+                        <paper-input
+                          class="item validate"
+                          label="Denominator Label"
+                          on-input="_validate"
+                          value="{{data.denominator_label}}"
+                          always-float-label>
+                        </paper-input>
+                      </div>
+                    </template>
+                  </div>
+  
+                  <div class="item full-width">
+                    <div class="app-grid-triple">
                       <json-field
                         class="item validate"
                         type="[[data.blueprint.display_type]]"
-                        label="In need (optional)"
+                        label="Baseline"
                         on-input="_validate"
-                        value="{{data.in_need}}"
+                        value="{{data.baseline}}"
                         allowed-pattern="[+\-\d]">
                       </json-field>
-                    </template>
-
-                    <json-field
-                      class="item validate"
-                      type="[[data.blueprint.display_type]]"
-                      label="Target"
-                      on-input="_validate"
-                      value="{{data.target}}"
-                      allowed-pattern="[+\-\d]"
-                      required>
-                    </json-field>
+  
+                      <template
+                          is="dom-if"
+                          if="[[isNumber]]"
+                          restamp="true">
+                        <json-field
+                          class="item validate"
+                          type="[[data.blueprint.display_type]]"
+                          label="In need (optional)"
+                          on-input="_validate"
+                          value="{{data.in_need}}"
+                          allowed-pattern="[+\-\d]">
+                        </json-field>
+                      </template>
+  
+                      <json-field
+                        class="item validate"
+                        type="[[data.blueprint.display_type]]"
+                        label="Target"
+                        on-input="_validate"
+                        value="{{data.target}}"
+                        allowed-pattern="[+\-\d]"
+                        required>
+                      </json-field>
+                    </div>
+                  </div>
+  
+                  <div class="item full-width">
+                    <indicator-locations-widget
+                      class="validate"
+                      indicator-type="[[data.blueprint.display_type]]"
+                      value="{{data.locations}}">
+                    </indicator-locations-widget>
+                  </div>
+  
+                  <div class="item full-width">
+                    <disaggregations-dropdown-widget
+                      class="validate"
+                      value="{{selectedDisaggregations}}"
+                      disaggregations="[[disaggregations]]">
+                    </disaggregations-dropdown-widget>
                   </div>
                 </div>
-
-                <div class="row">
-                  <indicator-locations-widget
-                    class="validate"
-                    indicator-type="[[data.blueprint.display_type]]"
-                    value="{{data.locations}}">
-                  </indicator-locations-widget>
-                </div>
-
-                <div class="row">
-                  <disaggregations-dropdown-widget
-                    class="validate"
-                    value="{{selectedDisaggregations}}"
-                    disaggregations="[[disaggregations]]">
-                  </disaggregations-dropdown-widget>
-                </div>
+                
               </template>
             </div>
           </paper-radio-group>
@@ -454,7 +486,7 @@
         </paper-button>
 
         <paper-button
-            on-tap="close">
+            on-tap="_close">
           Cancel
         </paper-button>
       </div>
@@ -950,6 +982,18 @@
               self.set('updatePending', false);
             });
         }
+      },
+
+      _close: function () {
+        console.log('closed!');
+        this.set('mode', '');
+
+        this.set('selectedCluster', '');
+        this.set('selectedObjective', '');
+        this.set('selectedIndicator', '');
+        this.set('selectedIndicatorDetailType', '');
+        
+        this.close();
       },
     });
   </script>
