@@ -36,7 +36,6 @@ from core.common import (
     PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
-from cluster.models import ClusterObjective
 from partner.models import PartnerProject
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
