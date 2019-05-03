@@ -1014,18 +1014,20 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName !== 'PAPER-DIALOG') {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('mode', '');
+
+          this.set('selectedCluster', '');
+          this.set('selectedObjective', '');
+          this.set('selectedIndicator', '');
+          this.set('selectedIndicatorDetailType', '');
+          
+          this.close();
+        } else {
           return;
         }
-
-        this.set('mode', '');
-
-        this.set('selectedCluster', '');
-        this.set('selectedObjective', '');
-        this.set('selectedIndicator', '');
-        this.set('selectedIndicatorDetailType', '');
-        
-        this.close();
       },
     });
   </script>
