@@ -878,31 +878,49 @@
         if(this.mode === 'objectives') {
           this._setDisaggregations();
 
-          if (this.selectedIndicatorDetailType === 'percentage') {
-            this.data.baseline.d = 100;
-            this.data.target.d = 100;
+          var data = this.get('data');
 
-            this.data.locations.forEach(function (location) {
+          if (this.selectedIndicatorDetailType === 'percentage') {
+            data.baseline.d = 100;
+            data.target.d = 100;
+
+            data.locations.forEach(function (location) {
               location.baseline.d = 100;
               location.target.d = 100;
             });
           } else if (this.selectedIndicatorDetailType === 'number') {
-            this.data.baseline.d = 1;
-            this.data.target.d = 1;
+            data.baseline.d = 1;
+            data.target.d = 1;
 
-            this.data.locations.forEach(function (location) {
+            data.locations.forEach(function (location) {
               location.baseline.d = 1;
               location.target.d = 1;
             });
           }
 
-          this.data.baseline.c = parseInt(this.data.baseline.v) / parseInt(this.data.baseline.d);
-          this.data.target.c = parseInt(this.data.target.v) / parseInt(this.data.target.d);
+          data.baseline.v = parseInt(data.baseline.v);
+          data.target.v = parseInt(data.target.v);
 
-          this.data.locations.forEach(function (location) {
-            location.baseline.c = parseInt(location.baseline.v) / parseInt(location.baseline.d);
-            location.target.c = parseInt(location.target.v) / parseInt(location.target.d);
+          data.baseline.d = parseInt(data.baseline.d);
+          data.target.d = parseInt(data.target.d);
+
+          data.baseline.c = data.baseline.v / data.baseline.d;
+          data.target.c = data.target.v / data.target.d;
+
+          data.locations.forEach(function (location) {
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            location.baseline.d = parseInt(location.baseline.d);
+            location.target.d = parseInt(location.target.d);
+
+            location.baseline.c = location.baseline.v / location.baseline.d;
+            location.target.c = location.target.v / location.target.d;
           });
+
+          console.log('raw data', data);
+
+          this.set('data', data);
 
           this.$.indicators.body = this.data;
 
