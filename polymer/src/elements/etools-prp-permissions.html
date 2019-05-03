@@ -115,9 +115,13 @@
 
             return responsePlanClusters.some(function (cluster) {
               return params.prpRoles.some(function (item) {
-                return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-                  (String(item.cluster.id) === String(cluster.id) &&
-                    allowedRoles.indexOf(item.role) > -1);
+                if (item.cluster === null) {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN;
+                } else {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                    (String(item.cluster.id) === String(cluster.id) &&
+                      allowedRoles.indexOf(item.role) > -1);
+                }
               });
             });
           },
@@ -134,7 +138,6 @@
                     (String(item.cluster.id) === String(cluster.id) &&
                       allowedRoles.indexOf(item.role) > -1);
                 }
-
               });
             });
           },
