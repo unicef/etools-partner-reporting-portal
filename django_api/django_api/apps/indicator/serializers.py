@@ -1120,7 +1120,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 else:
                     raise serializers.ValidationError("key 'v' for target needs to be number")
 
-            elif data['target']['d'] == 0:
+            if data['target']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
 
             if 'v' not in data['target']:
@@ -1149,7 +1149,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 else:
                     raise serializers.ValidationError("key 'v' for baseline needs to be number")
 
-            elif data['baseline']['d'] == 0:
+            if data['baseline']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
 
             if 'v' not in data['baseline']:
