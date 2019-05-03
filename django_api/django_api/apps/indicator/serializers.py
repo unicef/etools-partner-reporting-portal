@@ -1108,6 +1108,18 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
             if 'd' not in data['target']:
                 data['target']['d'] = 1
 
+            if isinstance(data['target']['d'], str):
+                if data['target']['d'].isnumeric():
+                    data['target']['d'] = int(data['target']['d'])
+                else:
+                    raise serializers.ValidationError("key 'd' for target needs to be number")
+
+            if isinstance(data['target']['v'], str):
+                if data['target']['v'].isnumeric():
+                    data['target']['v'] = int(data['target']['v'])
+                else:
+                    raise serializers.ValidationError("key 'v' for target needs to be number")
+
             elif data['target']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
 
@@ -1124,6 +1136,18 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
         else:
             if 'd' not in data['baseline']:
                 data['baseline']['d'] = 1
+
+            if isinstance(data['baseline']['d'], str):
+                if data['baseline']['d'].isnumeric():
+                    data['baseline']['d'] = int(data['baseline']['d'])
+                else:
+                    raise serializers.ValidationError("key 'd' for baseline needs to be number")
+
+            if isinstance(data['baseline']['v'], str):
+                if data['baseline']['v'].isnumeric():
+                    data['baseline']['v'] = int(data['baseline']['v'])
+                else:
+                    raise serializers.ValidationError("key 'v' for baseline needs to be number")
 
             elif data['baseline']['d'] == 0:
                 raise serializers.ValidationError("key 'd' cannot be zero")
