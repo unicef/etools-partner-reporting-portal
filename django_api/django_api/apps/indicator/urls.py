@@ -17,6 +17,7 @@ from .views import (
     ClusterIndicatorSendIMOMessageAPIView,
     ReportableReportingFrequencyListAPIView,
     ReportRefreshAPIView,
+    ClusterObjectiveIndicatorAdoptAPIView,
 )
 
 
@@ -61,6 +62,8 @@ urlpatterns = [
     url(r'^indicator-reports/(?P<pk>\d+)/review/$',
         IndicatorReportReviewAPIView.as_view(),
         name='indicator-report-review'),
+
+    url(r'^partner-project-indicator-adopt/$', ClusterObjectiveIndicatorAdoptAPIView.as_view(), name='partner-project-indicator-adopt'),
 
     url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
 

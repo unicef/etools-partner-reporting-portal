@@ -123,6 +123,8 @@ INSTALLED_APPS = [
     'unicef',
     'ocha',
     'id_management',
+    'post_office',
+    'unicef_notification',
 ]
 
 MIDDLEWARE_CLASSES = [

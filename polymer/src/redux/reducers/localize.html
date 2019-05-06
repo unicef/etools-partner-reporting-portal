@@ -14,10 +14,13 @@
 
     function languageReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = 'en'; // FIXME
+        state = navigator.language === 'en-US' ? 'en' : navigator.language;
       }
 
       switch (action.type) {
+        case App.Constants.SET_LANGUAGE:
+          return action.language;
+
         default:
           return state;
       }
