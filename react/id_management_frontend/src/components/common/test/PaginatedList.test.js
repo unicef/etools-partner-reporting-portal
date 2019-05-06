@@ -1,7 +1,8 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
-import {PaginatedList, mapStateToProps} from '../PaginatedList';
+import {PaginatedList,
+    mapStateToProps} from '../PaginatedList';
 
 describe('PaginatedList component', () => {
     const columns = [];
