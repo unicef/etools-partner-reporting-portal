@@ -73,7 +73,7 @@
         padding-top: 0;
       }
 
-      .freq, .start {
+      .pair {
         margin-right: 0;
       }
 
@@ -343,7 +343,7 @@
                   <div class="item full-width">
                     <div class="app-grid double">
                       <etools-single-selection-menu
-                        class="item validate freq"
+                        class="item validate pair"
                         label="Frequency of reporting"
                         options="[[frequencies]]"
                         option-value="id"
@@ -370,7 +370,7 @@
                       </template>
   
                       <etools-prp-date-input
-                        class="item validate start"
+                        class="item validate pair"
                         label="Start date of reporting period"
                         value="{{data.start_date_of_reporting_period}}"
                         error-message=""
@@ -398,9 +398,9 @@
                       is="dom-if"
                       if="[[!isNumber]]"
                       restamp="true">
-                      <div class="app-grid">
+                      <div class="app-grid double">
                         <paper-input
-                          class="item validate"
+                          class="item validate pair"
                           label="Numerator Label"
                           on-input="_validate"
                           value="{{data.numerator_label}}"
@@ -408,7 +408,7 @@
                         </paper-input>
   
                         <paper-input
-                          class="item validate"
+                          class="item validate pair"
                           label="Denominator Label"
                           on-input="_validate"
                           value="{{data.denominator_label}}"
@@ -419,20 +419,20 @@
                   </div>
   
                   <div class="item full-width">
-                    <div class="app-grid-triple">
-                      <json-field
-                        class="item validate"
-                        type="[[data.blueprint.display_type]]"
-                        label="Baseline"
-                        on-input="_validate"
-                        value="{{data.baseline}}"
-                        allowed-pattern="[+\-\d]">
-                      </json-field>
-  
-                      <template
-                          is="dom-if"
-                          if="[[isNumber]]"
-                          restamp="true">
+                    <template
+                      is="dom-if"
+                      if="[[isNumber]]"
+                      restamp="true">
+                      <div class="app-grid-triple">
+                        <json-field
+                          class="item validate"
+                          type="[[data.blueprint.display_type]]"
+                          label="Baseline"
+                          on-input="_validate"
+                          value="{{data.baseline}}"
+                          allowed-pattern="[+\-\d]">
+                        </json-field>
+    
                         <json-field
                           class="item validate"
                           type="[[data.blueprint.display_type]]"
@@ -441,18 +441,46 @@
                           value="{{data.in_need}}"
                           allowed-pattern="[+\-\d]">
                         </json-field>
-                      </template>
-  
-                      <json-field
-                        class="item validate"
-                        type="[[data.blueprint.display_type]]"
-                        label="Target"
-                        on-input="_validate"
-                        value="{{data.target}}"
-                        allowed-pattern="[+\-\d]"
-                        required>
-                      </json-field>
-                    </div>
+    
+                        <json-field
+                          class="item validate"
+                          type="[[data.blueprint.display_type]]"
+                          label="Target"
+                          on-input="_validate"
+                          value="{{data.target}}"
+                          allowed-pattern="[+\-\d]"
+                          required>
+                        </json-field>
+                      </div>
+                    </template>
+                  </div>
+
+                  <div class="item full-width">
+                    <template
+                      is="dom-if"
+                      if="[[!isNumber]]"
+                      restamp="true">
+                      <div class="app-grid double">
+                        <json-field
+                          class="item validate pair"
+                          type="[[data.blueprint.display_type]]"
+                          label="Baseline"
+                          on-input="_validate"
+                          value="{{data.baseline}}"
+                          allowed-pattern="[+\-\d]">
+                        </json-field>
+    
+                        <json-field
+                          class="item validate pair"
+                          type="[[data.blueprint.display_type]]"
+                          label="Target"
+                          on-input="_validate"
+                          value="{{data.target}}"
+                          allowed-pattern="[+\-\d]"
+                          required>
+                        </json-field>
+                      </div>
+                    </template>
                   </div>
   
                   <div class="item full-width">
@@ -986,18 +1014,20 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName !== 'PAPER-DIALOG') {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('mode', '');
+
+          this.set('selectedCluster', '');
+          this.set('selectedObjective', '');
+          this.set('selectedIndicator', '');
+          this.set('selectedIndicatorDetailType', '');
+          
+          this.close();
+        } else {
           return;
         }
-
-        this.set('mode', '');
-
-        this.set('selectedCluster', '');
-        this.set('selectedObjective', '');
-        this.set('selectedIndicator', '');
-        this.set('selectedIndicatorDetailType', '');
-        
-        this.close();
       },
     });
   </script>
