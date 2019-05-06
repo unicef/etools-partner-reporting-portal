@@ -106,6 +106,9 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
+    "modulePathIgnorePatterns": [
+      "node_modules"
+    ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web"
     },
