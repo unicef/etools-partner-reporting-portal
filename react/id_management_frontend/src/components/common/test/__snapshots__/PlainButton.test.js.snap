@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PlainButton component renders button and calls click 1`] = `
+<PlainButton
+  classes={
+    Object {
+      "button": "PlainButton-button-1",
+    }
+  }
+>
+  <Component />
+</PlainButton>
+`;

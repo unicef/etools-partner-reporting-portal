@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SmallText component renders the component 1`] = `
+<SmallText
+  block={false}
+  classes={
+    Object {
+      "block": "SmallText-block-2 block",
+      "text": "SmallText-text-1 text",
+    }
+  }
+  gutterBottom={false}
+  label={false}
+>
+  <div />
+</SmallText>
+`;

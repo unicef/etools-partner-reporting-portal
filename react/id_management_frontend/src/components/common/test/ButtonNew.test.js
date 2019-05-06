@@ -6,7 +6,6 @@ import ButtonNew from '../ButtonNew';
 describe('ButtonNew component', () => {
     it('renders ButtonNew component and calls click', () => {
         const onClick = jest.fn();
-        const classes = {icon: "ButtonNew-icon-1"};
 
         const wrapper = shallow(<ButtonNew
             onClick={onClick}
