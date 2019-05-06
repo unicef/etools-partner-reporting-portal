@@ -9,6 +9,14 @@ steps:
         working_directory: ${{main_clone}}/react/id_management_frontend
         tag: ${{CF_BRANCH}}
 
+    composition_step:
+       type: composition
+       composition: 'unicef-prp-unit-tests'
+       composition_candidates:
+           test:
+               image: ${{build_id_management_react}}
+               command: bash -c "npm run test"
+
     push_to_hub:
         type: push
         title: Pushing id management react image to docker hub
