@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SmallValue component renders the component correctly 1`] = `
+<div>
+  <WithStyles(SmallText)
+    block={true}
+    label={true}
+  >
+    CoolText
+  </WithStyles(SmallText)>
+  <WithStyles(SmallText)
+    block={true}
+  >
+    CoolValue
+  </WithStyles(SmallText)>
+</div>
+`;
