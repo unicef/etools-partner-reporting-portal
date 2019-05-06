@@ -15,7 +15,9 @@ steps:
        composition_candidates:
            test:
                image: ${{build_id_management_react}}
-               command: bash -c "npm run test"
+               command: bash -c "npm run test -- --coverage"
+               environment:
+                  - CI=true
 
     push_to_hub:
         type: push
