@@ -788,7 +788,7 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
     file_name = serializers.SerializerMethodField()
-    path = serializers.FileField(source='file')
+    path = serializers.FileField(source='file', max_length=500)
 
     def get_file_name(self, obj):
         return obj.file.name.split('/')[-1] if obj.file else None
