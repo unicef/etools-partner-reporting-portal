@@ -15,7 +15,7 @@ steps:
        composition_candidates:
            test:
                image: ${{build_id_management_react}}
-               command: bash -c "npm run test -- --coverage"
+               command: bash -c "npm run test -- --coverage --updateSnapshot"
                environment:
                   - CI=true
 
