@@ -600,9 +600,7 @@ class IndicatorReport(TimeStampedModel):
         default=OVERALL_STATUS.no_status,
         max_length=3
     )
-    narrative_assessment = models.CharField(max_length=255,
-                                            null=True,
-                                            blank=True)
+    narrative_assessment = models.TextField(null=True, blank=True)
 
     review_date = models.DateField(verbose_name='Review Date',
                                    blank=True,
