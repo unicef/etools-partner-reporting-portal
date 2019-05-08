@@ -23,7 +23,7 @@ describe('TooltipIcon component', () => {
             tooltipProps={tooltipProps}
         />);
 
-        expect(wrapper.dive()).toBeTruthy();
+        expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });
 });
