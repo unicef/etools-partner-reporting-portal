@@ -1,8 +1,9 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import {PaginatedList,
-    mapStateToProps} from '../PaginatedList';
+    mapStateToProps,
+    mapDispatchToProps} from '../PaginatedList';
 
 describe('PaginatedList component', () => {
     const columns = [];
@@ -57,5 +58,14 @@ describe('PaginatedList component', () => {
         const map = mapStateToProps(state);
 
         expect(map).toEqual(state);
+    });
+
+    it('runs mapDispatchToProps correctly', () => {
+        const test = item => item;
+        const id = 5;
+        const disp = mapDispatchToProps(test);
+        const result = {'ids': 5, 'type': 'EXPANDED_ROW_IDS'};
+
+        expect(disp.dispatchExpandedRowIds(id)).toEqual(result);
     });
 });
