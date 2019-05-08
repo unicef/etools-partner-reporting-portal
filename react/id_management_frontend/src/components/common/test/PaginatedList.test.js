@@ -1,6 +1,7 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
+import {PagingState} from '@devexpress/dx-react-grid';
 import {PaginatedList,
     mapStateToProps,
     mapDispatchToProps} from '../PaginatedList';
@@ -9,7 +10,7 @@ describe('PaginatedList component', () => {
     const columns = [];
     const columnExtensions = [];
     const alternativeSorting = [];
-    const data = {};
+    const data = {results: []};
     const expandedCell = jest.fn();
     const page = 451;
     const onPageChange = jest.fn();
@@ -61,11 +62,38 @@ describe('PaginatedList component', () => {
     });
 
     it('runs mapDispatchToProps correctly', () => {
-        const test = item => item;
+        const dispatch = item => item;
         const id = 5;
-        const disp = mapDispatchToProps(test);
+        const dispatched = mapDispatchToProps(dispatch);
         const result = {'ids': 5, 'type': 'EXPANDED_ROW_IDS'};
 
-        expect(disp.dispatchExpandedRowIds(id)).toEqual(result);
+        expect(dispatched.dispatchExpandedRowIds(id)).toEqual(result);
+    });
+
+    it('runs onPageChange correctly', () => {
+        const wrapper = mount(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+        />);
+
+        expect(wrapper.find(PagingState).prop('currentPage')).toBe(450);
+        wrapper.find(PagingState).prop('onCurrentPageChange')();
+
+        const calls = onPageChange.mock.calls;
+
+        expect(calls.length).toBe(1);
     });
 });
