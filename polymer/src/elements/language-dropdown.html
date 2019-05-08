@@ -108,14 +108,10 @@
       },
 
       _languageSelected: function(e) {
-        console.log('all languages', this.availableLanguages);
-        console.log('current', this.current);
         var allLanguages = Object.keys(this.availableLanguages);
-        console.log('list', allLanguages);
 
         if (allLanguages.includes(this.current) === false) {
-          console.log('not found!');
-          // this.set('current', 'en');
+          this.dispatch(App.Actions.Localize.set('en'));
         }
 
         var newLanguage = this.$.repeat.itemForElement(e.detail.item);
