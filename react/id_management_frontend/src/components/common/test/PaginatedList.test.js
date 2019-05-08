@@ -2,6 +2,7 @@ import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import {PagingState} from '@devexpress/dx-react-grid';
+import {TableRowDetail} from "@devexpress/dx-react-grid-material-ui";
 import {PaginatedList,
     mapStateToProps,
     mapDispatchToProps} from '../PaginatedList';
@@ -70,29 +71,21 @@ describe('PaginatedList component', () => {
         expect(dispatched.dispatchExpandedRowIds(id)).toEqual(result);
     });
 
-    it('runs onPageChange correctly', () => {
-        const wrapper = mount(<PaginatedList
-            columns={columns}
-            columnExtensions={columnExtensions}
-            data={data}
-            expandedCell={expandedCell}
-            page={page}
-            onPageChange={onPageChange}
-            onDelete={onDelete}
-            showDelete={showDelete}
-            showRestore={showRestore}
-            allowSorting={allowSorting}
-            loading={loading}
-            onEdit={onEdit}
-            showEdit={showEdit}
-            onExpandedRowIdsChange={onExpandedRowIdsChange}
-            classes={classes}
-        />);
-
+    it('runs onPageChange function when onCurrentPageChange prop is called', () => {
         expect(wrapper.find(PagingState).prop('currentPage')).toBe(450);
         wrapper.find(PagingState).prop('onCurrentPageChange')();
 
         const calls = onPageChange.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
+
+    it('runs expandedCell function when contentComponent prop is called', () => {
+        const row = {row: 5};
+
+        wrapper.find(TableRowDetail).prop('contentComponent')({row});
+
+        const calls = expandedCell.mock.calls;
 
         expect(calls.length).toBe(1);
     });
