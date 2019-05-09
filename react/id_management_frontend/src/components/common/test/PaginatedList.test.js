@@ -10,7 +10,11 @@ import {PaginatedList,
 describe('PaginatedList component', () => {
     const columns = [];
     const columnExtensions = [];
-    const alternativeSorting = [];
+    const alternativeSorting = [
+        {orderingNames: ['Levine', 'Rowling']},
+        {orderingNames: ['Pope', 'Ma']},
+        {orderingNames: ['Snicket', 'Davis']},
+    ];
     const data = {results: []};
     const expandedCell = jest.fn();
     const page = 451;
@@ -24,10 +28,12 @@ describe('PaginatedList component', () => {
     const showEdit = false;
     const onExpandedRowIdsChange = jest.fn();
     const classes = {};
+    const sorting = [{columnName: 'Druckmann'}, {columnName: 'Pope'}, {columnName: 'Miyazaki'}];
 
     const wrapper = shallow(<PaginatedList
         columns={columns}
         columnExtensions={columnExtensions}
+        alternativeSorting={alternativeSorting}
         data={data}
         expandedCell={expandedCell}
         page={page}
@@ -41,6 +47,7 @@ describe('PaginatedList component', () => {
         showEdit={showEdit}
         onExpandedRowIdsChange={onExpandedRowIdsChange}
         classes={classes}
+        sorting={sorting}
     />);
 
     it('renders the component', () => {
@@ -84,9 +91,15 @@ describe('PaginatedList component', () => {
         const row = {row: 5};
 
         wrapper.find(TableRowDetail).prop('contentComponent')({row});
-
         const calls = expandedCell.mock.calls;
 
         expect(calls.length).toBe(1);
+    });
+
+    it('runs computeInnerSorting correctly when alternativeSorting is truthy', () => {
+        const instance = wrapper.instance();
+
+        const sorted = instance.computeInnerSorting(sorting);
+        expect(sorted).toEqual([{columnName: 'Druckmann'}, {columnName: 'Miyazaki'}]);
     });
 });
