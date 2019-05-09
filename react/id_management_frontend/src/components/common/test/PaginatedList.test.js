@@ -28,7 +28,7 @@ describe('PaginatedList component', () => {
     const showEdit = false;
     const onExpandedRowIdsChange = jest.fn();
     const classes = {};
-    const sorting = [{columnName: 'Druckmann'}, {columnName: 'Pope'}, {columnName: 'Miyazaki'}];
+    const sorting = [{columnName: 'Druckmann'}, {columnName: 'Pope', direction: 'Dinn'}, {columnName: 'Miyazaki'}];
 
     const wrapper = shallow(<PaginatedList
         columns={columns}
@@ -127,5 +127,38 @@ describe('PaginatedList component', () => {
         const sorted = instance.computeInnerSorting(sorting);
 
         expect(sorted).toEqual(sorted);
+    });
+
+    it('runs computeInnerSorting correctly when length for alternativeSorting items are 1', () => {
+        const alternativeSorting = [
+            {orderingNames: ['Levine']},
+            {orderingNames: ['Pope'], columnName: 'Lucas'},
+            {orderingNames: ['Snicket']},
+        ];
+
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+        />);
+
+        const instance = wrapper.instance();
+        const sorted = instance.computeInnerSorting(sorting);
+
+        expect(sorted).toEqual([{columnName: 'Druckmann'}, {columnName: 'Lucas', direction: 'Dinn'}, {columnName: 'Miyazaki'}]);
     });
 });
