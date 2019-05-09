@@ -5,8 +5,10 @@
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
 <link rel="import" href="planned-action/router.html">
@@ -52,7 +54,7 @@ planned-action-projects-router.
 
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
-        <page-header title="My Planned Action">
+        <page-header title="[[localize('my_planned_action')]]">
           <div class="toolbar horizontal end-justified layout">
             <filter-list-by-cluster></filter-list-by-cluster>
           </div>
@@ -95,6 +97,9 @@ planned-action-projects-router.
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       observers: [
