@@ -1,8 +1,8 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
-import {PagingState, SortingState} from '@devexpress/dx-react-grid';
-import {TableRowDetail} from "@devexpress/dx-react-grid-material-ui";
+import {PagingState} from '@devexpress/dx-react-grid';
+import {TableRowDetail, TableEditRow} from "@devexpress/dx-react-grid-material-ui";
 import {PaginatedList,
     mapStateToProps,
     mapDispatchToProps} from '../PaginatedList';
@@ -211,5 +211,41 @@ describe('PaginatedList component', () => {
         const calls = onExpandedRowIdsChange.mock.calls;
 
         expect(calls.length).toBe(1);
+    });
+
+    it('runs editCell correctly', () => {
+        const row = {};
+
+        const wrapper = mount(<PaginatedList
+            columns={columns}
+            row={row}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            dispatchExpandedRowIds={dispatchExpandedRowIds}
+        />);
+
+        const instance = wrapper.instance();
+        const tableRow = instance.editCell(showEdit, showDelete, showRestore)(row);
+        const children = [showEdit, showDelete, showRestore];
+        const onValueChange = () => {};
+
+        const cell = <TableEditRow.Cell onValueChange={onValueChange}>{children}</TableEditRow.Cell>;
+
+        expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
     });
 });
