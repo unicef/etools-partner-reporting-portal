@@ -102,4 +102,30 @@ describe('PaginatedList component', () => {
         const sorted = instance.computeInnerSorting(sorting);
         expect(sorted).toEqual([{columnName: 'Druckmann'}, {columnName: 'Miyazaki'}]);
     });
+
+    it('runs computeInnerSorting correctly wnen alternativeSorting is falsy', () => {
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+        />);
+
+        const instance = wrapper.instance();
+        const sorted = instance.computeInnerSorting(sorting);
+
+        expect(sorted).toEqual(sorted);
+    });
 });
