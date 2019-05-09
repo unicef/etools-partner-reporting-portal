@@ -3,8 +3,10 @@
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/cluster-reporting/analysis/analysis-filters.html">
@@ -30,7 +32,7 @@
         data="{{routeData}}">
     </app-route>
 
-    <page-header title="Analysis"></page-header>
+    <page-header title="[[localize('analysis')]]"></page-header>
 
     <page-body>
       <analysis-filters></analysis-filters>
@@ -73,6 +75,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
