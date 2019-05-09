@@ -30,6 +30,7 @@ describe('PaginatedList component', () => {
     const classes = {};
     const sorting = [{columnName: 'Druckmann'}, {columnName: 'Pope', direction: 'Dinn'}, {columnName: 'Miyazaki'}];
     const onSortingChange = jest.fn();
+    const differentSortingChange = jest.fn();
 
     const wrapper = shallow(<PaginatedList
         columns={columns}
@@ -164,11 +165,38 @@ describe('PaginatedList component', () => {
         expect(sorted).toEqual([{columnName: 'Druckmann'}, {columnName: 'Lucas', direction: 'Dinn'}, {columnName: 'Miyazaki'}]);
     });
 
-    it('runs sortingChange corrently when alternativeSorting is truthy', () => {
+    it('runs sortingChange correctly when alternativeSorting is truthy', () => {
         const instance = wrapper.instance();
-        const changed = instance.sortingChange(sorting);
-
+        instance.sortingChange(sorting);
         const calls = onSortingChange.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
+
+    it('runs sortingchange correctly when alterrnativeSorting is falsy', () => {
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+            onSortingChange={differentSortingChange}
+        />);
+
+        const instance = wrapper.instance();
+        instance.sortingChange(sorting);
+        const calls = differentSortingChange.mock.calls;
 
         expect(calls.length).toBe(1);
     });
