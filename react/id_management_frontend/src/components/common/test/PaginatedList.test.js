@@ -1,7 +1,7 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
-import {PagingState} from '@devexpress/dx-react-grid';
+import {PagingState, SortingState} from '@devexpress/dx-react-grid';
 import {TableRowDetail} from "@devexpress/dx-react-grid-material-ui";
 import {PaginatedList,
     mapStateToProps,
@@ -29,6 +29,7 @@ describe('PaginatedList component', () => {
     const onExpandedRowIdsChange = jest.fn();
     const classes = {};
     const sorting = [{columnName: 'Druckmann'}, {columnName: 'Pope', direction: 'Dinn'}, {columnName: 'Miyazaki'}];
+    const onSortingChange = jest.fn();
 
     const wrapper = shallow(<PaginatedList
         columns={columns}
@@ -48,6 +49,7 @@ describe('PaginatedList component', () => {
         onExpandedRowIdsChange={onExpandedRowIdsChange}
         classes={classes}
         sorting={sorting}
+        onSortingChange={onSortingChange}
     />);
 
     it('renders the component', () => {
@@ -160,5 +162,14 @@ describe('PaginatedList component', () => {
         const sorted = instance.computeInnerSorting(sorting);
 
         expect(sorted).toEqual([{columnName: 'Druckmann'}, {columnName: 'Lucas', direction: 'Dinn'}, {columnName: 'Miyazaki'}]);
+    });
+
+    it('runs sortingChange corrently when alternativeSorting is truthy', () => {
+        const instance = wrapper.instance();
+        const changed = instance.sortingChange(sorting);
+
+        const calls = onSortingChange.mock.calls;
+
+        expect(calls.length).toBe(1);
     });
 });
