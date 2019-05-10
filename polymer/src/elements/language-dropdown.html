@@ -92,6 +92,11 @@
           computed: '_computeLanguage(data, current)',
         },
 
+        availableLanguages: {
+          type: Object,
+          statePath: 'localize.resources',
+        },
+
         selected: {
           type: Number,
           value: 0,
@@ -103,6 +108,12 @@
       },
 
       _languageSelected: function(e) {
+        var allLanguages = Object.keys(this.availableLanguages);
+
+        if (allLanguages.includes(this.current) === false) {
+          this.dispatch(App.Actions.Localize.set('en'));
+        }
+
         var newLanguage = this.$.repeat.itemForElement(e.detail.item);
 
         if (newLanguage === this.current) {

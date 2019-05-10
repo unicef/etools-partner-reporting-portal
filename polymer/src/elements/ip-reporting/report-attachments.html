@@ -254,6 +254,12 @@
 
         var files = isEmpty ? [] : change.base;
 
+        files.forEach(function (file) {
+          if (/\s/.test(file.file_name)) {
+            file.file_name = file.file_name.replace(/ /g, '_');
+          }
+        });
+
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
         if (isEmpty || (!isEmpty && attachment.path !== null)) {

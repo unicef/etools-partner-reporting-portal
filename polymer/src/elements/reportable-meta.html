@@ -282,6 +282,9 @@
       },
 
       detached: function () {
+        this.set(['localData', 'narrative_assessment'],
+          Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('input').value);
+        
         if (this.isDebouncerActive('local-data-changed')) {
           this.cancelDebouncer('local-data-changed');
         }
