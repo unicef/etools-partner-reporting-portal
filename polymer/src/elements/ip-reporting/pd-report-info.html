@@ -237,17 +237,13 @@
         var self = this;
         var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
 
-        var changedFields = PdReportInfoUtils.handleInput(
-          textInputs,
-          self.data.partner_contribution_to_date,
-          self.data.challenges_in_the_reporting_period,
-          self.data.proposed_way_forward
-        );
+        textInputs.forEach(function (input) {
+          var field = input.querySelector('input');
 
-        changedFields.forEach(function(field) {
-          if (field !== undefined) {
-            self.set(['localData', field.id], field.value.trim());
-          }
+          console.log('field id', field.id);
+          console.log('field value', field.value.trim());
+
+          self.set(['localData', field.id], field.value.trim());
         });
       },
 
@@ -259,23 +255,27 @@
           return;
         }
 
-        var updateThunk = this.$.update.thunk();
-
-        this.$.update.abort();
-
-        this.dispatch(
-          App.Actions.PDReports.update(
-            updateThunk,
-            this.pdId,
-            this.reportId
+        this.debounce('update-data', function () {
+          console.log('body', this.$.update.body);
+  
+          var updateThunk = this.$.update.thunk();
+  
+          this.$.update.abort();
+  
+          this.dispatch(
+            App.Actions.PDReports.update(
+              updateThunk,
+              this.pdId,
+              this.reportId
+            )
           )
-        )
             .then(function () {
               self._notifyChangesSaved();
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+        }, 100);
       },
 
       _computeUpdateUrl: function (locationId, reportId) {
