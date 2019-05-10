@@ -240,9 +240,6 @@
         textInputs.forEach(function (input) {
           var field = input.querySelector('input');
 
-          console.log('field id', field.id);
-          console.log('field value', field.value.trim());
-
           self.set(['localData', field.id], field.value.trim());
         });
       },
@@ -256,8 +253,6 @@
         }
 
         this.debounce('update-data', function () {
-          console.log('body', this.$.update.body);
-  
           var updateThunk = this.$.update.thunk();
   
           this.$.update.abort();
