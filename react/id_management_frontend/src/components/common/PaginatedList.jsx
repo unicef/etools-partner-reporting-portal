@@ -60,19 +60,19 @@ const TableRow = ({row, ...restProps}) => (
     />
 );
 
-const DeleteButton = ({onClick}) => (
+export const DeleteButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Delete row">
         <Close/>
     </IconButton>
 );
 
-const EditButton = ({onClick}) => (
+export const EditButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Edit row">
         <Edit/>
     </IconButton>
 );
 
-const RestoreButton = ({onClick}) => (
+export const RestoreButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Restore row">
         <Restore/>
     </IconButton>

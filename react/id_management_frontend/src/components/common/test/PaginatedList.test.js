@@ -4,6 +4,9 @@ import toJSON from 'enzyme-to-json';
 import {PagingState} from '@devexpress/dx-react-grid';
 import {TableRowDetail, TableEditRow} from "@devexpress/dx-react-grid-material-ui";
 import {PaginatedList,
+    EditButton,
+    DeleteButton,
+    RestoreButton,
     mapStateToProps,
     mapDispatchToProps} from '../PaginatedList';
 
@@ -32,6 +35,7 @@ describe('PaginatedList component', () => {
     const onSortingChange = jest.fn();
     const differentSortingChange = jest.fn();
     const dispatchExpandedRowIds = jest.fn();
+    const onRestore = jest.fn();
 
     const wrapper = shallow(<PaginatedList
         columns={columns}
@@ -213,7 +217,7 @@ describe('PaginatedList component', () => {
         expect(calls.length).toBe(1);
     });
 
-    it('runs editCell correctly', () => {
+    it('runs editCell correctly when attributes are falsy', () => {
         const row = {};
 
         const wrapper = mount(<PaginatedList
@@ -245,6 +249,50 @@ describe('PaginatedList component', () => {
         const onValueChange = () => {};
 
         const cell = <TableEditRow.Cell onValueChange={onValueChange}>{children}</TableEditRow.Cell>;
+
+        expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
+    });
+
+    it('runs editCell correctly when attributes are truthy', () => {
+        const row = {row: {canBeDeleted: true, canBeRestored: true}};
+        const showEdit = true;
+        const showDelete = true;
+        const showRestore = true;
+
+        const wrapper = mount(<PaginatedList
+            columns={columns}
+            row={row}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            dispatchExpandedRowIds={dispatchExpandedRowIds}
+            onRestore={onRestore}
+        />);
+
+        const instance = wrapper.instance();
+        const tableRow = instance.editCell(showEdit, showDelete, showRestore)(row);
+        const children = [showEdit, showDelete, showRestore];
+        const onValueChange = () => {};
+
+        const cell = <TableEditRow.Cell onValueChange={onValueChange}>
+            <EditButton onClick={() => onEdit(row)}/>
+            <DeleteButton onClick={() => onDelete(row)}/>
+            <RestoreButton onClick={() => onRestore(row)}/>
+        </TableEditRow.Cell>;
 
         expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
     });
