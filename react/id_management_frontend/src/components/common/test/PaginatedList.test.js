@@ -285,7 +285,7 @@ describe('PaginatedList component', () => {
 
         const instance = wrapper.instance();
         const tableRow = instance.editCell(showEdit, showDelete, showRestore)(row);
-        const children = [showEdit, showDelete, showRestore];
+        const tableWrapper = wrapper.wrap(tableRow);
         const onValueChange = () => {};
 
         const cell = <TableEditRow.Cell onValueChange={onValueChange}>
@@ -294,6 +294,11 @@ describe('PaginatedList component', () => {
             <RestoreButton onClick={() => onRestore(row)}/>
         </TableEditRow.Cell>;
 
+        console.log(tableWrapper.debug());
+        tableWrapper.find(EditButton).simulate('click');
+        const calls = onEdit.mock.calls;
+
+        expect(calls.length).toBe(1);
         expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
     });
 });
