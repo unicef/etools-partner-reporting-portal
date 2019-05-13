@@ -246,6 +246,37 @@ describe('PaginatedList component', () => {
         expect(calls.length).toBe(1);
     });
 
+    it('runs onExpandedRowIdsChange correctly when onExpandedRowIdsChange is falsy', () => {
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            classes={classes}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            dispatchExpandedRowIds={dispatchExpandedRowIds}
+        />);
+
+        const instance = wrapper.instance();
+        const ids = 1;
+        instance.onExpandedRowIdsChange(ids);
+
+        const calls = dispatchExpandedRowIds.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
+
     it('runs editCell correctly when attributes are falsy', () => {
         const row = {};
 
@@ -392,13 +423,22 @@ describe('PaginatedList component', () => {
         expect(calls.length).toBe(1);
     });
 
-    it('renders the Table.Row component correctly', () => {
-        const row = {row: {}};
+    it('renders the Table.Row component correctly when row.highlight is false', () => {
+        const row = {row: {highlight: false}};
         const restProps = {page: 451, onDelete: jest.fn()};
 
         const tableRow = shallow(TableRow(row, restProps));
         expect(tableRow.length).toBe(1);
         expect(tableRow.prop('style')).toEqual({});
+    });
+
+    it('renders the Table.Row component correctly when row.highlight is true', () => {
+        const row = {row: {highlight: true}};
+        const restProps = {page: 451, onDelete: jest.fn()};
+
+        const tableRow = shallow(TableRow(row, restProps));
+        expect(tableRow.length).toBe(1);
+        expect(tableRow.prop('style')).toEqual({backgroundColor: '#ffe0b2'});
     });
 
     it('runs the styleSheet function correctly', () => {
