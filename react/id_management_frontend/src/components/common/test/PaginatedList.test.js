@@ -243,14 +243,9 @@ describe('PaginatedList component', () => {
             dispatchExpandedRowIds={dispatchExpandedRowIds}
         />);
 
-        const instance = wrapper.instance();
-        const tableRow = instance.editCell(showEdit, showDelete, showRestore)(row);
-        const children = [showEdit, showDelete, showRestore];
-        const onValueChange = () => {};
+        const tableRow = shallow(wrapper.instance().editCell(showEdit, showDelete, showRestore)(row));
 
-        const cell = <TableEditRow.Cell onValueChange={onValueChange}>{children}</TableEditRow.Cell>;
-
-        expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
+        expect(tableRow.children().length).toBe(0);
     });
 
     it('runs editCell and calls clicks correctly when attributes are truthy', () => {
@@ -284,13 +279,6 @@ describe('PaginatedList component', () => {
         />);
 
         const tableRow = shallow(wrapper.instance().editCell(showEdit, showDelete, showRestore)(row));
-        const onValueChange = () => {};
-
-        const cell = <TableEditRow.Cell onValueChange={onValueChange}>
-            <EditButton onClick={() => onEdit(row)}/>
-            <DeleteButton onClick={() => onDelete(row)}/>
-            <RestoreButton onClick={() => onRestore(row)}/>
-        </TableEditRow.Cell>;
 
         tableRow.find(EditButton).simulate('click');
         const editCalls = onEdit.mock.calls;
@@ -302,5 +290,40 @@ describe('PaginatedList component', () => {
         expect(editCalls.length).toBe(1);
         expect(deleteCalls.length).toBe(1);
         expect(restoreCalls.length).toBe(1);
+    });
+
+    it('runs editCell and has the correct number of child components based on boolean props', () => {
+        const row = {row: {canBeDeleted: true, canBeRestored: true}};
+        const showEdit = false;
+        const showDelete = true;
+        const showRestore = true;
+
+        const wrapper = mount(<PaginatedList
+            columns={columns}
+            row={row}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            classes={classes}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            dispatchExpandedRowIds={dispatchExpandedRowIds}
+            onRestore={onRestore}
+        />);
+
+        const tableRow = shallow(wrapper.instance().editCell(showEdit, showDelete, showRestore)(row));
+
+        expect(tableRow.children().length).toBe(2);
     });
 });
