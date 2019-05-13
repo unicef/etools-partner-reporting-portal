@@ -28,4 +28,14 @@ describe('AddPermissionsDialog component', () => {
         expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });
+
+    it('calls onClose method correctly', () => {
+        wrapper.instance().onClose();
+
+        const closeCalls = onClose.mock.calls;
+        const resetCalls = reset.mock.calls;
+
+        expect(closeCalls.length).toBe(1);
+        expect(resetCalls.length).toBe(1);
+    });
 });
