@@ -11,6 +11,7 @@ import {styleSheet,
     RestoreButton,
     mapStateToProps,
     mapDispatchToProps} from '../PaginatedList';
+import LoadingIndicator from "../LoadingIndicator";
 
 describe('PaginatedList component', () => {
     const columns = [];
@@ -247,6 +248,8 @@ describe('PaginatedList component', () => {
     });
 
     it('runs onExpandedRowIdsChange correctly when onExpandedRowIdsChange is falsy', () => {
+        const dispatchExpandedRowIds = jest.fn();
+
         const wrapper = shallow(<PaginatedList
             columns={columns}
             columnExtensions={columnExtensions}
@@ -460,5 +463,29 @@ describe('PaginatedList component', () => {
         };
 
         expect(style).toEqual(sheet);
+    });
+
+    it('returns the LoadingIndicator component when loading is true', () => {
+        const loading = true;
+
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            classes={classes}
+            sorting={sorting}
+        />);
+
+        expect(wrapper.find(LoadingIndicator)).toBeTruthy();
     });
 });
