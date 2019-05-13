@@ -326,4 +326,40 @@ describe('PaginatedList component', () => {
 
         expect(tableRow.children().length).toBe(2);
     });
+
+    it('renders the EditButton component correctly', () => {
+        const onClick = jest.fn();
+        const wrapper = shallow(<EditButton
+            onClick={onClick}
+        />);
+
+        wrapper.simulate('click');
+        const calls = onClick.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
+
+    it('renders the DeleteButton component correctly', () => {
+        const onClick = jest.fn();
+        const wrapper = shallow(<DeleteButton
+            onClick={onClick}
+        />);
+
+        wrapper.simulate('click');
+        const calls = onClick.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
+
+    it('renders the RestoreButton component correctly', () => {
+        const onClick = jest.fn();
+        const wrapper = shallow(<RestoreButton
+            onClick={onClick}
+        />);
+
+        wrapper.simulate('click');
+        const calls = onClick.mock.calls;
+
+        expect(calls.length).toBe(1);
+    });
 });
