@@ -174,6 +174,33 @@ describe('PaginatedList component', () => {
     });
 
     it('runs sortingChange correctly when alternativeSorting is truthy', () => {
+        const alternativeSorting = [
+            {orderingNames: ['Levine']},
+            {orderingNames: ['Pope'], columnName: 'Lucas'},
+            {orderingNames: ['Snicket']},
+        ];
+        const sorting = [{columnName: 'Druckmann'}, {columnName: 'Lucas', direction: 'Dinn'}, {columnName: 'Miyazaki'}];
+
+        const wrapper = shallow(<PaginatedList
+            columns={columns}
+            columnExtensions={columnExtensions}
+            alternativeSorting={alternativeSorting}
+            data={data}
+            expandedCell={expandedCell}
+            page={page}
+            onPageChange={onPageChange}
+            onDelete={onDelete}
+            showDelete={showDelete}
+            showRestore={showRestore}
+            allowSorting={allowSorting}
+            loading={loading}
+            onEdit={onEdit}
+            showEdit={showEdit}
+            onExpandedRowIdsChange={onExpandedRowIdsChange}
+            onSortingChange={onSortingChange}
+            classes={classes}
+            sorting={sorting}
+        />);
         const instance = wrapper.instance();
         instance.sortingChange(sorting);
         const calls = onSortingChange.mock.calls;
