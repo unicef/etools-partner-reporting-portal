@@ -30,7 +30,7 @@ import orange from "@material-ui/core/colors/orange";
 
 const allowedPageSizes = [5, 10, 15];
 
-const styleSheet = (theme) => {
+export const styleSheet = (theme) => {
     const paddingSmall = theme.spacing.unit * 2;
     const paddingBig = theme.spacing.unit * 3;
 
@@ -53,7 +53,7 @@ const highlightStyle = {
     backgroundColor: orange[100]
 };
 
-const TableRow = ({row, ...restProps}) => (
+export const TableRow = ({row, ...restProps}) => (
     <Table.Row
         {...restProps}
         style={row.highlight ? highlightStyle : {}}

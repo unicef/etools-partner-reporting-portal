@@ -4,6 +4,7 @@ import toJSON from 'enzyme-to-json';
 import {PagingState} from '@devexpress/dx-react-grid';
 import {TableRowDetail, TableEditRow} from "@devexpress/dx-react-grid-material-ui";
 import {PaginatedList,
+    TableRow,
     EditButton,
     DeleteButton,
     RestoreButton,
@@ -361,5 +362,14 @@ describe('PaginatedList component', () => {
         const calls = onClick.mock.calls;
 
         expect(calls.length).toBe(1);
+    });
+
+    it('renders the Table.Row component correctly', () => {
+        const row = {row: {}};
+        const restProps = {page: 451, onDelete: jest.fn()};
+
+        const tableRow = shallow(TableRow(row, restProps));
+        expect(tableRow.length).toBe(1);
+        expect(tableRow.prop('style')).toEqual({});
     });
 });
