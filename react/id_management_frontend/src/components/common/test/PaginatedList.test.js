@@ -253,7 +253,7 @@ describe('PaginatedList component', () => {
         expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
     });
 
-    it('runs editCell correctly when attributes are truthy', () => {
+    it('runs editCell and calls clicks correctly when attributes are truthy', () => {
         const row = {row: {canBeDeleted: true, canBeRestored: true}};
         const showEdit = true;
         const showDelete = true;
@@ -283,9 +283,7 @@ describe('PaginatedList component', () => {
             onRestore={onRestore}
         />);
 
-        const instance = wrapper.instance();
-        const tableRow = instance.editCell(showEdit, showDelete, showRestore)(row);
-        const tableWrapper = wrapper.wrap(tableRow);
+        const tableRow = shallow(wrapper.instance().editCell(showEdit, showDelete, showRestore)(row));
         const onValueChange = () => {};
 
         const cell = <TableEditRow.Cell onValueChange={onValueChange}>
@@ -294,11 +292,15 @@ describe('PaginatedList component', () => {
             <RestoreButton onClick={() => onRestore(row)}/>
         </TableEditRow.Cell>;
 
-        console.log(tableWrapper.debug());
-        tableWrapper.find(EditButton).simulate('click');
-        const calls = onEdit.mock.calls;
+        tableRow.find(EditButton).simulate('click');
+        const editCalls = onEdit.mock.calls;
+        tableRow.find(DeleteButton).simulate('click');
+        const deleteCalls = onDelete.mock.calls;
+        tableRow.find(RestoreButton).simulate('click');
+        const restoreCalls = onRestore.mock.calls;
 
-        expect(calls.length).toBe(1);
-        expect(JSON.stringify(tableRow)).toBe(JSON.stringify(cell));
+        expect(editCalls.length).toBe(1);
+        expect(deleteCalls.length).toBe(1);
+        expect(restoreCalls.length).toBe(1);
     });
 });
