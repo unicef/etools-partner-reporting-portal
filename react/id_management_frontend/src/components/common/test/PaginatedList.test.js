@@ -3,8 +3,9 @@ import {shallow, mount} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import {PagingState} from '@devexpress/dx-react-grid';
 import {TableRowDetail, TableEditRow} from "@devexpress/dx-react-grid-material-ui";
-import {PaginatedList,
+import {styleSheet,
     TableRow,
+    PaginatedList,
     EditButton,
     DeleteButton,
     RestoreButton,
@@ -371,5 +372,26 @@ describe('PaginatedList component', () => {
         const tableRow = shallow(TableRow(row, restProps));
         expect(tableRow.length).toBe(1);
         expect(tableRow.prop('style')).toEqual({});
+    });
+
+    it('runs the styleSheet function correctly', () => {
+        const theme = {spacing: {unit: 5}, palette: {grey: {200: 'steelblue'}}};
+        const style = styleSheet(theme);
+
+        const sheet = {
+            container: {
+                marginTop: 15,
+                position: 'relative'
+            },
+            loading: {
+                backgroundColor: 'steelblue',
+                pointerEvents: 'none'
+            },
+            header: {
+                padding: '10px 0 10px 15px'
+            }
+        };
+
+        expect(style).toEqual(sheet);
     });
 });
