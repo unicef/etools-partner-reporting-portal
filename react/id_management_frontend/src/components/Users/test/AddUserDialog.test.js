@@ -2,6 +2,7 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import 'babel-polyfill';
+import SearchSelectForm from "../../form/SearchSelectForm";
 import {AddUserDialog, mapStateToProps} from '../AddUserDialog';
 
 jest.mock('../../../infrastructure/api', () => ({
@@ -71,5 +72,25 @@ describe('AddUserDialog component', () => {
 
         // FIX: hard to test because it relies on global Redux store
         expect(map).toEqual({user_type: undefined});
+    });
+
+    it('renders the correct child components with certain props', () => {
+        const portal = 'cluster-reporting';
+        const user_type = 'PARTNER';
+        
+        const wrapper = shallow(<AddUserDialog
+            handleSubmit={handleSubmit}
+            onClose={onClose}
+            onSave={onSave}
+            open={open}
+            partnerOptions={partnerOptions}
+            portal={portal}
+            reset={reset}
+            user={user}
+            user_type={user_type}
+        />);
+
+        expect(wrapper.find('SelectForm').props().fieldName).toBe('user_type');
+        expect(wrapper.find(SearchSelectForm).props().fieldName).toBe('partner');
     });
 });
