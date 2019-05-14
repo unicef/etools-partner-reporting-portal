@@ -7,7 +7,13 @@ import {AddUserDialog, mapStateToProps} from '../AddUserDialog';
 
 jest.mock('../../../infrastructure/api', () => ({
     api: {
-        post: jest.fn(() => Promise.resolve({data: 'success!'}))
+        post: jest.fn((url, data, params) => {
+            if(data === 'hello!') {
+                return Promise.resolve({data: 'success!'});
+            } else {
+                return Promise.resolve()
+            }
+        })
     }
 }));
 
@@ -58,9 +64,22 @@ describe('AddUserDialog component', () => {
         const closeCalls = onClose.mock.calls;
         const state = wrapper.state();
 
-        wrapper.instance().onSubmit({user_id: null})
-            .then(res => {
+        wrapper.instance().onSubmit('hello!')
+            .then(() => {
                 expect(saveCalls.length).toBe(1);
+                expect(closeCalls.length).toBe(1);
+                expect(state.loading).toBe(false);
+            });
+    });
+
+    it('does not call onSave when there is no res or res.data', () => {
+        const saveCalls = onSave.mock.calls;
+        const closeCalls = onClose.mock.calls;
+        const state = wrapper.state();
+
+        wrapper.instance().onSubmit()
+            .then(() => {
+                expect(saveCalls.length).toBe(0);
                 expect(closeCalls.length).toBe(1);
                 expect(state.loading).toBe(false);
             });
