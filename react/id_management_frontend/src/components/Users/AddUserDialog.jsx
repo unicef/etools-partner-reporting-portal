@@ -29,7 +29,7 @@ const labels = getLabels({
     saveAndContinue: "Save and continue",
 });
 
-class AddUserDialog extends Component {
+export class AddUserDialog extends Component {
     constructor(props) {
         super(props);
 
