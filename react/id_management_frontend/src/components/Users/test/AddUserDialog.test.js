@@ -2,7 +2,7 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import 'babel-polyfill';
-import {AddUserDialog} from '../AddUserDialog';
+import {AddUserDialog, mapStateToProps} from '../AddUserDialog';
 
 jest.mock('../../../infrastructure/api', () => ({
     api: {
@@ -63,5 +63,13 @@ describe('AddUserDialog component', () => {
                 expect(closeCalls.length).toBe(1);
                 expect(state.loading).toBe(false);
             });
+    });
+
+    it('calls mapStateToProps correctly', () => {
+        const state = {user_type: 'yay'};
+        const map = mapStateToProps(state);
+
+        // FIX: hard to test because it relies on global Redux store
+        expect(map).toEqual({user_type: undefined});
     });
 });

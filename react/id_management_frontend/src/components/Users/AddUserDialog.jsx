@@ -128,7 +128,7 @@ AddUserDialog.propTypes = {
     user_type: PropTypes.string
 };
 
-const mapStateToProps = (state) => {
+export const mapStateToProps = (state) => {
     return {
         user_type: selector(state, "user_type")
     }
