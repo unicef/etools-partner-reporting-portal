@@ -33,6 +33,10 @@ describe('AddPermissionsDialog component', () => {
         id={id}
     />);
 
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
     it('renders the component correctly', () => {
         expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
@@ -49,9 +53,15 @@ describe('AddPermissionsDialog component', () => {
     });
 
     it('calls onSubmit method correctly', () => {
+        const saveCalls = onSave.mock.calls;
+        const closeCalls = onClose.mock.calls;
+        const state = wrapper.state();
+
         wrapper.instance().onSubmit({user_id: null})
             .then(res => {
-                console.log(res);
-            })
+                expect(saveCalls.length).toBe(1);
+                expect(closeCalls.length).toBe(1);
+                expect(state.loading).toBe(false);
+            });
     });
 });
