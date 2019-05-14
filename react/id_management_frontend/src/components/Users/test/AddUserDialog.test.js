@@ -3,6 +3,8 @@ import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import 'babel-polyfill';
 import SearchSelectForm from "../../form/SearchSelectForm";
+import ButtonSubmit from "../../common/ButtonSubmit";
+import {EDITABLE_USER_TYPE_OPTIONS, USER_TYPE_OPTIONS} from "../../../constants";
 import {AddUserDialog, mapStateToProps} from '../AddUserDialog';
 
 jest.mock('../../../infrastructure/api', () => ({
@@ -109,7 +111,33 @@ describe('AddUserDialog component', () => {
             user_type={user_type}
         />);
 
+        expect(wrapper.find('SelectForm').props().values).toEqual(USER_TYPE_OPTIONS);
+        expect(wrapper.find(SearchSelectForm).props().options).toEqual([]);
+        expect(wrapper.find(ButtonSubmit).props().label).toBe('Save and continue');
+
         expect(wrapper.find('SelectForm').props().fieldName).toBe('user_type');
         expect(wrapper.find(SearchSelectForm).props().fieldName).toBe('partner');
+    });
+
+    it('renders child components with correct props when given other props', () => {
+        const portal = 'cluster-reporting';
+        const user_type = 'CLUSTER_ADMIN';
+        const user = {prp_roles: [{is_active: true, role: ''}]};
+        
+        const wrapper = shallow(<AddUserDialog
+            handleSubmit={handleSubmit}
+            onClose={onClose}
+            onSave={onSave}
+            open={open}
+            partnerOptions={partnerOptions}
+            portal={portal}
+            reset={reset}
+            user={user}
+            user_type={user_type}
+        />);
+
+        expect(wrapper.find(ButtonSubmit).props().label).toBe('Save');
+        expect(wrapper.find('SelectForm').props().values).toEqual([{label: 'Partner user', value: 'PARTNER'}]);
+        expect(wrapper.find('SelectForm').props().fieldName).toBe('user_type');
     });
 });
