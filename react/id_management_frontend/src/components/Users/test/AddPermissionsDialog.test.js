@@ -8,7 +8,7 @@ jest.mock('../../../infrastructure/api', () => ({
     api: {
         post: jest.fn(() => Promise.resolve({}))
     }
-}))
+}));
 
 describe('AddPermissionsDialog component', () => {
     const error = 'this is an error';

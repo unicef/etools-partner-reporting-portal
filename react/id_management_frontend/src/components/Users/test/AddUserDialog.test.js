@@ -1,7 +1,14 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 import toJSON from 'enzyme-to-json';
+import 'babel-polyfill';
 import {AddUserDialog} from '../AddUserDialog';
+
+jest.mock('../../../infrastructure/api', () => ({
+    api: {
+        post: jest.fn(() => Promise.resolve({data: 'success!'}))
+    }
+}));
 
 describe('AddUserDialog component', () => {
     const handleSubmit = jest.fn();
@@ -43,5 +50,18 @@ describe('AddUserDialog component', () => {
 
         expect(closeCalls.length).toBe(1);
         expect(resetCalls.length).toBe(1);
+    });
+
+    it('calls onSubmit method correctly', () => {
+        const saveCalls = onSave.mock.calls;
+        const closeCalls = onClose.mock.calls;
+        const state = wrapper.state();
+
+        wrapper.instance().onSubmit({user_id: null})
+            .then(res => {
+                expect(saveCalls.length).toBe(1);
+                expect(closeCalls.length).toBe(1);
+                expect(state.loading).toBe(false);
+            });
     });
 });
