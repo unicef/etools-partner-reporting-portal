@@ -225,7 +225,7 @@
                   options="[[_getLocations(locations, item.loc_type)]]"
                   option-value="id"
                   option-label="title"
-                  selected="[[item.location]]"
+                  selected="{{item.location}}"
                   on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
@@ -403,8 +403,6 @@
             var thunk = self.$.search;
             thunk.url = self.get('url');
 
-            console.log('event changed', event);
-
             thunk.params = {
               loc_type: loc_type,
               title: event.detail.value
@@ -510,7 +508,6 @@
             return;
           }
           this.set('searchLocationType', loc_type);
-          console.log('do we get here?');
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
@@ -562,7 +559,6 @@
         },
 
         _setLocations: function (loc_type, value) {
-          console.log('here again?');
           var newLocations = Object.assign({}, this.get('locations'));
 
           newLocations[loc_type] = value;
