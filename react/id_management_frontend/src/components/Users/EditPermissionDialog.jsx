@@ -18,7 +18,7 @@ import {portal} from "../../helpers/props";
 
 const title = "Edit permission";
 
-class EditPermissionDialog extends Component {
+export class EditPermissionDialog extends Component {
     constructor(props) {
         super(props);
 
