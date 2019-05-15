@@ -303,7 +303,7 @@
       },
 
       _getLocationName: function (locationId, locations) {
-        var location = locations.find(function (loc) {
+        var location = locations.results.find(function (loc) {
           return String(loc.id) === String(locationId);
         });
 
