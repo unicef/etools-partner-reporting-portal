@@ -180,36 +180,6 @@
           </table>
         </div>
 
-        <template
-            is="dom-if"
-            if="[[dualReportingEnabled]]"
-            restamp="true">
-          <div class="flex-none percentage-map">
-            <h4>Percentage funded by:</h4>
-
-            <ul>
-              <template
-                  is="dom-repeat"
-                  items="[[localData.reporting_entity_percentage_map]]">
-                <li class="layout horizontal">
-                  <span class="flex self-center entity-name">[[item.title]]</span>
-                  <span class="flex-none">
-                    <paper-input
-                        class="validate"
-                        on-input="_handleInput"
-                        data-index$="[[index]]"
-                        value="[[_formatPercentage(item.percentage)]]"
-                        allowed-pattern="^\d*\.?\d*$"
-                        no-label-float
-                        required>
-                    </paper-input>
-                  </span>
-                  <span class="flex-none self-center">%</span>
-                </li>
-              </template>
-            </ul>
-          </div>
-        </template>
       </div>
     </div>
 
@@ -475,7 +445,7 @@
             .map(function (location) {
               return {
                 title: location.reporting_entity.title,
-                percentage: Number(location.percentage_allocated),
+                percentage: 1,
               };
             });
       },
