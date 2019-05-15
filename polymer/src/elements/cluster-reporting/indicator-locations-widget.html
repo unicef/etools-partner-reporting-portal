@@ -225,7 +225,7 @@
                   options="[[_getLocations(locations, item.loc_type)]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{item.location}}"
+                  selected="[[item.location]]"
                   on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
@@ -335,6 +335,11 @@
             value: false,
           },
 
+          locationsInitialized: {
+            type: Boolean,
+            value: false
+          },
+
           maxAdminLevel: {
             type: Number,
             value: App.Settings.cluster.maxLocType,
@@ -377,7 +382,7 @@
           this.debounce('fetch-locations-' + loc_type, function() {
             var self = this;
 
-            if (event.detail.value === '') {
+            if (this.locationsInitialized === false) {
               this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
                   self.set('url', res.xhr.responseURL);
@@ -387,25 +392,34 @@
                 .catch(function () {
                   self._setPending(loc_type, false);
                 });
-              return;
-            } else {
-              var thunk = self.$.search;
-              thunk.url = self.get('url');
-
-              thunk.params = {
-                loc_type: loc_type,
-                title: event.detail.value
-              };
-
-              thunk.thunk()()
-                .then(function(res) {
-                  self._setLocations(loc_type, res.data.results);
-                })
-                .catch(function (err) {
-                  console.log(err);
-                  self._setPending(loc_type, false);
-                });
+              
+              this.set('locationsInitialized', true);
             }
+
+            if (event.detail.value === '') {
+              return;
+            }
+
+            var thunk = self.$.search;
+            thunk.url = self.get('url');
+
+            console.log('event changed', event);
+
+            thunk.params = {
+              loc_type: loc_type,
+              title: event.detail.value
+            };
+
+            thunk.thunk()()
+              .then(function(res) {
+                self._setPending(loc_type, false);
+                self._setLocations(loc_type, res.data.results);
+              })
+              .catch(function (err) {
+                console.log(err);
+                self._setPending(loc_type, false);
+              });
+            return;
           }, 1000);
         },
 
@@ -496,6 +510,7 @@
             return;
           }
           this.set('searchLocationType', loc_type);
+          console.log('do we get here?');
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
@@ -547,6 +562,7 @@
         },
 
         _setLocations: function (loc_type, value) {
+          console.log('here again?');
           var newLocations = Object.assign({}, this.get('locations'));
 
           newLocations[loc_type] = value;
