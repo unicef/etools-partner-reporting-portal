@@ -232,40 +232,45 @@
               </etools-single-selection-menu>
             </template>
 
-            <json-field
-                class="item validate"
-                type="[[indicatorType]]"
-                label="Baseline"
-                on-input="_validate"
-                value="{{item.baseline}}"
-                allowed-pattern="[+\-\d]"
-                disabled="[[!canEditDetails]]">
-            </json-field>
-
             <template
                 is="dom-if"
-                if="[[isNumber]]"
+                if="[[indicatorType]]"
                 restamp="true">
               <json-field
                   class="item validate"
                   type="[[indicatorType]]"
-                  label="In need (optional)"
+                  label="Baseline"
                   on-input="_validate"
-                  value="{{item.in_need}}"
+                  value="{{item.baseline}}"
                   allowed-pattern="[+\-\d]"
                   disabled="[[!canEditDetails]]">
               </json-field>
-            </template>
 
-            <json-field
-                class="item validate"
-                type="[[indicatorType]]"
-                label="Target"
-                on-input="_validate"
-                value="{{item.target}}"
-                allowed-pattern="[+\-\d]"
-                required>
-            </json-field>
+              <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                <json-field
+                    class="item validate"
+                    type="[[indicatorType]]"
+                    label="In need (optional)"
+                    on-input="_validate"
+                    value="{{item.in_need}}"
+                    allowed-pattern="[+\-\d]"
+                    disabled="[[!canEditDetails]]">
+                </json-field>
+              </template>
+
+              <json-field
+                  class="item validate"
+                  type="[[indicatorType]]"
+                  label="Target"
+                  on-input="_validate"
+                  value="{{item.target}}"
+                  allowed-pattern="[+\-\d]"
+                  required>
+              </json-field>
+            </template>
           </div>
         </div>
       </div>

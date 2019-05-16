@@ -429,7 +429,6 @@
                   <div class="item full-width">
                     <indicator-locations-widget
                       class="validate"
-                      indicator-type="[[data.blueprint.display_type]]"
                       value="{{data.locations}}">
                     </indicator-locations-widget>
                   </div>
@@ -958,12 +957,7 @@
           this.data = {
             'custom_fields': [],
             'funding': {},
-            'locations': [],
-            'blueprint': {
-              display_type: 'number',
-              calculation_formula_across_locations: 'sum',
-              calculation_formula_across_periods: 'sum',
-            }
+            'locations': []
           };
           this.selectedClusters = [];
         }
