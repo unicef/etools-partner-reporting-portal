@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
 from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
+from core.models import Location
 
 from cluster.models import (
     Cluster,
@@ -305,6 +306,9 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
 
+        locations = self.initial_data.get('locations')
+        project.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+
         self.save_funding(instance=project)
         return project
 
@@ -328,6 +332,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             cluster_ids = [c['id'] for c in clusters]
             project.clusters.clear()
             project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
+
+        locations = self.initial_data.get('locations')
+
+        if locations:
+            location_ids = [l['id'] for l in locations]
+            project.locations.clear()
+            project.locations.add(*Location.objects.filter(id__in=location_ids))
 
         self.save_funding(instance=instance)
 
