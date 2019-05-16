@@ -963,8 +963,6 @@
         }
         this.set('opened', true);
         this.set('refresh', true);
-
-        console.log(this.data);
       },
 
       _handleDetailsChange: function () {
@@ -1110,13 +1108,17 @@
         this.set('selectedPartner', {});
         this.set('data', {
           'custom_fields': [],
-          'funding': {}
+          'funding': {},
+          'locations': []
         });
         this.set('projectDetails', {});
         this.set('errors', {});
       },
 
       _save: function () {
+        console.log(this.data);
+        return;
+
         var self = this;
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
