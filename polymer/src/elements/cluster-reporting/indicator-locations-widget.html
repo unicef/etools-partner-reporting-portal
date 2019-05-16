@@ -224,9 +224,8 @@
                   options="[[_getLocations(locations, item.loc_type)]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{item.location}}"
+                  selected-item="{{ item.location }}"
                   on-value-changed="_onValueChanged"
-                  on-selected-item-changed="_testMethod"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
                   required>
@@ -379,19 +378,6 @@
             type: Boolean,
             computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
           },
-        },
-
-        _testMethod: function (event) {
-          console.log('hello!');
-          console.log(event);
-
-          if (this.indicatorType === undefined && event.detail.value.id !== undefined) {
-            console.log('we are in Add or Edit Project modal!');
-          } else if (this.indicatorType === undefined && event.detail.value.id === undefined) {
-            console.log('we are in Add or Edit Project modal, but there is no selected item in the dropdown!');
-          } else {
-            return;
-          }
         },
 
         _onValueChanged: function(event) {
