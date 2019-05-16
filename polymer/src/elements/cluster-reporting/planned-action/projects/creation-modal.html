@@ -41,6 +41,7 @@
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
 <link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../indicator-locations-widget.html">
 
 
 <dom-module id="planned-action-projects-modal">
@@ -423,6 +424,13 @@
                         </template>
                       </paper-listbox>
                     </paper-dropdown-menu>
+                  </div>
+
+                  <div class="item full-width">
+                    <indicator-locations-widget
+                      class="validate"
+                      value="{{data.locations}}">
+                    </indicator-locations-widget>
                   </div>
 
                   <paper-input
@@ -946,11 +954,17 @@
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
-          this.data = {'custom_fields': [], 'funding': {}};
+          this.data = {
+            'custom_fields': [],
+            'funding': {},
+            'locations': []
+          };
           this.selectedClusters = [];
         }
         this.set('opened', true);
         this.set('refresh', true);
+
+        console.log(this.data);
       },
 
       _handleDetailsChange: function () {
