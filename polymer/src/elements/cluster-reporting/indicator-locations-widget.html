@@ -511,6 +511,8 @@
           if (this.get('locations')[loc_type]) {
             return;
           }
+          console.log('loc_type?', loc_type);
+
           this.set('searchLocationType', loc_type);
 
           this.debounce('fetch-locations-' + loc_type, function () {
@@ -531,8 +533,13 @@
         },
 
         _fetchInitialLocations: function (lockedItems) {
+          console.log('lockedItems', lockedItems);
           lockedItems.forEach(function (item) {
-            this._fetchLocations(item.loc_type);
+            if (item.loc_type === undefined) {
+              this._fetchLocations(item.admin_level);
+            } else {
+              this._fetchLocations(item.loc_type);
+            }
           }, this);
         },
 
