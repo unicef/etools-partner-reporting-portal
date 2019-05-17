@@ -315,7 +315,9 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
 
         locations = self.initial_data.get('locations')
-        project.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+
+        if locations:
+            project.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
 
         self.save_funding(instance=project)
         return project
