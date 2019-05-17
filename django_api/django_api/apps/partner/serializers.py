@@ -262,7 +262,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
         end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
-        locations = validated_data.get('locations', list())
+        locations = self.initial_data.get('locations', list())
 
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
