@@ -259,26 +259,28 @@ class PartnerProject(TimeStampedExternalSourceModel):
         return bool(self.external_id and self.external_source == EXTERNAL_DATA_SOURCES.HPC)
 
 
-@receiver(post_save, sender=PartnerProject, dispatch_uid="sync_locations_for_pa")
-def sync_locations_for_pa(sender, instance, **kwargs):
+@receiver(post_save, sender=PartnerProject, dispatch_uid="sync_locations_for_pp_reportables")
+def sync_locations_for_pp_reportables(sender, instance, **kwargs):
     from indicator.models import ReportableLocationGoal
     locations = instance.locations.all()
-    loc_type = locations.first().gateway.admin_level
 
-    for r in instance.reportables.all():
-        r_new_locations = locations.difference(r.locations.all())
-        r_loc_type = r.locations.first().gateway.admin_level
+    if locations.count() != 0:
+        loc_type = locations.first().gateway.admin_level
 
-        if loc_type != r_loc_type:
-            raise Exception(
-                "Location admin level in Project and {} Project Indicator are not same".format(r)
-            )
+        for r in instance.reportables.all():
+            r_new_locations = locations.difference(r.locations.all())
+            r_loc_type = r.locations.first().gateway.admin_level
 
-        for loc in r_new_locations:
-            ReportableLocationGoal.objects.create(
-                reportable=r,
-                location=loc,
-            )
+            if loc_type != r_loc_type:
+                raise Exception(
+                    "Location admin level in Project and {} Project Indicator are not same".format(r)
+                )
+
+            for loc in r_new_locations:
+                ReportableLocationGoal.objects.create(
+                    reportable=r,
+                    location=loc,
+                )
 
 
 class PartnerProjectFunding(TimeStampedModel):
