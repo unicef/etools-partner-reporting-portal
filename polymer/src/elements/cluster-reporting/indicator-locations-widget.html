@@ -183,7 +183,7 @@
               <labelled-item
                   class="item"
                   label="Location - administrative level">
-                <span class="readonly">Admin [[item.loc_type]]</span>
+                <span class="readonly">Admin [[item.admin_level]]</span>
               </labelled-item>
             </template>
 
@@ -210,7 +210,7 @@
               <labelled-item
                   class="item item-2-col"
                   label="Location">
-                <span class="readonly">[[_getLocationTitle(locations, item.loc_type, item.location)]]</span>
+                <span class="readonly">[[_getLocationTitle(locations, item.admin_level, item.id)]]</span>
               </labelled-item>
             </template>
 
@@ -364,6 +364,11 @@
             computed: '_computeLocationsUrl(responsePlanId)',
           },
 
+          locationTitle: {
+            type: String,
+            value: '',
+          },
+
           ajaxData: {
             type: Array,
             computed: '_computeAjaxData(maxAdminLevel)',
@@ -508,12 +513,14 @@
         },
 
         _fetchLocations: function (loc_type) {
-          if (this.get('locations')[loc_type]) {
-            return;
-          }
+          // if (this.get('locations')[loc_type]) {
+          //   console.log('blocked!');
+          //   return;
+          // }
           console.log('loc_type?', loc_type);
 
           this.set('searchLocationType', loc_type);
+          this.$$('#locations' + loc_type).params.title = this.locationTitle;
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
@@ -535,7 +542,13 @@
         _fetchInitialLocations: function (lockedItems) {
           console.log('lockedItems', lockedItems);
           lockedItems.forEach(function (item) {
+            // if (item.title !== undefined) {
+            //   this.set('locationTitle', item.title.split('[')[0].trim());
+            //   console.log(this.locationTitle);
+            // }
+
             if (item.loc_type === undefined) {
+              this.set('locationTitle', item.title.split('[')[0].trim());
               this._fetchLocations(item.admin_level);
             } else {
               this._fetchLocations(item.loc_type);
@@ -548,6 +561,7 @@
         },
 
         _getLocations: function (locations, loc_type) {
+          console.log('getLocations', locations[loc_type]);
           return locations[loc_type] || [];
         },
 
@@ -557,6 +571,8 @@
           var location = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
           });
+
+          // console.log('getLocationTitle', location.title);
 
           return location ? location.title : '';
         },
@@ -571,10 +587,14 @@
 
         _setLocations: function (loc_type, value) {
           var newLocations = Object.assign({}, this.get('locations'));
+          console.log('newLocations from the top', newLocations);
+          console.log('value', value);
 
           newLocations[loc_type] = value;
+          console.log('never been made!');
 
           this.set('locations', newLocations);
+          console.log(this.locations);
         },
 
         _msgIMO: function () {
