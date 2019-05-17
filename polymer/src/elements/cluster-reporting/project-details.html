@@ -66,6 +66,16 @@
               </labelled-item>
             </li>
 
+            <li class="item full-width">
+              <labelled-item label="Locations">
+                <template
+                    is="dom-repeat"
+                    items="[[projectData.locations]]">
+                  <span class="value">[[item.title]]</span>
+                </template>
+              </labelled-item>
+            </li>
+
             <li class="item">
               <labelled-item label="Clusters">
                 <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
@@ -248,6 +258,7 @@
     },
 
     _computeDetailsButtonMsg: function(detailsOpened) {
+      console.log(this.projectData);
       if (detailsOpened) {
         return 'show less details';
       }
