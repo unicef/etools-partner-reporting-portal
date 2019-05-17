@@ -932,6 +932,12 @@
       _save: function () {
         var self = this;
 
+        var wholeData = this.get('data');
+        wholeData.locations.forEach(function (location) {
+          var id = location.location.id;
+          location.location = id;
+        });
+
         if (!this._fieldsAreValid()) {
           return;
         }
