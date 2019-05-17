@@ -262,6 +262,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
         end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
+        locations = validated_data.get('locations', list())
 
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
@@ -274,6 +275,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'custom_fields': 'Custom Field Names should be unique'
                 })
+
+        if locations and Location.objects.filter(id__in=[l['id'] for l in locations]) \
+                .values_list('gateway__admin_level', flat=True) \
+                .distinct().count() != 1:
+            raise serializers.ValidationError({
+                'locations': 'All locations need to have same admin level'
+            })
 
         return validated_data
 
