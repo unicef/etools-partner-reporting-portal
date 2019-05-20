@@ -513,11 +513,9 @@
         },
 
         _fetchLocations: function (loc_type, title) {
-          if (this.get('locations')[loc_type]) {
-            console.log('blocked!');
-            return;
-          }
-          console.log('loc_type?', loc_type);
+          // if (this.get('locations')[loc_type]) {
+          //   return;
+          // }
 
           this.set('searchLocationType', loc_type);
           
@@ -526,12 +524,14 @@
             
             this._setPending(loc_type, true);
             
-            this.$$('#locations' + loc_type).params.title = title;
+            if (title !== undefined) {
+              this.$$('#locations' + loc_type).params.title = title;
+            }
+
             this.$$('#locations' + loc_type).thunk()()
               .then(function (res) {
                 self.set('url', res.xhr.responseURL);
                 self._setPending(loc_type, false);
-                console.log('res results', res.data.results);
                 self._setLocations(loc_type, res.data.results);
               })
               .catch(function () {
@@ -543,7 +543,7 @@
         _fetchInitialLocations: function (lockedItems) {
           var self = this;
           var existingLocations = {};
-          
+
           lockedItems.forEach(function (item) {
             if (item.loc_type === undefined) {
               if (existingLocations[item.admin_level]) {
@@ -554,7 +554,7 @@
 
               self.set('locations', existingLocations);
             } else {
-              self._fetchLocations(item.loc_type);
+              self._fetchLocations(item.loc_type, item.title);
             }
           }, this);
         },
@@ -564,7 +564,6 @@
         },
 
         _getLocations: function (locations, loc_type) {
-          console.log('getLocations', locations[loc_type]);
           return locations[loc_type] || [];
         },
 
@@ -574,8 +573,6 @@
           var location = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
           });
-
-          // console.log('getLocationTitle', location.title);
 
           return location ? location.title : '';
         },
@@ -590,14 +587,11 @@
 
         _setLocations: function (loc_type, value) {
           var newLocations = Object.assign({}, this.get('locations'));
-          console.log('newLocations from the top', newLocations);
-          console.log('value', value);
+          console.log('newLocations', newLocations);
 
           newLocations[loc_type] = value;
-          console.log('never been made!');
 
           this.set('locations', newLocations);
-          console.log(this.locations);
         },
 
         _msgIMO: function () {

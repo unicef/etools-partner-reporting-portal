@@ -935,7 +935,9 @@
         var wholeData = this.get('data');
         wholeData.locations.forEach(function (location) {
           var id = location.location.id;
+          var title = location.location.title;
           location.location = id;
+          location.title = title;
         });
 
         if (!this._fieldsAreValid()) {
