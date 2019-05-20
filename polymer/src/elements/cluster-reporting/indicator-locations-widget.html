@@ -183,7 +183,7 @@
               <labelled-item
                   class="item"
                   label="Location - administrative level">
-                <span class="readonly">Admin [[item.admin_level]]</span>
+                <span class="readonly">Admin [[_getLocationAdminLevel(item)]]</span>
               </labelled-item>
             </template>
 
@@ -210,7 +210,7 @@
               <labelled-item
                   class="item item-2-col"
                   label="Location">
-                <span class="readonly">[[_getLocationTitle(locations, item.admin_level, item.id)]]</span>
+                <span class="readonly">[[_getLocationTitle(savedLocations, item, item.id)]]</span>
               </labelled-item>
             </template>
 
@@ -299,6 +299,7 @@
           parentIndicatorId: Number,
           clusterId: Number,
           locations: Object,
+          savedLocations: Object,
           pending: Object,
           isPai: Boolean,
           searchLocationType: String,
@@ -478,6 +479,7 @@
           this.set('valueInitialized', true);
 
           this.async(function () {
+            console.log('VALUE', value);
             this.set('lockedItems', value.slice());
           });
         },
@@ -513,9 +515,9 @@
         },
 
         _fetchLocations: function (loc_type, title) {
-          // if (this.get('locations')[loc_type]) {
-          //   return;
-          // }
+          if (this.get('locations')[loc_type]) {
+            return;
+          }
 
           this.set('searchLocationType', loc_type);
           
@@ -532,6 +534,7 @@
               .then(function (res) {
                 self.set('url', res.xhr.responseURL);
                 self._setPending(loc_type, false);
+                console.log('res results', res.data.results);
                 self._setLocations(loc_type, res.data.results);
               })
               .catch(function () {
@@ -541,7 +544,6 @@
         },
 
         _fetchInitialLocations: function (lockedItems) {
-          var self = this;
           var existingLocations = {};
 
           lockedItems.forEach(function (item) {
@@ -552,9 +554,15 @@
                 existingLocations[item.admin_level] = [item];
               }
 
-              self.set('locations', existingLocations);
+              this.set('savedLocations', existingLocations);
             } else {
-              self._fetchLocations(item.loc_type, item.title);
+              if (existingLocations[item.loc_type]) {
+                existingLocations[item.loc_type].push(item);
+              } else {
+                existingLocations[item.loc_type] = [item];
+              }
+
+              this.set('savedLocations', existingLocations);
             }
           }, this);
         },
@@ -567,8 +575,15 @@
           return locations[loc_type] || [];
         },
 
-        _getLocationTitle: function (locations, loc_type, locationId) {
+        _getLocationAdminLevel: function (location) {
+          return location.loc_type ? location.loc_type : location.admin_level;
+        },
+
+        _getLocationTitle: function (locations, location, locationId) {
+          var loc_type = location.loc_type ? location.loc_type : location.admin_level;
           var allLocations = this._getLocations(locations, loc_type);
+
+          console.log('allLocations', allLocations);
 
           var location = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
@@ -586,8 +601,9 @@
         },
 
         _setLocations: function (loc_type, value) {
-          var newLocations = Object.assign({}, this.get('locations'));
+          var newLocations = this.get('locations');
           console.log('newLocations', newLocations);
+          console.log('value', value);
 
           newLocations[loc_type] = value;
 
