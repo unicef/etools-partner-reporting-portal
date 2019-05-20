@@ -224,7 +224,8 @@
                   options="[[_getLocations(locations, item.loc_type)]]"
                   option-value="id"
                   option-label="title"
-                  selected-item="{{ item.location }}"
+                  selected-item="{{item.location}}"
+                  on-selected-changed="_onSelectedLocationChanged"
                   on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type)]]"
@@ -300,6 +301,7 @@
           clusterId: Number,
           locations: Object,
           savedLocations: Object,
+          selectedLocations: Object,
           pending: Object,
           isPai: Boolean,
           searchLocationType: String,
@@ -386,7 +388,40 @@
           },
         },
 
-        _onValueChanged: function(event) {
+        _onSelectedLocationChanged: function () {
+          var loc_type = this.get('searchLocationType');
+          var allLocations = this.get('locations')[loc_type];
+
+          console.log('selected id', event.detail.value);
+          console.log('all locations', allLocations);
+
+          var match = allLocations.find(function (location) {
+            return location.id === event.detail.value;
+          })
+
+          var selectedLocations = this.get('selectedLocations');
+          if (selectedLocations === undefined) {
+            selectedLocations = {};
+          }
+
+          if (selectedLocations[loc_type]) {
+            var found = selectedLocations[loc_type].find(function (location) {
+              return location.id === event.detail.value;
+            });
+
+            if (found !== undefined) {
+              return;
+            }
+            selectedLocations[loc_type].push(match);
+          } else {
+            selectedLocations[loc_type] = [match];
+          };
+
+          this.set('selectedLocations', selectedLocations);
+          console.log('selected locations', selectedLocations);
+        },
+
+        _onValueChanged: function (event) {
           var loc_type = this.get('searchLocationType');
 
           this.debounce('fetch-locations-' + loc_type, function() {
@@ -601,7 +636,7 @@
         },
 
         _setLocations: function (loc_type, value) {
-          var newLocations = this.get('locations');
+          var newLocations = Object.assign({}, this.get('locations'));
           console.log('newLocations', newLocations);
           console.log('value', value);
 
