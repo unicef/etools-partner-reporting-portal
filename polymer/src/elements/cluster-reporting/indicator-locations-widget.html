@@ -227,6 +227,7 @@
                   option-label="title"
                   selected-item="{{item.location}}"
                   on-value-changed="_onValueChanged"
+                  on-selected-changed="_onSelectedChanged"
                   data-index$="[[index]]"
                   disabled="[[_getPending(pending, item.loc_type, index)]]"
                   required>
@@ -387,9 +388,17 @@
           },
         },
 
+        _onSelectedChanged: function (event) {
+          console.log('selected!', this.value);
+        },
+
         _onValueChanged: function (event) {
           var loc_type = this.get('searchLocationType') || 0;
           var index = -1;
+
+          if (event.detail.value === '') {
+            return;
+          }
 
           event.path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
@@ -398,9 +407,11 @@
             }
           });
 
-          if (index === undefined) {
-            return;
+          if (loc_type === 0 && index === undefined) {
+            index = 0;
           }
+
+          var setLocations = this.get('locations');
 
           this.debounce('fetch-locations-' + loc_type, function() {
             var self = this;
@@ -507,11 +518,22 @@
             loc_type: initial,
           });
 
-          var newLocations = Object.assign({}, this.get('locations'));
+          this.set('searchLocationType', 0);
+          this.set('locationsInitialized', true);
+
+          var newLocations = this.get('locations');
           var value = this.get('value');
 
+          console.log('value on add', value);
+          console.log('locations on add', newLocations);
+          // if (newLocations[0] !== undefined) {
+          //   return;
+          // }
+
           value.forEach(function (location, index) {
-            newLocations[index] = {0: []};
+            if (location.location === undefined) {
+              newLocations[index] = {0: []};
+            }
           });
 
           this.set('locations', newLocations);
@@ -567,9 +589,9 @@
         },
 
         _fetchLocations: function (loc_type, title, index) {
-          if (this.get('locations')[loc_type]) {
-            return;
-          }
+          // if (this.get('locations')[loc_type]) {
+          //   return;
+          // }
 
           this.set('searchLocationType', loc_type);
           
