@@ -434,6 +434,16 @@
                   </div>
 
                   <paper-input
+                    class="item validate full-width"
+                    id="description"
+                    label="Description *"
+                    value="{{ data.description }}"
+                    type="string"
+                    required
+                    on-input="_validate">
+                  </paper-input>
+
+                  <paper-input
                     class="item validate"
                     id="total_budget"
                     label="Total Budget"
@@ -451,16 +461,6 @@
                     value="{{ data.funding_source }}"
                     type="string"
                     on-input="_validate">
-                  </paper-input>
-
-                  <paper-input
-                    class="item validate full-width"
-                    id="description"
-                    label="Description *"
-                    value="{{ data.description }}"
-                    type="string"
-                    on-input="_validate"
-                    required>
                   </paper-input>
 
                   <paper-input
@@ -958,7 +958,8 @@
           this.data = {
             'custom_fields': [],
             'funding': {},
-            'locations': []
+            'locations': [],
+            'description': '',
           };
           this.selectedClusters = [];
         }
@@ -1110,14 +1111,14 @@
         this.set('data', {
           'custom_fields': [],
           'funding': {},
-          'locations': []
+          'locations': [],
+          'description': '',
         });
         this.set('projectDetails', {});
         this.set('errors', {});
       },
 
       _save: function () {
-
         var wholeData = this.get('data');
         wholeData.locations = this.data.locations;
 
