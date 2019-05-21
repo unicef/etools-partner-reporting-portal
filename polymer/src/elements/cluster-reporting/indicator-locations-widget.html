@@ -599,9 +599,21 @@
 
           var newLocations = Object.assign({}, this.get('locations'));
 
-          lockedItems.forEach(function (location, index) {
-            newLocations[index] = {0: []};
-          });
+          if (lockedItems.length > 0) {
+            lockedItems.forEach(function (location, index) {
+              if (location.admin_level === undefined) {
+                newLocations[index] = {};
+                newLocations[index][location.loc_type] = [location];
+              } else {
+                newLocations[index] = {};
+                newLocations[index][location.admin_level] = [location];
+              }
+            });
+          } else {
+            lockedItems.forEach(function (location, index) {
+              newLocations[index] = {0: []};
+            });
+          }
 
           this.set('locations', newLocations);
         },
@@ -626,6 +638,8 @@
             return String(loc.id) === String(locationId);
           });
 
+          console.log('location from locationTitle', location);
+
           return location ? location.title : '';
         },
 
@@ -645,6 +659,8 @@
           }
 
           newLocations[index][loc_type] = value;
+
+          console.log('newLocations from setLocations', newLocations);
 
           this.set('locations', newLocations);
         },
