@@ -666,6 +666,16 @@
         _setPending: function (loc_type, value, index) {
           var newPending = Object.assign({}, this.get('pending'));
 
+          console.log('loc_type', loc_type);
+          console.log('value', value);
+          console.log('index', index);
+
+          console.log('newPending', newPending);
+
+          if (newPending[index] === undefined) {
+            newPending[index] = {};
+          }
+
           newPending[index][loc_type] = value;
 
           this.set('pending', newPending);

@@ -547,6 +547,19 @@
       _save: function () {
         var self = this;
 
+        var wholeData = this.get('data');
+        wholeData.locations.forEach(function (location) {
+          if (location.location.id !== undefined) {
+            var id = location.location.id;
+            var name = location.location.title;
+            location.location = id;
+            location.title = name;
+          }
+        });
+
+        console.log('wholeData', wholeData);
+        console.log('this data', this.get('data'));
+
         if (!this._fieldsAreValid()) {
           return;
         }
