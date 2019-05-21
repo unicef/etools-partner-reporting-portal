@@ -388,10 +388,6 @@
           },
         },
 
-        _onSelectedChanged: function (event) {
-          console.log('selected!', this.value);
-        },
-
         _onValueChanged: function (event) {
           var loc_type = this.get('searchLocationType') || 0;
           var index = -1;
@@ -524,14 +520,8 @@
           var newLocations = this.get('locations');
           var value = this.get('value');
 
-          console.log('value on add', value);
-          console.log('locations on add', newLocations);
-          // if (newLocations[0] !== undefined) {
-          //   return;
-          // }
-
           value.forEach(function (location, index) {
-            if (location.location === undefined) {
+            if (location.location === undefined && newLocations[index] === undefined) {
               newLocations[index] = {0: []};
             }
           });
@@ -666,12 +656,6 @@
         _setPending: function (loc_type, value, index) {
           var newPending = Object.assign({}, this.get('pending'));
 
-          console.log('loc_type', loc_type);
-          console.log('value', value);
-          console.log('index', index);
-
-          console.log('newPending', newPending);
-
           if (newPending[index] === undefined) {
             newPending[index] = {};
           }
@@ -689,8 +673,6 @@
           }
 
           newLocations[index][loc_type] = value;
-
-          console.log('newLocations from setLocations', newLocations);
 
           this.set('locations', newLocations);
         },
