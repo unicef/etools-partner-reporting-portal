@@ -1119,9 +1119,14 @@
       _save: function () {
 
         var wholeData = this.get('data');
+        wholeData.locations = this.data.locations;
 
         var newLocations = wholeData.locations.map(function (location) {
-          return location.location;
+          if (location.location !== undefined) {
+            return location.location;
+          } else {
+            return location;
+          }
         });
 
         wholeData.locations = newLocations;  // Un-nest location data from indicator-locations-widget
