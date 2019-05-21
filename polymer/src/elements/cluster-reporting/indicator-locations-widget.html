@@ -211,7 +211,7 @@
               <labelled-item
                   class="item item-2-col"
                   label="Location">
-                <span class="readonly">[[_getLocationTitle(savedLocations, item, item.id, index)]]</span>
+                <span class="readonly">[[_getLocationTitle(locations, item, item.id, index)]]</span>
               </labelled-item>
             </template>
 
@@ -637,8 +637,6 @@
           var location = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
           });
-
-          console.log('location from locationTitle', location);
 
           return location ? location.title : '';
         },
