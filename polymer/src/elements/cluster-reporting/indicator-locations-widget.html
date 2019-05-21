@@ -198,6 +198,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.loc_type}}"
+                  data-index$="[[index]]"
                   on-selected-changed="_onLocTypeChanged"
                   required>
               </etools-single-selection-menu>
@@ -210,7 +211,7 @@
               <labelled-item
                   class="item item-2-col"
                   label="Location">
-                <span class="readonly">[[_getLocationTitle(savedLocations, item, item.id)]]</span>
+                <span class="readonly">[[_getLocationTitle(savedLocations, item, item.id, index)]]</span>
               </labelled-item>
             </template>
 
@@ -221,14 +222,13 @@
               <etools-single-selection-menu
                   class="item item-2-col validate"
                   label="Location"
-                  options="[[_getLocations(locations, item.loc_type)]]"
+                  options="[[_getLocations(locations, item.loc_type, index)]]"
                   option-value="id"
                   option-label="title"
                   selected-item="{{item.location}}"
-                  on-selected-changed="_onSelectedLocationChanged"
                   on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
-                  disabled="[[_getPending(pending, item.loc_type)]]"
+                  disabled="[[_getPending(pending, item.loc_type, index)]]"
                   required>
               </etools-single-selection-menu>
             </template>
@@ -388,41 +388,56 @@
           },
         },
 
-        _onSelectedLocationChanged: function () {
-          var loc_type = this.get('searchLocationType');
-          var allLocations = this.get('locations')[loc_type];
+        // _onSelectedLocationChanged: function () {
+          // var loc_type = this.get('searchLocationType');
+          // var allLocations = this.get('locations')[loc_type];
 
-          console.log('selected id', event.detail.value);
-          console.log('all locations', allLocations);
+          // console.log('selected id', event.detail.value);
+          // console.log('all locations', allLocations);
 
-          var match = allLocations.find(function (location) {
-            return location.id === event.detail.value;
-          })
+          // var match = allLocations.find(function (location) {
+          //   return location.id === event.detail.value;
+          // })
 
-          var selectedLocations = this.get('selectedLocations');
-          if (selectedLocations === undefined) {
-            selectedLocations = {};
-          }
+          // var selectedLocations = this.get('selectedLocations');
+          // if (selectedLocations === undefined) {
+          //   selectedLocations = {};
+          // }
 
-          if (selectedLocations[loc_type]) {
-            var found = selectedLocations[loc_type].find(function (location) {
-              return location.id === event.detail.value;
-            });
+          // if (selectedLocations[loc_type]) {
+          //   var found = selectedLocations[loc_type].find(function (location) {
+          //     return location.id === event.detail.value;
+          //   });
 
-            if (found !== undefined) {
-              return;
-            }
-            selectedLocations[loc_type].push(match);
-          } else {
-            selectedLocations[loc_type] = [match];
-          };
+          //   if (found !== undefined) {
+          //     return;
+          //   }
+          //   selectedLocations[loc_type].push(match);
+          // } else {
+          //   selectedLocations[loc_type] = [match];
+          // };
 
-          this.set('selectedLocations', selectedLocations);
-          console.log('selected locations', selectedLocations);
-        },
+          // this.set('selectedLocations', selectedLocations);
+          // console.log('selected locations', selectedLocations);
+        // },
 
         _onValueChanged: function (event) {
-          var loc_type = this.get('searchLocationType');
+          var loc_type = this.get('searchLocationType') || 0;
+          var index = -1;
+
+          event.path.forEach(function (node) {
+            if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
+              index = node.dataset.index;
+              console.log('node from forEach', node.dataset);
+              return;
+            }
+          });
+
+          if (index === undefined) {
+            return;
+          }
+
+          console.log('index from onValueChanged', index);
 
           this.debounce('fetch-locations-' + loc_type, function() {
             var self = this;
@@ -431,11 +446,11 @@
               this.$$('#locations' + loc_type).thunk()()
                 .then(function (res) {
                   self.set('url', res.xhr.responseURL);
-                  self._setPending(loc_type, false);
-                  self._setLocations(loc_type, res.data.results);
+                  self._setPending(loc_type, false, index);
+                  self._setLocations(loc_type, res.data.results, index);
                 })
                 .catch(function () {
-                  self._setPending(loc_type, false);
+                  self._setPending(loc_type, false, index);
                 });
               
               this.set('locationsInitialized', true);
@@ -455,12 +470,12 @@
 
             thunk.thunk()()
               .then(function(res) {
-                self._setPending(loc_type, false);
-                self._setLocations(loc_type, res.data.results);
+                self._setPending(loc_type, false, index);
+                self._setLocations(loc_type, res.data.results, index);
               })
               .catch(function (err) {
                 console.log(err);
-                self._setPending(loc_type, false);
+                self._setPending(loc_type, false, index);
               });
             return;
           }, 1000);
@@ -514,7 +529,6 @@
           this.set('valueInitialized', true);
 
           this.async(function () {
-            console.log('VALUE', value);
             this.set('lockedItems', value.slice());
           });
         },
@@ -525,19 +539,49 @@
 
         _add: function () {
           var initial = 0;
+          console.log('SCOPE', this);
 
           this.push('value', {
             loc_type: initial,
           });
 
-          this._fetchLocations(initial);
+          var newLocations = Object.assign({}, this.get('locations'));
+          var value = this.get('value');
+
+          value.forEach(function (location, index) {
+            newLocations[index] = {0: []};
+          });
+
+          this.set('locations', newLocations);
+
+          var pendingTest = this.get('pending');
+
+          console.log('PENDING', pendingTest);
+
+          var newPendingIndex = Object.keys(this.get('pending')).length;
+          var pending = this.get('pending');
+
+          pending[newPendingIndex] = {
+            initial: false
+          };
+
+          this.set('pending', pending);
+
+          this._fetchLocations(initial, undefined, this.get('value').length - 1);
         },
 
         _remove: function (e) {
           var value = this.get('value');
           var toRemove = +e.target.dataset.index;
+          var pending = this.get('pending');
+          var locations = this.get('locations');
+
+          delete locations[toRemove];
+          delete pending[toRemove];
+
           var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
 
+          this.set('pending', pending);
           this.set('value', newValue);
         },
 
@@ -545,11 +589,30 @@
           e.target.validate();
         },
 
-        _onLocTypeChanged: function (_, data) {
-          this._fetchLocations(data.value);
+        _onLocTypeChanged: function (event, data) {
+          console.log('event', event);
+          console.log('data', data);
+          console.log('THIS', this);
+
+          var index = -1;
+
+          event.path.forEach(function (node) {
+            if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
+              index = node.dataset.index;
+              return;
+            }
+          });
+
+          if (index === -1) {
+            return;
+          }
+
+          this._fetchLocations(data.value, undefined, index);
         },
 
-        _fetchLocations: function (loc_type, title) {
+        _fetchLocations: function (loc_type, title, index) {
+          console.log('SCOPE from fetchLocations', this);
+
           if (this.get('locations')[loc_type]) {
             return;
           }
@@ -559,7 +622,7 @@
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
             
-            this._setPending(loc_type, true);
+            this._setPending(loc_type, true, index);
             
             if (title !== undefined) {
               this.$$('#locations' + loc_type).params.title = title;
@@ -568,57 +631,44 @@
             this.$$('#locations' + loc_type).thunk()()
               .then(function (res) {
                 self.set('url', res.xhr.responseURL);
-                self._setPending(loc_type, false);
-                console.log('res results', res.data.results);
-                self._setLocations(loc_type, res.data.results);
+                self._setPending(loc_type, false, index);
+                self._setLocations(loc_type, res.data.results, index);
               })
               .catch(function () {
-                self._setPending(loc_type, false);
+                self._setPending(loc_type, false, index);
               });
           });
         },
 
         _fetchInitialLocations: function (lockedItems) {
-          var existingLocations = {};
+          this.set('savedLocations', lockedItems);
 
-          lockedItems.forEach(function (item) {
-            if (item.loc_type === undefined) {
-              if (existingLocations[item.admin_level]) {
-                existingLocations[item.admin_level].push(item);
-              } else {
-                existingLocations[item.admin_level] = [item];
-              }
+          console.log('lockedItems in fetch initial', lockedItems);
 
-              this.set('savedLocations', existingLocations);
-            } else {
-              if (existingLocations[item.loc_type]) {
-                existingLocations[item.loc_type].push(item);
-              } else {
-                existingLocations[item.loc_type] = [item];
-              }
+          var newLocations = Object.assign({}, this.get('locations'));
 
-              this.set('savedLocations', existingLocations);
-            }
-          }, this);
+          lockedItems.forEach(function (location, index) {
+            newLocations[index] = {0: []};
+          });
+
+          this.set('locations', newLocations);
         },
 
-        _getPending: function (pending, loc_type) {
-          return !!pending[loc_type];
+        _getPending: function (pending, loc_type, index) {
+          return !!pending[index][loc_type];
         },
 
-        _getLocations: function (locations, loc_type) {
-          return locations[loc_type] || [];
+        _getLocations: function (locations, loc_type, index) {
+          return locations[index][loc_type] || [];
         },
 
         _getLocationAdminLevel: function (location) {
           return location.loc_type ? location.loc_type : location.admin_level;
         },
 
-        _getLocationTitle: function (locations, location, locationId) {
+        _getLocationTitle: function (locations, location, locationId, index) {
           var loc_type = location.loc_type ? location.loc_type : location.admin_level;
-          var allLocations = this._getLocations(locations, loc_type);
-
-          console.log('allLocations', allLocations);
+          var allLocations = this._getLocations(locations, loc_type, index);
 
           var location = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
@@ -627,20 +677,26 @@
           return location ? location.title : '';
         },
 
-        _setPending: function (loc_type, value) {
+        _setPending: function (loc_type, value, index) {
           var newPending = Object.assign({}, this.get('pending'));
 
-          newPending[loc_type] = value;
+          console.log('loc_type', loc_type);
+          console.log('value', value);
+          console.log('index', index);
+
+          newPending[index][loc_type] = value;
 
           this.set('pending', newPending);
         },
 
-        _setLocations: function (loc_type, value) {
+        _setLocations: function (loc_type, value, index) {
           var newLocations = Object.assign({}, this.get('locations'));
-          console.log('newLocations', newLocations);
-          console.log('value', value);
 
-          newLocations[loc_type] = value;
+          if (newLocations[index] === undefined) {
+            newLocations[index] = {};
+          }
+
+          newLocations[index][loc_type] = value;
 
           this.set('locations', newLocations);
         },
