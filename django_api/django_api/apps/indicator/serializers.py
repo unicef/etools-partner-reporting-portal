@@ -1758,10 +1758,11 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            if obj.reportable.content_object.project:
+            if obj.reportable.content_object.projects.exists():
+                project = obj.reportable.content_object.projects.first()
                 return {
-                    "id": obj.reportable.content_object.project.id,
-                    "title": obj.reportable.content_object.project.title
+                    "id": project.id,
+                    "title": project.title
                 }
         else:
             return None
@@ -1933,11 +1934,11 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             return []
 
     def get_project(self, obj):
-        if isinstance(obj.content_object, PartnerActivity) \
-                and obj.content_object.project:
-            return obj.content_object.project.title
-        else:
-            return ""
+        if isinstance(obj.content_object, PartnerActivity):
+            if obj.content_object.projects.exists():
+                return obj.content_object.projects.first().title
+
+        return ""
 
     def get_cluster_activity(self, obj):
         if isinstance(obj.content_object, PartnerActivity) \
