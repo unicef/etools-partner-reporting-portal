@@ -932,17 +932,34 @@
       _save: function () {
         var self = this;
 
-        var wholeData = this.get('data');
-        wholeData.locations.forEach(function (location) {
-          var id = location.location.id;
-          var title = location.location.title;
-          location.location = id;
-          location.title = title;
+        var noLocationSet = false;
+        var rawLocations = this.get('data.locations');
+
+        var changedLocations = rawLocations.map(function (location) {
+          if (location.location !== undefined && location.location.id !== undefined) {
+            var id = location.location.id;
+            var title = location.location.title;
+            location.location = id;
+            location.title = title;
+            return location;
+          } else if (location.loc_type !== undefined && location.location === undefined) {
+            self.set('errors', 'No location set - please set a location.');
+            noLocationSet = true;
+            return location;
+          } else {
+            return location;
+          }
         });
+
+        if (noLocationSet === true) {
+          return;
+        }
 
         if (!this._fieldsAreValid()) {
           return;
         }
+
+        this.set('data.locations', changedLocations);
 
         if (this.mode === 'objectives') {
           this._setDisaggregations();
@@ -1000,12 +1017,15 @@
             })
             .catch(function (err) {
               self.set('errors', err.data);
+              self.set('data.locations', rawLocations);
               self.set('updatePending', false);
             });
         } else {
           this.set('updatePending', true);
           this._setDisaggregations();
           this.$.indicators.body = this._processData(this.data);
+
+          console.log('body data', this.$.indicators.body);
 
           this.$.indicators.thunk()()
             .then(function (res) {
@@ -1016,6 +1036,7 @@
             })
             .catch(function (err) {
               self.set('errors', err.data);
+              self.set('data.locations', rawLocations);
               self.set('updatePending', false);
             });
         }
