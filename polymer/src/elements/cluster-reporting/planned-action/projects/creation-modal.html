@@ -1119,18 +1119,27 @@
       },
 
       _save: function () {
-        var wholeData = this.get('data');
-        wholeData.locations = this.data.locations;
+        var rawLocations = this.get('data.locations');
 
-        var newLocations = wholeData.locations.map(function (location) {
-          if (location.location !== undefined) {
-            return location.location;
+        var locTypeCheck = rawLocations.every(function (location) {
+          if (rawLocations[0].loc_type === undefined) {
+            return location.loc_type || location.admin_level == rawLocations[0].admin_level;
           } else {
-            return location;
+            return location.loc_type == rawLocations[0].loc_type;
           }
         });
 
-        wholeData.locations = newLocations;  // Un-nest location data from indicator-locations-widget
+        if (locTypeCheck === true) {
+          var changedLocations = rawLocations.map(function (location) {
+            if (location.location !== undefined) {
+              return location.location;
+            } else {
+              return location;
+            }
+          });
+
+          this.data.locations = changedLocations;
+        }
 
         var self = this;
         if (!this.data.partner_id) {
