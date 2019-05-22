@@ -1119,7 +1119,10 @@
       },
 
       _save: function () {
+        var self = this;
+
         var rawLocations = this.get('data.locations');
+        console.log('raw locations', rawLocations);
 
         var changedLocations = rawLocations.map(function (location) {
           if (location.location !== undefined) {
@@ -1129,9 +1132,21 @@
           }
         });
 
+        var noLocationSet = false;
+
+        changedLocations.forEach(function (location) {
+          if (location.title === undefined) {
+            self.set('errors', 'no location set - please set a location.');
+            noLocationSet = true;
+          }
+        });
+
+        if (noLocationSet === true) {
+          return;
+        }
+
         this.set('data.locations', changedLocations);
 
-        var self = this;
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }

@@ -406,28 +406,8 @@
             index = 0;
           }
 
-          var setLocations = this.get('locations');
-
           this.debounce('fetch-locations-' + loc_type, function() {
             var self = this;
-
-            if (this.locationsInitialized === false) {
-              this.$$('#locations' + loc_type).thunk()()
-                .then(function (res) {
-                  self.set('url', res.xhr.responseURL);
-                  self._setPending(loc_type, false, index);
-                  self._setLocations(loc_type, res.data.results, index);
-                })
-                .catch(function () {
-                  self._setPending(loc_type, false, index);
-                });
-              
-              this.set('locationsInitialized', true);
-            }
-
-            if (event.detail.value === '') {
-              return;
-            }
 
             var thunk = self.$.search;
             thunk.url = self.get('url');
