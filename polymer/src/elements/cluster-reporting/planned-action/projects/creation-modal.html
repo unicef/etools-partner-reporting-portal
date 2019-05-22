@@ -1121,25 +1121,15 @@
       _save: function () {
         var rawLocations = this.get('data.locations');
 
-        var locTypeCheck = rawLocations.every(function (location) {
-          if (rawLocations[0].loc_type === undefined) {
-            return location.loc_type || location.admin_level == rawLocations[0].admin_level;
+        var changedLocations = rawLocations.map(function (location) {
+          if (location.location !== undefined) {
+            return location.location;
           } else {
-            return location.loc_type == rawLocations[0].loc_type;
+            return location;
           }
         });
 
-        if (locTypeCheck === true) {
-          var changedLocations = rawLocations.map(function (location) {
-            if (location.location !== undefined) {
-              return location.location;
-            } else {
-              return location;
-            }
-          });
-
-          this.data.locations = changedLocations;
-        }
+        this.set('data.locations', changedLocations);
 
         var self = this;
         if (!this.data.partner_id) {
@@ -1165,6 +1155,7 @@
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
+            self.set('data.locations', rawLocations);
             self.set('errors', err.data);
           });
       },

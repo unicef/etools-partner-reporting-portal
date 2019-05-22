@@ -578,9 +578,9 @@
         },
 
         _fetchLocations: function (loc_type, title, index) {
-          // if (this.get('locations')[loc_type]) {
-          //   return;
-          // }
+          if (loc_type === undefined) {
+            return;
+          }
 
           this.set('searchLocationType', loc_type);
           
