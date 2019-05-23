@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
 from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
+from core.models import Location
 
 from cluster.models import (
     Cluster,
@@ -261,6 +262,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
         end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
+        locations = self.initial_data.get('locations', list())
 
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
@@ -273,6 +275,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'custom_fields': 'Custom Field Names should be unique'
                 })
+
+        if locations and Location.objects.filter(id__in=[l['id'] for l in locations]) \
+                .values_list('gateway__admin_level', flat=True) \
+                .distinct().count() != 1:
+            raise serializers.ValidationError({
+                'locations': 'All locations need to have same admin level'
+            })
 
         return validated_data
 
@@ -305,6 +314,11 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
 
+        locations = self.initial_data.get('locations')
+
+        if locations:
+            project.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+
         self.save_funding(instance=project)
         return project
 
@@ -328,6 +342,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             cluster_ids = [c['id'] for c in clusters]
             project.clusters.clear()
             project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
+
+        locations = self.initial_data.get('locations')
+
+        if locations:
+            location_ids = [l['id'] for l in locations]
+            project.locations.clear()
+            project.locations.add(*Location.objects.filter(id__in=location_ids))
 
         self.save_funding(instance=instance)
 

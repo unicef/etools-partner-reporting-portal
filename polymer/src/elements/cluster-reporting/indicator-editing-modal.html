@@ -547,9 +547,33 @@
       _save: function () {
         var self = this;
 
+        var noLocationSet = false;
+        var rawLocations = this.get('data.locations');
+
+        var changedLocations = rawLocations.map(function (location) {
+          if (location.location !== undefined && location.location.id !== undefined) {
+            var id = location.location.id;
+            var title = location.location.title;
+            location.location = id;
+            return location;
+          } else if (location.loc_type !== undefined && location.location === undefined) {
+            self.set('errors', 'No location set - please set a location.');
+            noLocationSet = true;
+            return location;
+          } else {
+            return location;
+          }
+        });
+
+        if (noLocationSet === true) {
+          return;
+        }
+
         if (!this._fieldsAreValid()) {
           return;
         }
+
+        this.set('data.locations', changedLocations);
 
         this.set('updatePending', true);
 
@@ -568,6 +592,7 @@
             })
             .catch(function (err) {
               self.set('errors', err.data);
+              self.set('data.locations', rawLocations);
               self.set('updatePending', false);
             });
       },

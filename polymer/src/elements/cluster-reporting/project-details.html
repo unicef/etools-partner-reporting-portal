@@ -16,7 +16,7 @@
         --app-grid-columns:4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
+        --app-grid-expandible-item-columns: 3;
       }
 
       .app-grid {
@@ -25,8 +25,24 @@
         list-style: none;
       }
 
-      .full-width {
+      .extended {
         @apply(--app-grid-expandible-item);
+      }
+
+      .location {
+        margin: 2px 0px;
+      }
+
+      .top-row {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: row;
+      }
+
+      .top-element {
+        margin-right: 50px;
+        min-width: 200px;
       }
 
       ul {
@@ -60,9 +76,19 @@
     <etools-content-panel panel-title="Project Details">
         <div class="row">
           <ul class="app-grid">
-            <li class="item full-width">
+            <li class="item">
               <labelled-item label="Title">
                 <span class="value">[[projectData.title]]</span>
+              </labelled-item>
+            </li>
+
+            <li class="item extended">
+              <labelled-item label="Locations">
+                <template
+                    is="dom-repeat"
+                    items="[[projectData.locations]]">
+                  <p class="location value">[[item.title]]</p>
+                </template>
               </labelled-item>
             </li>
 
