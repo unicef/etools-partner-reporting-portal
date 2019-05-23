@@ -507,8 +507,6 @@
 
           this.set('locations', newLocations);
 
-          var pendingTest = this.get('pending');
-
           var newPendingIndex = Object.keys(this.get('pending')).length;
           var pending = this.get('pending');
 
@@ -563,12 +561,12 @@
           }
 
           this.set('searchLocationType', loc_type);
-          
+
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
-            
+
             this._setPending(loc_type, true, index);
-            
+
             if (title !== undefined) {
               this.$$('#locations' + loc_type).params.title = title;
             }
@@ -625,11 +623,11 @@
           var loc_type = location.loc_type ? location.loc_type : location.admin_level;
           var allLocations = this._getLocations(locations, loc_type, index);
 
-          var location = allLocations.find(function (loc) {
+          var targetLocation = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
           });
 
-          return location ? location.title : '';
+          return targetLocation ? targetLocation.title : '';
         },
 
         _setPending: function (loc_type, value, index) {
