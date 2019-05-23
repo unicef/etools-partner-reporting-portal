@@ -167,342 +167,580 @@
           restamp="true">
           <error-box errors="[[errors]]"></error-box>
 
-          <paper-radio-group
-            id="mode"
-            selected="{{ mode }}"
-            on-change="adjustPosition">
-
-            <paper-radio-button name="objectives">
-              <strong>Adopt from Cluster Objective</strong>
-            </paper-radio-button>
-
-            <div
-              class="fields"
-              empty$="[[!_equals(mode, 'objectives')]]">
-              <template
-                is="dom-if"
-                if="[[_equals(mode, 'objectives')]]"
-                restamp="true">
-                
-                <div class="app-grid">
-                  <div class="item">
-                    <etools-single-selection-menu
-                      class="validate"
-                      label="Clusters *"
-                      options="[[clusters]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{ selectedCluster }}"
-                      on-iron-activate="_validate"
-                      required>
-                    </etools-single-selection-menu>
-                  </div>
-
-                  <div class="item">
-                    <etools-single-selection-menu
+          <template
+            is="dom-if"
+            if="[[partnerID]]"
+            restamp="true">
+          
+            <paper-radio-group
+              id="mode"
+              selected="{{ mode }}"
+              on-change="adjustPosition">
+  
+              <paper-radio-button name="objectives">
+                <strong>Adopt from Cluster Objective</strong>
+              </paper-radio-button>
+  
+              <div
+                class="fields"
+                empty$="[[!_equals(mode, 'objectives')]]">
+                <template
+                  is="dom-if"
+                  if="[[_equals(mode, 'objectives')]]"
+                  restamp="true">
+                  
+                  <div class="app-grid">
+                    <div class="item">
+                      <etools-single-selection-menu
                         class="validate"
-                        label="Objective *"
-                        options="[[objectives]]"
+                        label="Clusters *"
+                        options="[[clusters]]"
                         option-value="id"
                         option-label="title"
-                        selected="{{ selectedObjective }}"
-                        on-iron-select="_validate"
-                        disabled="[[_equals(objectives.length, 0)]]"
+                        selected="{{ selectedCluster }}"
+                        on-iron-activate="_validate"
                         required>
-                    </etools-single-selection-menu>
+                      </etools-single-selection-menu>
+                    </div>
+  
+                    <div class="item">
+                      <etools-single-selection-menu
+                          class="validate"
+                          label="Objective *"
+                          options="[[objectives]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{ selectedObjective }}"
+                          on-iron-select="_validate"
+                          disabled="[[_equals(objectives.length, 0)]]"
+                          required>
+                      </etools-single-selection-menu>
+                    </div>
+  
+                    <div class="item full-width">
+                      <etools-single-selection-menu
+                        class="validate"
+                        label="Indicator *"
+                        options="[[indicators]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedIndicator }}"
+                        on-iron-select="_validate"
+                        disabled="[[_equals(indicators.length, 0)]]"
+                        required>
+                      </etools-single-selection-menu>
+                    </div>
+  
+                    <json-field
+                      class="item validate"
+                      id="target"
+                      label="Baseline"
+                      value="{{ data.baseline }}"
+                      type="[[selectedIndicatorDetailType]]"
+                      allowed-pattern="[+\-\d.]"
+                      on-input="_validate">
+                    </json-field>
+  
+                    <json-field
+                      class="item validate"
+                      id="total"
+                      label="Target"
+                      value="{{ data.target }}"
+                      type="[[selectedIndicatorDetailType]]"
+                      allowed-pattern="[+\-\d.]"
+                      on-input="_validate">
+                    </json-field>
+  
+                    <template
+                      is="dom-if"
+                      if="[[selectedIndicatorDetailType]]"
+                      restamp="true">
+                      <div class="item full-width">
+                        <indicator-locations-widget
+                          class="validate"
+                          indicator-type="[[selectedIndicatorDetailType]]"
+                          value="{{ data.locations }}">
+                        </indicator-locations-widget>
+                      </div>
+                    </template>
+                    
                   </div>
-
-                  <div class="item full-width">
-                    <etools-single-selection-menu
-                      class="validate"
-                      label="Indicator *"
-                      options="[[indicators]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{ selectedIndicator }}"
-                      on-iron-select="_validate"
-                      disabled="[[_equals(indicators.length, 0)]]"
-                      required>
-                    </etools-single-selection-menu>
-                  </div>
-
-                  <json-field
-                    class="item validate"
-                    id="target"
-                    label="Baseline"
-                    value="{{ data.baseline }}"
-                    type="[[selectedIndicatorDetailType]]"
-                    allowed-pattern="[+\-\d.]"
-                    on-input="_validate">
-                  </json-field>
-
-                  <json-field
-                    class="item validate"
-                    id="total"
-                    label="Target"
-                    value="{{ data.target }}"
-                    type="[[selectedIndicatorDetailType]]"
-                    allowed-pattern="[+\-\d.]"
-                    on-input="_validate">
-                  </json-field>
-
-                  <template
-                    is="dom-if"
-                    if="[[selectedIndicatorDetailType]]"
-                    restamp="true">
+                </template>
+              </div>
+  
+              <paper-radio-button name="custom">
+                <strong>Custom</strong>
+              </paper-radio-button>
+  
+              <div
+                class="fields"
+                empty$="[[!_equals(mode, 'custom')]]">
+                <template
+                  is="dom-if"
+                  if="[[_equals(mode, 'custom')]]"
+                  restamp="true">
+  
+                  <div class="app-grid">
+                    <div class="item full-width title">
+                      <paper-input
+                        class="validate"
+                        label="Title"
+                        on-input="_validate"
+                        value="{{data.blueprint.title}}"
+                        always-float-label
+                        required>
+                      </paper-input>
+                    </div>
+    
+                    <div class="item full-width">
+                      <labelled-item label="Type">
+                        <paper-radio-group
+                            selected="{{data.blueprint.display_type}}">
+                          <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                          <paper-radio-button name="percentage">Percent</paper-radio-button>
+                          <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                        </paper-radio-group>
+                      </labelled-item>
+                    </div>
+    
+                    <div class="item full-width">
+                      <div class="layout horizontal">
+                        <labelled-item
+                          class="calculation-method"
+                          label="Calculation method across locations">
+                          <calculation-method
+                            value="{{data.blueprint.calculation_formula_across_locations}}"
+                            disabled="[[!isNumber]]">
+                          </calculation-method>
+                        </labelled-item>
+    
+                        <labelled-item
+                          class="calculation-method"
+                          label="Calculation method across reporting periods">
+                          <calculation-method
+                            value="{{data.blueprint.calculation_formula_across_periods}}"
+                            disabled="[[!isNumber]]">
+                          </calculation-method>
+                        </labelled-item>
+                      </div>
+                    </div>
+    
+                    <div class="item full-width">
+                      <paper-input
+                        class="validate"
+                        label="Comments (optional)"
+                        on-input="_validate"
+                        value="{{data.comments}}"
+                        always-float-label>
+                      </paper-input>
+                    </div>
+    
+                    <div class="item full-width">
+                      <paper-input
+                        class="validate"
+                        label="Measurement specifications (optional)"
+                        on-input="_validate"
+                        value="{{data.measurement_specifications}}"
+                        always-float-label>
+                      </paper-input>
+                    </div>
+    
+                    <div class="item full-width">
+                      <div class="app-grid double">
+                        <etools-single-selection-menu
+                          class="item validate pair"
+                          label="Frequency of reporting"
+                          options="[[frequencies]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{data.frequency}}"
+                          on-iron-activate="_validate"
+                          trigger-value-change-event
+                          hide-search
+                          required>
+                        </etools-single-selection-menu>
+    
+                        <template
+                            is="dom-if"
+                            if="[[_showCSD(data.frequency)]]"
+                            restamp="true">
+                          <etools-prp-chips
+                            class="item validate"
+                            value="{{data.cs_dates}}"
+                            label="Due date of report"
+                            on-selected-chips-updated="_validate"
+                            required>
+                            <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                          </etools-prp-chips>
+                        </template>
+    
+                        <etools-prp-date-input
+                          class="item validate pair"
+                          label="Start date of reporting period"
+                          value="{{data.start_date_of_reporting_period}}"
+                          error-message=""
+                          format="[[dateFormat]]"
+                          no-init>
+                        </etools-prp-date-input>
+                      </div>
+                    </div>
+    
+                    <div class="item full-width">
+                      <template
+                        is="dom-if"
+                        if="[[isNumber]]"
+                        restamp="true">
+                        <paper-input
+                          class="validate"
+                          label="Label"
+                          on-input="_validate"
+                          value="{{data.label}}"
+                          always-float-label>
+                        </paper-input>
+                      </template>
+    
+                      <template
+                        is="dom-if"
+                        if="[[!isNumber]]"
+                        restamp="true">
+                        <div class="app-grid double">
+                          <paper-input
+                            class="item validate pair"
+                            label="Numerator Label"
+                            on-input="_validate"
+                            value="{{data.numerator_label}}"
+                            always-float-label>
+                          </paper-input>
+    
+                          <paper-input
+                            class="item validate pair"
+                            label="Denominator Label"
+                            on-input="_validate"
+                            value="{{data.denominator_label}}"
+                            always-float-label>
+                          </paper-input>
+                        </div>
+                      </template>
+                    </div>
+    
+                    <div class="item full-width">
+                      <template
+                        is="dom-if"
+                        if="[[isNumber]]"
+                        restamp="true">
+                        <div class="app-grid-triple">
+                          <json-field
+                            class="item validate"
+                            type="[[data.blueprint.display_type]]"
+                            label="Baseline"
+                            on-input="_validate"
+                            value="{{data.baseline}}"
+                            allowed-pattern="[+\-\d]">
+                          </json-field>
+      
+                          <json-field
+                            class="item validate"
+                            type="[[data.blueprint.display_type]]"
+                            label="In need (optional)"
+                            on-input="_validate"
+                            value="{{data.in_need}}"
+                            allowed-pattern="[+\-\d]">
+                          </json-field>
+      
+                          <json-field
+                            class="item validate"
+                            type="[[data.blueprint.display_type]]"
+                            label="Target"
+                            on-input="_validate"
+                            value="{{data.target}}"
+                            allowed-pattern="[+\-\d]"
+                            required>
+                          </json-field>
+                        </div>
+                      </template>
+                    </div>
+  
+                    <div class="item full-width">
+                      <template
+                        is="dom-if"
+                        if="[[!isNumber]]"
+                        restamp="true">
+                        <div class="app-grid double">
+                          <json-field
+                            class="item validate pair"
+                            type="[[data.blueprint.display_type]]"
+                            label="Baseline"
+                            on-input="_validate"
+                            value="{{data.baseline}}"
+                            allowed-pattern="[+\-\d]">
+                          </json-field>
+      
+                          <json-field
+                            class="item validate pair"
+                            type="[[data.blueprint.display_type]]"
+                            label="Target"
+                            on-input="_validate"
+                            value="{{data.target}}"
+                            allowed-pattern="[+\-\d]"
+                            required>
+                          </json-field>
+                        </div>
+                      </template>
+                    </div>
+    
                     <div class="item full-width">
                       <indicator-locations-widget
                         class="validate"
-                        indicator-type="[[selectedIndicatorDetailType]]"
-                        value="{{ data.locations }}">
+                        indicator-type="[[data.blueprint.display_type]]"
+                        value="{{data.locations}}">
                       </indicator-locations-widget>
                     </div>
-                  </template>
-                  
-                </div>
-              </template>
-            </div>
-
-            <paper-radio-button name="custom">
-              <strong>Custom</strong>
-            </paper-radio-button>
-
-            <div
-              class="fields"
-              empty$="[[!_equals(mode, 'custom')]]">
-              <template
-                is="dom-if"
-                if="[[_equals(mode, 'custom')]]"
-                restamp="true">
-
-                <div class="app-grid">
-                  <div class="item full-width title">
-                    <paper-input
-                      class="validate"
-                      label="Title"
-                      on-input="_validate"
-                      value="{{data.blueprint.title}}"
-                      always-float-label
-                      required>
-                    </paper-input>
-                  </div>
-  
-                  <div class="item full-width">
-                    <labelled-item label="Type">
-                      <paper-radio-group
-                          selected="{{data.blueprint.display_type}}">
-                        <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-                        <paper-radio-button name="percentage">Percent</paper-radio-button>
-                        <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                      </paper-radio-group>
-                    </labelled-item>
-                  </div>
-  
-                  <div class="item full-width">
-                    <div class="layout horizontal">
-                      <labelled-item
-                        class="calculation-method"
-                        label="Calculation method across locations">
-                        <calculation-method
-                          value="{{data.blueprint.calculation_formula_across_locations}}"
-                          disabled="[[!isNumber]]">
-                        </calculation-method>
-                      </labelled-item>
-  
-                      <labelled-item
-                        class="calculation-method"
-                        label="Calculation method across reporting periods">
-                        <calculation-method
-                          value="{{data.blueprint.calculation_formula_across_periods}}"
-                          disabled="[[!isNumber]]">
-                        </calculation-method>
-                      </labelled-item>
-                    </div>
-                  </div>
-  
-                  <div class="item full-width">
-                    <paper-input
-                      class="validate"
-                      label="Comments (optional)"
-                      on-input="_validate"
-                      value="{{data.comments}}"
-                      always-float-label>
-                    </paper-input>
-                  </div>
-  
-                  <div class="item full-width">
-                    <paper-input
-                      class="validate"
-                      label="Measurement specifications (optional)"
-                      on-input="_validate"
-                      value="{{data.measurement_specifications}}"
-                      always-float-label>
-                    </paper-input>
-                  </div>
-  
-                  <div class="item full-width">
-                    <div class="app-grid double">
-                      <etools-single-selection-menu
-                        class="item validate pair"
-                        label="Frequency of reporting"
-                        options="[[frequencies]]"
-                        option-value="id"
-                        option-label="title"
-                        selected="{{data.frequency}}"
-                        on-iron-activate="_validate"
-                        trigger-value-change-event
-                        hide-search
-                        required>
-                      </etools-single-selection-menu>
-  
-                      <template
-                          is="dom-if"
-                          if="[[_showCSD(data.frequency)]]"
-                          restamp="true">
-                        <etools-prp-chips
-                          class="item validate"
-                          value="{{data.cs_dates}}"
-                          label="Due date of report"
-                          on-selected-chips-updated="_validate"
-                          required>
-                          <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
-                        </etools-prp-chips>
-                      </template>
-  
-                      <etools-prp-date-input
-                        class="item validate pair"
-                        label="Start date of reporting period"
-                        value="{{data.start_date_of_reporting_period}}"
-                        error-message=""
-                        format="[[dateFormat]]"
-                        no-init>
-                      </etools-prp-date-input>
-                    </div>
-                  </div>
-  
-                  <div class="item full-width">
-                    <template
-                      is="dom-if"
-                      if="[[isNumber]]"
-                      restamp="true">
-                      <paper-input
+    
+                    <div class="item full-width">
+                      <disaggregations-dropdown-widget
                         class="validate"
-                        label="Label"
-                        on-input="_validate"
-                        value="{{data.label}}"
-                        always-float-label>
-                      </paper-input>
-                    </template>
-  
-                    <template
-                      is="dom-if"
-                      if="[[!isNumber]]"
-                      restamp="true">
-                      <div class="app-grid double">
-                        <paper-input
-                          class="item validate pair"
-                          label="Numerator Label"
-                          on-input="_validate"
-                          value="{{data.numerator_label}}"
-                          always-float-label>
-                        </paper-input>
-  
-                        <paper-input
-                          class="item validate pair"
-                          label="Denominator Label"
-                          on-input="_validate"
-                          value="{{data.denominator_label}}"
-                          always-float-label>
-                        </paper-input>
-                      </div>
-                    </template>
+                        value="{{selectedDisaggregations}}"
+                        disaggregations="[[disaggregations]]">
+                      </disaggregations-dropdown-widget>
+                    </div>
                   </div>
-  
-                  <div class="item full-width">
-                    <template
-                      is="dom-if"
-                      if="[[isNumber]]"
-                      restamp="true">
-                      <div class="app-grid-triple">
-                        <json-field
-                          class="item validate"
-                          type="[[data.blueprint.display_type]]"
-                          label="Baseline"
-                          on-input="_validate"
-                          value="{{data.baseline}}"
-                          allowed-pattern="[+\-\d]">
-                        </json-field>
-    
-                        <json-field
-                          class="item validate"
-                          type="[[data.blueprint.display_type]]"
-                          label="In need (optional)"
-                          on-input="_validate"
-                          value="{{data.in_need}}"
-                          allowed-pattern="[+\-\d]">
-                        </json-field>
-    
-                        <json-field
-                          class="item validate"
-                          type="[[data.blueprint.display_type]]"
-                          label="Target"
-                          on-input="_validate"
-                          value="{{data.target}}"
-                          allowed-pattern="[+\-\d]"
-                          required>
-                        </json-field>
-                      </div>
-                    </template>
-                  </div>
+                  
+                </template>
+              </div>
+            </paper-radio-group>
+          </template>
 
-                  <div class="item full-width">
-                    <template
-                      is="dom-if"
-                      if="[[!isNumber]]"
-                      restamp="true">
-                      <div class="app-grid double">
-                        <json-field
-                          class="item validate pair"
-                          type="[[data.blueprint.display_type]]"
-                          label="Baseline"
-                          on-input="_validate"
-                          value="{{data.baseline}}"
-                          allowed-pattern="[+\-\d]">
-                        </json-field>
-    
-                        <json-field
-                          class="item validate pair"
-                          type="[[data.blueprint.display_type]]"
-                          label="Target"
-                          on-input="_validate"
-                          value="{{data.target}}"
-                          allowed-pattern="[+\-\d]"
-                          required>
-                        </json-field>
-                      </div>
-                    </template>
-                  </div>
-  
-                  <div class="item full-width">
-                    <indicator-locations-widget
-                      class="validate"
-                      indicator-type="[[data.blueprint.display_type]]"
-                      value="{{data.locations}}">
-                    </indicator-locations-widget>
-                  </div>
-  
-                  <div class="item full-width">
-                    <disaggregations-dropdown-widget
-                      class="validate"
-                      value="{{selectedDisaggregations}}"
-                      disaggregations="[[disaggregations]]">
-                    </disaggregations-dropdown-widget>
-                  </div>
+          <template
+            is="dom-if"
+            if="[[!partnerID]]"
+            restamp="true">
+
+            <div class="app-grid">
+              <div class="item full-width title">
+                <paper-input
+                  class="validate"
+                  label="Title"
+                  on-input="_validate"
+                  value="{{data.blueprint.title}}"
+                  always-float-label
+                  required>
+                </paper-input>
+              </div>
+
+              <div class="item full-width">
+                <labelled-item label="Type">
+                  <paper-radio-group
+                      selected="{{data.blueprint.display_type}}">
+                    <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                    <paper-radio-button name="percentage">Percent</paper-radio-button>
+                    <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                  </paper-radio-group>
+                </labelled-item>
+              </div>
+
+              <div class="item full-width">
+                <div class="layout horizontal">
+                  <labelled-item
+                    class="calculation-method"
+                    label="Calculation method across locations">
+                    <calculation-method
+                      value="{{data.blueprint.calculation_formula_across_locations}}"
+                      disabled="[[!isNumber]]">
+                    </calculation-method>
+                  </labelled-item>
+
+                  <labelled-item
+                    class="calculation-method"
+                    label="Calculation method across reporting periods">
+                    <calculation-method
+                      value="{{data.blueprint.calculation_formula_across_periods}}"
+                      disabled="[[!isNumber]]">
+                    </calculation-method>
+                  </labelled-item>
                 </div>
-                
-              </template>
+              </div>
+
+              <div class="item full-width">
+                <paper-input
+                  class="validate"
+                  label="Comments (optional)"
+                  on-input="_validate"
+                  value="{{data.comments}}"
+                  always-float-label>
+                </paper-input>
+              </div>
+
+              <div class="item full-width">
+                <paper-input
+                  class="validate"
+                  label="Measurement specifications (optional)"
+                  on-input="_validate"
+                  value="{{data.measurement_specifications}}"
+                  always-float-label>
+                </paper-input>
+              </div>
+
+              <div class="item full-width">
+                <div class="app-grid double">
+                  <etools-single-selection-menu
+                    class="item validate pair"
+                    label="Frequency of reporting"
+                    options="[[frequencies]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.frequency}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
+                    required>
+                  </etools-single-selection-menu>
+
+                  <template
+                      is="dom-if"
+                      if="[[_showCSD(data.frequency)]]"
+                      restamp="true">
+                    <etools-prp-chips
+                      class="item validate"
+                      value="{{data.cs_dates}}"
+                      label="Due date of report"
+                      on-selected-chips-updated="_validate"
+                      required>
+                      <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                    </etools-prp-chips>
+                  </template>
+
+                  <etools-prp-date-input
+                    class="item validate pair"
+                    label="Start date of reporting period"
+                    value="{{data.start_date_of_reporting_period}}"
+                    error-message=""
+                    format="[[dateFormat]]"
+                    no-init>
+                  </etools-prp-date-input>
+                </div>
+              </div>
+
+              <div class="item full-width">
+                <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                  <paper-input
+                    class="validate"
+                    label="Label"
+                    on-input="_validate"
+                    value="{{data.label}}"
+                    always-float-label>
+                  </paper-input>
+                </template>
+
+                <template
+                  is="dom-if"
+                  if="[[!isNumber]]"
+                  restamp="true">
+                  <div class="app-grid double">
+                    <paper-input
+                      class="item validate pair"
+                      label="Numerator Label"
+                      on-input="_validate"
+                      value="{{data.numerator_label}}"
+                      always-float-label>
+                    </paper-input>
+
+                    <paper-input
+                      class="item validate pair"
+                      label="Denominator Label"
+                      on-input="_validate"
+                      value="{{data.denominator_label}}"
+                      always-float-label>
+                    </paper-input>
+                  </div>
+                </template>
+              </div>
+
+              <div class="item full-width">
+                <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                  <div class="app-grid-triple">
+                    <json-field
+                      class="item validate"
+                      type="[[data.blueprint.display_type]]"
+                      label="Baseline"
+                      on-input="_validate"
+                      value="{{data.baseline}}"
+                      allowed-pattern="[+\-\d]">
+                    </json-field>
+
+                    <json-field
+                      class="item validate"
+                      type="[[data.blueprint.display_type]]"
+                      label="In need (optional)"
+                      on-input="_validate"
+                      value="{{data.in_need}}"
+                      allowed-pattern="[+\-\d]">
+                    </json-field>
+
+                    <json-field
+                      class="item validate"
+                      type="[[data.blueprint.display_type]]"
+                      label="Target"
+                      on-input="_validate"
+                      value="{{data.target}}"
+                      allowed-pattern="[+\-\d]"
+                      required>
+                    </json-field>
+                  </div>
+                </template>
+              </div>
+
+              <div class="item full-width">
+                <template
+                  is="dom-if"
+                  if="[[!isNumber]]"
+                  restamp="true">
+                  <div class="app-grid double">
+                    <json-field
+                      class="item validate pair"
+                      type="[[data.blueprint.display_type]]"
+                      label="Baseline"
+                      on-input="_validate"
+                      value="{{data.baseline}}"
+                      allowed-pattern="[+\-\d]">
+                    </json-field>
+
+                    <json-field
+                      class="item validate pair"
+                      type="[[data.blueprint.display_type]]"
+                      label="Target"
+                      on-input="_validate"
+                      value="{{data.target}}"
+                      allowed-pattern="[+\-\d]"
+                      required>
+                    </json-field>
+                  </div>
+                </template>
+              </div>
+
+              <div class="item full-width">
+                <indicator-locations-widget
+                  class="validate"
+                  indicator-type="[[data.blueprint.display_type]]"
+                  value="{{data.locations}}">
+                </indicator-locations-widget>
+              </div>
+
+              <div class="item full-width">
+                <disaggregations-dropdown-widget
+                  class="validate"
+                  value="{{selectedDisaggregations}}"
+                  disaggregations="[[disaggregations]]">
+                </disaggregations-dropdown-widget>
+              </div>
             </div>
-          </paper-radio-group>
+          </template>
+
         </template>
       </paper-dialog-scrollable>
 
@@ -747,6 +985,11 @@
         if (!opened) {
           return;
         }
+
+        if (this.partnerID === undefined) {
+          this.set('partnerID', false);
+        }
+        console.log(this.partnerID);
 
         if (this.mode === undefined) {
           return;
