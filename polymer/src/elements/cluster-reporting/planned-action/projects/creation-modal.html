@@ -231,12 +231,13 @@
     <paper-dialog
       id="dialog"
       with-backdrop
+      on-iron-overlay-closed="_close"
       opened="{{ opened }}">
       <div class="header layout horizontal justified">
         <h2>[[_computeTitle(edit)]]</h2>
         <paper-icon-button
           class="self-center"
-          on-tap="close"
+          on-tap="_close"
           icon="icons:close">
         </paper-icon-button>
       </div>
@@ -672,7 +673,7 @@
                   Save
                 </paper-button>
 
-                <paper-button on-tap="close">
+                <paper-button on-tap="_close">
                   Cancel
                 </paper-button>
               </div>
@@ -937,11 +938,20 @@
         return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
-      close: function () {
-        this.set('data', {});
-        this.set('opened', false);
-        this.set('refresh', false);
-        this.set('detailsOpened', false);
+      _close: function (e) {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('data', {});
+          this.set('opened', false);
+          this.set('refresh', false);
+          this.set('detailsOpened', false);
+          this.set('errors', {});
+
+          this.close();
+        } else {
+          return;
+        }
       },
 
       open: function () {
@@ -1121,8 +1131,8 @@
       _save: function () {
         var self = this;
 
+        var locationError = false;
         var rawLocations = this.get('data.locations');
-        console.log('raw locations', rawLocations);
 
         var changedLocations = rawLocations.map(function (location) {
           if (location.location !== undefined) {
@@ -1132,16 +1142,17 @@
           }
         });
 
-        var noLocationSet = false;
-
         changedLocations.forEach(function (location) {
           if (location.title === undefined) {
             self.set('errors', 'No location set - please set a location.');
-            noLocationSet = true;
+            locationError = true;
+          } else if (changedLocations[0].admin_level !== location.admin_level) {
+            self.set('errors', 'All locations need to have the same admin level.');
+            locationError = true;
           }
         });
 
-        if (noLocationSet === true) {
+        if (locationError === true) {
           return;
         }
 
@@ -1170,8 +1181,8 @@
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            self.set('data.locations', rawLocations);
             self.set('errors', err.data);
+            self.set('data.locations', rawLocations);
           });
       },
 
