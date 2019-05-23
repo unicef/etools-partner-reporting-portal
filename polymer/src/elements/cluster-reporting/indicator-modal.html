@@ -96,6 +96,10 @@
         padding-top: 24px;
       }
 
+      #custom-form-only {
+        padding-top: 20px;
+      }
+
       .calculation-method:not(:first-child) {
         margin-left: 50px;
       }
@@ -515,7 +519,7 @@
             if="[[!partnerID]]"
             restamp="true">
 
-            <div class="app-grid">
+            <div class="app-grid" id="custom-form-only">
               <div class="item full-width title">
                 <paper-input
                   class="validate"
@@ -988,8 +992,8 @@
 
         if (this.partnerID === undefined) {
           this.set('partnerID', false);
+          this.set('mode', 'admin');
         }
-        console.log(this.partnerID);
 
         if (this.mode === undefined) {
           return;
