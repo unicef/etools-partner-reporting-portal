@@ -335,7 +335,15 @@
     "provide_alternate_id": "Provide alternate ID",
     "provide_risk_rating": "Provide risk rating",
     "provide_basis_risk_rating": "Provide basis for risk rating",
-    "edit_partner": "Edit Partner"
+    "edit_partner": "Edit Partner",
+    "changes_saved": "Changes saved",
+    "an_error_occurred": "An error occurred, please try again later.",
+    "file_uploaded": "File uploaded.",
+    "file_deleted": "File deleted.",
+    "request_ocha_timed_out": "Request to OCHA timed out. Please try again.",
+    "message_sent": "Message sent",
+    "account_created": "Account created.",
+    "please_wait_business_days": "Please wait 1-2 business days for your admin to approve you. If it has been longer then 1-2 business days, please email X to get you approved."
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
