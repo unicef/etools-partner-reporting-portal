@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models.signals import pre_save, post_save, m2m_changed
+from django.db.models.signals import pre_save, m2m_changed
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
