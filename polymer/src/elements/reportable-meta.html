@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-char-counter.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="report-status.html">
@@ -197,6 +198,14 @@
             return App.Endpoints.reportProgressReset();
           },
         },
+      },
+
+      _updateCharCounter: function (event) {
+        console.log('event', event);
+        var input = this.$$('#narrative_assessment');
+        var inputContainer = input.parentElement;
+        var charCounter = input.nextElementSibling;
+        console.log('input', charCounter.update(inputContainer));
       },
 
       _handleInput: function () {
