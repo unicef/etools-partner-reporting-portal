@@ -173,7 +173,7 @@
 
           <template
             is="dom-if"
-            if="[[partnerID]]"
+            if="[[!_isClusterImo(prpRoles)]]"
             restamp="true">
           
             <paper-radio-group
@@ -531,7 +531,7 @@
 
           <template
             is="dom-if"
-            if="[[!partnerID]]"
+            if="[[_isClusterImo(prpRoles)]]"
             restamp="true">
 
             <div class="app-grid" id="custom-form-only">
@@ -897,6 +897,11 @@
           statePath: 'partner.current.id',
         },
 
+        prpRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles',
+        },
+
         updatePending: {
           type: Boolean,
           value: false,
@@ -971,6 +976,18 @@
         '_fetchIndicatorsList(selectedObjective)',
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
+
+      _isClusterImo: function (prpRoles) {
+        var isImo = prpRoles.find(function (role) {
+          return role.role === 'CLUSTER_IMO';
+        });
+
+        if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator') {
+          return true;
+        } else {
+          return false;
+        }
+      },
 
       _computeIsNumber: function (type) {
         return type === 'number';
