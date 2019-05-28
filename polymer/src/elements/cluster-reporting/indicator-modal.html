@@ -209,6 +209,7 @@
 
                     <div class="item">
                       <etools-single-selection-menu
+                        id="clustersDropdown"
                         class="validate"
                         label="Clusters *"
                         options="[[clusters]]"
@@ -216,6 +217,7 @@
                         option-label="title"
                         selected="{{ selectedCluster }}"
                         on-iron-activate="_validate"
+                        disabled
                         required>
                       </etools-single-selection-menu>
                     </div>
@@ -962,6 +964,8 @@
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
         '_fetchPartnersList(partner)',
+        '_savePartner(selectedPartner)',
+        '_enableClustersList(selectedPartner)',
         '_saveCluster(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
@@ -1092,6 +1096,20 @@
         this.set('partners', [this.partner]);
       },
 
+      _savePartner: function (selectedPartnerId) {
+        console.log('selected partner id', selectedPartnerId);
+        this.set('data.partner_id', selectedPartnerId);
+      },
+
+      _enableClustersList: function (selectedPartnerId) {
+        if (selectedPartnerId === '') {
+          return;
+        }
+
+        var clustersDropdownElement = this.$$('#clustersDropdown');
+        clustersDropdownElement.disabled = false;
+      },
+
       _saveCluster: function () {
         this.set('data.cluster_id', this.selectedCluster);
       },
@@ -1100,7 +1118,6 @@
         if (selectedClusterId === '') {
           return;
         }
-        this.set('data.partner_id', this.partnerID);
         this.set('data.cluster_id', selectedClusterId);
         this.set('data.partner_project_id', parseInt(this.objectId));
 
