@@ -130,6 +130,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+      id="partners"
+      timeout="100000"
+      url="[[partnersUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
       id="objectives"
       timeout="100000"
       url="[[objectivesUrl]]"
@@ -173,7 +179,7 @@
 
           <template
             is="dom-if"
-            if="[[partnerID]]"
+            if="[[!_isClusterImo(prpRoles)]]"
             restamp="true">
           
             <paper-radio-group
@@ -194,8 +200,28 @@
                   restamp="true">
                   
                   <div class="app-grid">
+                    <div class="item full-width">
+                      <template
+                        is="dom-if"
+                        if="[[imoInPartner]]"
+                        restamp="true">
+
+                        <etools-single-selection-menu
+                          class="validate"
+                          label="Partners *"
+                          options="[[partners]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{ selectedPartner }}"
+                          on-iron-activate="_validate"
+                          required>
+                        </etools-single-selection-menu>
+                      </template>
+                    </div>
+
                     <div class="item">
                       <etools-single-selection-menu
+                        id="clustersDropdown"
                         class="validate"
                         label="Clusters *"
                         options="[[clusters]]"
@@ -203,6 +229,7 @@
                         option-label="title"
                         selected="{{ selectedCluster }}"
                         on-iron-activate="_validate"
+                        disabled="[[_equals(selectedPartner, '')]]"
                         required>
                       </etools-single-selection-menu>
                     </div>
@@ -516,7 +543,7 @@
 
           <template
             is="dom-if"
-            if="[[!partnerID]]"
+            if="[[_isClusterImo(prpRoles)]]"
             restamp="true">
 
             <div class="app-grid" id="custom-form-only">
@@ -782,6 +809,11 @@
         objectType: String,
         modalTitle: String,
 
+        imoInPartner: {
+          type: Boolean,
+          value: false,
+        },
+
         isNumber: {
           type: Boolean,
           computed: '_computeIsNumber(data.blueprint.display_type)',
@@ -862,9 +894,34 @@
           computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
+        partnersUrl: {
+          type: String,
+          computed: '_computePartnersUrl(responsePlanId)',
+        },
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        partners: {
+          type: Array,
+          value: [],
+        },
+
+        selectedPartner: {
+          type: String,
+          value: '',
+        },
+
         partnerID: {
           type: String,
           statePath: 'partner.current.id',
+        },
+
+        prpRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles',
         },
 
         updatePending: {
@@ -930,14 +987,33 @@
 
       observers: [
         '_setDefaults(opened)',
+        '_isClusterImo(prpRoles)',
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
+        '_fetchPartnersList(partner)',
+        '_savePartner(selectedPartner)',
         '_saveCluster(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
+
+      _isClusterImo: function (prpRoles) {
+        var isImo = prpRoles.find(function (role) {
+          return role.role === 'CLUSTER_IMO';
+        });
+
+        if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator') {
+          this.set('mode', 'custom');
+          return true;
+        } else if (isImo !== undefined && this.modalTitle === 'Add Project Indicator') {
+          this.set('imoInPartner', true);
+          return false;
+        } else {
+          return false;
+        }
+      },
 
       _computeIsNumber: function (type) {
         return type === 'number';
@@ -990,14 +1066,11 @@
           return;
         }
 
-        if (this.partnerID === undefined) {
-          this.set('partnerID', false);
-          this.set('mode', 'admin');
-        }
-
         if (this.mode === undefined) {
           return;
-        } else if (this.mode === 'objectives') {
+        }
+
+        if (this.mode === 'objectives') {
           this.set('data', {
             partner_id: '',
             partner_project_id: '',
@@ -1010,6 +1083,10 @@
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
+
+          if (this.imoInPartner === false) {
+            this.set('selectedPartner', this.partnerID);
+          }
         } else {
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
@@ -1050,6 +1127,10 @@
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
+      _computePartnersUrl: function (responsePlanId) {
+        return App.Endpoints.clusterPartnerNames(responsePlanId);
+      },
+
       _fetchDisaggregations: function() {
         var self = this;
 
@@ -1059,11 +1140,36 @@
           });
       },
 
+      _fetchPartnersList: function () {
+        this.debounce('fetch-objectives', function () {
+          var self = this;
+
+          this.set('partners', []);
+
+          this.$.partners.abort();
+          this.$.partners.thunk()()
+            .then(function (res) {
+              self.set('partners', res.data);
+              self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
+      },
+
+      _savePartner: function (selectedPartnerId) {
+        this.set('data.partner_id', selectedPartnerId);
+      },
+
+      _saveCluster: function () {
+        this.set('data.cluster_id', this.selectedCluster);
+      },
+
       _fetchObjectivesList: function (selectedClusterId) {
         if (selectedClusterId === '') {
           return;
         }
-        this.set('data.partner_id', this.partnerID);
         this.set('data.cluster_id', selectedClusterId);
         this.set('data.partner_project_id', parseInt(this.objectId));
 
@@ -1141,10 +1247,6 @@
               // TODO: error handling
             });
         }, 100);
-      },
-
-      _saveCluster: function () {
-        this.set('data.cluster_id', this.selectedCluster);
       },
 
       _processData: function (rawData) {
@@ -1292,9 +1394,18 @@
             e.target.nodeName === 'PAPER-BUTTON' ||
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
           this.set('mode', '');
+          this.set('data', {});
 
+          this.set('partners', []);
+          this.set('selectedPartner', '');
+
+          this.set('clusters', []);
           this.set('selectedCluster', '');
+
+          this.set('objectives', []);
           this.set('selectedObjective', '');
+
+          this.set('indicators', []);
           this.set('selectedIndicator', '');
           this.set('selectedIndicatorDetailType', '');
           
