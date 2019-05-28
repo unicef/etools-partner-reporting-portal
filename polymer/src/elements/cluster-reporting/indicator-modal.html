@@ -130,6 +130,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+      id="partners"
+      timeout="100000"
+      url="[[partnersUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
       id="objectives"
       timeout="100000"
       url="[[objectivesUrl]]"
@@ -195,16 +201,22 @@
                   
                   <div class="app-grid">
                     <div class="item full-width">
-                      <etools-single-selection-menu
-                        class="validate"
-                        label="Partners *"
-                        options="[[partners]]"
-                        option-value="id"
-                        option-label="title"
-                        selected="{{ selectedPartner }}"
-                        on-iron-activate="_validate"
-                        required>
-                      </etools-single-selection-menu>
+                      <template
+                        is="dom-if"
+                        if="[[imoInPartner]]"
+                        restamp="true">
+
+                        <etools-single-selection-menu
+                          class="validate"
+                          label="Partners *"
+                          options="[[partners]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{ selectedPartner }}"
+                          on-iron-activate="_validate"
+                          required>
+                        </etools-single-selection-menu>
+                      </template>
                     </div>
 
                     <div class="item">
@@ -217,7 +229,7 @@
                         option-label="title"
                         selected="{{ selectedCluster }}"
                         on-iron-activate="_validate"
-                        disabled
+                        disabled="[[_equals(selectedPartner, '')]]"
                         required>
                       </etools-single-selection-menu>
                     </div>
@@ -797,6 +809,11 @@
         objectType: String,
         modalTitle: String,
 
+        imoInPartner: {
+          type: Boolean,
+          value: false,
+        },
+
         isNumber: {
           type: Boolean,
           computed: '_computeIsNumber(data.blueprint.display_type)',
@@ -875,6 +892,11 @@
         objectivesUrl: {
           type: String,
           computed: '_computeObjectivesUrl(responsePlanId)',
+        },
+
+        partnersUrl: {
+          type: String,
+          computed: '_computePartnersUrl(responsePlanId)',
         },
 
         partner: {
@@ -965,12 +987,12 @@
 
       observers: [
         '_setDefaults(opened)',
+        '_isClusterImo(prpRoles)',
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
         '_fetchPartnersList(partner)',
         '_savePartner(selectedPartner)',
-        '_enableClustersList(selectedPartner)',
         '_saveCluster(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
@@ -983,7 +1005,12 @@
         });
 
         if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator') {
+          this.set('mode', 'custom');
           return true;
+        } else if (isImo !== undefined && this.modalTitle === 'Add Project Indicator') {
+          console.log('here in project indicator as imo!');
+          this.set('imoInPartner', true);
+          return false;
         } else {
           return false;
         }
@@ -1040,14 +1067,14 @@
           return;
         }
 
-        if (this.partnerID === undefined) {
-          this.set('partnerID', false);
-          this.set('mode', 'admin');
+        if (this.mode === undefined) {
+          console.log('mode is undefined!');
+          return;
         }
 
-        if (this.mode === undefined) {
-          return;
-        } else if (this.mode === 'objectives') {
+        if (this.mode === 'objectives') {
+          console.log('here in objective mode!');
+          console.log('imoInPartner', this.imoInPartner);
           this.set('data', {
             partner_id: '',
             partner_project_id: '',
@@ -1060,7 +1087,12 @@
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
+
+          if (this.imoInPartner === false) {
+            this.set('selectedPartner', this.partnerID);
+          }
         } else {
+          console.log('here in custom mode?');
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
           this.set('data', {
@@ -1100,6 +1132,10 @@
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
+      _computePartnersUrl: function (responsePlanId) {
+        return App.Endpoints.clusterPartnerNames(responsePlanId);
+      },
+
       _fetchDisaggregations: function() {
         var self = this;
 
@@ -1110,20 +1146,25 @@
       },
 
       _fetchPartnersList: function () {
-        this.set('partners', [this.partner]);
+        this.debounce('fetch-objectives', function () {
+          var self = this;
+
+          this.set('partners', []);
+
+          this.$.partners.abort();
+          this.$.partners.thunk()()
+            .then(function (res) {
+              self.set('partners', res.data);
+              self.fire('details-loaded');
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        }, 100);
       },
 
       _savePartner: function (selectedPartnerId) {
         this.set('data.partner_id', selectedPartnerId);
-      },
-
-      _enableClustersList: function (selectedPartnerId) {
-        if (selectedPartnerId === '') {
-          return;
-        }
-
-        var clustersDropdownElement = this.$$('#clustersDropdown');
-        clustersDropdownElement.disabled = false;
       },
 
       _saveCluster: function () {
@@ -1358,9 +1399,18 @@
             e.target.nodeName === 'PAPER-BUTTON' ||
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
           this.set('mode', '');
+          this.set('data', {});
 
+          this.set('partners', []);
+          this.set('selectedPartner', '');
+
+          this.set('clusters', []);
           this.set('selectedCluster', '');
+
+          this.set('objectives', []);
           this.set('selectedObjective', '');
+
+          this.set('indicators', []);
           this.set('selectedIndicator', '');
           this.set('selectedIndicatorDetailType', '');
           
