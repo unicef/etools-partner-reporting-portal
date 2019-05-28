@@ -194,6 +194,19 @@
                   restamp="true">
                   
                   <div class="app-grid">
+                    <div class="item full-width">
+                      <etools-single-selection-menu
+                        class="validate"
+                        label="Partners *"
+                        options="[[partners]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedPartner }}"
+                        on-iron-activate="_validate"
+                        required>
+                      </etools-single-selection-menu>
+                    </div>
+
                     <div class="item">
                       <etools-single-selection-menu
                         class="validate"
@@ -862,6 +875,21 @@
           computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        partners: {
+          type: Array,
+          value: [],
+        },
+
+        selectedPartner: {
+          type: String,
+          value: '',
+        },
+
         partnerID: {
           type: String,
           statePath: 'partner.current.id',
@@ -933,6 +961,7 @@
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
+        '_fetchPartnersList(partner)',
         '_saveCluster(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
@@ -1059,6 +1088,14 @@
           });
       },
 
+      _fetchPartnersList: function () {
+        this.set('partners', [this.partner]);
+      },
+
+      _saveCluster: function () {
+        this.set('data.cluster_id', this.selectedCluster);
+      },
+
       _fetchObjectivesList: function (selectedClusterId) {
         if (selectedClusterId === '') {
           return;
@@ -1141,10 +1178,6 @@
               // TODO: error handling
             });
         }, 100);
-      },
-
-      _saveCluster: function () {
-        this.set('data.cluster_id', this.selectedCluster);
       },
 
       _processData: function (rawData) {
