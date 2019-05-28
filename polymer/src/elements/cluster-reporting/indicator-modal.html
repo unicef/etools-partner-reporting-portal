@@ -1008,7 +1008,6 @@
           this.set('mode', 'custom');
           return true;
         } else if (isImo !== undefined && this.modalTitle === 'Add Project Indicator') {
-          console.log('here in project indicator as imo!');
           this.set('imoInPartner', true);
           return false;
         } else {
@@ -1068,13 +1067,10 @@
         }
 
         if (this.mode === undefined) {
-          console.log('mode is undefined!');
           return;
         }
 
         if (this.mode === 'objectives') {
-          console.log('here in objective mode!');
-          console.log('imoInPartner', this.imoInPartner);
           this.set('data', {
             partner_id: '',
             partner_project_id: '',
@@ -1092,7 +1088,6 @@
             this.set('selectedPartner', this.partnerID);
           }
         } else {
-          console.log('here in custom mode?');
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
           this.set('data', {
