@@ -130,9 +130,9 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-      id="partners"
+      id="partner"
       timeout="100000"
-      url="[[partnersUrl]]">
+      url="[[partnerDetailUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -200,24 +200,6 @@
                   restamp="true">
                   
                   <div class="app-grid">
-                    <div class="item full-width">
-                      <template
-                        is="dom-if"
-                        if="[[imoInPartner]]"
-                        restamp="true">
-
-                        <etools-single-selection-menu
-                          class="validate"
-                          label="Partners *"
-                          options="[[partners]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedPartner }}"
-                          on-iron-activate="_validate"
-                          required>
-                        </etools-single-selection-menu>
-                      </template>
-                    </div>
 
                     <div class="item">
                       <etools-single-selection-menu
@@ -229,7 +211,6 @@
                         option-label="title"
                         selected="{{ selectedCluster }}"
                         on-iron-activate="_validate"
-                        disabled="[[_equals(selectedPartner, '')]]"
                         required>
                       </etools-single-selection-menu>
                     </div>
@@ -806,13 +787,9 @@
       properties: {
         data: Object,
         objectId: Number,
+        projectData: Object,
         objectType: String,
         modalTitle: String,
-
-        imoInPartner: {
-          type: Boolean,
-          value: false,
-        },
 
         isNumber: {
           type: Boolean,
@@ -894,26 +871,6 @@
           computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
-        partnersUrl: {
-          type: String,
-          computed: '_computePartnersUrl(responsePlanId)',
-        },
-
-        partner: {
-          type: Object,
-          statePath: 'partner.current',
-        },
-
-        partners: {
-          type: Array,
-          value: [],
-        },
-
-        selectedPartner: {
-          type: String,
-          value: '',
-        },
-
         partnerID: {
           type: String,
           statePath: 'partner.current.id',
@@ -991,8 +948,6 @@
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
-        '_fetchPartnersList(partner)',
-        '_savePartner(selectedPartner)',
         '_saveCluster(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
@@ -1072,7 +1027,7 @@
 
         if (this.mode === 'objectives') {
           this.set('data', {
-            partner_id: '',
+            partner_id: this.projectData.partner_id || this.partnerID,
             partner_project_id: '',
             cluster_id: '',
             cluster_objective_id: '',
@@ -1083,10 +1038,6 @@
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
-
-          if (this.imoInPartner === false) {
-            this.set('selectedPartner', this.partnerID);
-          }
         } else {
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
@@ -1127,10 +1078,6 @@
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
-      _computePartnersUrl: function (responsePlanId) {
-        return App.Endpoints.clusterPartnerNames(responsePlanId);
-      },
-
       _fetchDisaggregations: function() {
         var self = this;
 
@@ -1140,30 +1087,10 @@
           });
       },
 
-      _fetchPartnersList: function () {
-        this.debounce('fetch-objectives', function () {
-          var self = this;
-
-          this.set('partners', []);
-
-          this.$.partners.abort();
-          this.$.partners.thunk()()
-            .then(function (res) {
-              self.set('partners', res.data);
-              self.fire('details-loaded');
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-        }, 100);
-      },
-
-      _savePartner: function (selectedPartnerId) {
-        this.set('data.partner_id', selectedPartnerId);
-      },
-
       _saveCluster: function () {
         this.set('data.cluster_id', this.selectedCluster);
+
+        console.log(this.data);
       },
 
       _fetchObjectivesList: function (selectedClusterId) {
@@ -1395,9 +1322,6 @@
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
           this.set('mode', '');
           this.set('data', {});
-
-          this.set('partners', []);
-          this.set('selectedPartner', '');
 
           this.set('clusters', []);
           this.set('selectedCluster', '');
