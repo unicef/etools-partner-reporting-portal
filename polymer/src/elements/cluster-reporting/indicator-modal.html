@@ -122,6 +122,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+      id="activities"
+      params="[[activitiesParams]]"
+      url="[[activitiesUrl]]">
+  </etools-prp-ajax>
+
+    <etools-prp-ajax
       id="indicators"
       url="[[indicatorsUrl]]"
       method="post"
@@ -338,13 +344,13 @@
                             options="[[activities]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{ selectedActivity }}"
+                            selected="{{ data.cluster_activity_id }}"
                             on-iron-select="_validate"
                             disabled="[[_equals(activities.length, 0)]]"
                             required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <div class="item full-width">
                         <etools-single-selection-menu
                           class="validate"
@@ -943,6 +949,20 @@
           value: {},
         },
 
+        activitiesUrl: String,
+
+        activitiesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        activities: {
+          type: Array,
+          value: [],
+        },
+
         clusters: {
           format: Array,
           value: [],
@@ -1066,8 +1086,10 @@
         '_resetFields(isNumber)',
         '_updateCSDates(data.start_date_of_reporting_period)',
         '_saveCluster(selectedCluster)',
+        '_fetchActivities(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
+        '_fetchActivityIndicatorsList(data.cluster_activity_id)',
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
 
@@ -1155,6 +1177,19 @@
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
+        } else if (this.mode === 'activity') {
+          this.set('data', {
+            partner_id: this.activityData.partner.id || this.partnerID,
+            partner_project_id: '',
+            cluster_id: '',
+            cluster_activity_id: '',
+            reportable_id: '',
+            locations: [],
+            target: {d: 1},
+            baseline: {d: 1}
+          });
+
+          this.set('indicatorsListUrl', App.Endpoints.indicators('ca') + '/');
         } else {
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
@@ -1210,6 +1245,60 @@
 
       _saveCluster: function () {
         this.set('data.cluster_id', this.selectedCluster);
+      },
+
+      _fetchActivities: function (clusterId) {
+        var self = this;
+        if (typeof clusterId === 'undefined' || typeof this.responsePlanId === 'undefined') {
+          return;
+        }
+        this.set('activities', []);
+        this.set('data.cluster.cluster_activity', undefined);
+        this.set('activitiesParams.cluster_id', clusterId);
+        this.set('activitiesUrl',
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
+            + '?cluster_id=' + clusterId);
+        this.$.activities.abort();
+
+        this.$.activities.thunk()()
+            .then(function (res) {
+              self.set('activities', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchActivityIndicatorsList: function (selectedId) {
+        if (selectedId === '') {
+          return;
+        }
+
+        this.set('indicatorsListParams', {object_id: selectedId, page_size: 9999, page: 1});
+
+        this.debounce('fetch-indicators', function () {
+          var self = this;
+
+          this.set('indicators', []);
+
+          this.$.indicatorsList.abort();
+          this.$.indicatorsList.thunk()()
+            .then(function (res) {
+              console.log('res', res);
+              var simpleIndicatorsList = [];
+
+              res.data.results.forEach(function (indicator) {
+                var simpleIndicator = {};
+                simpleIndicator.id = indicator.id;
+                simpleIndicator.title = indicator.blueprint.title;
+
+                simpleIndicatorsList.push(simpleIndicator);
+              });
+
+              self.set('indicators', simpleIndicatorsList);
+              self.fire('details-loaded');
+            });
+        });
       },
 
       _fetchObjectivesList: function (selectedClusterId) {
