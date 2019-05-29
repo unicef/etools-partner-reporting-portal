@@ -344,7 +344,7 @@
                             options="[[activities]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{ data.cluster_activity_id }}"
+                            selected="{{ selectedActivity }}"
                             on-iron-select="_validate"
                             disabled="[[_equals(activities.length, 0)]]"
                             required>
@@ -963,6 +963,11 @@
           value: [],
         },
 
+        selectedActivity: {
+          type: String,
+          value: '',
+        },
+
         clusters: {
           format: Array,
           value: [],
@@ -998,10 +1003,7 @@
           value: '',
         },
 
-        selectedIndicatorDetailType: {
-          type: String,
-          value: ''
-        },
+        selectedIndicatorDetailType: String,
 
         objectivesUrl: {
           type: String,
@@ -1089,7 +1091,7 @@
         '_fetchActivities(selectedCluster)',
         '_fetchObjectivesList(selectedCluster)',
         '_fetchIndicatorsList(selectedObjective)',
-        '_fetchActivityIndicatorsList(data.cluster_activity_id)',
+        '_fetchActivityIndicatorsList(selectedActivity)',
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
 
@@ -1166,7 +1168,7 @@
 
         if (this.mode === 'objectives') {
           this.set('data', {
-            partner_id: this.projectData.partner_id || this.activityData.partner.id || this.partnerID,
+            partner_id: this.projectData.partner_id || this.partnerID,
             partner_project_id: '',
             cluster_id: '',
             cluster_objective_id: '',
@@ -1177,19 +1179,6 @@
           });
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
-        } else if (this.mode === 'activity') {
-          this.set('data', {
-            partner_id: this.activityData.partner.id || this.partnerID,
-            partner_project_id: '',
-            cluster_id: '',
-            cluster_activity_id: '',
-            reportable_id: '',
-            locations: [],
-            target: {d: 1},
-            baseline: {d: 1}
-          });
-
-          this.set('indicatorsListUrl', App.Endpoints.indicators('ca') + '/');
         } else {
           this.set('selectedDisaggregations', []);
           this.set('errors', {});
@@ -1203,6 +1192,10 @@
             locations: [],
             disaggregations: [],
           });
+
+          if (this.mode === 'activity') {
+            this.set('indicatorsListUrl', App.Endpoints.indicators('ca') + '/');
+          };
 
           this.set('indicatorsUrl', App.Endpoints.clusterIndicators());
 
@@ -1244,7 +1237,9 @@
       },
 
       _saveCluster: function () {
-        this.set('data.cluster_id', this.selectedCluster);
+        if (this.mode === 'objectives') {
+          this.set('data.cluster_id', this.selectedCluster);
+        }
       },
 
       _fetchActivities: function (clusterId) {
@@ -1284,7 +1279,6 @@
           this.$.indicatorsList.abort();
           this.$.indicatorsList.thunk()()
             .then(function (res) {
-              console.log('res', res);
               var simpleIndicatorsList = [];
 
               res.data.results.forEach(function (indicator) {
@@ -1361,15 +1355,16 @@
       },
 
       _fetchSelectedIndicatorDetailType: function (responsePlanId, selectedIndicator) {
-        if (selectedIndicator === undefined) {
+        if (selectedIndicator === undefined || selectedIndicator === '') {
           return;
         }
 
         this.debounce('fetch-selected-indicator', function () {
           var self = this;
 
-          this.set('selectedIndicatorDetailType', '');
-          this.set('data.reportable_id', selectedIndicator);
+          if (this.mode === 'objectives') {
+            this.set('data.reportable_id', selectedIndicator);
+          }
 
           this.$.indicatorDetail.url = App.Endpoints.analysisIndicator(responsePlanId, selectedIndicator);
 
@@ -1537,9 +1532,12 @@
           this.set('objectives', []);
           this.set('selectedObjective', '');
 
+          this.set('activities', []);
+          this.set('selectedActivity', '');
+
           this.set('indicators', []);
           this.set('selectedIndicator', '');
-          this.set('selectedIndicatorDetailType', '');
+          this.set('selectedIndicatorDetailType', undefined);
           
           this.close();
         } else {
