@@ -1248,7 +1248,6 @@
           return;
         }
         this.set('activities', []);
-        this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
             App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
@@ -1282,8 +1281,7 @@
               var simpleIndicatorsList = [];
 
               res.data.results.forEach(function (indicator) {
-                var simpleIndicator = {};
-                simpleIndicator.id = indicator.id;
+                var simpleIndicator = indicator;
                 simpleIndicator.title = indicator.blueprint.title;
 
                 simpleIndicatorsList.push(simpleIndicator);
@@ -1299,8 +1297,11 @@
         if (selectedClusterId === '') {
           return;
         }
-        this.set('data.cluster_id', selectedClusterId);
-        this.set('data.partner_project_id', parseInt(this.objectId));
+        
+        if (this.mode === 'objectives') {
+          this.set('data.cluster_id', selectedClusterId);
+          this.set('data.partner_project_id', parseInt(this.objectId));
+        }
 
         this.debounce('fetch-objectives', function () {
           var self = this;
@@ -1366,12 +1367,26 @@
             this.set('data.reportable_id', selectedIndicator);
           }
 
+          if (this.mode === 'activity') {
+            var chosenActivityIndicator = this.indicators.find(function (indicator) {
+              return indicator.id === selectedIndicator;
+            });
+
+            console.log('indicator', chosenActivityIndicator);
+
+            this.set('data.blueprint.title', chosenActivityIndicator.title);
+            this.set('data.frequency', chosenActivityIndicator.frequency);
+            this.set('data.label', chosenActivityIndicator.label);
+            this.set('data.start_date_of_reporting_period', chosenActivityIndicator.start_date_of_reporting_period);
+          }
+
           this.$.indicatorDetail.url = App.Endpoints.analysisIndicator(responsePlanId, selectedIndicator);
 
           this.$.indicatorDetail.abort();
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
               self.set('selectedIndicatorDetailType', res.data.display_type);
+              console.log('data right now', self.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
