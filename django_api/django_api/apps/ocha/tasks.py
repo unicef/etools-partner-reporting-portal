@@ -19,7 +19,7 @@ logger = logging.getLogger('ocha-sync')
 def finish_response_plan_import(external_plan_id):
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
-    save_location_list(plan_data.get('locations', []), save_children=True)
+    save_location_list(plan_data.get('locations', []), "response_plan")
 
     strategic_objectives_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=measurements'.format(
         external_plan_id

@@ -68,7 +68,7 @@ def import_project_details(project, current_version_id):
                         disaggregation_id=disaggregation.id
                     )
 
-                locations = save_location_list(disaggregated['locations'])
+                locations = save_location_list(disaggregated['locations'], "indicator")
                 for location in locations:
                     ReportableLocationGoal.objects.get_or_create(reportable=reportable, location=location)
             except (KeyError, TypeError, AttributeError):

@@ -115,7 +115,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         else:
             partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
-        locations = save_location_list(location_data_list)
+        locations = save_location_list(location_data_list, "project")
 
         # Add clusters
         if cluster_ids:
