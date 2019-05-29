@@ -125,7 +125,7 @@
       id="activities"
       params="[[activitiesParams]]"
       url="[[activitiesUrl]]">
-  </etools-prp-ajax>
+    </etools-prp-ajax>
 
     <etools-prp-ajax
       id="indicators"
@@ -205,25 +205,6 @@
                     restamp="true">
                     
                     <div class="app-grid">
-                      <div class="item full-width">
-                        <template
-                          is="dom-if"
-                          if="[[imoInPartner]]"
-                          restamp="true">
-  
-                          <etools-single-selection-menu
-                            class="validate"
-                            label="Partners *"
-                            options="[[partners]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{ selectedPartner }}"
-                            on-iron-activate="_validate"
-                            required>
-                          </etools-single-selection-menu>
-                        </template>
-                      </div>
-  
                       <div class="item">
                         <etools-single-selection-menu
                           id="clustersDropdown"
