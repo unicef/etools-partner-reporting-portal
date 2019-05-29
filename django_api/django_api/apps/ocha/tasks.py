@@ -66,8 +66,13 @@ def finish_partner_project_import(project_id, response_plan_id=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
 
+    if not project_data:
+        logger.warning('No project V2 data found for project_id: {}. Using V1 data'.format(external_project_id))
+        return
+
     funding_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(external_project_id)
     funding_data = get_json_from_url(funding_url)
+
     try:
         funding_serializer = V1FundingSourceImportSerializer(data=funding_data['data'])
         funding_serializer.is_valid(raise_exception=True)
@@ -97,10 +102,10 @@ def finish_partner_project_import(project_id, response_plan_id=None):
     project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities'] if c['entityPrototypeId'] == 9]
 
     # At this point all clusters should be in DB
-    clusters.extend(Cluster.objects.filter(
+    clusters.extend(list(Cluster.objects.filter(
         external_source=EXTERNAL_DATA_SOURCES.HPC,
         external_id__in=project_cluster_ids,
-    ))
+    )))
     logger.debug('Adding {} clusters to project {} and it\'s partner.'.format(
         len(clusters), project
     ))
