@@ -76,7 +76,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
 
 
 def save_location_list(location_list, parent=None, save_children=False):
-    location_ids = [l['id'] for l in location_list if 'id' in l and type(l['id']) == int]
+    location_ids = [l['external_id'] for l in location_list if 'external_id' in l and type(l['external_id']) == int]
 
     location_country_map = {}
     locations = []
@@ -88,7 +88,7 @@ def save_location_list(location_list, parent=None, save_children=False):
         ).first()
 
         if not location or save_children:
-            location_data = get_json_from_url(HPC_V2_ROOT_URL + 'location/{}'.format(location_id))
+            location_data = get_json_from_url(HPC_V2_ROOT_URL + 'projectVersion/{}/locations'.format(location_id))
             if 'data' not in location_data:
                 continue
 
