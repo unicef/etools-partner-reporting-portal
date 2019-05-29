@@ -1372,8 +1372,6 @@
               return indicator.id === selectedIndicator;
             });
 
-            console.log('indicator', chosenActivityIndicator);
-
             this.set('data.blueprint.title', chosenActivityIndicator.title);
             this.set('data.frequency', chosenActivityIndicator.frequency);
             this.set('data.label', chosenActivityIndicator.label);
@@ -1386,7 +1384,6 @@
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
               self.set('selectedIndicatorDetailType', res.data.display_type);
-              console.log('data right now', self.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
