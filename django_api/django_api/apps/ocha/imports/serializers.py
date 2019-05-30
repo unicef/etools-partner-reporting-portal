@@ -72,7 +72,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     currentRequestedFunds = serializers.FloatField(source='total_budget', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
-    code = serializers.CharField()
+    code = serializers.CharField(allow_null=True, allow_blank=True)
     additional_information = serializers.CharField(allow_null=True, allow_blank=True)
     locations = V2PartnerProjectLocationImportSerializer(many=True)
     cluster_ids = serializers.ListField(child=serializers.IntegerField(), allow_null=True)

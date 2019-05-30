@@ -153,18 +153,21 @@ def save_location_list(location_list, source_type):
                 name=gateway_name,
             )
 
+            loc_id = location_data['id'] if 'id' in location_data else location_data['external_id']
+            loc_name = location_data['name'] if 'name' in location_data else location_data['title']
+
             location, _ = Location.objects.update_or_create(
                 gateway=gateway,
-                title=location_data['name'],
+                title=loc_name,
                 defaults={
                     'external_source': EXTERNAL_DATA_SOURCES.HPC,
-                    'external_id': location_data['id'],
+                    'external_id': loc_id,
                     'latitude': location_data.get('latitude', None),
                     'longitude': location_data.get('longitude', None),
                     'parent': parent_loc,
                 }
             )
-            logger.debug('Saved location {} as {}'.format(location_data['id'], location))
+            logger.debug('Saved location {} as {}'.format(loc_name, location))
 
         locations.append(location)
 
