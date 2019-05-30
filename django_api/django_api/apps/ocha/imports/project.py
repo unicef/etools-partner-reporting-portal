@@ -85,8 +85,10 @@ def import_project_details(project, current_version_id):
                         'partner': project.partner,
                     }
                 )
-                partner_activity.reportables.add(reportable)
                 partner_activity.locations.add(*locations)
+
+                project.reportables.add(reportable)
+                project.locations.add(*locations)
 
             reportables.append(reportable)
 
