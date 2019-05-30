@@ -128,7 +128,7 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
 
     from ocha.tasks import finish_partner_project_import
     (finish_partner_project_import.delay if async else finish_partner_project_import)(
-        project.pk, response_plan_id=getattr(response_plan, 'id', None)
+        project.pk, external_project_id, response_plan_id=getattr(response_plan, 'id', None)
     )
 
     return project
