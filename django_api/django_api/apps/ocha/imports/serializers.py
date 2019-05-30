@@ -109,7 +109,10 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             validated_data['additional_information'] = ''
         location_data_list = validated_data.pop('locations')
         cluster_ids = validated_data.pop('cluster_ids', None)
-        partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
+        partner_project = PartnerProject.objects.filter(
+            external_source=EXTERNAL_DATA_SOURCES.HPC,
+            external_id=validated_data['external_id']
+        ).first()
         if partner_project:
             partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
         else:
