@@ -285,8 +285,10 @@
       },
 
       detached: function () {
-        this.set(['localData', 'narrative_assessment'],
-          Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input').value);
+        if (Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input') !== null) {
+          this.set(['localData', 'narrative_assessment'],
+            Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input').value);
+        }
         
         if (this.isDebouncerActive('local-data-changed')) {
           this.cancelDebouncer('local-data-changed');

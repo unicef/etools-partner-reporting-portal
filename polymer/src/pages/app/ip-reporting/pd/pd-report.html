@@ -367,6 +367,9 @@
       },
 
       _onReportStatusChanged: function (currentReport, mode) {
+        if (currentReport.status === 'Sen') {
+          this.set('routeData.mode', 'edit');
+        }
         if (
           this._isReadOnlyReport(currentReport) &&
           (mode || '').toLowerCase !== 'view'

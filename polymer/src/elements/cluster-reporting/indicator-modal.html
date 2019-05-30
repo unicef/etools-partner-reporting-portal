@@ -181,12 +181,12 @@
             is="dom-if"
             if="[[!_isClusterImo(prpRoles)]]"
             restamp="true">
-          
+
             <paper-radio-group
               id="mode"
               selected="{{ mode }}"
               on-change="adjustPosition">
-  
+
               <template
                 is="dom-if"
                 if="[[!_equals(modalTitle, 'Add Activity Indicator')]]"
@@ -195,7 +195,7 @@
                 <paper-radio-button name="objectives">
                   <strong>Adopt from Cluster Objective</strong>
                 </paper-radio-button>
-    
+
                 <div
                   class="fields"
                   empty$="[[!_equals(mode, 'objectives')]]">
@@ -203,7 +203,7 @@
                     is="dom-if"
                     if="[[_equals(mode, 'objectives')]]"
                     restamp="true">
-                    
+
                     <div class="app-grid">
                       <div class="item">
                         <etools-single-selection-menu
@@ -219,7 +219,7 @@
                           required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <div class="item">
                         <etools-single-selection-menu
                             class="validate"
@@ -233,7 +233,7 @@
                             required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <div class="item full-width">
                         <etools-single-selection-menu
                           class="validate"
@@ -247,7 +247,7 @@
                           required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <json-field
                         class="item validate"
                         id="target"
@@ -257,7 +257,7 @@
                         allowed-pattern="[+\-\d.]"
                         on-input="_validate">
                       </json-field>
-    
+
                       <json-field
                         class="item validate"
                         id="total"
@@ -267,7 +267,7 @@
                         allowed-pattern="[+\-\d.]"
                         on-input="_validate">
                       </json-field>
-    
+
                       <template
                         is="dom-if"
                         if="[[selectedIndicatorDetailType]]"
@@ -280,17 +280,17 @@
                           </indicator-locations-widget>
                         </div>
                       </template>
-                      
+
                     </div>
                   </template>
                 </div>
               </template>
-              
+
               <template
                 is="dom-if"
                 if="[[_equals(modalTitle, 'Add Activity Indicator')]]"
                 restamp="true">
-              
+
                 <paper-radio-button name="activity">
                   <strong>Adopt from Cluster Activity</strong>
                 </paper-radio-button>
@@ -302,11 +302,11 @@
                     is="dom-if"
                     if="[[_equals(mode, 'activity')]]"
                     restamp="true">
-                    
+
                     <div class="app-grid">
                       <div class="item">
                         <etools-single-selection-menu
-                          id="clustersDropdown"
+                          id="clustersDropdownForActivity"
                           class="validate"
                           label="Clusters *"
                           options="[[clusters]]"
@@ -317,7 +317,7 @@
                           required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <div class="item">
                         <etools-single-selection-menu
                             class="validate"
@@ -345,27 +345,27 @@
                           required>
                         </etools-single-selection-menu>
                       </div>
-    
+
                       <json-field
                         class="item validate"
-                        id="target"
+                        id="targetForActivity"
                         label="Baseline"
                         value="{{ data.baseline }}"
                         type="[[selectedIndicatorDetailType]]"
                         allowed-pattern="[+\-\d.]"
                         on-input="_validate">
                       </json-field>
-    
+
                       <json-field
                         class="item validate"
-                        id="total"
+                        id="totalForActivity"
                         label="Target"
                         value="{{ data.target }}"
                         type="[[selectedIndicatorDetailType]]"
                         allowed-pattern="[+\-\d.]"
                         on-input="_validate">
                       </json-field>
-    
+
                       <template
                         is="dom-if"
                         if="[[selectedIndicatorDetailType]]"
@@ -378,16 +378,16 @@
                           </indicator-locations-widget>
                         </div>
                       </template>
-                      
+
                     </div>
                   </template>
                 </div>
               </template>
-  
+
               <paper-radio-button name="custom">
                 <strong>Custom</strong>
               </paper-radio-button>
-  
+
               <div
                 class="fields"
                 empty$="[[!_equals(mode, 'custom')]]">
@@ -395,7 +395,7 @@
                   is="dom-if"
                   if="[[_equals(mode, 'custom')]]"
                   restamp="true">
-  
+
                   <div class="app-grid">
                     <div class="item full-width title">
                       <paper-input
@@ -407,7 +407,7 @@
                         required>
                       </paper-input>
                     </div>
-    
+
                     <div class="item full-width">
                       <labelled-item label="Type">
                         <paper-radio-group
@@ -418,7 +418,7 @@
                         </paper-radio-group>
                       </labelled-item>
                     </div>
-    
+
                     <div class="item full-width">
                       <div class="layout horizontal">
                         <labelled-item
@@ -429,7 +429,7 @@
                             disabled="[[!isNumber]]">
                           </calculation-method>
                         </labelled-item>
-    
+
                         <labelled-item
                           class="calculation-method"
                           label="Calculation method across reporting periods">
@@ -440,7 +440,7 @@
                         </labelled-item>
                       </div>
                     </div>
-    
+
                     <div class="item full-width">
                       <paper-input
                         class="validate"
@@ -450,7 +450,7 @@
                         always-float-label>
                       </paper-input>
                     </div>
-    
+
                     <div class="item full-width">
                       <paper-input
                         class="validate"
@@ -460,7 +460,7 @@
                         always-float-label>
                       </paper-input>
                     </div>
-    
+
                     <div class="item full-width">
                       <div class="app-grid double">
                         <etools-single-selection-menu
@@ -475,7 +475,7 @@
                           hide-search
                           required>
                         </etools-single-selection-menu>
-    
+
                         <template
                             is="dom-if"
                             if="[[_showCSD(data.frequency)]]"
@@ -489,7 +489,7 @@
                             <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
                           </etools-prp-chips>
                         </template>
-    
+
                         <etools-prp-date-input
                           class="item validate pair"
                           label="Start date of reporting period"
@@ -500,7 +500,7 @@
                         </etools-prp-date-input>
                       </div>
                     </div>
-    
+
                     <div class="item full-width">
                       <template
                         is="dom-if"
@@ -514,7 +514,7 @@
                           always-float-label>
                         </paper-input>
                       </template>
-    
+
                       <template
                         is="dom-if"
                         if="[[!isNumber]]"
@@ -527,7 +527,7 @@
                             value="{{data.numerator_label}}"
                             always-float-label>
                           </paper-input>
-    
+
                           <paper-input
                             class="item validate pair"
                             label="Denominator Label"
@@ -538,7 +538,7 @@
                         </div>
                       </template>
                     </div>
-    
+
                     <div class="item full-width">
                       <template
                         is="dom-if"
@@ -553,7 +553,7 @@
                             value="{{data.baseline}}"
                             allowed-pattern="[+\-\d]">
                           </json-field>
-      
+
                           <json-field
                             class="item validate"
                             type="[[data.blueprint.display_type]]"
@@ -562,7 +562,7 @@
                             value="{{data.in_need}}"
                             allowed-pattern="[+\-\d]">
                           </json-field>
-      
+
                           <json-field
                             class="item validate"
                             type="[[data.blueprint.display_type]]"
@@ -575,7 +575,7 @@
                         </div>
                       </template>
                     </div>
-  
+
                     <div class="item full-width">
                       <template
                         is="dom-if"
@@ -590,7 +590,7 @@
                             value="{{data.baseline}}"
                             allowed-pattern="[+\-\d]">
                           </json-field>
-      
+
                           <json-field
                             class="item validate pair"
                             type="[[data.blueprint.display_type]]"
@@ -603,7 +603,7 @@
                         </div>
                       </template>
                     </div>
-    
+
                     <div class="item full-width">
                       <indicator-locations-widget
                         class="validate"
@@ -611,7 +611,7 @@
                         value="{{data.locations}}">
                       </indicator-locations-widget>
                     </div>
-    
+
                     <div class="item full-width">
                       <disaggregations-dropdown-widget
                         class="validate"
@@ -620,7 +620,7 @@
                       </disaggregations-dropdown-widget>
                     </div>
                   </div>
-                  
+
                 </template>
               </div>
             </paper-radio-group>
@@ -1177,7 +1177,7 @@
 
           if (this.mode === 'activity') {
             this.set('indicatorsListUrl', App.Endpoints.indicators('ca') + '/');
-          };
+          }
 
           this.set('indicatorsUrl', App.Endpoints.clusterIndicators());
 
@@ -1279,7 +1279,7 @@
         if (selectedClusterId === '') {
           return;
         }
-        
+
         if (this.mode === 'objectives') {
           this.set('data.cluster_id', selectedClusterId);
           this.set('data.partner_project_id', parseInt(this.objectId));
@@ -1532,7 +1532,7 @@
           this.set('indicators', []);
           this.set('selectedIndicator', '');
           this.set('selectedIndicatorDetailType', undefined);
-          
+
           this.close();
         } else {
           return;
