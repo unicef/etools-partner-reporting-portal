@@ -1,5 +1,3 @@
-import logging
-
 from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
@@ -10,15 +8,12 @@ from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_valu
 from partner.models import PartnerActivity
 
 
-logger = logging.getLogger('ocha-sync')
-
-
 def import_project_details(project, current_version_id):
     source_url = HPC_V2_ROOT_URL + 'projectVersion/{}/attachments'.format(current_version_id)
     attachments = get_json_from_url(source_url)['data']
 
     if not attachments:
-        logger.warning('No project attachment V2 data found for project_id: {}. Skipping reportables and location data'.format(external_project_id))
+        logger.warning('No project attachment V2 data found for project_id: {}. Skipping reportables and location data'.format(current_version_id))
         return
 
     reportables = []
