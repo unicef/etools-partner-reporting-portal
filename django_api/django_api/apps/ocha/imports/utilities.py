@@ -95,7 +95,7 @@ def save_location_list(location_list, source_type):
     locations = []
 
     for location_data in location_list:
-        if id_key == 'external_id':
+        if id_key == 'external_id' or id_key == 'id':
             location = Location.objects.filter(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=location_data[id_key]
@@ -107,20 +107,31 @@ def save_location_list(location_list, source_type):
             ).first()
 
         if not location:
-            country = None
             parent_loc = None
 
-            if 'parentId' in location_data:
+            if source_type == "indicator" and 'parent' in location_data:
+                parent_loc = Location.objects.filter(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    title=location_data['parent']['name']
+                ).first()
+
+                if not parent_loc:
+                    logger.warning('Couldn\'t find parent location for {}, skipping: {}'.format(
+                        source_type, location_data
+                    ))
+                    continue
+
+            elif source_type == "project" and 'parentId' in location_data:
                 parent_loc = Location.objects.filter(
                     external_source=EXTERNAL_DATA_SOURCES.HPC,
                     external_id=location_data['parentId']
                 ).first()
 
-            elif 'parent' in location_data:
-                parent_loc = Location.objects.filter(
-                    external_source=EXTERNAL_DATA_SOURCES.HPC,
-                    title=location_data['parent']['name']
-                ).first()
+                if not parent_loc:
+                    logger.warning('Couldn\'t find parent location for {}, skipping: {}'.format(
+                        source_type, location_data
+                    ))
+                    continue
 
             if parent_loc:
                 country = parent_loc.gateway.country
@@ -133,7 +144,8 @@ def save_location_list(location_list, source_type):
                         'name': location_data['name']
                     }
                 )
-            elif not country:
+
+            if not country:
                 logger.warning('Couldn\'t find country for {}, skipping: {}'.format(
                     source_type, location_data
                 ))

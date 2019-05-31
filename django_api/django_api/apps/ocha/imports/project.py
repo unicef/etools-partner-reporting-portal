@@ -75,6 +75,7 @@ def import_project_details(project, current_version_id):
                 locations = []
 
             if cluster_activity:
+                from indicator.models import create_pa_reportables_from_ca
                 partner_activity, _ = PartnerActivity.objects.update_or_create(
                     project=project,
                     cluster_activity=cluster_activity,
@@ -86,6 +87,7 @@ def import_project_details(project, current_version_id):
                     }
                 )
                 partner_activity.locations.add(*locations)
+                create_pa_reportables_from_ca(partner_activity, cluster_activity)
 
                 project.reportables.add(reportable)
                 project.locations.add(*locations)
