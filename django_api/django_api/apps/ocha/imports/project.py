@@ -1,3 +1,5 @@
+import logging
+
 from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
@@ -8,9 +10,16 @@ from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_valu
 from partner.models import PartnerActivity
 
 
+logger = logging.getLogger('ocha-sync')
+
+
 def import_project_details(project, current_version_id):
-    source_url = HPC_V2_ROOT_URL + 'project-version/{}/attachments'.format(current_version_id)
+    source_url = HPC_V2_ROOT_URL + 'projectVersion/{}/attachments'.format(current_version_id)
     attachments = get_json_from_url(source_url)['data']
+
+    if not attachments:
+        logger.warning('No project attachment V2 data found for project_id: {}. Skipping reportables and location data'.format(external_project_id))
+        return
 
     reportables = []
 
@@ -59,13 +68,14 @@ def import_project_details(project, current_version_id):
                         disaggregation_id=disaggregation.id
                     )
 
-                locations = save_location_list(disaggregated['locations'])
+                locations = save_location_list(disaggregated['locations'], "indicator")
                 for location in locations:
                     ReportableLocationGoal.objects.get_or_create(reportable=reportable, location=location)
             except (KeyError, TypeError, AttributeError):
                 locations = []
 
             if cluster_activity:
+                from indicator.models import create_pa_reportables_from_ca
                 partner_activity, _ = PartnerActivity.objects.update_or_create(
                     project=project,
                     cluster_activity=cluster_activity,
@@ -76,8 +86,11 @@ def import_project_details(project, current_version_id):
                         'partner': project.partner,
                     }
                 )
-                partner_activity.reportables.add(reportable)
                 partner_activity.locations.add(*locations)
+                create_pa_reportables_from_ca(partner_activity, cluster_activity)
+
+                project.reportables.add(reportable)
+                project.locations.add(*locations)
 
             reportables.append(reportable)
 
@@ -111,13 +124,7 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
     current_project_data['cluster_ids'] = list()
     if 'governingEntities' in current_project_data:
         for cluster in current_project_data['governingEntities']:
-            if 'clusterNumber' in cluster:
-                if not cluster['clusterNumber'].isdigit():
-                    cluster_number = int(cluster['clusterNumber'][1:])
-                else:
-                    cluster_number = int(cluster['clusterNumber'])
-
-                current_project_data['cluster'] = current_project_data['cluster_ids'].append(cluster_number)
+            current_project_data['cluster_ids'].append(cluster['id'])
 
     serializer = V2PartnerProjectImportSerializer(data=current_project_data)
     serializer.is_valid(raise_exception=True)
@@ -125,7 +132,7 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
 
     from ocha.tasks import finish_partner_project_import
     (finish_partner_project_import.delay if async else finish_partner_project_import)(
-        project.pk, response_plan_id=getattr(response_plan, 'id', None)
+        project.pk, external_project_id, response_plan_id=getattr(response_plan, 'id', None)
     )
 
     return project

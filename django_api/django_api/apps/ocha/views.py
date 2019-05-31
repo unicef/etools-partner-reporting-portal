@@ -261,6 +261,17 @@ class RPMProjectDetailAPIView(APIView):
                 current_project_data = project
                 break
 
+        # Fetch attachment data
+        attachment_url = HPC_V2_ROOT_URL \
+            + 'projectVersion/{}/attachments'.format(details['data']['currentPublishedVersionId'])
+        attachments = get_json_from_url(attachment_url)
+
+        if 'data' in attachments:
+            out_data['attachments'] = map(
+                lambda item: item['attachment']['value']['description'],
+                filter(lambda x: x['attachment']['type'] == 'indicator', attachments['data'])
+            )
+
         out_data['startDate'] = current_project_data['startDate']
         out_data['endDate'] = current_project_data['endDate']
         out_data['name'] = current_project_data['name']
@@ -272,10 +283,13 @@ class RPMProjectDetailAPIView(APIView):
         out_data['totalBudgetUSD'] = current_project_data['currentRequestedFunds']
 
         funding_sources = []
-        for flow in budget_info['data']['flows']:
-            funding_sources.extend([
-                fs['name'] for fs in flow.get('sourceObjects', []) if fs['type'] == 'Organization'
-            ])
+
+        if 'data' in budget_info:
+            for flow in budget_info['data']['flows']:
+                funding_sources.extend([
+                    fs['name'] for fs in flow.get('sourceObjects', []) if fs['type'] == 'Organization'
+                ])
+
         out_data['fundingSources'] = funding_sources
         out_data['objective'] = current_project_data['objective']
         additional_information = list()

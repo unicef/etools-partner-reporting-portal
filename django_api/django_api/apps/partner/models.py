@@ -280,16 +280,12 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
 
             r_loc_type = r_locations.first().gateway.admin_level
 
-            if loc_type != r_loc_type:
-                raise Exception(
-                    "Location admin level in Project and {} Project Indicator are not same".format(r)
-                )
-
-            for loc in new_locations:
-                ReportableLocationGoal.objects.get_or_create(
-                    reportable=r,
-                    location=loc,
-                )
+            if loc_type == r_loc_type:
+                for loc in new_locations:
+                    ReportableLocationGoal.objects.get_or_create(
+                        reportable=r,
+                        location=loc,
+                    )
 
 
 class PartnerProjectFunding(TimeStampedModel):
