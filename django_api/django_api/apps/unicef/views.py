@@ -846,7 +846,6 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                     # Store location_totals only for each IndicatorLocationData
                     for ild in target_hf_ilds_by_loc:
-                        calculated[loc_id]['total']['c'] += ild.disaggregation['()']['c']
                         calculated[loc_id]['total']['v'] += ild.disaggregation['()']['v']
 
                         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
@@ -854,6 +853,12 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
+
+                    calculated[loc_id]['total']['c'] = float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
+
+                    if calculated[loc_id]['total']['c'] is None:
+                        calculated[loc_id]['total']['c'] = 0
+
                 else:
                     target_keys = target_hf_ilds_by_loc[0].disaggregation.keys()
 
@@ -866,7 +871,6 @@ class ProgressReportPullHFDataAPIView(APIView):
                             if key not in calculated[loc_id]['data']:
                                 calculated[loc_id]['data'][key] = {'c': 0, 'd': 0, 'v': 0}
 
-                            calculated[loc_id]['data'][key]['c'] += ild.disaggregation[key]['c']
                             calculated[loc_id]['data'][key]['v'] += ild.disaggregation[key]['v']
 
                             if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
@@ -874,6 +878,11 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                             else:
                                 calculated[loc_id]['data'][key]['d'] += ild.disaggregation[key]['d']
+
+                        calculated[loc_id]['data'][key]['c'] = float(calculated[loc_id]['data'][key]['v']) / calculated[loc_id]['data'][key]['d']
+
+                        if calculated[loc_id]['data'][key]['c'] is None:
+                            calculated[loc_id]['data'][key]['c'] = 0
 
         return calculated
 
