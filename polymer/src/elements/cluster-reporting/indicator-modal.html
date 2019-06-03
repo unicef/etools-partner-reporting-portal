@@ -187,202 +187,98 @@
               selected="{{ mode }}"
               on-change="adjustPosition">
 
-              <template
-                is="dom-if"
-                if="[[!_equals(modalTitle, 'Add Activity Indicator')]]"
-                restamp="true">
+              <paper-radio-button name="objectives">
+                <strong>Adopt from Cluster Objective</strong>
+              </paper-radio-button>
 
-                <paper-radio-button name="objectives">
-                  <strong>Adopt from Cluster Objective</strong>
-                </paper-radio-button>
+              <div
+                class="fields"
+                empty$="[[!_equals(mode, 'objectives')]]">
+                <template
+                  is="dom-if"
+                  if="[[_equals(mode, 'objectives')]]"
+                  restamp="true">
 
-                <div
-                  class="fields"
-                  empty$="[[!_equals(mode, 'objectives')]]">
-                  <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'objectives')]]"
-                    restamp="true">
-
-                    <div class="app-grid">
-                      <div class="item">
-                        <etools-single-selection-menu
-                          id="clustersDropdown"
-                          class="validate"
-                          label="Clusters *"
-                          options="[[clusters]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedCluster }}"
-                          on-iron-activate="_validate"
-                          disabled="[[_equals(selectedPartner, '')]]"
-                          required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <div class="item">
-                        <etools-single-selection-menu
-                            class="validate"
-                            label="Objective *"
-                            options="[[objectives]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{ selectedObjective }}"
-                            on-iron-select="_validate"
-                            disabled="[[_equals(objectives.length, 0)]]"
-                            required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <div class="item full-width">
-                        <etools-single-selection-menu
-                          class="validate"
-                          label="Indicator *"
-                          options="[[indicators]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedIndicator }}"
-                          on-iron-select="_validate"
-                          disabled="[[_equals(indicators.length, 0)]]"
-                          required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <json-field
-                        class="item validate"
-                        id="target"
-                        label="Baseline"
-                        value="{{ data.baseline }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\-\d.]"
-                        on-input="_validate">
-                      </json-field>
-
-                      <json-field
-                        class="item validate"
-                        id="total"
-                        label="Target"
-                        value="{{ data.target }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\-\d.]"
-                        on-input="_validate">
-                      </json-field>
-
-                      <template
-                        is="dom-if"
-                        if="[[selectedIndicatorDetailType]]"
-                        restamp="true">
-                        <div class="item full-width">
-                          <indicator-locations-widget
-                            class="validate"
-                            indicator-type="[[selectedIndicatorDetailType]]"
-                            value="{{ data.locations }}">
-                          </indicator-locations-widget>
-                        </div>
-                      </template>
-
+                  <div class="app-grid">
+                    <div class="item">
+                      <etools-single-selection-menu
+                        id="clustersDropdown"
+                        class="validate"
+                        label="Clusters *"
+                        options="[[clusters]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedCluster }}"
+                        on-iron-activate="_validate"
+                        disabled="[[_equals(selectedPartner, '')]]"
+                        required>
+                      </etools-single-selection-menu>
                     </div>
-                  </template>
-                </div>
-              </template>
 
-              <template
-                is="dom-if"
-                if="[[_equals(modalTitle, 'Add Activity Indicator')]]"
-                restamp="true">
-
-                <paper-radio-button name="activity">
-                  <strong>Adopt from Cluster Activity</strong>
-                </paper-radio-button>
-
-                <div
-                  class="fields"
-                  empty$="[[!_equals(mode, 'activity')]]">
-                  <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'activity')]]"
-                    restamp="true">
-
-                    <div class="app-grid">
-                      <div class="item">
-                        <etools-single-selection-menu
-                          id="clustersDropdownForActivity"
+                    <div class="item">
+                      <etools-single-selection-menu
                           class="validate"
-                          label="Clusters *"
-                          options="[[clusters]]"
+                          label="Objective *"
+                          options="[[objectives]]"
                           option-value="id"
                           option-label="title"
-                          selected="{{ selectedCluster }}"
-                          on-iron-activate="_validate"
-                          required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <div class="item">
-                        <etools-single-selection-menu
-                            class="validate"
-                            label="Activity *"
-                            options="[[activities]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{ selectedActivity }}"
-                            on-iron-select="_validate"
-                            disabled="[[_equals(activities.length, 0)]]"
-                            required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <div class="item full-width">
-                        <etools-single-selection-menu
-                          class="validate"
-                          label="Indicator *"
-                          options="[[indicators]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedIndicator }}"
+                          selected="{{ selectedObjective }}"
                           on-iron-select="_validate"
-                          disabled="[[_equals(indicators.length, 0)]]"
+                          disabled="[[_equals(objectives.length, 0)]]"
                           required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <json-field
-                        class="item validate"
-                        id="targetForActivity"
-                        label="Baseline"
-                        value="{{ data.baseline }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\-\d.]"
-                        on-input="_validate">
-                      </json-field>
-
-                      <json-field
-                        class="item validate"
-                        id="totalForActivity"
-                        label="Target"
-                        value="{{ data.target }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\-\d.]"
-                        on-input="_validate">
-                      </json-field>
-
-                      <template
-                        is="dom-if"
-                        if="[[selectedIndicatorDetailType]]"
-                        restamp="true">
-                        <div class="item full-width">
-                          <indicator-locations-widget
-                            class="validate"
-                            indicator-type="[[selectedIndicatorDetailType]]"
-                            value="{{ data.locations }}">
-                          </indicator-locations-widget>
-                        </div>
-                      </template>
-
+                      </etools-single-selection-menu>
                     </div>
-                  </template>
-                </div>
-              </template>
+
+                    <div class="item full-width">
+                      <etools-single-selection-menu
+                        class="validate"
+                        label="Indicator *"
+                        options="[[indicators]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedIndicator }}"
+                        on-iron-select="_validate"
+                        disabled="[[_equals(indicators.length, 0)]]"
+                        required>
+                      </etools-single-selection-menu>
+                    </div>
+
+                    <json-field
+                      class="item validate"
+                      id="target"
+                      label="Baseline"
+                      value="{{ data.baseline }}"
+                      type="[[selectedIndicatorDetailType]]"
+                      allowed-pattern="[+\-\d.]"
+                      on-input="_validate">
+                    </json-field>
+
+                    <json-field
+                      class="item validate"
+                      id="total"
+                      label="Target"
+                      value="{{ data.target }}"
+                      type="[[selectedIndicatorDetailType]]"
+                      allowed-pattern="[+\-\d.]"
+                      on-input="_validate">
+                    </json-field>
+
+                    <template
+                      is="dom-if"
+                      if="[[selectedIndicatorDetailType]]"
+                      restamp="true">
+                      <div class="item full-width">
+                        <indicator-locations-widget
+                          class="validate"
+                          indicator-type="[[selectedIndicatorDetailType]]"
+                          value="{{ data.locations }}">
+                        </indicator-locations-widget>
+                      </div>
+                    </template>
+
+                  </div>
+                </template>
+              </div>
 
               <paper-radio-button name="custom">
                 <strong>Custom</strong>
@@ -1082,7 +978,9 @@
           return role.role === 'CLUSTER_IMO';
         });
 
-        if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator') {
+        if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator'
+          || isImo !== undefined && this.modalTitle === 'Add Activity Indicator'
+        ) {
           this.set('mode', 'custom');
           return true;
         } else if (isImo !== undefined && this.modalTitle === 'Add Project Indicator') {
