@@ -73,6 +73,7 @@
       },
 
       attached: function () {
+        this.$.field.validate();
         this.fire('register-field', this);
       },
 

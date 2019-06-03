@@ -200,7 +200,6 @@
 
       attached: function () {
         var nullData = this._clone(this.data);
-        console.log('null data', nullData);
         if (nullData.v === 0) {
           nullData.v = null;
         }
@@ -208,7 +207,6 @@
           nullData.d = null;
         }
         this.set('data', nullData);
-        console.log('this data', this.data);
       },
     });
   </script>
