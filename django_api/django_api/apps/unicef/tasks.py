@@ -529,11 +529,8 @@ def process_programme_documents(fast=False, area=False):
                                                 try:
                                                     partner_activity = PartnerActivity.objects.create(
                                                         title=cai.blueprint.title,
-                                                        project=pp,
                                                         partner=pd.partner,
                                                         cluster_activity=cai.content_object,
-                                                        start_date=cai.content_object.response_plan.start,
-                                                        end_date=cai.content_object.response_plan.end,
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
