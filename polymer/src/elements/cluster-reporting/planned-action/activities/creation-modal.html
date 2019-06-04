@@ -51,6 +51,21 @@
         };
       }
 
+      .app-grid {
+        padding-top: 0;
+        margin: 0 -var(--app-grid-gutter);
+      }
+
+      .row {
+        margin-bottom: 1em;
+      }
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+        color: var(--paper-deep-orange-a700);
+      }
+
       .item-wide {
         @apply --app-grid-expandible-item;
       }
@@ -204,61 +219,94 @@
                       required>
                   </etools-single-selection-menu>
                 </div>
-                <div class="item item-wide">
-                   <etools-single-selection-menu
-                      class="validate"
-                      label="Partner Project"
-                      options="[[projects]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{selectedProject}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(projects.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
-                <div class="item">
-                   <etools-prp-date-input
-                      class="start-date"
-                      label="Start date"
-                      value="{{selectedStartdate}}"
-                      error-message=""
-                      required
-                      no-init>
-                   </etools-prp-date-input>
-                  </etools-date-input>
-                </div>
-                <div class="item">
-                  <etools-prp-date-input
-                      class="end-date"
-                      label="End date"
-                      value="{{selectedEnddate}}"
-                      error-message=""
-                      required
-                      no-init>
-                  </etools-prp-date-input>
-                </div>
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Status"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{selectedStatus}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[statuses]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
+
+                <template
+                  is="dom-repeat"
+                  items="[[value]]">
+
+                  <div class="row layout horizontal">
+                    <div>
+                      <paper-icon-button
+                          index="[[index]]"
+                          class="remove-btn"
+                          data-index$="[[index]]"
+                          on-tap="_remove"
+                          icon="icons:cancel">
+                      </paper-icon-button>
+                      <paper-tooltip offset="5">Remove</paper-tooltip>
+                    </div>
+                  </div>
+
+                  <div class="flex">
+                    <div class="app-grid">
+                      <div class="item item-wide">
+                        <etools-single-selection-menu
+                            class="validate"
+                            label="Partner Project"
+                            options="[[projects]]"
+                            option-value="id"
+                            option-label="title"
+                            selected="{{selectedProject}}"
+                            on-iron-activate="_validate"
+                            disabled="[[_equals(projects.length, 0)]]"
+                            trigger-value-change-event
+                            required>
+                        </etools-single-selection-menu>
+                      </div>
+
+                      <div class="item">
+                        <etools-prp-date-input
+                            class="start-date"
+                            label="Start date"
+                            value="{{selectedStartdate}}"
+                            error-message=""
+                            required
+                            no-init>
+                        </etools-prp-date-input>
+                        </etools-date-input>
+                      </div>
+
+                      <div class="item">
+                        <etools-prp-date-input
+                            class="end-date"
+                            label="End date"
+                            value="{{selectedEnddate}}"
+                            error-message=""
+                            required
+                            no-init>
+                        </etools-prp-date-input>
+                      </div>
+
+                      <div class="item">
+                        <paper-dropdown-menu
+                            class="validate"
+                            label="Status"
+                            on-value-changed="_validate"
+                            always-float-label
+                            required>
+                          <paper-listbox
+                              selected="{{selectedStatus}}"
+                              attr-for-selected="value"
+                              slot="dropdown-content"
+                              class="dropdown-content">
+                            <template
+                                is="dom-repeat"
+                                items="[[statuses]]">
+                              <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                            </template>
+                          </paper-listbox>
+                        </paper-dropdown-menu>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <paper-button
+                    class="btn-primary"
+                    on-tap="_add">
+                  Add Project
+                </paper-button>
+
               </div>
             </template>
           </div>
@@ -411,6 +459,11 @@
       properties: {
         data: Object,
 
+        value: {
+          type: Array,
+          value: [1],
+        },
+
         activitiesUrl: String,
 
         updatePending: {
@@ -553,6 +606,10 @@
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
+        '_saveProject(selectedProject)',
+        '_saveStartdate(selectedStartdate)',
+        '_saveEnddate(selectedEnddate)',
+        '_saveStatus(selectedStatus)',
       ],
 
       _setDefaults: function () {
