@@ -211,7 +211,7 @@
                       options="[[projects]]"
                       option-value="id"
                       option-label="title"
-                      selected="{{data.cluster.project}}"
+                      selected="{{selectedProject}}"
                       on-iron-activate="_validate"
                       disabled="[[_equals(projects.length, 0)]]"
                       trigger-value-change-event
@@ -222,7 +222,7 @@
                    <etools-prp-date-input
                       class="start-date"
                       label="Start date"
-                      value="{{data.cluster.start_date}}"
+                      value="{{selectedStartdate}}"
                       error-message=""
                       required
                       no-init>
@@ -233,7 +233,7 @@
                   <etools-prp-date-input
                       class="end-date"
                       label="End date"
-                      value="{{data.cluster.end_date}}"
+                      value="{{selectedEnddate}}"
                       error-message=""
                       required
                       no-init>
@@ -247,7 +247,7 @@
                       always-float-label
                       required>
                     <paper-listbox
-                        selected="{{data.cluster.status}}"
+                        selected="{{selectedStatus}}"
                         attr-for-selected="value"
                         slot="dropdown-content"
                         class="dropdown-content">
@@ -521,6 +521,26 @@
         profile: {
           type: Object,
           statePath: 'userProfile.profile',
+        },
+
+        selectedProject: {
+          type: String,
+          value: ''
+        },
+
+        selectedStartdate: {
+          type: String,
+          value: ''
+        },
+
+        selectedEnddate: {
+          type: String,
+          value: ''
+        },
+
+        selectedStatus: {
+          type: String,
+          value: ''
         },
 
       },
