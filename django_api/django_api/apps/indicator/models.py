@@ -641,6 +641,13 @@ class IndicatorReport(TimeStampedModel):
         'indicator.ReportingEntity', related_name="indicator_reports"
     )
 
+    project = models.ForeignKey(
+        'partner.PartnerProject',
+        related_name="indicator_reports",
+        null=True,
+        blank=True
+    )
+
     tracker = FieldTracker(fields=['report_status'])
     objects = IndicatorReportManager()
 
