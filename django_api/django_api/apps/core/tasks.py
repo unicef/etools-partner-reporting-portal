@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
 from celery import shared_task
 from django.db import transaction
@@ -19,10 +18,10 @@ from core.helpers import (
     get_latest_pr_by_type,
     create_pr_for_report_type,
     create_ir_and_ilds_for_pr,
+    create_ir_for_cluster,
 )
 from unicef.models import ProgrammeDocument
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport, ReportingEntity, IndicatorLocationData
-
+from indicator.models import Reportable
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15
@@ -76,6 +75,7 @@ def process_period_reports():
                     continue
 
                 frequency = reportable.frequency
+                reportable_type = reportable.content_type.model
                 latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
 
                 if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
@@ -130,75 +130,17 @@ def process_period_reports():
                         else:
                             end_date = calculate_end_date_given_start_date(start_date, frequency)
 
-                        if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                            logger.info("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
-                                reportable, start_date, end_date
-                            ))
+                        if reportable_type == 'partneractivity':
+                            project_contexts = reportable.content_object.projects.all()
 
-                            indicator_report = IndicatorReport.objects.create(
-                                reportable=reportable,
-                                time_period_start=start_date,
-                                time_period_end=end_date,
-                                due_date=end_date + relativedelta(days=1),
-                                title=reportable.blueprint.title,
-                                total={'c': 0, 'd': 0, 'v': 0},
-                                overall_status="NoS",
-                                report_status="Due",
-                                submission_date=None,
-                                reporting_entity=ReportingEntity.objects.get(title="Cluster"),
-                            )
-
-                            for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-                                logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                    indicator_report, start_date, end_date
-                                ))
-
-                                IndicatorLocationData.objects.create(
-                                    indicator_report=indicator_report,
-                                    location=location_goal.location,
-                                    num_disaggregation=indicator_report.disaggregations.count(),
-                                    level_reported=indicator_report.disaggregations.count(),
-                                    disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                        'id', flat=True)),
-                                    disaggregation={
-                                        '()': {'c': 0, 'd': 0, 'v': 0}
-                                    },
-                                )
-
+                            for project_context in project_contexts:
+                                create_ir_for_cluster(reportable, start_date, end_date, project_context.project)
                         else:
-                            logger.info("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
-                                reportable, start_date, end_date
-                            ))
+                            project = None
+                            if reportable_type == 'partnerproject':
+                                project = reportable.content_object
 
-                            indicator_report = IndicatorReport.objects.create(
-                                reportable=reportable,
-                                time_period_start=start_date,
-                                time_period_end=end_date,
-                                due_date=end_date + relativedelta(days=1),
-                                title=reportable.blueprint.title,
-                                total={'c': 0, 'd': 0, 'v': 0},
-                                overall_status="NoS",
-                                report_status="Due",
-                                submission_date=None,
-                                reporting_entity=ReportingEntity.objects.get(title="Cluster"),
-                            )
-
-                            for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-                                logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                    indicator_report, start_date, end_date
-                                ))
-
-                                IndicatorLocationData.objects.create(
-                                    indicator_report=indicator_report,
-                                    location=location_goal.location,
-                                    num_disaggregation=indicator_report.disaggregations.count(),
-                                    level_reported=indicator_report.disaggregations.count(),
-                                    disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                        'id', flat=True)),
-                                    disaggregation={
-                                        '()': {'c': 0, 'd': 0, 'v': 0}
-                                    },
-                                )
+                            create_ir_for_cluster(reportable, start_date, end_date, project)
 
             # PD report generation
             for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
