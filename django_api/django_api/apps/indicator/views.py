@@ -862,7 +862,14 @@ class ReportRefreshAPIView(APIView):
 
         if serializer.validated_data['report_type'] == 'PR':
             report = get_object_or_404(ProgressReport, id=serializer.validated_data['report_id'])
-            reset_progress_report_data(report)
+            target_prs = ProgressReport.objects.filter(
+                programme_document=report.programme_document,
+                report_type=report.report_type,
+                report_number__gte=report.report_number
+            )
+
+            for pr in target_prs:
+                reset_progress_report_data(pr)
         else:
             report = get_object_or_404(IndicatorReport, id=serializer.validated_data['report_id'])
 

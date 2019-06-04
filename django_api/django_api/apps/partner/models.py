@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, m2m_changed
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
@@ -257,6 +257,35 @@ class PartnerProject(TimeStampedExternalSourceModel):
     @property
     def is_ocha_imported(self):
         return bool(self.external_id and self.external_source == EXTERNAL_DATA_SOURCES.HPC)
+
+
+@receiver(m2m_changed, sender=PartnerProject.locations.through, dispatch_uid="sync_locations_for_pp_reportables")
+def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs):
+    if action != "post_add":
+        return
+
+    from core.models import Location
+    from indicator.models import ReportableLocationGoal
+    locations = instance.locations.all()
+
+    if locations.exists():
+        loc_type = locations.first().gateway.admin_level
+        new_locations = Location.objects.filter(id__in=pk_set)
+
+        for r in instance.reportables.all():
+            r_locations = r.locations.all()
+
+            if not r_locations.exists():
+                return
+
+            r_loc_type = r_locations.first().gateway.admin_level
+
+            if loc_type == r_loc_type:
+                for loc in new_locations:
+                    ReportableLocationGoal.objects.get_or_create(
+                        reportable=r,
+                        location=loc,
+                    )
 
 
 class PartnerProjectFunding(TimeStampedModel):

@@ -270,9 +270,13 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     in_need = serializers.JSONField(required=False, allow_null=True)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     def get_loc_type(self, obj):
         return obj.location.gateway.admin_level
+
+    def get_title(self, obj):
+        return obj.location.title
 
     def validate_baseline(self, value):
         if 'd' not in value:
@@ -311,6 +315,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
             'target',
             'location',
             'loc_type',
+            'title',
         )
 
 
