@@ -249,6 +249,7 @@
                             selected="{{selectedProject}}"
                             data-index$="[[index]]"
                             on-iron-activate="_validate"
+                            on-selected-changed="_setIndex"
                             disabled="[[_equals(projects.length, 0)]]"
                             trigger-value-change-event
                             required>
@@ -592,6 +593,11 @@
           value: ''
         },
 
+        activeIndex: {
+          type: String,
+          value: ''
+        },
+
       },
 
       listeners: {
@@ -602,21 +608,44 @@
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
-        '_saveProjectDetails(selectedProject, selectedStartdate, selectedEnddate, selectedStatus)',
+        '_saveProjectDetails(activeIndex, selectedProject, selectedStartdate, selectedEnddate, selectedStatus)',
       ],
 
       _add: function () {
         this.push('data.cluster.projects', {});
+
+        console.log('data', this.data.cluster.projects);
       },
 
-      _saveProjectDetails: function (selectedProject, selectedStartdate, selectedEnddate, selectedStatus) {
-        if (!selectedProject) {
+      _setIndex: function (e) {
+        if (this.activeIndex === e.target.dataset.index) {
           return;
         }
-        console.log('selected project?', selectedProject);
-        console.log('whole data', this.data.cluster.projects);
 
-        console.log('dom?', this.$);
+        console.log('target?', e.target.dataset.index)
+        this.set('activeIndex', e.target.dataset.index);
+      },
+
+      _saveProjectDetails: function (index, selectedProject, selectedStartdate, selectedEnddate, selectedStatus) {
+        if (!index || !selectedProject) {
+          return;
+        }
+
+        console.log('selected index?', index);
+        console.log('selected project', selectedProject);
+        console.log('selected Startdate', selectedStartdate);
+        console.log('selected Enddate', selectedEnddate);
+        console.log('selected Status', selectedStatus);
+
+        var projects = this.get('data.cluster.projects');
+        projects[index].project_id = selectedProject;
+        projects[index].start_date = selectedStartdate;
+        projects[index].end_date = selectedEnddate;
+        projects[index].status = selectedStatus;
+
+        this.set('data.cluster.projects', projects);
+
+        console.log('data projects', this.data.cluster.projects);
       },
 
       _setDefaults: function () {
