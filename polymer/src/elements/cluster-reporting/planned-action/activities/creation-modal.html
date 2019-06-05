@@ -602,6 +602,7 @@
 
       listeners: {
         'mode.selected-changed': 'adjustPosition',
+        'project-details-selection-refit': 'adjustPosition',
       },
 
       observers: [
@@ -622,30 +623,11 @@
         }
 
         console.log('target?', e.target.dataset.index)
+        console.log('node?', this.$)
         this.set('activeIndex', e.target.dataset.index);
         console.log('data projects', this.data.cluster.projects);
-      },
 
-      _saveProjectDetails: function (index, selectedProject, selectedStartdate, selectedEnddate, selectedStatus) {
-        if (!index || !selectedProject) {
-          return;
-        }
-
-        console.log('selected index?', index);
-        console.log('selected project', selectedProject);
-        console.log('selected Startdate', selectedStartdate);
-        console.log('selected Enddate', selectedEnddate);
-        console.log('selected Status', selectedStatus);
-
-        var projects = this.get('data.cluster.projects');
-        projects[index].project_id = selectedProject;
-        projects[index].start_date = selectedStartdate;
-        projects[index].end_date = selectedEnddate;
-        projects[index].status = selectedStatus;
-
-        this.set('data.cluster.projects', projects);
-
-        console.log('data projects', this.data.cluster.projects);
+        this.fire('project-details-selection-refit');
       },
 
       _setDefaults: function () {
