@@ -249,7 +249,6 @@
                             selected="{{item.project_id}}"
                             data-index$="[[index]]"
                             on-iron-activate="_validate"
-                            on-selected-changed="_setIndex"
                             disabled="[[_equals(projects.length, 0)]]"
                             trigger-value-change-event
                             required>
@@ -587,29 +586,15 @@
       ],
 
       _add: function () {
-        this.fire('project-details-selection-refit');
         this.push('data.cluster.projects', {});
-
-        console.log('data', this.data.cluster.projects);
-      },
-
-      _setIndex: function (e) {
-        if (this.activeIndex === e.target.dataset.index) {
-          return;
-        }
-
         this.fire('project-details-selection-refit');
       },
 
       _remove: function (e) {
-        this.fire('project-details-selection-refit');
-
         var currentIndex = +e.target.dataset.index;
-        console.log('selected index', currentIndex);
-
         this.splice('data.cluster.projects', currentIndex, 1);
 
-        console.log('data projects after the fact', this.data.cluster.projects);
+        this.fire('project-details-selection-refit');
       },
 
       _setDefaults: function () {
@@ -749,6 +734,7 @@
             .catch(function (err) {
               self.set('errors', err.data);
               self.set('updatePending', false);
+              self.fire('project-details-selection-refit');
             });
       },
     });
