@@ -140,13 +140,14 @@
     <paper-dialog
         id="dialog"
         with-backdrop
+        on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add activity</h2>
 
         <paper-icon-button
             class="self-center"
-            on-tap="close"
+            on-tap="_close"
             icon="icons:close">
         </paper-icon-button>
       </div>
@@ -438,7 +439,7 @@
         </paper-button>
 
         <paper-button
-            on-tap="close">
+            on-tap="_close">
           Cancel
         </paper-button>
       </div>
@@ -725,17 +726,35 @@
           partner: this.partner,
         }, this.data[this.mode]);
         this.$.activity.thunk()()
-            .then(function (res) {
-              self.fire('activity-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('updatePending', false);
-              self.fire('project-details-selection-refit');
-            });
+          .then(function (res) {
+            self.fire('activity-added', res.data);
+            self.set('updatePending', false);
+            self.set('errors', {});
+            self._close();
+          })
+          .catch(function (err) {
+            self.set('errors', err.data);
+            self.set('updatePending', false);
+            self.fire('project-details-selection-refit');
+          });
+      },
+
+      _close: function (e) {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('mode', '');
+          this.set('data', {});
+
+          this.set('objectives', []);
+          this.set('activities', []);
+
+          this.set('errors', {});
+
+          this.close();
+        } else {
+          return;
+        }
       },
     });
   </script>
