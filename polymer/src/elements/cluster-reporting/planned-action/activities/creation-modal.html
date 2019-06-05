@@ -246,7 +246,7 @@
                             options="[[projects]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{selectedProject}}"
+                            selected="{{item.project_id}}"
                             data-index$="[[index]]"
                             on-iron-activate="_validate"
                             on-selected-changed="_setIndex"
@@ -260,7 +260,7 @@
                         <etools-prp-date-input
                             class="start-date"
                             label="Start date"
-                            value="{{selectedStartdate}}"
+                            value="{{item.start_date}}"
                             error-message=""
                             required
                             no-init>
@@ -272,7 +272,7 @@
                         <etools-prp-date-input
                             class="end-date"
                             label="End date"
-                            value="{{selectedEnddate}}"
+                            value="{{item.end_date}}"
                             error-message=""
                             required
                             no-init>
@@ -287,7 +287,7 @@
                             always-float-label
                             required>
                           <paper-listbox
-                              selected="{{selectedStatus}}"
+                              selected="{{item.status}}"
                               attr-for-selected="value"
                               slot="dropdown-content"
                               class="dropdown-content">
@@ -608,7 +608,6 @@
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
-        '_saveProjectDetails(activeIndex, selectedProject, selectedStartdate, selectedEnddate, selectedStatus)',
       ],
 
       _add: function () {
@@ -624,6 +623,7 @@
 
         console.log('target?', e.target.dataset.index)
         this.set('activeIndex', e.target.dataset.index);
+        console.log('data projects', this.data.cluster.projects);
       },
 
       _saveProjectDetails: function (index, selectedProject, selectedStartdate, selectedEnddate, selectedStatus) {
