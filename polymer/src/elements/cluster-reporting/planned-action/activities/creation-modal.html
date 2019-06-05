@@ -587,6 +587,7 @@
       ],
 
       _add: function () {
+        this.fire('project-details-selection-refit');
         this.push('data.cluster.projects', {});
 
         console.log('data', this.data.cluster.projects);
@@ -598,6 +599,17 @@
         }
 
         this.fire('project-details-selection-refit');
+      },
+
+      _remove: function (e) {
+        this.fire('project-details-selection-refit');
+
+        var currentIndex = +e.target.dataset.index;
+        console.log('selected index', currentIndex);
+
+        this.splice('data.cluster.projects', currentIndex, 1);
+
+        console.log('data projects after the fact', this.data.cluster.projects);
       },
 
       _setDefaults: function () {
