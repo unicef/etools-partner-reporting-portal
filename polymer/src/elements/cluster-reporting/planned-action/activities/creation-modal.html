@@ -222,7 +222,7 @@
 
                 <template
                   is="dom-repeat"
-                  items="[[value]]">
+                  items="{{data.cluster.projects}}">
 
                   <div class="row layout horizontal">
                     <div>
@@ -247,6 +247,7 @@
                             option-value="id"
                             option-label="title"
                             selected="{{selectedProject}}"
+                            data-index$="[[index]]"
                             on-iron-activate="_validate"
                             disabled="[[_equals(projects.length, 0)]]"
                             trigger-value-change-event
@@ -459,11 +460,6 @@
       properties: {
         data: Object,
 
-        value: {
-          type: Array,
-          value: [1],
-        },
-
         activitiesUrl: String,
 
         updatePending: {
@@ -606,16 +602,31 @@
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
-        '_saveProject(selectedProject)',
-        '_saveStartdate(selectedStartdate)',
-        '_saveEnddate(selectedEnddate)',
-        '_saveStatus(selectedStatus)',
+        '_saveProjectDetails(selectedProject, selectedStartdate, selectedEnddate, selectedStatus)',
       ],
+
+      _add: function () {
+        this.push('data.cluster.projects', {});
+      },
+
+      _saveProjectDetails: function (selectedProject, selectedStartdate, selectedEnddate, selectedStatus) {
+        if (!selectedProject) {
+          return;
+        }
+        console.log('selected project?', selectedProject);
+        console.log('whole data', this.data.cluster.projects);
+
+        console.log('dom?', this.$);
+      },
 
       _setDefaults: function () {
         this.set('data', {
-          cluster: {},
-          custom: {},
+          cluster: {
+            projects: []
+          },
+          custom: {
+            projects: []
+          },
         });
         this.set('activities', []);
         this.set('objectives', []);
