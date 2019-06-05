@@ -573,31 +573,6 @@
           statePath: 'userProfile.profile',
         },
 
-        selectedProject: {
-          type: String,
-          value: ''
-        },
-
-        selectedStartdate: {
-          type: String,
-          value: ''
-        },
-
-        selectedEnddate: {
-          type: String,
-          value: ''
-        },
-
-        selectedStatus: {
-          type: String,
-          value: ''
-        },
-
-        activeIndex: {
-          type: String,
-          value: ''
-        },
-
       },
 
       listeners: {
@@ -621,11 +596,6 @@
         if (this.activeIndex === e.target.dataset.index) {
           return;
         }
-
-        console.log('target?', e.target.dataset.index)
-        console.log('node?', this.$)
-        this.set('activeIndex', e.target.dataset.index);
-        console.log('data projects', this.data.cluster.projects);
 
         this.fire('project-details-selection-refit');
       },
