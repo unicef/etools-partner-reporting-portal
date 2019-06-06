@@ -60,6 +60,10 @@
         margin-bottom: 1em;
       }
 
+      .remove-btn-container {
+        width: 45px;
+      }
+
       .remove-btn {
         width: 34px;
         height: 34px;
@@ -221,27 +225,27 @@
                   </etools-single-selection-menu>
                 </div>
 
-                <template
-                  is="dom-repeat"
-                  items="{{data.cluster.projects}}">
+              </div>
+              <template
+                is="dom-repeat"
+                items="{{data.cluster.projects}}">
 
-                  <div class="row layout horizontal">
+                <div class="row layout horizontal">
 
-                    <div class="flex-none layout vertical center-center col-actions">
-                      <paper-icon-button
-                          index="[[index]]"
-                          class="remove-btn"
-                          data-index$="[[index]]"
-                          on-tap="_remove"
-                          icon="icons:cancel">
-                      </paper-icon-button>
-                      <paper-tooltip offset="5">Remove</paper-tooltip>
-                    </div>
+                  <div class="flex-none layout vertical center-center col-actions">
+                    <paper-icon-button
+                        index="[[index]]"
+                        class="remove-btn"
+                        data-index$="[[index]]"
+                        on-tap="_remove"
+                        icon="icons:cancel">
+                    </paper-icon-button>
+                    <paper-tooltip offset="5">Remove</paper-tooltip>
                   </div>
 
                   <div class="flex">
                     <div class="app-grid">
-                      <div class="item item-2-col">
+                      <div class="item item-wide">
                         <etools-single-selection-menu
                             class="validate"
                             label="Partner Project"
@@ -301,21 +305,22 @@
                         </paper-dropdown-menu>
                       </div>
                     </div>
+                    
                   </div>
-                </template>
+                </div>
+              </template>
 
-                <template
-                  is="dom-if"
-                  if="[[data.cluster.cluster_activity]]"
-                  restamp="true">
-                
-                  <paper-button
-                      class="btn-primary"
-                      on-tap="_add">
-                    Add Project
-                  </paper-button>
-                </template>
-              </div>
+              <template
+                is="dom-if"
+                if="[[data.cluster.cluster_activity]]"
+                restamp="true">
+              
+                <paper-button
+                    class="btn-primary"
+                    on-tap="_add">
+                  Add Project
+                </paper-button>
+              </template>
             </template>
           </div>
 
