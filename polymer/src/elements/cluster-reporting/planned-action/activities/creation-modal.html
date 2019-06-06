@@ -52,16 +52,16 @@
       }
 
       .app-grid {
-        padding-top: 0;
         margin: 0 -var(--app-grid-gutter);
+        padding-bottom: 24px;
+      }
+
+      .project-details {
+        --app-grid-gutter: 48px;
       }
 
       .row {
         margin-bottom: 1em;
-      }
-
-      .remove-btn-container {
-        width: 45px;
       }
 
       .remove-btn {
@@ -72,6 +72,12 @@
 
       .item-wide {
         @apply --app-grid-expandible-item;
+      }
+
+      .col-actions {
+        width: 40px;
+        margin-right: 24px;
+        border-right: 1px solid var(--paper-grey-400);
       }
 
       paper-radio-group {
@@ -231,7 +237,6 @@
                 items="{{data.cluster.projects}}">
 
                 <div class="row layout horizontal">
-
                   <div class="flex-none layout vertical center-center col-actions">
                     <paper-icon-button
                         index="[[index]]"
@@ -244,8 +249,8 @@
                   </div>
 
                   <div class="flex">
-                    <div class="app-grid">
-                      <div class="item item-wide">
+                    <div class="app-grid project-details">
+                      <div class="item">
                         <etools-single-selection-menu
                             class="validate"
                             label="Partner Project"
@@ -259,6 +264,27 @@
                             trigger-value-change-event
                             required>
                         </etools-single-selection-menu>
+                      </div>
+
+                      <div class="item">
+                        <paper-dropdown-menu
+                            class="validate"
+                            label="Status"
+                            on-value-changed="_validate"
+                            always-float-label
+                            required>
+                          <paper-listbox
+                              selected="{{item.status}}"
+                              attr-for-selected="value"
+                              slot="dropdown-content"
+                              class="dropdown-content">
+                            <template
+                                is="dom-repeat"
+                                items="[[statuses]]">
+                              <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                            </template>
+                          </paper-listbox>
+                        </paper-dropdown-menu>
                       </div>
 
                       <div class="item">
@@ -283,29 +309,7 @@
                             no-init>
                         </etools-prp-date-input>
                       </div>
-
-                      <div class="item">
-                        <paper-dropdown-menu
-                            class="validate"
-                            label="Status"
-                            on-value-changed="_validate"
-                            always-float-label
-                            required>
-                          <paper-listbox
-                              selected="{{item.status}}"
-                              attr-for-selected="value"
-                              slot="dropdown-content"
-                              class="dropdown-content">
-                            <template
-                                is="dom-repeat"
-                                items="[[statuses]]">
-                              <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                            </template>
-                          </paper-listbox>
-                        </paper-dropdown-menu>
-                      </div>
                     </div>
-                    
                   </div>
                 </div>
               </template>
@@ -314,7 +318,6 @@
                 is="dom-if"
                 if="[[data.cluster.cluster_activity]]"
                 restamp="true">
-              
                 <paper-button
                     class="btn-primary"
                     on-tap="_add">
