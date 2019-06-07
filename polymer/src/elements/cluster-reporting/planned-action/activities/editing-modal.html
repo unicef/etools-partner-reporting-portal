@@ -88,137 +88,163 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
-                <div class="item item-wide">
-                   <etools-single-selection-menu
-                      class="validate"
-                      label="Partner Project"
-                      options="[[projects]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.project}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(projects.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
-                <div class="item">
-                   <etools-prp-date-input
-                      class="start-date"
-                      label="Start date"
-                      value="{{data.start_date}}"
-                      error-message=""
-                      required
-                      no-init>
-                   </etools-prp-date-input>
-                  </etools-date-input>
-                </div>
-                <div class="item">
-                  <etools-prp-date-input
-                      class="end-date"
-                      label="End date"
-                      value="{{data.end_date}}"
-                      error-message=""
-                      required
-                      no-init>
-                  </etools-prp-date-input>
-                </div>
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Status"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.status}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[statuses]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-              </iron-form>
-            </template>
-
             <template
-                is="dom-if"
-                if="[[_equals(mode, 'custom')]]"
-                restamp="true">
-              <iron-form class="app-grid">
+              is="dom-repeat"
+              items="{{editData.projects}}">
 
-                <div class="item item-wide">
-                  <paper-input
-                      class="validate"
-                      label="Title"
-                      value="{{data.title}}"
-                      on-input="_validate"
-                      always-float-label
-                      required>
-                  </paper-input>
+              <div class="row layout horizontal">
+                <div class="flex-none layout vertical center-center col-actions">
+                  <paper-icon-button
+                      index="[[index]]"
+                      class="remove-btn"
+                      data-index$="[[index]]"
+                      on-tap="_remove"
+                      icon="icons:cancel">
+                  </paper-icon-button>
+                  <paper-tooltip offset="5">Remove</paper-tooltip>
                 </div>
-                <div class="item item-wide">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Partner Project"
-                      options="[[projects]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.project}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(projects.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
+
+                <div class="flex">
+                  <div class="app-grid">
+                    <div class="item">
+                      <etools-single-selection-menu
+                          class="validate"
+                          label="Partner Project"
+                          options="[[projects]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{item.project_id}}"
+                          data-index$="[[index]]"
+                          on-iron-activate="_validate"
+                          disabled="[[_equals(projects.length, 0)]]"
+                          trigger-value-change-event
+                          required>
+                      </etools-single-selection-menu>
+                    </div>
+
+                    <div class="item">
+                      <paper-dropdown-menu
+                          class="validate"
+                          label="Status"
+                          on-value-changed="_validate"
+                          always-float-label
+                          required>
+                        <paper-listbox
+                            selected="{{item.status}}"
+                            attr-for-selected="value"
+                            slot="dropdown-content"
+                            class="dropdown-content">
+                          <template
+                              is="dom-repeat"
+                              items="[[statuses]]">
+                            <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                          </template>
+                        </paper-listbox>
+                      </paper-dropdown-menu>
+                    </div>
+
+                    <div class="item">
+                      <etools-prp-date-input
+                          class="start-date"
+                          label="Start date"
+                          value="{{item.start_date}}"
+                          error-message=""
+                          required
+                          no-init>
+                      </etools-prp-date-input>
+                      </etools-date-input>
+                    </div>
+
+                    <div class="item">
+                      <etools-prp-date-input
+                          class="end-date"
+                          label="End date"
+                          value="{{item.end_date}}"
+                          error-message=""
+                          required
+                          no-init>
+                      </etools-prp-date-input>
+                    </div>
+                  </div>
                 </div>
-                 <div class="item">
-                   <etools-prp-date-input
-                      class="start-date"
-                      label="Start date"
-                      value="{{data.start_date}}"
-                      error-message=""
-                      required
-                      no-init>
-                   </etools-prp-date-input>
-                  </etools-date-input>
-                </div>
-                <div class="item">
-                  <etools-prp-date-input
-                      class="end-date"
-                      label="End date"
-                      value="{{data.end_date}}"
-                      error-message=""
-                      required
-                      no-init>
-                  </etools-prp-date-input>
-                </div>
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Status"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.status}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[statuses]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-              </iron-form>
+              </div>
             </template>
+          </iron-form>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'custom')]]"
+            restamp="true">
+          <iron-form class="app-grid">
+
+            <div class="item item-wide">
+              <paper-input
+                  class="validate"
+                  label="Title"
+                  value="{{data.title}}"
+                  on-input="_validate"
+                  always-float-label
+                  required>
+              </paper-input>
+            </div>
+            <div class="item item-wide">
+              <etools-single-selection-menu
+                  class="validate"
+                  label="Partner Project"
+                  options="[[projects]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.project}}"
+                  on-iron-activate="_validate"
+                  disabled="[[_equals(projects.length, 0)]]"
+                  trigger-value-change-event
+                  required>
+              </etools-single-selection-menu>
+            </div>
+              <div class="item">
+                <etools-prp-date-input
+                  class="start-date"
+                  label="Start date"
+                  value="{{data.start_date}}"
+                  error-message=""
+                  required
+                  no-init>
+                </etools-prp-date-input>
+              </etools-date-input>
+            </div>
+            <div class="item">
+              <etools-prp-date-input
+                  class="end-date"
+                  label="End date"
+                  value="{{data.end_date}}"
+                  error-message=""
+                  required
+                  no-init>
+              </etools-prp-date-input>
+            </div>
+            <div class="item">
+              <paper-dropdown-menu
+                  class="validate"
+                  label="Status"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                <paper-listbox
+                    selected="{{data.status}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      is="dom-repeat"
+                      items="[[statuses]]">
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+            </div>
+          </iron-form>
+        </template>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -339,10 +365,14 @@
       _setDefaults: function () {
         this.set('data', Object.assign({},
           {id: this.editData.id,
-          status: this.editData.status,
-          start_date: this.editData.start_date,
-          end_date: this.editData.end_date,
-          project: this.editData.project.id}));
+          cluster: this.editData.cluster,
+          cluster_activity: this.editData.cluster_activity,
+          cluster_objective: this.editData.cluster_objective,
+          title: this.editData.title,
+          is_custom: this.editData.is_custom,
+          partner: this.editData.partner,
+          reportables: this.editData.reportables,
+          projects: this.editData.projects}));
 
         if (this.editData.is_custom) {
           this.set('data.title', this.editData.title);
@@ -351,6 +381,8 @@
       },
 
       open: function () {
+        console.log('this edit data', this.editData);
+        console.log('this mode', this.mode);
         this.set('opened', true);
         this.set('refresh', true);
         this._setDefaults();
@@ -418,6 +450,7 @@
         }
 
         this.set('updatePending', true);
+        console.log('this data', this.data);
 
         this.$.editActivity.thunk()()
             .then(function (res) {
