@@ -389,39 +389,6 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
         ]
 
 
-class PartnerActivityProjectContextListSerializer(serializers.ListSerializer):
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        pass
-        # project_context_mapping = {project_context.id: project_context for project_context in instance}
-        # data_mapping = {item['id']: item for item in validated_data}
-        # updated = list()
-
-        # if 'reportable_id' not in self.context['view'].kwargs:
-        #     raise ValidationError("The view needs reportable_id from url")
-
-        # reportable_id = self.context['view'].kwargs['reportable_id']
-        # reportable = get_object_or_404(Reportable, id=reportable_id)
-
-        # # Handling creation and updates
-        # for data_id, data in data_mapping.items():
-        #     project_context = project_context_mapping.get(data_id, None)
-        #     data['reportable'] = reportable
-
-        #     if not project_context:
-        #         updated.append(self.child.create(data))
-
-        #     else:
-        #         updated.append(self.child.update(project_context, data))
-
-        # # Handling deletion from update
-        # for project_context_id, project_context in project_context_mapping.items():
-        #     if project_context_id not in data_mapping:
-        #         project_context.delete()
-
-        # return updated
-
-
 class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     start_date = serializers.DateField()
@@ -436,7 +403,6 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
             'end_date',
             'status',
         )
-        list_serializer_class = PartnerActivityProjectContextListSerializer
 
 
 class PartnerActivityBaseCreateSerializer(serializers.Serializer):
@@ -654,16 +620,13 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
 class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
 
-    project = serializers.IntegerField(write_only=True)
+    projects = PartnerActivityProjectContextSerializer(many=True)
 
     class Meta:
         model = PartnerActivity
         fields = (
             'title',
-            'status',
-            'project',
-            'start_date',
-            'end_date',
+            'projects',
         )
 
     def __init__(self, instance, *args, **kwargs):
@@ -678,25 +641,60 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        project_id = data.pop('project', None)
-        project = PartnerProject.objects.filter(id=project_id).first()
-        if not project:
-            raise serializers.ValidationError({
-                'project': 'PartnerProject ID {} does not exist.'.format(data['project'])
-            })
-        elif not project.partner_id == self.instance.partner.id:
-            raise serializers.ValidationError({
-                'partner': 'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner'])
-            })
+        for idx, project_context in enumerate(data['projects']):
+            project = PartnerProject.objects.filter(id=project_context['id']).first()
+            if not project:
+                raise serializers.ValidationError({
+                    'project_id': 'PartnerProject ID {} does not exist.'.format(project_context['id'])
+                })
+            elif not project.partner_id == self.instance.partner.id:
+                raise serializers.ValidationError({
+                    'partner': 'PartnerProject does not belong to Partner {}.'.format(self.instance.partner.id)
+                })
+
+            data['projects'][idx]['project'] = project
+
+            if project_context['start_date'] > project_context['end_date']:
+                raise serializers.ValidationError({
+                    "start_date": "start_date should come before end_date",
+                })
+
+            if project.start_date > project_context['start_date']:
+                raise serializers.ValidationError({
+                    "start_date": "start_date cannot start before its project's start date",
+                })
+
+            if project.end_date < project_context['end_date']:
+                raise serializers.ValidationError({
+                    "end_date": "end_date cannot end after its project's end date",
+                })
+
         return super(PartnerActivityUpdateSerializer, self).validate(data)
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
-        instance.project = validated_data.get('project', instance.project)
-        instance.start_date = validated_data.get('start_date', instance.start_date)
-        instance.end_date = validated_data.get('end_date', instance.end_date)
-        instance.status = validated_data.get('status', instance.status)
         instance.save()
+
+        old_projects = set(instance.projects.values_list('id', flat=True))
+        updated_projects = set(map(lambda x: x['project'].id, validated_data['projects']))
+        old_projects_to_delete = old_projects.difference(updated_projects)
+
+        PartnerActivityProjectContext.objects.filter(
+            activity=instance,
+            project__in=old_projects_to_delete
+        ).delete()
+
+        for validated_context_data in validated_data['projects']:
+                project = validated_context_data['project']
+                PartnerActivityProjectContext.objects.get_or_create(
+                    project=project,
+                    activity=instance,
+                    defaults={
+                        'start_date': validated_context_data['start_date'],
+                        'end_date': validated_context_data['end_date'],
+                        'status': validated_context_data['status']
+                    }
+                )
 
         return instance
 
