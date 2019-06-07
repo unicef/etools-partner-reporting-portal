@@ -28,6 +28,7 @@ from core.factories import (
     LocationFactory,
     ClusterActivityFactory,
     PartnerProjectFactory,
+    PartnerActivityProjectContextFactory,
     ClusterActivityPartnerActivityFactory,
     QuantityTypeIndicatorBlueprintFactory,
     QuantityReportableToClusterActivityFactory,
@@ -701,8 +702,12 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.blueprint = QuantityTypeIndicatorBlueprintFactory()
@@ -862,13 +867,21 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.p_custom_activity = CustomPartnerActivityFactory(
             cluster_objective=self.objective,
+            partner=self.partner,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.blueprint = QuantityTypeIndicatorBlueprintFactory()
@@ -1055,7 +1068,11 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
 
         self.p_custom_activity = CustomPartnerActivityFactory(
             cluster_objective=self.objective,
+            partner=self.partner,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_custom_activity,
         )
 
         self.blueprint = QuantityTypeIndicatorBlueprintFactory()
@@ -1191,12 +1208,21 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
 
             p_activity = ClusterActivityPartnerActivityFactory(
                 cluster_activity=self.activity,
+                partner=partner,
+            )
+            self.project_context = PartnerActivityProjectContextFactory(
                 project=project,
+                activity=p_activity,
             )
 
             p_custom_activity = CustomPartnerActivityFactory(
                 cluster_objective=self.objective,
+                partner=partner,
+            )
+
+            self.project_context = PartnerActivityProjectContextFactory(
                 project=project,
+                activity=p_custom_activity,
             )
 
             partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
