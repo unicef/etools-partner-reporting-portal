@@ -370,7 +370,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 
     def get_queryset(self):
         return PartnerActivity.objects.filter(
-            project__clusters__response_plan_id=self.kwargs['response_plan_id']
+            projects__clusters__response_plan_id=self.kwargs['response_plan_id']
         ).distinct()
 
     def get_object(self, pk):
