@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from core.serializers import ShortLocationSerializer
-from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
+from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES, PARTNER_ACTIVITY_STATUS
 from core.models import Location
 
 from cluster.models import (
@@ -393,7 +393,7 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     start_date = serializers.DateField()
     end_date = serializers.DateField()
-    status = serializers.ChoiceField(choices=PARTNER_PROJECT_STATUS)
+    status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
 
     class Meta:
         model = PartnerActivityProjectContext
@@ -403,6 +403,10 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
             'end_date',
             'status',
         )
+
+
+class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):
+    project_id = serializers.IntegerField(source="project.id")
 
 
 class PartnerActivityBaseCreateSerializer(serializers.Serializer):
@@ -574,7 +578,7 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
 class PartnerActivitySerializer(serializers.ModelSerializer):
 
     cluster = serializers.SerializerMethodField()
-    projects = PartnerActivityProjectContextSerializer(many=True)
+    projects = PartnerActivityProjectContextDetailUpdateSerializer(source='partneractivityprojectcontext_set', many=True)
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
     cluster_activity = ClusterActivitySerializer()
     partner = PartnerDetailsSerializer()
@@ -620,7 +624,7 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
 class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
 
-    projects = PartnerActivityProjectContextSerializer(many=True)
+    projects = PartnerActivityProjectContextDetailUpdateSerializer(source='partneractivityprojectcontext_set', many=True)
 
     class Meta:
         model = PartnerActivity
@@ -643,18 +647,18 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        for idx, project_context in enumerate(data['projects']):
-            project = PartnerProject.objects.filter(id=project_context['id']).first()
+        for idx, project_context in enumerate(data['partneractivityprojectcontext_set']):
+            project = PartnerProject.objects.filter(id=project_context['project']['id']).first()
             if not project:
                 raise serializers.ValidationError({
-                    'project_id': 'PartnerProject ID {} does not exist.'.format(project_context['id'])
+                    'project_id': 'PartnerProject ID {} does not exist.'.format(project_context['project']['id'])
                 })
             elif not project.partner_id == self.instance.partner.id:
                 raise serializers.ValidationError({
                     'partner': 'PartnerProject does not belong to Partner {}.'.format(self.instance.partner.id)
                 })
 
-            data['projects'][idx]['project'] = project
+            data['partneractivityprojectcontext_set'][idx]['project'] = project
 
             if project_context['start_date'] > project_context['end_date']:
                 raise serializers.ValidationError({
@@ -678,7 +682,7 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         old_projects = set(instance.projects.values_list('id', flat=True))
-        updated_projects = set(map(lambda x: x['project'].id, validated_data['projects']))
+        updated_projects = set(map(lambda x: x['project'].id, validated_data['partneractivityprojectcontext_set']))
         old_projects_to_delete = old_projects.difference(updated_projects)
 
         PartnerActivityProjectContext.objects.filter(
@@ -686,9 +690,9 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
             project__in=old_projects_to_delete
         ).delete()
 
-        for validated_context_data in validated_data['projects']:
+        for validated_context_data in validated_data['partneractivityprojectcontext_set']:
                 project = validated_context_data['project']
-                PartnerActivityProjectContext.objects.get_or_create(
+                obj, created = PartnerActivityProjectContext.objects.update_or_create(
                     project=project,
                     activity=instance,
                     defaults={
