@@ -380,7 +380,8 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
         instance = self.get_object(pk)
         serializer = self.get_serializer(
             instance=instance,
-            data=self.request.data
+            data=self.request.data,
+            partial=True
         )
 
         serializer.is_valid(raise_exception=True)

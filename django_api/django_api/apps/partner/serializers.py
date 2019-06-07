@@ -630,6 +630,8 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
         )
 
     def __init__(self, instance, *args, **kwargs):
+        self.partial = kwargs['partial']
+
         if not instance.is_custom:
             self.fields.pop('title')
         super(PartnerActivityUpdateSerializer, self).__init__(instance, *args, **kwargs)
