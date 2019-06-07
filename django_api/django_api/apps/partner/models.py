@@ -373,7 +373,7 @@ class PartnerActivity(TimeStampedModel):
     @property
     def clusters(self):
         from cluster.models import Cluster
-        return Cluster.objects.filter(id__in=self.projects.values_list('project__clusters', flat=True).distinct())
+        return Cluster.objects.filter(id__in=self.projects.values_list('clusters', flat=True).distinct())
 
     @property
     def response_plan(self):

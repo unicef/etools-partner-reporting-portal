@@ -25,6 +25,7 @@ from core.management.commands._generate_disaggregation_fake_data import (
 )
 from core.factories import (CartoDBTableFactory,
                             ProgressReportIndicatorReportFactory,
+                            PartnerActivityProjectContextFactory,
                             IPPRPRoleFactory,
                             CountryFactory, DisaggregationFactory,
                             DisaggregationValueFactory, GatewayTypeFactory,
@@ -269,8 +270,12 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.sample_disaggregation_value_map = {
@@ -386,8 +391,12 @@ class TestIndicatorListAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -608,8 +617,12 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -817,8 +830,12 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1021,8 +1038,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1279,7 +1300,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             self.blueprint_count + 1)
 
     def test_create_indicator_partner_activities_reporting(self):
-        pa = PartnerActivity.objects.filter(project__isnull=False).first()
+        pa = PartnerActivity.objects.filter(projects__isnull=False).first()
         self.data['object_id'] = pa.id
         self.data['object_type'] = 'partner.partneractivity'
         response = self.client.post(self.url, data=self.data, format='json')
@@ -1369,8 +1390,12 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1916,8 +1941,12 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -2173,8 +2202,12 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],

@@ -1399,12 +1399,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
 
-            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
-                error_msg = "Start date of reporting period cannot come before the activity's start date"
-
+            if not content_object.partneractivityprojectcontext_set.exists():
                 raise ValidationError({
-                    "start_date_of_reporting_period": error_msg,
+                    "start_date_of_reporting_period": "This PartnerActivity does not have start date",
                 })
+
+            for context in content_object.partneractivityprojectcontext_set.all():
+                if validated_data['start_date_of_reporting_period'] < context.start_date:
+                    error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                    raise ValidationError({
+                        "start_date_of_reporting_period": error_msg,
+                    })
         else:
             raise NotImplemented()
 
