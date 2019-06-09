@@ -163,6 +163,7 @@
 
       observers: [
         '_updateUrlTab(routeData.tab)',
+        '_getActivityAjax(projects)',
       ],
 
       listeners: {
@@ -170,7 +171,9 @@
       },
 
       _onSuccess: function() {
-        this._getProjects();
+        if (this.projects === undefined) {
+          this._getProjects();
+        }
         this._getActivityAjax();
       },
 
@@ -196,16 +199,18 @@
       },
 
       _getActivityAjax: function() {
-        var thunk = this.$.overview.thunk();
+        if (this.projects === undefined || this.queryParams === undefined) {
+          return;
+        }
         var self = this;
+        var thunk = this.$.overview.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
-            var data = res.data;
-            data.projects.forEach(function (project) {
+            res.data.projects.forEach(function (project) {
               project.title = self.projects[project.project_id].title;
             });
-            self.activityData = data;
+            self.activityData = res.data;
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
@@ -215,11 +220,11 @@
 
       _getProjects: function () {
         var self = this;
-        var thunk = this.$.projects.thunk();
+        var projectsThunk = this.$.projects.thunk();
 
         this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
 
-        thunk()
+        projectsThunk()
           .then(function (res) {
             var allProjects = {};
             res.data.results.forEach(function (project) {
@@ -227,13 +232,11 @@
             });
 
             self.set('projects', allProjects);
-            console.log('projects', self.projects);
           });
       },
 
       attached: function () {
         this._getProjects();
-        this._getActivityAjax();
       },
     });
   </script>
