@@ -62,6 +62,11 @@
       params="[[queryParams]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="plannedActionsProjects"
+      url="[[projectsUrl]]">
+    </etools-prp-ajax>
+
     <app-route
       route="{{route}}"
       pattern="/:tab"
@@ -135,6 +140,11 @@
           statePath: 'partner.current',
         },
 
+        partnerProjects: {
+          type: Array,
+          statePath: 'partnerProjects.all'
+        },
+
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
@@ -198,8 +208,27 @@
           });
       },
 
+      _getProjectsAjax: function () {
+        this.debounce('projects-ajax', function () {
+          this.projectsUrl = App.Endpoints.plannedActions(this.responsePlanID);
+
+          var thunk = this.$.plannedActionsProjects.thunk();
+
+          this.$.plannedActionsProjects.abort();
+
+          thunk()
+            .then(function (res) {
+              console.log('res', res.data);
+            });
+        }, 300);
+      },
+
       attached: function () {
         this._getActivityAjax();
+
+        if (this.partnerProjects.length === 0) {
+          this._getProjectsAjax();
+        }
       },
     });
   </script>
