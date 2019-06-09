@@ -5,7 +5,6 @@
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../ip-reporting/partner-details.html">
 <link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
 
@@ -39,38 +38,33 @@
       }
     </style>
 
-    <etools-prp-ajax
-      id="projects"
-      url="[[projectsUrl]]">
-    </etools-prp-ajax>
-
     <etools-content-panel panel-title="Activity Details">
         <div class="row">
           <ul class="app-grid">
             <li class="item full-width">
               <labelled-item label="Title">
-                <span class="value">[[activity.title]]</span>
+                <span class="value">[[activityData.title]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
               <labelled-item label="Cluster Activity">
-                <template is="dom-if" if="[[activity.cluster_activity]]">
-                  <span class="value">[[activity.cluster_activity.title]]</span>
+                <template is="dom-if" if="[[activityData.cluster_activity]]">
+                  <span class="value">[[activityData.cluster_activity.title]]</span>
                 </template>
-                <template is="dom-if" if="[[!activity.cluster_activity]]">
+                <template is="dom-if" if="[[!activityData.cluster_activity]]">
                   <span class="value">---</span>
                 </template>
               </labelled-item>
             </li>
             <li class="item">
               <labelled-item label="Cluster">
-                <span class="value">[[activity.cluster.name]]</span>
+                <span class="value">[[activityData.cluster.name]]</span>
               </labelled-item>
             </li>
             <template
               is="dom-repeat"
-              items="[[activity.projects]]">
+              items="[[activityData.projects]]">
 
               <div>
                 <li class="item">
@@ -93,7 +87,7 @@
 
             <li class="item">
               <labelled-item label="Partner">
-                <span class="value">[[activity.partner.title]]</span>
+                <span class="value">[[activityData.partner.title]]</span>
               </labelled-item>
             </li>
 
@@ -109,67 +103,11 @@
 
     behaviors: [
       App.Behaviors.UtilsBehavior,
-      App.Behaviors.ReduxBehavior,
     ],
 
     properties: {
       activityData: Object,
-
-      activity: {
-        type: Object,
-        value: {}
-      },
-
-      responsePlanId: {
-        type: String,
-        statePath: 'responsePlans.currentID'
-      },
-
-      projects: {
-        type: Object,
-        value: {}
-      }
     },
-
-    observers: [
-      '_getTitles(projects)',
-    ],
-
-    _getProjects: function () {
-      var self = this;
-      var thunk = this.$.projects.thunk();
-
-      this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanId));
-
-      thunk()
-        .then(function (res) {
-          var allProjects = {};
-          res.data.results.forEach(function (project) {
-            allProjects[project.id] = project;
-          });
-
-          self.set('projects', allProjects);
-          console.log('projects', self.projects);
-        });
-    },
-
-    _getTitles: function (projects) {
-      var self = this;
-
-      if (projects === undefined || this.activityData === undefined) {
-        return;
-      }
-
-      this.activityData.projects.forEach(function (project) {
-        project.title = self.projects[project.project_id].title;
-      });
-
-      this.set('activity', this.activityData);
-    },
-
-    attached: function () {
-      this._getProjects();
-    }
   });
 </script>
 </dom-module>
