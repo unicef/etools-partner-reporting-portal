@@ -145,6 +145,11 @@
           statePath: 'partnerProjects.all'
         },
 
+        rawProjectsData: {
+          type: Array,
+          value: []
+        },
+
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
@@ -163,6 +168,7 @@
 
       observers: [
         '_updateUrlTab(routeData.tab)',
+        '_getTitles(activityData, rawProjectsData)',
       ],
 
       listeners: {
@@ -209,6 +215,7 @@
       },
 
       _getProjectsAjax: function () {
+        var self = this;
         this.debounce('projects-ajax', function () {
           this.projectsUrl = App.Endpoints.plannedActions(this.responsePlanID);
 
@@ -218,17 +225,37 @@
 
           thunk()
             .then(function (res) {
-              console.log('res', res.data);
+              self.set('rawProjectsData', res.data);
             });
         }, 300);
       },
 
-      attached: function () {
-        this._getActivityAjax();
+      _getTitles: function (activityData, rawProjectsData) {
+        console.log('projects', this.partnerProjects);
+        console.log('raw projects', this.rawProjectsData);
+        console.log('activity data', this.activityData);
 
+        if (this.activityData.projects !== undefined && this.partnerProjects.length !== 0) {
+          var allProjects = {};
+          this.partnerProjects.forEach(function (project) {
+            allProjects[project.id] = project;
+          });
+          console.log('projects dict?', allProjects);
+
+          this.activityData.projects.forEach(function (project) {
+            project.title = allProjects[project.project_id].title;
+          });
+
+          this.set('activityData', this.activityData);
+        }
+      },
+
+      attached: function () {
         if (this.partnerProjects.length === 0) {
           this._getProjectsAjax();
         }
+
+        this._getActivityAjax();
       },
     });
   </script>
