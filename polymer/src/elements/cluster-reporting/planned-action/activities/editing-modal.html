@@ -26,6 +26,7 @@
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 
 <dom-module id="planned-action-activity-editing-modal">
   <template>
@@ -53,12 +54,20 @@
 
     </style>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <etools-prp-ajax
         id="editActivity"
         url="[[activityUrl]]"
         method="patch"
         body="[[data]]"
         content-type="application/json">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="activities"
+        params="[[activitiesParams]]"
+        url="[[activitiesUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -88,9 +97,24 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
+              <div class="item">
+                <etools-single-selection-menu
+                    class="validate"
+                    label="Activity"
+                    options="[[activities]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.cluster_activity.id}}"
+                    on-iron-activate="_validate"
+                    disabled="[[_equals(activities.length, 0)]]"
+                    trigger-value-change-event
+                    required>
+                </etools-single-selection-menu>
+              </div>
+
             <template
               is="dom-repeat"
-              items="{{editData.projects}}">
+              items="{{data.projects}}">
 
               <div class="row layout horizontal">
                 <div class="flex-none layout vertical center-center col-actions">
@@ -279,6 +303,7 @@
         data: Object,
 
         activitiesUrl: String,
+
         editData: {
           type: Object,
           value: {},
@@ -360,6 +385,7 @@
 
       observers: [
         '_fetchProjects(partnerId)',
+        '_fetchActivities(data.cluster.id)',
       ],
 
       _setDefaults: function () {
@@ -377,6 +403,8 @@
         if (this.editData.is_custom) {
           this.set('data.title', this.editData.title);
         }
+
+        console.log('all data', this.data);
 
       },
 
@@ -417,6 +445,27 @@
         }
       },
 
+      _fetchActivities: function (clusterId) {
+        var self = this;
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+        this.set('activities', []);
+        this.set('activitiesParams.cluster_id', clusterId);
+        this.set('activitiesUrl',
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
+            + '?cluster_id=' + clusterId);
+        this.$.activities.abort();
+
+        this.$.activities.thunk()()
+            .then(function (res) {
+              self.set('activities', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       _fetchProjects: function (partnerId) {
         var self = this;
 
@@ -448,7 +497,6 @@
         }
 
         this.set('updatePending', true);
-        console.log('this data', this.data);
 
         this.$.editActivity.thunk()()
             .then(function (res) {
