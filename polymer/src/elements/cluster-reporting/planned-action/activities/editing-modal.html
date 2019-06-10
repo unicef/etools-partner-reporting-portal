@@ -181,7 +181,7 @@
                   always-float-label
                   required>
                 <paper-listbox
-                    selected="{{data.cluster.id}}"
+                    selected="{{data.cluster}}"
                     attr-for-selected="value"
                     slot="dropdown-content"
                     class="dropdown-content">
@@ -202,7 +202,7 @@
                   options="[[activities]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{data.cluster_activity.id}}"
+                  selected="{{data.cluster_activity}}"
                   on-iron-activate="_validate"
                   disabled="[[_equals(activities.length, 0)]]"
                   trigger-value-change-event
@@ -317,7 +317,7 @@
                   always-float-label
                   required>
                 <paper-listbox
-                    selected="{{data.cluster.id}}"
+                    selected="{{data.cluster}}"
                     attr-for-selected="value"
                     slot="dropdown-content"
                     class="dropdown-content">
@@ -338,7 +338,7 @@
                   options="[[objectives]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{data.cluster_objective.id}}"
+                  selected="{{data.cluster_objective}}"
                   on-iron-activate="_validate"
                   disabled="[[_equals(objectives.length, 0)]]"
                   trigger-value-change-event
@@ -591,8 +591,8 @@
 
       observers: [
         '_fetchProjects(partnerId)',
-        '_fetchActivities(data.cluster.id)',
-        '_fetchObjectives(data.cluster.id)',
+        '_fetchActivities(data.cluster)',
+        '_fetchObjectives(data.cluster)',
       ],
 
       _add: function () {
@@ -609,9 +609,9 @@
       _setDefaults: function () {
         this.set('data', Object.assign({},
           {id: this.editData.id,
-          cluster: this.editData.cluster,
-          cluster_activity: this.editData.cluster_activity,
-          cluster_objective: this.editData.cluster_objective,
+          cluster: this.editData.cluster.id,
+          cluster_activity: null,
+          cluster_objective: this.editData.cluster_objective.id,
           title: this.editData.title,
           is_custom: this.editData.is_custom,
           partner: this.editData.partner,
@@ -620,6 +620,8 @@
 
         if (this.editData.is_custom) {
           this.set('data.title', this.editData.title);
+        } else {
+          this.set('data.cluster_activity', this.editData.cluster_activity.id);
         }
       },
 

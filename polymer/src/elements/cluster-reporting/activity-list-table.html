@@ -130,7 +130,12 @@
                 [[activity.cluster.name]]
               </div>
               <div class="table-cell table-cell--text">
-                [[activity.cluster_activity.title]]
+                <template is="dom-if" if="[[activity.cluster_activity]]">
+                  [[activity.cluster_activity.title]]
+                </template>
+                <template is="dom-if" if="[[!activity.cluster_activity]]">
+                  —
+                </template>
               </div>
               <div class="table-cell table-cell--text">
                 [[activity.cluster_objective.title]]
@@ -264,6 +269,10 @@
         },
 
         _getProjects: function () {
+          if (Object.keys(this.projects).length !== 0) {
+            return;
+          }
+
           var self = this;
           var projectsThunk = this.$.projects.thunk();
 
@@ -281,6 +290,9 @@
         },
 
         _getTitle: function (projectId) {
+          if (Object.keys(this.projects).length === 0) {
+            return;
+          }
           return this.projects[projectId].title;
         },
 

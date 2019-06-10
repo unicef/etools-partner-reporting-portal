@@ -83,6 +83,12 @@
               </li>
             </template>
 
+            <li class="item">
+              <labelled-item label="Partner">
+                <span class="value">[[activityData.partner.title]]</span>
+              </labelled-item>
+            </li>
+
             <template
               is="dom-repeat"
               items="[[activityData.projects]]">
@@ -105,12 +111,6 @@
                 </li>
               </div>
             </template>
-
-            <li class="item">
-              <labelled-item label="Partner">
-                <span class="value">[[activityData.partner.title]]</span>
-              </labelled-item>
-            </li>
 
           </ul>
         </div>
