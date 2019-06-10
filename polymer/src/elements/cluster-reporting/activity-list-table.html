@@ -27,6 +27,11 @@
         display: block;
       }
 
+      div[slot='row-data-details'] {
+        display: flex;
+        flex-direction: column;
+      }
+
       div[slot='row-data-details'] .table-cell--text {
         font-size: 12px;
       }
@@ -94,12 +99,6 @@
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="status" sortable>
-            <div class="table-column">Status</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="location">
-            <div class="table-column">Location</div>
-          </etools-data-table-column>
         </etools-data-table-header>
 
         <etools-data-table-footer
@@ -144,24 +143,30 @@
                   [[activity.partner.title]]
                 </div>
               </template>
-              <div class="table-cell table-cell--text">
-                <project-status status="[[activity.status]]"></project-status>
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(activity.locations, 'title')]]
-              </div>
             </div>
             <div slot="row-data-details">
+              <template
+                is="dom-repeat"
+                items="[[activity.projects]]">
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">
+                    <span class="label">Title</span>
+                    [[item.project_id]]
+                  </div>
+                  <div class="table-cell table-cell--text">
+                    <span class="label">Status</span>
+                    <project-status status="[[item.status]]"></project-status>
+                  </div>
+                  <div class="table-cell table-cell--text">
                     <span class="label">Start Date</span>
-                    [[activity.start_date]]
+                    [[item.start_date]]
                   </div>
                   <div class="table-cell table-cell--text">
                     <span class="label">End Date</span>
-                    [[activity.end_date]]
+                    [[item.end_date]]
                   </div>
                 </div>
+              </template>
             </div>
           </etools-data-table-row>
         </template>
