@@ -54,8 +54,6 @@
 
     </style>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-
     <etools-prp-ajax
         id="editActivity"
         url="[[activityUrl]]"
@@ -97,20 +95,42 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
-              <div class="item">
-                <etools-single-selection-menu
-                    class="validate"
-                    label="Activity"
-                    options="[[activities]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.cluster_activity.id}}"
-                    on-iron-activate="_validate"
-                    disabled="[[_equals(activities.length, 0)]]"
-                    trigger-value-change-event
-                    required>
-                </etools-single-selection-menu>
-              </div>
+            <div class="item">
+              <paper-dropdown-menu
+                  class="validate"
+                  label="Cluster"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                <paper-listbox
+                    selected="{{data.cluster.id}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      id="clusters"
+                      is="dom-repeat"
+                      items="[[clusters]]">
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+            </div>
+
+            <div class="item">
+              <etools-single-selection-menu
+                  class="validate"
+                  label="Activity"
+                  options="[[activities]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.cluster_activity.id}}"
+                  on-iron-activate="_validate"
+                  disabled="[[_equals(activities.length, 0)]]"
+                  trigger-value-change-event
+                  required>
+              </etools-single-selection-menu>
+            </div>
 
             <template
               is="dom-repeat"
@@ -355,6 +375,11 @@
           statePath: 'location.id',
         },
 
+        clusters: {
+          type: Array,
+          statePath: 'responsePlans.current.clusters',
+        },
+
         projects: {
           type: Array,
           value: [],
@@ -405,6 +430,7 @@
         }
 
         console.log('all data', this.data);
+        console.log('all clusters', this.clusters);
 
       },
 
