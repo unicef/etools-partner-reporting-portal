@@ -48,6 +48,12 @@
             </li>
 
             <li class="item">
+              <labelled-item label="Cluster">
+                <span class="value">[[activityData.cluster.name]]</span>
+              </labelled-item>
+            </li>
+
+            <li class="item">
               <labelled-item label="Cluster Activity">
                 <template is="dom-if" if="[[activityData.cluster_activity]]">
                   <span class="value">[[activityData.cluster_activity.title]]</span>
@@ -57,11 +63,17 @@
                 </template>
               </labelled-item>
             </li>
-            <li class="item">
-              <labelled-item label="Cluster">
-                <span class="value">[[activityData.cluster.name]]</span>
-              </labelled-item>
-            </li>
+
+            <template
+              is="dom-if"
+              if="[[activityData.cluster_objective]]">
+              <li class="item">
+                <labelled-item label="Cluster Objective">
+                  <span class="value">[[activityData.cluster_objective.title]]</span>
+                </labelled-item>
+              </li>
+            </template>
+
             <template
               is="dom-repeat"
               items="[[activityData.projects]]">

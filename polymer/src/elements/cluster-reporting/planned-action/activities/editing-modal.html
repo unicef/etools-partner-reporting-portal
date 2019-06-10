@@ -141,6 +141,12 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+        id="objectives"
+        params="[[objectivesParams]]"
+        url="[[objectivesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="projects"
         params="[[projectsParams]]"
         url="[[projectsUrl]]">
@@ -303,6 +309,42 @@
             if="[[_equals(mode, 'custom')]]"
             restamp="true">
           <iron-form class="app-grid">
+            <div class="item">
+              <paper-dropdown-menu
+                  class="validate"
+                  label="Cluster"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                <paper-listbox
+                    selected="{{data.cluster.id}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      id="clusters"
+                      is="dom-repeat"
+                      items="[[clusters]]">
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+            </div>
+
+            <div class="item">
+              <etools-single-selection-menu
+                  class="validate"
+                  label="Cluster Objective"
+                  options="[[objectives]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.cluster_objective}}"
+                  on-iron-activate="_validate"
+                  disabled="[[_equals(objectives.length, 0)]]"
+                  trigger-value-change-event
+                  required>
+              </etools-single-selection-menu>
+            </div>
 
             <div class="item item-wide">
               <paper-input
@@ -462,6 +504,23 @@
           statePath: 'responsePlans.current.clusters',
         },
 
+        objectives: {
+          type: Array,
+          value: [],
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        objectivesUrl: {
+          type: String,
+          computed: '_computeObjectivesUrl(responsePlanId)',
+        },
+
         projects: {
           type: Array,
           value: [],
@@ -497,6 +556,7 @@
       observers: [
         '_fetchProjects(partnerId)',
         '_fetchActivities(data.cluster.id)',
+        '_fetchObjectives(data.cluster.id)',
       ],
 
       _add: function () {
@@ -556,6 +616,10 @@
         return App.Endpoints.partnerActivityUpdate(responsePlanId, activityId);
       },
 
+      _computeObjectivesUrl: function (responsePlanId) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      },
+
       _computeProjectsUrl: function (responsePlanId) {
         return App.Endpoints.plannedActions(responsePlanId);
       },
@@ -583,6 +647,27 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchObjectives: function (clusterId) {
+        var self = this;
+
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+
+        this.set('objectivesParams.cluster_id', clusterId);
+        this.set('objectives', []);
+
+        this.$.objectives.abort();
+
+        this.$.objectives.thunk()()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
