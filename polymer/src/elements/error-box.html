@@ -92,6 +92,9 @@
                 value: error,
               },
             ];
+          
+          case 'undefined':
+              return [];
 
           default:
             return Object.keys(error)
