@@ -61,6 +61,11 @@
       }
     </style>
 
+    <etools-prp-ajax
+      id="projects"
+      url="[[projectsUrl]]">
+    </etools-prp-ajax>
+
     <iron-location
       query="{{query}}">
     </iron-location>
@@ -151,7 +156,7 @@
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">
                     <span class="label">Title</span>
-                    [[item.project_id]]
+                    [[_getTitle(item.project_id)]]
                   </div>
                   <div class="table-cell table-cell--text">
                     <span class="label">Status</span>
@@ -228,6 +233,16 @@
             type: Array,
             value: []
           },
+
+          responsePlanID: {
+            type: String,
+            statePath: 'responsePlans.currentID',
+          },
+
+          projects: {
+            type: Object,
+            value: {}
+          },
         },
 
         _openModal: function () {
@@ -246,6 +261,31 @@
           }
           //Query string is passed to construct the back button.
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+        },
+
+        _getProjects: function () {
+          var self = this;
+          var projectsThunk = this.$.projects.thunk();
+
+          this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
+
+          projectsThunk()
+            .then(function (res) {
+              var allProjects = {};
+              res.data.results.forEach(function (project) {
+                allProjects[project.id] = project;
+              });
+
+              self.set('projects', allProjects);
+            });
+        },
+
+        _getTitle: function (projectId) {
+          return this.projects[projectId].title;
+        },
+
+        attached: function () {
+          this._getProjects();
         },
 
         detached: function () {
