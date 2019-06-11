@@ -387,7 +387,7 @@
           },
         },
 
-        _onValueChanged: function (event) {
+        _onValueChanged: function (event) {  // This method runs whenever user begins searching in locations dropdown
           var loc_type = this.get('searchLocationType') || 0;
           var index = -1;
 
@@ -397,7 +397,7 @@
 
           event.path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
-              index = node.dataset.index;
+              index = node.dataset.index;  // Grab index of current location widget component
               return;
             }
           });
