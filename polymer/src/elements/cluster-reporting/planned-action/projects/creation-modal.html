@@ -1182,8 +1182,8 @@
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
             self.set('errors', err.data);
-            self.set('data.locations', rawLocations);
-          });
+            self.set('data.locations', rawLocations);   // If there are backend validation errors, reset locations
+          });                                           // to what they were before request was sent!
       },
 
       detached: function () {
