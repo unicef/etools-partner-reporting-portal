@@ -47,7 +47,9 @@ class ProgressReportsXLSXExporter:
         'Challenges/bottlenecks in the reporting period',
         'Proposed way forward',
         'Submitted by',
-        'Attachment',
+        'FACE Attachment',
+        'Other Attachment 1',
+        'Other Attachment 2',
         'Narrative',
         'PD Output progress status',
         'PD Output narrative assessment',
@@ -124,6 +126,20 @@ class ProgressReportsXLSXExporter:
                 ValueType.VALUE, 0
             )
 
+        face_attachment = None
+        other_attachment1 = None
+        other_attachment2 = None
+
+        if progress_report.attachments.filter(type="FACE").exists():
+            face_attachment = progress_report.attachments.filter(type="FACE").first()
+
+        if progress_report.attachments.filter(type="Other").exists():
+            if progress_report.attachments.filter(type="Other").count() > 1:
+                other_attachment1 = progress_report.attachments.filter(type="Other").first()
+                other_attachment2 = progress_report.attachments.filter(type="Other").last()
+            else:
+                other_attachment1 = progress_report.attachments.filter(type="Other").first()
+
         general_info_row = [
             (partner.title, None),
             (location_data.location.gateway.country.name, None),
@@ -139,7 +155,9 @@ class ProgressReportsXLSXExporter:
             (progress_report.challenges_in_the_reporting_period, None),
             (progress_report.proposed_way_forward, None),
             (progress_report.submitted_by.display_name if progress_report.submitted_by else '', None),
-            (progress_report.attachment.url if progress_report.attachment else '', None),
+            (face_attachment.url if face_attachment else '', None),
+            (other_attachment1.url if other_attachment1 else '', None),
+            (other_attachment2.url if other_attachment2 else '', None),
             (progress_report.narrative, None),
             (indicator_report.get_overall_status_display(), None),
             (indicator_report.narrative_assessment, None),

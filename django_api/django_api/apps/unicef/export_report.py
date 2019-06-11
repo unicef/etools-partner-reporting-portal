@@ -1,7 +1,7 @@
 import itertools
 
 from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle
+from openpyxl.styles import Font, Alignment, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
 
 from django.conf import settings
@@ -18,6 +18,7 @@ SAVE_PATH = '/tmp/'
 DISAGGREGATION_COLUMN_START = 43
 INDICATOR_DATA_ROW_START = 5
 MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
+REQUIRED_FILL = PatternFill(fill_type='solid', start_color='FFE5A479', end_color='FFE5A479')
 
 
 class ProgressReportXLSXExporter:
@@ -183,12 +184,18 @@ class ProgressReportXLSXExporter:
                     self.progress_report.submission_date
                 self.sheet.cell(row=start_row_id, column=10).value = \
                     self.progress_report.partner_contribution_to_date
+                self.sheet.cell(row=start_row_id, column=10).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=11).value = \
                     self.progress_report.programme_document.funds_received_to_date
                 self.sheet.cell(row=start_row_id, column=12).value = \
                     self.progress_report.challenges_in_the_reporting_period
+                self.sheet.cell(row=start_row_id, column=12).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=13).value = \
                     self.progress_report.proposed_way_forward
+                self.sheet.cell(row=start_row_id, column=13).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=14).value = \
                     self.progress_report.submitted_by.display_name if \
                     self.progress_report.submitted_by else ''
@@ -214,6 +221,8 @@ class ProgressReportXLSXExporter:
                     indicator.get_overall_status_display()
                 self.sheet.cell(row=start_row_id, column=19).value = \
                     indicator.narrative_assessment
+                self.sheet.cell(row=start_row_id, column=19).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=20).value = \
                     indicator.reportable.blueprint.title
                 self.sheet.cell(row=start_row_id, column=21).value = \
@@ -249,6 +258,8 @@ class ProgressReportXLSXExporter:
                     indicator.reportable.denominator_label
                 self.sheet.cell(row=start_row_id, column=38).value = \
                     achievement_in_reporting_period
+                self.sheet.cell(row=start_row_id, column=38).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=39).value = \
                     total_cumulative_progress
                 self.sheet.cell(row=start_row_id, column=40).value = \
@@ -267,6 +278,9 @@ class ProgressReportXLSXExporter:
 
                 # Check location item values
                 blueprint = location_data.indicator_report.reportable.blueprint
+
+                for dk, dv in disaggregation_values_map.items():
+                    self.sheet.cell(row=start_row_id, column=dv).fill = REQUIRED_FILL
 
                 for k, v in location_data.disaggregation.items():
                     if k == "()":
@@ -569,11 +583,12 @@ class ProgressReportXLSXExporter:
                 continue
 
             self.sheets.append(self.duplicate_sheet(self.sheets[1]))
+            sheet_no += 1
             self.sheet = self.sheets[sheet_no]
 
             if not self.fill_sheet(disaggregation_types, indicators):
                 to_remove.append(self.sheets[sheet_no])
-            sheet_no += 1
+                sheet_no -= 1
 
         to_remove.append(self.sheets[1])
 
