@@ -65,7 +65,6 @@
 
         this.$.partnerProjects.thunk()()
             .then(function (res) {
-							console.log('projects res', res);
               self.set('data', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line

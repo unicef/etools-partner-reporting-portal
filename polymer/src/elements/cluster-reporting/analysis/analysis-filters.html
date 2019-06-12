@@ -74,7 +74,7 @@
         </location-type-filter>
 
         <location-filter-multi-narrowed
-            class="item filter-2-col"
+            class="item"
             value="[[_withDefault(queryParams.locs, '')]]"
             dependencies="loc_type">
         </location-filter-multi-narrowed>
@@ -132,10 +132,6 @@
             this.set('queryParams.narrow_loc_type', null);
           }
         });
-      },
-
-      attached: function () {
-        console.log('query params', this.queryParams);
       },
 
       detached: function () {
