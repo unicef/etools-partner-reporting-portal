@@ -149,6 +149,8 @@
 
       _clearFilters: function () {
         var self = this;
+        console.log('query params', this.queryParams);
+        console.log('filters', this.filters);
 
         this.set('queryParams', Object.keys(this.queryParams)
             .reduce(function (prev, curr) {

@@ -5,7 +5,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 
-<dom-module id="cluster-filter-multi">
+<dom-module id="partner-project-filter-multi">
   <template>
     <style>
       :host {
@@ -20,7 +20,7 @@
 
     <dropdown-filter-multi
         label="Partner Projects"
-        name="partnerProjects"
+        name="partner_projects"
         value="[[value]]"
         data="[[data]]">
     </dropdown-filter-multi>
@@ -65,7 +65,8 @@
 
         this.$.partnerProjects.thunk()()
             .then(function (res) {
-              self.set('data', res.data);
+							console.log('projects res', res);
+              self.set('data', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
