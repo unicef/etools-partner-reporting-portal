@@ -290,7 +290,7 @@
         },
 
         _getTitle: function (projectId) {
-          if (Object.keys(this.projects).length === 0) {
+          if (this.projects[projectId] === undefined) {
             return;
           }
           return this.projects[projectId].title;
