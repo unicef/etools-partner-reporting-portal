@@ -200,109 +200,109 @@
     </etools-content-panel>
   </template>
 
-    <script>
-      Polymer({
-        is: 'activity-list-table',
+  <script>
+    Polymer({
+      is: 'activity-list-table',
 
-        behaviors: [
-          App.Behaviors.PaginationBehavior,
-          App.Behaviors.ReduxBehavior,
-          App.Behaviors.RoutingBehavior,
-          App.Behaviors.DataTableBehavior,
-          App.Behaviors.UtilsBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
-        properties: {
-          activities: {
-            type: Object,
-            statePath: 'partnerActivities.all',
-            observer: '_tableContentChanged',
-          },
-
-          loading: {
-            type: Boolean,
-            statePath: 'partnerActivities.loading'
-          },
-
-          totalResults: {
-            type: Number,
-            statePath: 'partnerActivities.count',
-          },
-
-          anchorQueryParams: {
-            type: Object,
-            computed: '_withDefaultParams(queryParams)',
-          },
-
-          openedDetails: {
-            type: Array,
-            value: []
-          },
-
-          responsePlanID: {
-            type: String,
-            statePath: 'responsePlans.currentID',
-          },
-
-          projects: {
-            type: Object,
-            value: {}
-          },
+      properties: {
+        activities: {
+          type: Object,
+          statePath: 'partnerActivities.all',
+          observer: '_tableContentChanged',
         },
 
-        _openModal: function () {
-          this.$$('#modal').open();
+        loading: {
+          type: Boolean,
+          statePath: 'partnerActivities.loading'
         },
 
-        listeners: {
-          'page-number-changed': '_tableContentChanged',
-          'details-opened-changed': '_detailsChange'
+        totalResults: {
+          type: Number,
+          statePath: 'partnerActivities.count',
         },
 
-        _detailUrl: function(activity, query) {
-          var path = '/response-parameters/partners/activity/' + activity.id;
-          if (this.page === 'planned-action') {
-            path = '/planned-action/activity/' + activity.id;
-          }
-          //Query string is passed to construct the back button.
-          return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+        anchorQueryParams: {
+          type: Object,
+          computed: '_withDefaultParams(queryParams)',
         },
 
-        _getProjects: function () {
-          if (Object.keys(this.projects).length !== 0) {
-            return;
-          }
+        openedDetails: {
+          type: Array,
+          value: []
+        },
 
-          var self = this;
-          var projectsThunk = this.$.projects.thunk();
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
-          this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
+        projects: {
+          type: Object,
+          value: {}
+        },
+      },
 
-          projectsThunk()
-            .then(function (res) {
-              var allProjects = {};
-              res.data.results.forEach(function (project) {
-                allProjects[project.id] = project;
-              });
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
 
-              self.set('projects', allProjects);
+      listeners: {
+        'page-number-changed': '_tableContentChanged',
+        'details-opened-changed': '_detailsChange'
+      },
+
+      _detailUrl: function(activity, query) {
+        var path = '/response-parameters/partners/activity/' + activity.id;
+        if (this.page === 'planned-action') {
+          path = '/planned-action/activity/' + activity.id;
+        }
+        //Query string is passed to construct the back button.
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+      },
+
+      _getProjects: function () {
+        if (Object.keys(this.projects).length !== 0) {
+          return;
+        }
+
+        var self = this;
+        var projectsThunk = this.$.projects.thunk();
+
+        this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
+
+        projectsThunk()
+          .then(function (res) {
+            var allProjects = {};
+            res.data.results.forEach(function (project) {
+              allProjects[project.id] = project;
             });
-        },
 
-        _getTitle: function (projectId) {
-          if (this.projects[projectId] === undefined) {
-            return;
-          }
-          return this.projects[projectId].title;
-        },
+            self.set('projects', allProjects);
+          });
+      },
 
-        attached: function () {
-          this._getProjects();
-        },
+      _getTitle: function (projectId) {
+        if (this.projects[projectId] === undefined) {
+          return;
+        }
+        return this.projects[projectId].title;
+      },
 
-        detached: function () {
-          this.openedDetails.length = 0;
-        },
-      });
-    </script>
-  </dom-module>
+      attached: function () {
+        this._getProjects();
+      },
+
+      detached: function () {
+        this.openedDetails.length = 0;
+      },
+    });
+  </script>
+</dom-module>
