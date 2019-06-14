@@ -19,10 +19,10 @@
 
         --app-grid-columns: 4;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
+        --app-grid-expandible-item-columns: 3;
       }
 
-      .filter-2-col {
+      .filter-3-col {
         @apply --app-grid-expandible-item;
       }
 
@@ -47,7 +47,7 @@
         </cluster-indicator-type-filter>
 
         <partner-project-filter-multi
-            class="item filter-2-col"
+            class="item filter-3-col"
             value="[[_withDefault(queryParams.partner_projects, '')]]">
         </partner-project-filter-multi>
       </div>
