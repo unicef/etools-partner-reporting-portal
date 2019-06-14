@@ -62,28 +62,23 @@
             dependencies="clusters">
         </cluster-objective-filter-multi>
 
-        <partner-project-filter-multi
-            class="item filter-2-col"
-            value="[[_withDefault(queryParams.partner_projects, '')]]">
-        </partner-project-filter-multi>
-
         <location-type-filter
             id="locationType"
             class="item"
             value="[[_withDefault(queryParams.loc_type, '')]]">
         </location-type-filter>
 
-        <narrow-location-type-filter
-            class="item"
-            value="[[_withDefault(queryParams.narrow_loc_type, '')]]"
-            dependencies="loc_type">
-        </narrow-location-type-filter>
-
         <location-filter-multi-narrowed
             class="item filter-2-col"
             value="[[_withDefault(queryParams.locs, '')]]"
             dependencies="loc_type">
         </location-filter-multi-narrowed>
+
+        <narrow-location-type-filter
+            class="item"
+            value="[[_withDefault(queryParams.narrow_loc_type, '')]]"
+            dependencies="loc_type">
+        </narrow-location-type-filter>
       </div>
     </filter-list>
   </template>
