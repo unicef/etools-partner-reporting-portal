@@ -55,7 +55,8 @@ class UserRowExpanded extends Component {
                 {permissions.editUserPermission(role, row) &&
                 <Fragment>
                     <LinkButton label={labels.edit} onClick={() => onPermissionEdit(row, role)}/>
-                    <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
+                    {!permissions.revokeIpAdmin(role) &&
+                    <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>}
                 </Fragment>}
 
                 {permissions.makeIpAdmin(role) &&
