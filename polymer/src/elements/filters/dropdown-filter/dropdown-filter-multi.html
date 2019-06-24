@@ -82,6 +82,10 @@
       _handleData: function (data) {
         if (data.length) {
           this._filterReady();
+        } else if (this.name === 'location') {
+          // Locations get populated by PDs so user can filter by location, so if there are no PDs,
+          // there are no locations - in that case, fire filterReady method to have filters stop loading.
+          this._filterReady();
         }
       },
 

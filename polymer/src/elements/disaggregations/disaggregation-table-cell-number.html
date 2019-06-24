@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="disaggregation-table-cell.html">
 <link rel="import" href="disaggregation-field.html">
 <link rel="import" href="../etools-prp-number.html">
@@ -31,11 +32,26 @@
     Polymer({
       is: 'disaggregation-table-cell-number',
 
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
         data: Object,
         coords: String,
         editable: Number,
-      }
+      },
+
+      attached: function () {
+        var nullData = this._clone(this.data);
+        if (nullData.v === 0) {
+          nullData.v = null;
+        }
+        if (nullData.d === 0) {
+          nullData.d = null;
+        }
+        this.set('data', nullData);
+      },
     });
   </script>
 
