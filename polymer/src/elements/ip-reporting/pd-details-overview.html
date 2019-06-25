@@ -234,7 +234,7 @@
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="table-cell">
-                  [[_commaSeparated(amendment.types)]]
+                  [[_displayFullName(amendment.types)]]
                 </div>
                 <div class="table-cell">
                   [[amendment.signed_date]]
@@ -312,6 +312,21 @@
 
       _computeReportingRequirements: function (reportingPeriods) {
         return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, App.Settings.dateFormat);
+      },
+
+      _displayFullName: function (types) {
+        if (!types) {
+          return '';
+        }
+
+        var namedTypes = types.map(function (type) {
+          if (type === 'budget') {
+            return 'budget_full_name';
+          } else {
+            return type;
+          }
+        });
+        return namedTypes.join(', ');
       },
     });
   </script>
