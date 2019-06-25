@@ -27,6 +27,11 @@
         display: block;
       }
 
+      div[slot='row-data-details'] {
+        display: flex;
+        flex-direction: column;
+      }
+
       div[slot='row-data-details'] .table-cell--text {
         font-size: 12px;
       }
@@ -55,6 +60,11 @@
         display: flex;
       }
     </style>
+
+    <etools-prp-ajax
+      id="projects"
+      url="[[projectsUrl]]">
+    </etools-prp-ajax>
 
     <iron-location
       query="{{query}}">
@@ -94,12 +104,6 @@
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="status" sortable>
-            <div class="table-column">Status</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="location">
-            <div class="table-column">Location</div>
-          </etools-data-table-column>
         </etools-data-table-header>
 
         <etools-data-table-footer
@@ -126,7 +130,12 @@
                 [[activity.cluster.name]]
               </div>
               <div class="table-cell table-cell--text">
-                [[activity.cluster_activity.title]]
+                <template is="dom-if" if="[[activity.cluster_activity]]">
+                  [[activity.cluster_activity.title]]
+                </template>
+                <template is="dom-if" if="[[!activity.cluster_activity]]">
+                  —
+                </template>
               </div>
               <div class="table-cell table-cell--text">
                 [[activity.cluster_objective.title]]
@@ -144,24 +153,30 @@
                   [[activity.partner.title]]
                 </div>
               </template>
-              <div class="table-cell table-cell--text">
-                <project-status status="[[activity.status]]"></project-status>
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(activity.locations, 'title')]]
-              </div>
             </div>
             <div slot="row-data-details">
+              <template
+                is="dom-repeat"
+                items="[[activity.projects]]">
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">
+                    <span class="label">Title</span>
+                    [[_getTitle(item.project_id)]]
+                  </div>
+                  <div class="table-cell table-cell--text">
+                    <span class="label">Status</span>
+                    <project-status status="[[item.status]]"></project-status>
+                  </div>
+                  <div class="table-cell table-cell--text">
                     <span class="label">Start Date</span>
-                    [[activity.start_date]]
+                    [[item.start_date]]
                   </div>
                   <div class="table-cell table-cell--text">
                     <span class="label">End Date</span>
-                    [[activity.end_date]]
+                    [[item.end_date]]
                   </div>
                 </div>
+              </template>
             </div>
           </etools-data-table-row>
         </template>
@@ -185,67 +200,109 @@
     </etools-content-panel>
   </template>
 
-    <script>
-      Polymer({
-        is: 'activity-list-table',
+  <script>
+    Polymer({
+      is: 'activity-list-table',
 
-        behaviors: [
-          App.Behaviors.PaginationBehavior,
-          App.Behaviors.ReduxBehavior,
-          App.Behaviors.RoutingBehavior,
-          App.Behaviors.DataTableBehavior,
-          App.Behaviors.UtilsBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
-        properties: {
-          activities: {
-            type: Object,
-            statePath: 'partnerActivities.all',
-            observer: '_tableContentChanged',
-          },
-
-          loading: {
-            type: Boolean,
-            statePath: 'partnerActivities.loading'
-          },
-
-          totalResults: {
-            type: Number,
-            statePath: 'partnerActivities.count',
-          },
-
-          anchorQueryParams: {
-            type: Object,
-            computed: '_withDefaultParams(queryParams)',
-          },
-
-          openedDetails: {
-            type: Array,
-            value: []
-          },
+      properties: {
+        activities: {
+          type: Object,
+          statePath: 'partnerActivities.all',
+          observer: '_tableContentChanged',
         },
 
-        _openModal: function () {
-          this.$$('#modal').open();
+        loading: {
+          type: Boolean,
+          statePath: 'partnerActivities.loading'
         },
 
-        listeners: {
-          'page-number-changed': '_tableContentChanged',
-          'details-opened-changed': '_detailsChange'
+        totalResults: {
+          type: Number,
+          statePath: 'partnerActivities.count',
         },
 
-        _detailUrl: function(activity, query) {
-          var path = '/response-parameters/partners/activity/' + activity.id;
-          if (this.page === 'planned-action') {
-            path = '/planned-action/activity/' + activity.id;
-          }
-          //Query string is passed to construct the back button.
-          return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+        anchorQueryParams: {
+          type: Object,
+          computed: '_withDefaultParams(queryParams)',
         },
 
-        detached: function () {
-          this.openedDetails.length = 0;
+        openedDetails: {
+          type: Array,
+          value: []
         },
-      });
-    </script>
-  </dom-module>
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        projects: {
+          type: Object,
+          value: {}
+        },
+      },
+
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
+
+      listeners: {
+        'page-number-changed': '_tableContentChanged',
+        'details-opened-changed': '_detailsChange'
+      },
+
+      _detailUrl: function(activity, query) {
+        var path = '/response-parameters/partners/activity/' + activity.id;
+        if (this.page === 'planned-action') {
+          path = '/planned-action/activity/' + activity.id;
+        }
+        //Query string is passed to construct the back button.
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+      },
+
+      _getProjects: function () {
+        if (Object.keys(this.projects).length !== 0) {
+          return;
+        }
+
+        var self = this;
+        var projectsThunk = this.$.projects.thunk();
+
+        this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
+
+        projectsThunk()
+          .then(function (res) {
+            var allProjects = {};
+            res.data.results.forEach(function (project) {
+              allProjects[project.id] = project;
+            });
+
+            self.set('projects', allProjects);
+          });
+      },
+
+      _getTitle: function (projectId) {
+        if (this.projects[projectId] === undefined) {
+          return;
+        }
+        return this.projects[projectId].title;
+      },
+
+      attached: function () {
+        this._getProjects();
+      },
+
+      detached: function () {
+        this.openedDetails.length = 0;
+      },
+    });
+  </script>
+</dom-module>

@@ -24,6 +24,7 @@ from core.factories import (CartoDBTableFactory,
                             LocationFactory,
                             LocationWithReportableLocationGoalFactory,
                             PartnerUserFactory, PartnerFactory,
+                            PartnerActivityProjectContextFactory,
                             ProgressReportFactory,
                             QuantityReportableToLowerLevelOutputFactory,
                             QuantityTypeIndicatorBlueprintFactory,
@@ -96,8 +97,12 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -365,8 +370,8 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
-            project=self.project,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -590,10 +595,14 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
         self.data = {
             "cluster": self.cluster.id,
             "partner": self.partner.id,
-            "project": self.project.id,
-            "start_date": self.project.start_date.strftime(settings.PRINT_DATA_FORMAT),
-            "end_date": self.project.end_date.strftime(settings.PRINT_DATA_FORMAT),
-            "status": "Ong"
+            "projects": [
+                {
+                    "project_id": self.project.id,
+                    "start_date": self.project.start_date.strftime(settings.PRINT_DATA_FORMAT),
+                    "end_date": self.project.end_date.strftime(settings.PRINT_DATA_FORMAT),
+                    "status": "Ong"
+                }
+            ],
         }
 
     def test_create_activity_from_cluster_activity(self):
@@ -681,8 +690,12 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],

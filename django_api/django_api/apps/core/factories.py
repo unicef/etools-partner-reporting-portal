@@ -31,7 +31,7 @@ from indicator.models import (Disaggregation, DisaggregationValue,
                               IndicatorReport, Reportable,
                               ReportableLocationGoal, ReportingEntity)
 from partner.models import (Partner, PartnerActivity, PartnerProject,
-                            PartnerProjectFunding)
+                            PartnerProjectFunding, PartnerActivityProjectContext)
 from unicef.models import (LowerLevelOutput, PDResultLink, Person,
                            ProgrammeDocument, ProgressReport,
                            ProgressReportAttachment, ReportingPeriodDates,
@@ -493,11 +493,7 @@ class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
 
 
 class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
-    project = factory.SubFactory('core.factories.PartnerProjectFactory', partner_activity=None)
-    partner = factory.LazyAttribute(lambda o: o.project.partner)
-    start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=180)
-    status = fuzzy.FuzzyChoice(PARTNER_ACTIVITY_STATUS_LIST)
+    partner = factory.SubFactory('core.factories.PartnerFactory', partner_activity=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -508,6 +504,15 @@ class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
             for location in extracted:
                 self.locations.add(location)
 
+    @factory.post_generation
+    def partneractivityprojectcontext_set(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for partneractivityprojectcontext in extracted:
+                self.partneractivityprojectcontexts.add(partneractivityprojectcontext)
+
     class Meta:
         model = PartnerActivity
         abstract = True
@@ -517,11 +522,9 @@ class ClusterActivityPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_activity {ClusterActivity} -- Cluster Activity ORM object to bind
-        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_activity=cluster_activity1,
-            project=project1,
         )
     """
 
@@ -537,15 +540,13 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_objective {ClusterObjective} -- Cluster Objective ORM object to bind
-        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_objective=cluster_objective1,
-            project {PartnerProject} -- PartnerProject ORM object to bind
         )
     """
 
-    title = factory.LazyAttribute(lambda o: "{} -- Custom".format(o.project.title))
+    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Custom".format(o.partner.title, n))
     cluster_activity = None
     cluster_objective = factory.SubFactory('core.factories.ClusterObjectiveFactory', partner_activity=None)
 
@@ -1174,6 +1175,29 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
     class Meta:
         model = ReportableLocationGoal
         django_get_or_create = ('location', 'reportable')
+
+
+class PartnerActivityProjectContextFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        project {PartnerProject} -- PartnerProject ORM object to bind
+        activity {PartnerActivity} -- PartnerActivity ORM object to bind
+
+    Ex) PartnerActivityProjectContextFactory(
+            project=project1,
+            activity=activity1,
+        )
+    """
+
+    project = factory.SubFactory('core.factories.PartnerProjectFactory')
+    activity = factory.SubFactory('core.factories.PartnerActivityFactory')
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+    start_date = factory.LazyFunction(faker.date)
+    end_date = factory.LazyFunction(faker.date)
+
+    class Meta:
+        model = PartnerActivityProjectContext
+        django_get_or_create = ('project', 'activity')
 
 
 @factory.django.mute_signals(signals.post_save)

@@ -392,7 +392,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     * cluster - Integer ID for cluster
     * partner - Integer ID for partner
     * indicator - Integer ID for IndicatorReport
-    * project - Integer ID for project
+    * projects - A comma-seperated-list of Integer ID for projects
     * location - Integer ID for location
     * cluster_objective - Integer ID for cluster_objective
     * cluster_activity - Integer ID for cluster_activity

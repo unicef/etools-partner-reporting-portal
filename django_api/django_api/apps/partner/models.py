@@ -340,14 +340,17 @@ class PartnerActivity(TimeStampedModel):
     partner is allowed to define their ideas that wasn't defined.
 
     related models:
-        partner.PartnerProject (ForeignKey): "project"
+        partner.PartnerProject (ManyToMany): "projects"
         partner.Partner (ForeignKey): "partner"
         cluster.ClusterActivity (ForeignKey): "cluster_activity"
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=2048)
-    project = models.ForeignKey(PartnerProject, null=True,
-                                related_name="partner_activities")
+    projects = models.ManyToManyField(
+        PartnerProject,
+        related_name="partner_activities",
+        through="PartnerActivityProjectContext",
+    )
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity',
                                          related_name="partner_activities",
@@ -359,12 +362,6 @@ class PartnerActivity(TimeStampedModel):
                                   related_query_name='partner_activities')
     locations = models.ManyToManyField('core.Location',
                                        related_name="partner_activities")
-    start_date = models.DateField()
-    end_date = models.DateField()
-
-    # PartnerActivity shares the status flags with PartnerProject
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
-                              default=PARTNER_PROJECT_STATUS.ongoing)
 
     class Meta:
         ordering = ['-id']
@@ -375,11 +372,12 @@ class PartnerActivity(TimeStampedModel):
 
     @property
     def clusters(self):
-        return self.project.clusters.all()
+        from cluster.models import Cluster
+        return Cluster.objects.filter(id__in=self.projects.values_list('clusters', flat=True).distinct())
 
     @property
     def response_plan(self):
-        return self.project.clusters.all()[0].response_plan
+        return self.clusters[0].response_plan
 
     @property
     def is_custom(self):
@@ -395,3 +393,17 @@ def check_pa_double_fks(sender, instance, **kwargs):
         raise Exception(
             "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective"
         )
+
+
+class PartnerActivityProjectContext(TimeStampedModel):
+    project = models.ForeignKey("PartnerProject", on_delete=models.CASCADE)
+    activity = models.ForeignKey("PartnerActivity", on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    # PartnerActivity shares the status flags with PartnerProject
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
+                              default=PARTNER_PROJECT_STATUS.ongoing)
+
+    class Meta:
+        unique_together = ('project', 'activity')

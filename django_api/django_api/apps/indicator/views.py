@@ -774,7 +774,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             )
 
         try:
-            project_name = reportable.content_object.project.title
+            project_name = reportable.content_object.projects.first().title
         except Exception:
             project_name = ''
 

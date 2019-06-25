@@ -105,7 +105,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(
-            Q(reportable__partner_activities__project__partner=value) |
+            Q(reportable__partner_activities__partner=value) |
             Q(reportable__partner_projects__partner=value)
         ).distinct()
 
@@ -117,14 +117,15 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             return queryset.filter(reportable=reportable)
 
     def get_project(self, queryset, name, value):
+        value_list = value.split(',')
         return queryset.filter(
-            Q(reportable__cluster_objectives__cluster__partner_projects=value) |
-            Q(reportable__cluster_objectives__cluster_activities__partner_activities__project=value) |
-            Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects=value) |
-            Q(reportable__cluster_activities__partner_activities__project=value)
+            Q(reportable__cluster_objectives__cluster__partner_projects__in=value_list) |
+            Q(reportable__cluster_objectives__cluster_activities__partner_activities__projects__in=value_list) |
+            Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects__in=value_list) |
+            Q(reportable__cluster_activities__partner_activities__projects__in=value_list)
             |
-            Q(reportable__partner_activities__project=value) |
-            Q(reportable__partner_projects=value)
+            Q(reportable__partner_activities__projects__in=value_list) |
+            Q(reportable__partner_projects__in=value_list)
         ).distinct()
 
     def get_location(self, queryset, name, value):

@@ -370,7 +370,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 
     def get_queryset(self):
         return PartnerActivity.objects.filter(
-            project__clusters__response_plan_id=self.kwargs['response_plan_id']
+            projects__clusters__response_plan_id=self.kwargs['response_plan_id']
         ).distinct()
 
     def get_object(self, pk):
@@ -380,7 +380,8 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
         instance = self.get_object(pk)
         serializer = self.get_serializer(
             instance=instance,
-            data=self.request.data
+            data=self.request.data,
+            partial=True
         )
 
         serializer.is_valid(raise_exception=True)

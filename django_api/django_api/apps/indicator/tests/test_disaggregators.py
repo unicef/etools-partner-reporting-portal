@@ -8,6 +8,7 @@ from core.helpers import (
 )
 from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             ClusterActivityPartnerActivityFactory,
+                            PartnerActivityProjectContextFactory,
                             ClusterFactory, ClusterIndicatorReportFactory,
                             ClusterObjectiveFactory, ClusterPRPRoleFactory,
                             CountryFactory, DisaggregationFactory,
@@ -69,8 +70,12 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.sample_disaggregation_value_map = {
@@ -426,8 +431,12 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.sample_disaggregation_value_map = {
