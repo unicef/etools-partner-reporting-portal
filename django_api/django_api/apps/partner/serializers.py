@@ -1,9 +1,8 @@
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from core.serializers import ShortLocationSerializer
-from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES, PARTNER_ACTIVITY_STATUS
+from core.common import PARTNER_TYPE, CSO_TYPES, PARTNER_ACTIVITY_STATUS
 from core.models import Location
 
 from cluster.models import (
