@@ -234,7 +234,7 @@
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="table-cell">
-                  [[amendment.types]]
+                  [[_commaSeparated(amendment.types)]]
                 </div>
                 <div class="table-cell">
                   [[amendment.signed_date]]
@@ -306,6 +306,7 @@
       },
 
       _hasAmendments: function (pd) {
+        console.log('amendments', pd.amendments)
         return PdDetailsOverviewUtils.hasAmendments(pd);
       },
 
