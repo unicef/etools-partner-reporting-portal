@@ -325,13 +325,11 @@
 
               if (attachment.id === null) {
                 var duplicates = attachments.filter(function(item) {
-                  var tokens = attachment.file_name.split('.');
-                  if (tokens.length === 0) {
-                    return item.file_name.indexOf(attachment.file_name) !== -1;
-                  } else {
-                    return item.file_name.indexOf(tokens[0]) !== -1;
-                  }
+                  console.log('item', item);
+                  return item.file_name.indexOf(attachment.file_name) !== -1;
                 });
+
+                console.log('duplicates', duplicates);
 
                 if (duplicates.length === 1) {
                   self.set(attachmentPropertyName, [duplicates[0]]);
