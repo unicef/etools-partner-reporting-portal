@@ -59,16 +59,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var serverBackend = (window.location.port !== '8082');
       var baseUrl = serverBackend ? '/app/' : '/';
 
-      // add base tag with href set to baseUrl
-      var base = document.createElement('base');
-      base.href = baseUrl;
-      document.head.appendChild(base);
-      
-      var polyfills = document.createElement('script');
-      polyfills.async = true;
-      polyfills.src = baseUrl + 'js/polyfill.min.js';
-      document.head.appendChild(polyfills);
-
       // Load webcomponentsjs polyfill if browser does not support native Web Components
       (function() {
         'use strict';
