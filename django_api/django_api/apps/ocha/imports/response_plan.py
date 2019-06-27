@@ -8,7 +8,7 @@ from ocha.imports.utilities import logger, get_json_from_url, save_cluster_objec
     save_reportables_for_cluster_objective_or_activity
 
 
-def import_response_plan(external_plan_id, workspace=None, async=True):
+def import_response_plan(external_plan_id, workspace=None, asynch=True):
     logger.debug('Importing Response Plan #{}'.format(external_plan_id))
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
@@ -20,7 +20,7 @@ def import_response_plan(external_plan_id, workspace=None, async=True):
 
     # Do most of the work in background, otherwise it times out the request a lot
     from ocha.tasks import finish_response_plan_import
-    (finish_response_plan_import.delay if async else finish_response_plan_import)(external_plan_id)
+    (finish_response_plan_import.delay if asynch else finish_response_plan_import)(external_plan_id)
 
     return response_plan
 

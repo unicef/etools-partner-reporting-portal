@@ -34,6 +34,6 @@ class Command(BaseCommand):
         if country:
             import_plans_for_country(country)
         elif _id:
-            import_response_plan(_id, async=False)
+            import_response_plan(_id, asynch=False)
         else:
             self.stderr.write('Either country or id needs to be provided')

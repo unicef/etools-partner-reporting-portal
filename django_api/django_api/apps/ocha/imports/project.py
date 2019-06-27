@@ -94,7 +94,7 @@ def import_project_details(project, current_version_id):
     ))
 
 
-def import_project(external_project_id, partner_id, response_plan=None, async=True):
+def import_project(external_project_id, partner_id, response_plan=None, asynch=True):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)['data']
     # Grab project details from projectVersion array of dict
@@ -126,7 +126,7 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
     project = serializer.save()
 
     from ocha.tasks import finish_partner_project_import
-    (finish_partner_project_import.delay if async else finish_partner_project_import)(
+    (finish_partner_project_import.delay if asynch else finish_partner_project_import)(
         project.pk, external_project_id, response_plan_id=getattr(response_plan, 'id', None)
     )
 

@@ -44,12 +44,12 @@ class Command(BaseCommand):
         response_plan = ResponsePlan.objects.filter(id=rp_id).first()
 
         if _id:
-            import_project(_id, Partner.objects.first().id, response_plan=response_plan, async=False)
+            import_project(_id, Partner.objects.first().id, response_plan=response_plan, asynch=False)
         elif response_plan:
             project_list = get_project_list_for_plan(response_plan.external_id)
             for project in project_list:
                 try:
-                    import_project(project['id'], Partner.objects.first().id, response_plan=response_plan, async=False)
+                    import_project(project['id'], Partner.objects.first().id, response_plan=response_plan, asynch=False)
                 except OCHAImportException:
                     continue
         elif bulk:
@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 return
             for project_id in range(start_id, end_id + 1):
                 try:
-                    import_project(project_id, Partner.objects.first().id, response_plan=response_plan, async=False)
+                    import_project(project_id, Partner.objects.first().id, response_plan=response_plan, asynch=False)
                 except Exception as e:
                     self.stderr.write('Error getting {}: {}'.format(project_id, e))
         else:
