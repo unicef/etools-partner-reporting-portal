@@ -285,6 +285,21 @@
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
+        amendmentTypes: {
+          type: Object,
+          value: {
+            dates: 'Dates',
+            results: 'Results',
+            budget: 'Budget',
+            admin_error: 'Type 1: Administrative error (correction)',
+            budget_lte_20: 'Type 2: Budget <= 20%',
+            budget_gt_20: 'Type 3: Budget > 20%',
+            change: 'Type 4: Changes to planned results',
+            no_cost: 'Type 5: No cost extension',
+            other: 'Type 6: Other'
+          }
+        },
+
         loaded: {
           type: Boolean,
           value: false,
