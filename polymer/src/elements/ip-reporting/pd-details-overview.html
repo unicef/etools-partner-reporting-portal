@@ -330,18 +330,19 @@
       },
 
       _displayFullName: function (types) {
+        var self = this;
+
         if (!types) {
           return '';
         }
 
-        var namedTypes = types.map(function (type) {
-          if (type === 'budget_test') {  // placeholder for now
-            return 'budget_full_name';
-          } else {
-            return type;
-          }
-        });
-        return namedTypes.join(', ');
+        console.log('amendmentTypes dict', this.amendmentTypes);
+
+        return types
+          .map(function (type) {
+            return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
+          })
+          .join(', ');
       },
     });
   </script>
