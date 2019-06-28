@@ -321,7 +321,6 @@
       },
 
       _hasAmendments: function (pd) {
-        console.log('amendments', pd.amendments)
         return PdDetailsOverviewUtils.hasAmendments(pd);
       },
 
@@ -335,8 +334,6 @@
         if (!types) {
           return '';
         }
-
-        console.log('amendmentTypes dict', this.amendmentTypes);
 
         return types
           .map(function (type) {
