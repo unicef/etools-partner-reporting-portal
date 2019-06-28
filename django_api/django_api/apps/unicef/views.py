@@ -693,7 +693,7 @@ class ProgressReportSRSubmitAPIView(APIView):
             )
 
         # Attachment field validation
-        if not progress_report.attachment:
+        if not progress_report.attachments.exists():
             raise ValidationError(
                 "Attachment is required for SR report type"
             )
