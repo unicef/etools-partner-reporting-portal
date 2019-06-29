@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script>
       // Setup Polymer options
       window.Polymer = {
-        // dom: 'shadow',
+        dom: 'shadow',
         lazyRegister: true
       };
 
@@ -68,11 +68,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var onload = function() {
           // For native Imports, manually fire WebComponentsReady so user code
           // can use the same code path for native and polyfill'd imports.
-          if (!window.HTMLImports) {
-            document.dispatchEvent(
-              new CustomEvent('WebComponentsReady', {bubbles: true})
-            );
-          }
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
         };
 
         var script = document.createElement('script');
