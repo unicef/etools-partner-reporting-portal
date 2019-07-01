@@ -20,7 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <link rel="icon" href="images/favicon.ico">
 
     <!-- See https://goo.gl/OOhYW5 -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- See https://goo.gl/qRE0vM -->
     <meta name="theme-color" content="#2E3AA1">
@@ -46,8 +46,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-TileColor" content="#3f51b5">
     <meta name="msapplication-tap-highlight" content="no">
 
-    <!-- Zendesk support -->
-    <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=fd275a17-bb04-499b-bc03-ffe711fa1ba8"> </script>
+    <!-- Zendesk support found here:
+    https://github.com/unicef/etools-tpm/pull/48/commits/4c732b803e6c986eb3b80389a6c73b63b77a0259 -->
+    <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=69eb3f61-7900-4d7e-a3e2-9f4b3b28b2ac"> </script>
 
     <script>
       // Setup Polymer options
@@ -67,28 +68,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var onload = function() {
           // For native Imports, manually fire WebComponentsReady so user code
           // can use the same code path for native and polyfill'd imports.
-          if (!window.HTMLImports) {
-            document.dispatchEvent(
-              new CustomEvent('WebComponentsReady', {bubbles: true})
-            );
-          }
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
         };
 
-        var webComponentsSupported = (
-          'registerElement' in document
-          && 'import' in document.createElement('link')
-          && 'content' in document.createElement('template')
-        );
-
-        if (!webComponentsSupported) {
-          var script = document.createElement('script');
-          script.async = true;
-          script.src = baseUrl + 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
-          script.onload = onload;
-          document.head.appendChild(script);
-        } else {
-          onload();
-        }
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = baseUrl + 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
       })();
 
       // Load pre-caching Service Worker
