@@ -587,8 +587,6 @@
 
         this._fetchData()
             .then(function () {
-              console.log('disaggregations', self.disaggregations);
-              console.log('isHfIndicator', self.isHfIndicator);
               self.set('loading', false);
             })
             .catch(function (err) { // jshint ignore:line
@@ -618,7 +616,6 @@
       },
 
       _computeIsHfIndicator: function (disaggregations) {
-        console.log('reportIsQpr', this.reportIsQpr);
         return disaggregations !== undefined
           && this.reportIsQpr === true
           && disaggregations.is_hf_indicator === true;
