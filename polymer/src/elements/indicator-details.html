@@ -201,7 +201,7 @@
       <div>
         <template
             is="dom-if"
-            if="[[reportIsQpr]]">
+            if="[[isHfIndicator]]">
           <div class="tab-header layout horizontal justified">
             <div class="self-center">For this indicator data can be pulled from reports matching this reporting period</div>
             <div>
@@ -553,7 +553,12 @@
         disablePull: {
           type: Boolean,
           computed: '_computeDisablePull(reportStatus)'
-        }
+        },
+
+        isHfIndicator: {
+          type: Boolean,
+          computed: '_computeIsHfIndicator(disaggregations)'
+        },
       },
 
       listeners: {
@@ -608,6 +613,12 @@
 
       _computeDisaggregations: function (data, key) {
         return this._clone(data[key]);
+      },
+
+      _computeIsHfIndicator: function (disaggregations) {
+        return disaggregations !== undefined
+          && this.reportIsQpr === true
+          && disaggregations.is_hf_indicator === true;
       },
 
       _computeMode: function (mode, overrideMode) {
