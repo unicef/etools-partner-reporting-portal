@@ -283,7 +283,11 @@
       },
 
       detached: function () {
-        if (Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input') !== null) {
+        if (Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input') !== null
+          && Polymer.dom(this.root)
+            .querySelectorAll('labelled-item')[1]
+            .querySelector('paper-button').textContent.trim() === 'Save'
+        ) {
           this.set(['localData', 'narrative_assessment'],
             Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input').value);
         }
