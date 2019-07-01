@@ -831,6 +831,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     parent_ir_id = serializers.SerializerMethodField()
     child_ir_ids = serializers.SerializerMethodField()
     has_high_frequency_reports = serializers.SerializerMethodField()
+    is_hf_indicator = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -855,6 +856,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'parent_ir_id',
             'child_ir_ids',
             'has_high_frequency_reports',
+            'is_hf_indicator',
         )
 
     def get_has_high_frequency_reports(self, obj):
@@ -872,6 +874,9 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         )
 
         return True if pr.report_type == "QPR" and hf_reports.exists() else False
+
+    def get_is_hf_indicator(self, obj):
+        return obj.reportable.is_unicef_hf_indicator
 
     def get_parent_ir_id(self, obj):
         return obj.parent.id if obj.parent else None
