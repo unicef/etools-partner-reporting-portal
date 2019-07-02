@@ -17,6 +17,14 @@
         display: block;
       }
 
+      .item {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        padding: 18px 54px 18px 0px;
+      }
+
       message-box {
         max-width: 600px;
         margin: 0 auto;
@@ -41,6 +49,7 @@
         <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
         [[localize('sign_out')]]
       </div>
+
       <template
           is="dom-if"
           if="[[loading]]"
@@ -101,10 +110,6 @@
             } else {
               self.set('loading', false);
             }
-          })
-          .catch(function (err) {
-            console.log('err', err);
-            self.set('loading', false);
           });
       },
     });
