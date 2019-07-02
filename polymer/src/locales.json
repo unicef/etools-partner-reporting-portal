@@ -343,7 +343,12 @@
     "request_ocha_timed_out": "Request to OCHA timed out. Please try again.",
     "message_sent": "Message sent",
     "account_created": "Account created.",
-    "please_wait_business_days": "Please wait 1-2 business days for your admin to approve you. If it has been longer then 1-2 business days, please email X to get you approved."
+    "please_wait_business_days": "Please wait 1-2 business days for your admin to approve you. If it has been longer then 1-2 business days, please email X to get you approved.",
+    "could_not_be_submitted": "Your report could not be submitted, because you are not the authorized officer assigned to the PCA that is connected to that PD. Please select the authorized officer on behalf of whom this report is submitted.",
+    "not_selected_overall_status": "You have not selected overall status for one of Outputs",
+    "not_completed_partner_contribution": "You have not completed Partner Contribution To Date field on Other Info tab.",
+    "not_completed_challenges_bottlenecks": "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab.",
+    "not_completed_proposed_way": "You have not completed Proposed way forward field on Other Info tab."
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
@@ -689,6 +694,11 @@
     "request_ocha_timed_out":  "La requête auprès d'OCHA a expiré. Veuillez réessayer.",
     "message_sent":  "Message envoyé",
     "account_created":  "Compte créé.",
-    "please_wait_business_days":  "Veuillez attendre 1 à 2 jours ouvrables pour que votre administrateur vous approuve. Si cela fait plus de 1-2 jours ouvrables, veuillez envoyer un courriel à X pour votre approbation."
+    "please_wait_business_days":  "Veuillez attendre 1 à 2 jours ouvrables pour que votre administrateur vous approuve. Si cela fait plus de 1-2 jours ouvrables, veuillez envoyer un courriel à X pour votre approbation.",
+    "could_not_be_submitted": "Votre rapport n'a pas pu être soumis, car vous n'êtes pas l'agent autorisé désigné selon le PCA connecté à ce DP. Veuillez sélectionner l’agent autorisé pour le compte duquel ce rapport a été soumis.",
+    "not_selected_overall_status": "Vous n'avez pas sélectionné le statut global pour l'un des résultats.",
+    "not_completed_partner_contribution": "Vous n'avez pas rempli le champ Contribution du partenaire à ce jour dans l'onglet Autres informations.",
+    "not_completed_challenges_bottlenecks": "Vous n'avez pas rempli les défis/goulots d'étranglement dans le champ Période de reporting de l'onglet Autres informations.",
+    "not_completed_proposed_way": "Vous n'avez pas rempli le champ Proposition de voie à suivre dans l'onglet Autres informations."
   }
 }
