@@ -331,6 +331,7 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
         ),
     )
 
