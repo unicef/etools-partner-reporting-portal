@@ -551,14 +551,11 @@ class ProgressReportSubmitAPIView(APIView):
             )
 
         for ir in progress_report.indicator_reports.all():
-            # Check if all indicator data is fulfilled
-            for data in ir.indicator_location_data.all():
-                for key, vals in data.disaggregation.items():
-                    if (vals.get('d', 0) in [None, '']):
-                        raise ValidationError(
-                            "You have not completed all indicator location data across "
-                            "all indicator reports for this progress report."
-                        )
+            if not ir.is_complete:
+                raise ValidationError(
+                    "You have not completed all indicator location data across "
+                    "all indicator reports for this progress report."
+                )
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
