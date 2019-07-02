@@ -8,6 +8,7 @@ from calendar import monthrange
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from itertools import combinations, product
 
 from core.common import (
@@ -640,3 +641,99 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                             "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
                             "linked with LLO Reportable. "
                             "Skipping link!", e)
+
+
+def create_ir_for_cluster(reportable, start_date, end_date, project):
+    """
+    Create a new IndicatorReport and its IndicatorLocationData instances,
+    with passed-in new dates
+
+    Arguments:
+        reportable {Reportable} -- Reportable instance to create report for
+        start_date {datetime.datetime} -- Start date for reporting
+        end_date {datetime.datetime} -- End date for reporting
+        project {PartnerProject} -- PartnerProject context to bind
+
+    Returns:
+        IndicatorReport -- Newly generated IndicatorReport instance
+    """
+    from indicator.models import (
+        IndicatorBlueprint,
+        IndicatorReport,
+        IndicatorLocationData,
+        ReportingEntity,
+    )
+
+    if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+        logger.info("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
+            reportable, start_date, end_date
+        ))
+
+        indicator_report = IndicatorReport.objects.create(
+            reportable=reportable,
+            project=project,
+            time_period_start=start_date,
+            time_period_end=end_date,
+            due_date=end_date + relativedelta(days=1),
+            title=reportable.blueprint.title,
+            total={'c': 0, 'd': 0, 'v': 0},
+            overall_status="NoS",
+            report_status="Due",
+            submission_date=None,
+            reporting_entity=ReportingEntity.objects.get(title="Cluster"),
+        )
+
+        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
+            logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                indicator_report, start_date, end_date
+            ))
+
+            IndicatorLocationData.objects.create(
+                indicator_report=indicator_report,
+                location=location_goal.location,
+                num_disaggregation=indicator_report.disaggregations.count(),
+                level_reported=indicator_report.disaggregations.count(),
+                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                    'id', flat=True)),
+                disaggregation={
+                    '()': {'c': 0, 'd': 0, 'v': 0}
+                },
+            )
+
+    else:
+        logger.info("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
+            reportable, start_date, end_date
+        ))
+
+        indicator_report = IndicatorReport.objects.create(
+            reportable=reportable,
+            project=project,
+            time_period_start=start_date,
+            time_period_end=end_date,
+            due_date=end_date + relativedelta(days=1),
+            title=reportable.blueprint.title,
+            total={'c': 0, 'd': 0, 'v': 0},
+            overall_status="NoS",
+            report_status="Due",
+            submission_date=None,
+            reporting_entity=ReportingEntity.objects.get(title="Cluster"),
+        )
+
+        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
+            logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                indicator_report, start_date, end_date
+            ))
+
+            IndicatorLocationData.objects.create(
+                indicator_report=indicator_report,
+                location=location_goal.location,
+                num_disaggregation=indicator_report.disaggregations.count(),
+                level_reported=indicator_report.disaggregations.count(),
+                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                    'id', flat=True)),
+                disaggregation={
+                    '()': {'c': 0, 'd': 0, 'v': 0}
+                },
+            )
+
+    return indicator_report

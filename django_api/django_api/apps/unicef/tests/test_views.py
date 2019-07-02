@@ -24,6 +24,7 @@ from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             LocationWithReportableLocationGoalFactory,
                             LowerLevelOutputFactory, NonPartnerUserFactory,
                             PartnerFactory, PartnerProjectFactory,
+                            PartnerActivityProjectContextFactory,
                             PartnerUserFactory, PDResultLinkFactory,
                             PersonFactory, ProgrammeDocumentFactory,
                             ProgressReportAttachmentFactory,
@@ -84,8 +85,12 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -339,8 +344,12 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -549,8 +558,12 @@ class TestProgressReportAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],

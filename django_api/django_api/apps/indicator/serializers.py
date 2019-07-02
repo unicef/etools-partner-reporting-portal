@@ -270,9 +270,13 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     in_need = serializers.JSONField(required=False, allow_null=True)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     def get_loc_type(self, obj):
         return obj.location.gateway.admin_level
+
+    def get_title(self, obj):
+        return obj.location.title
 
     def validate_baseline(self, value):
         if 'd' not in value:
@@ -311,6 +315,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
             'target',
             'location',
             'loc_type',
+            'title',
         )
 
 
@@ -826,6 +831,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     parent_ir_id = serializers.SerializerMethodField()
     child_ir_ids = serializers.SerializerMethodField()
     has_high_frequency_reports = serializers.SerializerMethodField()
+    is_hf_indicator = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -850,6 +856,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'parent_ir_id',
             'child_ir_ids',
             'has_high_frequency_reports',
+            'is_hf_indicator',
         )
 
     def get_has_high_frequency_reports(self, obj):
@@ -867,6 +874,9 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         )
 
         return True if pr.report_type == "QPR" and hf_reports.exists() else False
+
+    def get_is_hf_indicator(self, obj):
+        return obj.reportable.is_unicef_hf_indicator
 
     def get_parent_ir_id(self, obj):
         return obj.parent.id if obj.parent else None
@@ -1394,12 +1404,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
 
-            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
-                error_msg = "Start date of reporting period cannot come before the activity's start date"
-
+            if not content_object.partneractivityprojectcontext_set.exists():
                 raise ValidationError({
-                    "start_date_of_reporting_period": error_msg,
+                    "start_date_of_reporting_period": "This PartnerActivity does not have start date",
                 })
+
+            for context in content_object.partneractivityprojectcontext_set.all():
+                if validated_data['start_date_of_reporting_period'] < context.start_date:
+                    error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                    raise ValidationError({
+                        "start_date_of_reporting_period": error_msg,
+                    })
         else:
             raise NotImplemented()
 
@@ -1758,10 +1774,11 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            if obj.reportable.content_object.project:
+            if obj.reportable.content_object.projects.exists():
+                project = obj.reportable.content_object.projects.first()
                 return {
-                    "id": obj.reportable.content_object.project.id,
-                    "title": obj.reportable.content_object.project.title
+                    "id": project.id,
+                    "title": project.title
                 }
         else:
             return None
@@ -1933,11 +1950,11 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             return []
 
     def get_project(self, obj):
-        if isinstance(obj.content_object, PartnerActivity) \
-                and obj.content_object.project:
-            return obj.content_object.project.title
-        else:
-            return ""
+        if isinstance(obj.content_object, PartnerActivity):
+            if obj.content_object.projects.exists():
+                return obj.content_object.projects.first().title
+
+        return ""
 
     def get_cluster_activity(self, obj):
         if isinstance(obj.content_object, PartnerActivity) \

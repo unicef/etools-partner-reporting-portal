@@ -30,7 +30,7 @@ import orange from "@material-ui/core/colors/orange";
 
 const allowedPageSizes = [5, 10, 15];
 
-const styleSheet = (theme) => {
+export const styleSheet = (theme) => {
     const paddingSmall = theme.spacing.unit * 2;
     const paddingBig = theme.spacing.unit * 3;
 
@@ -53,32 +53,32 @@ const highlightStyle = {
     backgroundColor: orange[100]
 };
 
-const TableRow = ({row, ...restProps}) => (
+export const TableRow = ({row, ...restProps}) => (
     <Table.Row
         {...restProps}
         style={row.highlight ? highlightStyle : {}}
     />
 );
 
-const DeleteButton = ({onClick}) => (
+export const DeleteButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Delete row">
         <Close/>
     </IconButton>
 );
 
-const EditButton = ({onClick}) => (
+export const EditButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Edit row">
         <Edit/>
     </IconButton>
 );
 
-const RestoreButton = ({onClick}) => (
+export const RestoreButton = ({onClick}) => (
     <IconButton onClick={onClick} title="Restore row">
         <Restore/>
     </IconButton>
 );
 
-class PaginatedList extends Component {
+export class PaginatedList extends Component {
     constructor(props) {
         super(props);
 
@@ -278,7 +278,7 @@ PaginatedList.propTypes = {
     classes: PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => {
+export const mapStateToProps = (state) => {
     const {expandedRowIds} = state;
 
     return {
@@ -286,7 +286,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = dispatch => {
+export const mapDispatchToProps = dispatch => {
     return {
         dispatchExpandedRowIds: ids => dispatch(expandedRowIds(ids))
     }

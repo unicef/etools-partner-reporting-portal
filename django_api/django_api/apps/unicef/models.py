@@ -532,6 +532,7 @@ class ProgressReportAttachment(TimeStampedModel):
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="attachments")
     file = models.FileField(
         upload_to=get_pr_attachment_upload_to,
+        max_length=500
     )
     type = models.CharField(verbose_name="Attachment type", choices=PR_ATTACHMENT_TYPES, max_length=5)
 

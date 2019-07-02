@@ -30,6 +30,10 @@
         @apply(--app-grid-expandible-item);
       }
 
+      .indicators-list {
+        padding-left: 15px;
+      }
+
       ul {
         padding-left: 0;
       }
@@ -80,6 +84,18 @@
             <li class="item">
               <labelled-item label="Additional Information (e.g. links)">
                 [[_withDefault(projectData.additional_information)]]
+              </labelled-item>
+            </li>
+
+            <li class="item">
+              <labelled-item label="Indicators">
+                <ul class="indicators-list">
+                  <template
+                    is="dom-repeat"
+                    items="[[projectData.attachments]]">
+                    <li>[[item]]</li>
+                  </template>
+                </ul>
               </labelled-item>
             </li>
 

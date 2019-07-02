@@ -254,6 +254,12 @@
 
         var files = isEmpty ? [] : change.base;
 
+        files.forEach(function (file) {
+          if (/\s/.test(file.file_name)) {
+            file.file_name = file.file_name.replace(/ /g, '_');
+          }
+        });
+
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
         if (isEmpty || (!isEmpty && attachment.path !== null)) {
@@ -323,7 +329,7 @@
                   if (tokens.length === 0) {
                     return item.file_name.indexOf(attachment.file_name) !== -1;
                   } else {
-                    return item.file_name.indexOf(tokens[0]) !== -1;
+                    return item.file_name.indexOf(tokens[0]) !== -1 && item.file_name.indexOf(tokens[1]) !== -1;
                   }
                 });
 

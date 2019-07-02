@@ -207,6 +207,7 @@ PARTNER_ACTIVITY_STATUS = Choices(
 EXTERNAL_DATA_SOURCES = Choices(
     ("HPC", "HPC"),
     ("OPS", "OPS"),
+    ("UNICEF", "UNICEF"),
 )
 
 CURRENCIES = Choices(

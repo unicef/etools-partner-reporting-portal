@@ -143,7 +143,7 @@ class IndicatorsXLSXExporter:
                     partner_activity.cluster_activity else partner_activity.cluster_objective.cluster
                 cluster_objective = partner_activity.cluster_activity.cluster_objective if \
                     partner_activity.cluster_activity else partner_activity.cluster_objective
-                partner_project = partner_activity.project
+                partner_project = partner_activity.projects.first().project
             elif partner_project:
                 cluster = partner_project.clusters.first()
                 cluster_objective = cluster.cluster_objectives.first()

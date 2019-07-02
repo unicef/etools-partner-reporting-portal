@@ -72,7 +72,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     currentRequestedFunds = serializers.FloatField(source='total_budget', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
-    code = serializers.CharField()
+    code = serializers.CharField(allow_null=True, allow_blank=True)
     additional_information = serializers.CharField(allow_null=True, allow_blank=True)
     locations = V2PartnerProjectLocationImportSerializer(many=True)
     cluster_ids = serializers.ListField(child=serializers.IntegerField(), allow_null=True)
@@ -109,13 +109,16 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             validated_data['additional_information'] = ''
         location_data_list = validated_data.pop('locations')
         cluster_ids = validated_data.pop('cluster_ids', None)
-        partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
+        partner_project = PartnerProject.objects.filter(
+            external_source=EXTERNAL_DATA_SOURCES.HPC,
+            external_id=validated_data['external_id']
+        ).first()
         if partner_project:
             partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
         else:
             partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
-        locations = save_location_list(location_data_list)
+        locations = save_location_list(location_data_list, "project")
 
         # Add clusters
         if cluster_ids:

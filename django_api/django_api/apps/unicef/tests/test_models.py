@@ -22,6 +22,7 @@ from core.factories import (CartoDBTableFactory,
                             LocationFactory,
                             LocationWithReportableLocationGoalFactory,
                             PartnerUserFactory, PartnerFactory,
+                            PartnerActivityProjectContextFactory,
                             ProgressReportFactory,
                             QuantityReportableToLowerLevelOutputFactory,
                             QuantityTypeIndicatorBlueprintFactory,
@@ -94,8 +95,12 @@ class TestProgressReportModel(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],

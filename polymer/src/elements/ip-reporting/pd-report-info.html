@@ -87,14 +87,13 @@
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-              <paper-input-container
-                  no-label-float>
-                <input
-                    id="partner_contribution_to_date"
-                    value="[[data.partner_contribution_to_date]]"
-                    maxlength="2000">
-                <paper-input-char-counter></paper-input-char-counter>
-              </paper-input-container>
+              <paper-input
+                  id="partner_contribution_to_date"
+                  value="[[data.partner_contribution_to_date]]"
+                  no-label-float
+                  char-counter
+                  maxlength="2000">
+              </paper-input>
             </template>
           </labelled-item>
         </div>
@@ -112,14 +111,13 @@
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-              <paper-input-container
-                  no-label-float>
-                <input
-                    id="challenges_in_the_reporting_period"
-                    value="[[data.challenges_in_the_reporting_period]]"
-                    maxlength="2000">
-                <paper-input-char-counter></paper-input-char-counter>
-              </paper-input-container>
+              <paper-input
+                  id="challenges_in_the_reporting_period"
+                  value="[[data.challenges_in_the_reporting_period]]"
+                  no-label-float
+                  char-counter
+                  maxlength="2000">
+              </paper-input>
             </template>
           </labelled-item>
         </div>
@@ -137,14 +135,13 @@
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-               <paper-input-container
-                  no-label-float>
-                <input
-                    id="proposed_way_forward"
-                    value="[[data.proposed_way_forward]]"
-                    maxlength="2000">
-                <paper-input-char-counter></paper-input-char-counter>
-              </paper-input-container>
+              <paper-input
+                  id="proposed_way_forward"
+                  value="[[data.proposed_way_forward]]"
+                  no-label-float
+                  char-counter
+                  maxlength="2000">
+              </paper-input>
             </template>
           </labelled-item>
         </div>
@@ -235,19 +232,10 @@
 
       _handleInput: function () {
         var self = this;
-        var textInputs = Polymer.dom(this.root).querySelectorAll('labelled-item');
+        var textInputs = Polymer.dom(this.root).querySelectorAll('paper-input');
 
-        var changedFields = PdReportInfoUtils.handleInput(
-          textInputs,
-          self.data.partner_contribution_to_date,
-          self.data.challenges_in_the_reporting_period,
-          self.data.proposed_way_forward
-        );
-
-        changedFields.forEach(function(field) {
-          if (field !== undefined) {
-            self.set(['localData', field.id], field.value.trim());
-          }
+        textInputs.forEach(function (input) {
+          self.set(['localData', input.id], input.$.input.value.trim());
         });
       },
 
@@ -259,23 +247,25 @@
           return;
         }
 
-        var updateThunk = this.$.update.thunk();
-
-        this.$.update.abort();
-
-        this.dispatch(
-          App.Actions.PDReports.update(
-            updateThunk,
-            this.pdId,
-            this.reportId
+        this.debounce('update-data', function () {
+          var updateThunk = this.$.update.thunk();
+  
+          this.$.update.abort();
+  
+          this.dispatch(
+            App.Actions.PDReports.update(
+              updateThunk,
+              this.pdId,
+              this.reportId
+            )
           )
-        )
             .then(function () {
               self._notifyChangesSaved();
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+        }, 100);
       },
 
       _computeUpdateUrl: function (locationId, reportId) {
