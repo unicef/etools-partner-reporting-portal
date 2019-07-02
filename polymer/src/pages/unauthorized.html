@@ -6,6 +6,7 @@
 <link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../elements/message-box.html">
 <link rel="import" href="../elements/page-body.html">
+<link rel="import" href="../elements/user-profile/profile-dropdown.html">
 
 <dom-module id="page-unauthorized">
   <template>
@@ -34,6 +35,7 @@
     </etools-prp-ajax>
 
     <page-body>
+      <profile-dropdown></profile-dropdown>
       <template
           is="dom-if"
           if="[[loading]]"
@@ -78,13 +80,17 @@
         var self = this;
 
         this.$.userProfile.thunk()()
-            .then(function (res) {
-              if (res.data.access.length) {
-                location.href = '/';
-              } else {
-                self.set('loading', false);
-              }
-            });
+          .then(function (res) {
+            if (res.data.access.length) {
+              location.href = '/';
+            } else {
+              self.set('loading', false);
+            }
+          })
+          .catch(function (err) {
+            console.log('err', err);
+            self.set('loading', false);
+          });
       },
     });
   </script>
