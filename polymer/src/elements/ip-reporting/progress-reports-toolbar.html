@@ -21,6 +21,7 @@
       location-id="{{ locationId }}"
     >
       <template is="dom-if" if="[[canExport]]" restamp="true">
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
         <download-button url="[[xlsExportUrl]]">XLS</download-button>
       </template>
     </etools-prp-toolbar>
@@ -54,6 +55,11 @@
         xlsExportUrl: {
           type: String,
           computed: '_appendQuery(pdReportsUrl, query, \'export=xlsx\')',
+        },
+
+        pdfExportUrl: {
+          type: String,
+          computed: '_appendQuery(pdReportsUrl, query, \'export=pdf\')',
         },
       },
 
