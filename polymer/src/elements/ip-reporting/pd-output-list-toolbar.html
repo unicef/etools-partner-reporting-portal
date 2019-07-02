@@ -54,7 +54,7 @@
         <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
         <template
             is="dom-if"
-            if="[[canRefresh]]"
+            if="[[showRefresh]]"
             restamp="true">
           <paper-button
               class="btn-primary"
@@ -137,7 +137,7 @@
         showRefresh: {
           type: Boolean,
           value: false,
-          computed: '_computeShowRefresh(currentUserRoles)',
+          computed: '_computeShowRefresh(canRefresh, currentUserRoles)',
         },
 
         refreshUrl: {
@@ -176,10 +176,9 @@
         return PdOutputListToolbarUtils.computeCanRefresh(report, programmeDocument);
       },
 
-      _computeShowRefresh: function (currentUserRoles) {
-        console.log('can refresh?', this.canRefresh);
-        console.log('show refresh?', this.canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles))
-        return this.canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles);
+      _computeShowRefresh: function (canRefresh, currentUserRoles) {
+        console.log('show refresh?', canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles));
+        return canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles);
       },
 
       _refresh: function () {
