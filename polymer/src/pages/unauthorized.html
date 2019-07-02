@@ -25,6 +25,10 @@
         padding: 18px 54px 18px 0px;
       }
 
+      .sign-out-button {
+        cursor: pointer;
+      }
+
       message-box {
         max-width: 600px;
         margin: 0 auto;
@@ -45,9 +49,11 @@
     </etools-prp-ajax>
 
     <page-body>
-      <div class="item" on-tap="_logout">
-        <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
-        [[localize('sign_out')]]
+      <div class="item">
+        <span class="sign-out-button" on-tap="_logout">
+          <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
+          [[localize('sign_out')]]
+        </span>
       </div>
 
       <template
