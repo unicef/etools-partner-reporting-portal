@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../endpoints.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../elements/message-box.html">
 <link rel="import" href="../elements/page-body.html">
@@ -35,7 +37,10 @@
     </etools-prp-ajax>
 
     <page-body>
-      <profile-dropdown></profile-dropdown>
+      <div class="item" on-tap="_logout">
+        <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
+        [[localize('sign_out')]]
+      </div>
       <template
           is="dom-if"
           if="[[loading]]"
@@ -64,6 +69,12 @@
     Polymer({
       is: 'page-unauthorized',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
       properties: {
         loading: {
           type: Boolean,
@@ -74,6 +85,10 @@
           type: String,
           value: App.Endpoints.userProfile(),
         },
+      },
+
+      _logout: function() {
+        this.fire('sign-out');
       },
 
       attached: function () {
