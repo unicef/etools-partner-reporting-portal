@@ -1,17 +1,32 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../endpoints.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../elements/message-box.html">
 <link rel="import" href="../elements/page-body.html">
+<link rel="import" href="../elements/user-profile/profile-dropdown.html">
 
 <dom-module id="page-unauthorized">
   <template>
     <style>
       :host {
         display: block;
+      }
+
+      .item {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        padding: 18px 54px 18px 0px;
+      }
+
+      .sign-out-button {
+        cursor: pointer;
       }
 
       message-box {
@@ -34,6 +49,13 @@
     </etools-prp-ajax>
 
     <page-body>
+      <div class="item">
+        <span class="sign-out-button" on-tap="_logout">
+          <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
+          [[localize('sign_out')]]
+        </span>
+      </div>
+
       <template
           is="dom-if"
           if="[[loading]]"
@@ -62,6 +84,12 @@
     Polymer({
       is: 'page-unauthorized',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
       properties: {
         loading: {
           type: Boolean,
@@ -74,17 +102,21 @@
         },
       },
 
+      _logout: function() {
+        this.fire('sign-out');
+      },
+
       attached: function () {
         var self = this;
 
         this.$.userProfile.thunk()()
-            .then(function (res) {
-              if (res.data.access.length) {
-                location.href = '/';
-              } else {
-                self.set('loading', false);
-              }
-            });
+          .then(function (res) {
+            if (res.data.access.length) {
+              location.href = '/';
+            } else {
+              self.set('loading', false);
+            }
+          });
       },
     });
   </script>
