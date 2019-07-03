@@ -64,6 +64,7 @@ from core.factories import (
     RatioReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerActivityFactory,
     QuantityReportableToClusterActivityFactory,
+    ProgressReportIndicatorReportFactory,
     # QuantityIndicatorReportFactory,
     LocationWithReportableLocationGoalFactory,
     # RatioIndicatorReportFactory,
@@ -208,7 +209,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     print("{} Section objects created".format(workspace_quantity))
 
     unicef_re = ReportingEntity.objects.get(title="UNICEF")
-    cluster_re = ReportingEntity.objects.get(title="Cluster")
+    # cluster_re = ReportingEntity.objects.get(title="Cluster")
 
     ws_list = list()
 
@@ -732,7 +733,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
                         for reportable in queryset:
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                                QuantityIndicatorReportFactory(
+                                ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
@@ -742,7 +743,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     reporting_entity=unicef_re,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                                RatioIndicatorReportFactory(
+                                ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
