@@ -839,6 +839,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
 
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     def test_list_api_export(self):
         # ensure at least one report has status overdue
         report = self.queryset.first()
@@ -865,6 +866,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     def test_list_api_export_filter(self):
         # ensure we have needed report statuses
         report_overdue = self.queryset.first()
@@ -908,6 +910,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     def test_list_api_export_filter_multiple(self):
         # ensure we have needed report statuses
         reports = self.queryset.all()
