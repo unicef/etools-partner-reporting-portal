@@ -36,6 +36,12 @@ PdOutputListToolbarUtils.computeCanRefresh = function(report, programmeDocument)
     }
 };
 
+PdOutputListToolbarUtils.computeShowRefresh = function(roles) {
+    return roles.every(function (role) {
+        return role.role !== 'IP_ADMIN' && role.role !== 'IP_VIEWER';
+    });
+};
+
 try {
     module.exports = exports = PdOutputListToolbarUtils;
 } catch (e) {}
