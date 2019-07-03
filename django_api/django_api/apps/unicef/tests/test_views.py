@@ -1,6 +1,9 @@
+import csv
 import datetime
+import io
 import tempfile
 import os
+import xlrd
 from unittest.mock import Mock, patch
 
 from django.conf import settings
@@ -44,6 +47,30 @@ from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (IndicatorBlueprint, IndicatorLocationData,
                               IndicatorReport)
 from unicef.models import ProgressReport, ProgressReportAttachment
+
+
+def convert_xlsx_to_csv(response):
+    download_file = io.BytesIO(response.content)
+    xlsx_file = xlrd.open_workbook(file_contents=download_file.read())
+    xlsx_sheet = xlsx_file.sheet_by_index(0)
+    csv_filename = tempfile.NamedTemporaryFile()
+    with open(csv_filename.name, "w") as csv_file:
+        wr = csv.writer(csv_file)
+        for rownum in range(xlsx_sheet.nrows):
+            wr.writerow(xlsx_sheet.row_values(rownum))
+    return csv_filename
+
+
+def string_in_download(text, response):
+    exists = False
+    csv_filename = convert_xlsx_to_csv(response)
+    with open(csv_filename.name) as csv_file:
+        rd = csv.reader(csv_file)
+        for row in rd:
+            if text in ",".join(row):
+                exists = True
+                break
+    return exists
 
 
 class TestProgrammeDocumentListAPIView(BaseAPITestCase):
@@ -811,6 +838,134 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+    def test_list_api_export(self):
+        # ensure at least one report has status overdue
+        report = self.queryset.first()
+        report.status = PROGRESS_REPORT_STATUS.overdue
+        report.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "xlsx"})
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.overdue
+        )
+        self.assertTrue(len(self.reports))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            response,
+        ))
+
+    def test_list_api_export_filter(self):
+        # ensure we have needed report statuses
+        report_overdue = self.queryset.first()
+        report_overdue.status = PROGRESS_REPORT_STATUS.overdue
+        report_overdue.save()
+        report_due = self.queryset.last()
+        report_due.status = PROGRESS_REPORT_STATUS.due
+        report_due.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": PROGRESS_REPORT_STATUS.due
+            },
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        reports_overdue = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.overdue
+        )
+        self.assertTrue(len(reports_overdue))
+        reports_due = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.due
+        )
+        self.assertTrue(len(reports_due))
+        self.assertFalse(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            response,
+        ))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.due],
+            response,
+        ))
+
+    def test_list_api_export_filter_multiple(self):
+        # ensure we have needed report statuses
+        reports = self.queryset.all()
+        self.assertTrue(len(reports) > 3)
+        report_overdue = reports[0]
+        report_overdue.status = PROGRESS_REPORT_STATUS.overdue
+        report_overdue.save()
+        report_accepted = reports[1]
+        report_accepted.status = PROGRESS_REPORT_STATUS.accepted
+        report_accepted.save()
+        report_sent_back = reports[2]
+        report_sent_back.status = PROGRESS_REPORT_STATUS.sent_back
+        report_sent_back.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": ",".join([
+                    PROGRESS_REPORT_STATUS.accepted,
+                    PROGRESS_REPORT_STATUS.sent_back,
+                ]),
+            },
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        reports_overdue = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.overdue
+        )
+        self.assertTrue(len(reports_overdue))
+        reports_accepted = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.accepted
+        )
+        self.assertTrue(len(reports_accepted))
+        reports_sent_back = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.sent_back
+        )
+        self.assertTrue(len(reports_sent_back))
+        self.assertFalse(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            response,
+        ))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
+            response,
+        ))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
+            response,
+        ))
 
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
