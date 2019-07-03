@@ -12,9 +12,15 @@
       resources: resourcesReducer,
     });
 
+    var availableLangs;
+
     function languageReducer(state, action) {
       if (typeof state === 'undefined') {
         state = navigator.language === 'en-US' ? 'en' : navigator.language;
+      }
+      
+      if (availableLangs !== undefined && !availableLangs.includes(state)) {
+        state = 'en';
       }
 
       switch (action.type) {
@@ -33,6 +39,7 @@
 
       switch (action.type) {
         case App.Constants.SET_L11N_RESOURCES:
+          availableLangs = Object.keys(action.resources);
           return action.resources;
 
         default:
