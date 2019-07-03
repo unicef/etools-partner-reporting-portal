@@ -12,6 +12,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.urls import reverse
 from rest_framework import status
+from unicef_notification.models import Notification
 
 from core.common import (INDICATOR_REPORT_STATUS, OVERALL_STATUS,
                          PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES, PR_ATTACHMENT_TYPES)
@@ -840,7 +841,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data['results']), len(pr_queryset))
 
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export(self, mock_create):
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export(self, mock_create, mock_clean, mock_send):
         # ensure at least one report has status overdue
         report = self.queryset.first()
         report.status = PROGRESS_REPORT_STATUS.overdue
@@ -869,7 +872,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertTrue(mock_create.called)
 
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export_filter(self, mock_create):
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter(self, mock_create, mock_clean, mock_send):
         # ensure we have needed report statuses
         report_overdue = self.queryset.first()
         report_overdue.status = PROGRESS_REPORT_STATUS.overdue
@@ -915,7 +920,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertTrue(mock_create.called)
 
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export_filter_multiple(self, mock_create):
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter_multiple(self, mock_create, mock_clean, mock_send):
         # ensure we have needed report statuses
         reports = self.queryset.all()
         self.assertTrue(len(reports) > 3)
