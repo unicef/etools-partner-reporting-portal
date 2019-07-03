@@ -49,14 +49,40 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
+    project_id = serializers.IntegerField(source="id")
+    project_name = serializers.SerializerMethodField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
+
+    class Meta:
+        model = PartnerActivityProjectContext
+        fields = (
+            'project_id',
+            'project_name',
+            'start_date',
+            'end_date',
+            'status',
+        )
+
+    def get_project_name(self, obj):
+        return obj.project.title if getattr(obj, 'project', None) else obj.title
+
+
+class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):
+    project_id = serializers.IntegerField(source="project.id")
+
+
 class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
+    projects = PartnerActivityProjectContextSerializer(many=True)
 
     class Meta:
         model = PartnerActivity
         fields = (
             'id',
             'title',
-            'project',
+            'projects',
             'partner',
             'cluster_activity'
         )
@@ -386,26 +412,6 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
         return [
             pp.additional_information for pp in obj.partner_projects.all()
         ]
-
-
-class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
-    project_id = serializers.IntegerField(source="id")
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
-    status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
-
-    class Meta:
-        model = PartnerActivityProjectContext
-        fields = (
-            'project_id',
-            'start_date',
-            'end_date',
-            'status',
-        )
-
-
-class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):
-    project_id = serializers.IntegerField(source="project.id")
 
 
 class PartnerActivityBaseCreateSerializer(serializers.Serializer):
