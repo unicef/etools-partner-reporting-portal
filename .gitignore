@@ -14,6 +14,7 @@
 !django_api/django_api/keys/jwt/certificate.pem
 .coverage
 htmlcov
+.pytest_cache
 
 # Frontend
 node_modules/
@@ -23,3 +24,5 @@ data/
 
 # k8s secrets
 kubernetes/base/secrets.yml
+
+Pipfile

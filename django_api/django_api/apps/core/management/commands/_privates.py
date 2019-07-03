@@ -64,16 +64,17 @@ from core.factories import (
     RatioReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerActivityFactory,
     QuantityReportableToClusterActivityFactory,
-    QuantityIndicatorReportFactory,
+    ProgressReportIndicatorReportFactory,
+    # QuantityIndicatorReportFactory,
     LocationWithReportableLocationGoalFactory,
-    RatioIndicatorReportFactory,
+    # RatioIndicatorReportFactory,
     # UserFactory,
     ClusterFactory,
     ClusterObjectiveFactory,
     ClusterActivityFactory,
     PartnerFactory,
     PartnerProjectFactory,
-    PartnerActivityFactory,
+    ClusterActivityPartnerActivityFactory,
     SectionFactory,
     ProgrammeDocumentFactory,
     ProgressReportFactory,
@@ -83,8 +84,9 @@ from core.factories import (
     GatewayTypeFactory,
     CartoDBTableFactory,
     CountryFactory,
-    ReportingPeriodDatesFactory,
-    PRPRoleFactory,
+    HRReportingPeriodDatesFactory,
+    QPRReportingPeriodDatesFactory,
+    ClusterPRPRoleFactory,
 )
 from core.common import (
     INDICATOR_REPORT_STATUS,
@@ -96,10 +98,10 @@ from core.common import (
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
-from ._generate_disaggregation_fake_data import (
-    generate_indicator_report_location_disaggregation_quantity_data,
-    generate_indicator_report_location_disaggregation_ratio_data,
-)
+# from ._generate_disaggregation_fake_data import (
+#     generate_indicator_report_location_disaggregation_quantity_data,
+#     generate_indicator_report_location_disaggregation_ratio_data,
+# )
 
 from core.tasks import process_workspaces, process_period_reports
 from indicator.tasks import process_due_reports
@@ -186,7 +188,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Cluster admin creation
     sys_admin, _ = User.objects.get_or_create(username='cluster_admin', defaults={
-        'email': 'cluster_admin@notanemail.com',
+        'email': 'cluster_admin@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Cluster',
@@ -196,7 +198,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     sys_admin.save()
 
     # Give Cluster admin role to cluster_admin User
-    PRPRoleFactory(
+    ClusterPRPRoleFactory(
         user=sys_admin,
         role=PRP_ROLE_TYPES.cluster_system_admin,
         workspace=None,
@@ -207,7 +209,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     print("{} Section objects created".format(workspace_quantity))
 
     unicef_re = ReportingEntity.objects.get(title="UNICEF")
-    cluster_re = ReportingEntity.objects.get(title="Cluster")
+    # cluster_re = ReportingEntity.objects.get(title="Cluster")
 
     ws_list = list()
 
@@ -268,7 +270,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Cluster IMO creation
     imo, _ = User.objects.get_or_create(username='cluster_imo', defaults={
-        'email': 'cluster_imo@notanemail.com',
+        'email': 'cluster_imo@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Cluster',
@@ -292,7 +294,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         )
 
         # Give Cluster IMO role in this cluster to cluster_admin User
-        PRPRoleFactory(
+        ClusterPRPRoleFactory(
             user=imo,
             role=PRP_ROLE_TYPES.cluster_imo,
             workspace=response_plan.workspace,
@@ -308,14 +310,14 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         if random.randint(0, 1) == 0:
             reportable = RatioReportableToClusterObjectiveFactory(
                 content_object=co,
-                indicator_report__progress_report=None,
-                indicator_report__reporting_entity=cluster_re,
+                # indicator_report__progress_report=None,
+                # indicator_report__reporting_entity=cluster_re,
             )
         else:
             reportable = QuantityReportableToClusterObjectiveFactory(
                 content_object=co,
-                indicator_report__progress_report=None,
-                indicator_report__reporting_entity=cluster_re,
+                # indicator_report__progress_report=None,
+                # indicator_report__reporting_entity=cluster_re,
             )
 
         for loc in locations[:2]:
@@ -332,9 +334,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         partner = PartnerFactory(
             title="{} - {} Cluster Partner".format(
-                cluster.response_plan.title, cluster.type.upper()),
-            partner_activity=None,
-            partner_project=None,
+                cluster.response_plan.title, cluster.type.upper())[:50],
+            # partner_activity=None,
+            # partner_project=None,
         )
         partner.clusters.add(cluster)
 
@@ -366,7 +368,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Partner AO creation
     ao, _ = User.objects.get_or_create(username='partner_ao', defaults={
-        'email': 'partner_ao@notanemail.com',
+        'email': 'partner_ao@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Partner',
@@ -378,7 +380,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Partner Editor creation
     editor, _ = User.objects.get_or_create(username='partner_editor', defaults={
-        'email': 'partner_editor@notanemail.com',
+        'email': 'partner_editor@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Partner',
@@ -390,7 +392,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Partner Viewer creation
     viewer, _ = User.objects.get_or_create(username='partner_viewer', defaults={
-        'email': 'partner_viewer@notanemail.com',
+        'email': 'partner_viewer@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Partner',
@@ -402,7 +404,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     # Partner Admin creation
     admin, _ = User.objects.get_or_create(username='partner_admin', defaults={
-        'email': 'partner_admin@notanemail.com',
+        'email': 'partner_admin@example.com',
         'is_superuser': True,
         'is_staff': True,
         'first_name': 'Partner',
@@ -413,7 +415,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     partner_users.append(admin)
 
     # Give Cluster IMO role in this cluster to cluster_admin User
-    PRPRoleFactory(
+    ClusterPRPRoleFactory(
         user=imo,
         role=PRP_ROLE_TYPES.cluster_imo,
         workspace=None,
@@ -439,7 +441,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         elif 'admin' in u.username:
             role = PRP_ROLE_TYPES.ip_admin
 
-        PRPRoleFactory(
+        ClusterPRPRoleFactory(
             user=u,
             role=role,
             workspace=workspace,
@@ -455,8 +457,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
             reportable = QuantityReportableToClusterActivityFactory(
                 content_object=ca,
-                indicator_report__progress_report=None,
-                indicator_report__reporting_entity=cluster_re,
+                # indicator_report__progress_report=None,
+                # indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations[:2]:
@@ -486,8 +488,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         reportable = QuantityReportableToPartnerProjectFactory(
             content_object=pp,
-            indicator_report__progress_report=None,
-            indicator_report__reporting_entity=cluster_re,
+            # indicator_report__progress_report=None,
+            # indicator_report__reporting_entity=cluster_re,
         )
 
         for loc in locations[:2]:
@@ -511,17 +513,17 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         partner = cluster_activity.cluster_objective.cluster.partners.first()
 
         for project in partner.partner_projects.all():
-            pa = PartnerActivityFactory(
+            pa = ClusterActivityPartnerActivityFactory(
                 partner=project.partner,
-                project=project,
+                # project=project,
                 cluster_activity=cluster_activity,
                 title="{} Partner Activity from CA".format(project.title)
             )
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa,
-                indicator_report__progress_report=None,
-                indicator_report__reporting_entity=cluster_re,
+                # indicator_report__progress_report=None,
+                # indicator_report__reporting_entity=cluster_re,
             )
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
             reportable_to_pa.save()
@@ -538,9 +540,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                     reportable=reportable_to_pa
                 )
 
-            pa = PartnerActivityFactory(
+            pa = ClusterActivityPartnerActivityFactory(
                 partner=project.partner,
-                project=project,
+                # project=project,
                 cluster_activity=None,
                 cluster_objective=cluster_activity.cluster_objective,
                 title="{} Partner Activity".format(project.title)
@@ -548,8 +550,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa,
-                indicator_report__progress_report=None,
-                indicator_report__reporting_entity=cluster_re,
+                # indicator_report__progress_report=None,
+                # indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations[:2]:
@@ -586,45 +588,40 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             for month in range(1, 13):
                 monthrange = calendar.monthrange(now.year, month)
 
-                ReportingPeriodDatesFactory(
+                HRReportingPeriodDatesFactory(
                     programme_document=pd,
-                    report_type="HR",
                     start_date=datetime.datetime(now.year, month, 1),
                     end_date=datetime.datetime(now.year, month, monthrange[1]),
                     due_date=datetime.datetime(now.year, month, monthrange[1]),
                 )
 
             # Q1
-            ReportingPeriodDatesFactory(
+            QPRReportingPeriodDatesFactory(
                 programme_document=pd,
-                report_type="QPR",
                 start_date=datetime.datetime(now.year, 1, 1),
                 end_date=datetime.datetime(now.year, 3, 31),
                 due_date=datetime.datetime(now.year, 3, 31),
             )
 
             # Q2
-            ReportingPeriodDatesFactory(
+            QPRReportingPeriodDatesFactory(
                 programme_document=pd,
-                report_type="QPR",
                 start_date=datetime.datetime(now.year, 4, 1),
                 end_date=datetime.datetime(now.year, 6, 30),
                 due_date=datetime.datetime(now.year, 6, 30),
             )
 
             # Q3
-            ReportingPeriodDatesFactory(
+            QPRReportingPeriodDatesFactory(
                 programme_document=pd,
-                report_type="QPR",
                 start_date=datetime.datetime(now.year, 7, 1),
                 end_date=datetime.datetime(now.year, 9, 30),
                 due_date=datetime.datetime(now.year, 9, 30),
             )
 
             # Q4
-            ReportingPeriodDatesFactory(
+            QPRReportingPeriodDatesFactory(
                 programme_document=pd,
-                report_type="QPR",
                 start_date=datetime.datetime(now.year, 10, 1),
                 end_date=datetime.datetime(now.year, 12, 31),
                 due_date=datetime.datetime(now.year, 12, 31),
@@ -736,7 +733,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
                         for reportable in queryset:
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                                QuantityIndicatorReportFactory(
+                                ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
@@ -746,7 +743,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     reporting_entity=unicef_re,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                                RatioIndicatorReportFactory(
+                                ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
@@ -806,11 +803,11 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
-    print("Generating IndicatorLocationData for Quantity type")
-    generate_indicator_report_location_disaggregation_quantity_data(generate_all=generate_all_disagg)
+    # print("Generating IndicatorLocationData for Quantity type")
+    # generate_indicator_report_location_disaggregation_quantity_data(generate_all=generate_all_disagg)
 
-    print("Generating IndicatorLocationData for Ratio type")
-    generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
+    # print("Generating IndicatorLocationData for Ratio type")
+    # generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
 
     # Disaggregation association fix for CAI LLO indicators
     for indicator in cai_llo_queryset:
