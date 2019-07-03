@@ -13,6 +13,8 @@
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../styles/shared-styles.html">
 <link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../behaviors/routing.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="status-badge.html">
@@ -179,7 +181,7 @@
         <span class="table-cell table-cell--text self-center" flex-2>
           <div class="self-center flex-none">
             <dl class="indicator-progress layout horizontal">
-              <dt class="flex-none self-center">Against Target:</dt>
+              <dt class="flex-none self-center">[[localize('against_target')]]</dt>
               <dd class="flex-none">
                 <template
                     is="dom-if"
@@ -215,7 +217,7 @@
 
         <template is="dom-if" if="[[hasReports]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
-            <a href="[[indicatorReportsUrl]]">REPORTS</a>
+            <a href="[[indicatorReportsUrl]]">[[localize('reports')]]</a>
           </span>
         </template>
 
@@ -259,6 +261,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       _flagIndicator: function(target, baseline, isCustom) {
