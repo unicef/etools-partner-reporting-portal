@@ -13,9 +13,11 @@
 <link rel="import" href="../etools-prp-currency.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../styles/table-styles.html">
 
 <dom-module id="pd-list">
@@ -44,37 +46,37 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-content-panel panel-title="List of PDs">
+    <etools-content-panel panel-title="[[localize('list_pds')]]">
 
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <etools-data-table-column field="reference_number" sortable>
-          <div class="table-column">PD/SSFA ToR ref. #</div>
+          <div class="table-column">[[localize('pd_ref_number')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
-          <div class="table-column">PD/SSFA status</div>
+          <div class="table-column">[[localize('pd_ssfa_status')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="start_date" sortable>
-          <div class="table-column">Start date</div>
+          <div class="table-column">[[localize('start_date')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="end_date" sortable>
-          <div class="table-column">End date</div>
+          <div class="table-column">[[localize('end_date')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="cso_contribution" sortable>
-          <div class="table-column">CSO contribution</div>
+          <div class="table-column">[[localize('cso_contribution')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="total_unicef_cash" sortable>
-          <div class="table-column">UNICEF cash</div>
+          <div class="table-column">[[localize('unicef_cash')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="total_unicef_supplies" sortable>
-          <div class="table-column">UNICEF supplies</div>
+          <div class="table-column">[[localize('unicef_supplies')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="budget" sortable>
-            <div class="table-column">Planned Budget</div>
+            <div class="table-column">[[localize('planned_budget')]]</div>
           </etools-data-table-column>
         <etools-data-table-column field="funds_received_to_date" sortable>
-          <div class="table-column">Cash Transfers to Date (%)</div>
+          <div class="table-column">[[localize('cash_transfers')]]</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
@@ -176,6 +178,8 @@
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
