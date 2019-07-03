@@ -3,8 +3,12 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../bower_components/etools-datepicker/etools-datepicker-button.html">
+
 <link rel="import" href="../../styles/filter-styles.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
 <link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
@@ -46,7 +50,7 @@
       <div class="app-grid">
         <text-filter
           class="item"
-          label="PD/SSFA ToR ref. # and Title"
+          label="[[localize('pd_ref_and_title')]]"
           name="pd_ref_title"
           value="[[queryParams.pd_ref_title]]">
         </text-filter>
@@ -58,7 +62,7 @@
 
         <dropdown-filter-multi
             class="item item-2-col"
-            label="Report status"
+            label="[[localize('report_status')]]"
             name="status"
             value="[[_withDefault(queryParams.status, '')]]"
             data="[[statuses]]"
@@ -68,7 +72,7 @@
 
         <dropdown-filter-multi
           class="item item-2-col"
-          label="Report Type"
+          label="[[localize('report_type')]]"
           name="report_type"
           value="[[_withDefault(queryParams.report_type, '')]]"
           data="[[types]]"
@@ -84,7 +88,10 @@
       is: 'progress-reports-filters',
 
       behaviors: [
+        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
