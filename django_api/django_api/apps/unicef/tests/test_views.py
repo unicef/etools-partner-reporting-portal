@@ -869,8 +869,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
-        self.assertTrue(mock_create.called)
-
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
@@ -916,8 +914,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.due],
             response,
         ))
-
-        self.assertTrue(mock_create.called)
 
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
@@ -980,8 +976,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
             response,
         ))
-
-        self.assertTrue(mock_create.called)
 
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
