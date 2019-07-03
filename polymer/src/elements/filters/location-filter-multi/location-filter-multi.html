@@ -4,6 +4,8 @@
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 
 <dom-module id="location-filter-multi">
   <template>
@@ -19,7 +21,7 @@
     </etools-prp-ajax>
 
     <dropdown-filter-multi
-        label="Location"
+        label="[[localize('location')]]"
         name="location"
         value="[[value]]"
         data="[[data]]">
@@ -32,6 +34,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
