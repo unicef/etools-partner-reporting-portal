@@ -840,7 +840,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data['results']), len(pr_queryset))
 
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export(self):
+    def test_list_api_export(self, mock_create):
         # ensure at least one report has status overdue
         report = self.queryset.first()
         report.status = PROGRESS_REPORT_STATUS.overdue
@@ -866,8 +866,10 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+        self.assertTrue(mock_create.called)
+
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export_filter(self):
+    def test_list_api_export_filter(self, mock_create):
         # ensure we have needed report statuses
         report_overdue = self.queryset.first()
         report_overdue.status = PROGRESS_REPORT_STATUS.overdue
@@ -910,8 +912,10 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+        self.assertTrue(mock_create.called)
+
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
-    def test_list_api_export_filter_multiple(self):
+    def test_list_api_export_filter_multiple(self, mock_create):
         # ensure we have needed report statuses
         reports = self.queryset.all()
         self.assertTrue(len(reports) > 3)
@@ -969,6 +973,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
             response,
         ))
+
+        self.assertTrue(mock_create.called)
 
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
