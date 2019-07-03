@@ -200,10 +200,10 @@
 
       attached: function () {
         var nullData = this._clone(this.data);
-        if (nullData.v === 0) {
+        if (nullData !== undefined && nullData.v === 0) {
           nullData.v = null;
         }
-        if (nullData.d === 0) {
+        if (nullData !== undefined && nullData.d === 0) {
           nullData.d = null;
         }
         this.set('data', nullData);
