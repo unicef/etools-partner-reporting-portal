@@ -20,7 +20,7 @@ steps:
                depends_on:
                    - django_api
                    - db
-               command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && coverage run --source="." ./manage.py test"
+               command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && pip install -r requirements/dev.txt && flake8 && coverage run --source="." ./manage.py test"
                environment:
                    - POSTGRES_DB=etools_prp
                    - POSTGRES_USER=etools_prp_user
