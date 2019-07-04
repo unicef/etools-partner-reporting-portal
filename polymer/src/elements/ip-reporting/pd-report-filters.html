@@ -4,6 +4,9 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/filter-styles.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
@@ -33,7 +36,7 @@
       <div class="app-grid">
         <dropdown-filter
             class="item"
-            label="Status"
+            label="[[localize('status')]]"
             name="status"
             value="[[_withDefault(queryParams.status, '')]]"
             data="[[statuses]]">
@@ -48,6 +51,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
