@@ -12,6 +12,8 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../../../behaviors/localize.html">
+<link rel="import" href="../../../../redux/actions/localize.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
@@ -180,22 +182,22 @@
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'HR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on indicators</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_indicators')]]</paper-tab>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'QPR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on results</paper-tab>
-            <paper-tab name="info">Other info</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_results')]]</paper-tab>
+            <paper-tab name="info">[[localize('other_info')]]</paper-tab>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'SR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on data</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_data')]]</paper-tab>
           </template>
         </paper-tabs>
       </div>
@@ -255,6 +257,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
