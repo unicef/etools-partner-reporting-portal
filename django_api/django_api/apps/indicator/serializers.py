@@ -2144,7 +2144,18 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def get_progress_over_time(self, obj):
-        return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
+        if obj.content_type.model == "partneractivity":
+            progress_dict = dict()
+
+            for ir in obj.indicator_reports.order_by('id'):
+                if ir.time_period_end not in progress_dict:
+                    progress_dict[ir.time_period_end] = 0.0
+
+                progress_dict[ir.time_period_end] += ir.total
+
+            return list(progress_dict.items())
+        else:
+            return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
         """
