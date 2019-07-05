@@ -2259,18 +2259,20 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         try:
             # Only if the indicator is cluster activity, the children (unicef indicators) will exist
             if obj.children.exists():
-                latest_indicator_reports = map(
-                    lambda x: x.indicator_reports.latest(
-                        'time_period_start'), obj.children.all()
-                )
+                latest_indicator_reports = list()
+
+                for reportable in obj.children.all():
+                    latest_time_period = reportable.indicator_reports.latest('time_period_start').time_period_start
+                    latest_indicator_reports.extend(reportable.indicator_reports.filter(time_period_start=latest_time_period))
 
                 for ir in latest_indicator_reports:
                     self._get_progress_by_location(ir.indicator_location_data.all(), location_progresses)
 
             # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
             else:
-                indicator_location_data = obj.indicator_reports \
-                    .latest('time_period_start').indicator_location_data.all()
+                latest_time_period = obj.indicator_reports.latest('time_period_start').time_period_start
+                latest_irs = obj.indicator_reports.filter(time_period_start=latest_time_period)
+                indicator_location_data = IndicatorLocationData.objects.filter(indicator_report__in=latest_irs)
 
                 self._get_progress_by_location(indicator_location_data, location_progresses)
 
