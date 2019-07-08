@@ -46,10 +46,14 @@
             value="[[_withDefault(queryParams.indicator_type, '')]]">
         </cluster-indicator-type-filter>
 
-        <partner-project-filter-multi
-            class="item filter-3-col"
-            value="[[_withDefault(queryParams.partner_projects, '')]]">
-        </partner-project-filter-multi>
+        <template
+            is="dom-if"
+            if="[[_correctIndicatorType(queryParams.indicator_type)]]">
+          <partner-project-filter-multi
+              class="item filter-3-col"
+              value="[[_withDefault(queryParams.partner_projects, '')]]">
+          </partner-project-filter-multi>
+        </template>
       </div>
     </filter-list>
   </template>
@@ -69,6 +73,10 @@
           type: Object,
           notify: true,
         },
+      },
+
+      _correctIndicatorType: function (indicatorType) {
+        return indicatorType === 'partner_activity' || indicatorType === 'partner_project';
       },
     });
   </script>
