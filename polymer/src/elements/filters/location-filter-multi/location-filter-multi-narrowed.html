@@ -35,6 +35,7 @@
         label="Location"
         name="locs"
         value="[[value]]"
+        on-value-changed="_onValueChanged"
         data="[[data]]"
         disabled="[[pending]]">
     </dropdown-filter-multi>
@@ -92,13 +93,22 @@
           this.$.locations.thunk()()
               .then(function (res) {
                 self.set('pending', false);
-                self.set('data', res.data);
+                self.set('data', res.data.results);
               })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling
                 self.set('pending', false);
               });
         });
+      },
+
+      _onValueChanged: function (e) {
+        console.log('here!', e);
+        console.log('query params?', this.loc_type);
+
+        if (e.detail.value === '') {
+          return;
+        }
       },
 
       detached: function () {
