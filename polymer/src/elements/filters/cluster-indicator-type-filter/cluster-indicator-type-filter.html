@@ -38,13 +38,24 @@
       ],
 
       properties: {
-        isPartner: Boolean,
+        isPartner: {
+          type: Boolean,
+          computed: '_computeRole(currentUserRoles)',
+        },
+
+        currentUserRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles'
+        },
+
         data: {
           type: Array,
           computed: '_computeData(isPartner)',
         },
+
         value: String,
       },
+
       _computeData: function (isPartner) {
         if (isPartner) {
           return options.filter(function (option) {
@@ -53,7 +64,13 @@
         }
 
         return options;
-      }
+      },
+
+      _computeRole: function (roles) {
+        return roles.every(function (role) {
+          return role.role !== 'CLUSTER_IMO';
+        });
+      },
     });
   </script>
 </dom-module>
