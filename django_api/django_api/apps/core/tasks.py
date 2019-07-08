@@ -131,10 +131,10 @@ def process_period_reports():
                             end_date = calculate_end_date_given_start_date(start_date, frequency)
 
                         if reportable_type == 'partneractivity':
-                            project_contexts = reportable.content_object.projects.all()
+                            projects = reportable.content_object.projects.all()
 
-                            for project_context in project_contexts:
-                                create_ir_for_cluster(reportable, start_date, end_date, project_context.project)
+                            for project in projects:
+                                create_ir_for_cluster(reportable, start_date, end_date, project)
                         else:
                             project = None
                             if reportable_type == 'partnerproject':
