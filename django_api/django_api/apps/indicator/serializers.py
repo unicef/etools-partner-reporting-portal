@@ -2050,6 +2050,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     total_against_target = serializers.SerializerMethodField()
     current_progress_by_partner = serializers.SerializerMethodField()
     current_progress_by_location = serializers.SerializerMethodField()
+    current_progress_by_project = serializers.SerializerMethodField()
     indicator_type = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     baseline = serializers.JSONField()
@@ -2296,6 +2297,23 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         return location_progresses
 
+    def get_current_progress_by_project(self, obj):
+        project_progresses = defaultdict()
+
+        if obj.content_type.model != "partneractivity":
+            return project_progresses
+
+        # Consolidation for progress info
+        # project_progresses is Dict[Float] type
+        for ir in obj.indicator_reports.all():
+            if ir.project:
+                if ir.project.title not in project_progresses:
+                    project_progresses[ir.project.title] = 0.0
+
+                project_progresses[ir.project.title] += ir.total['c']
+
+        return project_progresses
+
     class Meta:
         model = Reportable
         fields = (
@@ -2313,6 +2331,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'progress_over_time',
             'current_progress_by_partner',
             'current_progress_by_location',
+            'current_progress_by_project',
             'total_against_in_need',
             'total_against_target',
         )
