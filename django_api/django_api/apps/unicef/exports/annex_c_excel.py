@@ -133,12 +133,36 @@ class ProgressReportsXLSXExporter:
         if progress_report.attachments.filter(type="FACE").exists():
             face_attachment = progress_report.attachments.filter(type="FACE").first()
 
+            try:
+                # Evaluate the file url to see if it has actual file
+                face_attachment.file.url
+            except ValueError:
+                face_attachment = None
+
         if progress_report.attachments.filter(type="Other").exists():
             if progress_report.attachments.filter(type="Other").count() > 1:
                 other_attachment1 = progress_report.attachments.filter(type="Other").first()
                 other_attachment2 = progress_report.attachments.filter(type="Other").last()
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment1.file.url
+                except ValueError:
+                    other_attachment1 = None
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment2.file.url
+                except ValueError:
+                    other_attachment2 = None
             else:
                 other_attachment1 = progress_report.attachments.filter(type="Other").first()
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment1.file.url
+                except ValueError:
+                    other_attachment1 = None
 
         general_info_row = [
             (partner.title, None),
