@@ -1316,7 +1316,10 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             )
 
         else:
-            projects = list()
+            # Defaulting partner projects from given clusters
+            projects = PartnerProject.objects.filter(
+                partner__clusters__in=clusters
+            ).distinct()
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
