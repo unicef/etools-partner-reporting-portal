@@ -225,12 +225,16 @@
 
       <hr>
 
-      <div class="app-grid">
-        <current-progress-by-project
-            class="item"
-            data="[[data.current_progress_by_project]]">
-        </current-progress-by-project>
-      </div>
+      <template
+        is="dom-if"
+        if="[[_equals(data.indicator_type, 'Partner Activity Indicator')]]">
+        <div class="app-grid">
+          <current-progress-by-project
+              class="item"
+              data="[[data.current_progress_by_project]]">
+          </current-progress-by-project>
+        </div>
+      </template>
     </template>
 
     <etools-loading active="[[loading]]"></etools-loading>
