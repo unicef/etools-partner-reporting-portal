@@ -2152,7 +2152,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 if ir.time_period_end not in progress_dict:
                     progress_dict[ir.time_period_end] = 0.0
 
-                progress_dict[ir.time_period_end] += ir.total
+                progress_dict[ir.time_period_end] += int(ir.total['c'])
 
             return list(progress_dict.items())
         else:
@@ -2245,7 +2245,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 partner_titles.add(partner_title)
 
             data = {
-                'progress': ild.disaggregation['()']['c'],
+                'progress': int(ild.disaggregation['()']['c']),
                 'partners': partner_titles,
             }
 
@@ -2308,9 +2308,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         for ir in obj.indicator_reports.all():
             if ir.project:
                 if ir.project.title not in project_progresses:
-                    project_progresses[ir.project.title] = 0.0
+                    project_progresses[ir.project.title] = 0
 
-                project_progresses[ir.project.title] += ir.total['c']
+                project_progresses[ir.project.title] += int(ir.total['c'])
 
         return project_progresses
 
