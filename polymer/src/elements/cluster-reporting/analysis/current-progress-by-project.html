@@ -58,12 +58,19 @@
           type: Array,
           value: [
             {
-              label: 'Status',
+              label: 'Project',
               type: 'string',
             },
             {
               label: 'Count',
               type: 'number',
+            },
+            {
+              type: 'string',
+              role: 'tooltip',
+              p: {
+                html: true
+              },
             },
           ],
         },
@@ -85,10 +92,6 @@
             left: '30%',
             width: '50%',
           },
-
-          // TODO: tooltips
-          enableInteractivity: false,
-          tooltip: null,
         });
       },
 
@@ -97,8 +100,13 @@
           return [
             key,
             data[key],
+            this._buildTooltip(key, data[key])
           ];
-        });
+        }, this);
+      },
+
+      _buildTooltip: function (title, data) {
+        return '<div>hello!</div>';
       },
     });
   </script>
