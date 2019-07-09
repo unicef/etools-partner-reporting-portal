@@ -106,7 +106,12 @@
       },
 
       _buildTooltip: function (title, data) {
-        return '<div>hello!</div>';
+        console.log('title', title);
+        console.log('data', data);
+        return [
+          '<div>' + title + '</div>',
+          '<div>' + data + '</div>',
+        ].join('\n');
       },
     });
   </script>
