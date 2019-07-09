@@ -97,7 +97,7 @@
     <etools-content-panel panel-title="[[prefix]] [[data.title]]">
       <dl class="cluster-objective">
         <dt>Cluster Objective:</dt>
-        <dd>[[data.co_title]]</dd>
+        <dd>[[_computeTitle(data)]]</dd>
       </dl>
 
       <template
@@ -168,6 +168,10 @@
 
       _toggle: function (e) {
         this.$$('#collapse-' + e.target.toggles).toggle();
+      },
+
+      _computeTitle: function (data) {
+        return data.cluster_objective_title === undefined ? data.title : data.cluster_objective_title;
       },
 
       _computePrefix: function (data) {

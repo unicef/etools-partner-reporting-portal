@@ -2050,6 +2050,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     total_against_target = serializers.SerializerMethodField()
     current_progress_by_partner = serializers.SerializerMethodField()
     current_progress_by_location = serializers.SerializerMethodField()
+    current_progress_by_project = serializers.SerializerMethodField()
     indicator_type = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     baseline = serializers.JSONField()
@@ -2144,7 +2145,18 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def get_progress_over_time(self, obj):
-        return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
+        if obj.content_type.model == "partneractivity":
+            progress_dict = dict()
+
+            for ir in obj.indicator_reports.order_by('id'):
+                if ir.time_period_end not in progress_dict:
+                    progress_dict[ir.time_period_end] = 0.0
+
+                progress_dict[ir.time_period_end] += int(ir.total['c'])
+
+            return list(progress_dict.items())
+        else:
+            return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
         """
@@ -2233,7 +2245,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 partner_titles.add(partner_title)
 
             data = {
-                'progress': ild.disaggregation['()']['c'],
+                'progress': int(ild.disaggregation['()']['c']),
                 'partners': partner_titles,
             }
 
@@ -2248,18 +2260,20 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         try:
             # Only if the indicator is cluster activity, the children (unicef indicators) will exist
             if obj.children.exists():
-                latest_indicator_reports = map(
-                    lambda x: x.indicator_reports.latest(
-                        'time_period_start'), obj.children.all()
-                )
+                latest_indicator_reports = list()
+
+                for reportable in obj.children.all():
+                    latest_time_period = reportable.indicator_reports.latest('time_period_start').time_period_start
+                    latest_indicator_reports.extend(reportable.indicator_reports.filter(time_period_start=latest_time_period))
 
                 for ir in latest_indicator_reports:
                     self._get_progress_by_location(ir.indicator_location_data.all(), location_progresses)
 
             # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
             else:
-                indicator_location_data = obj.indicator_reports \
-                    .latest('time_period_start').indicator_location_data.all()
+                latest_time_period = obj.indicator_reports.latest('time_period_start').time_period_start
+                latest_irs = obj.indicator_reports.filter(time_period_start=latest_time_period)
+                indicator_location_data = IndicatorLocationData.objects.filter(indicator_report__in=latest_irs)
 
                 self._get_progress_by_location(indicator_location_data, location_progresses)
 
@@ -2283,6 +2297,23 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         return location_progresses
 
+    def get_current_progress_by_project(self, obj):
+        project_progresses = defaultdict()
+
+        if obj.content_type.model != "partneractivity":
+            return project_progresses
+
+        # Consolidation for progress info
+        # project_progresses is Dict[Float] type
+        for ir in obj.indicator_reports.all():
+            if ir.project:
+                if ir.project.title not in project_progresses:
+                    project_progresses[ir.project.title] = 0
+
+                project_progresses[ir.project.title] += int(ir.total['c'])
+
+        return project_progresses
+
     class Meta:
         model = Reportable
         fields = (
@@ -2300,6 +2331,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'progress_over_time',
             'current_progress_by_partner',
             'current_progress_by_location',
+            'current_progress_by_project',
             'total_against_in_need',
             'total_against_target',
         )

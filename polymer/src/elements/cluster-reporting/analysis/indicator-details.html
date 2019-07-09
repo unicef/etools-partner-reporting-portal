@@ -14,6 +14,7 @@
 <link rel="import" href="progress-over-time.html">
 <link rel="import" href="current-progress-by-partner.html">
 <link rel="import" href="current-progress-by-location.html">
+<link rel="import" href="current-progress-by-project.html">
 
 <dom-module id="analysis-indicator-details">
   <template>
@@ -221,6 +222,19 @@
             data="[[data.current_progress_by_location]]">
         </current-progress-by-location>
       </div>
+
+      <hr>
+
+      <template
+          is="dom-if"
+          if="[[_equals(data.indicator_type, 'Partner Activity Indicator')]]">
+        <div class="app-grid">
+          <current-progress-by-project
+              class="item"
+              data="[[data.current_progress_by_project]]">
+          </current-progress-by-project>
+        </div>
+      </template>
     </template>
 
     <etools-loading active="[[loading]]"></etools-loading>
