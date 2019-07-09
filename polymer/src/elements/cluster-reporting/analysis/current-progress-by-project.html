@@ -18,6 +18,10 @@
         width: 100%;
         height: 100%;
       }
+
+      .custom-tooltip {
+        background-color: red;
+      }
     </style>
 
     <analysis-widget widget-title="[[widgetTitle]]">
@@ -106,11 +110,24 @@
       },
 
       _buildTooltip: function (title, data) {
-        console.log('title', title);
-        console.log('data', data);
         return [
-          '<div>' + title + '</div>',
-          '<div>' + data + '</div>',
+          '<style>',
+            '.google-visualization-tooltip {',
+              'padding: 10px;',
+              'position: absolute;',
+              'border-radius: 3px;',
+              'font: 11px/1.5 Roboto, Noto, sans-serif;',
+              'color: rgba(255, 255, 255, .9);',
+              'background: #424242;',
+              'box-shadow: 0 3px 14px rgba(0, 0, 0, .4);',
+              'opacity: .7;',
+              'z-index: 1000',
+            '}',
+          '</style>',
+          '<div>',
+            '<div>' + title + '</div>',
+            '<div>' + data + '</div>',
+          '</div>',
         ].join('\n');
       },
     });
