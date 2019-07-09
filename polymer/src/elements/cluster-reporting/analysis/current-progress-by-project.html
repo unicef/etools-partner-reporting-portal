@@ -1,0 +1,105 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+
+<link rel="import" href="analysis-widget.html">
+<link rel="import" href="../../list-placeholder.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/analysis-chart.html">
+<link rel="import" href="../../../polyfills/es6-shim.html">
+
+<dom-module id="current-progress-by-project">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-chart {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <analysis-widget widget-title="[[widgetTitle]]">
+      <div hidden$="[[!rows.length]]">
+        <google-chart
+            type="bar"
+            options="[[options]]"
+            cols="[[cols]]"
+            rows="[[rows]]">
+        </google-chart>
+      </div>
+
+      <list-placeholder
+          data="[[rows]]"
+          message="No data for [[widgetTitle]] yet.">
+      </list-placeholder>
+    </analysis-widget>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'current-progress-by-project',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.AnalysisChart,
+      ],
+
+      properties: {
+        data: Object,
+
+        widgetTitle: {
+          type: String,
+          value: 'Current progress by project',
+        },
+
+        cols: {
+          type: Array,
+          value: [
+            {
+              label: 'Status',
+              type: 'string',
+            },
+            {
+              label: 'Count',
+              type: 'number',
+            },
+          ],
+        },
+
+        rows: {
+          type: Array,
+          computed: '_computeRows(data)',
+        },
+      },
+
+      _computeOptions: function (rows) {
+        return Object.assign({}, this._baseOptions, {
+          height: rows.length * 45 + 30,
+          colors: rows.map(function () {
+            return '#88c245';
+          }),
+          chartArea: {
+            top: 0,
+            left: '30%',
+            width: '50%',
+          },
+
+          // TODO: tooltips
+          enableInteractivity: false,
+          tooltip: null,
+        });
+      },
+
+      _computeRows: function (data) {
+        return Object.keys(data || {}).map(function (key) {
+          return [
+            key,
+            data[key],
+          ];
+        });
+      },
+    });
+  </script>
+</dom-module>
