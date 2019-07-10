@@ -319,13 +319,13 @@ class ProgressReportXLSXExporter:
         # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
         # Partner contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=9, end_row=start_row_id, end_column=9)
+                               start_column=9, end_row=start_row_id - 1, end_column=9)
         # Challenges/bottlenecks in the reporting period
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=11, end_row=start_row_id, end_column=11)
+                               start_column=11, end_row=start_row_id - 1, end_column=11)
         # Proposed way forward
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=12, end_row=start_row_id, end_column=12)
+                               start_column=12, end_row=start_row_id - 1, end_column=12)
 
         return True
 
