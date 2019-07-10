@@ -127,8 +127,6 @@
             title: searchValue
           };
 
-          console.log('thunk.params', thunk.params);
-          
           thunk.thunk()()
             .then(function (res) {
               self.set('pending', false);
