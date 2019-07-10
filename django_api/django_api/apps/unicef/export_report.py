@@ -20,6 +20,7 @@ DISAGGREGATION_COLUMN_START = 43
 INDICATOR_DATA_ROW_START = 5
 MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
 REQUIRED_FILL = PatternFill(fill_type='solid', start_color='FFE5A479', end_color='FFE5A479')
+NO_FILL = PatternFill(fill_type=None)
 
 
 class ProgressReportXLSXExporter:
@@ -293,7 +294,7 @@ class ProgressReportXLSXExporter:
                         if disaggregation_values_list:
                             self.sheet.cell(
                                 row=start_row_id,
-                                column=disaggregation_values_map['()']).fill = None
+                                column=disaggregation_values_map['()']).fill = NO_FILL
 
                     else:
                         for dk, dv in disaggregation_values_map.items():
@@ -308,7 +309,7 @@ class ProgressReportXLSXExporter:
 
                                 # De-highlight any subtotal disaggregation data column
                                 if len(dk.split(",")) != len(disaggregation_types):
-                                    self.sheet.cell(row=start_row_id, column=dv).fill = None
+                                    self.sheet.cell(row=start_row_id, column=dv).fill = NO_FILL
 
                 start_row_id += 1
 
