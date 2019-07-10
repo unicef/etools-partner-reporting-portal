@@ -155,9 +155,10 @@ class ProgressReportXLSXReader(object):
                             and (narrative_assessment is not None and narrative_assessment != ''):
                         pd_output_narratives[llo.id] = narrative_assessment
 
-                        for ir in pr.indicator_reports.filter(reportable__lower_level_outputs=llo):
-                            ir.narrative_assessment = narrative_assessment
-                            ir.save()
+                        indicator.indicator_report.narrative_assessment = narrative_assessment
+                        indicator.indicator_report.save()
+
+                        pr.indicator_reports.filter(reportable__lower_level_outputs=llo).update(narrative_assessment=narrative_assessment)
 
                 # Prepare
                 already_updated_row_value = False
