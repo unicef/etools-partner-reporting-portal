@@ -3,13 +3,14 @@
 
 <link rel="import" href="analysis-widget.html">
 <link rel="import" href="../../list-placeholder.html">
-<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../styles/shared-styles.html">
 
 <dom-module id="current-progress-by-project">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
@@ -17,6 +18,10 @@
       google-chart {
         width: 100%;
         height: 100%;
+      }
+
+      .custom-tooltip {
+        background-color: red;
       }
     </style>
 
@@ -48,6 +53,7 @@
 
       properties: {
         data: Object,
+        partnerNumData: String,
 
         widgetTitle: {
           type: String,
@@ -106,11 +112,12 @@
       },
 
       _buildTooltip: function (title, data) {
-        console.log('title', title);
-        console.log('data', data);
         return [
-          '<div>' + title + '</div>',
-          '<div>' + data + '</div>',
+          '<div class="tooltip-content">',
+            '<p>' + title + '</p>',
+            '<div class="project-value">' + data + '</div>',
+            '<div class="partner-value">Partners: ' + this.partnerNumData + '</div>',
+          '</div>',
         ].join('\n');
       },
     });
