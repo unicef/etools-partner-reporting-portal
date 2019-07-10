@@ -31,6 +31,10 @@
         params="[[params]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="search">
+    </etools-prp-ajax>
+
     <dropdown-filter-multi
         label="Location"
         name="locs"
@@ -103,10 +107,40 @@
       },
 
       _onValueChanged: function (e) {
-
         if (e.detail.value === '') {
           return;
         }
+
+        this.debounce('fetch-locations', function () {
+          var self = this;
+          var searchValue = e.detail.value;
+
+          this.set('pending', true);
+
+          this.$.search.abort();
+
+          var thunk = this.$.search;
+          thunk.url = this.get('locationsUrl');
+          
+          thunk.params = {
+            loc_type: this.params.loc_type,
+            title: searchValue
+          };
+
+          console.log('thunk.params', thunk.params);
+          
+          thunk.thunk()()
+            .then(function (res) {
+              self.set('pending', false);
+              self.set('data', res.data.results);
+            })
+            .catch(function (err) {
+              console.log('err', err);
+              self.set('pending', false);
+            });
+            
+          return;
+        }, 1000);
       },
 
       detached: function () {
