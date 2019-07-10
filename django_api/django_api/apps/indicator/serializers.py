@@ -1302,7 +1302,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "cannot be empty"}
             )
 
-        target_value = convert_string_number_to_float(validated_data['target']['v']) if convert_string_number_to_float(validated_data['target']['d']) == 1 else \
+        target_value = convert_string_number_to_float(validated_data['target']['v']) \
+            if convert_string_number_to_float(validated_data['target']['d']) == 1 else \
             convert_string_number_to_float(validated_data['target']['v']) / convert_string_number_to_float(validated_data['target']['d'])
 
         if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "":
@@ -1314,7 +1315,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     {"in_need": "denominator for in_need cannot be zero"}
                 )
 
-            in_need_value = convert_string_number_to_float(validated_data['in_need']['v']) if convert_string_number_to_float(validated_data['in_need']['d']) == 1 else \
+            in_need_value = convert_string_number_to_float(validated_data['in_need']['v']) \
+                if convert_string_number_to_float(validated_data['in_need']['d']) == 1 else \
                 convert_string_number_to_float(validated_data['in_need']['v']) / convert_string_number_to_float(validated_data['in_need']['d'])
 
             if target_value > in_need_value:
