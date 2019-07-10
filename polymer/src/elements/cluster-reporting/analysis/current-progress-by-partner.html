@@ -133,6 +133,19 @@
         var progressAgainstInNeed = data.progress / inNeed;
 
         return [
+        '<style>',
+            '.google-visualization-tooltip {',
+              'padding: 10px;',
+              'position: absolute;',
+              'border-radius: 3px;',
+              'font: 11px/1.5 Roboto, Noto, sans-serif;',
+              'color: rgba(255, 255, 255, .9);',
+              'background: #424242;',
+              'box-shadow: 0 3px 14px rgba(0, 0, 0, .4);',
+              'opacity: .7;',
+              'z-index: 1000',
+            '}',
+          '</style>',
           '<div class="tooltip-content">',
             '<div>' + title + '</div>',
             '<div class="number-of-partners">',
