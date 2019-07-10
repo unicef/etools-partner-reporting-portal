@@ -49,6 +49,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from indicator.utilities import convert_string_number_to_float
 from partner.models import Partner
 from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
 
@@ -852,7 +853,7 @@ class ProgressReportPullHFDataAPIView(APIView):
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
 
-                    calculated[loc_id]['total']['c'] = float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
+                    calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
 
                     if calculated[loc_id]['total']['c'] is None:
                         calculated[loc_id]['total']['c'] = 0
@@ -877,7 +878,8 @@ class ProgressReportPullHFDataAPIView(APIView):
                             else:
                                 calculated[loc_id]['data'][key]['d'] += ild.disaggregation[key]['d']
 
-                        calculated[loc_id]['data'][key]['c'] = float(calculated[loc_id]['data'][key]['v']) / calculated[loc_id]['data'][key]['d']
+                        calculated[loc_id]['data'][key]['c'] = convert_string_number_to_float(calculated[loc_id]['data'][key]['v']) \
+                            / calculated[loc_id]['data'][key]['d']
 
                         if calculated[loc_id]['data'][key]['c'] is None:
                             calculated[loc_id]['data'][key]['c'] = 0
