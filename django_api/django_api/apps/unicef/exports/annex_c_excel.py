@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from indicator.constants import ValueType
 from indicator.models import Disaggregation, IndicatorBlueprint
+from indicator.utilities import convert_string_number_to_float
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.models import ProgressReport
 
@@ -107,7 +108,7 @@ class ProgressReportsXLSXExporter:
         partner = programme_document.partner
 
         try:
-            indicator_target = float(indicator_report.reportable.calculated_target)
+            indicator_target = convert_string_number_to_float(indicator_report.reportable.calculated_target)
         except ValueError:
             indicator_target = indicator_report.reportable.calculated_target
 

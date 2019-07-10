@@ -34,6 +34,7 @@ from .models import (
     ReportingEntity,
     create_pa_reportables_for_new_ca_reportable,
 )
+from .utilities import convert_string_number_to_float
 
 
 class DisaggregationValueListSerializer(serializers.ModelSerializer):
@@ -223,7 +224,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
             if in_need['v'] == "":
                 data['in_need']['v'] = 0
 
-            elif float(in_need['v']) < float(target['v']):
+            elif convert_string_number_to_float(in_need['v']) < convert_string_number_to_float(target['v']):
                 raise serializers.ValidationError({
                     "in_need": "Target cannot be greater than In Need",
                 })
@@ -777,7 +778,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     {"reporting_entity_percentage_map": {"Each dictionary should have 'title' and 'percentage' key"}}
                 )
 
-            if any(map(lambda x: x["percentage"] > 1 or float(x["percentage"]) < 0, map_list)):
+            if any(map(lambda x: x["percentage"] > 1 or convert_string_number_to_float(x["percentage"]) < 0, map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"Each dictionary should 'percentage' value between 0 to 1"}}
                 )
@@ -799,12 +800,12 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                         split_data[entity['title']] = {}
 
                         if entity['title'] == "UNICEF":
-                            ild.percentage_allocated = float(entity['percentage'])
+                            ild.percentage_allocated = convert_string_number_to_float(entity['percentage'])
 
                         for key, val in disagg_data_copy.items():
                             for val_key in val:
                                 if val[val_key]:
-                                    val[val_key] *= float(entity['percentage'])
+                                    val[val_key] *= convert_string_number_to_float(entity['percentage'])
 
                             split_data[entity['title']][key] = val
 
@@ -1137,7 +1138,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 raise serializers.ValidationError("key 'd' cannot be zero")
 
             if 'c' not in data['target']:
-                data['target']['c'] = float(data['target']['v']) / data['target']['d']
+                data['target']['c'] = convert_string_number_to_float(data['target']['v']) / data['target']['d']
 
         if not isinstance(data['baseline'], dict):
             raise serializers.ValidationError({
@@ -1166,7 +1167,7 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
                 raise serializers.ValidationError("key 'd' cannot be zero")
 
             if 'c' not in data['baseline']:
-                data['baseline']['c'] = float(data['baseline']['v']) / data['baseline']['d']
+                data['baseline']['c'] = convert_string_number_to_float(data['baseline']['v']) / data['baseline']['d']
 
         if not Partner.objects.filter(id=data['partner_id']).exists():
             raise serializers.ValidationError({
@@ -1301,8 +1302,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "cannot be empty"}
             )
 
-        target_value = float(validated_data['target']['v']) if float(validated_data['target']['d']) == 1 else \
-            float(validated_data['target']['v']) / float(validated_data['target']['d'])
+        target_value = convert_string_number_to_float(validated_data['target']['v']) if convert_string_number_to_float(validated_data['target']['d']) == 1 else \
+            convert_string_number_to_float(validated_data['target']['v']) / convert_string_number_to_float(validated_data['target']['d'])
 
         if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "":
             if 'd' not in validated_data['in_need']:
@@ -1313,8 +1314,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     {"in_need": "denominator for in_need cannot be zero"}
                 )
 
-            in_need_value = float(validated_data['in_need']['v']) if float(validated_data['in_need']['d']) == 1 else \
-                float(validated_data['in_need']['v']) / float(validated_data['in_need']['d'])
+            in_need_value = convert_string_number_to_float(validated_data['in_need']['v']) if convert_string_number_to_float(validated_data['in_need']['d']) == 1 else \
+                convert_string_number_to_float(validated_data['in_need']['v']) / convert_string_number_to_float(validated_data['in_need']['d'])
 
             if target_value > in_need_value:
                 raise ValidationError(

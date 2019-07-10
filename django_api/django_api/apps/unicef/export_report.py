@@ -11,6 +11,7 @@ from core import common
 
 from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
+from indicator.utilities import convert_string_number_to_float
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'
@@ -144,7 +145,7 @@ class ProgressReportXLSXExporter:
                     )
                 else:
                     try:
-                        indicator_target = float(
+                        indicator_target = convert_string_number_to_float(
                             indicator.reportable.calculated_target)
                     except ValueError:
                         indicator_target = indicator.reportable.calculated_target

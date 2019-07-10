@@ -8,9 +8,10 @@ from core.helpers import (
 )
 
 from indicator.constants import ValueType
-from indicator.models import (
-    IndicatorLocationData,
-)
+
+
+def convert_string_number_to_float(num):
+    return float(num.replace(',', '')) if type(num) == str else float(num)
 
 
 def format_total_value_to_string(total, is_percentage=False):
@@ -31,6 +32,9 @@ def reset_indicator_report_data(indicator_report):
     Arguments:
         indicator_report {IndicatorReport} -- IndicatorReport instance to delete its location data from
     """
+    from indicator.models import (
+        IndicatorLocationData,
+    )
 
     # Reset submission and status attributes
     indicator_report.total = {'c': 0, 'd': 0, 'v': 0}
