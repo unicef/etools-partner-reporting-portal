@@ -103,11 +103,8 @@
         var style = document.createElement('style');
 
         style.innerHTML = tooltipStyles;
-        console.log('style', style);
 
         this.$$('google-chart').shadowRoot.appendChild(style);
-        console.log('analysis chart behaviors attached!');
-        console.log('chart nodes', this.$$('google-chart'))
       },
     };
 
