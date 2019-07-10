@@ -174,49 +174,50 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=4).value = \
                     self.progress_report.programme_document.title
                 self.sheet.cell(row=start_row_id, column=5).value = \
-                    indicator.reportable.content_object.title
-                self.sheet.cell(row=start_row_id, column=6).value = \
                     self.progress_report.get_reporting_period()
-                self.sheet.cell(row=start_row_id, column=7).value = \
+                self.sheet.cell(row=start_row_id, column=6).value = \
                     self.progress_report.get_status_display()
-                self.sheet.cell(row=start_row_id, column=8).value = \
+                self.sheet.cell(row=start_row_id, column=7).value = \
                     self.progress_report.due_date
-                self.sheet.cell(row=start_row_id, column=9).value = \
+                self.sheet.cell(row=start_row_id, column=8).value = \
                     self.progress_report.submission_date
-                self.sheet.cell(row=start_row_id, column=10).value = \
+                self.sheet.cell(row=start_row_id, column=9).value = \
                     self.progress_report.partner_contribution_to_date
-                self.sheet.cell(row=start_row_id, column=10).fill = \
+                self.sheet.cell(row=start_row_id, column=9).fill = \
                     REQUIRED_FILL
-                self.sheet.cell(row=start_row_id, column=11).value = \
+                self.sheet.cell(row=start_row_id, column=10).value = \
                     self.progress_report.programme_document.funds_received_to_date
-                self.sheet.cell(row=start_row_id, column=12).value = \
+                self.sheet.cell(row=start_row_id, column=11).value = \
                     self.progress_report.challenges_in_the_reporting_period
+                self.sheet.cell(row=start_row_id, column=11).fill = \
+                    REQUIRED_FILL
+                self.sheet.cell(row=start_row_id, column=12).value = \
+                    self.progress_report.proposed_way_forward
                 self.sheet.cell(row=start_row_id, column=12).fill = \
                     REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=13).value = \
-                    self.progress_report.proposed_way_forward
-                self.sheet.cell(row=start_row_id, column=13).fill = \
-                    REQUIRED_FILL
-                self.sheet.cell(row=start_row_id, column=14).value = \
                     self.progress_report.submitted_by.display_name if \
                     self.progress_report.submitted_by else ''
 
                 attachments = self.progress_report.attachments.all()
                 other_attachments = attachments.filter(type="Other")
 
-                self.sheet.cell(row=start_row_id, column=15).value = \
+                self.sheet.cell(row=start_row_id, column=14).value = \
                     attachments.filter(type="FACE").first().file.url if attachments.filter(type="FACE").exists() else ''
 
                 if other_attachments.exists():
                     if other_attachments.count() == 1:
-                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.first().file.url
-                        self.sheet.cell(row=start_row_id, column=17).value = ''
+                        self.sheet.cell(row=start_row_id, column=15).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=16).value = ''
                     elif other_attachments.count() > 1:
-                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.first().file.url
-                        self.sheet.cell(row=start_row_id, column=17).value = other_attachments.last().file.url
+                        self.sheet.cell(row=start_row_id, column=15).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.last().file.url
                 else:
+                    self.sheet.cell(row=start_row_id, column=15).value = ''
                     self.sheet.cell(row=start_row_id, column=16).value = ''
-                    self.sheet.cell(row=start_row_id, column=17).value = ''
+
+                self.sheet.cell(row=start_row_id, column=17).value = \
+                    indicator.reportable.content_object.title
 
                 self.sheet.cell(row=start_row_id, column=18).value = \
                     indicator.get_overall_status_display()
@@ -259,8 +260,6 @@ class ProgressReportXLSXExporter:
                     indicator.reportable.denominator_label
                 self.sheet.cell(row=start_row_id, column=38).value = \
                     achievement_in_reporting_period
-                self.sheet.cell(row=start_row_id, column=38).fill = \
-                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=39).value = \
                     total_cumulative_progress
                 self.sheet.cell(row=start_row_id, column=40).value = \
@@ -290,6 +289,12 @@ class ProgressReportXLSXExporter:
                             column=disaggregation_values_map['()']).value = v['v'] \
                             if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
 
+                        # De-highlight total column if the indicator is disaggregated
+                        if disaggregation_values_list:
+                            self.sheet.cell(
+                                row=start_row_id,
+                                column=disaggregation_values_map['()']).fill = None
+
                     else:
                         for dk, dv in disaggregation_values_map.items():
                             if dk == "()":
@@ -300,6 +305,10 @@ class ProgressReportXLSXExporter:
                                     row=start_row_id, column=dv).value = v['v'] \
                                     if blueprint.unit == IndicatorBlueprint.NUMBER \
                                     else "{}/{}".format(v['v'], v['d'])
+
+                                # De-highlight any subtotal disaggregation data column
+                                if len(dk.split(",")) != len(disaggregation_types):
+                                    self.sheet.cell(row=start_row_id, column=dv).fill = None
 
                 start_row_id += 1
 

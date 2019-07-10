@@ -73,17 +73,17 @@ class ProgressReportXLSXReader(object):
             # Partner contribution to date
             if not partner_contribution:
                 partner_contribution = self.sheet.cell(
-                    row=COLUMN_HASH_ID + 1, column=10).value
+                    row=COLUMN_HASH_ID + 1, column=9).value
 
             # Challenges/bottlenecks in the reporting period
             if not challenges:
                 challenges = self.sheet.cell(
-                    row=COLUMN_HASH_ID + 1, column=12).value
+                    row=COLUMN_HASH_ID + 1, column=11).value
 
             # Proposed way forward
             if not proposed_way_forward:
                 proposed_way_forward = self.sheet.cell(
-                    row=COLUMN_HASH_ID + 1, column=13).value
+                    row=COLUMN_HASH_ID + 1, column=12).value
 
             # ... and assign if is QPR
             try:
@@ -151,7 +151,8 @@ class ProgressReportXLSXReader(object):
                     ).value
                     llo = indicator.indicator_report.reportable.content_object
 
-                    if llo.id not in pd_output_narratives and narrative_assessment is not None:
+                    if llo.id not in pd_output_narratives \
+                            and (narrative_assessment is not None and narrative_assessment != ''):
                         pd_output_narratives[llo.id] = narrative_assessment
 
                         for ir in pr.indicator_reports.filter(reportable__lower_level_outputs=llo):
