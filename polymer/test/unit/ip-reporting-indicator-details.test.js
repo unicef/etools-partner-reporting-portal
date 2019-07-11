@@ -7,31 +7,6 @@ const {getDataByKey,
     bucketByLocation} = IndicatorDetailsUtils;
 
 describe('IpReportingIndicatorDetails functions', () => {
-    describe('getDataByKey observer', () => {
-        // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
-        const dataObj = {
-            details: {
-                1: 'hello'
-            }
-        };
-    
-        const ind = {id: 1};
-        const badObj = {deets: 'howdy'};
-        const nullObj = '';
-    
-        xit('should equal hello', () => {
-            expect(getDataByKey(dataObj, ind)).toBe('hello');
-        });
-    
-        it('should return undefined if dataDict has no details', () => {
-            expect(getDataByKey(badObj, ind)).toBe(undefined);
-        });
-    
-        it('should return undefined if dataDict is not an object', () => {
-            expect(getDataByKey(nullObj, ind)).toBe(undefined);
-        });
-    });
-    
     describe('clusterApp function', () => {
         // found in polymer/src/elements/ip-reporting/ip-reporting-indicator-details.js
         const appName = 'cluster-reporting';
