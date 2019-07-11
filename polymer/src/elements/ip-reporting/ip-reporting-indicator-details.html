@@ -279,7 +279,9 @@
       },
 
       _getDataByKey: function(dataDict) {
-        IndicatorDetailsUtils.getDataByKey(dataDict, this.indicator);
+        if (dataDict.details) {
+          this.data = dataDict.details[this.indicator.id];
+        }
       },
 
       _computeHidden: function (data, loading) {
