@@ -9,6 +9,15 @@
   (function () {
     'use strict';
 
+    var pdListStatuses = {
+      Signed: 'signed',
+      Active: 'active',
+      Suspended: 'suspended',
+      Ended: 'ended',
+      Closed: 'closed',
+      Terminated: 'terminated',
+    }
+
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.UtilsBehavior = {
@@ -24,11 +33,16 @@
         );
       },
 
-      _withDefault: function (value, defaultValue) {
+      _withDefault: function (value, defaultValue, localize) {
         if (typeof defaultValue === 'undefined') {
           defaultValue = '...';
         }
 
+        if (pdListStatuses[value] !== undefined) {
+          console.log('here!', pdListStatuses[value])
+          return localize(pdListStatuses[value]);
+        }
+        
         return value == null /* undefinded & null */ ? // jshint ignore:line
             defaultValue : value;
       },
