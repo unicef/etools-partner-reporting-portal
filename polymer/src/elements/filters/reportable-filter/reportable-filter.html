@@ -3,6 +3,8 @@
 <link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/selectors/llos.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
 
 <dom-module id="reportable-filter">
   <template>
@@ -14,7 +16,7 @@
 
     <searchable-dropdown-filter
         class="item"
-        label="PD output"
+        label="[[localize('pd_output')]]"
         name="llo"
         value="[[value]]"
         data="[[options]]">
@@ -27,6 +29,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
