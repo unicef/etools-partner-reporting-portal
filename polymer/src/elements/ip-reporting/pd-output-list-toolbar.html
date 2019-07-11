@@ -54,7 +54,7 @@
         <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
         <template
             is="dom-if"
-            if="[[canRefresh]]"
+            if="[[showRefresh]]"
             restamp="true">
           <paper-button
               class="btn-primary"
@@ -118,6 +118,11 @@
           statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
+        currentUserRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles',
+        },
+
         refreshData: {
           type: Object,
           computed: '_computeRefreshData(reportId)',
@@ -127,6 +132,12 @@
           type: Boolean,
           value: false,
           computed: '_computeCanRefresh(currentReport, programmeDocument)',
+        },
+
+        showRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeShowRefresh(canRefresh, currentUserRoles)',
         },
 
         refreshUrl: {
@@ -163,6 +174,10 @@
 
       _computeCanRefresh: function (report, programmeDocument) {
         return PdOutputListToolbarUtils.computeCanRefresh(report, programmeDocument);
+      },
+
+      _computeShowRefresh: function (canRefresh, currentUserRoles) {
+        return canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles);
       },
 
       _refresh: function () {

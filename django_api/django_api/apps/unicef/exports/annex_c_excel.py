@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from indicator.constants import ValueType
 from indicator.models import Disaggregation, IndicatorBlueprint
+from indicator.utilities import convert_string_number_to_float
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.models import ProgressReport
 
@@ -107,7 +108,7 @@ class ProgressReportsXLSXExporter:
         partner = programme_document.partner
 
         try:
-            indicator_target = float(indicator_report.reportable.calculated_target)
+            indicator_target = convert_string_number_to_float(indicator_report.reportable.calculated_target)
         except ValueError:
             indicator_target = indicator_report.reportable.calculated_target
 
@@ -133,12 +134,36 @@ class ProgressReportsXLSXExporter:
         if progress_report.attachments.filter(type="FACE").exists():
             face_attachment = progress_report.attachments.filter(type="FACE").first()
 
+            try:
+                # Evaluate the file url to see if it has actual file
+                face_attachment.file.url
+            except ValueError:
+                face_attachment = None
+
         if progress_report.attachments.filter(type="Other").exists():
             if progress_report.attachments.filter(type="Other").count() > 1:
                 other_attachment1 = progress_report.attachments.filter(type="Other").first()
                 other_attachment2 = progress_report.attachments.filter(type="Other").last()
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment1.file.url
+                except ValueError:
+                    other_attachment1 = None
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment2.file.url
+                except ValueError:
+                    other_attachment2 = None
             else:
                 other_attachment1 = progress_report.attachments.filter(type="Other").first()
+
+                try:
+                    # Evaluate the file url to see if it has actual file
+                    other_attachment1.file.url
+                except ValueError:
+                    other_attachment1 = None
 
         general_info_row = [
             (partner.title, None),
@@ -155,9 +180,9 @@ class ProgressReportsXLSXExporter:
             (progress_report.challenges_in_the_reporting_period, None),
             (progress_report.proposed_way_forward, None),
             (progress_report.submitted_by.display_name if progress_report.submitted_by else '', None),
-            (face_attachment.url if face_attachment else '', None),
-            (other_attachment1.url if other_attachment1 else '', None),
-            (other_attachment2.url if other_attachment2 else '', None),
+            (face_attachment.file.url if face_attachment else '', None),
+            (other_attachment1.file.url if other_attachment1 else '', None),
+            (other_attachment2.file.url if other_attachment2 else '', None),
             (progress_report.narrative, None),
             (indicator_report.get_overall_status_display(), None),
             (indicator_report.narrative_assessment, None),

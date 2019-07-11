@@ -39,7 +39,7 @@ ENV = os.getenv('ENV')
 if not ENV:
     raise Exception('Environment variable ENV is required!')
 
-DATA_VOLUME = '/data'
+DATA_VOLUME = os.getenv('DATA_VOLUME', '/data')
 
 UPLOADS_DIR_NAME = 'uploads'
 MEDIA_URL = '/api/%s/' % UPLOADS_DIR_NAME

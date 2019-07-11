@@ -32,6 +32,7 @@ from indicator.disaggregators import (
     RatioIndicatorDisaggregator
 )
 from indicator.constants import ValueType
+from indicator.utilities import convert_string_number_to_float
 from utils.emails import send_email_from_template
 
 
@@ -327,9 +328,9 @@ class Reportable(TimeStampedExternalSourceModel):
             return 0.0
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.target['v'])
+            return convert_string_number_to_float(self.target['v'])
         else:
-            return float(self.target['v']) / float(self.target['d'])
+            return convert_string_number_to_float(self.target['v']) / convert_string_number_to_float(self.target['d'])
 
     @property
     def calculated_baseline(self):
@@ -337,9 +338,9 @@ class Reportable(TimeStampedExternalSourceModel):
             return 0.0
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.baseline['v'])
+            return convert_string_number_to_float(self.baseline['v'])
         else:
-            return float(self.baseline['v']) / float(self.baseline['d'])
+            return convert_string_number_to_float(self.baseline['v']) / convert_string_number_to_float(self.baseline['d'])
 
     @property
     def calculated_in_need(self):
@@ -347,22 +348,22 @@ class Reportable(TimeStampedExternalSourceModel):
             return None
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.in_need['v'])
+            return convert_string_number_to_float(self.in_need['v'])
         else:
-            return float(self.in_need['v']) / float(self.in_need['d'])
+            return convert_string_number_to_float(self.in_need['v']) / convert_string_number_to_float(self.in_need['d'])
 
     @property
     def progress_percentage(self):
         percentage = 0.0
 
         if self.achieved and self.baseline['v'] is not None and self.target['v'] is not None:
-            baseline = float(self.calculated_baseline)
-            target = float(self.calculated_target)
+            baseline = convert_string_number_to_float(self.calculated_baseline)
+            target = convert_string_number_to_float(self.calculated_target)
 
             dividend = 0    # default progress is 0
             if self.achieved['c'] > baseline:
                 dividend = self.achieved['c'] - baseline
-            divisor = float(target) - baseline
+            divisor = convert_string_number_to_float(target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
         return percentage

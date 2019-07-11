@@ -78,6 +78,7 @@ cs_date_3 = datetime.date(today.year, 5, 15)
 faker = Faker()
 fake_file = ContentFile(bytes(faker.text(), 'utf-8'))
 fake_file.name = faker.file_name()
+fake_file.url = faker.uri()
 
 
 def create_fake_multipolygon():
@@ -155,7 +156,7 @@ class PartnerUserFactory(AbstractUserFactory):
     """
 
     # We are going to let PartnerFactory create PartnerUser
-    partner = factory.SubFactory('core.factories.PartnerFactory', user=None)
+    partner = factory.SubFactory('core.factories.PartnerFactory')
 
     class Meta:
         model = User
@@ -759,7 +760,8 @@ class QuantityReportableBaseFactory(AbstractReportableFactory):
     numerator_label = None
     denominator_label = None
     blueprint = factory.SubFactory(
-        'core.factories.QuantityTypeIndicatorBlueprintFactory', reportable=None)
+        'core.factories.QuantityTypeIndicatorBlueprintFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -779,7 +781,8 @@ class RatioReportableBaseFactory(AbstractReportableFactory):
     numerator_label = factory.LazyFunction(faker.word)
     denominator_label = factory.LazyFunction(faker.word)
     blueprint = factory.SubFactory(
-        'core.factories.RatioTypeIndicatorBlueprintFactory', reportable=None)
+        'core.factories.RatioTypeIndicatorBlueprintFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -797,7 +800,8 @@ class QuantityReportableToLowerLevelOutputFactory(QuantityReportableBaseFactory)
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.LowerLevelOutputFactory', reportable=None)
+        'core.factories.LowerLevelOutputFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -814,7 +818,9 @@ class QuantityReportableToPartnerProjectFactory(QuantityReportableBaseFactory):
         )
     """
 
-    content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
+    content_object = factory.SubFactory(
+        'core.factories.PartnerProjectFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -831,7 +837,8 @@ class QuantityReportableToClusterObjectiveFactory(QuantityReportableBaseFactory)
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.ClusterObjectiveFactory', reportable=None)
+        'core.factories.ClusterObjectiveFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -848,7 +855,8 @@ class QuantityReportableToClusterActivityFactory(QuantityReportableBaseFactory):
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.ClusterActivityFactory', reportable=None)
+        'core.factories.ClusterActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -866,7 +874,8 @@ class QuantityReportableToPartnerActivityFactory(QuantityReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory', reportable=None)
+        'core.factories.PartnerActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -883,7 +892,8 @@ class RatioReportableToLowerLevelOutputFactory(RatioReportableBaseFactory):
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.LowerLevelOutputFactory', reportable=None)
+        'core.factories.LowerLevelOutputFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -899,7 +909,9 @@ class RatioReportableToPartnerProjectFactory(RatioReportableBaseFactory):
             content_object=project1, blueprint=blueprint1
         )
     """
-    content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
+    content_object = factory.SubFactory(
+        'core.factories.PartnerProjectFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -917,7 +929,8 @@ class RatioReportableToClusterObjectiveFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.ClusterObjectiveFactory', reportable=None)
+        'core.factories.ClusterObjectiveFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -935,7 +948,8 @@ class RatioReportableToClusterActivityFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.ClusterActivityFactory', reportable=None)
+        'core.factories.ClusterActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -953,7 +967,8 @@ class RatioReportableToPartnerActivityFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory', reportable=None)
+        'core.factories.PartnerActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -1235,8 +1250,8 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     review_date = due_date
     submission_date = due_date
     programme_document = factory.SubFactory('core.factories.ProgrammeDocument', progress_report=None)
-    submitted_by = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
-    submitting_user = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
+    submitted_by = factory.SubFactory('core.factories.PartnerUserFactory', profile=None)
+    submitting_user = factory.SubFactory('core.factories.PartnerUserFactory', profile=None)
     reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
     reviewed_by_name = factory.LazyFunction(faker.name)
     sent_back_feedback = factory.LazyFunction(faker.text)

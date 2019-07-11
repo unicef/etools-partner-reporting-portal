@@ -227,9 +227,20 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         indicator_start_date = indicator.content_object.cluster.response_plan.start
         indicator_end_date = indicator.content_object.cluster.response_plan.end
 
-    if indicator.content_type.model in ["partnerproject", "partneractivity", "lowerleveloutput"]:
+    if indicator.content_type.model in ["partnerproject", "lowerleveloutput"]:
         indicator_start_date = indicator.content_object.start_date
         indicator_end_date = indicator.content_object.end_date
+
+    if indicator.content_type.model == "partneractivity":
+        indicator_start_date = None
+        indicator_end_date = None
+
+        for context in indicator.content_object.partneractivityprojectcontext_set.all():
+            if not indicator_start_date or indicator_start_date > context.start_date:
+                indicator_start_date = context.start_date
+
+            if not indicator_end_date or indicator_end_date < context.end_date:
+                indicator_end_date = context.end_date
 
     # Override start date if indicator has its own start date
     if indicator.start_date_of_reporting_period:
@@ -237,6 +248,9 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
 
     date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator_start_date
     date_list = []
+
+    if not date_to_compare or not indicator_end_date:
+        return date_list
 
     # Only add 1 day to date_to_compare if it came from latest_indicator_report_date
     # in order to set next date period correctly
