@@ -104,27 +104,31 @@
 
         statuses: {
           type: Array,
-          value: function () {
-            return [
-              {title: 'Overdue', id: 'Ove'},
-              {title: 'Sent back', id: 'Sen'},
-              {title: 'Due', id: 'Due'},
-              {title: 'Submitted', id: 'Sub'},
-              {title: 'Accepted', id: 'Acc'},
-            ];
-          },
+          computed: '_localizeStatuses(localize)',
         },
 
         types: {
           type: Array,
-          value: function () {
-            return [
-              {title: 'QPR (Quarterly Progress Report)', id: 'QPR'},
-              {title: 'HR (Humanitarian Report)', id: 'HR'},
-              {title: 'SR (Special Report)', id: 'SR'},
-            ];
-          },
+          computed: '_localizeTypes(localize)',
         },
+      },
+
+      _localizeStatuses: function (localize) {
+        return [
+          {title: localize('overdue'), id: 'Ove'},
+          {title: localize('sent_back'), id: 'Sen'},
+          {title: localize('due'), id: 'Due'},
+          {title: localize('submitted'), id: 'Sub'},
+          {title: localize('accepted'), id: 'Acc'},
+        ];
+      },
+
+      _localizeTypes: function (localize) {
+        return [
+          {title: localize('qpr'), id: 'QPR'},
+          {title: localize('hr'), id: 'HR'},
+          {title: localize('sr'), id: 'SR'},
+        ];
       },
     });
   </script>
