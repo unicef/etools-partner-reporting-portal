@@ -2,12 +2,6 @@ function IndicatorDetailsUtils() {
         
 }
 
-IndicatorDetailsUtils.getDataByKey = function (dataDict, indicator) {
-    if (dataDict.details) {
-        this.data = dataDict.details[indicator.id];
-    }
-};
-
 IndicatorDetailsUtils.computeIsClusterApp = function (name) {
     return name === 'cluster-reporting';
 };
