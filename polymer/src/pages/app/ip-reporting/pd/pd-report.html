@@ -308,7 +308,7 @@
 
         headingPrefix: {
           type: String,
-          computed: '_computeHeadingPrefix(mode)',
+          computed: '_computeHeadingPrefix(mode, localize)',
         },
 
         backLink: {
@@ -397,13 +397,13 @@
         }, 300);
       },
 
-      _computeHeadingPrefix: function (mode) {
+      _computeHeadingPrefix: function (mode, localize) {
         switch (mode) {
           case 'view':
             return 'Report for';
 
           case 'edit':
-            return 'Enter data for';
+            return localize('enter_data_for');
 
           default:
             return '';

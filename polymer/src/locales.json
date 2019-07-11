@@ -362,7 +362,8 @@
     "pd_ssfa_details": "PD or SSFA Details",
     "submitted_by": "Submitted by",
     "on_behalf_of": "On behalf of",
-    "submit": "Submit"
+    "submit": "Submit",
+    "report_for": "Report for"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
