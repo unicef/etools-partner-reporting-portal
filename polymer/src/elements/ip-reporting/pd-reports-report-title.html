@@ -4,6 +4,8 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../behaviors/sorting.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 
 <link rel="import" href="../etools-prp-permissions.html">
 
@@ -32,13 +34,13 @@
       is="dom-if"
       if="[[showLink]]"
       restamp="true">
-      <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report)]]</a>
+      <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report, localize)]]</a>
     </template>
     <template
       is="dom-if"
       if="[[!showLink]]"
       restamp="true">
-      [[_getReportTitleFull(report)]]
+      [[_getReportTitleFull(report, localize)]]
     </template>
     <template
       is="dom-if"
@@ -57,6 +59,8 @@
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -79,12 +83,12 @@
         return PdReportsReportTitleUtils.shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
       },
 
-      _getReportTitleFull: function (report) {
-        return PdReportsReportTitleUtils.getReportTitleFull(report);
+      _getReportTitleFull: function (report, localize) {
+        return PdReportsReportTitleUtils.getReportTitleFull(report, localize);
       },
 
-      _getReportTitle: function (report) {
-        return PdReportsReportTitleUtils.getReportTitle(report);
+      _getReportTitle: function (report, localize) {
+        return PdReportsReportTitleUtils.getReportTitle(report, localize);
       },
 
       _getReportLink: function (report, permissions) {

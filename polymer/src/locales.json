@@ -363,7 +363,10 @@
     "submitted_by": "Submitted by",
     "on_behalf_of": "On behalf of",
     "submit": "Submit",
-    "report_for": "Report for"
+    "report_for": "Report for",
+    "qpr_long": "(Quarterly Progress Report)",
+    "hr_long": "(Humanitarian Report)",
+    "sr_long": "(Special Report)"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
@@ -724,7 +727,10 @@
     "not_completed_partner_contribution": "Vous n'avez pas rempli le champ Contribution du partenaire à ce jour dans l'onglet Autres informations.",
     "not_completed_challenges_bottlenecks": "Vous n'avez pas rempli les défis/goulots d'étranglement dans le champ Période de reporting de l'onglet Autres informations.",
     "not_completed_proposed_way": "Vous n'avez pas rempli le champ Proposition de voie à suivre dans l'onglet Autres informations.",
-    "submit": "Soumet"
+    "submit": "Soumet",
+    "qpr_long":  "(Rapport standard trimestriel du progrès)",
+    "hr_long":  "(Rapport humanitaire)",
+    "sr_long":  "(Rapport spécial)"
   },
   "es": {
     "ip_reporting": "Informe de IP",
@@ -1085,6 +1091,9 @@
     "not_completed_partner_contribution": "No ha completado el campo Contribución del socio hasta la fecha en la pestaña Otra información.",
     "not_completed_challenges_bottlenecks": "No ha completado los Desafíos/ cuellos de botella en el campo del período del informe de la pestaña Otra información.",
     "not_completed_proposed_way": "No ha completado el campo Reenvío propuesto en la pestaña Otra información.",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "qpr_long": "(Informe Trimestral de Progreso)",
+    "hr_long": "(Informe Humanitario)",
+    "sr_long": "(Informe Especial)"
   }
 }
