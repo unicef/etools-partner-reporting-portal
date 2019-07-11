@@ -357,7 +357,12 @@
     "not_selected_overall_status": "You have not selected overall status for one of Outputs",
     "not_completed_partner_contribution": "You have not completed Partner Contribution To Date field on Other Info tab.",
     "not_completed_challenges_bottlenecks": "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab.",
-    "not_completed_proposed_way": "You have not completed Proposed way forward field on Other Info tab."
+    "not_completed_proposed_way": "You have not completed Proposed way forward field on Other Info tab.",
+    "partnership_info": "Partnership Information",
+    "pd_ssfa_details": "PD or SSFA Details",
+    "submitted_by": "Submitted by",
+    "on_behalf_of": "On behalf of",
+    "submit": "Submit"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
@@ -717,7 +722,8 @@
     "not_selected_overall_status": "Vous n'avez pas sélectionné le statut global pour l'un des résultats.",
     "not_completed_partner_contribution": "Vous n'avez pas rempli le champ Contribution du partenaire à ce jour dans l'onglet Autres informations.",
     "not_completed_challenges_bottlenecks": "Vous n'avez pas rempli les défis/goulots d'étranglement dans le champ Période de reporting de l'onglet Autres informations.",
-    "not_completed_proposed_way": "Vous n'avez pas rempli le champ Proposition de voie à suivre dans l'onglet Autres informations."
+    "not_completed_proposed_way": "Vous n'avez pas rempli le champ Proposition de voie à suivre dans l'onglet Autres informations.",
+    "submit": "Soumet"
   },
   "es": {
     "ip_reporting": "Informe de IP",
@@ -1077,6 +1083,7 @@
     "not_selected_overall_status": "No ha seleccionado el estado general de uno de los ouputs.",
     "not_completed_partner_contribution": "No ha completado el campo Contribución del socio hasta la fecha en la pestaña Otra información.",
     "not_completed_challenges_bottlenecks": "No ha completado los Desafíos/ cuellos de botella en el campo del período del informe de la pestaña Otra información.",
-    "not_completed_proposed_way": "No ha completado el campo Reenvío propuesto en la pestaña Otra información."
+    "not_completed_proposed_way": "No ha completado el campo Reenvío propuesto en la pestaña Otra información.",
+    "submit": "Enviar"
   }
 }
