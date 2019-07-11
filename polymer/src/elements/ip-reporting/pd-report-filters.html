@@ -66,15 +66,19 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Overdue', id: 'Ove'},
-            {title: 'Sent back', id: 'Sen'},
-            {title: 'Due', id: 'Due'},
-            {title: 'All', id: ''},
-            {title: 'Submitted', id: 'Sub'},
-            {title: 'Accepted', id: 'Acc'},
-          ],
+          computed: '_localizeStatuses(localize)',
         },
+      },
+
+      _localizeStatuses: function (localize) {
+        return [
+          {title: localize('overdue'), id: 'Ove'},
+          {title: localize('sent_back'), id: 'Sen'},
+          {title: localize('due'), id: 'Due'},
+          {title: localize('all'), id: ''},
+          {title: localize('submitted'), id: 'Sub'},
+          {title: localize('accepted'), id: 'Acc'},
+        ];
       },
     });
   </script>

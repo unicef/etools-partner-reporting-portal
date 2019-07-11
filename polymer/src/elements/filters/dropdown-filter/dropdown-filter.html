@@ -5,6 +5,10 @@
 
 <link rel="import" href="../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../behaviors/filter.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
+
 
 <dom-module id="dropdown-filter">
   <template>
@@ -47,6 +51,10 @@
 
       behaviors: [
         App.Behaviors.FilterBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -76,6 +84,7 @@
 
       _handleChange: function (e) {
         var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+        console.log('newValue', newValue);
 
         this.fire('filter-changed', {
           name: this.name,
@@ -86,6 +95,8 @@
       _updateSelected: function (value, data) {
         this.async(function () {
           this.set('selected', data.findIndex(function (item) {
+            console.log('item id', item.id);
+            console.log('value', value);
             return String(item.id) === String(value);
           }));
         });
