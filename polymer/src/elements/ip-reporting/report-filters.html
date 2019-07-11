@@ -4,6 +4,9 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../styles/filter-styles.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/reportable-filter/reportable-filter.html">
@@ -52,7 +55,7 @@
             class="incomplete"
             name="incomplete"
             value="[[_withDefault(queryParams.incomplete, '')]]">
-          <span class="checkbox-label">Show incomplete only</span>
+          <span class="checkbox-label">[[localize('show_incomplete_only')]]</span>
         </checkbox-filter>
       </div>
     </filter-list>
@@ -63,7 +66,10 @@
       id: 'report-filters',
 
       behaviors: [
+        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
