@@ -366,7 +366,15 @@
     "report_for": "Report for",
     "qpr_long": "(Quarterly Progress Report)",
     "hr_long": "(Humanitarian Report)",
-    "sr_long": "(Special Report)"
+    "sr_long": "(Special Report)",
+    "nothing_due": "Nothing due",
+    "rejected": "Rejected",
+    "met_results": "Met results as planned",
+    "constrained_partially": "Constrained (partially met result)",
+    "planned": "Planned",
+    "completed": "Completed",
+    "no_status": "No status",
+    "received": "Received"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
