@@ -78,7 +78,10 @@
 
       properties: {
         queryParams: Object,
-        statuses: Array,
+        statuses: {
+          type: Array,
+          computed: '_initStatuses(localize)'
+        },
 
         filters: {
           type: Object,
@@ -86,18 +89,31 @@
         },
       },
 
-      attached: function () {
-        this.async(function () {
-          this.set('statuses', [
-            {title: 'Signed', id: 'Sig'},
-            {title: 'Active', id: 'Act'},
-            {title: 'Suspended', id: 'Sus'},
-            {title: 'Ended', id: 'End'},
-            {title: 'Closed', id: 'Clo'},
-            {title: 'Terminated', id: 'Ter'},
-          ]);
-        });
+      _initStatuses: function (localize) {
+        var statuses = [
+          {title: localize('signed'), id: 'Sig'},
+          {title: localize('active'), id: 'Act'},
+          {title: localize('suspended'), id: 'Sus'},
+          {title: localize('ended'), id: 'End'},
+          {title: localize('closed'), id: 'Clo'},
+          {title: localize('terminated'), id: 'Ter'},
+        ];
+
+        return statuses;
       },
+
+      // attached: function () {
+      //   this.async(function () {
+      //     this.set('statuses', [
+      //       {title: this.localize('signed'), id: 'Sig'},
+      //       {title: 'Active', id: 'Act'},
+      //       {title: 'Suspended', id: 'Sus'},
+      //       {title: 'Ended', id: 'End'},
+      //       {title: 'Closed', id: 'Clo'},
+      //       {title: 'Terminated', id: 'Ter'},
+      //     ]);
+      //   });
+      // },
     });
   </script>
 </dom-module>
