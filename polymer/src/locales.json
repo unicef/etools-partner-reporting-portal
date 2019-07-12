@@ -376,7 +376,8 @@
     "no_status": "No status",
     "received": "Received",
     "indicators_for_pd": "Indicators for this PD/SSFA",
-    "to_help_you_decide": "To help you decide about calculation methods, learn more about them here"
+    "to_help_you_decide": "To help you decide about calculation methods, learn more about them here",
+    "to_learn_more": "To learn more about or to change calculation methods, click the link above"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",

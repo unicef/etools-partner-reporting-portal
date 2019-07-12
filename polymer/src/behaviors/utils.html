@@ -34,6 +34,10 @@
         );
       },
 
+      _toLowerCaseLocalized: function (text, localize) {
+        return localize(text).toLowerCase();
+      },
+
       _withDefault: function (value, defaultValue, localize) {
         if (typeof defaultValue === 'undefined') {
           defaultValue = '...';

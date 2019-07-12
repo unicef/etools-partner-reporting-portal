@@ -176,15 +176,19 @@
                   <h3>[[indicator.reportable.blueprint.title]]</h3>
 
                   <dl class="layout horizontal">
-                    <dt><a href="[[calculationMethodUrl]]">Calculation methods <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
-                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[_calculationFormulaAcrossPeriods(indicator)]]</b> (across reporting periods)</dt>
+                    <dt><a href="[[calculationMethodUrl]]">[[localize('calculation_methods')]]
+                      <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
+                    <dt>
+                      <b>[[_toLowerCaseLocalized(indicator.reportable.blueprint.calculation_formula_across_locations, localize)]]</b>
+                      ([[_toLowerCaseLocalized('across_locations', localize)]]),
+                      <b>[[_calculationFormulaAcrossPeriods(indicator, localize)]]</b> ([[_toLowerCaseLocalized('across_reporting_periods', localize)]])</dt>
                   </dl>
                 </div>
               </div>
             </div>
             <div class="indicator-header__target flex-none layout vertical center-justified">
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Target:</dt>
+                <dt class="flex-3">[[localize('target')]]:</dt>
                 <dd class="flex">
                   <template
                       is="dom-if"
@@ -207,7 +211,7 @@
                 </dd>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Total cumulative progress:</dt>
+                <dt class="flex-3">[[localize('total_cumulative_progress')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
@@ -224,7 +228,7 @@
                 </template>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Achievement in reporting period:</dt>
+                <dt class="flex-3">[[localize('achievement_in_reporting_period')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
@@ -344,8 +348,8 @@
         'reportable-meta-changed': '_updateMeta',
       },
 
-      _calculationFormulaAcrossPeriods: function (indicator) {
-        return PdOutputUtils.calculationFormulaAcrossPeriods(indicator);
+      _calculationFormulaAcrossPeriods: function (indicator, localize) {
+        return PdOutputUtils.calculationFormulaAcrossPeriods(indicator, localize);
       },
 
       _toggle: function (e) {

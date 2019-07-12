@@ -2,9 +2,9 @@ function PdOutputUtils() {
 
 }
 
-PdOutputUtils.calculationFormulaAcrossPeriods = function (indicator) {
+PdOutputUtils.calculationFormulaAcrossPeriods = function (indicator, localize) {
     return indicator.reportable.blueprint.display_type === 'ratio'
-        ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+        ? localize('latest') : localize(indicator.reportable.blueprint.calculation_formula_across_periods).toLowerCase();
 };
 
 // No unit test for this one because it involves DOM manipulation
