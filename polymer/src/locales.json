@@ -126,8 +126,8 @@
     "edit": "Edit",
     "save": "Save",
     "sum": "SUM",
-    "across_locations": "across locations",
-    "across_reporting_periods": "across reporting periods",
+    "across_locations": "Across locations",
+    "across_reporting_periods": "Across reporting periods",
     "total_cumulative_progress": "Total cumulative progress",
     "achievement_in_reporting_period": "Achievement in reporting period",
     "for_this_indicator": "For this indicator, data can be pulled from reports matching this reporting period",
@@ -375,7 +375,8 @@
     "completed": "Completed",
     "no_status": "No status",
     "received": "Received",
-    "indicators_for_pd": "Indicators for this PD/SSFA"
+    "indicators_for_pd": "Indicators for this PD/SSFA",
+    "to_help_you_decide": "To help you decide about calculation methods, learn more about them here"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
