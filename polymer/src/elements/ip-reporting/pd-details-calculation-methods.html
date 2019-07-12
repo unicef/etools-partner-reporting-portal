@@ -277,13 +277,10 @@
 
         pdReportsCount: {
           type: Object,
-          statePath: 'programmeDocumentReports.countByPD'
+          statePath: 'programmeDocumentReports.countByPD',
+          observer: '_getPdReports',
         },
       },
-
-      observers: [
-        '_getPdReports(pdReportsCount)',
-      ],
 
       _initLocalData: function (data) {
         this.set('localData', this._clone(data));

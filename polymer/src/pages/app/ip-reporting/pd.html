@@ -93,18 +93,12 @@
           type: Object,
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
-
-        pdReportsCount: {
-          type: Object,
-          statePath: 'programmeDocumentReports.countByPD'
-        }
       },
 
       observers: [
         '_handleInputChange(programmeDocumentsUrl, queryParams)',
         '_routePdIdChanged(routeData.pd_id)',
         '_routePathChanged(route.path)',
-        '_getPdReports(pdReportsCount)',
       ],
 
       _routePdIdChanged: function (pd_id) {
@@ -172,27 +166,6 @@
       detached: function () {
         if (this.isDebouncerActive('fetch-pds')) {
           this.cancelDebouncer('fetch-pds');
-        }
-      },
-
-      _getPdReports: function () {
-        // Status being present prevents res.data from getting reports,
-        // preventing pd-details title from rendering. Deleting the status
-        // can resolve this issue, and filter will still work
-        if (this.pdReportsCount[this.routeData.pd_id] > 0 && this.currentPD.id === undefined) {
-          this.debounce('fetch-pds', function () {
-            pdThunk = this.$.programmeDocuments;
-
-            delete pdThunk.params.status;
-
-            // Cancel the pending request, if any
-            this.$.programmeDocuments.abort();
-
-            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-          }, 100);
         }
       },
     });
