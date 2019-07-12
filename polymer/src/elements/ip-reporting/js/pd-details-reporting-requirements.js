@@ -2,8 +2,8 @@ function PdDetailsReportingRequirementsUtils() {
 
 }
 
-PdDetailsReportingRequirementsUtils.getReportName = function(type, index) {
-    return type + (index + 1);
+PdDetailsReportingRequirementsUtils.getReportName = function(type, index, localize) {
+    return localize(type.toLowerCase()).split(' ')[0] + (index + 1);
 };
 
 try {

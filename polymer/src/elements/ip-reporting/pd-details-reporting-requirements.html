@@ -52,7 +52,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell">
-              [[_getReportName(item.report_type, index)]]
+              [[_getReportName(item.report_type, index, localize)]]
             </div>
             <div class="table-cell table-cell--text">
               [[item.due_date]]
@@ -89,8 +89,8 @@
         title: String,
       },
 
-      _getReportName: function (type, index) {
-        return PdDetailsReportingRequirementsUtils.getReportName(type, index);
+      _getReportName: function (type, index, localize) {
+        return PdDetailsReportingRequirementsUtils.getReportName(type, index, localize);
       },
     });
   </script>
