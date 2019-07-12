@@ -93,6 +93,12 @@
         margin-bottom: 50px;
       }
     </style>
+
+    <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
     <page-body>
       <etools-content-panel panel-title="Partnership Information">
         <etools-loading active="[[!loaded]]"></etools-loading>
@@ -310,9 +316,30 @@
           computed: '_computeLoaded(pd)',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         reportingRequirements: {
           type: Object,
           computed: '_computeReportingRequirements(pd.reporting_periods)',
+        },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+        },
+
+        pdReportsCount: {
+          type: Object,
+          statePath: 'programmeDocumentReports.countByPD',
+          observer: '_getPdReports',
         },
       },
 
@@ -332,6 +359,10 @@
         return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, App.Settings.dateFormat);
       },
 
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
+      },
+
       _displayFullName: function (types) {
         var self = this;
 
@@ -344,6 +375,30 @@
             return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
           })
           .join(', ');
+      },
+
+      _getPdReports: function () {
+        // Status being present prevents Redux / res.data from getting reports,
+        // preventing pd-details title from rendering. In that case (which we 
+        // check by seeing if this.pdReportsCount is present), just get the reports again
+        if (this.pdReportsCount[this.pdId] === undefined) {
+          this.debounce('fetch-pds', function () {
+            pdThunk = this.$.programmeDocuments;
+            pdThunk.params = {
+              page: 1,
+              page_size: 10,
+              programme_document: this.pdId
+            }
+
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
+
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+          }, 100);
+        }
       },
     });
   </script>
