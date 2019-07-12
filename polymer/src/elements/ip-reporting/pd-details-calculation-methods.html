@@ -71,6 +71,11 @@
     </etools-prp-permissions>
 
     <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="indicators"
         url="[[indicatorsUrl]]">
     </etools-prp-ajax>
@@ -264,7 +269,21 @@
           computed: '_computeIndicatorsUrl(locationId, pdId)',
           observer: '_fetchData',
         },
+
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+        },
+
+        pdReportsCount: {
+          type: Object,
+          statePath: 'programmeDocumentReports.countByPD'
+        },
       },
+
+      observers: [
+        '_getPdReports(pdReportsCount)',
+      ],
 
       _initLocalData: function (data) {
         this.set('localData', this._clone(data));
@@ -272,6 +291,10 @@
 
       _computeIndicatorsUrl: function (locationId, pdId) {
         return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
+      },
+
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
       _computeFormattedData: function (data) {
@@ -359,6 +382,30 @@
 
         if (this.isDebouncerActive('fetch-data')) {
           this.cancelDebouncer('fetch-data');
+        }
+      },
+
+      _getPdReports: function () {
+        // Status being present prevents Redux / res.data from getting reports,
+        // preventing pd-details title from rendering. In that case (which we 
+        // check by seeing if this.pdReportsCount is present), just get the reports again
+        if (this.pdReportsCount[this.pdId] === undefined) {
+          this.debounce('fetch-pds', function () {
+            pdThunk = this.$.programmeDocuments;
+            pdThunk.params = {
+              page: 1,
+              page_size: 10,
+              programme_document: this.pdId
+            }
+
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
+
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+          }, 100);
         }
       },
     });
