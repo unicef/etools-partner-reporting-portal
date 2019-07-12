@@ -16,7 +16,6 @@
 
           return pdThunk()
               .then(function (res) {
-                console.log('res', res);
                 var pdData = res.data;
 
                 dispatch(App.Actions.PD.set(pdData.results));

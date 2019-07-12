@@ -177,21 +177,19 @@
 
       _getPdReports: function () {
         if (this.pdReportsCount[this.routeData.pd_id] > 0 && this.currentPD.id === undefined) {
-          console.log('here!');
           this.debounce('fetch-pds', function () {
-              pdThunk = this.$.programmeDocuments;
-              console.log('pd thunk qp', pdThunk.params);
-              delete pdThunk.params.status;   // Status being present prevents res.data from getting reports,
-                                              // preventing pd-details title from rendering. Deleting the status
-                                              // can resolve this issue, and filter will still work
+            pdThunk = this.$.programmeDocuments;
+            delete pdThunk.params.status;   // Status being present prevents res.data from getting reports,
+                                            // preventing pd-details title from rendering. Deleting the status
+                                            // can resolve this issue, and filter will still work
 
-              // Cancel the pending request, if any
-              this.$.programmeDocuments.abort();
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
 
-              this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
-                  .catch(function (err) { // jshint ignore:line
-                    // TODO: error handling
-                  });
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
           }, 100);
         }
       },
