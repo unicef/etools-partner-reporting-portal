@@ -84,7 +84,6 @@
 
       _handleChange: function (e) {
         var newValue = this.$.repeat.itemForElement(e.detail.item).id;
-        console.log('newValue', newValue);
 
         this.fire('filter-changed', {
           name: this.name,
@@ -95,8 +94,6 @@
       _updateSelected: function (value, data) {
         this.async(function () {
           this.set('selected', data.findIndex(function (item) {
-            console.log('item id', item.id);
-            console.log('value', value);
             return String(item.id) === String(value);
           }));
         });
