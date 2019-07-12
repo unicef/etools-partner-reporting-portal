@@ -11,6 +11,8 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -88,10 +90,10 @@
           <div class="table-column">Indicators for this PD/SSFA</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across locations</div>
+          <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across reporting periods</div>
+          <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -133,17 +135,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -167,17 +169,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -205,7 +207,7 @@
               class="btn-primary"
               disabled="[[loading]]"
               raised>
-            Save
+            [[localize('save')]]
           </paper-button>
         </div>
       </template>
@@ -223,6 +225,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.NotificationsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
