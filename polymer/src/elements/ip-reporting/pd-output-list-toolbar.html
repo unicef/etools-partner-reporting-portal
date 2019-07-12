@@ -3,6 +3,8 @@
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../refresh-report-modal.html">
@@ -49,9 +51,9 @@
         <upload-button
           url="[[importUrl]]"
           modal-title="Import Template">
-          Import Template
+          [[localize('import_template')]]
         </upload-button>
-        <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
+        <download-button url="[[importTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
         <template
             is="dom-if"
             if="[[showRefresh]]"
@@ -61,7 +63,7 @@
               on-tap="_refresh"
               disabled="[[busy]]"
               raised>
-            Refresh
+            [[localize('refresh')]]
           </paper-button>
         </template>
       </template>
@@ -75,6 +77,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
