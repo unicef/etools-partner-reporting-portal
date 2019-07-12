@@ -23,6 +23,8 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../redux/actions.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 <link rel="import" href="../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../styles/buttons.html">
@@ -203,13 +205,13 @@
             is="dom-if"
             if="[[isHfIndicator]]">
           <div class="tab-header layout horizontal justified">
-            <div class="self-center">For this indicator data can be pulled from reports matching this reporting period</div>
+            <div class="self-center">[[localize('for_this_indicator')]]</div>
             <div>
               <paper-button
                   class="btn-primary"
                   modal-index="[[indicatorId]]"
                   on-tap="_openPullModal" disabled="[[disablePull]]">
-                Pull Data from HR
+                [[localize('pull_data')]]
               </paper-button>
             </div>
           </div>
@@ -222,7 +224,7 @@
           <div id="tabs-list-container">
             <div class="tabs-header-container">
               <div class="header">
-                <h3 class="locations-heading">Data for locations</h3>
+                <h3 class="locations-heading">[[localize('data_for_locations')]]</h3>
       
                 <paper-icon-button
                     class="print-btn"
@@ -235,7 +237,7 @@
                     is="dom-if"
                     if="[[currentPD.title]]">
                   <dl class="printme" style="margin: 0;">
-                    <dt style="display: inline;">Programme document:</dt>
+                    <dt style="display: inline;">[[_singularLocalized('programme_documents', localize)]]:</dt>
                     <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
                   </dl>
                 </template>
@@ -244,7 +246,7 @@
                     is="dom-if"
                     if="[[indicatorName]]">
                   <dl class="printme" style="margin: 0;">
-                    <dt style="display: inline;">Indicator:</dt>
+                    <dt style="display: inline;">[[localize('indicator')]]:</dt>
                     <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
                   </dl>
                 </template>
@@ -252,7 +254,7 @@
                 <template
                     is="dom-if"
                     if="[[indicatorStatus]]">
-                  <span class="printme" style="margin-right: .5em;">Indicator status:</span>
+                  <span class="printme" style="margin-right: .5em;">[[localize('indicator_status')]]:</span>
                   <report-status
                       class="printme"
                       status="[[indicatorStatus]]"
@@ -291,14 +293,14 @@
                       is="dom-if"
                       if="[[_canEnterData(computedMode, topLevelLocation.byEntity.0.is_locked)]]">
                     <div class="tab-header layout horizontal justified">
-                      <div class="self-center">Enter data for this location</div>
+                      <div class="self-center">[[localize('enter_data_location')]]</div>
                       <div>
                         <paper-button
                             class="btn-primary"
                             modal-index="[[topLevelLocationIndex]]"
                             on-tap="_openModal"
                             raised>
-                          Enter data
+                          [[localize('enter_data')]]
                         </paper-button>
                       </div>
                     </div>
@@ -329,7 +331,7 @@
                         <div class="item">
                           <div hidden aria-hidden="true">
                             <dl class="printme">
-                              <dt style="display: inline;">Location:</dt>
+                              <dt style="display: inline;">[[localize('location')]]:</dt>
                               <dd style="display: inline; margin: 0;">[[location.location.title]] - [[location.reporting_entity.title]]</dd>
                             </dl>
                           </div>
@@ -339,11 +341,11 @@
                                 is="dom-if"
                                 if="[[_equals(location.display_type, 'number')]]"
                                 restamp="true">
-                              <dt>Location progress against [[location.reporting_entity.title]] target:</dt>
+                              <dt>[[localize('location_progress_against')]] [[location.reporting_entity.title]]:</dt>
                               <dd>
                                 <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
                               </dd>
-                              <dt>Previous location progress:</dt>
+                              <dt>[[localize('previous_location_progress')]]:</dt>
                               <dd>
                                 <etools-prp-number value="[[location.previous_location_progress.v]]"></etools-prp-number>
                               </dd>
@@ -352,9 +354,9 @@
                                 is="dom-if"
                                 if="[[!_equals(location.display_type, 'number')]]"
                                 restamp="true">
-                              <dt>Location progress:</dt>
+                              <dt>[[localize('location_progress')]]:</dt>
                               <dd>[[_formatIndicatorValue(location.display_type, location.location_progress.c, 1)]]</dd>
-                              <dt>Previous location progress:</dt>
+                              <dt>[[localize('previous_location_progress')]]:</dt>
                               <dd>[[_formatIndicatorValue(location.display_type, location.previous_location_progress.c, 1)]]</dd>
                             </template>
                           </dl>
@@ -396,7 +398,7 @@
                       </div>
                       <div class="layout vertical end-justified">
                         <dl class="location-progress">
-                          <dt>Location progress</dt>
+                          <dt>[[localize('location_progress')]]</dt>
                           <dd>
                             <template
                                 is="dom-if"
@@ -455,6 +457,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

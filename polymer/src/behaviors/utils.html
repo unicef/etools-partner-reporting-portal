@@ -38,6 +38,10 @@
         return localize(text).toLowerCase();
       },
 
+      _singularLocalized: function (text, localize) {
+        return localize(text).substring(0, text.length - 1);
+      },
+
       _withDefault: function (value, defaultValue, localize) {
         if (typeof defaultValue === 'undefined') {
           defaultValue = '...';

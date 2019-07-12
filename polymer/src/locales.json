@@ -134,7 +134,7 @@
     "pull_data": "Pull Data from HR",
     "data_for_locations": "Data for locations",
     "enter_data_location": "Enter data for this location",
-    "location_progress_against_unicef": "Location progress against UNICEF target",
+    "location_progress_against": "Location progress against",
     "previous_location_progress": "Previous location progress",
     "total": "Total",
     "partner_contribution": "Partner contribution to date",
@@ -367,6 +367,8 @@
     "qpr_long": "(Quarterly Progress Report)",
     "hr_long": "(Humanitarian Report)",
     "sr_long": "(Special Report)",
+    "indicator_status": "Indicator status",
+    "location_progress": "Location progress",
     "nothing_due": "Nothing due",
     "rejected": "Rejected",
     "met_results": "Met results as planned",
@@ -514,7 +516,7 @@
     "pull_data":  "Extraire les données du RH",
     "data_for_locations":  "Données pour les sites",
     "enter_data_location":  "Saisir les données pour ce site",
-    "location_progress_against_unicef":  "Progrès du site selon l'objectif de l'UNICEF",
+    "location_progress_against":  "Progrès du site selon l'objectif de",
     "previous_location_progress":  "Progrès précédents du site",
     "total":  "Total",
     "partner_contribution":  "Contribution du partenaire à ce jour",
@@ -741,7 +743,9 @@
     "submit": "Soumet",
     "qpr_long":  "(Rapport standard trimestriel du progrès)",
     "hr_long":  "(Rapport humanitaire)",
-    "sr_long":  "(Rapport spécial)"
+    "sr_long":  "(Rapport spécial)",
+    "indicator_status": "Statut d’indicateur",
+    "location_progress": "Progrès du site"
   },
   "es": {
     "ip_reporting": "Informe de IP",
@@ -878,7 +882,7 @@
     "pull_data": "Obtenga datos de HR",
     "data_for_locations": "Datos para ubicaciones",
     "enter_data_location": "Ingrese datos para esta ubicación",
-    "location_progress_against_unicef": "Progreso de la ubicación con relación al objetivo de UNICEF",
+    "location_progress_against": "Progreso de la ubicación con relación al objetivo de",
     "previous_location_progress": "Progreso de la ubicación anterior",
     "total": "Total",
     "partner_contribution": "Contribución del socio hasta la fecha",
@@ -1105,6 +1109,8 @@
     "submit": "Enviar",
     "qpr_long": "(Informe Trimestral de Progreso)",
     "hr_long": "(Informe Humanitario)",
-    "sr_long": "(Informe Especial)"
+    "sr_long": "(Informe Especial)",
+    "indicator_status": "Estado del indicador",
+    "location_progress": "Progreso de la ubicación"
   }
 }
