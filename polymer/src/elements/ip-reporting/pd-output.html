@@ -12,6 +12,8 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../labelled-item.html">
@@ -127,7 +129,7 @@
     </etools-prp-ajax>
 
     <div class="header">
-      <labelled-item label="Title">[[data.title]]</labelled-item>
+      <labelled-item label="[[localize('title')]]">[[data.title]]</labelled-item>
 
       <template
           is="dom-if"
@@ -273,6 +275,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
