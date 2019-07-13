@@ -369,6 +369,8 @@
     "sr_long": "(Special Report)",
     "indicator_status": "Indicator status",
     "location_progress": "Location progress",
+    "total_progress": "Total progress",
+    "progress_in_reporting_period": "Progress in reporting period",
     "nothing_due": "Nothing due",
     "rejected": "Rejected",
     "met_results": "Met results as planned",
@@ -383,7 +385,8 @@
     "enter_data_by_disaggregation": "Enter data by disaggregation",
     "are_you_sure": "Are you sure",
     "you_are_about_to_delete": "You are about to delete all of the draft data entered in this report. The report will be regenerated and any changes to the indicator/locations made by your UNICEF counterpart will be visible. This action is irreversible. Please click 'Refresh' if you wish to continue.",
-    "not_completed_indicator_location": "You have not completed all indicator location data across all indicator reports for this progress report."
+    "not_completed_indicator_location": "You have not completed all indicator location data across all indicator reports for this progress report.",
+    "report_submitted": "Report submitted"
   },
   "fr": {
     "ip_reporting": "Reporting Partenaires UNICEF",
@@ -749,7 +752,9 @@
     "hr_long":  "(Rapport humanitaire)",
     "sr_long":  "(Rapport spécial)",
     "indicator_status": "Statut d’indicateur",
-    "location_progress": "Progrès du site"
+    "location_progress": "Progrès du site",
+    "total_progress": "Total des progrès",
+    "progress_in_reporting_period": "Progrès dans la période de reporting"
   },
   "es": {
     "ip_reporting": "Informe de IP",
@@ -1115,6 +1120,8 @@
     "hr_long": "(Informe Humanitario)",
     "sr_long": "(Informe Especial)",
     "indicator_status": "Estado del indicador",
-    "location_progress": "Progreso de la ubicación"
+    "location_progress": "Progreso de la ubicación",
+    "total_progress": "Total de progreso acumulado",
+    "progress_in_reporting_period": "Progreso el período de informe"
   }
 }
