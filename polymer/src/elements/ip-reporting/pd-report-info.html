@@ -7,6 +7,8 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/reportInfo.html">
@@ -75,7 +77,7 @@
     <etools-content-panel panel-title="Other info" no-header="[[noHeader]]">
       <div class="app-grid">
         <div class="row">
-          <labelled-item label="Partner contribution to date">
+          <labelled-item label="[[localize('partner_contribution')]]">
             <template
                 is="dom-if"
                 if="[[_equals(computedMode, 'view')]]"
@@ -99,7 +101,7 @@
         </div>
 
         <div class="row">
-          <labelled-item label="Challenges/bottlenecks in the reporting period (latest)">
+          <labelled-item label="[[localize('challenges_bottlenecks')]]">
             <template
                 is="dom-if"
                 if="[[_equals(computedMode, 'view')]]"
@@ -123,7 +125,7 @@
         </div>
 
         <div class="row">
-          <labelled-item label="Proposed way forward (latest)">
+          <labelled-item label="[[localize('proposed_way_forward')]]">
             <template
                 is="dom-if"
                 if="[[_equals(computedMode, 'view')]]"
@@ -173,6 +175,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
