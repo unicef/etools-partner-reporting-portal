@@ -4,6 +4,8 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions/pdReportsAttachments.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
@@ -55,7 +57,7 @@
       <etools-file
           id="faceAttachmentComponent"
           files="{{faceAttachment}}"
-          label="FACE"
+          label="[[localize('face')]]"
           disabled="[[pending]]"
           readonly="[[readonly]]"
           use-delete-events>
@@ -70,7 +72,7 @@
       <etools-file
           id="otherOneAttachmentComponent"
           files="{{otherOneAttachment}}"
-          label="Other #1"
+          label="[[localize('other')]] #1"
           disabled="[[pending]]"
           readonly="[[readonly]]"
           use-delete-events>
@@ -85,7 +87,7 @@
       <etools-file
           id="otherTwoAttachmentComponent"
           files="{{otherTwoAttachment}}"
-          label="Other #2"
+          label="[[localize('other')]] #2"
           disabled="[[pending]]"
           readonly="[[readonly]]"
           use-delete-events>
@@ -107,6 +109,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.NotificationsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       listeners: {
