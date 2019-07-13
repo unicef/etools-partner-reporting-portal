@@ -75,7 +75,11 @@
         return Number(val);
       },
 
-      _capitalizeFirstLetter: function (text) {
+      _capitalizeFirstLetter: function (text, localize) {
+        if (localize !== undefined) {
+          return localize(text);
+        }
+        
         if (text) {
           return text[0].toUpperCase() + text.substring(1);
         }
