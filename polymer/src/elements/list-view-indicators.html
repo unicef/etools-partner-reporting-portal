@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../behaviors/data-table.html">
 <link rel="import" href="../behaviors/pagination.html">
 <link rel="import" href="../behaviors/utils.html">
@@ -41,7 +43,7 @@
         permissions="{{permissions}}">
     </etools-prp-permissions>
 
-    <etools-content-panel panel-title="List of Indicators">
+    <etools-content-panel panel-title="[[localize('list_of_indicators')]]">
       <template
           is="dom-if"
           if="[[showLocationsWarning]]"
@@ -53,34 +55,34 @@
 
       <etools-data-table-header
         id="listHeader"
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
 
         <etools-data-table-column field="indicator">
-          <div class="table-column">Indicator</div>
+          <div class="table-column">[[localize('indicator')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="blueprint.calculation_formula_across_locations">
-          <div class="table-column">Calculation (across locations)</div>
+          <div class="table-column">[[localize('calc_across_locations')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="blueprint.calculation_formula_across_periods">
-          <div class="table-column">Calculation (across reporting periods)</div>
+          <div class="table-column">[[localize('calc_across_periods')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="indicator">
-          <div class="table-column">Baseline</div>
+          <div class="table-column">[[localize('baseline')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="indicator">
-          <div class="table-column">Target</div>
+          <div class="table-column">[[localize('target')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="indicator">
-          <div class="table-column">Achieved</div>
+          <div class="table-column">[[localize('achieved')]]</div>
         </etools-data-table-column>
 
         <etools-data-table-column field="progress_percentage" sortable flex-2>
-            <div class="table-column">Current progress</div>
+            <div class="table-column">[[localize('current_progress')]]</div>
         </etools-data-table-column>
 
         <template
@@ -156,6 +158,8 @@
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

@@ -6,6 +6,8 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
@@ -103,11 +105,11 @@
             as="report">
           <div class="item">
             <dl>
-              <dt>Report submitted:</dt>
+              <dt>[[localize('submitted')]]:</dt>
               <dd>[[report.submission_date]]</dd>
             </dl>
             <dl>
-              <dt>Total progress:</dt>
+              <dt>[[localize('total_progress')]]:</dt>
               <dd>
                 <template
                     is="dom-if"
@@ -124,7 +126,7 @@
               </dd>
             </dl>
             <dl>
-              <dt>Progress in reporting period:</dt>
+              <dt>[[localize('progress_in_reporting_period')]]:</dt>
               <dd class="reporting-period">
                 [[report.time_period_start]] - [[report.time_period_end]]
               </dd>
@@ -199,6 +201,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

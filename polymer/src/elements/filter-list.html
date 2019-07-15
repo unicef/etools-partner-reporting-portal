@@ -6,6 +6,10 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
 
 <dom-module id="filter-list">
   <template>
@@ -44,7 +48,7 @@
         if="[[!hideClear]]"
         restamp="true">
       <div id="action">
-        <paper-button on-tap="_clearFilters">Clear</paper-button>
+        <paper-button on-tap="_clearFilters">[[localize('clear')]]</paper-button>
       </div>
     </template>
 
@@ -54,6 +58,12 @@
   <script>
     Polymer({
       is: 'filter-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         queryParams: Object,

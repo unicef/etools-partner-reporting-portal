@@ -11,6 +11,8 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -69,6 +71,11 @@
     </etools-prp-permissions>
 
     <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="indicators"
         url="[[indicatorsUrl]]">
     </etools-prp-ajax>
@@ -88,10 +95,10 @@
           <div class="table-column">Indicators for this PD/SSFA</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across locations</div>
+          <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across reporting periods</div>
+          <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -133,17 +140,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -167,17 +174,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -205,7 +212,7 @@
               class="btn-primary"
               disabled="[[loading]]"
               raised>
-            Save
+            [[localize('save')]]
           </paper-button>
         </div>
       </template>
@@ -223,6 +230,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.NotificationsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -260,6 +269,17 @@
           computed: '_computeIndicatorsUrl(locationId, pdId)',
           observer: '_fetchData',
         },
+
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+        },
+
+        pdReportsCount: {
+          type: Object,
+          statePath: 'programmeDocumentReports.countByPD',
+          observer: '_getPdReports',
+        },
       },
 
       _initLocalData: function (data) {
@@ -268,6 +288,10 @@
 
       _computeIndicatorsUrl: function (locationId, pdId) {
         return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
+      },
+
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
       _computeFormattedData: function (data) {
@@ -355,6 +379,30 @@
 
         if (this.isDebouncerActive('fetch-data')) {
           this.cancelDebouncer('fetch-data');
+        }
+      },
+
+      _getPdReports: function () {
+        // Status being present prevents Redux / res.data from getting reports,
+        // preventing pd-details title from rendering. In that case (which we 
+        // check by seeing if this.pdReportsCount is present), just get the reports again
+        if (this.pdReportsCount[this.pdId] === undefined) {
+          this.debounce('fetch-pds', function () {
+            pdThunk = this.$.programmeDocuments;
+            pdThunk.params = {
+              page: 1,
+              page_size: 10,
+              programme_document: this.pdId
+            }
+
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
+
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+          }, 100);
         }
       },
     });

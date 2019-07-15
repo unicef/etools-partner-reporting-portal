@@ -8,6 +8,8 @@
 <link rel="import" href="../elements/etools-prp-workspaces.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
 
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../redux/store.html">
@@ -67,9 +69,7 @@
         if="[[!userHasPrpRolesOrAccess]]">
     <div class="no-groups-notification">
       <h3>Account created.</h3>
-      <p>Please wait 1-2 business days for your admin to approve you.<br>
-      If it has been longer then 1-2 business days,
-         please email X to get you approved.</p>
+      <p>[[localize('please_wait_business_days')]]</p>
     </div>
     </template>
 
@@ -93,43 +93,43 @@
 
     <paper-toast
         id="changes-saved"
-        text="Changes saved"
-        duration="1500">
+        text="[[localize('changes_saved')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="server-error"
-        text="An error occurred, please try again later."
-        duration="1500">
+        text="[[localize('an_error_occurred')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="file-uploaded"
-        text="File uploaded."
-        duration="1500">
+        text="[[localize('file_uploaded')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="file-deleted"
-        text="File deleted."
-        duration="1500">
+        text="[[localize('file_deleted')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="ocha-timeout"
-        text="Request to OCHA timed out. Plese try again"
-        duration="1500">
+        text="[[localize('request_ocha_timed_out')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="message-sent"
-        text="Message sent"
-        duration="1500">
+        text="[[localize('message_sent')]]"
+        duration="3000">
     </paper-toast>
 
     <paper-toast
         id="error-message"
-        duration="1500">
+        duration="3000">
     </paper-toast>
   </template>
 
@@ -140,6 +140,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

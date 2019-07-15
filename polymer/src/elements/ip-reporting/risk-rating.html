@@ -4,8 +4,10 @@
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/partner.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../elements/labelled-item.html">
 
 <dom-module id="risk-rating">
@@ -31,22 +33,22 @@
       }
     </style>
 
-    <etools-content-panel panel-title="Financial Management Capacity Assessment">
+    <etools-content-panel panel-title="[[localize('financial_management')]]">
       <etools-loading active="[[loading]]"></etools-loading>
 
       <ul class="app-grid">
         <li class="item">
-          <labelled-item label="Partner Risk Rating">
+          <labelled-item label="[[localize('partner_risk')]]">
             <span class="field-value">[[_withDefault(partner.rating)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Date of Assessment">
+          <labelled-item label="[[localize('date_assessment')]]">
             <span class="field-value">[[_withDefault(partner.last_assessment_date)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Basis For Risk Rating">
+          <labelled-item label="[[localize('basis_risk')]]">
             <span class="field-value">[[_withDefault(partner.basis_for_risk_rating)]]</span>
           </labelled-item>
         </li>
@@ -61,6 +63,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

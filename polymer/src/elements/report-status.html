@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../redux/store.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 <link rel="import" href="status-badge.html">
 
 <dom-module id="report-status">
@@ -32,6 +34,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -49,7 +53,7 @@
 
         label: {
           type: String,
-          computed: '_computeLabel(status, final, app, reportType)',
+          computed: '_computeLabel(status, final, app, reportType, localize)',
         },
 
         final: {
@@ -95,30 +99,30 @@
         }
       },
 
-      _computeLabel: function (status, final, app, reportType) {
+      _computeLabel: function (status, final, app, reportType, localize) {
         switch (status) {
           case '1':
             return 'Nothing due';
           case '2':
           case 'Ove':
-            return 'Overdue';
+            return localize('overdue');
           case '3':
           case 'Due':
-            return 'Due';
+            return localize('due');
           case 'Sub':
-            return 'Submitted';
+            return localize('submitted');
           case 'Rej':
             return 'Rejected';
           case 'Met':
-            return final ? 'Met results as planned' : 'Met';
+            return final ? 'Met results as planned' : localize('met');
           case 'OnT':
-            return 'On Track';
+            return localize('on_track');
           case 'NoP':
-            return 'No Progress';
+            return localize('no_progress');
           case 'Con':
-            return final ? 'Constrained (partially met result)' : 'Constrained';
+            return final ? 'Constrained (partially met result)' : localize('constrained');
           case 'Ong':
-            return 'Ongoing';
+            return localize('ongoing');
           case 'Pla':
             return 'Planned';
           case 'Com':
@@ -126,9 +130,9 @@
           case 'NoS':
             return 'No Status';
           case 'Sen':
-            return 'Sent Back';
+            return localize('sent_back');
           case 'Acc':
-            return app === 'ip-reporting' && reportType !== 'HR' ? 'Accepted' : 'Received';
+            return app === 'ip-reporting' && reportType !== 'HR' ? localize('accepted') : 'Received';
         }
       },
 

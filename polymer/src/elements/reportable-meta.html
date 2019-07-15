@@ -4,6 +4,8 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="labelled-item.html">
 <link rel="import" href="refresh-report-modal.html">
@@ -70,11 +72,11 @@
         on-tap="_refresh"
         disabled="[[busy]]"
         raised>
-        Refresh
+        [[localize('refresh')]]
       </paper-button>
     </template>
 
-    <labelled-item label="Overall status">
+    <labelled-item label="[[localize('overall_status')]]">
       <template
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
@@ -83,15 +85,15 @@
             id="overall_status"
             selected="[[data.overall_status]]"
             on-selected-changed="_handleInput">
-          <paper-radio-button name="Met">[[_computeMetLabel(completed)]]</paper-radio-button>
+          <paper-radio-button name="Met">[[_computeMetLabel(completed, localize)]]</paper-radio-button>
           <template
             is="dom-if"
             if="[[!completed]]"
             restamp="true">
-            <paper-radio-button name="OnT">On Track</paper-radio-button>
-            <paper-radio-button name="NoP">No Progress</paper-radio-button>
+            <paper-radio-button name="OnT">[[localize('on_track')]]</paper-radio-button>
+            <paper-radio-button name="NoP">[[localize('no_progress')]]</paper-radio-button>
           </template>
-          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed)]]</paper-radio-button>
+          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed, localize)]]</paper-radio-button>
           <template
               is="dom-if"
               if="[[allowNoStatus]]"
@@ -109,7 +111,7 @@
       </template>
     </labelled-item>
 
-    <labelled-item label="Narrative assessment">
+    <labelled-item label="[[localize('narrative_assessment')]]">
       <template
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
@@ -124,7 +126,7 @@
               maxlength="2000">
           </paper-input>
           <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-            {{toggle}}
+            {{localizedToggle}}
           </paper-button>
         </div>
       </template>
@@ -149,6 +151,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -157,6 +162,11 @@
         toggle: {
           type: String,
           value: 'Edit'
+        },
+
+        localizedToggle: {
+          type: String,
+          computed: '_localizeToggle(toggle, localize)'
         },
 
         data: Object,
@@ -244,18 +254,22 @@
         '_localDataChanged(localData.*)',
       ],
 
-      _computeMetLabel: function(completed) {
+      _computeMetLabel: function(completed, localize) {
         if (completed) {
-          return 'Met results as planned';
+          return 'Met results as planned';  // need to localize
         }
-        return 'Met';
+        return localize('met');
       },
 
-      _computeConstrainedLabel: function(completed) {
+      _computeConstrainedLabel: function(completed, localize) {
         if (completed) {
-          return 'Constrained (partially met result)';
+          return 'Constrained (partially met result)';  // need to localize
         }
-        return 'Constrained';
+        return localize('constrained');
+      },
+
+      _localizeToggle: function (toggle, localize) {
+        return localize(toggle.toLowerCase());
       },
 
       _localDataChanged: function (change) {

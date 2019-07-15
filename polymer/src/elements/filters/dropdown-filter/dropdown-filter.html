@@ -5,6 +5,10 @@
 
 <link rel="import" href="../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../behaviors/filter.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
+
 
 <dom-module id="dropdown-filter">
   <template>
@@ -47,6 +51,10 @@
 
       behaviors: [
         App.Behaviors.FilterBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

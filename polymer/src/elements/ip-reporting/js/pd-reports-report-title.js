@@ -6,20 +6,28 @@ PdReportsReportTitleUtils.shouldDisplayLink = function (displayLink, report, per
     return displayLink && fn(permissions, report);
 };
 
-PdReportsReportTitleUtils.getReportTitleFull = function (report) {
-    var title =  report.report_type + report.report_number;
+PdReportsReportTitleUtils.getReportTitleFull = function (report, localize) {
+    var title = '';
     if (report.report_type === 'QPR') {
-        title += ' (Quarterly Progress Report)';
+        title += localize('qpr_short') + report.report_number + ' ' + localize('qpr_long');
     } else if (report.report_type === 'HR') {
-        title += ' (Humanitarian Report)';
+        title += localize('hr_short') + report.report_number + ' ' + localize('hr_long');
     } else if (report.report_type === 'SR') {
-        title += ' (Special Report)';
+        title += localize('sr_short') + report.report_number + ' ' + localize('sr_long');
     }
     return title;
 };
 
-PdReportsReportTitleUtils.getReportTitle = function (report) {
-    return report.report_type + report.report_number;
+PdReportsReportTitleUtils.getReportTitle = function (report, localize) {
+    var title = '';
+    if (report.report_type === 'QPR') {
+        title += localize('qpr_short') + report.report_number;
+    } else if (report.report_type === 'HR') {
+        title += localize('hr_short') + report.report_number;
+    } else if (report.report_type === 'SR') {
+        title += localize('sr_short') + report.report_number;
+    }
+    return title;
 };
 
 PdReportsReportTitleUtils.getReportLink = function (report, suffix, buildUrlFn, baseUrl) {

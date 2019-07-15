@@ -10,6 +10,9 @@
 <link rel="import" href="../filters/pd-filter/pd-dropdown-filter.html">
 <link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/filter-styles.html">
 
 
@@ -47,7 +50,7 @@
       <div class="app-grid">
         <dropdown-filter-multi
             class="item item-2-col"
-            label="PD status"
+            label="[[localize('pd_status')]]"
             name="pd_statuses"
             value="[[_withDefault(queryParams.pd_statuses, '')]]"
             data="[[pd_statuses]]"
@@ -66,7 +69,7 @@
 
         <text-filter
             class="item"
-            label="Indicator Title"
+            label="[[localize('indicator_title')]]"
             name="blueprint__title"
             value="[[queryParams.blueprint__title]]">
         </text-filter>
@@ -80,6 +83,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -88,20 +94,23 @@
 
         pd_statuses: {
           type: Array,
-          value: function () {
-            return [
-              {title: 'Signed', id: 'Sig'},
-              {title: 'Active', id: 'Act'},
-              {title: 'Suspended', id: 'Sus'},
-              {title: 'Ended', id: 'End'},
-              {title: 'Closed', id: 'Clo'},
-              {title: 'Terminated', id: 'Ter'},
-            ];
-          },
+          computed: '_initStatuses(localize)',
         },
 
       },
 
+      _initStatuses: function (localize) {
+        var statuses = [
+          {title: localize('signed'), id: 'Sig'},
+          {title: localize('active'), id: 'Act'},
+          {title: localize('suspended'), id: 'Sus'},
+          {title: localize('ended'), id: 'End'},
+          {title: localize('closed'), id: 'Clo'},
+          {title: localize('terminated'), id: 'Ter'},
+        ];
+
+        return statuses;
+      },
     });
   </script>
 </dom-module>

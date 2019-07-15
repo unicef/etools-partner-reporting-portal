@@ -4,6 +4,8 @@
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../behaviors/disaggregations.html">
 <link rel="import" href="../message-box.html">
 
@@ -74,6 +76,9 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DisaggregationBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

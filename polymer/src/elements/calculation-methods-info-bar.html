@@ -6,7 +6,9 @@
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../styles/buttons.html">
 <link rel="import" href="./calculation-methods-demo-modal.html">
-
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 
 <dom-module id="calculation-methods-info-bar">
   <template>
@@ -37,15 +39,15 @@
     <div class="layout horizontal justified center-aligned">
       <div class="layout horizontal center-center">
         <iron-icon icon="icons:info"></iron-icon>
-        <span>To help you decide about calculation methods, learn more about them</span>
+        <span>To help you decide about calculation methods, learn more about them here:</span>
       </div>
       <div>
         <paper-button id="locations" on-tap="_openLocationsModal" class="btn-primary">
-          Across locations
+          [[localize('across_locations')]]
         </paper-button>
 
         <paper-button id="periods" on-tap="_openPeriodsModal" class="btn-primary">
-          Across Reporting Periods
+          [[localize('across_reporting_periods')]]
         </paper-button>
       </div>
     </div>
@@ -59,6 +61,12 @@
   <script>
     Polymer({
       is: 'calculation-methods-info-bar',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       _openLocationsModal: function () {
         this.$$('#locations-modal').open();

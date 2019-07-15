@@ -8,6 +8,8 @@
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../confirm-box.html">
@@ -37,10 +39,10 @@
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Enter data</h2>
+        <h2>[[localize('enter_data')]]</h2>
 
         <div class="layout horizontal">
-          <p>Reporting period: [[reportingPeriod]]</p>
+          <p>[[localize('reporting_period')]]: [[reportingPeriod]]</p>
 
           <paper-icon-button
               class="self-center"
@@ -63,12 +65,12 @@
             class="btn-primary"
             on-tap="_save"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -83,7 +85,10 @@
       is: 'disaggregation-modal',
 
       behaviors: [
+      App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
