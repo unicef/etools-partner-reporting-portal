@@ -8,7 +8,7 @@ const _buildUrl = tail => '/api' + tail;
 describe('PdOutput functions', () => {
     describe('calculationFormulaAcrossPeriods function', () => {
         const localizeDefinitions = {
-            ratio: 'latest',
+            latest: 'latest',
             sum: 'sum'
         };
         const localize = param => (localizeDefinitions[param]);
