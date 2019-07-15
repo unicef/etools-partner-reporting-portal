@@ -7,6 +7,12 @@ const _buildUrl = tail => '/api' + tail;
 
 describe('PdOutput functions', () => {
     describe('calculationFormulaAcrossPeriods function', () => {
+        const localizeDefinitions = {
+            ratio: 'latest',
+            sum: 'sum'
+        };
+        const localize = param => (localizeDefinitions[param]);
+
         const indicator = {
             reportable: {
                 blueprint: {
@@ -25,11 +31,11 @@ describe('PdOutput functions', () => {
         };
     
         it('returns sum if display_type is anything other than ratio', () => {
-            expect(calculationFormulaAcrossPeriods(indicator)).toBe('sum');
+            expect(calculationFormulaAcrossPeriods(indicator, localize)).toBe('sum');
         });
     
         it('returns latest if display_type is ratio', () => {
-            expect(calculationFormulaAcrossPeriods(indicatorRatio)).toBe('latest');
+            expect(calculationFormulaAcrossPeriods(indicatorRatio, localize)).toBe('latest');
         });
     });
     

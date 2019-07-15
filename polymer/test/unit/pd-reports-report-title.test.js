@@ -6,6 +6,16 @@ const {shouldDisplayLink,
     getReportLink} = PdReportsReportTitleUtils;
 
 describe('PdReportsReportTitle functions', () => {
+    const localizeDefinitions = {
+        qpr_short: 'QPR',
+        hr_short: 'HR',
+        sr_short: 'SR',
+        qpr_long: '(Quarterly Progress Report)',
+        hr_long: '(Humanitarian Report)',
+        sr_long: '(Special Report)',
+    };
+    const localize = length => (localizeDefinitions[length]);
+
     describe('shouldDisplayLink function', () => {
         const link = true;
         const report = {id: 111};
@@ -18,19 +28,9 @@ describe('PdReportsReportTitle functions', () => {
     });
     
     describe('getReportTitleFull function', () => {
-        const localizeDefinitions = {
-            qpr_short: 'QPR',
-            hr_short: 'HR',
-            sr_short: 'SR',
-            qpr_long: '(Quarterly Progress Report)',
-            hr_long: '(Humanitarian Report)',
-            sr_long: '(Special Report)',
-        };
-
         const reportQpr = {report_type: 'QPR', report_number: 1138};
         const reportHr = {report_type: 'HR', report_number: 667};
         const reportSr = {report_type: 'SR', report_number: 451};
-        const localize = length => (localizeDefinitions[length]);
     
         it('returns the correct full report title', () => {
             expect(getReportTitleFull(reportQpr, localize)).toBe('QPR1138 (Quarterly Progress Report)');
@@ -46,7 +46,7 @@ describe('PdReportsReportTitle functions', () => {
         const report = {report_type: 'QPR', report_number: 7};
     
         it('returns the correct report title', () => {
-            expect(getReportTitle(report)).toBe('QPR7');
+            expect(getReportTitle(report, localize)).toBe('QPR7');
         });
     });
     
