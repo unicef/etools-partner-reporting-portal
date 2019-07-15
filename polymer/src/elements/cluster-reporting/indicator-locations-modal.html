@@ -142,16 +142,16 @@
                     is="dom-if"
                     if="[[_equals(data.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd>[[[_withDefault(data.label)]]]</dd>
+                  <dd>[[_withDefault(data.label)]]</dd>
                 </template>
                 <template
                     is="dom-if"
                     if="[[!_equals(data.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd>
-                    [[[_withDefault(data.numerator_label)]]]
+                    [[_withDefault(data.numerator_label)]]
                     /
-                    [[[_withDefault(data.denominator_label)]]]
+                    [[_withDefault(data.denominator_label)]]
                   </dd>
                 </template>
               </dl>
