@@ -141,12 +141,12 @@
         // can resolve this issue, and filter will still work
         if (this.pdReportsCount[this.pdId] > 0 && this.pdReportsId === '') {
           this.debounce('fetch-pds', function () {
-            pdThunk = this.$.programmeDocuments;
+            var pdThunk = this.$.programmeDocuments;
             pdThunk.params = {
               page: 1,
               page_size: 10,
               programme_document: this.pdId
-            }
+            };
 
             // Cancel the pending request, if any
             this.$.programmeDocuments.abort();

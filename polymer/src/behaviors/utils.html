@@ -17,7 +17,7 @@
       Closed: 'closed',
       Terminated: 'terminated',
       All: 'all',
-    }
+    };
 
     App.Behaviors = App.Behaviors || {};
 
@@ -50,7 +50,7 @@
         if (pdListStatuses[value] !== undefined) {
           return localize(pdListStatuses[value]);
         }
-        
+
         return value == null /* undefinded & null */ ? // jshint ignore:line
             defaultValue : value;
       },
@@ -79,7 +79,7 @@
         if (localize !== undefined) {
           return localize(text);
         }
-        
+
         if (text) {
           return text[0].toUpperCase() + text.substring(1);
         }
