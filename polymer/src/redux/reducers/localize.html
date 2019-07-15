@@ -15,8 +15,9 @@
     var availableLangs;
 
     function languageReducer(state, action) {
+      var currentLanguage = navigator.language.split('-')[0];
       if (typeof state === 'undefined') {
-        state = navigator.language === 'en-US' ? 'en' : navigator.language;
+        state = currentLanguage;
       }
       
       if (availableLangs !== undefined && !availableLangs.includes(state)) {
