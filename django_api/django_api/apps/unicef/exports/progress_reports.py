@@ -103,10 +103,16 @@ class ProgressReportDetailPDFExporter:
         return tables
 
     def get_context(self):
+        funds_received_to_date_percentage = "%.1f" % (
+            self.progress_report.programme_document.funds_received_to_date * 100 / self.progress_report.programme_document.budget
+        ) if self.progress_report.programme_document and self.progress_report.programme_document.budget > 0 else 0
+
         context = {
             'progress_report': self.progress_report,
+            'pd': self.progress_report.programme_document,
             'title': self.display_name,
-            'tables': self.create_tables_for_indicator_reports(self.progress_report.indicator_reports.all())
+            'tables': self.create_tables_for_indicator_reports(self.progress_report.indicator_reports.all()),
+            'funds_received_to_date_percentage': funds_received_to_date_percentage,
         }
 
         return context
