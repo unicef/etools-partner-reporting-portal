@@ -364,6 +364,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 

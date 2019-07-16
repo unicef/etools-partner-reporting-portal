@@ -472,7 +472,11 @@ class PDLowerLevelOutputStatusAPIView(APIView):
         super().check_permissions(request)
         pd_progress_report_id = self.kwargs.get('pd_progress_report_id')
         if not request.user.prp_roles.filter(
-                role__in=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_editor],
+                role__in=[
+                    PRP_ROLE_TYPES.ip_authorized_officer,
+                    PRP_ROLE_TYPES.ip_editor,
+                    PRP_ROLE_TYPES.ip_admin,
+                ],
                 workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
         ).exists():
             self.permission_denied(request)
