@@ -111,7 +111,7 @@
       </template>
     </labelled-item>
 
-    <labelled-item label="[[localize('narrative_assessment')]]">
+    <labelled-item id="labelled-narrative" label="[[localize('narrative_assessment')]]">
       <template
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
@@ -214,7 +214,7 @@
         var field = Polymer.dom(event).rootTarget;
         var narrativeTextInput = this.$$('#narrative_assessment');
 
-        if (field.textContent.trim() === 'Edit') {
+        if (this.toggle === 'Edit' && field.id === 'toggle-button') {
           narrativeTextInput.disabled = false;
           narrativeTextInput.focus();
           this.set('toggle', 'Save');
@@ -223,7 +223,7 @@
 
         if (field.id === 'toggle-button') {
           var parent = Polymer.dom(event).path.find(function(node) {
-            return node.label === 'Narrative assessment';
+            return node.id === 'labelled-narrative';
           });
 
           field = parent.querySelector('paper-input');
@@ -233,12 +233,12 @@
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
-            this.set('toggle', 'Edit');
-            narrativeTextInput.disabled = true;
             break;
 
           case 'narrative_assessment':
-            if (this.data.narrative_assessment === field.value.trim()) {
+            if (field.value !== null && this.data.narrative_assessment === field.value.trim()
+              || field.value === null && this.data.narrative_assessment === null
+            ) {
               this.set('toggle', 'Edit');
               narrativeTextInput.disabled = true;
               break;

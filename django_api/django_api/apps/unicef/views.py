@@ -364,6 +364,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -516,12 +517,13 @@ class ProgressReportLocationsAPIView(ListAPIView):
 
 class ProgressReportSubmitAPIView(APIView):
     """
-    Only a partner authorized officer and partner editor can submit a progress report.
+    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
     """
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -650,12 +652,13 @@ class ProgressReportSubmitAPIView(APIView):
 class ProgressReportSRSubmitAPIView(APIView):
     """
     A dedicated API endpoint for submitting SR Progress Report.
-    Only a partner authorized officer and partner editor can submit a progress report.
+    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
     """
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -1109,6 +1112,7 @@ class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
@@ -1140,6 +1144,7 @@ class ProgressReportAttachmentAPIView(APIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
