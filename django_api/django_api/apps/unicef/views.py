@@ -1111,6 +1111,7 @@ class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
@@ -1142,6 +1143,7 @@ class ProgressReportAttachmentAPIView(APIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
