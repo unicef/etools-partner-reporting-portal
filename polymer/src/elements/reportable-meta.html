@@ -214,7 +214,7 @@
         var field = Polymer.dom(event).rootTarget;
         var narrativeTextInput = this.$$('#narrative_assessment');
 
-        if (this.toggle === 'Edit') {
+        if (this.toggle === 'Edit' && field.id === 'toggle-button') {
           narrativeTextInput.disabled = false;
           narrativeTextInput.focus();
           this.set('toggle', 'Save');
@@ -233,8 +233,6 @@
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
-            this.set('toggle', 'Edit');
-            narrativeTextInput.disabled = true;
             break;
 
           case 'narrative_assessment':
