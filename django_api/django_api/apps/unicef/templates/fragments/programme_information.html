@@ -4,6 +4,7 @@
     <th rowspan="3" width="40%">
         1.1 Programme reference
     </th>
+
     <th width="40%">
         UNICEF Office
     </th>
@@ -27,6 +28,7 @@
     <th rowspan="9">
         1.2 Organization information
     </th>
+
     <th>Organization / Acronym</th>
     <td colspan="2">
         {{ pd.partner.title }} / {{ pd.partner.short_title }}
@@ -38,7 +40,7 @@
 </tr>
 <tr>
     <th>Title of Authorized Official</th>
-    <td colspan="2">{{ authorized_officer.title }}</td>
+    <td colspan="2">{{ authorized_officer.title|default:"---" }}</td>
 </tr>
 <tr>
     <th>Email of Authorized Official</th>
@@ -54,7 +56,7 @@
 </tr>
 <tr>
     <th>Focal Point Title</th>
-    <td colspan="2">{{ focal_point.title }}</td>
+    <td colspan="2">{{ focal_point.title|default:"---" }}</td>
 </tr>
 <tr>
     <th>Focal Point Email</th>
@@ -62,26 +64,5 @@
 </tr>
 <tr>
     <th>Focal Point Telephone</th>
-    <td colspan="2">{{ focal_point.phone_number }}</td>
-</tr>
-<tr>
-    <th>
-        1.3 Programme information
-    </th>
-    <th>Program Duration</th>
-    <td colspan="2">From {{ pd.start_date }} to {{ pd.end_date }}</td>
-</tr>
-<tr>
-    <th rowspan="3">1.4 Budget information</th>
-    <th>Programme budget</th>
-    <td colspan="2">{{ pd.cso_contribution|format_currency:pd.cso_contribution_currency }}</td>
-</tr>
-<tr>
-    <th>UNICEF contribution</th>
-    <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
-</tr>
-<tr>
-    <th>Funds received to date</th>
-    <td>{{ pd.funds_received_to_date|format_currency:pd.funds_received_to_date_currency }}</td>
-    <td>{{ funds_received_to_date_percentage }}% to date</td>
+    <td colspan="2">{{ focal_point.phone_number|default:"---" }}</td>
 </tr>
