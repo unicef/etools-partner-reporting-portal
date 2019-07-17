@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:7.8.0
+FROM mhart/alpine-node:11.13.0
 
 RUN apk update
 RUN apk --update --no-cache \
