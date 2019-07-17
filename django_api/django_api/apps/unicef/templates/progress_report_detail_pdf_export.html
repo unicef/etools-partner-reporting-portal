@@ -140,15 +140,14 @@
 
             <tr>
                 <td colspan="3">Overall progress of the programme document</td>
-                <td colspan="3">{{ report.get_review_overall_status_display|default:"---" }}</td>
-                <td colspan="3">{{ report.sent_back_feedback|default:"---" }}</td>
+                <td colspan="3">{{ report.get_review_overall_status_display }}</td>
+                <td colspan="3">{{ report.sent_back_feedback }}</td>
             </tr>
 
             <tr>
                 <td colspan="9">
-                    Name and signature of UNICEF PD focal point:</br></br>
-                    Title: {{ report.reviewed_by_name|default:"---" }}</br>
-                    Date: {{ report.review_date|default:"---" }}
+                    Name and signature of UNICEF PD focal point: {{ report.reviewed_by_name }}</br>
+                    Date: {{ report.review_date }}
                 </td>
             </tr>
         </table>
