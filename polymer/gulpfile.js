@@ -51,6 +51,7 @@ global.config = {
         replacePrefix: '/app/',
         navigateFallback: '/index.html',
         navigateFallbackWhitelist: [
+            /^\//,
             /^\/app\//,
             /^\/login\//,
             /^\/unauthorized\//,
