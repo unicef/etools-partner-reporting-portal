@@ -127,7 +127,7 @@
 
             <tr>
                 <th colspan="2">1.5 Partner Contribution to Date</th>
-                <td colspan="2">{{ report.partner_contribution_to_date|default:"---" }}</td>
+                <td colspan="2">{{ progress_report.partner_contribution_to_date|default:"---" }}</td>
             </tr>
         </table>
 
@@ -140,14 +140,14 @@
 
             <tr>
                 <td colspan="3">Overall progress of the programme document</td>
-                <td colspan="3">{{ report.get_review_overall_status_display }}</td>
-                <td colspan="3">{{ report.sent_back_feedback }}</td>
+                <td colspan="3">{{ progress_report.get_review_overall_status_display|default:"" }}</td>
+                <td colspan="3">{{ progress_report.sent_back_feedback|default:"" }}</td>
             </tr>
 
             <tr>
                 <td colspan="9">
-                    Name and signature of UNICEF PD focal point: {{ report.reviewed_by_name }}</br>
-                    Date: {{ report.review_date }}
+                    Name and signature of UNICEF PD focal point: {{ progress_report.reviewed_by_name|default:"" }}<br/>
+                    Date: {{ progress_report.review_date|default:"" }}
                 </td>
             </tr>
         </table>
