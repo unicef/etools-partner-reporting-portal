@@ -27,16 +27,11 @@ def get_absolute_file_url(context, django_file, default='---'):
 
 @register.inclusion_tag('fragments/programme_information.html')
 def render_base_programme_info_for_report(report):
-    funds_received_to_date_percentage = "%.1f" % (
-            report.programme_document.funds_received_to_date * 100 / report.programme_document.budget
-        ) if report.programme_document and report.programme_document.budget > 0 else 0
-
     context = {
         'report': report,
         'pd': report.programme_document,
         'authorized_officer': report.programme_document.unicef_officers.first(),
         'focal_point': report.programme_document.partner_focal_point.first(),
-        'funds_received_to_date_percentage': funds_received_to_date_percentage
     }
 
     return context
