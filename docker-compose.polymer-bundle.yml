@@ -1,6 +1,38 @@
 version: '2.1'
 
 services:
+  beater-prp:
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-info}"
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+      - redis
+    restart: always
+
+  celerycam-prp:
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celerycam"
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+      - redis
+    restart: always
+
+  worker-prp:
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && ./manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-debug}"
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+      - redis
+    restart: always
+    volumes:
+      - './django_api:/code/'
+      
   proxy:
     image: unicef/etools-prp-nginx-proxy
     environment:
@@ -49,6 +81,16 @@ services:
     build:
       context: ./redis
       dockerfile: ./Dockerfile
+  
+  id-management-frontend:
+    image: unicef/etools-prp-id-management-frontend
+    build:
+      context: ./react/id_management_frontend
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./react/id_management_frontend/:/code
+      - /code/node_modules
+    command: bash -c "npm start"
 
   polymer:
     image: unicef/etools-prp-polymer
