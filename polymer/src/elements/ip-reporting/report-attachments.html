@@ -259,9 +259,11 @@
         var files = isEmpty ? [] : change.base;
 
         files.forEach(function (file) {
-          if (/\s/.test(file.file_name)) {
-            file.file_name = file.file_name.replace(/ /g, '_');
-          }
+          console.log('file name at beginning', file.file_name);
+          file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
+          console.log('file name at end', file.file_name);
+          self.set('error', 'BAD');
+          console.log('error?', self.error);
         });
 
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
