@@ -257,27 +257,12 @@
         }
 
         var files = isEmpty ? [] : change.base;
+        var nameMessage = {text: 'Non-alphanumeric characters in the filename have been replaced with an underscore.'}
 
-        var badFile = files.findIndex(function (file) {
-          if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
-
-            console.log('bad file here', file);
-            return file;
-          }
-          // console.log('caught!', file.file_name);
-          // self.set('errors', 'BAD');
-          // console.log('file name at beginning', file.file_name);
-          // file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
-          // console.log('file name at end', file.file_name);
+        files.findIndex(function (file) {
+          file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
+          self._notifyErrorMessage(nameMessage);
         });
-
-        console.log('badFile', badFile)
-
-        if (badFile !== undefined) {
-          var message = {text: 'File names must consist of alphanumeric characters only.'}
-          this._notifyErrorMessage(message);
-          return;
-        }
 
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
