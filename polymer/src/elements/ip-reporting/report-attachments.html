@@ -258,9 +258,9 @@
 
         var files = isEmpty ? [] : change.base;
 
-        files.forEach(function (file) {
-          if (/\s/.test(file.file_name)) {
-            file.file_name = file.file_name.replace(/ /g, '_');
+        files.findIndex(function (file) {
+          if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
+            file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
           }
         });
 
