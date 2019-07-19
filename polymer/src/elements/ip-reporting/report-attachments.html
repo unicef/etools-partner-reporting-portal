@@ -257,11 +257,11 @@
         }
 
         var files = isEmpty ? [] : change.base;
-        var nameMessage = {text: 'Non-alphanumeric characters in the filename have been replaced with an underscore.'}
 
         files.findIndex(function (file) {
-          file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
-          self._notifyErrorMessage(nameMessage);
+          if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
+            file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
+          }
         });
 
         var attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
