@@ -38,8 +38,7 @@
       },
 
       _computePercentage: function(num) {
-        console.log('displayType', this.displayType);
-        return Math.round(num * 100);
+        return this.displayType !== 'percentage' ? Math.round(num * 100) : Math.round(num);
       }
 
     });
