@@ -646,6 +646,7 @@ class IndicatorLocationDataUpdateAPIView(APIView):
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.ip_admin,
         )
     )
 
