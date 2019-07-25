@@ -17,7 +17,7 @@
       }
     </style>
 
-    <etools-prp-progress-bar number="[[number]]"></etools-prp-progress-bar>
+    <etools-prp-progress-bar display-type="[[displayType]]" number="[[number]]"></etools-prp-progress-bar>
   </template>
 
   <script>
@@ -25,6 +25,7 @@
       is: 'etools-prp-progress-bar-cluster',
 
       properties: {
+        displayType: String,
         number: Number,
       },
     });
