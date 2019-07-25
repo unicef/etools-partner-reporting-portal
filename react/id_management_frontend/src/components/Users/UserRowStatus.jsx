@@ -31,7 +31,8 @@ class UserRowStatus extends Component {
     render() {
         const {row} = this.props;
 
-        const status = row.is_incomplete ? USER_STATUS.INCOMPLETE : row.status;
+        const aoRole = row.prp_roles.find(role => role.role === 'IP_AUTHORIZED_OFFICER' && role.is_active === false);
+        const status = aoRole !== undefined || row.is_incomplete ? USER_STATUS.INCOMPLETE : row.status;
 
         return (
             <Grid container alignItems="center">
