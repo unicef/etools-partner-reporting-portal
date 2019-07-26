@@ -15,7 +15,7 @@
 
     <tr class$="[[_computeClass(rowType)]]">
       <td class="cellTitle">
-        <span class="cellValue">[[_capitalizeFirstLetter(data.title, localize)]]</span>
+        <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
 
       <template is="dom-repeat"
@@ -134,7 +134,7 @@
       _computeClass: function (rowType) {
         return rowType;
       },
-
+      
       _setTotalEditable: function (coords, levelReported, editable) {
         this.set(
           'totalEditable',
