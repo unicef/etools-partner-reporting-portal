@@ -1,4 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
+
 
 <dom-module id="list-placeholder">
   <template>
@@ -9,12 +13,18 @@
       }
     </style>
 
-    <div class="msg">[[message]]</div>
+    <div class="msg">[[localize(message)]]</div>
   </template>
 
   <script>
     Polymer({
       is: 'list-placeholder',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         data: {
@@ -29,7 +39,7 @@
 
         message: {
           type: String,
-          value: 'No results found'
+          value: 'no_results_found'
         },
 
         hidden: {
