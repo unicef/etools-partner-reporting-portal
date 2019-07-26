@@ -188,6 +188,7 @@
                     if="[[_equals(progressBarType, 'cluster')]]"
                     restamp="true">
                   <etools-prp-progress-bar-cluster
+                      display-type="[[indicator.bluepring.display_type]]"
                       number="[[indicator.total_against_target]]">
                   </etools-prp-progress-bar-cluster>
                 </template>
@@ -196,6 +197,7 @@
                     if="[[_equals(progressBarType, 'default')]]"
                     restamp="true">
                   <etools-prp-progress-bar
+                      display-type="[[indicator.blueprint.display_type]]"
                       number="[[indicator.total_against_target]]">
                   </etools-prp-progress-bar>
                 </template>
@@ -204,9 +206,10 @@
 
             <template is="dom-if" if="[[isClusterApp]]" restamp="true">
               <dl class="indicator-progress layout horizontal">
-                  <dt class="flex-none self-center">Against In need:</dt>
+                  <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
                   <dd class="flex-none">
                     <etools-prp-progress-bar-alt
+                        display-type="[[indicator.blueprint.display_type]]"
                         number="[[indicator.total_against_in_need]]">
                     </etools-prp-progress-bar-alt>
                   </dd>

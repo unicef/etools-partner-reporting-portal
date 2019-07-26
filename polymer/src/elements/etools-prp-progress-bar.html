@@ -17,27 +17,30 @@
   </template>
 
   <script>
-    (function () {
-      Polymer({
-        is: 'etools-prp-progress-bar',
+    Polymer({
+      is: 'etools-prp-progress-bar',
 
-        properties: {
-          number: {
-            type: Number,
-            value: 0
-          },
-
-          percentage: {
-            type: Number,
-            computed: '_computePercentage(number)'
-          }
+      properties: {
+        displayType: {
+          type: String,
+          value: ''
         },
 
-        _computePercentage: function(num) {
-          return Math.round(num * 100);
-        }
+        number: {
+          type: Number,
+          value: 0
+        },
 
-      });
-    }());
+        percentage: {
+          type: Number,
+          computed: '_computePercentage(number)'
+        }
+      },
+
+      _computePercentage: function(num) {
+        return this.displayType !== 'percentage' ? Math.round(num * 100) : Math.round(num);
+      }
+
+    });
   </script>
 </dom-module>
