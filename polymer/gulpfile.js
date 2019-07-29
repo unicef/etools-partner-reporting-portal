@@ -49,7 +49,7 @@ global.config = {
     // https://github.com/GoogleChrome/sw-precache#options-parameter
     swPrecacheConfig: {
         replacePrefix: '/app/',
-        navigateFallback: '/index.html',
+        navigateFallback: '/',
         navigateFallbackWhitelist: [
             /^\/app\//,
             /^\/login\//,
