@@ -9,6 +9,8 @@
 <link rel="import" href="../../../../../behaviors/notifications.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
+<link rel="import" href="../../../../../redux/actions/localize.html">
 <link rel="import" href="../../../../../redux/selectors/reportInfo.html">
 <link rel="import" href="../../../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../../../elements/labelled-item.html">
@@ -57,7 +59,7 @@
     <etools-content-panel no-header>
       <div class="app-grid">
         <div class="row">
-          <labelled-item label="Narrative">
+          <labelled-item label="[[localize('narrative')]]">
             <template
                 is="dom-if"
                 if="[[_equals(computedMode, 'view')]]"
@@ -99,6 +101,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
