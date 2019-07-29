@@ -59,6 +59,12 @@
     <etools-content-panel no-header>
       <div class="app-grid">
         <div class="row">
+          <labelled-item label="[[localize('description')]]">
+            <span class="value">[[_withDefault(data.description)]]</span>
+          </labelled-item>
+        </div>
+
+        <div class="row">
           <labelled-item label="[[localize('narrative')]]">
             <template
                 is="dom-if"
