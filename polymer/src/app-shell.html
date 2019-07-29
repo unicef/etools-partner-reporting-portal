@@ -74,6 +74,13 @@
         <page-login-token name="login-token"></page-login-token>
       </template>
 
+      <template
+          is="dom-if"
+          if="[[!_in(page, ['app', 'login', 'unauthorized', 'not-found', 'login-token')]]]"
+          restamp="true">
+        <page-not-found name="not-found"></page-not-found>
+      </template>
+
     </iron-pages>
   </template>
 
