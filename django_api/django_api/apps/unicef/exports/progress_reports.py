@@ -68,8 +68,8 @@ class ProgressReportDetailPDFExporter:
                         HTMLTableCell(total_cumulative_progress),
                     ],
                     [
-                        HTMLTableHeader('Calculation method'),
-                        HTMLTableCell(indicator.reportable.blueprint.display_type),
+                        HTMLTableHeader('Calculation method across locations'),
+                        HTMLTableCell(indicator.reportable.blueprint.calculation_formula_across_locations),
                         HTMLTableHeader('Achievement in reporting period'),
                         HTMLTableCell(achievement_in_reporting_period),
                     ],

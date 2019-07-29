@@ -146,7 +146,7 @@
                             <th>{{ indicator.title }}</th>
                             <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target }}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
                             <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
                             <td class="{{ indicator.overall_status }}" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
                             <td rowspan="{{ output|length }}">{{ indicator.narrative_assessment|default:"---" }}</td>
                         </tr>
@@ -155,7 +155,7 @@
                             <th>{{ indicator.title }}</th>
                             <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target}}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
                             <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td>{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
