@@ -50,6 +50,7 @@ global.config = {
 
     // Having navigateFallback be index.html (with the extension) may have been causing issues
     // According to the documentation above, it should just be a path and not a file
+    // See this issue for more info: https://github.com/Polymer/polymer/issues/5092
     swPrecacheConfig: {
         replacePrefix: '/app/',
         navigateFallback: '/',
