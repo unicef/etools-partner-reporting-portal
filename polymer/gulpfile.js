@@ -49,7 +49,6 @@ global.config = {
     // https://github.com/GoogleChrome/sw-precache#options-parameter
 
     // Having navigateFallback be index.html (with the extension) may have been causing issues
-    // According to the documentation above, it should just be a path and not a file
     swPrecacheConfig: {
         replacePrefix: '/app/',
         navigateFallback: '/',
