@@ -285,6 +285,10 @@
       _normalizeDate: function (date) {
         return moment(date, App.Settings.dateFormat).startOf('day').toDate();
       },
+
+      _in: function (target, items) {
+        return items.includes(target);
+      },
     };
 
     function buildQuery(chunks) {
