@@ -75,9 +75,9 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     budget_currency = serializers.SerializerMethodField()
     cso_contribution_currency = serializers.SerializerMethodField()
     funds_received_to_date_currency = serializers.SerializerMethodField()
-    unicef_officers = PersonSerializer(read_only=True, many=True)
-    unicef_focal_point = PersonSerializer(read_only=True, many=True)
-    partner_focal_point = PersonSerializer(read_only=True, many=True)
+    unicef_officers = serializers.SerializerMethodField()
+    unicef_focal_point = serializers.SerializerMethodField()
+    partner_focal_point = serializers.SerializerMethodField()
     document_type_display = serializers.CharField(source='get_document_type_display')
     locations = serializers.SerializerMethodField(allow_null=True)
     amendments = serializers.JSONField(read_only=True)
@@ -143,6 +143,15 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             many=True
         ).data
 
+    def get_unicef_officers(self, obj):
+        return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
+
+    def get_unicef_focal_point(self, obj):
+        return PersonSerializer(obj.unicef_focal_point.filter(active=True), read_only=True, many=True).data
+
+    def get_partner_focal_point(self, obj):
+        return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
+
 
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -158,9 +167,9 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
     frequency = serializers.CharField(source='get_frequency_display')
     # sections = serializers.SerializerMethodField()
     sections = SectionSerializer(read_only=True, many=True)
-    unicef_officers = PersonSerializer(read_only=True, many=True)
-    unicef_focal_point = PersonSerializer(read_only=True, many=True)
-    partner_focal_point = PersonSerializer(read_only=True, many=True)
+    unicef_officers = serializers.SerializerMethodField()
+    unicef_focal_point = serializers.SerializerMethodField()
+    partner_focal_point = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -184,6 +193,15 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'in_kind_amount',
             'budget',
         )
+
+    def get_unicef_officers(self, obj):
+        return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
+
+    def get_unicef_focal_point(self, obj):
+        return PersonSerializer(obj.unicef_focal_point.filter(active=True), read_only=True, many=True).data
+
+    def get_partner_focal_point(self, obj):
+        return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
