@@ -142,7 +142,7 @@
         var pageIsValid = validPages.includes(page);
 
         if (pageIsValid === false) {
-          this.page = 'not-found';
+          this.set('page', 'not-found');
         }
 
         var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
