@@ -98,7 +98,9 @@
                 <th>Attachment</th>
                 <td colspan="2">
                     {% if progress_report.attachments.exists %}
-                        &#10003;
+                        {% for attachment in progress_report.attachments.all %}
+                            {{ attachment.file.name }} <br/>
+                        {% endfor %}
                     {% else %}
                         &#10007;
                     {% endif %}
