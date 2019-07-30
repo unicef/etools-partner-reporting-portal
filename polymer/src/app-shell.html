@@ -74,13 +74,6 @@
         <page-login-token name="login-token"></page-login-token>
       </template>
 
-      <template
-          is="dom-if"
-          if="[[!_in(page, ['app', 'login', 'unauthorized', 'not-found', 'login-token'])]]"
-          restamp="true">
-        <page-not-found name="not-found"></page-not-found>
-      </template>
-
     </iron-pages>
   </template>
 
@@ -145,6 +138,16 @@
       },
 
       _pageChanged: function (page) {
+        var validPages = ['app', 'login', 'unauthorized', 'not-found', 'login-token'];
+        var pageIsValid = validPages.includes(page);
+        console.log('is valid?', pageIsValid);
+        console.log('page before?', page);
+
+        if (pageIsValid === false) {
+          this.page = 'not-found';
+        }
+
+        console.log('page after?', page);
         var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
