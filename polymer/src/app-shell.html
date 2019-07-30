@@ -125,8 +125,13 @@
       },
 
       _routePageChanged: function (page) {
+        var validPages = ['app', 'login', 'unauthorized', 'not-found', 'login-token'];
+        var isPageValid = validPages.includes(page);
+
         if (!page) {
           this.set('route.path', this.redirectPath);
+        } else if (isPageValid === false) {
+          this.page = 'not-found';
         } else {
           this.page = page;
         }
@@ -138,13 +143,6 @@
       },
 
       _pageChanged: function (page) {
-        var validPages = ['app', 'login', 'unauthorized', 'not-found', 'login-token'];
-        var pageIsValid = validPages.includes(page);
-
-        if (pageIsValid === false) {
-          this.set('page', 'not-found');
-        }
-
         var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
