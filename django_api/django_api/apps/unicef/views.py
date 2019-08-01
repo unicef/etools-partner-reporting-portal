@@ -1299,11 +1299,29 @@ class ProgressReportExcelImportView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request,  *args, **kwargs):
+    def post(self, request, workspace_id, pk):
 
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
         destination = open(filepath, 'wb+')
+
+        tokens = up_file.name[:up_file.name.rfind('.')].split('_')
+        file_report_name = tokens[0].lower()
+        file_ref_num = tokens[1].lower()
+
+        progress_report = get_object_or_404(
+            ProgressReport,
+            id=pk,
+            programme_document__workspace_id=workspace_id,
+        )
+
+        report_name = f"{progress_report.report_type}{progress_report.report_number}".lower()
+        ref_num = progress_report.programme_document.reference_number.split('/')[-1].lower()
+
+        if file_ref_num != ref_num or file_report_name != report_name:
+            raise ValidationError(
+                "The uploaded template is not compatible with this progress report."
+            )
 
         for chunk in up_file.chunks():
             destination.write(chunk)
