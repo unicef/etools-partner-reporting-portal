@@ -611,7 +611,8 @@ class ProgressReportSubmitAPIView(APIView):
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
                 prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document.unicef_officers.values_list('email', flat=True)
+                email__in=progress_report.programme_document
+                .unicef_officers.filter(active=True).values_list('email', flat=True)
             ).first()
 
             if not authorized_officer_user:
@@ -712,7 +713,8 @@ class ProgressReportSRSubmitAPIView(APIView):
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
                 prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
+                email__in=progress_report.programme_document.unicef_officers
+                .filter(active=True).values_list('email', flat=True)
             ).first()
 
             if not authorized_officer_user:
