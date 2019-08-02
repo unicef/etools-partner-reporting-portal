@@ -30,8 +30,8 @@ def render_base_programme_info_for_report(report):
     context = {
         'report': report,
         'pd': report.programme_document,
-        'authorized_officer': report.programme_document.unicef_officers.first(),
-        'focal_point': report.programme_document.partner_focal_point.first(),
+        'authorized_officer': report.programme_document.unicef_officers.filter(active=True).first(),
+        'focal_point': report.programme_document.partner_focal_point.filter(active=True).first(),
     }
 
     return context

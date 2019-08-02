@@ -81,8 +81,8 @@ class ProgrammeDocumentsXLSXExporter:
                 (pd.get_document_type_display(), None),
                 (pd.reference_number, None),
                 (pd.unicef_office, None),
-                (', '.join([person.name for person in pd.unicef_focal_point.all()]), None),
-                (', '.join([person.name for person in pd.partner_focal_point.all()]), None),
+                (', '.join([person.name for person in pd.unicef_focal_point.filter(active=True)]), None),
+                (', '.join([person.name for person in pd.partner_focal_point.filter(active=True)]), None),
                 (None, None),  # This field is not calculated anywhere yet
                 (pd.start_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
                 (pd.end_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
@@ -178,7 +178,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableHeader('Document Type'),
                 HTMLTableCell(pd.get_document_type_display()),
                 HTMLTableHeader('UNICEF Focal Point(s)'),
-                HTMLTableCell(', '.join([person.name for person in pd.unicef_focal_point.all()])),
+                HTMLTableCell(', '.join([person.name for person in pd.unicef_focal_point.filter(active=True)])),
                 HTMLTableHeader('Total UNICEF cash'),
                 HTMLTableCell(format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency))
             ])
@@ -186,7 +186,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableHeader('Reference Number'),
                 HTMLTableCell(pd.reference_number),
                 HTMLTableHeader('Partner Focal Point(s)'),
-                HTMLTableCell(', '.join([person.name for person in pd.partner_focal_point.all()])),
+                HTMLTableCell(', '.join([person.name for person in pd.partner_focal_point.filter(active=True)])),
                 HTMLTableHeader('Total UNICEF supplies'),
                 HTMLTableCell(format_currency(pd.in_kind_amount, pd.in_kind_amount_currency))
             ])
