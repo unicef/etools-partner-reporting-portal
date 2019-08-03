@@ -1322,7 +1322,8 @@ class ProgressReportExcelImportView(APIView):
 
         if file_ref_num != ref_num or file_report_name != report_name:
             raise ValidationError(
-                "The uploaded template is not compatible with this progress report."
+                f"You are trying to upload a template for the wrong report."
+                f"This template is for {file_report_name} and you are loading it into {report_name}."
             )
 
         for chunk in up_file.chunks():
