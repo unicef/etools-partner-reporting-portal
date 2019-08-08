@@ -221,16 +221,19 @@
       },
 
       _computeSrDescription: function (pdId, programmeDocuments, allPdReports, reportId) {
+        // get the current progress report's due date
         var progressReportDueDate = allPdReports[pdId]
           .find(function (report) {
             return report.id === parseInt(reportId);
           })
           .due_date;
 
+        // get the current programme document
         var currentPdReport = programmeDocuments.find(function (report) {
           return report.id === pdId;
         });
 
+        // get the current SR reporting_period object from the current programme document's reporting_periods array
         var currentSrReport = currentPdReport.reporting_periods.find(function (reporting_period) {
           return reporting_period.report_type === 'SR' && new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
         });
