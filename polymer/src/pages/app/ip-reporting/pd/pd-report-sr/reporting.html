@@ -221,19 +221,11 @@
       },
 
       _computeSrDescription: function (pdId, programmeDocuments, allPdReports, reportId) {
-        console.log('pdId', pdId);
-        console.log('programmeDocuments', programmeDocuments);
-        console.log('allPdReports', allPdReports);
-        console.log('reportId', reportId);
-
         var progressReportDueDate = allPdReports[pdId]
           .find(function (report) {
             return report.id === parseInt(reportId);
           })
           .due_date;
-
-        console.log('progressReportDueDate', progressReportDueDate);
-        console.log('can compare dates?', new Date('31-Jul-2019') <= new Date(progressReportDueDate));
 
         var currentPdReport = programmeDocuments.find(function (report) {
           return report.id === pdId;
