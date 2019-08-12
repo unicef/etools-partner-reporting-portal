@@ -65,7 +65,7 @@ def trim_list(object_list):
         try:
             out.append({
                 'id': obj['id'],
-                'name': obj['name'],
+                'name': obj['planVersion']['name'],
             })
         except KeyError:
             pass

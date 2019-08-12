@@ -117,7 +117,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
         if 'governingEntities' in plan_data:
             cluster_names = [
-                ge['name'] for ge in plan_data['governingEntities'] if
+                ge['governingEntityVersion']['name'] for ge in plan_data['governingEntities'] if
                 ge['entityPrototype']['refCode'] == RefCode.CLUSTER
             ]
         else:
@@ -128,8 +128,8 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         else:
             out_data['planType'] = RESPONSE_PLAN_TYPE.hrp
 
-        out_data['startDate'] = parse(out_data['startDate']).strftime(settings.DATE_FORMAT)
-        out_data['endDate'] = parse(out_data['endDate']).strftime(settings.DATE_FORMAT)
+        out_data['startDate'] = parse(plan_data['planVersion']['startDate']).strftime(settings.DATE_FORMAT)
+        out_data['endDate'] = parse(plan_data['planVersion']['endDate']).strftime(settings.DATE_FORMAT)
 
         return Response(out_data)
 
