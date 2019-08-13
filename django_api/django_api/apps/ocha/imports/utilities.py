@@ -232,7 +232,7 @@ def save_cluster_objective(objective, child_activity=None):
         external_source=EXTERNAL_DATA_SOURCES.HPC,
         defaults={
             'cluster': cluster,
-            'title': objective['value']['description'][:2048]
+            'title': objective['planEntityVersion']['value']['description'][:2048]
         }
     )
     logger.debug('Saved Cluster Objective: {}'.format(cluster_objective))
@@ -247,14 +247,14 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
         if not attachment['type'] == 'indicator':
             continue
 
-        values = attachment['value']['metrics']['values']['totals']
-        disaggregated = attachment['value']['metrics']['values'].get('disaggregated', {})
+        values = attachment['attachmentVersion']['value']['metrics']['values']['totals']
+        disaggregated = attachment['attachmentVersion']['value']['metrics']['values'].get('disaggregated', {})
 
         blueprint, _ = IndicatorBlueprint.objects.update_or_create(
             external_id=attachment['id'],
             external_source=EXTERNAL_DATA_SOURCES.HPC,
             defaults={
-                'title': attachment['value']['description'],
+                'title': attachment['attachmentVersion']['value']['description'],
                 'disaggregatable': bool(disaggregated),
             }
         )
@@ -279,7 +279,7 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
 
         try:
             locations = save_location_list(
-                attachment['value']['metrics']['values']['disaggregated']['locations'],
+                attachment['attachmentVersion']['value']['metrics']['values']['disaggregated']['locations'],
                 "indicator"
             )
             logger.debug('Saving {} locations for {}'.format(
