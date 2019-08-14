@@ -119,4 +119,4 @@ def finish_partner_project_import(project_id, external_id, response_plan_id=None
 
     project.clusters.add(*clusters)
     project.partner.clusters.add(*clusters)
-    import_project_details(project, project_data['currentPublishedVersionId'])
+    import_project_details(project, external_id)
