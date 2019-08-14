@@ -59,13 +59,13 @@ def convert_to_json_ratio_value(value):
     }
 
 
-def trim_list(object_list):
+def trim_list(object_list, api_data_type):
     out = []
     for obj in object_list:
         try:
             out.append({
                 'id': obj['id'],
-                'name': obj['planVersion']['name'],
+                'name': obj['planVersion']['name'] if api_data_type == 'response_plan' else obj['name'],
             })
         except KeyError:
             pass
