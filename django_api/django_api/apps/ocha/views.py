@@ -70,7 +70,7 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
     def get(self, request, *args, **kwargs):
         response_plans = self.get_response_plans()
 
-        return Response(trim_list(response_plans))
+        return Response(trim_list(response_plans, 'response_plan'))
 
     def post(self, request, *args, **kwargs):
         plan_id = request.data.get('plan')
@@ -117,7 +117,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
         if 'governingEntities' in plan_data:
             cluster_names = [
-                ge['name'] for ge in plan_data['governingEntities'] if
+                ge['governingEntityVersion']['name'] for ge in plan_data['governingEntities'] if
                 ge['entityPrototype']['refCode'] == RefCode.CLUSTER
             ]
         else:
@@ -128,8 +128,8 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         else:
             out_data['planType'] = RESPONSE_PLAN_TYPE.hrp
 
-        out_data['startDate'] = parse(out_data['startDate']).strftime(settings.DATE_FORMAT)
-        out_data['endDate'] = parse(out_data['endDate']).strftime(settings.DATE_FORMAT)
+        out_data['startDate'] = parse(plan_data['planVersion']['startDate']).strftime(settings.DATE_FORMAT)
+        out_data['endDate'] = parse(plan_data['planVersion']['endDate']).strftime(settings.DATE_FORMAT)
 
         return Response(out_data)
 
@@ -180,7 +180,7 @@ class RPMProjectListAPIView(APIView):
         else:
             result = projects
 
-        return Response(trim_list(result))
+        return Response(trim_list(result, 'partner_project'))
 
     def get_partner(self):
         if self.request.user.prp_roles.filter(
@@ -239,7 +239,7 @@ class RPMProjectDetailAPIView(APIView):
 
         # We should use project code whenever is possible. ID filtering might be not working in case of new OPS data
         if details:
-            project_code = details[0]['data']['code']
+            project_code = details[0]['data']['projectVersion']['code']
             budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectCode={}'.format(project_code)
         else:
             budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(self.kwargs['id'])
@@ -263,12 +263,12 @@ class RPMProjectDetailAPIView(APIView):
 
         # Fetch attachment data
         attachment_url = HPC_V2_ROOT_URL \
-            + 'projectVersion/{}/attachments'.format(details['data']['currentPublishedVersionId'])
+            + 'project/{}/attachments'.format(details['data']['id'])
         attachments = get_json_from_url(attachment_url)
 
         if 'data' in attachments:
             out_data['attachments'] = map(
-                lambda item: item['attachment']['value']['description'],
+                lambda item: item['attachment']['attachmentVersion']['value']['description'],
                 filter(lambda x: x['attachment']['type'] == 'indicator', attachments['data'])
             )
 

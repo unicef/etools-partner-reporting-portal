@@ -274,7 +274,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
 
             Cluster.objects.update_or_create(
                 type=CLUSTER_TYPES.imported,
-                imported_type=cluster_data['name'],
+                imported_type=cluster_data['governingEntityVersion']['name'],
                 response_plan=response_plan,
                 defaults={
                     'external_id': cluster_data['id'],
