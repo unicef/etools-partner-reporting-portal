@@ -534,9 +534,11 @@ def process_programme_documents(fast=False, area=False):
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
-                                                    PartnerActivityProjectContext.objects.create(
-                                                        project=pp,
-                                                        activity=partner_activity,
+                                                    PartnerActivityProjectContext.objects.update_or_create(
+                                                        defaults={
+                                                            'activity': partner_activity,
+                                                            'project': pp,
+                                                        },
                                                         start_date=item['start_date'],
                                                         end_date=item['end_date'],
                                                     )

@@ -509,9 +509,11 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
 
             for validated_context_data in validated_data['projects']:
                 project = validated_context_data['project']
-                PartnerActivityProjectContext.objects.create(
-                    project=project,
-                    activity=partner_activity,
+                PartnerActivityProjectContext.objects.update_or_create(
+                    defaults={
+                        'activity': partner_activity,
+                        'project': project,
+                    },
                     start_date=validated_context_data['start_date'],
                     end_date=validated_context_data['end_date'],
                     status=validated_context_data['status'],
@@ -564,9 +566,11 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
 
             for validated_context_data in validated_data['projects']:
                 project = validated_context_data['project']
-                PartnerActivityProjectContext.objects.create(
-                    project=project,
-                    activity=partner_activity,
+                PartnerActivityProjectContext.objects.update_or_create(
+                    defaults={
+                        'activity': partner_activity,
+                        'project': project,
+                    },
                     start_date=validated_context_data['start_date'],
                     end_date=validated_context_data['end_date'],
                     status=validated_context_data['status'],
