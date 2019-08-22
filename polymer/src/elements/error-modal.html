@@ -101,15 +101,20 @@
         var localizedErrors = errors.map(function (error) {
           if (error === 'Your report could not be submitted, because you are not the authorized officer assigned to the PCA that is connected to that PD. Please select the authorized officer on behalf of whom this report is submitted.') {
             return localize('could_not_be_submitted');
+          } else if (error === 'You have not selected overall status for one of Outputs') {
+            return localize('not_selected_overall_status');
+          } else if (error === 'You have not completed Partner Contribution To Date field on Other Info tab.') {
+            return localize('not_completed_partner_contribution');
+          } else if (error === 'You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab.') {
+            return localize('not_completed_challenges_bottlenecks');
+          } else if (error === 'You have not completed Proposed way forward field on Other Info tab.') {
+            return localize('not_completed_proposed_way');
           } else if (error === 'You have not completed all indicator location data across all indicator reports for this progress report.') {
-            console.log('errors', localize('not_completed_indicator_location'));
             return localize('not_completed_indicator_location');
           } else {
             return error;
           }
         });
-
-        console.log('localized errors', localizedErrors);
 
         return localizedErrors;
       },
