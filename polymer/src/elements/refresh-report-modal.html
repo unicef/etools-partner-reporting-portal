@@ -16,6 +16,8 @@
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../behaviors/routing.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
 
 
 <dom-module id="refresh-report-modal">
@@ -48,7 +50,7 @@
 
     <paper-dialog with-backdrop opened=[[opened]]>
       <div class="header layout horizontal justified">
-        <h2>Are you sure?</h2>
+        <h2>[[localize('are_you_sure')]]?</h2>
 
         <paper-icon-button class="self-center" on-tap="close" icon="icons:close">
         </paper-icon-button>
@@ -60,7 +62,7 @@
                 is="dom-if"
                 if="[[_equals(data.report_type, 'PR')]]"
                 restamp="true">
-                You are about to delete all of the draft data entered in this report. The report will be regenerated and any changes to the indicator/locations made by your UNICEF counterpart will be visible. This action is irreversible. Please click "Refresh" if you wish to continue.
+                [[localize('you_are_about_to_delete')]]
             </template>
 
             <template
@@ -80,13 +82,13 @@
           on-tap="_refresh"
           raised
           disabled="[[busy]]">
-          Refresh
+          [[localize('refresh')]]
         </paper-button>
         <paper-button
           class="btn-primary"
           on-tap="_cancel"
           disabled="[[busy]]">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
     </paper-dialog>
@@ -102,6 +104,8 @@
         App.Behaviors.ModalBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
