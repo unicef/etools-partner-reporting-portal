@@ -2,6 +2,10 @@
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../styles/buttons.html">
 
 <dom-module id="error-modal">
@@ -28,7 +32,18 @@
               is="dom-repeat"
               items="[[errors]]"
               as="error">
-            <li>[[error]]</li>
+            <template
+                is="dom-if"
+                if="[[_equals(error, 'You have not completed all indicator location data across all indicator reports for this progress report.')]]"
+                restamp="true">
+              <li>[[localize('not_completed_indicator_location')]]</li>
+            </template>
+            <template
+                is="dom-if"
+                if="[[!_equals(error, 'You have not completed all indicator location data across all indicator reports for this progress report.')]]"
+                restamp="true">
+              <li>[[error]]</li>
+            </template>
           </template>
         </ul>
         <div class="layout horizontal-reverse">
@@ -45,6 +60,13 @@
   <script>
     Polymer({
       is: 'error-modal',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         errors: {
