@@ -129,12 +129,7 @@
           return value;
         }
 
-        console.log('indicatorType', indicatorType);
-
         var _value = value.toFixed(2);
-
-        console.log('_value', _value);
-        console.log('result?', percentize === 1 ? Math.floor(_value) + '%' : _value + '%');
 
         switch (indicatorType) {
           case 'percentage':
