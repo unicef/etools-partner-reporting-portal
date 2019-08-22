@@ -102,7 +102,7 @@
       _computeLabel: function (status, final, app, reportType, localize) {
         switch (status) {
           case '1':
-            return 'Nothing due';
+            return localize('nothing_due');
           case '2':
           case 'Ove':
             return localize('overdue');
@@ -112,27 +112,27 @@
           case 'Sub':
             return localize('submitted');
           case 'Rej':
-            return 'Rejected';
+            return localize('rejected');
           case 'Met':
-            return final ? 'Met results as planned' : localize('met');
+            return final ? localize('met_results') : localize('met');
           case 'OnT':
             return localize('on_track');
           case 'NoP':
             return localize('no_progress');
           case 'Con':
-            return final ? 'Constrained (partially met result)' : localize('constrained');
+            return final ? localize('constrained_partially') : localize('constrained');
           case 'Ong':
             return localize('ongoing');
           case 'Pla':
-            return 'Planned';
+            return localize('planned');
           case 'Com':
-            return 'Completed';
+            return localize('completed');
           case 'NoS':
-            return 'No Status';
+            return localize('no_status');
           case 'Sen':
             return localize('sent_back');
           case 'Acc':
-            return app === 'ip-reporting' && reportType !== 'HR' ? localize('accepted') : 'Received';
+            return app === 'ip-reporting' && reportType !== 'HR' ? localize('accepted') : localize('received');
         }
       },
 

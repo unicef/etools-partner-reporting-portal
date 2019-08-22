@@ -256,14 +256,14 @@
 
       _computeMetLabel: function(completed, localize) {
         if (completed) {
-          return 'Met results as planned';  // need to localize
+          return localize('met_results');
         }
         return localize('met');
       },
 
       _computeConstrainedLabel: function(completed, localize) {
         if (completed) {
-          return 'Constrained (partially met result)';  // need to localize
+          return localize('constrained_partially');
         }
         return localize('constrained');
       },
