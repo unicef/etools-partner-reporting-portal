@@ -221,6 +221,11 @@
       },
 
       _computeSrDescription: function (pdId, programmeDocuments, allPdReports, reportId) {
+        // for some reason method was getting run on detach, so catch that
+        if (allPdReports[pdId] === undefined) {
+          return;
+        }
+
         // get the current progress report's due date
         var progressReportDueDate = allPdReports[pdId]
           .find(function (report) {

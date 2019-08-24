@@ -2,6 +2,10 @@
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../styles/buttons.html">
 
 <dom-module id="error-modal">
@@ -26,9 +30,9 @@
         <ul>
           <template
               is="dom-repeat"
-              items="[[errors]]"
-              as="error">
-            <li>[[error]]</li>
+              items="[[localizedErrors]]"
+              as="localizedError">
+            <li>[[localizedError]]</li>
           </template>
         </ul>
         <div class="layout horizontal-reverse">
@@ -46,10 +50,22 @@
     Polymer({
       is: 'error-modal',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
       properties: {
         errors: {
           type: Array,
           value: [],
+        },
+
+        localizedErrors: {
+          type: Array,
+          computed: '_localizeErrors(errors, localize)'
         },
 
         opened: {
@@ -75,6 +91,32 @@
         }));
 
         return this._result;
+      },
+
+      _localizeErrors: function (errors, localize) {
+        if (errors.length === 0) {
+          return;
+        }
+
+        var localizedErrors = errors.map(function (error) {
+          switch (error) {
+            case 'You have not selected overall status for one of Outputs':
+              return localize('not_selected_overall_status');
+            case 'You have not completed Partner Contribution To Date field on Other Info tab.':
+              return localize('not_completed_partner_contribution');
+            case 'You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab.':
+              return localize('not_completed_challenges_bottlenecks');
+            case 'You have not completed Proposed way forward field on Other Info tab.':
+              return localize('not_completed_proposed_way');
+            case 'You have not completed all indicator location data across all indicator reports for this progress' +
+                ' report.':
+              return localize('not_completed_indicator_location');
+            default:
+              return error;
+          }
+        });
+
+        return localizedErrors;
       },
 
       close: function () {

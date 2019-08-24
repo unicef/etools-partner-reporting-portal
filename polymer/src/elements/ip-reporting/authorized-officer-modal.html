@@ -18,6 +18,8 @@
 <link rel="import" href="../../redux/selectors/programmeDocumentDetails.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../redux/actions/localize.html">
+<link rel="import" href="../../behaviors/localize.html">
 
 <link rel="import" href="js/authorized-officer-modal-functions.html">
 
@@ -51,23 +53,20 @@
 
     <paper-dialog with-backdrop opened=[[opened]]>
       <div class="header layout horizontal justified">
-        <h2>Select Authorized Officer</h2>
+        <h2>[[localize('select_authorized_officer')]]</h2>
 
         <paper-icon-button class="self-center" on-tap="close" icon="icons:close">
         </paper-icon-button>
       </div>
       <paper-dialog-scrollable>
 
-        <h3>Your report could not be submitted, because you are not the authorized officer assigned
-          to the PCA that is connected to that PD. Please select the authorized officer on
-          behalf of whom this report is submitted.
-        </h3>
+        <h3>[[localize('could_not_be_submitted')]]</h3>
 
         <paper-dropdown-menu
           id="officerDropdown"
           class="validate"
-          label="Authorized Officer"
-          placeholder="Select"
+          label="[[localize('authorized_officer')]]"
+          placeholder="[[localize('select')]]"
           on-value-changed="_validate"
           always-float-label
           required>
@@ -90,13 +89,13 @@
           on-tap="_save"
           raised
           disabled="[[busy]]">
-          Submit
+          [[localize('submit')]]
         </paper-button>
         <paper-button
           class="btn-primary"
           on-tap="_cancel"
           disabled="[[busy]]">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
     </paper-dialog>
@@ -112,6 +111,8 @@
         App.Behaviors.ModalBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

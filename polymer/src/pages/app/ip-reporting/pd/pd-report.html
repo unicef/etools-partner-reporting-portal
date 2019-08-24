@@ -166,8 +166,8 @@
             is="dom-if"
             if="[[submittedOnBehalf]]"
             restamp="true">
-          <p>Submitted by: [[currentReport.submitting_user]]</p>
-          <p>On behalf: [[currentReport.submitted_by]]</p>
+          <p>[[localize('submitted_by')]]: [[currentReport.submitting_user]]</p>
+          <p>[[localize('on_behalf_of')]]: [[currentReport.submitted_by]]</p>
           <p>[[localize('date_of_submission')]]: [[currentReport.submission_date]]</p>
         </template>
       </div>
@@ -400,7 +400,7 @@
       _computeHeadingPrefix: function (mode, localize) {
         switch (mode) {
           case 'view':
-            return 'Report for';
+            return localize('report_for');
 
           case 'edit':
             return localize('enter_data_for');
