@@ -218,6 +218,10 @@ def process_programme_documents(fast=False, area=False):
                             logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
                             continue
 
+                        pd.unicef_focal_point.all().update(active=False)
+                        pd.unicef_officers.all().update(active=False)
+                        pd.partner_focal_point.all().update(active=False)
+
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
                         for person_data in person_data_list:
