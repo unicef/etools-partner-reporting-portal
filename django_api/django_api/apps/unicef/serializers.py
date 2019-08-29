@@ -684,7 +684,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
     amendments = serializers.JSONField(allow_null=True)
-    document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES)
+    document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
 
     def validate(self, attrs):
         validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
