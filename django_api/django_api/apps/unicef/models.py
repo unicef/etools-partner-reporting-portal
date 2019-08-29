@@ -218,6 +218,13 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         null=True,
     )
 
+    funds_received_to_date_percent = models.DecimalField(
+        decimal_places=2,
+        max_digits=64,
+        default=0,
+        verbose_name='Funds received %'
+    )
+
     amendments = JSONField(default=list())
 
     # TODO:
