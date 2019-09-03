@@ -205,7 +205,8 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     funds_received_to_date = models.DecimalField(
         decimal_places=2,
         max_digits=64,
-        default=-1,
+        blank=True,
+        null=True,
         verbose_name='Funds received'
     )
 
@@ -221,7 +222,8 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     funds_received_to_date_percent = models.DecimalField(
         decimal_places=2,
         max_digits=64,
-        default=-1,
+        blank=True,
+        null=True,
         verbose_name='Funds received %'
     )
 
