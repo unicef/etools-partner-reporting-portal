@@ -10,7 +10,7 @@ from .models import (
     ProgressReportAttachment,
 )
 
-from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
+from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS, INTERVENTION_TYPES
 from core.models import Workspace, Location
 
 from indicator.models import IndicatorBlueprint
@@ -671,7 +671,8 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_budget_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_blank=True, allow_null=True, source="budget_currency"
     )
-    funds_received = serializers.FloatField(source='funds_received_to_date', required=False)
+    disbursement = serializers.FloatField(source='funds_received_to_date', required=False)
+    disbursement_percent = serializers.FloatField(source='funds_received_to_date_percent', required=False)
     funds_received_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_blank=True, allow_null=True, required=False, source="funds_received_to_date_currency"
     )
@@ -683,6 +684,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
     amendments = serializers.JSONField(allow_null=True)
+    document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
 
     def validate(self, attrs):
         validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
@@ -717,11 +719,13 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "unicef_budget_currency",
             "unicef_budget_cash",
             "unicef_budget_supplies",
-            "funds_received",
             "funds_received_currency",
             "workspace",
             "amendments",
             "external_business_area_code",
+            "disbursement",
+            "disbursement_percent",
+            "document_type",
         )
 
 

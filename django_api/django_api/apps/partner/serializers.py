@@ -700,16 +700,16 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
         ).delete()
 
         for validated_context_data in validated_data['partneractivityprojectcontext_set']:
-                project = validated_context_data['project']
-                obj, created = PartnerActivityProjectContext.objects.update_or_create(
-                    project=project,
-                    activity=instance,
-                    defaults={
-                        'start_date': validated_context_data['start_date'],
-                        'end_date': validated_context_data['end_date'],
-                        'status': validated_context_data['status']
-                    }
-                )
+            project = validated_context_data['project']
+            obj, created = PartnerActivityProjectContext.objects.update_or_create(
+                project=project,
+                activity=instance,
+                defaults={
+                    'start_date': validated_context_data['start_date'],
+                    'end_date': validated_context_data['end_date'],
+                    'status': validated_context_data['status']
+                }
+            )
 
         return instance
 
