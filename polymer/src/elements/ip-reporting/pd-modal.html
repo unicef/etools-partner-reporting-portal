@@ -167,11 +167,10 @@
           </li>
           <li class="item item-2-col">
             <labelled-item label="[[localize('disbursements')]]">
-              <!-- TODO
+              <span class="field-value">[[_computeFunds(pd.funds_received_to_date)]]</span>
               <etools-prp-progress-bar
-                  number="[[]]">
+                number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
               </etools-prp-progress-bar>
-              -->
             </labelled-item>
           </li>
         </ul>
@@ -203,6 +202,14 @@
           type: Object,
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
+      },
+
+      _computeFunds: function (num) {
+        if (num !== null || num !== -1) {
+          return num;
+        } else {
+          return 'N/A';
+        }
       },
 
       _formatFocalPoint: function (items) {
