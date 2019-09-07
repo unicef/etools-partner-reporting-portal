@@ -205,11 +205,10 @@
           </li>
           <li class="item item-2-col">
             <labelled-item label="[[localize('disbursements')]]">
-              <!-- TODO
+              <span class="field-value">[[_computeFunds(pd.funds_received_to_date)]]</span>
               <etools-prp-progress-bar
-                  number="[[]]">
+                number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
               </etools-prp-progress-bar>
-              -->
             </labelled-item>
           </li>
         </ul>
@@ -341,6 +340,14 @@
           statePath: 'programmeDocumentReports.countByPD',
           observer: '_getPdReports',
         },
+      },
+
+      _computeFunds: function (num) {
+        if (num === null || num === -1) {
+          return num;
+        } else {
+          return 'N/A';
+        }
       },
 
       _computeLoaded: function (pd) {
