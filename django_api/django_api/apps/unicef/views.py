@@ -585,8 +585,8 @@ class ProgressReportSubmitAPIView(APIView):
             if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
                     and not ir.narrative_assessment:
                 raise ValidationError(
-                    "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
-                    "status is Met or No Progress.".format(
+                    "You have not completed the narrative assessment for one of the outputs ({}). Unless your output "
+                    "status is Met or No Progress, you have to fill in the narrative assessment.".format(
                         ir.reportable.content_object
                     )
                 )
