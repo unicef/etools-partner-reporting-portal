@@ -787,7 +787,7 @@
     "not_completed_indicator_location": " Vous n'avez pas rempli toutes les données concernant la localisation des indicateurs dans tous les rapports d'indicateurs de ce rapport d'étape.",
     "report_submitted": "Rapport soumis",
     "please_make_sure_indicators": "Veuillez vous assurer que les indicateurs ont des emplacements pour les rapports à générer.",
-    "you_are_about_to_location": ""
+    "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
     "ip_reporting": "Informe de IP",
@@ -1182,7 +1182,7 @@
     "not_completed_indicator_location": "Usted no ha completado todos los datos de ubicación de los indicadores en todos los informes para este reporte de progreso.",
     "report_submitted": "Informe enviado",
     "please_make_sure_indicators": "Por favor asegúrese de que los indicadores tengan ubicaciones establecidas para generar informes.",
-    "you_are_about_to_location": ""
+    "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
     "ip_reporting": "Отчетность партнеров-исполнителей",
@@ -1577,6 +1577,6 @@
     "not_completed_indicator_location": "Вы не внесли все индикаторы/местоположения, необходимые для этого отчета о ходе реализации проекта.",
     "report_submitted": "Отчет послан",
     "please_make_sure_indicators": "Пожалуйста, удостоверьтесь, что индикаторы включают местоположения, установленные для данных отчетов.",
-    "you_are_about_to_location": ""
+    "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   }
 }
