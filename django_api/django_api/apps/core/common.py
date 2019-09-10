@@ -97,8 +97,8 @@ SHARED_PARTNER_TYPE = Choices(
 
 INTERVENTION_TYPES = Choices(
     ('PD', 'PD', 'Programme Document'),
-    ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA', u'Small-Scale Funding Agreement'),
+    ('HPD', 'HPD', 'Humanitarian Programme Document'),
+    ('SSFA', 'SSFA', 'SSFA'),
 )
 
 INTERVENTION_STATUS = Choices(
