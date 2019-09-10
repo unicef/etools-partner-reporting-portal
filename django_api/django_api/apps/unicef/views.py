@@ -753,6 +753,7 @@ class ProgressReportPullHFDataAPIView(APIView):
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
