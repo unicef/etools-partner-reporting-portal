@@ -573,11 +573,11 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
     latest_accepted_pr = serializers.SerializerMethodField()
     latest_accepted_pr_indicator_reports = serializers.SerializerMethodField()
     unicef_budget_cash = serializers.FloatField(source='total_unicef_cash')
-    unicef_budget_cash_currency = serializers.FloatField(source='total_unicef_cash_currency')
+    unicef_budget_cash_currency = serializers.CharField(source='total_unicef_cash_currency')
     unicef_budget_supplies = serializers.FloatField(source='in_kind_amount')
-    unicef_budget_supplies_currency = serializers.FloatField(source='in_kind_amount_currency')
+    unicef_budget_supplies_currency = serializers.CharField(source='in_kind_amount_currency')
     disbursement = serializers.FloatField(source='funds_received_to_date')
-    disbursement_currency = serializers.FloatField(source='funds_received_to_date_currency')
+    disbursement_currency = serializers.CharField(source='funds_received_to_date_currency')
     disbursement_percent = serializers.FloatField(source='funds_received_to_date_percent')
 
     class Meta:
