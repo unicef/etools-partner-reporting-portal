@@ -15,10 +15,12 @@ from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES, EXTERNAL_DATA_SOURCES
 
 from partner.models import PartnerActivity
+from partner.serializers import (
+    PMPPartnerSerializer,
+)
 
 from unicef.serializers import (
     PMPProgrammeDocumentSerializer,
-    PMPPartnerSerializer,
     PMPPDPersonSerializer,
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
