@@ -654,23 +654,6 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
         extra_kwargs = {'name': {'required': True}}
 
 
-class PMPPDPartnerSerializer(serializers.ModelSerializer):
-
-    name = serializers.CharField(source='title')
-    short_name = serializers.CharField(source='short_title', allow_blank=True)
-    unicef_vendor_number = serializers.CharField(source='vendor_number')
-
-    class Meta:
-        model = Partner
-        fields = (
-            "external_id",
-            "name",
-            "short_name",
-            "unicef_vendor_number",
-        )
-        validators = []
-
-
 class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     offices = serializers.CharField(source='unicef_office')

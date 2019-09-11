@@ -18,7 +18,7 @@ from partner.models import PartnerActivity
 
 from unicef.serializers import (
     PMPProgrammeDocumentSerializer,
-    PMPPDPartnerSerializer,
+    PMPPartnerSerializer,
     PMPPDPersonSerializer,
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
@@ -169,7 +169,7 @@ def process_programme_documents(fast=False, area=False):
                         try:
                             partner = process_model(
                                 Partner,
-                                PMPPDPartnerSerializer,
+                                PMPPartnerSerializer,
                                 partner_data, {
                                     'vendor_number': partner_data['unicef_vendor_number']
                                 }
