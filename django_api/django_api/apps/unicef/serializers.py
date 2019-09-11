@@ -668,8 +668,8 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_budget_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_blank=True, allow_null=True, source="budget_currency"
     )
-    disbursement = serializers.FloatField(source='funds_received_to_date', required=False)
-    disbursement_percent = serializers.FloatField(source='funds_received_to_date_percent', required=False)
+    disbursement = serializers.FloatField(source='funds_received_to_date', required=False, allow_null=True)
+    disbursement_percent = serializers.FloatField(source='funds_received_to_date_percent', required=False, allow_null=True)
     funds_received_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_blank=True, allow_null=True, required=False, source="funds_received_to_date_currency"
     )

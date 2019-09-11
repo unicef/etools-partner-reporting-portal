@@ -749,10 +749,9 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         validated_data = self.fix_choices(validated_data)
 
         for key, value in validated_data.items():
-            if key == 'id':
-                continue
-
             setattr(instance, key, value)
+
+        instance.save()
 
         return instance
 

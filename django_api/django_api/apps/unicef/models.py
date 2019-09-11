@@ -620,7 +620,7 @@ class LowerLevelOutput(TimeStampedExternalBusinessAreaModel):
     class Meta:
         ordering = ['id']
         unique_together = (
-            TimeStampedExternalBusinessAreaModel.Meta.unique_together
+            (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'cp_output')
         )
 
     def __str__(self):
