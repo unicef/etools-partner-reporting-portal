@@ -124,12 +124,16 @@
         'token-error': '_onTokenError',
       },
 
+      _goToLanding: function () {
+        location.pathname = '/landing';
+      },
+
       _routePageChanged: function (page) {
         var validPages = ['app', 'login', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
         var isPageValid = validPages.includes(page);  // Check if page is valid
 
         if (!page) {
-          this.set('route.path', this.redirectPath);
+          location.pathname = this.redirectPath;
         } else if (isPageValid === false) {
           this.page = 'not-found';  // If page is invalid, redirect to not-found page
         } else {
@@ -139,7 +143,7 @@
 
       _onTokenError: function() {
         this.set('error', true);
-        this.set('route.path', '/login');
+        this._goToLanding();
       },
 
       _pageChanged: function (page) {
@@ -153,7 +157,7 @@
         var thunk = this.$.signOut.thunk();
         this.dispatch(App.Actions.userLogout(thunk))
           .then(function () {
-            self.set('route.path', '/login');
+            self._goToLanding();
             self.dispatch(App.Actions.reset());
           })
         .catch(function (err) { //jshint ignore:line
@@ -166,7 +170,7 @@
       },
 
       _computeRedirectPath: function (authenticated) {
-        return authenticated ? '/app' : '/login';
+        return authenticated ? '/app' : '/landing';
       },
 
       _handleResources: function (resources) {
