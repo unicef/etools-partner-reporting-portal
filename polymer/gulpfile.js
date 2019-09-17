@@ -52,7 +52,7 @@ global.config = {
         navigateFallback: '/index.html',
         navigateFallbackWhitelist: [
             /^\/app\//,
-            /^\/login\//,
+            /^\/landing\//,
             /^\/unauthorized\//,
             /^\/not-found\//,
         ],

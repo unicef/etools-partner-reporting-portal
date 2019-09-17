@@ -7,6 +7,7 @@
 # PyCharm etc.
 .idea/
 .vscode/
+.devcontainer
 
 # Python compiled
 *.pyc
