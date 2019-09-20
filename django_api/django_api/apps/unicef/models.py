@@ -93,7 +93,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
 
     document_type = models.CharField(
-        max_length=3,
+        max_length=4,
         choices=PD_DOCUMENT_TYPE,
         default=PD_DOCUMENT_TYPE.PD,
         verbose_name='Document Type'
