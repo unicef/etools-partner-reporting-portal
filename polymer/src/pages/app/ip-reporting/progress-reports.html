@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
@@ -9,6 +10,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
 
 <link rel="import" href="../../../elements/ip-reporting/progress-reports-list.html">
 <link rel="import" href="../../../elements/ip-reporting/progress-reports-toolbar.html">
@@ -38,7 +40,7 @@
       params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <page-header title="Progress Reports"></page-header>
+    <page-header title="[[localize('progress_reports')]]"></page-header>
 
     <page-body>
       <progress-reports-filters></progress-reports-filters>
@@ -55,6 +57,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

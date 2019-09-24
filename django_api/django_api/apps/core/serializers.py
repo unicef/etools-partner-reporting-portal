@@ -38,6 +38,14 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     admin_level = serializers.CharField(source="gateway.admin_level")
+    title = serializers.SerializerMethodField()
+
+    def get_title(self, obj):
+        return "%s [%s - %s]" % (
+            obj.title,
+            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.p_code if obj.p_code else "n/a"
+        )
 
     class Meta:
         model = Location
@@ -48,16 +56,24 @@ class ShortLocationSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
+    admin_level = serializers.SerializerMethodField()
 
     class Meta:
         model = Location
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'admin_level')
 
     def get_title(self, obj):
-        return "%s [%s - %s]" % (obj.title, obj.gateway.name, obj.p_code if obj.p_code else "n/a")
+        return "%s [%s - %s]" % (
+            obj.title,
+            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.p_code if obj.p_code else "n/a"
+        )
 
     def get_id(self, obj):
         return str(obj.id)
+
+    def get_admin_level(self, obj):
+        return obj.gateway.admin_level
 
 
 class IdLocationSerializer(serializers.ModelSerializer):

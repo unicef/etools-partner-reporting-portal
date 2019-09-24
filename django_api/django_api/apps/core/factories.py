@@ -2,74 +2,43 @@ import datetime
 import json
 import random
 from collections import defaultdict
+
+import factory
 from dateutil.relativedelta import relativedelta
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.base import ContentFile
 from django.db.models import signals
 
-import factory
 from factory import fuzzy
 from faker import Faker
 
 from account.models import User, UserProfile
-from cluster.models import Cluster, ClusterObjective, ClusterActivity
-from partner.models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-    PartnerProjectFunding,
-)
-from indicator.models import (
-    IndicatorBlueprint,
-    Reportable,
-    IndicatorReport,
-    IndicatorLocationData,
-    Disaggregation,
-    DisaggregationValue,
-    ReportableLocationGoal,
-    ReportingEntity,
-)
-from unicef.models import (
-    Section,
-    Person,
-    ProgressReport,
-    ProgrammeDocument,
-    PDResultLink,
-    LowerLevelOutput,
-    ReportingPeriodDates,
-)
-from core.common import (
-    REPORTING_TYPES,
-    PRP_ROLE_TYPES,
-    CLUSTER_TYPES,
-    CSO_TYPES,
-    PARTNER_TYPE,
-    SHARED_PARTNER_TYPE,
-    INDICATOR_REPORT_STATUS,
-    FREQUENCY_LEVEL,
-    PD_FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
-    PD_DOCUMENT_TYPE,
-    PROGRESS_REPORT_STATUS,
-    PD_STATUS,
-    RESPONSE_PLAN_TYPE,
-    OVERALL_STATUS,
-    PARTNER_PROJECT_STATUS,
-    PARTNER_ACTIVITY_STATUS,
-)
-from core.models import (
-    Country,
-    Workspace,
-    Location,
-    ResponsePlan,
-    GatewayType,
-    CartoDBTable,
-    PRPRole,
-)
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from core.common import (CLUSTER_TYPES, CSO_TYPES, FREQUENCY_LEVEL,
+                         INDICATOR_REPORT_STATUS, OVERALL_STATUS,
+                         PARTNER_ACTIVITY_STATUS, PARTNER_PROJECT_STATUS,
+                         PARTNER_TYPE, PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL,
+                         PD_STATUS, PR_ATTACHMENT_TYPES,
+                         PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES,
+                         REPORTABLE_FREQUENCY_LEVEL, REPORTING_TYPES,
+                         RESPONSE_PLAN_TYPE, SHARED_PARTNER_TYPE)
 from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-
+from core.models import (CartoDBTable, Country, GatewayType, Location, PRPRole,
+                         ResponsePlan, Workspace)
+from indicator.models import (Disaggregation, DisaggregationValue,
+                              IndicatorBlueprint, IndicatorLocationData,
+                              IndicatorReport, Reportable,
+                              ReportableLocationGoal, ReportingEntity)
+from partner.models import (Partner, PartnerActivity, PartnerProject,
+                            PartnerProjectFunding, PartnerActivityProjectContext)
+from unicef.models import (LowerLevelOutput, PDResultLink, Person,
+                           ProgrammeDocument, ProgressReport,
+                           ProgressReportAttachment, ReportingPeriodDates,
+                           Section)
 
 PRP_ROLE_TYPES_LIST = [x[0] for x in PRP_ROLE_TYPES]
+PR_ATTACHMENT_TYPES_LIST = [x[0] for x in PR_ATTACHMENT_TYPES]
 IP_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('IP'), PRP_ROLE_TYPES_LIST))
 CLUSTER_PRP_ROLE_TYPES_LIST = list(filter(lambda item: item.startswith('CLUSTER'), PRP_ROLE_TYPES_LIST))
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
@@ -107,6 +76,9 @@ cs_date_1 = datetime.date(today.year, 1, 1)
 cs_date_2 = datetime.date(today.year, 3, 24)
 cs_date_3 = datetime.date(today.year, 5, 15)
 faker = Faker()
+fake_file = ContentFile(bytes(faker.text(), 'utf-8'))
+fake_file.name = faker.file_name()
+fake_file.url = faker.uri()
 
 
 def create_fake_multipolygon():
@@ -184,7 +156,7 @@ class PartnerUserFactory(AbstractUserFactory):
     """
 
     # We are going to let PartnerFactory create PartnerUser
-    partner = factory.SubFactory('core.factories.PartnerFactory', user=None)
+    partner = factory.SubFactory('core.factories.PartnerFactory')
 
     class Meta:
         model = User
@@ -522,11 +494,7 @@ class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
 
 
 class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
-    project = factory.SubFactory('core.factories.PartnerProjectFactory', partner_activity=None)
-    partner = factory.LazyAttribute(lambda o: o.project.partner)
-    start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=180)
-    status = fuzzy.FuzzyChoice(PARTNER_ACTIVITY_STATUS_LIST)
+    partner = factory.SubFactory('core.factories.PartnerFactory', partner_activity=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -537,6 +505,15 @@ class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
             for location in extracted:
                 self.locations.add(location)
 
+    @factory.post_generation
+    def partneractivityprojectcontext_set(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for partneractivityprojectcontext in extracted:
+                self.partneractivityprojectcontexts.add(partneractivityprojectcontext)
+
     class Meta:
         model = PartnerActivity
         abstract = True
@@ -546,11 +523,9 @@ class ClusterActivityPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_activity {ClusterActivity} -- Cluster Activity ORM object to bind
-        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_activity=cluster_activity1,
-            project=project1,
         )
     """
 
@@ -566,15 +541,13 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
     Arguments:
         cluster_objective {ClusterObjective} -- Cluster Objective ORM object to bind
-        project {PartnerProject} -- PartnerProject ORM object to bind
 
     Ex) ClusterActivityPartnerActivityFactory(
             cluster_objective=cluster_objective1,
-            project {PartnerProject} -- PartnerProject ORM object to bind
         )
     """
 
-    title = factory.LazyAttribute(lambda o: "{} -- Custom".format(o.project.title))
+    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Custom".format(o.partner.title, n))
     cluster_activity = None
     cluster_objective = factory.SubFactory('core.factories.ClusterObjectiveFactory', partner_activity=None)
 
@@ -787,7 +760,8 @@ class QuantityReportableBaseFactory(AbstractReportableFactory):
     numerator_label = None
     denominator_label = None
     blueprint = factory.SubFactory(
-        'core.factories.QuantityTypeIndicatorBlueprintFactory', reportable=None)
+        'core.factories.QuantityTypeIndicatorBlueprintFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -807,7 +781,8 @@ class RatioReportableBaseFactory(AbstractReportableFactory):
     numerator_label = factory.LazyFunction(faker.word)
     denominator_label = factory.LazyFunction(faker.word)
     blueprint = factory.SubFactory(
-        'core.factories.RatioTypeIndicatorBlueprintFactory', reportable=None)
+        'core.factories.RatioTypeIndicatorBlueprintFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -825,7 +800,8 @@ class QuantityReportableToLowerLevelOutputFactory(QuantityReportableBaseFactory)
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.LowerLevelOutputFactory', reportable=None)
+        'core.factories.LowerLevelOutputFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -842,7 +818,9 @@ class QuantityReportableToPartnerProjectFactory(QuantityReportableBaseFactory):
         )
     """
 
-    content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
+    content_object = factory.SubFactory(
+        'core.factories.PartnerProjectFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -859,7 +837,8 @@ class QuantityReportableToClusterObjectiveFactory(QuantityReportableBaseFactory)
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.ClusterObjectiveFactory', reportable=None)
+        'core.factories.ClusterObjectiveFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -876,7 +855,8 @@ class QuantityReportableToClusterActivityFactory(QuantityReportableBaseFactory):
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.ClusterActivityFactory', reportable=None)
+        'core.factories.ClusterActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -894,7 +874,8 @@ class QuantityReportableToPartnerActivityFactory(QuantityReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory', reportable=None)
+        'core.factories.PartnerActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -911,7 +892,8 @@ class RatioReportableToLowerLevelOutputFactory(RatioReportableBaseFactory):
         )
     """
     content_object = factory.SubFactory(
-        'core.factories.LowerLevelOutputFactory', reportable=None)
+        'core.factories.LowerLevelOutputFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -927,7 +909,9 @@ class RatioReportableToPartnerProjectFactory(RatioReportableBaseFactory):
             content_object=project1, blueprint=blueprint1
         )
     """
-    content_object = factory.SubFactory('core.factories.PartnerProjectFactory', reportable=None)
+    content_object = factory.SubFactory(
+        'core.factories.PartnerProjectFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -945,7 +929,8 @@ class RatioReportableToClusterObjectiveFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.ClusterObjectiveFactory', reportable=None)
+        'core.factories.ClusterObjectiveFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -963,7 +948,8 @@ class RatioReportableToClusterActivityFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.ClusterActivityFactory', reportable=None)
+        'core.factories.ClusterActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -981,7 +967,8 @@ class RatioReportableToPartnerActivityFactory(RatioReportableBaseFactory):
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory', reportable=None)
+        'core.factories.PartnerActivityFactory',
+    )
 
     class Meta:
         model = Reportable
@@ -1205,6 +1192,30 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
         django_get_or_create = ('location', 'reportable')
 
 
+class PartnerActivityProjectContextFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        project {PartnerProject} -- PartnerProject ORM object to bind
+        activity {PartnerActivity} -- PartnerActivity ORM object to bind
+
+    Ex) PartnerActivityProjectContextFactory(
+            project=project1,
+            activity=activity1,
+        )
+    """
+
+    project = factory.SubFactory('core.factories.PartnerProjectFactory')
+    activity = factory.SubFactory('core.factories.PartnerActivityFactory')
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
+    start_date = factory.LazyFunction(faker.date)
+    end_date = factory.LazyFunction(faker.date)
+
+    class Meta:
+        model = PartnerActivityProjectContext
+        django_get_or_create = ('project', 'activity')
+
+
+@factory.django.mute_signals(signals.post_save)
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     """
     Arguments:
@@ -1239,8 +1250,8 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     review_date = due_date
     submission_date = due_date
     programme_document = factory.SubFactory('core.factories.ProgrammeDocument', progress_report=None)
-    submitted_by = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
-    submitting_user = factory.SubFactory('core.factories.AbstractUserFactory', progress_report=None)
+    submitted_by = factory.SubFactory('core.factories.PartnerUserFactory', profile=None)
+    submitting_user = factory.SubFactory('core.factories.PartnerUserFactory', profile=None)
     reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
     reviewed_by_name = factory.LazyFunction(faker.name)
     sent_back_feedback = factory.LazyFunction(faker.text)
@@ -1248,13 +1259,32 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     reviewed_by_external_id = factory.LazyFunction(lambda: faker.random_number(4, True))
     status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
     review_overall_status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
-    attachment = None
 
     class Meta:
         django_get_or_create = (
             'programme_document', 'report_type', 'report_number'
         )
         model = ProgressReport
+
+
+class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):
+    """
+    Arguments:
+        type {str} -- Attachment type: FACE or Other
+        progress_report {ProgressReport} -- ProgressReport ORM object to bind
+
+    Ex) ProgressReportAttachmentFactory(
+            progress_report=progress_report1,
+            type=PR_ATTACHMENT_TYPES.face,
+            file=fake_file # ContentFile object with name attribute defined. Make sure file and ORM is deleted after usage.
+        )
+    """
+    progress_report = factory.SubFactory('core.factories.ProgressReportFactory', attachment=None)
+    type = fuzzy.FuzzyChoice(PR_ATTACHMENT_TYPES_LIST)
+    file = fake_file
+
+    class Meta:
+        model = ProgressReportAttachment
 
 
 class AbstractIndicatorReportFactory(factory.django.DjangoModelFactory):

@@ -39,7 +39,7 @@ ENV = os.getenv('ENV')
 if not ENV:
     raise Exception('Environment variable ENV is required!')
 
-DATA_VOLUME = '/data'
+DATA_VOLUME = os.getenv('DATA_VOLUME', '/data')
 
 UPLOADS_DIR_NAME = 'uploads'
 MEDIA_URL = '/api/%s/' % UPLOADS_DIR_NAME
@@ -123,6 +123,8 @@ INSTALLED_APPS = [
     'unicef',
     'ocha',
     'id_management',
+    'post_office',
+    'unicef_notification',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -139,13 +141,13 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').replace(' ', '').strip().split(',') or [
     'etools.unicef.org',
     'etools-demo.unicef.org',
     'etools-test.unicef.org',
     'etools-staging.unicef.org',
     'etools-dev.unicef.org',
-)
+]
 
 ROOT_URLCONF = 'django_api.urls'
 
@@ -445,7 +447,7 @@ SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.user.get_username',
     'core.mixins.get_username',
     'social_core.pipeline.social_auth.associate_by_email',
-    'social_core.pipeline.user.create_user',
+    # 'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     # 'social_core.pipeline.user.user_details',

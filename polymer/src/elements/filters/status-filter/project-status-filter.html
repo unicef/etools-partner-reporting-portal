@@ -2,6 +2,9 @@
 
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
+<link rel="import" href="../../../redux/store.html">
 
 <dom-module id="project-status-filter">
   <template>
@@ -13,7 +16,7 @@
 
     <dropdown-filter
       class="item"
-      label="Status"
+      label="[[localize('status')]]"
       name="status"
       value="[[_withDefault(value, '')]]"
       data="[[data]]">
@@ -27,6 +30,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

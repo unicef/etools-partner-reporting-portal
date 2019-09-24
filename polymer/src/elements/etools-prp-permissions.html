@@ -29,6 +29,7 @@
           editProgressReport: [
             App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
             App.Constants.PRP_ROLE.IP_EDITOR,
+            App.Constants.PRP_ROLE.IP_ADMIN,
           ],
 
           exportSubmittedProgressReport: [
@@ -39,6 +40,7 @@
           savePdReport: [
             App.Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
             App.Constants.PRP_ROLE.IP_EDITOR,
+            App.Constants.PRP_ROLE.IP_ADMIN,
           ],
 
           changeProgrammeDocumentCalculationMethod: [
@@ -115,9 +117,13 @@
 
             return responsePlanClusters.some(function (cluster) {
               return params.prpRoles.some(function (item) {
-                return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-                  (String(item.cluster.id) === String(cluster.id) &&
-                    allowedRoles.indexOf(item.role) > -1);
+                if (item.cluster === null) {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN;
+                } else {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                    (String(item.cluster.id) === String(cluster.id) &&
+                      allowedRoles.indexOf(item.role) > -1);
+                }
               });
             });
           },
@@ -127,9 +133,13 @@
 
             return entityClusters.some(function (cluster) {
               return params.prpRoles.some(function (item) {
-                return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
-                  (String(item.cluster.id) === String(cluster.id) &&
-                    allowedRoles.indexOf(item.role) > -1);
+                if (item.cluster === null) {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN;
+                } else {
+                  return item.role === App.Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
+                    (String(item.cluster.id) === String(cluster.id) &&
+                      allowedRoles.indexOf(item.role) > -1);
+                }
               });
             });
           },

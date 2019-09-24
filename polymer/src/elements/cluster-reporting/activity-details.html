@@ -48,40 +48,69 @@
             </li>
 
             <li class="item">
-              <labelled-item label="Cluster Activity">
-                <template is="dom-if" if="[[activityData.cluster_activity]]">
-                  <span class="value">[[activityData.cluster_activity.title]]</span>
-                </template>
-                <template is="dom-if" if="[[!activityData.cluster_activity]]">
-                  <span class="value">---</span>
-                </template>
-              </labelled-item>
-            </li>
-            <li class="item">
               <labelled-item label="Cluster">
                 <span class="value">[[activityData.cluster.name]]</span>
               </labelled-item>
             </li>
-             <li class="item">
-              <labelled-item label="Partner Project">
-                <span class="value">[[activityData.project.title]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="Start Date">
-                <span class="value">[[activityData.start_date]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="End Date">
-                <span class="value">[[activityData.end_date]]</span>
-              </labelled-item>
-            </li>
+
+            <template
+              is="dom-if"
+              if="[[activityData.cluster_activity]]">
+              <li class="item">
+                <labelled-item label="Cluster Activity">
+                  <span class="value">[[activityData.cluster_activity.title]]</span>
+                </labelled-item>
+              </li>
+            </template>
+
+            <template
+              is="dom-if"
+              if="[[!activityData.cluster_activity]]">
+              <li class="item">
+                <labelled-item label="Cluster Activity">
+                  <span class="value">---</span>
+                </labelled-item>
+              </li>
+            </template>
+
+            <template
+              is="dom-if"
+              if="[[activityData.cluster_objective]]">
+              <li class="item">
+                <labelled-item label="Cluster Objective">
+                  <span class="value">[[activityData.cluster_objective.title]]</span>
+                </labelled-item>
+              </li>
+            </template>
+
             <li class="item">
               <labelled-item label="Partner">
                 <span class="value">[[activityData.partner.title]]</span>
               </labelled-item>
             </li>
+
+            <template
+              is="dom-repeat"
+              items="[[activityData.projects]]">
+
+              <div>
+                <li class="item">
+                  <labelled-item label="Partner Project">
+                    <span class="value">[[item.title]]</span>
+                  </labelled-item>
+                </li>
+                <li class="item">
+                  <labelled-item label="Start Date">
+                    <span class="value">[[item.start_date]]</span>
+                  </labelled-item>
+                </li>
+                <li class="item">
+                  <labelled-item label="End Date">
+                    <span class="value">[[item.end_date]]</span>
+                  </labelled-item>
+                </li>
+              </div>
+            </template>
 
           </ul>
         </div>

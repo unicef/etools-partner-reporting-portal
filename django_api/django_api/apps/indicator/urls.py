@@ -16,6 +16,8 @@ from .views import (
     ReportableLocationGoalBaselineInNeedAPIView,
     ClusterIndicatorSendIMOMessageAPIView,
     ReportableReportingFrequencyListAPIView,
+    ReportRefreshAPIView,
+    ClusterObjectiveIndicatorAdoptAPIView,
 )
 
 
@@ -61,6 +63,8 @@ urlpatterns = [
         IndicatorReportReviewAPIView.as_view(),
         name='indicator-report-review'),
 
+    url(r'^partner-project-indicator-adopt/$', ClusterObjectiveIndicatorAdoptAPIView.as_view(), name='partner-project-indicator-adopt'),
+
     url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
 
     url(r'^cluster-indicator-imo-message/$',
@@ -74,4 +78,8 @@ urlpatterns = [
     url(r'^reporting-frequencies/$',
         ReportableReportingFrequencyListAPIView.as_view(),
         name='reportable-reporting-frequency-list-api'),
+
+    url(r'^report-refresh/$',
+        ReportRefreshAPIView.as_view(),
+        name='report-refresh-api'),
 ]

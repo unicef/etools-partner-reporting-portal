@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
+
 
 <dom-module id="reporting-period">
   <template>
@@ -20,7 +24,7 @@
       }
     </style>
 
-    Reporting period: <span class="range">[[_withDefault(range)]]</span>
+    [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>
   </template>
 
   <script>
@@ -29,6 +33,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

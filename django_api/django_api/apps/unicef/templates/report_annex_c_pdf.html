@@ -67,6 +67,40 @@
                 <th colspan="4" class="section">Section 1. Programme & CSO overview</th>
             </tr>
             {% render_base_programme_info_for_report report %}
+
+            <tr>
+                <th rowspan="3">
+                    1.3 Programme Information
+                </th>
+            
+                <th>Program Duration</th>
+                <td colspan="2">From {{ pd.start_date }} to {{ pd.end_date }}</td>
+            </tr>
+            <tr>
+                <th>Start Date</th>
+                <td colspan="2">{{ pd.start_date }}</td>
+            </tr>
+            <tr>
+                <th>Reporting period</th>
+                <td colspan="2">{{ report.get_reporting_period }}</td>
+            </tr>
+
+            <tr>
+                <th rowspan="3">1.4 Budget information</th>
+            
+                <th>Programme budget</th>
+                <td colspan="2">{{ pd.cso_contribution|format_currency:pd.cso_contribution_currency }}</td>
+            </tr>
+            <tr>
+                <th>UNICEF contribution</th>
+                <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
+            </tr>
+            <tr>
+                <th>Funds received to date</th>
+                <td>{{ pd.funds_received_to_date|format_currency:pd.funds_received_to_date_currency }}</td>
+                <td>{{ funds_received_to_date_percentage }}% to date</td>
+            </tr>
+
             <tr>
                 <th>1.5 Partner Contribution made to date</th>
                 <td colspan="3">{{ report.partner_contribution_to_date }}</td>
@@ -112,7 +146,7 @@
                             <th>{{ indicator.title }}</th>
                             <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target }}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
                             <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
                             <td class="{{ indicator.overall_status }}" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
                             <td rowspan="{{ output|length }}">{{ indicator.narrative_assessment|default:"---" }}</td>
                         </tr>
@@ -121,7 +155,7 @@
                             <th>{{ indicator.title }}</th>
                             <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target}}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
                             <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td>{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -147,5 +181,26 @@
             * Information directly extracted from Section 2.2 of the signed Programme document.<br />
             ** Information to be updated upon submission of the report.
         </p>
+
+        <table style="margin-top: 2.5em;">
+            <tr>
+                <th colspan="3">FOR UNICEF OFFICE USE ONLY</th>
+                <th colspan="3">Rating</th>
+                <th colspan="3">Comment if applicable</th>
+            </tr>
+
+            <tr>
+                <td colspan="3">Overall progress of the programme document</td>
+                <td colspan="3">{{ report.get_review_overall_status_display|default:"" }}</td>
+                <td colspan="3">{{ report.sent_back_feedback|default:"" }}</td>
+            </tr>
+
+            <tr>
+                <td colspan="9">
+                    Name and signature of UNICEF PD focal point: {{ report.reviewed_by_name|default:"" }}<br/>
+                    Date: {{ report.review_date|default:"" }}
+                </td>
+            </tr>
+        </table>
     </div>
 {% endblock %}

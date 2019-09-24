@@ -6,6 +6,8 @@
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../../redux/store.html">
 
+<link rel="import" href="js/progress-reports-toolbar-functions.html">
+
 <dom-module id="progress-reports-toolbar">
   <template>
     <style>
@@ -19,6 +21,7 @@
       location-id="{{ locationId }}"
     >
       <template is="dom-if" if="[[canExport]]" restamp="true">
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
         <download-button url="[[xlsExportUrl]]">XLS</download-button>
       </template>
     </etools-prp-toolbar>
@@ -53,14 +56,19 @@
           type: String,
           computed: '_appendQuery(pdReportsUrl, query, \'export=xlsx\')',
         },
+
+        pdfExportUrl: {
+          type: String,
+          computed: '_appendQuery(pdReportsUrl, query, \'export=pdf\')',
+        },
       },
 
       _computePdReportsUrl: function (locationId) {
-        return App.Endpoints.programmeDocumentReports(locationId);
+        return ProgressReportsToolbarUtils.computePdReportsUrl(locationId);
       },
 
       _canExport: function (totalResults) {
-        return totalResults > 0;
+        return ProgressReportsToolbarUtils.canExport(totalResults);
       },
     });
   </script>

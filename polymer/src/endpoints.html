@@ -73,6 +73,10 @@
         return this.programmeDocumentReportSubmit(workspaceId, reportId) + 'sr/';
       },
 
+      reportProgressReset: function () {
+        return this._buildUrl('/indicator/report-refresh/');
+      },
+
       programmeDocumentReportUpdate: function (workspaceId, reportId) {
         return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
       },
@@ -238,6 +242,10 @@
         return this._buildUrl('/indicator/cluster-indicator/');
       },
 
+      adoptedClusterIndicators: function () {
+        return this._buildUrl('/indicator/partner-project-indicator-adopt/');
+      },
+
       partnerActivity: function (responsePlanId, mode) {
         return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
       },
@@ -291,8 +299,12 @@
         return this._buildUrl('/account/user-profile/');
       },
 
-      progressReportAttachment: function (locationId, reportId) {
-        return this.progressReports(locationId) + reportId + '/attachment/';
+      progressReportAttachments: function (locationId, reportId) {
+        return this.progressReports(locationId) + reportId + '/attachments/';
+      },
+
+      progressReportAttachmentDetail: function (locationId, reportId, attachmentId) {
+        return this.progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
       },
 
       analysisOperationalPresence: function (responsePlanId, type) {

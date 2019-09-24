@@ -36,6 +36,7 @@ from core.common import (
     PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
+from partner.models import PartnerProject
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
@@ -54,6 +55,8 @@ from .serializers import (
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer,
+    ReportRefreshSerializer,
+    ClusterObjectiveIndicatorAdoptSerializer,
     ReportableLocationGoalBaselineInNeedSerializer,
     ClusterIndicatorIMOMessageSerializer,
     ReportableReportingFrequencyIdSerializer,
@@ -65,8 +68,10 @@ from .models import (
     Reportable,
     IndicatorLocationData,
     Disaggregation,
-    ReportableLocationGoal
+    ReportableLocationGoal,
+    create_reportable_for_pp_from_co_reportable,
 )
+from .utilities import reset_indicator_report_data, reset_progress_report_data
 from functools import reduce
 
 logger = logging.getLogger(__name__)
@@ -131,7 +136,11 @@ class PDReportsDetailAPIView(RetrieveAPIView):
 
     def check_permissions(self, request):
         super().check_permissions(request)
-        pd_id = self.kwargs['pd_id']
+        pd_id = self.kwargs.get('pd_id', None)
+
+        if not pd_id:
+            self.permission_denied(request)
+
         if not request.user.partner.programmedocument_set.filter(id=pd_id).exists():
             self.permission_denied(request)
 
@@ -463,7 +472,11 @@ class PDLowerLevelOutputStatusAPIView(APIView):
         super().check_permissions(request)
         pd_progress_report_id = self.kwargs.get('pd_progress_report_id')
         if not request.user.prp_roles.filter(
-                role__in=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_editor],
+                role__in=[
+                    PRP_ROLE_TYPES.ip_authorized_officer,
+                    PRP_ROLE_TYPES.ip_editor,
+                    PRP_ROLE_TYPES.ip_admin,
+                ],
                 workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
         ).exists():
             self.permission_denied(request)
@@ -630,6 +643,7 @@ class IndicatorLocationDataUpdateAPIView(APIView):
         HasAnyRole(
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
+            PRP_ROLE_TYPES.ip_admin,
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
@@ -765,7 +779,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             )
 
         try:
-            project_name = reportable.content_object.project.title
+            project_name = reportable.content_object.projects.first().title
         except Exception:
             project_name = ''
 
@@ -828,3 +842,85 @@ class ReportableReportingFrequencyListAPIView(APIView):
             response.append({'frequency': freq, 'cs_dates': cs_dates})
 
         return Response(response, status=status.HTTP_200_OK)
+
+
+class ReportRefreshAPIView(APIView):
+
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.ip_authorized_officer,
+            PRP_ROLE_TYPES.ip_editor,
+        ),
+    )
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """
+        Removes all IndicatorReport instances for given ProgressReport, including underlying IndicatorLocationData instances
+        """
+        serializer = ReportRefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if serializer.validated_data['report_type'] == 'PR':
+            report = get_object_or_404(ProgressReport, id=serializer.validated_data['report_id'])
+            target_prs = ProgressReport.objects.filter(
+                programme_document=report.programme_document,
+                report_type=report.report_type,
+                report_number__gte=report.report_number
+            )
+
+            for pr in target_prs:
+                reset_progress_report_data(pr)
+        else:
+            report = get_object_or_404(IndicatorReport, id=serializer.validated_data['report_id'])
+
+            if report.progress_report:
+                raise ValidationError("This indicator report is linked to a progress report. Use the progress report ID instead.")
+
+            reset_indicator_report_data(report)
+
+        return Response({"response": "OK"}, status=status.HTTP_200_OK)
+
+
+class ClusterObjectiveIndicatorAdoptAPIView(APIView):
+    """
+    Create a PartnerProject Reportable from ClusterObjective Reportable.
+
+    Only a IMO should be allowed to do this action.
+    """
+    permission_classes = (
+        IsAuthenticated,
+        HasAnyRole(
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+        )
+    )
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = ClusterObjectiveIndicatorAdoptSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        co_reportable = Reportable.objects.get(id=serializer.validated_data['reportable_id'])
+        pp = PartnerProject.objects.get(id=serializer.validated_data['partner_project_id'])
+        pp_reportable = create_reportable_for_pp_from_co_reportable(pp, co_reportable)
+        pp_reportable.target = serializer.validated_data['target']
+        pp_reportable.baseline = serializer.validated_data['baseline']
+        pp_reportable.save()
+
+        for item in serializer.validated_data['locations']:
+            ReportableLocationGoal.objects.create(
+                reportable=pp_reportable,
+                location=item['location'],
+                target=item['target'],
+                baseline=item['baseline'],
+            )
+
+        result_serializer = ClusterIndicatorSerializer(instance=pp_reportable)
+
+        return Response(result_serializer.data, status=status.HTTP_200_OK)

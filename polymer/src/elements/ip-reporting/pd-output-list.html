@@ -7,7 +7,12 @@
 <link rel="import" href="../ip-reporting/pd-output.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/llos.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
+
 <link rel="import" href="pd-output.html">
+
+<link rel="import" href="js/pd-output-list-functions.html">
 
 <dom-module id="pd-output-list">
   <template>
@@ -33,7 +38,7 @@
       }
     </style>
 
-    <etools-content-panel panel-title="PD Output/ SSFA Expected Results">
+    <etools-content-panel panel-title="[[localize('pd_output_results')]]">
       <template
           is="dom-if"
           if="[[loading]]"
@@ -72,6 +77,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -109,9 +116,7 @@
       },
 
       _computeViewData: function (data) {
-        return data.filter(function (item) {
-          return Boolean(item.indicator_reports.length);
-        });
+        return PdOutputListUtils.computeViewData(data);
       },
     });
   </script>

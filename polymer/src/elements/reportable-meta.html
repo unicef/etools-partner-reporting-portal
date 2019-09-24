@@ -1,19 +1,27 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input-char-counter.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../behaviors/localize.html">
+<link rel="import" href="../redux/actions/localize.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="labelled-item.html">
+<link rel="import" href="refresh-report-modal.html">
 <link rel="import" href="../behaviors/progressReportUtils.html">
+<link rel="import" href="../styles/buttons.html">
 
 <dom-module id="reportable-meta">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
+
+        --paper-input-container-disabled: {
+          opacity: 0.67
+        };
+
       }
 
       labelled-item {
@@ -24,17 +32,51 @@
         margin-bottom: 25px;
       }
 
+      #input-button-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: row;
+      }
+
+      paper-input {
+        width: 100%;
+        padding-right: 18px;
+      }
+
       paper-radio-group {
         margin-left: -12px;
+      }
+
+      #toggle-button {
+        font-size: 14px;
       }
 
       status-badge {
         position: relative;
         top: -2px;
       }
+
+      #refresh-button {
+        margin-block-end: 1rem;
+      }
     </style>
 
-    <labelled-item label="Overall status">
+    <template
+      is="dom-if"
+      if="[[canRefresh]]"
+      restamp="true">
+      <paper-button
+        id="refresh-button"
+        class="btn-primary"
+        on-tap="_refresh"
+        disabled="[[busy]]"
+        raised>
+        [[localize('refresh')]]
+      </paper-button>
+    </template>
+
+    <labelled-item label="[[localize('overall_status')]]">
       <template
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
@@ -43,15 +85,15 @@
             id="overall_status"
             selected="[[data.overall_status]]"
             on-selected-changed="_handleInput">
-          <paper-radio-button name="Met">[[_computeMetLabel(completed)]]</paper-radio-button>
+          <paper-radio-button name="Met">[[_computeMetLabel(completed, localize)]]</paper-radio-button>
           <template
             is="dom-if"
             if="[[!completed]]"
             restamp="true">
-            <paper-radio-button name="OnT">On Track</paper-radio-button>
-            <paper-radio-button name="NoP">No Progress</paper-radio-button>
+            <paper-radio-button name="OnT">[[localize('on_track')]]</paper-radio-button>
+            <paper-radio-button name="NoP">[[localize('no_progress')]]</paper-radio-button>
           </template>
-          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed)]]</paper-radio-button>
+          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed, localize)]]</paper-radio-button>
           <template
               is="dom-if"
               if="[[allowNoStatus]]"
@@ -69,20 +111,24 @@
       </template>
     </labelled-item>
 
-    <labelled-item label="Narrative assessment">
+    <labelled-item id="labelled-narrative" label="[[localize('narrative_assessment')]]">
       <template
           is="dom-if"
           if="[[!_equals(mode, 'view')]]"
           restamp="true">
-        <paper-input-container
-            no-label-float>
-          <input
+        <div id="input-button-container">
+          <paper-input
               id="narrative_assessment"
-              on-input="_handleInput"
               value="[[data.narrative_assessment]]"
+              disabled
+              char-counter
+              no-label-float
               maxlength="2000">
-          <paper-input-char-counter></paper-input-char-counter>
-        </paper-input-container>
+          </paper-input>
+          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+            {{localizedToggle}}
+          </paper-button>
+        </div>
       </template>
 
       <template
@@ -92,6 +138,11 @@
         [[data.narrative_assessment]]
       </template>
     </labelled-item>
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
   </template>
 
   <script>
@@ -100,10 +151,23 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
         mode: String,
+
+        toggle: {
+          type: String,
+          value: 'Edit'
+        },
+
+        localizedToggle: {
+          type: String,
+          computed: '_localizeToggle(toggle, localize)'
+        },
 
         data: Object,
 
@@ -115,15 +179,56 @@
           reflectToAttribute: true,
         },
 
+        isCluster: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
+
         completed: {
           type: Boolean,
           value: false,
           reflectToAttribute: true,
         },
+
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(data.id)',
+        },
+
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(isCluster, data)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
+        },
       },
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
+        var narrativeTextInput = this.$$('#narrative_assessment');
+
+        if (this.toggle === 'Edit' && field.id === 'toggle-button') {
+          narrativeTextInput.disabled = false;
+          narrativeTextInput.focus();
+          this.set('toggle', 'Save');
+          return;
+        }
+
+        if (field.id === 'toggle-button') {
+          var parent = Polymer.dom(event).path.find(function(node) {
+            return node.id === 'labelled-narrative';
+          });
+
+          field = parent.querySelector('paper-input');
+        }
+
         var id = field.id;
         switch (id) {
           case 'overall_status':
@@ -131,7 +236,16 @@
             break;
 
           case 'narrative_assessment':
+            if (field.value !== null && this.data.narrative_assessment === field.value.trim()
+              || field.value === null && this.data.narrative_assessment === null
+            ) {
+              this.set('toggle', 'Edit');
+              narrativeTextInput.disabled = true;
+              break;
+            }
             this.set(['localData', id], field.value.trim());
+            this.set('toggle', 'Edit');
+            narrativeTextInput.disabled = true;
             break;
         }
       },
@@ -140,18 +254,22 @@
         '_localDataChanged(localData.*)',
       ],
 
-      _computeMetLabel: function(completed) {
+      _computeMetLabel: function(completed, localize) {
         if (completed) {
-          return 'Met results as planned';
+          return localize('met_results');
         }
-        return 'Met';
+        return localize('met');
       },
 
-      _computeConstrainedLabel: function(completed) {
+      _computeConstrainedLabel: function(completed, localize) {
         if (completed) {
-          return 'Constrained (partially met result)';
+          return localize('constrained_partially');
         }
-        return 'Constrained';
+        return localize('constrained');
+      },
+
+      _localizeToggle: function (toggle, localize) {
+        return localize(toggle.toLowerCase());
       },
 
       _localDataChanged: function (change) {
@@ -159,9 +277,19 @@
           return;
         }
 
-        this.debounce('local-data-changed', function () {
-          this.fire('reportable-meta-changed', this.localData);
-        }, 2000);
+        this.fire('reportable-meta-changed', this.localData);
+      },
+
+      _computeRefreshData: function (reportId) {
+        return {'report_id': reportId, 'report_type': 'IR'};
+      },
+
+      _computeCanRefresh: function (isCluster, data) {
+        return isCluster && data.can_submit;
+      },
+
+      _refresh: function () {
+        this.$.refresh.open();
       },
 
       attached: function () {
@@ -169,9 +297,19 @@
       },
 
       detached: function () {
+        if (Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input') !== null
+          && Polymer.dom(this.root)
+            .querySelectorAll('labelled-item')[1]
+            .querySelector('paper-button').textContent.trim() === 'Save'
+        ) {
+          this.set(['localData', 'narrative_assessment'],
+            Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input').value);
+        }
+        
         if (this.isDebouncerActive('local-data-changed')) {
           this.cancelDebouncer('local-data-changed');
         }
+        this.$.refresh.close();
       },
     });
   </script>

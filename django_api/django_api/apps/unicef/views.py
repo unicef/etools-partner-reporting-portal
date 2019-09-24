@@ -10,7 +10,7 @@ from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,6 +25,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
+    PR_ATTACHMENT_TYPES,
     PRP_ROLE_TYPES,
 )
 from core.paginations import SmallPagination
@@ -48,6 +49,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from indicator.utilities import convert_string_number_to_float
 from partner.models import Partner
 from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
 
@@ -72,7 +74,7 @@ from .serializers import (
     ProgressReportSRUpdateSerializer,
     ProgressReportPullHFDataSerializer,
 )
-from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput
+from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput, ProgressReportAttachment
 from .permissions import (
     CanChangePDCalculationMethod,
     UnicefPartnershipManagerOrRead
@@ -330,15 +332,21 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
         ),
     )
 
     def get(self, request, *args, **kwargs):
         report = self.get_object()
 
+        funds_received_to_date_percentage = "%.1f" % (
+            report.programme_document.funds_received_to_date * 100 / report.programme_document.budget
+        ) if report.programme_document and report.programme_document.budget > 0 else 0
+
         data = {
             'report': report,
             'pd': report.programme_document,
+            'funds_received_to_date_percentage': funds_received_to_date_percentage,
             'challenges_in_the_reporting_period': report.challenges_in_the_reporting_period,
             'proposed_way_forward': report.proposed_way_forward,
             'partner_contribution_to_date': report.partner_contribution_to_date,
@@ -361,6 +369,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -513,12 +522,13 @@ class ProgressReportLocationsAPIView(ListAPIView):
 
 class ProgressReportSubmitAPIView(APIView):
     """
-    Only a partner authorized officer and partner editor can submit a progress report.
+    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
     """
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -550,14 +560,11 @@ class ProgressReportSubmitAPIView(APIView):
             )
 
         for ir in progress_report.indicator_reports.all():
-            # Check if all indicator data is fulfilled
-            for data in ir.indicator_location_data.all():
-                for key, vals in data.disaggregation.items():
-                    if (vals.get('d', 0) in [None, '']):
-                        raise ValidationError(
-                            "You have not completed all indicator location data across "
-                            "all indicator reports for this progress report."
-                        )
+            if not ir.is_complete:
+                raise ValidationError(
+                    "You have not completed all indicator location data across "
+                    "all indicator reports for this progress report."
+                )
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -578,8 +585,8 @@ class ProgressReportSubmitAPIView(APIView):
             if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
                     and not ir.narrative_assessment:
                 raise ValidationError(
-                    "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
-                    "status is Met or No Progress.".format(
+                    "You have not completed the narrative assessment for one of the outputs ({}). Unless your output "
+                    "status is Met or No Progress, you have to fill in the narrative assessment.".format(
                         ir.reportable.content_object
                     )
                 )
@@ -604,7 +611,8 @@ class ProgressReportSubmitAPIView(APIView):
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
                 prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document.unicef_officers.values_list('email', flat=True)
+                email__in=progress_report.programme_document
+                .unicef_officers.filter(active=True).values_list('email', flat=True)
             ).first()
 
             if not authorized_officer_user:
@@ -650,12 +658,13 @@ class ProgressReportSubmitAPIView(APIView):
 class ProgressReportSRSubmitAPIView(APIView):
     """
     A dedicated API endpoint for submitting SR Progress Report.
-    Only a partner authorized officer and partner editor can submit a progress report.
+    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
     """
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -692,7 +701,7 @@ class ProgressReportSRSubmitAPIView(APIView):
             )
 
         # Attachment field validation
-        if not progress_report.attachment:
+        if not progress_report.attachments.exists():
             raise ValidationError(
                 "Attachment is required for SR report type"
             )
@@ -704,7 +713,8 @@ class ProgressReportSRSubmitAPIView(APIView):
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
                 prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
+                email__in=progress_report.programme_document.unicef_officers
+                .filter(active=True).values_list('email', flat=True)
             ).first()
 
             if not authorized_officer_user:
@@ -743,6 +753,7 @@ class ProgressReportPullHFDataAPIView(APIView):
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
@@ -845,7 +856,6 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                     # Store location_totals only for each IndicatorLocationData
                     for ild in target_hf_ilds_by_loc:
-                        calculated[loc_id]['total']['c'] += ild.disaggregation['()']['c']
                         calculated[loc_id]['total']['v'] += ild.disaggregation['()']['v']
 
                         if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
@@ -853,6 +863,12 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
+
+                    calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
+
+                    if calculated[loc_id]['total']['c'] is None:
+                        calculated[loc_id]['total']['c'] = 0
+
                 else:
                     target_keys = target_hf_ilds_by_loc[0].disaggregation.keys()
 
@@ -865,7 +881,6 @@ class ProgressReportPullHFDataAPIView(APIView):
                             if key not in calculated[loc_id]['data']:
                                 calculated[loc_id]['data'][key] = {'c': 0, 'd': 0, 'v': 0}
 
-                            calculated[loc_id]['data'][key]['c'] += ild.disaggregation[key]['c']
                             calculated[loc_id]['data'][key]['v'] += ild.disaggregation[key]['v']
 
                             if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
@@ -873,6 +888,12 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                             else:
                                 calculated[loc_id]['data'][key]['d'] += ild.disaggregation[key]['d']
+
+                        calculated[loc_id]['data'][key]['c'] = convert_string_number_to_float(calculated[loc_id]['data'][key]['v']) \
+                            / calculated[loc_id]['data'][key]['d']
+
+                        if calculated[loc_id]['data'][key]['c'] is None:
+                            calculated[loc_id]['data'][key]['c'] = 0
 
         return calculated
 
@@ -1092,28 +1113,63 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
+class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
+    serializer_class = ProgressReportAttachmentSerializer
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+    )
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get_queryset(self):
+        return ProgressReportAttachment.objects.filter(
+            progress_report_id=self.kwargs['progress_report_id'],
+            progress_report__programme_document__workspace_id=self.kwargs['workspace_id'],
+        )
+
+    def perform_create(self, serializer):
+        if self.get_queryset().count() == 3:
+            raise ValidationError('This progress report already has 3 attachments')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
+            raise ValidationError('This progress report already has 1 FACE attachment')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 2:
+            raise ValidationError('This progress report already has 2 Other attachments')
+
+        serializer.save(progress_report_id=self.kwargs['progress_report_id'])
+
+
 class ProgressReportAttachmentAPIView(APIView):
     permission_classes = (
         AnyPermission(
             IsUNICEFAPIUser,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
             IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
         ),
     )
 
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
-    def get(self, request, workspace_id, progress_report_id):
-        progress_report = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id
+    def get(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
         )
 
         try:
             # lookup just so the possible FileNotFoundError can be triggered
-            progress_report.attachment
-            serializer = ProgressReportAttachmentSerializer(progress_report)
+            attachment.file
+            serializer = ProgressReportAttachmentSerializer(attachment)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         except FileNotFoundError:
             pass
@@ -1121,16 +1177,18 @@ class ProgressReportAttachmentAPIView(APIView):
         return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
-    def delete(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id
+    def delete(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
         )
 
-        if pr.attachment:
+        if attachment.file:
             try:
-                pr.attachment.delete()
+                attachment.file.delete()
+                attachment.delete()
                 return Response({}, status=statuses.HTTP_204_NO_CONTENT)
             except ValueError:
                 pass
@@ -1138,21 +1196,23 @@ class ProgressReportAttachmentAPIView(APIView):
             return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
-    def put(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
-            ProgressReport,
-            id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+    def put(self, request, workspace_id, progress_report_id, pk):
+        attachment = get_object_or_404(
+            ProgressReportAttachment,
+            id=pk,
+            progress_report_id=progress_report_id,
+            progress_report__programme_document__workspace_id=workspace_id
+        )
 
         serializer = ProgressReportAttachmentSerializer(
-            instance=pr,
+            instance=attachment,
             data=request.data
         )
 
         serializer.is_valid(raise_exception=True)
-        if pr.attachment:
+        if attachment.file:
             try:
-                pr.attachment.delete()
+                attachment.file.delete()
             except ValueError:
                 pass
 
@@ -1242,11 +1302,30 @@ class ProgressReportExcelImportView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request,  *args, **kwargs):
+    def post(self, request, workspace_id, pk):
 
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
         destination = open(filepath, 'wb+')
+
+        tokens = up_file.name[:up_file.name.rfind('.')].split('_')
+        file_report_name = tokens[0].lower()
+        file_ref_num = tokens[1].lower()
+
+        progress_report = get_object_or_404(
+            ProgressReport,
+            id=pk,
+            programme_document__workspace_id=workspace_id,
+        )
+
+        report_name = f"{progress_report.report_type}{progress_report.report_number}".lower()
+        ref_num = progress_report.programme_document.reference_number.split('/')[-1].lower()
+
+        if file_ref_num != ref_num or file_report_name != report_name:
+            raise ValidationError(
+                f"You are trying to upload a template for the wrong report. "
+                f"This template is for {file_report_name.upper()} and you are loading it into {report_name.upper()}."
+            )
 
         for chunk in up_file.chunks():
             destination.write(chunk)

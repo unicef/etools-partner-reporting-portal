@@ -8,24 +8,31 @@ from ocha.imports.utilities import logger, get_json_from_url, save_cluster_objec
     save_reportables_for_cluster_objective_or_activity
 
 
-def import_response_plan(external_plan_id, workspace=None, async=True):
+def import_response_plan(external_plan_id, workspace=None, asynch=True):
     logger.debug('Importing Response Plan #{}'.format(external_plan_id))
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
     if workspace:
         plan_data['workspace_id'] = workspace.id
+
+    plan_data['name'] = plan_data['planVersion']['name']
+    plan_data['startDate'] = plan_data['planVersion']['startDate']
+    plan_data['endDate'] = plan_data['planVersion']['endDate']
+
     plan_serializer = V1ResponsePlanImportSerializer(data=plan_data)
     plan_serializer.is_valid(raise_exception=True)
     response_plan = plan_serializer.save()
 
     # Do most of the work in background, otherwise it times out the request a lot
     from ocha.tasks import finish_response_plan_import
-    (finish_response_plan_import.delay if async else finish_response_plan_import)(external_plan_id)
+    (finish_response_plan_import.delay if asynch else finish_response_plan_import)(external_plan_id)
 
     return response_plan
 
 
 def save_activities_and_objectives_for_response_plan(entities_response={}, measurements_response={}):
+    logger.debug('Importing Activities and Objectives for Response Plan')
+
     activities = []
     objectives = {}
 
@@ -41,7 +48,7 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     for activity in activities:
         try:
-            activity_data = activity['value']['support']
+            activity_data = activity['planEntityVersion']['value']['support']
 
             # Cameroon data is different format
             # 'support': {'0': {'planEntityIds': []}}
@@ -59,8 +66,8 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
             if len(parent_objective_ids) > 1:
                 logger.warning(
                     'Activity \n`{}` supports \n{} \nobjectives. Only 1st one will be saved.'.format(
-                        activity['value']['description'],
-                        [objectives[obj_id]['value']['description'] for obj_id in parent_objective_ids]
+                        activity['planEntityVersion']['value']['description'],
+                        [objectives[obj_id]['planEntityVersion']['value']['description'] for obj_id in parent_objective_ids]
                     )
                 )
             parent_objective = objectives[parent_objective_ids[0]]
@@ -75,7 +82,7 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 defaults={
                     'cluster_objective': cluster_objective,
-                    'title': activity['value']['description'][:2048]
+                    'title': activity['planEntityVersion']['value']['description'][:2048]
                 }
             )
 

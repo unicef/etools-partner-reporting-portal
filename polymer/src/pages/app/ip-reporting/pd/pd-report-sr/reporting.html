@@ -9,6 +9,8 @@
 <link rel="import" href="../../../../../behaviors/notifications.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
+<link rel="import" href="../../../../../redux/actions/localize.html">
 <link rel="import" href="../../../../../redux/selectors/reportInfo.html">
 <link rel="import" href="../../../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../../../elements/labelled-item.html">
@@ -57,7 +59,13 @@
     <etools-content-panel no-header>
       <div class="app-grid">
         <div class="row">
-          <labelled-item label="Narrative">
+          <labelled-item label="[[localize('description')]]">
+            <span class="value">[[srDescription]]</span>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="[[localize('narrative')]]">
             <template
                 is="dom-if"
                 if="[[_equals(computedMode, 'view')]]"
@@ -99,6 +107,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -113,6 +123,21 @@
         pdId: {
           type: Number,
           statePath: 'programmeDocuments.current',
+        },
+
+        programmeDocuments: {
+          type: Array,
+          statePath: 'programmeDocuments.all'
+        },
+
+        allPdReports: {
+          type: Object,
+          statePath: 'programmeDocumentReports.byPD'
+        },
+
+        srDescription: {
+          type: String,
+          computed: '_computeSrDescription(pdId, programmeDocuments, allPdReports, reportId)'
         },
 
         locationId: {
@@ -193,6 +218,37 @@
 
       _computeUpdateUrl: function (locationId, reportId) {
         return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
+      },
+
+      _computeSrDescription: function (pdId, programmeDocuments, allPdReports, reportId) {
+        // for some reason method was getting run on detach, so catch that
+        if (allPdReports[pdId] === undefined) {
+          return;
+        }
+
+        // get the current progress report's due date
+        var progressReportDueDate = allPdReports[pdId]
+          .find(function (report) {
+            return report.id === parseInt(reportId);
+          })
+          .due_date;
+
+        // get the current programme document
+        var currentPdReport = programmeDocuments.find(function (report) {
+          return report.id === pdId;
+        });
+
+        // get the current SR reporting_period object from the current programme document's reporting_periods array
+        var currentSrReport = currentPdReport.reporting_periods.find(function (reporting_period) {
+          return reporting_period.report_type === 'SR' &&
+            new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
+        });
+
+        if (currentSrReport !== undefined && currentSrReport.description !== undefined) {
+          return currentSrReport.description;
+        } else {
+          return '...';
+        }
       },
 
       _computeMode: function (mode, overrideMode, report, permissions) {

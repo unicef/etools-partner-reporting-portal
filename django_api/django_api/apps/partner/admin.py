@@ -4,7 +4,9 @@ from .models import (
     Partner,
     PartnerProject,
     PartnerActivity,
-    PartnerProjectFunding)
+    PartnerProjectFunding,
+    PartnerActivityProjectContext,
+)
 
 
 class PartnerAdmin(admin.ModelAdmin):
@@ -14,17 +16,23 @@ class PartnerAdmin(admin.ModelAdmin):
     search_fields = ('title', 'short_title', 'alternate_title')
 
 
+class PartnerActivityProjectContextInline(admin.StackedInline):
+    model = PartnerActivityProjectContext
+    extra = 1
+    min_num = 0
+
+
 class PartnerProjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'partner', 'description', 'start_date',
-                    'end_date', 'status',)
-    list_filter = ('status', 'partner', 'clusters')
-    search_fields = ('title', 'description', 'additional_information')
+    list_display = ('title', 'partner', 'description',)
+    list_filter = ('status', 'partner', 'clusters',)
+    search_fields = ('title', 'description', 'additional_information',)
 
 
 class PartnerActivityAdmin(admin.ModelAdmin):
-    list_display = ('title', 'partner', 'project', 'cluster_activity',
-                    'cluster_objective', 'start_date', 'end_date', 'status',)
-    list_filter = ('status', 'partner', 'project')
+    inlines = (PartnerActivityProjectContextInline, )
+    list_display = ('title', 'partner', 'cluster_activity',
+                    'cluster_objective',)
+    list_filter = ('partner',)
     search_fields = ('title', )
 
 

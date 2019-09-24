@@ -4,8 +4,8 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../../settings.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
@@ -32,6 +32,9 @@
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 2;
+        --esmm-list-wrapper: {
+          height: 350px;
+        };
       }
 
       .app-grid {
@@ -108,6 +111,10 @@
       </etools-prp-ajax>
     </template>
 
+    <etools-prp-ajax
+      id="search">
+    </etools-prp-ajax>
+
     <template
         is="dom-if"
         if="[[canMessageIMO]]"
@@ -176,7 +183,7 @@
               <labelled-item
                   class="item"
                   label="Location - administrative level">
-                <span class="readonly">Admin [[item.loc_type]]</span>
+                <span class="readonly">Admin [[_getLocationAdminLevel(item)]]</span>
               </labelled-item>
             </template>
 
@@ -191,6 +198,7 @@
                   option-value="id"
                   option-label="title"
                   selected="{{item.loc_type}}"
+                  data-index$="[[index]]"
                   on-selected-changed="_onLocTypeChanged"
                   required>
               </etools-single-selection-menu>
@@ -203,7 +211,7 @@
               <labelled-item
                   class="item item-2-col"
                   label="Location">
-                <span class="readonly">[[_getLocationTitle(locations, item.loc_type, item.location)]]</span>
+                <span class="readonly">[[_getLocationTitle(locations, item, item.id, index)]]</span>
               </labelled-item>
             </template>
 
@@ -214,50 +222,56 @@
               <etools-single-selection-menu
                   class="item item-2-col validate"
                   label="Location"
-                  options="[[_getLocations(locations, item.loc_type)]]"
+                  options="[[_getLocations(locations, item.loc_type, index)]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{item.location}}"
+                  selected-item="{{item.location}}"
+                  on-value-changed="_onValueChanged"
                   data-index$="[[index]]"
-                  disabled="[[_getPending(pending, item.loc_type)]]"
+                  disabled="[[_getPending(pending, item.loc_type, index)]]"
                   required>
               </etools-single-selection-menu>
             </template>
 
-            <json-field
-                class="item validate"
-                type="[[indicatorType]]"
-                label="Baseline"
-                on-input="_validate"
-                value="{{item.baseline}}"
-                allowed-pattern="[+\-\d]"
-                disabled="[[!canEditDetails]]">
-            </json-field>
-
             <template
                 is="dom-if"
-                if="[[isNumber]]"
+                if="[[indicatorType]]"
                 restamp="true">
               <json-field
                   class="item validate"
                   type="[[indicatorType]]"
-                  label="In need (optional)"
+                  label="Baseline"
                   on-input="_validate"
-                  value="{{item.in_need}}"
+                  value="{{item.baseline}}"
                   allowed-pattern="[+\-\d]"
                   disabled="[[!canEditDetails]]">
               </json-field>
-            </template>
 
-            <json-field
-                class="item validate"
-                type="[[indicatorType]]"
-                label="Target"
-                on-input="_validate"
-                value="{{item.target}}"
-                allowed-pattern="[+\-\d]"
-                required>
-            </json-field>
+              <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                <json-field
+                    class="item validate"
+                    type="[[indicatorType]]"
+                    label="In need (optional)"
+                    on-input="_validate"
+                    value="{{item.in_need}}"
+                    allowed-pattern="[+\-\d]"
+                    disabled="[[!canEditDetails]]">
+                </json-field>
+              </template>
+
+              <json-field
+                  class="item validate"
+                  type="[[indicatorType]]"
+                  label="Target"
+                  on-input="_validate"
+                  value="{{item.target}}"
+                  allowed-pattern="[+\-\d]"
+                  required>
+              </json-field>
+            </template>
           </div>
         </div>
       </div>
@@ -286,8 +300,10 @@
           parentIndicatorId: Number,
           clusterId: Number,
           locations: Object,
+          savedLocations: Object,
           pending: Object,
           isPai: Boolean,
+          searchLocationType: String,
 
           editing: {
             type: Boolean,
@@ -302,6 +318,10 @@
           isNumber: {
             type: Boolean,
             computed: '_computeIsNumber(indicatorType)',
+          },
+
+          url: {
+            type: String,
           },
 
           value: {
@@ -319,6 +339,11 @@
             type: Boolean,
             notify: true,
             value: false,
+          },
+
+          locationsInitialized: {
+            type: Boolean,
+            value: false
           },
 
           maxAdminLevel: {
@@ -341,6 +366,11 @@
             computed: '_computeLocationsUrl(responsePlanId)',
           },
 
+          locationTitle: {
+            type: String,
+            value: '',
+          },
+
           ajaxData: {
             type: Array,
             computed: '_computeAjaxData(maxAdminLevel)',
@@ -355,6 +385,49 @@
             type: Boolean,
             computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
           },
+        },
+
+        _onValueChanged: function (event) {  // This method runs whenever user begins searching in locations dropdown
+          var loc_type = this.get('searchLocationType') || 0;
+          var index = -1;
+
+          if (event.detail.value === '') {
+            return;
+          }
+
+          event.path.forEach(function (node) {
+            if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
+              index = node.dataset.index;  // Grab index of current location widget component
+              return;
+            }
+          });
+
+          if (loc_type === 0 && index === undefined) {
+            index = 0;
+          }
+
+          this.debounce('fetch-locations-' + loc_type, function() {
+            var self = this;
+
+            var thunk = self.$.search;
+            thunk.url = self.get('url');
+
+            thunk.params = {
+              loc_type: loc_type,
+              title: event.detail.value
+            };
+
+            thunk.thunk()()
+              .then(function(res) {
+                self._setPending(loc_type, false, index);
+                self._setLocations(loc_type, res.data.results, index);
+              })
+              .catch(function (err) {
+                console.log(err);
+                self._setPending(loc_type, false, index);
+              });
+            return;
+          }, 1000);
         },
 
         _computeIsNumber: function (type) {
@@ -420,14 +493,44 @@
             loc_type: initial,
           });
 
-          this._fetchLocations(initial);
+          this.set('searchLocationType', 0);
+          this.set('locationsInitialized', true);
+
+          var newLocations = this.get('locations');
+          var value = this.get('value');
+
+          value.forEach(function (location, index) {
+            if (location.location === undefined && newLocations[index] === undefined) {
+              newLocations[index] = {0: []};
+            }
+          });
+
+          this.set('locations', newLocations);
+
+          var newPendingIndex = Object.keys(this.get('pending')).length;
+          var pending = this.get('pending');
+
+          pending[newPendingIndex] = {
+            initial: false
+          };
+
+          this.set('pending', pending);
+
+          this._fetchLocations(initial, undefined, this.get('value').length - 1);
         },
 
         _remove: function (e) {
           var value = this.get('value');
           var toRemove = +e.target.dataset.index;
+          var pending = this.get('pending');
+          var locations = this.get('locations');
+
+          delete locations[toRemove];
+          delete pending[toRemove];
+
           var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
 
+          this.set('pending', pending);
           this.set('value', newValue);
         },
 
@@ -435,67 +538,118 @@
           e.target.validate();
         },
 
-        _onLocTypeChanged: function (_, data) {
-          this._fetchLocations(data.value);
-        },
+        _onLocTypeChanged: function (event, data) {
+          var index = -1;
 
-        _fetchLocations: function (loc_type) {
-          if (this.get('locations')[loc_type]) {
+          event.path.forEach(function (node) {
+            if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
+              index = node.dataset.index;
+              return;
+            }
+          });
+
+          if (index === -1) {
             return;
           }
+
+          this._fetchLocations(data.value, undefined, index);
+        },
+
+        _fetchLocations: function (loc_type, title, index) {
+          if (loc_type === undefined) {
+            return;
+          }
+
+          this.set('searchLocationType', loc_type);
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
 
-            this._setPending(loc_type, true);
+            this._setPending(loc_type, true, index);
+
+            if (title !== undefined) {
+              this.$$('#locations' + loc_type).params.title = title;
+            }
 
             this.$$('#locations' + loc_type).thunk()()
-                .then(function (res) {
-                  self._setPending(loc_type, false);
-                  self._setLocations(loc_type, res.data);
-                })
-                .catch(function () {
-                  self._setPending(loc_type, false);
-                });
-          }, 100);
+              .then(function (res) {
+                self.set('url', res.xhr.responseURL);
+                self._setPending(loc_type, false, index);
+                self._setLocations(loc_type, res.data.results, index);
+              })
+              .catch(function () {
+                self._setPending(loc_type, false, index);
+              });
+          });
         },
 
         _fetchInitialLocations: function (lockedItems) {
-          lockedItems.forEach(function (item) {
-            this._fetchLocations(item.loc_type);
-          }, this);
+          this.set('savedLocations', lockedItems);
+
+          var newLocations = Object.assign({}, this.get('locations'));
+
+          if (lockedItems.length > 0) {
+            lockedItems.forEach(function (location, index) {
+              if (location.admin_level === undefined) {
+                newLocations[index] = {};
+                newLocations[index][location.loc_type] = [location];
+              } else {
+                newLocations[index] = {};
+                newLocations[index][location.admin_level] = [location];
+              }
+            });
+          } else {
+            lockedItems.forEach(function (location, index) {
+              newLocations[index] = {0: []};
+            });
+          }
+
+          this.set('locations', newLocations);
         },
 
-        _getPending: function (pending, loc_type) {
-          return !!pending[loc_type];
+        _getPending: function (pending, loc_type, index) {
+          return !!pending[index][loc_type];
         },
 
-        _getLocations: function (locations, loc_type) {
-          return locations[loc_type] || [];
+        _getLocations: function (locations, loc_type, index) {
+          return locations[index][loc_type] || [];
         },
 
-        _getLocationTitle: function (locations, loc_type, locationId) {
-          var allLocations = this._getLocations(locations, loc_type);
+        _getLocationAdminLevel: function (location) {
+          return location.loc_type ? location.loc_type : location.admin_level;
+        },
 
-          var location = allLocations.find(function (loc) {
+        _getLocationTitle: function (locations, location, locationId, index) {
+          var loc_type = location.loc_type ? location.loc_type : location.admin_level;
+          var allLocations = this._getLocations(locations, loc_type, index);
+
+          var targetLocation = allLocations.find(function (loc) {
             return String(loc.id) === String(locationId);
           });
 
-          return location ? location.title : '';
+          return targetLocation ? targetLocation.title : '';
         },
 
-        _setPending: function (loc_type, value) {
+        _setPending: function (loc_type, value, index) {
           var newPending = Object.assign({}, this.get('pending'));
 
-          newPending[loc_type] = value;
+          if (newPending[index] === undefined) {
+            newPending[index] = {};
+          }
+
+          newPending[index][loc_type] = value;
 
           this.set('pending', newPending);
         },
 
-        _setLocations: function (loc_type, value) {
+        _setLocations: function (loc_type, value, index) {
           var newLocations = Object.assign({}, this.get('locations'));
 
-          newLocations[loc_type] = value;
+          if (newLocations[index] === undefined) {
+            newLocations[index] = {};
+          }
+
+          newLocations[index][loc_type] = value;
 
           this.set('locations', newLocations);
         },

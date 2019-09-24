@@ -36,3 +36,5 @@ AUTHENTICATION_BACKENDS = (
 )
 
 CORS_ORIGIN_WHITELIST += ('localhost:8082', )
+
+FIXTURE_DIRS += ["fixtures"]

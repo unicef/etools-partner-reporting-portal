@@ -21,6 +21,8 @@
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../behaviors/localize.html">
+<link rel="import" href="../../../../redux/actions/localize.html">
 
 <dom-module id="page-ip-reporting-pd-details">
   <template>
@@ -58,9 +60,9 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="details">Details</paper-tab>
-          <paper-tab name="reports">Reports</paper-tab>
-          <paper-tab name="calculation-methods">Calculation Methods</paper-tab>
+          <paper-tab name="details">[[localize('details')]]</paper-tab>
+          <paper-tab name="reports">[[localize('reports')]]</paper-tab>
+          <paper-tab name="calculation-methods">[[localize('calculation_methods')]]</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -92,6 +94,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

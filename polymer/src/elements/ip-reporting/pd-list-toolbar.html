@@ -5,6 +5,8 @@
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
 
+<link rel="import" href="js/pd-list-toolbar-functions.html">
+
 <dom-module id="pd-list-toolbar">
   <template>
     <style>
@@ -49,7 +51,7 @@
       },
 
       _computePdUrl: function (locationId) {
-        return App.Endpoints.programmeDocuments(locationId);
+        return PdListToolbarUtils.computePdUrl(locationId);
       },
     });
   </script>

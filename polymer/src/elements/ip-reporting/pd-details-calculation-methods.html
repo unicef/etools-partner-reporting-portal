@@ -11,6 +11,8 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -22,6 +24,8 @@
 <link rel="import" href="../../styles/table-styles.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../calculation-methods-info-bar.html">
+
+<link rel="import" href="js/pd-details-calculation-methods-functions.html">
 
 <dom-module id="pd-details-calculation-methods">
   <template>
@@ -67,6 +71,11 @@
     </etools-prp-permissions>
 
     <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="indicators"
         url="[[indicatorsUrl]]">
     </etools-prp-ajax>
@@ -83,13 +92,13 @@
       <calculation-methods-info-bar></calculation-methods-info-bar>
       <etools-data-table-header no-collapse>
         <etools-data-table-column>
-          <div class="table-column">Indicators for this PD/SSFA</div>
+          <div class="table-column">[[localize('indicators_for_pd')]]</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across locations</div>
+          <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Calculation method across reporting periods</div>
+          <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -131,17 +140,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -165,17 +174,17 @@
                       <paper-radio-button
                           name="sum"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        SUM
+                        [[localize('sum')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="max"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        MAX
+                        [[localize('max')]]
                       </paper-radio-button>
                       <paper-radio-button
                           name="avg"
                           disabled="[[_computeDisabled(item.data.display_type)]]">
-                        AVG
+                        [[localize('avg')]]
                       </paper-radio-button>
                     </paper-radio-group>
                   </template>
@@ -203,7 +212,7 @@
               class="btn-primary"
               disabled="[[loading]]"
               raised>
-            Save
+            [[localize('save')]]
           </paper-button>
         </div>
       </template>
@@ -221,6 +230,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.NotificationsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -258,6 +269,17 @@
           computed: '_computeIndicatorsUrl(locationId, pdId)',
           observer: '_fetchData',
         },
+
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+        },
+
+        pdReportsCount: {
+          type: Object,
+          statePath: 'programmeDocumentReports.countByPD',
+          observer: '_getPdReports',
+        },
       },
 
       _initLocalData: function (data) {
@@ -265,40 +287,23 @@
       },
 
       _computeIndicatorsUrl: function (locationId, pdId) {
-        return locationId ? App.Endpoints.calculationMethods(locationId, pdId) : '';
+        return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
+      },
+
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
       _computeFormattedData: function (data) {
-        return data.ll_outputs_and_indicators.reduce(function (acc, curr) {
-          var items;
-
-          acc.push({
-            type: 'label',
-            text: curr.ll_output.title,
-          });
-
-          items = curr.indicators.map(function (indicator) {
-            return {
-              type: 'data',
-              data: Object.assign({}, indicator, {
-                editable: true,
-              }),
-              llo_id: curr.ll_output.id,
-            };
-          });
-
-          acc.push.apply(acc, items);
-
-          return acc;
-        }, []);
+        return PdDetailsCalculationMethodsUtils.computeFormattedData(data);
       },
 
       _computeSelected: function (data, scope) {
-        return data[scope];
+        return PdDetailsCalculationMethodsUtils.computeSelected(data, scope);
       },
 
       _computeDisabled: function (display_type) {
-        return ['percentage', 'ratio'].indexOf(display_type) !== -1;
+        return PdDetailsCalculationMethodsUtils.computeDisabled(display_type);
       },
 
       _fetchData: function (url) {
@@ -321,24 +326,13 @@
       _onValueChanged: function (e) {
         var newValue = e.target.selected;
         var data = e.target.dataset;
-
-        // Here's what the lack of expression interpolation in polymer makes people do:
-
-        var lloIndex = this.localData.ll_outputs_and_indicators
-            .findIndex(function (item) {
-              return Number(item.ll_output.id) === Number(data.lloId);
-            });
-
-        var indicatorIndex = this.localData.ll_outputs_and_indicators[lloIndex].indicators
-            .findIndex(function (item) {
-              return Number(item.id) === Number(data.id);
-            });
+        var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
 
         this.set([
           'localData.ll_outputs_and_indicators',
-          lloIndex,
+          indices.lloIndex,
           'indicators',
-          indicatorIndex,
+          indices.indicatorIndex,
           data.scope,
         ], newValue);
       },
@@ -373,12 +367,11 @@
       },
 
       _canEdit: function (item, permissions) {
-        return item.data.editable &&
-            permissions.changeProgrammeDocumentCalculationMethod;
+        return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
       },
 
       _canSave: function (permissions) {
-        return permissions.changeProgrammeDocumentCalculationMethod;
+        return PdDetailsCalculationMethodsUtils.canSave(permissions);
       },
 
       detached: function () {
@@ -386,6 +379,30 @@
 
         if (this.isDebouncerActive('fetch-data')) {
           this.cancelDebouncer('fetch-data');
+        }
+      },
+
+      _getPdReports: function () {
+        // Status being present prevents Redux / res.data from getting reports,
+        // preventing pd-details title from rendering. In that case (which we
+        // check by seeing if this.pdReportsCount is present), just get the reports again
+        if (this.pdReportsCount[this.pdId] === undefined) {
+          this.debounce('fetch-pds', function () {
+            var pdThunk = this.$.programmeDocuments;
+            pdThunk.params = {
+              page: 1,
+              page_size: 10,
+              programme_document: this.pdId
+            };
+
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
+
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+          }, 100);
         }
       },
     });

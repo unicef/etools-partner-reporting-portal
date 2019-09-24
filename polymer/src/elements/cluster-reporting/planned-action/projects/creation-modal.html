@@ -41,6 +41,7 @@
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
 <link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../indicator-locations-widget.html">
 
 
 <dom-module id="planned-action-projects-modal">
@@ -230,12 +231,13 @@
     <paper-dialog
       id="dialog"
       with-backdrop
+      on-iron-overlay-closed="_close"
       opened="{{ opened }}">
       <div class="header layout horizontal justified">
         <h2>[[_computeTitle(edit)]]</h2>
         <paper-icon-button
           class="self-center"
-          on-tap="close"
+          on-tap="_close"
           icon="icons:close">
         </paper-icon-button>
       </div>
@@ -425,6 +427,23 @@
                     </paper-dropdown-menu>
                   </div>
 
+                  <div class="item full-width">
+                    <indicator-locations-widget
+                      class="validate"
+                      value="{{data.locations}}">
+                    </indicator-locations-widget>
+                  </div>
+
+                  <paper-input
+                    class="item validate full-width"
+                    id="description"
+                    label="Description *"
+                    value="{{ data.description }}"
+                    type="string"
+                    required
+                    on-input="_validate">
+                  </paper-input>
+
                   <paper-input
                     class="item validate"
                     id="total_budget"
@@ -441,15 +460,6 @@
                     id="funding_source"
                     label="Funding Source"
                     value="{{ data.funding_source }}"
-                    type="string"
-                    on-input="_validate">
-                  </paper-input>
-
-                  <paper-input
-                    class="item validate full-width"
-                    id="description"
-                    label="Description"
-                    value="{{ data.description }}"
                     type="string"
                     on-input="_validate">
                   </paper-input>
@@ -663,7 +673,7 @@
                   Save
                 </paper-button>
 
-                <paper-button on-tap="close">
+                <paper-button on-tap="_close">
                   Cancel
                 </paper-button>
               </div>
@@ -928,11 +938,20 @@
         return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
-      close: function () {
-        this.set('data', {});
-        this.set('opened', false);
-        this.set('refresh', false);
-        this.set('detailsOpened', false);
+      _close: function (e) {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('data', {});
+          this.set('opened', false);
+          this.set('refresh', false);
+          this.set('detailsOpened', false);
+          this.set('errors', {});
+
+          this.close();
+        } else {
+          return;
+        }
       },
 
       open: function () {
@@ -946,7 +965,12 @@
           if (!this.canAddOchaProjects) {
             this.set('mode', 'custom');
           }
-          this.data = {'custom_fields': [], 'funding': {}};
+          this.data = {
+            'custom_fields': [],
+            'funding': {},
+            'locations': [],
+            'description': '',
+          };
           this.selectedClusters = [];
         }
         this.set('opened', true);
@@ -1096,7 +1120,9 @@
         this.set('selectedPartner', {});
         this.set('data', {
           'custom_fields': [],
-          'funding': {}
+          'funding': {},
+          'locations': [],
+          'description': '',
         });
         this.set('projectDetails', {});
         this.set('errors', {});
@@ -1104,6 +1130,34 @@
 
       _save: function () {
         var self = this;
+
+        var locationError = false;
+        var rawLocations = this.get('data.locations');
+
+        var changedLocations = rawLocations.map(function (location) {
+          if (location.location !== undefined) {
+            return location.location;
+          } else {
+            return location;
+          }
+        });
+
+        changedLocations.forEach(function (location) {
+          if (location.title === undefined) {
+            self.set('errors', 'No location set - please set a location.');
+            locationError = true;
+          } else if (changedLocations[0].admin_level !== location.admin_level) {
+            self.set('errors', 'All locations need to have the same admin level.');
+            locationError = true;
+          }
+        });
+
+        if (locationError === true) {
+          return;
+        }
+
+        this.set('data.locations', changedLocations);
+
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }
@@ -1128,7 +1182,8 @@
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
             self.set('errors', err.data);
-          });
+            self.set('data.locations', rawLocations);   // If there are backend validation errors, reset locations
+          });                                           // to what they were before request was sent!
       },
 
       detached: function () {

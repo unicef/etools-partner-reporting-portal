@@ -1,5 +1,6 @@
 {
   "node": true,
+  "esversion": 6,
   "browser": true,
   "bitwise": true,
   "camelcase": false,
@@ -28,6 +29,26 @@
     "fixture": true,
     "assert": true,
     "moment": true,
-    "numeral": true
+    "numeral": true,
+    "AuthorizedOfficerModalUtils": true,
+    "IndicatorDetailsUtils": true,
+    "IndicatorsToolbarUtils": true,
+    "PartnerDetailsUtils": true,
+    "PdDetailsOverviewUtils": true,
+    "PdDetailsCalculationMethodsUtils": true,
+    "PdDetailsDocDownloadUtils": true,
+    "PdDetailsReportingRequirementsUtils": true,
+    "PdDetailsReportsUtils": true,
+    "PdListToolbarUtils": true,
+    "PdOutputListToolbarUtils": true,
+    "PdOutputListUtils": true,
+    "PdOutputUtils": true,
+    "PdReportInfoUtils": true,
+    "PdReportsToolbarUtils": true,
+    "PdReportsListUtils": true,
+    "PdReportsReportTitleUtils": true,
+    "ProgressReportsToolbarUtils": true,
+    "ReportAttachmentsUtils": true,
+    "ProgressReportsListUtils": true
   }
 }

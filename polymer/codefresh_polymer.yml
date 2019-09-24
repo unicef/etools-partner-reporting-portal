@@ -9,6 +9,14 @@ steps:
         working_directory: ${{main_clone}}/polymer
         tag: ${{CF_BRANCH}}
 
+    composition_step:
+       type: composition
+       composition: 'unicef-prp-unit-tests'
+       composition_candidates:
+           test:
+               image: ${{build_polymer}}
+               command: ash -c "npm run test"
+
     push_to_hub:
         type: push
         title: Pushing polymer image to docker hub

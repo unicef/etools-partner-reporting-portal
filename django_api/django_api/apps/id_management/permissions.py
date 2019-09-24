@@ -79,7 +79,7 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
             workspace_kwargs = {'workspace__isnull': False, 'workspace_id': obj.workspace_id}
 
             if ((ROLES.ip_admin == role_in_payload or
-                 obj.role == ROLES.ip_admin and request.method == 'POST') and
+                 obj.role == ROLES.ip_admin and (request.method == 'POST' or request.method == 'PATCH')) and
                     user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs)):
                 return True
 
@@ -89,7 +89,7 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                 return True
 
             if (obj_roles_set.issubset({ROLES.ip_editor, ROLES.ip_viewer}) and
-                    user.prp_roles.filter(role=ROLES.ip_admin, **workspace_kwargs).exists()):
+                    user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs).exists()):
                 return True
 
         return False

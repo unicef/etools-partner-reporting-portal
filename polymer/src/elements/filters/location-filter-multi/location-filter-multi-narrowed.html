@@ -7,6 +7,8 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
 
 <dom-module id="location-filter-multi-narrowed">
   <template>
@@ -32,9 +34,10 @@
     </etools-prp-ajax>
 
     <dropdown-filter-multi
-        label="Location"
+        label="[[localize('location')]]"
         name="locs"
         value="[[value]]"
+        on-value-changed="_onValueChanged"
         data="[[data]]"
         disabled="[[pending]]">
     </dropdown-filter-multi>
@@ -47,6 +50,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.FilterDependenciesBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -92,13 +97,20 @@
           this.$.locations.thunk()()
               .then(function (res) {
                 self.set('pending', false);
-                self.set('data', res.data);
+                self.set('data', res.data.results);
               })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling
                 self.set('pending', false);
               });
         });
+      },
+
+      _onValueChanged: function (e) {
+
+        if (e.detail.value === '') {
+          return;
+        }
       },
 
       detached: function () {

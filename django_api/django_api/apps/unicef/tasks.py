@@ -12,13 +12,15 @@ from rest_framework.exceptions import ValidationError
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PRPRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
+from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES, EXTERNAL_DATA_SOURCES
 
 from partner.models import PartnerActivity
+from partner.serializers import (
+    PMPPartnerSerializer,
+)
 
 from unicef.serializers import (
     PMPProgrammeDocumentSerializer,
-    PMPPDPartnerSerializer,
     PMPPDPersonSerializer,
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
@@ -37,9 +39,10 @@ from indicator.models import (
     DisaggregationValue,
     ReportableLocationGoal,
     create_pa_reportables_from_ca,
+    create_reportable_for_pp_from_ca_reportable,
 )
 
-from partner.models import Partner
+from partner.models import Partner, PartnerProject, PartnerActivityProjectContext
 
 
 logger = logging.getLogger(__name__)
@@ -168,7 +171,7 @@ def process_programme_documents(fast=False, area=False):
                         try:
                             partner = process_model(
                                 Partner,
-                                PMPPDPartnerSerializer,
+                                PMPPartnerSerializer,
                                 partner_data, {
                                     'vendor_number': partner_data['unicef_vendor_number']
                                 }
@@ -216,6 +219,10 @@ def process_programme_documents(fast=False, area=False):
                         except KeyError as e:
                             logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
                             continue
+
+                        pd.unicef_focal_point.all().update(active=False)
+                        pd.unicef_officers.all().update(active=False)
+                        pd.partner_focal_point.all().update(active=False)
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
@@ -311,6 +318,9 @@ def process_programme_documents(fast=False, area=False):
                             llos.update(active=False)
                             Reportable.objects.filter(lower_level_outputs__in=llos).update(active=False)
 
+                            # Mark all ReportableLocationGoal instances referred in LLO Reportables as inactive
+                            ReportableLocationGoal.objects.filter(reportable__lower_level_outputs__in=llos).update(is_active=False)
+
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
                                 # Create PDResultLink
@@ -331,6 +341,7 @@ def process_programme_documents(fast=False, area=False):
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id
                                 d['external_business_area_code'] = workspace.business_area_code
+
                                 llo = process_model(
                                     LowerLevelOutput, PMPLLOSerializer, d,
                                     {
@@ -496,22 +507,51 @@ def process_programme_documents(fast=False, area=False):
                                             cai = Reportable.objects.get(id=int(i['cluster_indicator_id']))
                                             reportable.ca_indicator_used_by_reporting_entity = cai
 
+                                            # Partner Project for this PD check
+                                            if not PartnerProject.objects.filter(
+                                                external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF
+                                            ).exists():
+                                                pp = PartnerProject.objects.create(
+                                                    external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                                    external_source=EXTERNAL_DATA_SOURCES.UNICEF,
+                                                    title=item['title'],
+                                                    partner=partner,
+                                                )
+
+                                                logger.info(
+                                                        "Created a new PartnerProject "
+                                                        "from PD: " + str(item['reference_number'])
+                                                    )
+                                            else:
+                                                pp = PartnerProject.objects.get(
+                                                    external_id="{}/{}".format(area, item['id']),
+                                                    external_source=EXTERNAL_DATA_SOURCES.UNICEF
+                                                )
+
                                             # Force adoption of PartnerActivity from ClusterActivity Indicator
                                             if pd.partner.id not in cai.content_object.partner_activities.values_list(
                                                     'partner', flat=True):
                                                 try:
                                                     partner_activity = PartnerActivity.objects.create(
                                                         title=cai.blueprint.title,
-                                                        project=pd.partner.partner_projects.first(),
                                                         partner=pd.partner,
                                                         cluster_activity=cai.content_object,
-                                                        start_date=cai.content_object.response_plan.start,
-                                                        end_date=cai.content_object.response_plan.end,
                                                         status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
+
+                                                    PartnerActivityProjectContext.objects.update_or_create(
+                                                        defaults={
+                                                            'activity': partner_activity,
+                                                            'project': pp,
+                                                        },
+                                                        start_date=item['start_date'],
+                                                        end_date=item['end_date'],
+                                                    )
+
                                                 except Exception as e:
                                                     logger.exception(
-                                                        "Cannot force adopt PartnerActivity from ClusterActivity "
+                                                        "Cannot force adopt PartnerActivity and its project context from ClusterActivity "
                                                         "for dual reporting - skipping link!: " + str(e)
                                                     )
                                                     continue
@@ -530,6 +570,21 @@ def process_programme_documents(fast=False, area=False):
                                                         )
 
                                                         partner_activity.delete()
+                                                        continue
+
+                                                    try:
+                                                        # Grab Cluster Activity instance from
+                                                        # this newly created Partner Activity instance
+                                                        create_reportable_for_pp_from_ca_reportable(
+                                                            pp, cai
+                                                        )
+                                                    except Exception as e:
+                                                        logger.exception(
+                                                            "Cannot create Reportables for PD Partner Project "
+                                                            "from referenced Cluster Activity Reportable "
+                                                            " - skipping link!: " + str(e)
+                                                        )
+
                                                         continue
 
                                         except Reportable.DoesNotExist:
@@ -552,6 +607,7 @@ def process_programme_documents(fast=False, area=False):
                                             ReportableLocationGoal(
                                                 reportable=reportable,
                                                 location=l,
+                                                is_active=True,
                                             ) for l in Location.objects.filter(id__in=new_locs)
                                         ]
 
@@ -561,10 +617,13 @@ def process_programme_documents(fast=False, area=False):
                                             ReportableLocationGoal(
                                                 reportable=reportable,
                                                 location=l,
+                                                is_active=True,
                                             ) for l in locations
                                         ]
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
+                                    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
 
                                     if partner_activity:
                                         # Force update on PA Reportable instance for location update
@@ -580,10 +639,14 @@ def process_programme_documents(fast=False, area=False):
                                                     ReportableLocationGoal(
                                                         reportable=reportable,
                                                         location=l,
+                                                        is_active=True,
                                                     ) for l in loc_diff
                                                 ]
 
                                                 ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
+                                                # We don't overwrite is_active flag on PartnerActivity reportable from LLO locations here
+                                                # since Cluster may use those locations
 
                     # Check if another page exists
                     if list_data['next']:

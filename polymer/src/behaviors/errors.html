@@ -9,7 +9,6 @@
 
     App.Behaviors.ErrorHandlerBehavior = {
       _handleError: function (e) {
-        var self = this;
         var xhr;
 
         try {
@@ -23,7 +22,7 @@
             case 403: // FIXME: 401?
               App.Store.dispatch(App.Actions.userLogout())
                   .then(function () {
-                    self.set('route.path', '/login');
+                    location.pathname = '/landing';
                   });
               break;
 

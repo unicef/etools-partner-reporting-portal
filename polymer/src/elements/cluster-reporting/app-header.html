@@ -7,7 +7,9 @@
 <link rel="import" href="../etools-logo.html">
 <link rel="import" href="../app-switcher.html">
 <link rel="import" href="../workspace-dropdown.html">
+<link rel="import" href="../language-dropdown.html">
 <link rel="import" href="../etools-prp-workspaces.html">
+<link rel="import" href="../etools-prp-languages.html">
 <link rel="import" href="change-response-plan.html">
 <link rel="import" href="../user-profile/profile-dropdown.html">
 
@@ -54,8 +56,12 @@
         @apply(--layout-vertical);
         @apply(--layout-center-center);
       }
-
     </style>
+
+    <etools-prp-languages
+        all="{{languages}}"
+        current="{{language}}">
+    </etools-prp-languages>
 
     <etools-prp-workspaces
         all="{{workspaces}}"
@@ -74,6 +80,10 @@
           </div>
 
           <div class="wrapper">
+            <language-dropdown
+                data="[[languages]]"
+                current="[[language]]">
+            </language-dropdown>
 
             <workspace-dropdown
                 data="[[workspaces]]"

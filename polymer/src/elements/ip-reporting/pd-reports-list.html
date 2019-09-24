@@ -10,6 +10,8 @@
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
@@ -19,6 +21,7 @@
 <link rel="import" href="pd-reports-report-title.html">
 
 <link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="js/pd-reports-list-functions.html">
 
 <dom-module id="pd-reports-list">
   <template>
@@ -45,25 +48,25 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-content-panel panel-title="List of Reports">
+    <etools-content-panel panel-title="[[localize('list_of_reports')]]">
 
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <etools-data-table-column>
-          <div class="table-column">Report #</div>
+          <div class="table-column">[[localize('report_number')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
-          <div class="table-column">Report Status</div>
+          <div class="table-column">[[localize('report_status')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="due_date" sortable>
-          <div class="table-column">Due date</div>
+          <div class="table-column">[[localize('due_date')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="date_of_submission" sortable>
-          <div class="table-column">Date of submission</div>
+          <div class="table-column">[[localize('date_of_submission')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="reporting_period" sortable>
-          <div class="table-column">Reporting period</div>
+          <div class="table-column">[[localize('reporting_period')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -136,6 +139,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -160,11 +165,7 @@
 
       _getLink: function (report, permissions) {
         var suffix = this._getMode(report, permissions);
-
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + this.pdId + '/report/' + report.id + '/' + suffix
-        );
+        return PdReportsListUtils.getLink(report, suffix, this.buildUrl, this._baseUrl);
       },
     });
   </script>

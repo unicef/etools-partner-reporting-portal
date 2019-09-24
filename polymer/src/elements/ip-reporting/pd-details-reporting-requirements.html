@@ -4,6 +4,11 @@
 
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
+
+<link rel="import" href="js/pd-details-reporting-requirements-functions.html">
 
 <dom-module id="pd-details-reporting-requirements">
   <template>
@@ -31,13 +36,13 @@
 
       <etools-data-table-header no-collapse no-title>
         <etools-data-table-column field="">
-          Report #
+          [[localize('report_number')]]
         </etools-data-table-column>
         <etools-data-table-column field="">
-          Due date
+          [[localize('due_date')]]
         </etools-data-table-column>
         <etools-data-table-column field="">
-          Reporting period
+          [[localize('reporting_period')]]
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -47,7 +52,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell">
-              [[_getReportName(item.report_type, index)]]
+              [[_getReportName(item.report_type, index, localize)]]
             </div>
             <div class="table-cell table-cell--text">
               [[item.due_date]]
@@ -74,6 +79,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -82,8 +89,8 @@
         title: String,
       },
 
-      _getReportName: function (type, index) {
-        return type + (index + 1);
+      _getReportName: function (type, index, localize) {
+        return PdDetailsReportingRequirementsUtils.getReportName(type, index, localize);
       },
     });
   </script>

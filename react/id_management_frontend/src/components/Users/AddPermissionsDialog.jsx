@@ -11,7 +11,7 @@ import {api} from "../../infrastructure/api";
 
 const title = "Add permissions";
 
-class AddPermissionsDialog extends Component {
+export class AddPermissionsDialog extends Component {
     constructor(props) {
         super(props);
 

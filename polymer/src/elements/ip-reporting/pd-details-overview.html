@@ -13,12 +13,16 @@
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../settings.html">
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/etools-prp-currency.html">
 <link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../elements/labelled-item.html">
 <link rel="import" href="../../styles/table-styles.html">
+
+<link rel="import" href="js/pd-details-overview-functions.html">
 
 <dom-module id="pd-details-overview">
   <template>
@@ -89,28 +93,34 @@
         margin-bottom: 50px;
       }
     </style>
+
+    <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
     <page-body>
-      <etools-content-panel panel-title="Partnership Information">
+      <etools-content-panel panel-title="[[localize('partnership_info')]]">
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
           <li class="item item-2-col">
-            <labelled-item label="Agreement">
+            <labelled-item label="[[localize('agreement')]]">
               <span class="field-value">[[_withDefault(pd.agreement)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Document Type">
+            <labelled-item label="[[localize('document_type')]]">
               <span class="field-value">[[_withDefault(pd.document_type_display)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Reference Number">
+            <labelled-item label="[[localize('reference_number')]]">
               <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
             </labelled-item>
           </li>
         </ul>
 
-        <labelled-item label="Title">
+        <labelled-item label="[[localize('title')]]">
           <span class="field-value">[[_withDefault(pd.title)]]</span>
         </labelled-item>
 
@@ -118,43 +128,43 @@
 
         <ul class="app-grid">
           <li class="item item-2-col">
-            <labelled-item label="UNICEF Office(s)">
+            <labelled-item label="[[localize('unicef_offices')]]">
               <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="UNICEF Focal Point(s)">
+            <labelled-item label="[[localize('unicef_points')]]">
               <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Partner Focal Point(s)">
+            <labelled-item label="[[localize('partner_points')]]">
               <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
             </labelled-item>
           </li>
         </ul>
       </etools-content-panel>
 
-      <etools-content-panel panel-title="PD or SSFA Details">
+      <etools-content-panel panel-title="[[localize('pd_ssfa_details')]]">
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="PD/SSFA Document">
+            <labelled-item label="[[localize('pd_ssfa_document')]]">
               <pd-details-doc-download></pd-details-doc-download>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Start date">
+            <labelled-item label="[[localize('start_date')]]">
               <span class="field-value">[[_withDefault(pd.start_date)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="End date">
+            <labelled-item label="[[localize('end_date')]]">
               <span class="field-value">[[_withDefault(pd.end_date)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="CSO contribution">
+            <labelled-item label="[[localize('cso_contribution')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.cso_contribution]]"
@@ -164,7 +174,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total UNICEF cash">
+            <labelled-item label="[[localize('total_unicef_cash')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.total_unicef_cash]]"
@@ -174,7 +184,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total UNICEF supplies">
+            <labelled-item label="[[localize('total_unicef_supplies')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.total_unicef_supplies]]"
@@ -184,7 +194,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total Budget">
+            <labelled-item label="[[localize('total_budget')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.budget]]"
@@ -194,16 +204,15 @@
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="$ disbursements to date (%)">
-              <!-- TODO
+            <labelled-item label="[[localize('disbursements')]]">
+              <span class="field-value">[[_computeFunds(pd.funds_received_to_date)]]</span>
               <etools-prp-progress-bar
-                  number="[[]]">
+                number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
               </etools-prp-progress-bar>
-              -->
             </labelled-item>
           </li>
         </ul>
-        <labelled-item label="Location(s)">
+        <labelled-item label="[[localize('locations')]]">
           <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'title')]]</span>
         </labelled-item>
       </etools-content-panel>
@@ -212,15 +221,15 @@
           is="dom-if"
           if="[[_hasAmendments(pd)]]"
           restamp="true">
-        <etools-content-panel panel-title="Amendments" class="amendments">
+        <etools-content-panel panel-title="[[localize('amendments')]]" class="amendments">
           <etools-loading active="[[!loaded]]"></etools-loading>
 
           <etools-data-table-header no-collapse no-title>
             <etools-data-table-column field="">
-              Amendment Types
+              [[localize('amendment_types')]]
             </etools-data-table-column>
             <etools-data-table-column field="">
-              Signed Date
+              [[localize('signed_date')]]
             </etools-data-table-column>
           </etools-data-table-header>
 
@@ -232,7 +241,7 @@
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="table-cell">
-                  [[amendment.types]]
+                  [[_displayFullName(amendment.types)]]
                 </div>
                 <div class="table-cell">
                   [[amendment.signed_date]]
@@ -243,22 +252,22 @@
         </etools-content-panel>
       </template>
 
-      <etools-content-panel panel-title="Reporting Requirements" class="reporting-requirements">
+      <etools-content-panel panel-title="[[localize('reporting_requirements')]]" class="reporting-requirements">
         <etools-loading active="[[!loaded]]"></etools-loading>
           <pd-details-reporting-requirements
-              title="QPR"
+              title="[[localize('qpr_short')]]"
               data="[[reportingRequirements.qpr]]"
               loading="[[!loaded]]">
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
-              title="HR"
+              title="[[localize('hr_short')]]"
               data="[[reportingRequirements.hr]]"
               loading="[[!loaded]]">
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
-              title="SR"
+              title="[[localize('sr_short')]]"
               data="[[reportingRequirements.sr]]"
               loading="[[!loaded]]">
           </pd-details-reporting-requirements>
@@ -274,6 +283,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -283,20 +294,64 @@
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
+        amendmentTypes: {
+          type: Object,
+          value: {
+            dates: 'Dates',
+            results: 'Results',
+            budget: 'Budget',
+            admin_error: 'Type 1: Administrative error (correction)',
+            budget_lte_20: 'Type 2: Budget <= 20%',
+            budget_gt_20: 'Type 3: Budget > 20%',
+            change: 'Type 4: Changes to planned results',
+            no_cost: 'Type 5: No cost extension',
+            other: 'Type 6: Other'
+          }
+        },
+
         loaded: {
           type: Boolean,
           value: false,
           computed: '_computeLoaded(pd)',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         reportingRequirements: {
           type: Object,
           computed: '_computeReportingRequirements(pd.reporting_periods)',
         },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+        },
+
+        pdReportsCount: {
+          type: Object,
+          statePath: 'programmeDocumentReports.countByPD',
+          observer: '_getPdReports',
+        },
+      },
+
+      _computeFunds: function (num) {
+        if (num === null || num === -1) {
+          return num;
+        } else {
+          return 'N/A';
+        }
       },
 
       _computeLoaded: function (pd) {
-        return !!pd.id;
+        return PdDetailsOverviewUtils.computeLoaded(pd);
       },
 
       _formatFocalPoint: function (items) {
@@ -304,32 +359,53 @@
       },
 
       _hasAmendments: function (pd) {
-        return pd.amendments && !!pd.amendments.length;
+        return PdDetailsOverviewUtils.hasAmendments(pd);
       },
 
       _computeReportingRequirements: function (reportingPeriods) {
-        var byType = (reportingPeriods || []).reduce(function (acc, curr) {
-          var type = curr.report_type.toLowerCase();
+        return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, App.Settings.dateFormat);
+      },
 
-          if (!acc[type]) {
-            acc[type] = [];
-          }
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
+      },
 
-          acc[type].push(curr);
+      _displayFullName: function (types) {
+        var self = this;
 
-          return acc;
-        }, {});
+        if (!types) {
+          return '';
+        }
 
-        Object.keys(byType).forEach(function (type) {
-          byType[type].sort(function (a, b) {
-            var dateA = moment(a.start_date, App.Settings.dateFormat).toDate();
-            var dateB = moment(b.start_date, App.Settings.dateFormat).toDate();
+        return types
+          .map(function (type) {
+            return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
+          })
+          .join(', ');
+      },
 
-            return dateA - dateB;
-          });
-        });
+      _getPdReports: function () {
+        // Status being present prevents Redux / res.data from getting reports,
+        // preventing pd-details title from rendering. In that case (which we
+        // check by seeing if this.pdReportsCount is present), just get the reports again
+        if (this.pdReportsCount[this.pdId] === undefined) {
+          this.debounce('fetch-pds', function () {
+            var pdThunk = this.$.programmeDocuments;
+            pdThunk.params = {
+              page: 1,
+              page_size: 10,
+              programme_document: this.pdId
+            };
 
-        return byType;
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
+
+            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+          }, 100);
+        }
       },
     });
   </script>

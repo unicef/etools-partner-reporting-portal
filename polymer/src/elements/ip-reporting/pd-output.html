@@ -12,6 +12,8 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../labelled-item.html">
@@ -21,6 +23,8 @@
 <link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../indicator-details.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
+
+<link rel="import" href="js/pd-output-functions.html">
 
 <dom-module id="pd-output">
   <template>
@@ -125,7 +129,7 @@
     </etools-prp-ajax>
 
     <div class="header">
-      <labelled-item label="Title">[[data.title]]</labelled-item>
+      <labelled-item label="[[localize('title')]]">[[data.title]]</labelled-item>
 
       <template
           is="dom-if"
@@ -172,15 +176,19 @@
                   <h3>[[indicator.reportable.blueprint.title]]</h3>
 
                   <dl class="layout horizontal">
-                    <dt><a href="[[calculationMethodUrl]]">Calculation methods <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
-                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[_calculationFormulaAcrossPeriods(indicator)]]</b> (across reporting periods)</dt>
+                    <dt><a href="[[calculationMethodUrl]]">[[localize('calculation_methods')]]
+                      <paper-tooltip>[[localize('to_learn_more')]]</paper-tooltip></a>:</dt>
+                    <dt>
+                      <b>[[_toLowerCaseLocalized(indicator.reportable.blueprint.calculation_formula_across_locations, localize)]]</b>
+                      ([[_toLowerCaseLocalized('across_locations', localize)]]),
+                      <b>[[_calculationFormulaAcrossPeriods(indicator, localize)]]</b> ([[_toLowerCaseLocalized('across_reporting_periods', localize)]])</dt>
                   </dl>
                 </div>
               </div>
             </div>
             <div class="indicator-header__target flex-none layout vertical center-justified">
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Target:</dt>
+                <dt class="flex-3">[[localize('target')]]:</dt>
                 <dd class="flex">
                   <template
                       is="dom-if"
@@ -203,7 +211,7 @@
                 </dd>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Total cumulative progress:</dt>
+                <dt class="flex-3">[[localize('total_cumulative_progress')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
@@ -220,7 +228,7 @@
                 </template>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">Achievement in reporting period:</dt>
+                <dt class="flex-3">[[localize('achievement_in_reporting_period')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
@@ -271,6 +279,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -338,38 +348,33 @@
         'reportable-meta-changed': '_updateMeta',
       },
 
-      _calculationFormulaAcrossPeriods: function (indicator) {
-        return indicator.reportable.blueprint.display_type === 'ratio'
-          ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+      _calculationFormulaAcrossPeriods: function (indicator, localize) {
+        return PdOutputUtils.calculationFormulaAcrossPeriods(indicator, localize);
       },
 
       _toggle: function (e) {
-        var node = e.target;
-
-        while (node && typeof node.toggles === 'undefined') {
-          node = node.parentNode;
-        }
+        var node = PdOutputUtils.toggle(e);
 
         this.$$('#collapse-' + node.toggles).toggle();
       },
 
       _computeIcon: function (opened) {
-        return opened ? 'less' : 'more';
+        return PdOutputUtils.computeIcon(opened);
       },
 
       _computeCompleteIndicator: function (complete) {
-        return complete ? 'Met' : 'Ove';
+        return PdOutputUtils.computeCompleteIndicator(complete);
       },
 
       _computeReportableUrl: function (reportId, data) {
-        return App.Endpoints.reportable(reportId, data.id);
+        return PdOutputUtils.computeReportableUrl(reportId, data);
       },
 
       _computeCalculationMethodUrl: function (baseUrl, pdId) {
         return this.buildUrl(
-                baseUrl,
-                'pd/' + pdId + '/view/calculation-methods'
-              );
+          baseUrl,
+          'pd/' + pdId + '/view/calculation-methods'
+        );
       },
 
       _computeReportIsQpr: function (currentReport, indicator) {

@@ -1,11 +1,13 @@
 from ast import literal_eval as make_tuple
 import copy
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 from django.urls import reverse
 from django.conf import settings
 
 from rest_framework import status
+from unicef_notification.models import Notification
 
 from core.models import Location
 from core.common import (
@@ -23,6 +25,7 @@ from core.management.commands._generate_disaggregation_fake_data import (
 )
 from core.factories import (CartoDBTableFactory,
                             ProgressReportIndicatorReportFactory,
+                            PartnerActivityProjectContextFactory,
                             IPPRPRoleFactory,
                             CountryFactory, DisaggregationFactory,
                             DisaggregationValueFactory, GatewayTypeFactory,
@@ -31,6 +34,7 @@ from core.factories import (CartoDBTableFactory,
                             PartnerUserFactory, PartnerFactory,
                             ProgressReportFactory,
                             QuantityReportableToLowerLevelOutputFactory,
+                            QuantityReportableToClusterObjectiveFactory,
                             QuantityTypeIndicatorBlueprintFactory,
                             WorkspaceFactory,
                             SectionFactory,
@@ -266,8 +270,12 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         )
 
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
 
         self.sample_disaggregation_value_map = {
@@ -325,7 +333,10 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 
         super().setUp()
 
-    def test_submit_indicator(self):
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_submit_indicator(self, mock_create, mock_clean, mock_send):
         ir = IndicatorReport.objects.first()
         ir.report_status = INDICATOR_REPORT_STATUS.sent_back
         ir.overall_status = OVERALL_STATUS.met
@@ -380,8 +391,12 @@ class TestIndicatorListAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -602,8 +617,12 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -811,8 +830,12 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -840,10 +863,11 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -1014,8 +1038,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1043,10 +1071,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -1271,7 +1300,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             self.blueprint_count + 1)
 
     def test_create_indicator_partner_activities_reporting(self):
-        pa = PartnerActivity.objects.filter(project__isnull=False).first()
+        pa = PartnerActivity.objects.filter(projects__isnull=False).first()
         self.data['object_id'] = pa.id
         self.data['object_type'] = 'partner.partneractivity'
         response = self.client.post(self.url, data=self.data, format='json')
@@ -1361,8 +1390,12 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1473,10 +1506,11 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -1866,3 +1900,541 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             + "have correct value key structure: c, d, v",
             response.data['non_field_errors'][0]
         )
+
+
+class TestReportRefreshAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.user = NonPartnerUserFactory()
+        self.partner_user = PartnerUserFactory(partner=self.partner)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
+            cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
+            project=self.project,
+            activity=self.p_activity,
+        )
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
+
+        blueprint = QuantityTypeIndicatorBlueprintFactory(
+            unit=IndicatorBlueprint.NUMBER,
+            calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            calculation_formula_across_periods=IndicatorBlueprint.SUM,
+        )
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.partneractivity_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.partneractivity_reportable,
+        )
+
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        for idx in range(2):
+            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        for idx in range(6):
+            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+            ProgressReportFactory(
+                start_date=hr_period.start_date,
+                end_date=hr_period.end_date,
+                due_date=hr_period.due_date,
+                report_number=idx + 1,
+                report_type=hr_period.report_type,
+                is_final=False,
+                programme_document=self.pd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        self.llo_reportable.disaggregations.clear()
+        self.partneractivity_reportable.disaggregations.clear()
+
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            disagg = IPDisaggregationFactory(name=disagg_name)
+            cluster_disagg = DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
+
+            self.llo_reportable.disaggregations.add(disagg)
+            self.partneractivity_reportable.disaggregations.add(cluster_disagg)
+
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=cluster_disagg,
+                    value=value
+                )
+                DisaggregationValueFactory(
+                    disaggregation=disagg,
+                    value=value
+                )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.llo_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.llo_reportable,
+        )
+
+        for _ in range(2):
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        for pr in self.pd.progress_reports.all():
+            ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=self.llo_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+                overall_status=OVERALL_STATUS.met,
+            )
+
+        # Creating Level-3 disaggregation location data for all locations
+        generate_3_num_disagg_data(self.llo_reportable, indicator_type="quantity")
+
+        for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+        super().setUp()
+
+        # Logging in as Partner AO
+        self.client.force_authenticate(self.partner_user)
+
+        self.progress_report = self.pd.progress_reports.first()
+
+    def test_invalid_serializer_values(self):
+        url = reverse('report-refresh-api')
+        data = {"report_type": "PR", "report_id": -100}
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        data['report_id'] = self.progress_report.id
+        data['report_type'] = 'AAAA'
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        data['report_id'] = self.progress_report.indicator_reports.first().id
+        data['report_type'] = 'IR'
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+        self.assertEquals(
+            "This indicator report is linked to a progress report. Use the progress report ID instead.",
+            response.data['non_field_errors'][0]
+        )
+
+    def test_progress_report_reset(self):
+        url = reverse('report-refresh-api')
+        data = {"report_type": "PR", "report_id": self.progress_report.id}
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['response'], "OK")
+
+        # All indicator reports should be blank state
+        for ir in self.progress_report.indicator_reports.all():
+            self.assertEquals(ir.total['c'], 0)
+            self.assertEquals(ir.overall_status, "NoS")
+            self.assertEquals(ir.report_status, "Due")
+            self.assertEquals(ir.submission_date, None)
+
+    def test_cluster_indicator_report_reset(self):
+        ir = self.partneractivity_reportable.indicator_reports.first()
+        url = reverse('report-refresh-api')
+        data = {"report_type": "IR", "report_id": ir.id}
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['response'], "OK")
+
+        ir = IndicatorReport.objects.get(id=ir.id)
+
+        # All indicator report information should be initial state
+        self.assertEquals(ir.submission_date, None)
+        self.assertEquals(ir.overall_status, "NoS")
+        self.assertEquals(ir.report_status, "Due")
+        self.assertEquals(ir.total['c'], 0)
+
+        for ild in ir.indicator_location_data.all():
+            self.assertEquals(ild.disaggregation['()']['c'], 0)
+            self.assertEquals(ild.disaggregation['()']['d'], 0)
+            self.assertEquals(ild.disaggregation['()']['v'], 0)
+
+
+class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.cluster2 = ClusterFactory(type='education', response_plan=self.response_plan)
+        self.loc_type = GatewayTypeFactory(country=self.country)
+        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.objective = ClusterObjectiveFactory(
+            cluster=self.cluster,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.objective2 = ClusterObjectiveFactory(
+            cluster=self.cluster2,
+            locations=[
+                self.loc1,
+                self.loc2,
+            ]
+        )
+        self.activity = ClusterActivityFactory(
+            cluster_objective=self.objective,
+            locations=[
+                self.loc1, self.loc2
+            ]
+        )
+        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner2 = PartnerFactory(country_code=self.country.country_short_code)
+        self.user = NonPartnerUserFactory()
+        self.partner_user = PartnerUserFactory(partner=self.partner)
+        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.project2 = PartnerProjectFactory(
+            partner=self.partner2,
+            clusters=[self.cluster],
+            locations=[self.loc1, self.loc2],
+        )
+        self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
+            cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
+            project=self.project,
+            activity=self.p_activity,
+        )
+        self.sample_disaggregation_value_map = {
+            "height": ["tall", "medium", "short", "extrashort"],
+            "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
+            "gender": ["male", "female", "other"],
+        }
+
+        blueprint = QuantityTypeIndicatorBlueprintFactory(
+            unit=IndicatorBlueprint.NUMBER,
+            calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            calculation_formula_across_periods=IndicatorBlueprint.SUM,
+        )
+
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
+            content_object=self.p_activity, blueprint=blueprint
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.partneractivity_reportable,
+        )
+
+        LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.partneractivity_reportable,
+        )
+
+        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+            content_object=self.objective, blueprint=blueprint
+        )
+
+        self.reportable_loc_1 = LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.clusterobjective_reportable,
+        )
+
+        self.reportable_loc_2 = LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.clusterobjective_reportable,
+        )
+
+        self.clusterobjective_reportable2 = QuantityReportableToClusterObjectiveFactory(
+            content_object=self.objective2, blueprint=blueprint
+        )
+
+        self.reportable_2_loc_1 = LocationWithReportableLocationGoalFactory(
+            location=self.loc1,
+            reportable=self.clusterobjective_reportable2,
+        )
+
+        self.reportable_2_loc_2 = LocationWithReportableLocationGoalFactory(
+            location=self.loc2,
+            reportable=self.clusterobjective_reportable2,
+        )
+
+        self.clusterobjective_reportable.disaggregations.clear()
+        self.clusterobjective_reportable2.disaggregations.clear()
+        self.partneractivity_reportable.disaggregations.clear()
+
+        # Create the disaggregations and values in the db for all response plans
+        # including one for no response plan as well
+        for disagg_name, values in self.sample_disaggregation_value_map.items():
+            cluster_disagg = DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
+
+            self.clusterobjective_reportable.disaggregations.add(cluster_disagg)
+            self.clusterobjective_reportable2.disaggregations.add(cluster_disagg)
+            self.partneractivity_reportable.disaggregations.add(cluster_disagg)
+
+            for value in values:
+                DisaggregationValueFactory(
+                    disaggregation=cluster_disagg,
+                    value=value
+                )
+
+        super().setUp()
+
+        # Logging in as Partner AO
+        self.client.force_authenticate(self.partner_user)
+
+    def test_invalid_serializer_values(self):
+        url = reverse('partner-project-indicator-adopt')
+
+        # Start with valid data payload
+        data = {
+            'partner_id': self.partner.id,
+            'partner_project_id': self.project.id,
+            'cluster_id': self.cluster.id,
+            'cluster_objective_id': self.objective.id,
+            'reportable_id': self.clusterobjective_reportable.id,
+            'locations': [
+                {
+                    'id': self.reportable_loc_1.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc1.id,
+                },
+                {
+                    'id': self.reportable_loc_2.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc2.id,
+                }
+            ],
+            'target': {'d': 1, 'v': 1, 'c': 1},
+            'baseline': {'d': 1, 'v': 1, 'c': 1},
+        }
+
+        # Target value type check
+        data['target'] = list()
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Baseline value type check
+        data['target'] = {'d': 1, 'v': 1, 'c': 1}
+        data['baseline'] = list()
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # zero d value in target
+        data['baseline'] = {'d': 1, 'v': 1, 'c': 1}
+        data['target'] = {'d': 0, 'v': 1, 'c': 1}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # missing v value in target
+        data['target'] = {'d': 1, 'c': 1}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # zero d value in baseline
+        data['target'] = {'d': 1, 'v': 1, 'c': 1}
+        data['baseline'] = {'d': 0, 'v': 1, 'c': 1}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # missing v value in baseline
+        data['baseline'] = {'d': 1, 'c': 1}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Reset
+        data['target'] = {'d': 1, 'v': 1, 'c': 1}
+        data['baseline'] = {'d': 1, 'v': 1, 'c': 1}
+
+        # Non-exist partner check
+        data['partner_id'] = 999999
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Non-exist partner project check
+        data['partner_id'] = self.partner.id
+        data['partner_project_id'] = 999999
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Invalid partner project membership check
+        data['partner_id'] = self.partner.id
+        data['partner_project_id'] = self.project2.id
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Non-exist cluster check
+        data['partner_project_id'] = self.project.id
+        data['cluster_id'] = 999999
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Non-exist cluster objective check
+        data['cluster_id'] = self.cluster.id
+        data['cluster_objective_id'] = 999999
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Invalid cluster objective membership check
+        data['cluster_id'] = self.cluster.id
+        data['cluster_objective_id'] = self.objective2.id
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Non-exist reportable_id check
+        data['cluster_objective_id'] = self.objective.id
+        data['reportable_id'] = 9999999
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Invalid reportable type check
+        data['reportable_id'] = self.partneractivity_reportable.id
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Invalid reportable membership check
+        data['reportable_id'] = self.clusterobjective_reportable2.id
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+    def test_valid_serializer_values(self):
+        url = reverse('partner-project-indicator-adopt')
+
+        # Start with valid data payload
+        data = {
+            'partner_id': self.partner.id,
+            'partner_project_id': self.project.id,
+            'cluster_id': self.cluster.id,
+            'cluster_objective_id': self.objective.id,
+            'reportable_id': self.clusterobjective_reportable.id,
+            'locations': [
+                {
+                    'id': self.reportable_loc_1.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc1.id,
+                },
+                {
+                    'id': self.reportable_loc_2.id,
+                    'baseline': {'d': 1, 'v': 1, 'c': 1},
+                    'in_need': {'d': 1, 'v': 1, 'c': 1},
+                    'target': {'d': 1, 'v': 1, 'c': 1},
+                    'location': self.loc2.id,
+                }
+            ],
+            'target': {'d': 1, 'v': 1, 'c': 1},
+            'baseline': {'d': 1, 'v': 1, 'c': 1},
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertTrue(Reportable.objects.filter(id=response.data['id']).exists())

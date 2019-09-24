@@ -18,8 +18,12 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../behaviors/sorting.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
+
+<link rel="import" href="js/progress-reports-list-functions.html">
 
 <dom-module id="progress-reports-list">
   <template>
@@ -30,6 +34,7 @@
         --ecp-content: {
           padding: 0;
         };
+      }
     </style>
 
     <iron-location
@@ -41,27 +46,27 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-content-panel panel-title="List of Reports">
+    <etools-content-panel panel-title="[[localize('list_of_reports')]]">
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <etools-data-table-column field="programme_document__reference_number" sortable>
-          <div class="table-column">PD/SSFA ToR ref. #</div>
+          <div class="table-column">[[localize('pd_ref_number')]]</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Report #</div>
+          <div class="table-column">[[localize('report_number')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
-          <div class="table-column">Report Status</div>
+          <div class="table-column">[[localize('report_status')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="due_date" sortable>
-          <div class="table-column">Due date</div>
+          <div class="table-column">[[localize('due_date')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="submission_date" sortable>
-          <div class="table-column">Date of submission</div>
+          <div class="table-column">[[localize('date_of_submission')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="start_date" sortable>
-          <div class="table-column">Reporting period</div>
+          <div class="table-column">[[localize('reporting_period')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -139,6 +144,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
         App.Behaviors.SortingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -159,7 +166,7 @@
       },
 
       _getReportTitle: function (report) {
-        return report.report_type + report.report_number;
+        return ProgressReportsListUtils.getReportTitle(report);
       },
     });
   </script>

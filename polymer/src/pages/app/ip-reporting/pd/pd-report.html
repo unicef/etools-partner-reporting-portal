@@ -12,6 +12,8 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../../../behaviors/localize.html">
+<link rel="import" href="../../../../redux/actions/localize.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
@@ -116,7 +118,7 @@
 
       <pd-reports-report-title
         class="above-title"
-        report=[[currentReport]]>
+        report="[[currentReport]]">
       </pd-reports-report-title>
 
       <a
@@ -154,7 +156,7 @@
               on-tap="_submit"
               disabled="[[busy]]"
               raised>
-            Submit
+            [[localize('submit')]]
           </paper-button>
         </template>
       </div>
@@ -164,9 +166,9 @@
             is="dom-if"
             if="[[submittedOnBehalf]]"
             restamp="true">
-          <p>Submitted by: [[currentReport.submitting_user]]</p>
-          <p>On behalf: [[currentReport.submitted_by]]</p>
-          <p>Submission date: [[currentReport.submission_date]]</p>
+          <p>[[localize('submitted_by')]]: [[currentReport.submitting_user]]</p>
+          <p>[[localize('on_behalf_of')]]: [[currentReport.submitted_by]]</p>
+          <p>[[localize('date_of_submission')]]: [[currentReport.submission_date]]</p>
         </template>
       </div>
 
@@ -180,22 +182,22 @@
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'HR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on indicators</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_indicators')]]</paper-tab>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'QPR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on results</paper-tab>
-            <paper-tab name="info">Other info</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_results')]]</paper-tab>
+            <paper-tab name="info">[[localize('other_info')]]</paper-tab>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(currentReport.report_type, 'SR')]]"
               restamp="true">
-            <paper-tab name="reporting">Reporting on data</paper-tab>
+            <paper-tab name="reporting">[[localize('reporting_on_data')]]</paper-tab>
           </template>
         </paper-tabs>
       </div>
@@ -255,6 +257,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -304,7 +308,7 @@
 
         headingPrefix: {
           type: String,
-          computed: '_computeHeadingPrefix(mode)',
+          computed: '_computeHeadingPrefix(mode, localize)',
         },
 
         backLink: {
@@ -326,6 +330,13 @@
         submitUrl: {
           type: String,
           computed: '_computeSubmitUrl(locationId, currentReport.id, currentReport.report_type)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
         },
 
         busy: {
@@ -360,6 +371,9 @@
       },
 
       _onReportStatusChanged: function (currentReport, mode) {
+        if (currentReport.status === 'Sen') {
+          this.set('routeData.mode', 'edit');
+        }
         if (
           this._isReadOnlyReport(currentReport) &&
           (mode || '').toLowerCase !== 'view'
@@ -383,13 +397,13 @@
         }, 300);
       },
 
-      _computeHeadingPrefix: function (mode) {
+      _computeHeadingPrefix: function (mode, localize) {
         switch (mode) {
           case 'view':
-            return 'Report for';
+            return localize('report_for');
 
           case 'edit':
-            return 'Enter data for';
+            return localize('enter_data_for');
 
           default:
             return '';

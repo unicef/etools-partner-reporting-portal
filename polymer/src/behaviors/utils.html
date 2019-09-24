@@ -9,6 +9,16 @@
   (function () {
     'use strict';
 
+    var pdListStatuses = {
+      Signed: 'signed',
+      Active: 'active',
+      Suspended: 'suspended',
+      Ended: 'ended',
+      Closed: 'closed',
+      Terminated: 'terminated',
+      All: 'all',
+    };
+
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.UtilsBehavior = {
@@ -24,9 +34,21 @@
         );
       },
 
-      _withDefault: function (value, defaultValue) {
+      _toLowerCaseLocalized: function (text, localize) {
+        return localize(text).toLowerCase();
+      },
+
+      _singularLocalized: function (text, localize) {
+        return localize(text).substring(0, text.length - 1);
+      },
+
+      _withDefault: function (value, defaultValue, localize) {
         if (typeof defaultValue === 'undefined') {
           defaultValue = '...';
+        }
+
+        if (pdListStatuses[value] !== undefined) {
+          return localize(pdListStatuses[value]);
         }
 
         return value == null /* undefinded & null */ ? // jshint ignore:line
@@ -53,7 +75,11 @@
         return Number(val);
       },
 
-      _capitalizeFirstLetter: function (text) {
+      _capitalizeFirstLetter: function (text, localize) {
+        if (localize !== undefined) {
+          return localize(text);
+        }
+
         if (text) {
           return text[0].toUpperCase() + text.substring(1);
         }
@@ -107,7 +133,7 @@
 
         switch (indicatorType) {
           case 'percentage':
-            return percentize === 1 ? Math.floor(_value * 100) + '%' : _value + '%';
+            return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';
           case 'ratio':
             return _value + ':1';
           default:

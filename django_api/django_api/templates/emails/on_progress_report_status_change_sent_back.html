@@ -2,6 +2,19 @@
 
 {% block content %}
     <p>Dear {{ person.name }},</p>
-    <p>Your progress report <a href="{{ pr_url }}">{{ pr_url }}</a> for {{ pd_ref_title }}} has been Sent Back for Revision by UNICEF. Please make the necessary changes and resubmit this report.</p>
-    <p>Best Regards,</p>
+    <p>Please note that the following was sent back by UNICEF:</p>
+    <br>
+    <p>Report: {{report.report_type}}{{report.report_number}}</p>
+    <p>Period: {{report.start_date}} - {{report.end_date}}</p>
+    <p>Submission Date: {{report.submission_date}}</p>
+    <p>Due Date: {{report.due_date}}</p>
+    <p>Link to the report: <a href="{{ pr_url }}">{{ pr_url }}</a></p>
+    <p>Programme Document Ref: {{pd.reference_number}}</p>
+    <p>Programme Document Title: {{pd.title}}</p>
+    <br>
+    <p>Please log in to the UNICEF Partner Reporting Portal to see the reason and contact details of the person that sent the report back.</p>
+    <br>
+    <p>Kind regards,</p>
+    <p>UNICEF</p>
+    <p>-- Please note that replies to this email are not monitored and cannot be replied to --</p>
 {% endblock content %}

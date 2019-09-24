@@ -97,8 +97,8 @@ SHARED_PARTNER_TYPE = Choices(
 
 INTERVENTION_TYPES = Choices(
     ('PD', 'PD', 'Programme Document'),
-    ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA', u'Small-Scale Funding Agreement'),
+    ('HPD', 'HPD', 'Humanitarian Programme Document'),
+    ('SSFA', 'SSFA', 'SSFA'),
 )
 
 INTERVENTION_STATUS = Choices(
@@ -147,7 +147,7 @@ PD_LIST_REPORT_STATUS = Choices(
 PD_DOCUMENT_TYPE = Choices(
     ('PD', 'PD', 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA_TOR', u'SSFA TOR'),
+    ('SSFA', 'SSFA_TOR', 'SSFA TOR'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
@@ -172,6 +172,11 @@ RESPONSE_PLAN_TYPE = Choices(
     ("HRP", "hrp", "HRP"),  # Humanitarian Response Plan
     ("FA", "fa", "FA"),  # Flash Appeal
     ("OTHER", "other", "Other"),  # Flash Appeal
+)
+
+PR_ATTACHMENT_TYPES = Choices(
+    ("FACE", "face", "FACE"),
+    ("Other", "other", "Other"),
 )
 
 OVERALL_STATUS = Choices(
@@ -202,6 +207,7 @@ PARTNER_ACTIVITY_STATUS = Choices(
 EXTERNAL_DATA_SOURCES = Choices(
     ("HPC", "HPC"),
     ("OPS", "OPS"),
+    ("UNICEF", "UNICEF"),
 )
 
 CURRENCIES = Choices(

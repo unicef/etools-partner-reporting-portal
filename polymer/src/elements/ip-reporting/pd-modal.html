@@ -5,12 +5,13 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../bower_components/paper-styles/typography.html">
 
-
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/etools-prp-currency.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 
@@ -64,26 +65,26 @@
       </div>
 
       <paper-dialog-scrollable>
-        <h3>Partnership Information</h3>
+        <h3>[[localize('partnership_info')]]</h3>
         <ul class="app-grid">
           <li class="item item-2-col">
-            <labelled-item label="Agreement">
+            <labelled-item label="[[localize('agreement')]]">
               <span class="field-value">[[_withDefault(pd.agreement)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Document Type">
+            <labelled-item label="[[localize('document_type')]]">
               <span class="field-value">[[_withDefault(pd.document_type_display)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Reference Number">
+            <labelled-item label="[[localize('reference_number')]]">
               <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
             </labelled-item>
           </li>
         </ul>
 
-        <labelled-item label="Title">
+        <labelled-item label="[[localize('title')]]">
           <span class="field-value">[[_withDefault(pd.title)]]</span>
         </labelled-item>
 
@@ -91,23 +92,23 @@
 
         <ul class="app-grid">
           <li class="item item-2-col">
-            <labelled-item label="UNICEF Office(s)">
+            <labelled-item label="[[localize('unicef_offices')]]">
               <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="UNICEF Focal Point(s)">
+            <labelled-item label="[[localize('unicef_points')]]">
               <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="Partner Focal Point(s)">
+            <labelled-item label="[[localize('partner_points')]]">
               <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
             </labelled-item>
           </li>
         </ul>
 
-        <h3>PD or SSFA Details</h3>
+        <h3>[[localize('pd_ssfa_details')]]</h3>
         <ul class="app-grid">
           <li class="item">
             <labelled-item label="In response to an HRP">
@@ -115,17 +116,17 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Start date">
+            <labelled-item label="[[localize('start_date')]]">
               <span class="field-value">[[_withDefault(pd.start_date)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="End date">
+            <labelled-item label="[[localize('end_date')]]">
               <span class="field-value">[[_withDefault(pd.end_date)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="CSO contribution">
+            <labelled-item label="[[localize('cso_contribution')]]n">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.cso_contribution]]"
@@ -135,7 +136,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total UNICEF cash">
+            <labelled-item label="[[localize('total_unicef_cash')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.total_unicef_cash]]"
@@ -145,7 +146,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total UNICEF supplies">
+            <labelled-item label="[[localize('total_unicef_supplies')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.total_unicef_supplies]]"
@@ -155,7 +156,7 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Total Budget">
+            <labelled-item label="[[localize('total_budget')]]">
               <span class="field-value">
                 <etools-prp-currency
                     value="[[pd.budget]]"
@@ -165,22 +166,21 @@
             </labelled-item>
           </li>
           <li class="item item-2-col">
-            <labelled-item label="$ disbursements to date (%)">
-              <!-- TODO
+            <labelled-item label="[[localize('disbursements')]]">
+              <span class="field-value">[[_computeFunds(pd.funds_received_to_date)]]</span>
               <etools-prp-progress-bar
-                  number="[[]]">
+                number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
               </etools-prp-progress-bar>
-              -->
             </labelled-item>
           </li>
         </ul>
-        <labelled-item label="Location(s)">
+        <labelled-item label="[[localize('locations')]]">
           <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'title')]]</span>
         </labelled-item>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
-        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-dismiss>[[localize('cancel')]]</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -193,6 +193,8 @@
         App.Behaviors.ModalBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -200,6 +202,14 @@
           type: Object,
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
+      },
+
+      _computeFunds: function (num) {
+        if (num !== null || num !== -1) {
+          return num;
+        } else {
+          return 'N/A';
+        }
       },
 
       _formatFocalPoint: function (items) {

@@ -32,6 +32,7 @@ from indicator.disaggregators import (
     RatioIndicatorDisaggregator
 )
 from indicator.constants import ValueType
+from indicator.utilities import convert_string_number_to_float
 from utils.emails import send_email_from_template
 
 
@@ -327,9 +328,9 @@ class Reportable(TimeStampedExternalSourceModel):
             return 0.0
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.target['v'])
+            return convert_string_number_to_float(self.target['v'])
         else:
-            return float(self.target['v']) / float(self.target['d'])
+            return convert_string_number_to_float(self.target['v']) / convert_string_number_to_float(self.target['d'])
 
     @property
     def calculated_baseline(self):
@@ -337,9 +338,9 @@ class Reportable(TimeStampedExternalSourceModel):
             return 0.0
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.baseline['v'])
+            return convert_string_number_to_float(self.baseline['v'])
         else:
-            return float(self.baseline['v']) / float(self.baseline['d'])
+            return convert_string_number_to_float(self.baseline['v']) / convert_string_number_to_float(self.baseline['d'])
 
     @property
     def calculated_in_need(self):
@@ -347,22 +348,22 @@ class Reportable(TimeStampedExternalSourceModel):
             return None
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return float(self.in_need['v'])
+            return convert_string_number_to_float(self.in_need['v'])
         else:
-            return float(self.in_need['v']) / float(self.in_need['d'])
+            return convert_string_number_to_float(self.in_need['v']) / convert_string_number_to_float(self.in_need['d'])
 
     @property
     def progress_percentage(self):
         percentage = 0.0
 
         if self.achieved and self.baseline['v'] is not None and self.target['v'] is not None:
-            baseline = float(self.calculated_baseline)
-            target = float(self.calculated_target)
+            baseline = convert_string_number_to_float(self.calculated_baseline)
+            target = convert_string_number_to_float(self.calculated_target)
 
             dividend = 0    # default progress is 0
             if self.achieved['c'] > baseline:
                 dividend = self.achieved['c'] - baseline
-            divisor = float(target) - baseline
+            divisor = convert_string_number_to_float(target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
         return percentage
@@ -437,6 +438,58 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
     pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
 
     pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
+def create_reportable_for_pp_from_ca_reportable(pp, ca_reportable):
+    """
+    Copies one CA reportable instance to a partner activity.
+
+    Arguments:
+        pp {partner.models.PartnerProject} -- PartnerProject to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    """
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pp
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+    pp_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pp_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+    return pp_reportable
+
+
+def create_reportable_for_pp_from_co_reportable(pp, co_reportable):
+    """
+    Copies one CO reportable instance to a partner project.
+
+    Arguments:
+        pp {partner.models.PartnerProject} -- PartnerProject to copy to
+        co_reportable {indicator.models.Reportable} -- ClusterObjective Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+
+    Returns:
+        Reportable -- PartnerProject type Reportable ORM instance
+    """
+
+    # TODO: Add Cluster objective to have only one PartnerProject for a Partner
+    reportable_data_to_sync = get_reportable_data_to_clone(co_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pp
+    reportable_data_to_sync["blueprint"] = co_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = None
+    pp_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pp_reportable.disaggregations.add(*co_reportable.disaggregations.all())
+
+    return pp_reportable
 
 
 def create_pa_reportables_from_ca(pa, ca):
@@ -517,6 +570,7 @@ class ReportableLocationGoal(TimeStampedModel):
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
     in_need = JSONField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('reportable', 'location')
@@ -571,9 +625,7 @@ class IndicatorReport(TimeStampedModel):
         default=OVERALL_STATUS.no_status,
         max_length=3
     )
-    narrative_assessment = models.CharField(max_length=255,
-                                            null=True,
-                                            blank=True)
+    narrative_assessment = models.TextField(null=True, blank=True)
 
     review_date = models.DateField(verbose_name='Review Date',
                                    blank=True,
@@ -588,6 +640,13 @@ class IndicatorReport(TimeStampedModel):
 
     reporting_entity = models.ForeignKey(
         'indicator.ReportingEntity', related_name="indicator_reports"
+    )
+
+    project = models.ForeignKey(
+        'partner.PartnerProject',
+        related_name="indicator_reports",
+        null=True,
+        blank=True
     )
 
     tracker = FieldTracker(fields=['report_status'])

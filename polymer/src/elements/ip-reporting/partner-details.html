@@ -7,8 +7,12 @@
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/partner.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../labelled-item.html">
+
+<link rel="import" href="js/partner-details-functions.html">
 
 <dom-module id="partner-details">
   <template>
@@ -46,42 +50,42 @@
       }
     </style>
 
-    <etools-content-panel panel-title="Partner Details">
+    <etools-content-panel panel-title="[[localize('partner_details')]]">
       <etools-loading active="[[loading]]"></etools-loading>
 
       <ul class="app-grid">
         <li class="item">
-          <labelled-item label="Full Name">
+          <labelled-item label="[[localize('full_name')]]">
             <span class="field-value">[[_withDefault(partner.title)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Short Name">
+          <labelled-item label="[[localize('short_name')]]">
             <span class="field-value">[[_withDefault(partner.short_title)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Alternate Name">
+          <labelled-item label="[[localize('alternate_name')]]">
             <span class="field-value">[[_withDefault(partner.alternate_title)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Vendor Number">
+          <labelled-item label="[[localize('vendor_number')]]">
             <span class="field-value">[[_withDefault(partner.vendor_number)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Partner Type">
+          <labelled-item label="[[localize('partner_type')]]">
             <span class="field-value">[[_computePartnerType(partner)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Shared Partner(s)">
+          <labelled-item label="[[localize('shared_partners')]]">
             <span class="field-value">[[_withDefault(partner.shared_partner_display)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Date Last Assessed Against Core Values">
+          <labelled-item label="[[localize('date_last_assessed')]]">
             <span class="field-value">[[_withDefault(partner.core_values_assessment_date)]]</span>
           </labelled-item>
         </li>
@@ -89,7 +93,7 @@
 
       <ul class="app-grid">
         <li class="item">
-          <labelled-item label="Address">
+          <labelled-item label="[[localize('address')]]">
             <span class="field-value" has-icon>
               <iron-icon icon="communication:location-on"></iron-icon>
               [[_withDefault(partner.street_address)]]
@@ -97,7 +101,7 @@
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Phone Number">
+          <labelled-item label="[[localize('phone_number')]]">
             <span class="field-value" has-icon>
               <iron-icon icon="communication:phone"></iron-icon>
               [[_withDefault(partner.phone_number)]]
@@ -105,7 +109,7 @@
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="E-mail Address">
+          <labelled-item label="[[localize('email_address')]]">
             <span class="field-value" has-icon>
               <iron-icon icon="communication:email"></iron-icon>
               [[_withDefault(partner.email)]]
@@ -123,6 +127,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -138,12 +144,7 @@
       },
 
       _computePartnerType: function (partner) {
-        var chunks = [
-          partner.cso_type_display,
-          partner.partner_type_display,
-        ].filter(Boolean);
-
-        return this._withDefault(chunks.length ? chunks.join(' ') : null);
+        return PartnerDetailsUtils.computePartnerType(partner, this._withDefault);
       },
     });
   </script>

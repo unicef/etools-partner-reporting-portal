@@ -1,0 +1,141 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="./error-modal.html">
+<link rel="import" href="../behaviors/modal.html">
+<link rel="import" href="../styles/buttons.html">
+<link rel="import" href="../styles/modal.html">
+<link rel="import" href="./etools-prp-number.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions.html">
+<link rel="import" href="../behaviors/routing.html">
+<link rel="import" href="../redux/actions/localize.html">
+<link rel="import" href="../behaviors/localize.html">
+
+
+<dom-module id="refresh-report-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+        --paper-dialog: {
+          width: 750px;
+
+          &>* {
+            margin: 0;
+          }
+        }
+        ;
+      }
+    </style>
+
+    <iron-location
+      path="{{path}}">
+    </iron-location>
+
+    <etools-prp-ajax
+        id="refreshReport"
+        url="[[refreshUrl]]"
+        body="[[data]]"
+        method="post"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <paper-dialog with-backdrop opened=[[opened]]>
+      <div class="header layout horizontal justified">
+        <h2>[[localize('are_you_sure')]]?</h2>
+
+        <paper-icon-button class="self-center" on-tap="close" icon="icons:close">
+        </paper-icon-button>
+      </div>
+      <paper-dialog-scrollable>
+
+        <h3>
+            <template
+                is="dom-if"
+                if="[[_equals(data.report_type, 'PR')]]"
+                restamp="true">
+                [[localize('you_are_about_to_delete')]]
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_equals(data.report_type, 'IR')]]"
+                restamp="true">
+                You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. <!-- Localize this line! -->
+                This action is irreversible. Please click "Refresh" if you wish to proceed.  <!-- Localize this line! -->
+            </template>
+        </h3>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+          class="btn-primary"
+          on-tap="_refresh"
+          raised
+          disabled="[[busy]]">
+          [[localize('refresh')]]
+        </paper-button>
+        <paper-button
+          class="btn-primary"
+          on-tap="_cancel"
+          disabled="[[busy]]">
+          [[localize('cancel')]]
+        </paper-button>
+      </div>
+    </paper-dialog>
+    <error-modal id="error"></error-modal>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'refresh-report-modal',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        busy: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      _refresh: function() {
+        var self = this;
+        this.set('busy', true);
+
+        var refreshThunk = this.$.refreshReport.thunk();
+
+        refreshThunk()
+            .then(function () {
+              window.location.reload();
+            })
+            .catch(function (res) {
+              console.log(res);
+              self.set('busy', false);
+            });
+      },
+
+      _cancel: function() {
+        this.close();
+      },
+    });
+  </script>
+</dom-module>

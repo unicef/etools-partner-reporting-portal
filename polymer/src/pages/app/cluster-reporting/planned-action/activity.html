@@ -62,6 +62,11 @@
       params="[[queryParams]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="projects"
+      url="[[projectsUrl]]">
+    </etools-prp-ajax>
+
     <app-route
       route="{{route}}"
       pattern="/:tab"
@@ -130,6 +135,11 @@
           value: {}
         },
 
+        projects: {
+          type: Object,
+          value: {}
+        },
+
         partner: {
           type: Object,
           statePath: 'partner.current',
@@ -153,6 +163,7 @@
 
       observers: [
         '_updateUrlTab(routeData.tab)',
+        '_getActivityAjax(projects)',
       ],
 
       listeners: {
@@ -160,6 +171,9 @@
       },
 
       _onSuccess: function() {
+        if (this.projects === undefined) {
+          this._getProjects();
+        }
         this._getActivityAjax();
       },
 
@@ -185,11 +199,17 @@
       },
 
       _getActivityAjax: function() {
-        var thunk = this.$.overview.thunk();
+        if (this.projects === undefined || this.queryParams === undefined) {
+          return;
+        }
         var self = this;
+        var thunk = this.$.overview.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
+            res.data.projects.forEach(function (project) {
+              project.title = self.projects[project.project_id].title;
+            });
             self.activityData = res.data;
           })
           .catch(function (err) { // jshint ignore:line
@@ -198,8 +218,25 @@
           });
       },
 
+      _getProjects: function () {
+        var self = this;
+        var projectsThunk = this.$.projects.thunk();
+
+        this.set('projectsUrl', App.Endpoints.plannedActions(this.responsePlanID));
+
+        projectsThunk()
+          .then(function (res) {
+            var allProjects = {};
+            res.data.results.forEach(function (project) {
+              allProjects[project.id] = project;
+            });
+
+            self.set('projects', allProjects);
+          });
+      },
+
       attached: function () {
-        this._getActivityAjax();
+        this._getProjects();
       },
     });
   </script>

@@ -498,6 +498,7 @@ class GatewayType(TimeStampedModel):
     """
 
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
+    display_name = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Display Name'))
     admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
     country = models.ForeignKey(Country, related_name="gateway_types")

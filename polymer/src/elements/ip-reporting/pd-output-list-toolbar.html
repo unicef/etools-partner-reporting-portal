@@ -1,18 +1,40 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../etools-prp-toolbar.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../refresh-report-modal.html">
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../upload-button.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<link rel="import" href="js/pd-output-list-toolbar-functions.html">
 
 <dom-module id="pd-output-list-toolbar">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
       }
     </style>
+
+    <etools-prp-ajax
+      id="refreshReport"
+      url="[[refreshUrl]]"
+      body="[[refreshData]]"
+      method="post"
+      content-type="application/json">
+    </etools-prp-ajax>
+
+    <refresh-report-modal
+        id="refresh"
+        data="[[refreshData]]"
+        refresh-url="[[refreshUrl]]">
+    </refresh-report-modal>
 
     <etools-prp-toolbar
       query="{{ query }}"
@@ -29,9 +51,21 @@
         <upload-button
           url="[[importUrl]]"
           modal-title="Import Template">
-          Import Template
+          [[localize('import_template')]]
         </upload-button>
-        <download-button url="[[importTemplateUrl]]">Generate Uploader Template</download-button>
+        <download-button url="[[importTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
+        <template
+            is="dom-if"
+            if="[[showRefresh]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_refresh"
+              disabled="[[busy]]"
+              raised>
+            [[localize('refresh')]]
+          </paper-button>
+        </template>
       </template>
     </etools-prp-toolbar>
   </template>
@@ -42,7 +76,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -80,6 +116,40 @@
           type: String,
           computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')',
         },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+
+        currentUserRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles',
+        },
+
+        refreshData: {
+          type: Object,
+          computed: '_computeRefreshData(reportId)',
+        },
+
+        canRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeCanRefresh(currentReport, programmeDocument)',
+        },
+
+        showRefresh: {
+          type: Boolean,
+          value: false,
+          computed: '_computeShowRefresh(canRefresh, currentUserRoles)',
+        },
+
+        refreshUrl: {
+          type: String,
+          value: function () {
+            return App.Endpoints.reportProgressReset();
+          },
+        },
       },
 
       listeners: {
@@ -87,25 +157,45 @@
       },
 
       _computeImportTemplateUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentImportTemplate(locationId, reportId);
+        return PdOutputListToolbarUtils.computeImportTemplateUrl(locationId, reportId);
       },
 
       _computeImportUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentImport(locationId, reportId);
+        return PdOutputListToolbarUtils.computeImportUrl(locationId, reportId);
       },
 
       _computeShowImportButtons: function (programmeDocument) {
-        return programmeDocument.status !== 'Sub' && programmeDocument.status !== 'Acc';
+        return PdOutputListToolbarUtils.computeShowImportButtons(programmeDocument);
       },
 
       _computePdReportUrl: function (locationId, reportId) {
-        return App.Endpoints.programmeDocumentReport(locationId, reportId);
+        return PdOutputListToolbarUtils.computePdReportUrl(locationId, reportId);
+      },
+
+      _computeRefreshData: function (reportId) {
+        return PdOutputListToolbarUtils.computeRefreshData(reportId);
+      },
+
+      _computeCanRefresh: function (report, programmeDocument) {
+        return PdOutputListToolbarUtils.computeCanRefresh(report, programmeDocument);
+      },
+
+      _computeShowRefresh: function (canRefresh, currentUserRoles) {
+        return canRefresh && PdOutputListToolbarUtils.computeShowRefresh(currentUserRoles);
+      },
+
+      _refresh: function () {
+        this.$.refresh.open();
       },
 
       _onFileUploaded: function (e) {
         e.stopPropagation();
 
         window.location.reload();
+      },
+
+      detached: function () {
+        this.$.refresh.close();
       },
     });
   </script>

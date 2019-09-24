@@ -1,136 +1,153 @@
 {
-    "status":"ok",
-    "data":{
-        "incoming":{
-            "flowCount":1,
-            "fundingTotal":663790,
-            "pledgeTotal":0
+    "status": "ok",
+    "data": {
+        "incoming": {
+            "flowCount": 1,
+            "fundingTotal": 2614016,
+            "pledgeTotal": 0
         },
-        "outgoing":{
-            "flowCount":0,
-            "fundingTotal":0,
-            "pledgeTotal":0
+        "outgoing": {
+            "flowCount": 0,
+            "fundingTotal": 0,
+            "pledgeTotal": 0
         },
-        "internal":{
-            "flowCount":0
+        "internal": {
+            "flowCount": 0
         },
-        "flows":[
+        "flows": [
             {
-                "id":"155628",
-                "versionId":1,
-                "description":"Humanitarian Support",
-                "status":"commitment",
-                "date":"2017-03-13T00:00:00Z",
-                "amountUSD":663790,
-                "originalAmount":6000000,
-                "originalCurrency":"SEK",
-                "exchangeRate":9.039,
-                "firstReportedDate":"2017-03-24T00:00:00Z",
-                "budgetYear":"2017",
-                "decisionDate":"2017-03-13T00:00:00Z",
-                "flowType":"Standard",
-                "contributionType":"financial",
-                "keywords":[
-                    "Humanitarian aid"
+                "id": "193821",
+                "amountUSD": 2614016,
+                "budgetYear": "2019",
+                "childFlowIds": null,
+                "contributionType": "financial",
+                "createdAt": "2019-07-30T04:25:29.775Z",
+                "date": "2019-06-19T00:00:00Z",
+                "decisionDate": "2019-06-19T00:00:00Z",
+                "description": "Appui à la prise en charge médico-nutritionnelle des enfants de moins de 5 ans et des femmes enceintes et allaitantes dans la région sanitaire de N'Djamena et dans deux districts sanitaires de la région du Lac (Ngouri et Isseirom) (ECHO/-AF/BUD/2019/92036)",
+                "grandBargainEarmarkingType": [
+                    "unearmarked"
                 ],
-                "method":null,
-                "parentFlowId":null,
-                "childFlowIds":null,
-                "newMoney":true,
-                "createdAt":"2017-03-24T02:25:53.872Z",
-                "updatedAt":"2017-04-11T15:04:29.201Z",
-                "sourceObjects":[
+                "exchangeRate": 0.899,
+                "firstReportedDate": "2019-06-19T00:00:00Z",
+                "flowType": "Standard",
+                "keywords": null,
+                "newMoney": true,
+                "originalAmount": 2350000,
+                "originalCurrency": "EUR",
+                "method": "Traditional aid",
+                "parentFlowId": 184341,
+                "status": "commitment",
+                "updatedAt": "2019-07-30T07:43:31.102Z",
+                "versionId": 2,
+                "sourceObjects": [
                     {
-                        "type":"Organization",
-                        "id":"2921",
-                        "name":"Sweden, Government of",
-                        "behavior":"single",
-                        "organizationTypes":[
-                            "Government"
-                        ],
-                        "organizationSubTypes":[
-                            "National government"
+                        "type": "Organization",
+                        "id": "8523",
+                        "name": "European Commission's Humanitarian Aid and Civil Protection Department",
+                        "behavior": "single",
+                        "organizationTypes": [
+                            "Inter-governmental"
                         ]
                     },
                     {
-                        "type":"Location",
-                        "id":"216",
-                        "name":"Sweden",
-                        "behavior":"single"
-                    },
-                    {
-                        "type":"UsageYear",
-                        "id":"38",
-                        "name":"2017",
-                        "behavior":"single"
+                        "type": "UsageYear",
+                        "id": "40",
+                        "name": "2019",
+                        "behavior": "single"
                     }
                 ],
-                "destinationObjects":[
+                "destinationObjects": [
                     {
-                        "type":"Plan",
-                        "id":"532",
-                        "name":"Chad 2017",
-                        "behavior":"single"
+                        "type": "Plan",
+                        "id": "668",
+                        "name": "Chad 2019",
+                        "behavior": "single"
                     },
                     {
-                        "type":"Organization",
-                        "id":"8501",
-                        "name":"ACF - France",
-                        "behavior":"single",
-                        "organizationTypes":[
+                        "type": "Organization",
+                        "id": "1937",
+                        "name": "Alliance for International Medical Action",
+                        "behavior": "single",
+                        "organizationTypes": [
                             "NGO"
                         ],
-                        "organizationSubTypes":[
+                        "organizationSubTypes": [
                             "International"
                         ]
                     },
                     {
-                        "type":"Cluster",
-                        "id":"3347",
-                        "name":"Sécurité Alimentaire",
-                        "behavior":"single"
+                        "type": "Cluster",
+                        "id": "4330",
+                        "name": "Eau, hygiène et assainissement",
+                        "behavior": "shared"
                     },
                     {
-                        "type":"GlobalCluster",
-                        "id":"7",
-                        "name":"Health",
-                        "behavior":"single"
+                        "type": "Cluster",
+                        "id": "4332",
+                        "name": "Nutrition",
+                        "behavior": "shared"
                     },
                     {
-                        "type":"Location",
-                        "id":"44",
-                        "name":"Chad",
-                        "behavior":"single"
+                        "type": "Cluster",
+                        "id": "4334",
+                        "name": "Santé",
+                        "behavior": "shared"
                     },
                     {
-                        "type":"Project",
-                        "id":"47561",
-                        "name":"",
-                        "behavior":"single",
-                        "code":"CHD-17/H/102256/5271"
+                        "type": "GlobalCluster",
+                        "id": "11",
+                        "name": "Water Sanitation Hygiene",
+                        "behavior": "shared"
                     },
                     {
-                        "type":"UsageYear",
-                        "id":"38",
-                        "name":"2017",
-                        "behavior":"single"
+                        "type": "GlobalCluster",
+                        "id": "9",
+                        "name": "Nutrition",
+                        "behavior": "shared"
+                    },
+                    {
+                        "type": "GlobalCluster",
+                        "id": "7",
+                        "name": "Health",
+                        "behavior": "shared"
+                    },
+                    {
+                        "type": "Location",
+                        "id": "44",
+                        "name": "Chad",
+                        "behavior": "single"
+                    },
+                    {
+                        "type": "Project",
+                        "id": "154060",
+                        "name": "Appui à la prise en charge médico-nutritionnelle des enfants de moins de 5 ans, des femmes enceintes et femmes allaitantes dans la région sanitaire de N'Djamena.",
+                        "behavior": "single",
+                        "code": "HTCD19-HEA;NUT;WSH-154060-1"
+                    },
+                    {
+                        "type": "UsageYear",
+                        "id": "40",
+                        "name": "2019",
+                        "behavior": "single"
                     }
                 ],
-                "boundary":"incoming",
-                "onBoundary":"single",
-                "reportDetails":[
+                "boundary": "incoming",
+                "onBoundary": "single",
+                "reportDetails": [
                     {
-                        "sourceType":"Primary",
-                        "organization":"Sweden, Government of",
-                        "reportChannel":"From EDRIS",
-                        "date":"2017-03-24T00:00:00.000Z"
+                        "sourceType": "Primary",
+                        "organization": "European Commission's Humanitarian Aid and Civil Protection Department",
+                        "reportChannel": "From EDRIS",
+                        "date": "2019-07-29T00:00:00.000Z"
                     }
-                ]
+                ],
+                "refCode": "ECHO/-AF/BUD/2019/92036"
             }
         ]
     },
-    "meta":{
-        "language":"en",
-        "count":1
+    "meta": {
+        "language": "en",
+        "count": 1
     }
 }

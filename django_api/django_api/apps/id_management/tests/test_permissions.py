@@ -686,7 +686,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
                                          PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
-                                         PRP_ROLE_TYPES.ip_admin, PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
+                                         PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
         self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
@@ -785,10 +785,10 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
             (PRP_ROLE_TYPES.cluster_coordinator, False),
             (PRP_ROLE_TYPES.cluster_member, False),
             (PRP_ROLE_TYPES.cluster_viewer, False),
-            (PRP_ROLE_TYPES.ip_authorized_officer, False),
+            (PRP_ROLE_TYPES.ip_authorized_officer, True),
             (PRP_ROLE_TYPES.ip_admin, False),
-            (PRP_ROLE_TYPES.ip_editor, False),
-            (PRP_ROLE_TYPES.ip_viewer, False),
+            (PRP_ROLE_TYPES.ip_editor, True),
+            (PRP_ROLE_TYPES.ip_viewer, True),
         ]
 
         for role_to_assign, return_value in roles_to_assign:
@@ -1001,7 +1001,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
             (PRP_ROLE_TYPES.ip_authorized_officer, False),
             (PRP_ROLE_TYPES.ip_admin, True),
             (PRP_ROLE_TYPES.ip_editor, False),
-            (PRP_ROLE_TYPES.ip_viewer, False),
+            (PRP_ROLE_TYPES.ip_viewer, True),
         ]
 
         for role_to_assign, return_value in roles_to_assign:
@@ -1012,7 +1012,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request = self.factory.delete(reverse('role-group-update-destroy', args=[self.role.id]))
         request.user = request_user
         request.data = {}
-        self.assertFalse(self.perm.has_object_permission(request, None, self.role))
+        self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
     def test_permission_as_ip_authorized_officer__partner_match__no_workspace_match(self):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
@@ -1337,7 +1337,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
             (PRP_ROLE_TYPES.cluster_viewer, False),
             (PRP_ROLE_TYPES.ip_authorized_officer, False),
             (PRP_ROLE_TYPES.ip_admin, True),
-            (PRP_ROLE_TYPES.ip_editor, False),
+            (PRP_ROLE_TYPES.ip_editor, True),
             (PRP_ROLE_TYPES.ip_viewer, False),
         ]
 
@@ -1349,7 +1349,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request = self.factory.delete(reverse('role-group-update-destroy', args=[self.role.id]))
         request.user = request_user
         request.data = {}
-        self.assertFalse(self.perm.has_object_permission(request, None, self.role))
+        self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
     def test_permission_as_ip_authorized_officer__partner_match__no_workspace_match(self):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer

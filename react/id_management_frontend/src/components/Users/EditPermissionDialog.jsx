@@ -18,7 +18,7 @@ import {portal} from "../../helpers/props";
 
 const title = "Edit permission";
 
-class EditPermissionDialog extends Component {
+export class EditPermissionDialog extends Component {
     constructor(props) {
         super(props);
 
@@ -94,7 +94,14 @@ EditPermissionDialog.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
     const userRole = getUserRole(state.user, ownProps.permission, state.portal);
-    const userType = ownProps.user.user_type || (ownProps.user.partner ? USER_TYPE.PARTNER : USER_TYPE.IMO);
+    let userType = '';
+
+    if(ownProps.user === null) {
+        userType = USER_TYPE.IMO;
+    }
+    else {
+        userType = ownProps.user.user_type || (ownProps.user.partner ? USER_TYPE.PARTNER : USER_TYPE.IMO);
+    }
 
     return {
         roleOptions: EDITABLE_PRP_ROLE_OPTIONS[userRole].filter(option => USER_TYPE_ROLES[userType].indexOf(option.value) > -1),

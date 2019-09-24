@@ -392,7 +392,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     * cluster - Integer ID for cluster
     * partner - Integer ID for partner
     * indicator - Integer ID for IndicatorReport
-    * project - Integer ID for project
+    * projects - A comma-seperated-list of Integer ID for projects
     * location - Integer ID for location
     * cluster_objective - Integer ID for cluster_objective
     * cluster_activity - Integer ID for cluster_activity
@@ -1289,6 +1289,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             'partner_types': self.request.GET.get('partner_types', None),
             'loc_type': self.request.GET.get('loc_type', '1'),
             'locs': self.request.GET.get('locs', None),
+            'projects': self.request.GET.get('projects', None),
             'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
             'indicator_type': self.request.GET.get('indicator_type', 'all'),
         }
@@ -1309,6 +1310,17 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
+        if filter_parameters['projects']:
+            projects = PartnerProject.objects.filter(
+                id__in=map(lambda x: int(x), filter_parameters['projects'].split(','))
+            )
+
+        else:
+            # Defaulting partner projects from given clusters
+            projects = PartnerProject.objects.filter(
+                partner__clusters__in=clusters
+            ).distinct()
+
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
@@ -1328,12 +1340,14 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 content_type__model="partneractivity",
                 partner_activities__partner__clusters__in=clusters,
                 partner_activities__partner__partner_type__in=partner_types,
+                partner_activities__projects__in=projects,
             )
 
             partner_project_q = Q(
                 content_type__model="partnerproject",
                 partner_projects__clusters__in=clusters,
                 partner_projects__partner__partner_type__in=partner_types,
+                partner_projects__in=projects,
             )
 
         else:
@@ -1350,11 +1364,13 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             partner_activity_q = Q(
                 content_type__model="partneractivity",
                 partner_activities__partner__clusters__in=clusters,
+                partner_activities__projects__in=projects,
             )
 
             partner_project_q = Q(
                 content_type__model="partnerproject",
                 partner_projects__clusters__in=clusters,
+                partner_projects__in=projects,
             )
 
         if filter_parameters['indicator_type'] == 'all':

@@ -7,6 +7,7 @@
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../filter-list.html">
 <link rel="import" href="../../filters/cluster-indicator-type-filter/cluster-indicator-type-filter.html">
+<link rel="import" href="../../filters/partner-project-filter-multi/partner-project-filter-multi.html">
 
 
 <dom-module id="analysis-indicators-filters">
@@ -18,6 +19,11 @@
 
         --app-grid-columns: 4;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+      }
+
+      .filter-3-col {
+        @apply --app-grid-expandible-item;
       }
 
     </style>
@@ -39,6 +45,15 @@
             class="item"
             value="[[_withDefault(queryParams.indicator_type, '')]]">
         </cluster-indicator-type-filter>
+
+        <template
+            is="dom-if"
+            if="[[_correctIndicatorType(queryParams.indicator_type)]]">
+          <partner-project-filter-multi
+              class="item filter-3-col"
+              value="[[_withDefault(queryParams.partner_projects, '')]]">
+          </partner-project-filter-multi>
+        </template>
       </div>
     </filter-list>
   </template>
@@ -58,6 +73,10 @@
           type: Object,
           notify: true,
         },
+      },
+
+      _correctIndicatorType: function (indicatorType) {
+        return indicatorType === 'partner_activity' || indicatorType === 'partner_project';
       },
     });
   </script>

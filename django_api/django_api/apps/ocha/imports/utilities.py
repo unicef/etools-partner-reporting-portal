@@ -75,70 +75,113 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def save_location_list(location_list, parent=None, save_children=False):
-    location_ids = [l['id'] for l in location_list if 'id' in l and type(l['id']) == int]
+def save_location_list(location_list, source_type):
+    if not location_list:
+        logger.info('No locations for {}'.format(source_type))
+        return
 
-    location_country_map = {}
+    if source_type == "response_plan":
+        logger.info('Saving response plan locations...')
+        id_key = 'id'
+
+    elif source_type == "project":
+        logger.info('Saving project locations...')
+        id_key = 'external_id'
+
+    elif source_type == "indicator":
+        logger.info('Saving indicator locations...')
+        id_key = 'name'
+
     locations = []
 
-    for location_id in sorted(location_ids):
-        location = Location.objects.filter(
-            external_source=EXTERNAL_DATA_SOURCES.HPC,
-            external_id=location_id
-        ).first()
-
-        if not location or save_children:
-            location_data = get_json_from_url(HPC_V2_ROOT_URL + 'location/{}'.format(location_id))
-            if 'data' not in location_data:
-                continue
+    for location_data in location_list:
+        if id_key == 'external_id' or id_key == 'id':
+            location = Location.objects.filter(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=location_data[id_key]
+            ).first()
+        else:
+            location = Location.objects.filter(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                title=location_data[id_key]
+            ).first()
 
         if not location:
-            country = None
-            if parent:
-                country = parent.gateway.country
-            elif location_data['data']['adminLevel'] == 0:
+            parent_loc = None
+
+            if source_type == "indicator" and 'parent' in location_data:
+                parent_loc = Location.objects.filter(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    title=location_data['parent']['name']
+                ).first()
+
+                if not parent_loc:
+                    logger.warning('Couldn\'t find parent location for {}, skipping: {}'.format(
+                        source_type, location_data
+                    ))
+                    continue
+
+            elif source_type == "project" and 'parentId' in location_data:
+                parent_loc = Location.objects.filter(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    external_id=location_data['parentId']
+                ).first()
+
+                if not parent_loc:
+                    logger.warning('Couldn\'t find parent location for {}, skipping: {}'.format(
+                        source_type, location_data
+                    ))
+                    continue
+
+            if parent_loc:
+                country = parent_loc.gateway.country
+
+            elif 'adminLevel' in location_data \
+                    and location_data['adminLevel'] == 0:
                 country, _ = Country.objects.update_or_create(
-                    country_short_code=location_data['data']['iso3'],
+                    country_short_code=location_data['iso3'],
                     defaults={
-                        'name': location_data['data']['name']
+                        'name': location_data['name']
                     }
                 )
-                for child in location_data['data']['children']:
-                    location_country_map[child['id']] = country
-            elif location_data['data']['id'] in location_country_map:
-                country = location_country_map[location_data['data']['id']]
-                for child in location_data['data']['children']:
-                    location_country_map[child['id']] = country
-            elif not country:
-                logger.warning('Couldn\'t find country for {}, skipping'.format(
-                    HPC_V2_ROOT_URL + 'location/{}'.format(location_data['data']['id'])
+
+            if not country:
+                logger.warning('Couldn\'t find country for {}, skipping: {}'.format(
+                    source_type, location_data
                 ))
                 continue
 
-            gateway_name = '{}-Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+            if 'adminLevel' not in location_data:
+                logger.warning('Couldn\'t find gateway for {}, skipping: {}'.format(
+                    source_type, location_data
+                ))
+                continue
+
+            gateway_name = '{}-Admin Level {}'.format(country.country_short_code, location_data['adminLevel'])
             logger.debug('Saving gateway type with name {}'.format(gateway_name))
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
-                admin_level=location_data['data']['adminLevel'],
+                admin_level=location_data['adminLevel'],
+                name=gateway_name,
             )
+
+            loc_id = location_data['id'] if 'id' in location_data else location_data['external_id']
+            loc_name = location_data['name'] if 'name' in location_data else location_data['title']
 
             location, _ = Location.objects.update_or_create(
                 gateway=gateway,
-                title=location_data['data']['name'],
+                title=loc_name,
                 defaults={
                     'external_source': EXTERNAL_DATA_SOURCES.HPC,
-                    'external_id': location_data['data']['id'],
-                    'latitude': location_data['data'].get('latitude'),
-                    'longitude': location_data['data'].get('longitude'),
-                    'parent': parent,
+                    'external_id': loc_id,
+                    'latitude': location_data.get('latitude', None),
+                    'longitude': location_data.get('longitude', None),
+                    'parent': parent_loc,
                 }
             )
-            logger.debug('Saved location {} as {}'.format(location_data['data']['id'], location))
+            logger.debug('Saved location {} as {}'.format(loc_name, location))
 
         locations.append(location)
-
-        if save_children:
-            save_location_list(location_data['data'].get('children', []), parent=location)
 
     return locations
 
@@ -189,7 +232,7 @@ def save_cluster_objective(objective, child_activity=None):
         external_source=EXTERNAL_DATA_SOURCES.HPC,
         defaults={
             'cluster': cluster,
-            'title': objective['value']['description'][:2048]
+            'title': objective['planEntityVersion']['value']['description'][:2048]
         }
     )
     logger.debug('Saved Cluster Objective: {}'.format(cluster_objective))
@@ -204,14 +247,14 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
         if not attachment['type'] == 'indicator':
             continue
 
-        values = attachment['value']['metrics']['values']['totals']
-        disaggregated = attachment['value']['metrics']['values'].get('disaggregated', {})
+        values = attachment['attachmentVersion']['value']['metrics']['values']['totals']
+        disaggregated = attachment['attachmentVersion']['value']['metrics']['values'].get('disaggregated', {})
 
         blueprint, _ = IndicatorBlueprint.objects.update_or_create(
             external_id=attachment['id'],
             external_source=EXTERNAL_DATA_SOURCES.HPC,
             defaults={
-                'title': attachment['value']['description'],
+                'title': attachment['attachmentVersion']['value']['description'],
                 'disaggregatable': bool(disaggregated),
             }
         )
@@ -236,7 +279,8 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
 
         try:
             locations = save_location_list(
-                attachment['value']['metrics']['values']['disaggregated']['locations']
+                attachment['attachmentVersion']['value']['metrics']['values']['disaggregated']['locations'],
+                "indicator"
             )
             logger.debug('Saving {} locations for {}'.format(
                 len(locations), reportable

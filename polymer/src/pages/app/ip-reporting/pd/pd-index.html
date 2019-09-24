@@ -1,10 +1,12 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-filters.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list-toolbar.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 
 <dom-module id="page-ip-reporting-pd-index">
   <template>
@@ -14,7 +16,7 @@
       }
     </style>
 
-    <page-header title="Programme Documents"></page-header>
+    <page-header title="[[localize('programme_documents')]]"></page-header>
 
     <page-body>
       <pd-filters></pd-filters>
@@ -26,6 +28,12 @@
   <script>
     Polymer({
       is: 'page-ip-reporting-pd-index',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
     });
   </script>
 </dom-module>

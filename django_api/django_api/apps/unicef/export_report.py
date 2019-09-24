@@ -1,8 +1,7 @@
 import itertools
-import uuid
 
 from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle
+from openpyxl.styles import Font, Alignment, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
 
 from django.conf import settings
@@ -12,13 +11,16 @@ from core import common
 
 from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
+from indicator.utilities import convert_string_number_to_float
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'
 
-DISAGGREGATION_COLUMN_START = 40
+DISAGGREGATION_COLUMN_START = 43
 INDICATOR_DATA_ROW_START = 5
 MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
+REQUIRED_FILL = PatternFill(fill_type='solid', start_color='FFE5A479', end_color='FFE5A479')
+NO_FILL = PatternFill(fill_type=None)
 
 
 class ProgressReportXLSXExporter:
@@ -27,11 +29,11 @@ class ProgressReportXLSXExporter:
 
     def __init__(self, progress_report, analysis=None):
         self.wb = load_workbook(PATH)
-        self.sheet = self.wb.get_active_sheet()
+        self.sheet = self.wb.get_sheet_by_name('PR Template')
         self.progress_report = progress_report
         if analysis is not None:
             self.analysis = analysis
-        self.sheets = [self.sheet, ]
+        self.sheets = [self.wb.get_sheet_by_name('README'), self.sheet, ]
         self.disaggregations_start_column = DISAGGREGATION_COLUMN_START
 
         self.bold_center_style = NamedStyle(name="Bold and Center")
@@ -71,7 +73,7 @@ class ProgressReportXLSXExporter:
 
         # Hide non QPR columns
         if self.progress_report.report_type != common.QPR_TYPE:
-            for col in ['L', 'M', 'O', 'P']:
+            for col in ['L', 'M', 'O', 'P', 'Q']:
                 self.sheet.column_dimensions[col].hidden = True
 
         # Prepare Disaggregation Values for given disaggregation types
@@ -144,7 +146,7 @@ class ProgressReportXLSXExporter:
                     )
                 else:
                     try:
-                        indicator_target = float(
+                        indicator_target = convert_string_number_to_float(
                             indicator.reportable.calculated_target)
                     except ValueError:
                         indicator_target = indicator.reportable.calculated_target
@@ -173,45 +175,68 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=4).value = \
                     self.progress_report.programme_document.title
                 self.sheet.cell(row=start_row_id, column=5).value = \
-                    indicator.reportable.content_object.title
-                self.sheet.cell(row=start_row_id, column=6).value = \
                     self.progress_report.get_reporting_period()
-                self.sheet.cell(row=start_row_id, column=7).value = \
+                self.sheet.cell(row=start_row_id, column=6).value = \
                     self.progress_report.get_status_display()
-                self.sheet.cell(row=start_row_id, column=8).value = \
+                self.sheet.cell(row=start_row_id, column=7).value = \
                     self.progress_report.due_date
-                self.sheet.cell(row=start_row_id, column=9).value = \
+                self.sheet.cell(row=start_row_id, column=8).value = \
                     self.progress_report.submission_date
-                self.sheet.cell(row=start_row_id, column=10).value = \
+                self.sheet.cell(row=start_row_id, column=9).value = \
                     self.progress_report.partner_contribution_to_date
-                self.sheet.cell(row=start_row_id, column=11).value = \
+                self.sheet.cell(row=start_row_id, column=9).fill = \
+                    REQUIRED_FILL
+                self.sheet.cell(row=start_row_id, column=10).value = \
                     self.progress_report.programme_document.funds_received_to_date
-                self.sheet.cell(row=start_row_id, column=12).value = \
+                self.sheet.cell(row=start_row_id, column=11).value = \
                     self.progress_report.challenges_in_the_reporting_period
-                self.sheet.cell(row=start_row_id, column=13).value = \
+                self.sheet.cell(row=start_row_id, column=11).fill = \
+                    REQUIRED_FILL
+                self.sheet.cell(row=start_row_id, column=12).value = \
                     self.progress_report.proposed_way_forward
-                self.sheet.cell(row=start_row_id, column=14).value = \
+                self.sheet.cell(row=start_row_id, column=12).fill = \
+                    REQUIRED_FILL
+                self.sheet.cell(row=start_row_id, column=13).value = \
                     self.progress_report.submitted_by.display_name if \
                     self.progress_report.submitted_by else ''
-                self.sheet.cell(row=start_row_id, column=15).value = \
-                    self.progress_report.attachment.url if self.progress_report.attachment else ''
-                self.sheet.cell(row=start_row_id, column=16).value = \
-                    self.progress_report.narrative
+
+                attachments = self.progress_report.attachments.all()
+                other_attachments = attachments.filter(type="Other")
+
+                self.sheet.cell(row=start_row_id, column=14).value = \
+                    attachments.filter(type="FACE").first().file.url if attachments.filter(type="FACE").exists() else ''
+
+                if other_attachments.exists():
+                    if other_attachments.count() == 1:
+                        self.sheet.cell(row=start_row_id, column=15).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=16).value = ''
+                    elif other_attachments.count() > 1:
+                        self.sheet.cell(row=start_row_id, column=15).value = other_attachments.first().file.url
+                        self.sheet.cell(row=start_row_id, column=16).value = other_attachments.last().file.url
+                else:
+                    self.sheet.cell(row=start_row_id, column=15).value = ''
+                    self.sheet.cell(row=start_row_id, column=16).value = ''
+
                 self.sheet.cell(row=start_row_id, column=17).value = \
-                    indicator.get_overall_status_display()
+                    indicator.reportable.content_object.title
+
                 self.sheet.cell(row=start_row_id, column=18).value = \
-                    indicator.narrative_assessment
+                    indicator.get_overall_status_display()
                 self.sheet.cell(row=start_row_id, column=19).value = \
-                    indicator.reportable.blueprint.title
+                    indicator.narrative_assessment
+                self.sheet.cell(row=start_row_id, column=19).fill = \
+                    REQUIRED_FILL
                 self.sheet.cell(row=start_row_id, column=20).value = \
-                    indicator.display_type
+                    indicator.reportable.blueprint.title
                 self.sheet.cell(row=start_row_id, column=21).value = \
-                    indicator_target
+                    indicator.display_type
                 self.sheet.cell(row=start_row_id, column=22).value = \
-                    indicator.calculation_formula_across_locations
+                    indicator_target
                 self.sheet.cell(row=start_row_id, column=23).value = \
-                    indicator.calculation_formula_across_periods
+                    indicator.calculation_formula_across_locations
                 self.sheet.cell(row=start_row_id, column=24).value = \
+                    indicator.calculation_formula_across_periods
+                self.sheet.cell(row=start_row_id, column=25).value = \
                     location_data.previous_location_progress_value
 
                 # Iterate over location admin references:
@@ -220,9 +245,9 @@ class ProgressReportXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=24 +
+                    self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2).value = location.title
-                    self.sheet.cell(row=start_row_id, column=24 +
+                    self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:
@@ -230,15 +255,19 @@ class ProgressReportXLSXExporter:
                     else:
                         break
 
-                self.sheet.cell(row=start_row_id, column=35).value = \
-                    achievement_in_reporting_period
                 self.sheet.cell(row=start_row_id, column=36).value = \
-                    total_cumulative_progress
+                    indicator.reportable.numerator_label
                 self.sheet.cell(row=start_row_id, column=37).value = \
-                    self.progress_report.id
+                    indicator.reportable.denominator_label
                 self.sheet.cell(row=start_row_id, column=38).value = \
-                    indicator.id
+                    achievement_in_reporting_period
                 self.sheet.cell(row=start_row_id, column=39).value = \
+                    total_cumulative_progress
+                self.sheet.cell(row=start_row_id, column=40).value = \
+                    self.progress_report.id
+                self.sheet.cell(row=start_row_id, column=41).value = \
+                    indicator.id
+                self.sheet.cell(row=start_row_id, column=42).value = \
                     location_data.id
 
                 # Check location item disaggregation type
@@ -251,12 +280,21 @@ class ProgressReportXLSXExporter:
                 # Check location item values
                 blueprint = location_data.indicator_report.reportable.blueprint
 
+                for dk, dv in disaggregation_values_map.items():
+                    self.sheet.cell(row=start_row_id, column=dv).fill = REQUIRED_FILL
+
                 for k, v in location_data.disaggregation.items():
                     if k == "()":
                         self.sheet.cell(
                             row=start_row_id,
                             column=disaggregation_values_map['()']).value = v['v'] \
                             if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+
+                        # De-highlight total column if the indicator is disaggregated
+                        if disaggregation_values_list:
+                            self.sheet.cell(
+                                row=start_row_id,
+                                column=disaggregation_values_map['()']).fill = NO_FILL
 
                     else:
                         for dk, dv in disaggregation_values_map.items():
@@ -269,6 +307,10 @@ class ProgressReportXLSXExporter:
                                     if blueprint.unit == IndicatorBlueprint.NUMBER \
                                     else "{}/{}".format(v['v'], v['d'])
 
+                                # De-highlight any subtotal disaggregation data column
+                                if len(dk.split(",")) != len(disaggregation_types):
+                                    self.sheet.cell(row=start_row_id, column=dv).fill = NO_FILL
+
                 start_row_id += 1
 
         # Lock first rows
@@ -277,13 +319,13 @@ class ProgressReportXLSXExporter:
         # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
         # Partner contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=10, end_row=start_row_id, end_column=10)
+                               start_column=9, end_row=start_row_id - 1, end_column=9)
         # Challenges/bottlenecks in the reporting period
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=12, end_row=start_row_id, end_column=12)
+                               start_column=11, end_row=start_row_id - 1, end_column=11)
         # Proposed way forward
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
-                               start_column=13, end_row=start_row_id, end_column=13)
+                               start_column=12, end_row=start_row_id - 1, end_column=12)
 
         return True
 
@@ -551,25 +593,29 @@ class ProgressReportXLSXExporter:
             if not indicators:
                 continue
 
-            self.sheets.append(self.duplicate_sheet(self.sheets[0]))
+            self.sheets.append(self.duplicate_sheet(self.sheets[1]))
+            sheet_no += 1
             self.sheet = self.sheets[sheet_no]
 
             if not self.fill_sheet(disaggregation_types, indicators):
                 to_remove.append(self.sheets[sheet_no])
-            sheet_no += 1
+                sheet_no -= 1
 
-        to_remove.append(self.sheets[0])
+        to_remove.append(self.sheets[1])
 
         # Remove empty spreadsheets
         for s in to_remove:
-            # Spreadsheet need atleast 1 sheet
-            if len(self.sheets) > 1:
+            # Spreadsheet need at least 2 sheets
+            if len(self.sheets) > 2:
                 self.sheets.remove(s)
                 self.wb.remove_sheet(s)
 
         if self.analysis:
             self.merge_sheets()
 
-        file_path = SAVE_PATH + 'export_' + uuid.uuid4().hex + '.xlsx'
+        report_name = self.progress_report.report_type + str(self.progress_report.report_number)
+        ref_num = self.progress_report.programme_document.reference_number.split('/')[-1]
+
+        file_path = SAVE_PATH + f'{report_name}_{ref_num}.xlsx'
         self.wb.save(file_path)
         return file_path

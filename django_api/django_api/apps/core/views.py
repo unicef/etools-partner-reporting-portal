@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from djcelery.models import PeriodicTask
 
+from core.paginations import SmallPagination
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from utils.serializers import serialize_choices
@@ -51,6 +52,7 @@ class LocationListAPIView(ListAPIView):
     Endpoint for getting all Location objects belonging to the response plan.
     """
     permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )

@@ -2,6 +2,8 @@
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/actions/localize.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 <link rel="import" href="disaggregation-table-cell-number.html">
 <link rel="import" href="disaggregation-table-cell-percentage.html">
@@ -99,6 +101,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -129,7 +134,7 @@
       _computeClass: function (rowType) {
         return rowType;
       },
-
+      
       _setTotalEditable: function (coords, levelReported, editable) {
         this.set(
           'totalEditable',

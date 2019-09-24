@@ -1,5 +1,7 @@
 import json
 import os
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 from django.conf import settings
 
@@ -21,6 +23,7 @@ from core.factories import (CartoDBTableFactory,
                             LocationWithReportableLocationGoalFactory,
                             PartnerUserFactory, PartnerFactory,
                             ProgressReportFactory,
+                            PartnerActivityProjectContextFactory,
                             QuantityReportableToLowerLevelOutputFactory,
                             QuantityTypeIndicatorBlueprintFactory,
                             WorkspaceFactory,
@@ -94,8 +97,12 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -206,10 +213,11 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -236,19 +244,31 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
     def test_load_data(self):
         with open(os.path.join(SAMPLES_DIR, 'V2_project_info.json')) as sample_file:
             external_project_data = json.load(sample_file)['data']
-        external_project_data['partner'] = Partner.objects.first().pk
-        external_project_data['additional_information'] = "www.example.com"
-        external_project_data['cluster_ids'] = [self.cluster.id, ]
-        serializer = V2PartnerProjectImportSerializer(data=external_project_data)
+
+        # Grab project details from projectVersion array of dict
+        current_project_data = None
+
+        for project in external_project_data['projectVersions']:
+            if external_project_data['currentPublishedVersionId'] == project['id']:
+                current_project_data = project
+                break
+
+        if 'code' in external_project_data:
+            current_project_data['code'] = external_project_data['code']
+
+        current_project_data['partner'] = Partner.objects.first().pk
+        current_project_data['additional_information'] = "www.example.com"
+        current_project_data['cluster_ids'] = [self.cluster.id, ]
+        serializer = V2PartnerProjectImportSerializer(data=current_project_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         partner_project = serializer.save()
-        self.assertEqual(partner_project.title, external_project_data['name'].strip())
-        self.assertEqual(partner_project.code, external_project_data['code'].strip())
+        self.assertEqual(partner_project.title, current_project_data['name'].strip())
+        self.assertEqual(partner_project.code, current_project_data['code'].strip())
 
         with open(os.path.join(SAMPLES_DIR, 'V1_cash_flow.json')) as sample_file:
-            external_project_data = json.load(sample_file)['data']
-        external_project_data['partner'] = Partner.objects.first().pk
-        serializer = V1FundingSourceImportSerializer(data=external_project_data)
+            current_project_data = json.load(sample_file)['data']
+        current_project_data['partner'] = Partner.objects.first().pk
+        serializer = V1FundingSourceImportSerializer(data=current_project_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         funding_source = serializer.save()
         self.assertIsNotNone(funding_source)
@@ -293,8 +313,12 @@ class V1ResponsePlanImportSerializerTest(TestCase):
             locations=[self.loc1, self.loc2],
         )
         self.p_activity = ClusterActivityPartnerActivityFactory(
+            partner=self.partner,
             cluster_activity=self.activity,
+        )
+        self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
+            activity=self.p_activity,
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -405,10 +429,11 @@ class V1ResponsePlanImportSerializerTest(TestCase):
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
+            with patch("django.db.models.signals.ModelSignal.send", Mock()):
+                ClusterIndicatorReportFactory(
+                    reportable=self.partneractivity_reportable,
+                    report_status=INDICATOR_REPORT_STATUS.submitted,
+                )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -435,15 +460,19 @@ class V1ResponsePlanImportSerializerTest(TestCase):
     def test_multi_country_emergency_data(self):
         with open(os.path.join(SAMPLES_DIR, 'V1_response_plan.json')) as sample_file:
             response_plan_data = json.load(sample_file)['data']
+
+        response_plan_data['name'] = response_plan_data['planVersion']['name']
+        response_plan_data['startDate'] = response_plan_data['planVersion']['startDate']
+        response_plan_data['endDate'] = response_plan_data['planVersion']['endDate']
         serializer = V1ResponsePlanImportSerializer(data=response_plan_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         response_plan = serializer.save()
-        self.assertEqual(response_plan.title, 'Syria regional refugee and resilience plan (3RP) 2016')
+        self.assertEqual(response_plan.title, 'Sahel Regional 2015')
         self.assertEqual(
             len(response_plan_data['locations']),
             response_plan.workspace.countries.count()
         )
-        self.assertEqual(response_plan.workspace.title, 'Syrian Arab Republic - Civil Unrest (from 2012)')
+        self.assertEqual(response_plan.workspace.title, 'Sahel 2014-2016')
         self.assertEqual(
             len(response_plan_data['governingEntities']),
             response_plan.clusters.count()
@@ -452,15 +481,19 @@ class V1ResponsePlanImportSerializerTest(TestCase):
     def test_single_country_emergency_data(self):
         with open(os.path.join(SAMPLES_DIR, 'V1_response_plan_single_country.json')) as sample_file:
             response_plan_data = json.load(sample_file)['data']
+
+        response_plan_data['name'] = response_plan_data['planVersion']['name']
+        response_plan_data['startDate'] = response_plan_data['planVersion']['startDate']
+        response_plan_data['endDate'] = response_plan_data['planVersion']['endDate']
         serializer = V1ResponsePlanImportSerializer(data=response_plan_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         response_plan = serializer.save()
-        self.assertEqual(response_plan.title, 'occupied Palestinian territory 2016')
+        self.assertEqual(response_plan.title, 'Chad 2013')
         self.assertEqual(
             len(response_plan_data['locations']),
             response_plan.workspace.countries.count()
         )
-        self.assertEqual(response_plan.workspace.title, 'occupied Palestinian territory')
+        self.assertEqual(response_plan.workspace.title, 'Chad')
         self.assertEqual(
             len(response_plan_data['governingEntities']),
             response_plan.clusters.count()

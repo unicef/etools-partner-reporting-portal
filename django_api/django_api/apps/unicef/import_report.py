@@ -24,7 +24,15 @@ class ProgressReportXLSXReader(object):
         self.partner = partner
 
     def import_data(self):
-        for self.sheet in self.wb.worksheets:
+        partner_contribution = None
+        challenges = None
+        proposed_way_forward = None
+        pd_output_narratives = dict()
+
+        for idx, self.sheet in enumerate(self.wb.worksheets):
+            if self.sheet.title.lower() == 'readme':
+                continue
+
             # Find "Location ID" column
             location_column_id = None
             for column in range(1, MAX_COLUMNS):
@@ -63,14 +71,19 @@ class ProgressReportXLSXReader(object):
 
             # Other Info columns data retrieve
             # Partner contribution to date
-            partner_contribution = self.sheet.cell(
-                row=COLUMN_HASH_ID + 1, column=10).value
+            if not partner_contribution:
+                partner_contribution = self.sheet.cell(
+                    row=COLUMN_HASH_ID + 1, column=9).value
+
             # Challenges/bottlenecks in the reporting period
-            challenges = self.sheet.cell(
-                row=COLUMN_HASH_ID + 1, column=12).value
+            if not challenges:
+                challenges = self.sheet.cell(
+                    row=COLUMN_HASH_ID + 1, column=11).value
+
             # Proposed way forward
-            proposed_way_forward = self.sheet.cell(
-                row=COLUMN_HASH_ID + 1, column=13).value
+            if not proposed_way_forward:
+                proposed_way_forward = self.sheet.cell(
+                    row=COLUMN_HASH_ID + 1, column=12).value
 
             # ... and assign if is QPR
             try:
@@ -131,6 +144,22 @@ class ProgressReportXLSXReader(object):
 
                 blueprint = indicator.indicator_report.reportable.blueprint
                 data = indicator.disaggregation
+
+                if pr.report_type == common.QPR_TYPE:
+                    narrative_assessment = self.sheet.cell(
+                        row=row, column=19
+                    ).value
+                    llo = indicator.indicator_report.reportable.content_object
+
+                    if llo.id not in pd_output_narratives \
+                            and (narrative_assessment is not None and narrative_assessment != ''):
+                        pd_output_narratives[llo.id] = narrative_assessment
+
+                        indicator.indicator_report.narrative_assessment = narrative_assessment
+                        indicator.indicator_report.save()
+
+                        pr.indicator_reports.filter(reportable__lower_level_outputs=llo).update(narrative_assessment=narrative_assessment)
+
                 # Prepare
                 already_updated_row_value = False
                 for column in range(dis_data_column_start_id if dis_data_column_start_id else total_column_id,
@@ -169,7 +198,7 @@ class ProgressReportXLSXReader(object):
 
                             # Update values
                             if blueprint.unit == IndicatorBlueprint.NUMBER:
-                                data[dis_type_id]["v"] = value
+                                data[dis_type_id]["v"] = int(value)
                             else:
                                 if isinstance(value, datetime):
                                     transaction.rollback()

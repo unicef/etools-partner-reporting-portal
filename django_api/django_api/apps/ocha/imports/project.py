@@ -5,12 +5,16 @@ from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
 from ocha.imports.serializers import V2PartnerProjectImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list, logger, save_disaggregations
 from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
-from partner.models import PartnerActivity
+from partner.models import PartnerActivity, PartnerActivityProjectContext
 
 
-def import_project_details(project, current_version_id):
-    source_url = HPC_V2_ROOT_URL + 'project-version/{}/attachments'.format(current_version_id)
+def import_project_details(project, external_project_id):
+    source_url = HPC_V2_ROOT_URL + 'project/{}/attachments'.format(external_project_id)
     attachments = get_json_from_url(source_url)['data']
+
+    if not attachments:
+        logger.warning('No project attachment V2 data found for project_id: {}. Skipping reportables and location data'.format(external_project_id))
+        return
 
     reportables = []
 
@@ -25,11 +29,11 @@ def import_project_details(project, current_version_id):
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
                 defaults={
-                    'title': attachment['attachment']['value']['description'],
+                    'title': attachment['attachment']['attachmentVersion']['value']['description'],
                 }
             )
 
-            totals = attachment['attachment']['value']['metrics']['values']['totals']
+            totals = attachment['attachment']['attachmentVersion']['value']['metrics']['values']['totals']
 
             target = get_dict_from_list_by_key(totals, 'Target', key='name.en')['value']
             in_need = get_dict_from_list_by_key(totals, 'In Need', key='name.en')['value']
@@ -50,7 +54,7 @@ def import_project_details(project, current_version_id):
             )
 
             try:
-                disaggregated = attachment['attachment']['value']['metrics']['values']['disaggregated']
+                disaggregated = attachment['attachment']['attachmentVersion']['value']['metrics']['values']['disaggregated']
                 for disaggregation in save_disaggregations(
                         disaggregated.get('categories', []), response_plan=project.response_plan
                 ):
@@ -59,25 +63,37 @@ def import_project_details(project, current_version_id):
                         disaggregation_id=disaggregation.id
                     )
 
-                locations = save_location_list(disaggregated['locations'])
+                locations = save_location_list(disaggregated['locations'], "indicator")
                 for location in locations:
                     ReportableLocationGoal.objects.get_or_create(reportable=reportable, location=location)
             except (KeyError, TypeError, AttributeError):
                 locations = []
 
             if cluster_activity:
+                from indicator.models import create_pa_reportables_from_ca
                 partner_activity, _ = PartnerActivity.objects.update_or_create(
-                    project=project,
                     cluster_activity=cluster_activity,
                     defaults={
                         'title': cluster_activity.title,
-                        'start_date': project.start_date,
-                        'end_date': project.end_date,
                         'partner': project.partner,
                     }
                 )
-                partner_activity.reportables.add(reportable)
                 partner_activity.locations.add(*locations)
+
+                project_context, created = PartnerActivityProjectContext.objects.update_or_create(
+                    start_date=project.start_date,
+                    end_date=project.end_date,
+                    defaults={
+                        'activity': partner_activity,
+                        'project': project,
+                    },
+                )
+
+                if created:
+                    create_pa_reportables_from_ca(partner_activity, cluster_activity)
+
+                project.reportables.add(reportable)
+                project.locations.add(*locations)
 
             reportables.append(reportable)
 
@@ -86,7 +102,7 @@ def import_project_details(project, current_version_id):
     ))
 
 
-def import_project(external_project_id, partner_id, response_plan=None, async=True):
+def import_project(external_project_id, partner_id, response_plan=None, asynch=True):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)['data']
     # Grab project details from projectVersion array of dict
@@ -111,21 +127,15 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
     current_project_data['cluster_ids'] = list()
     if 'governingEntities' in current_project_data:
         for cluster in current_project_data['governingEntities']:
-            if 'clusterNumber' in cluster:
-                if not cluster['clusterNumber'].isdigit():
-                    cluster_number = int(cluster['clusterNumber'][1:])
-                else:
-                    cluster_number = int(cluster['clusterNumber'])
-
-                current_project_data['cluster'] = current_project_data['cluster_ids'].append(cluster_number)
+            current_project_data['cluster_ids'].append(cluster['id'])
 
     serializer = V2PartnerProjectImportSerializer(data=current_project_data)
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
 
     from ocha.tasks import finish_partner_project_import
-    (finish_partner_project_import.delay if async else finish_partner_project_import)(
-        project.pk, response_plan_id=getattr(response_plan, 'id', None)
+    (finish_partner_project_import.delay if asynch else finish_partner_project_import)(
+        project.pk, external_project_id, response_plan_id=getattr(response_plan, 'id', None)
     )
 
     return project

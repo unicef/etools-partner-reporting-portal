@@ -4,6 +4,8 @@
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
+<link rel="import" href="../../../redux/actions/localize.html">
 
 <dom-module id="pd-dropdown-filter">
   <template>
@@ -20,7 +22,7 @@
 
     <dropdown-filter-multi
       class="item"
-      label="PD"
+      label="[[localize('pd')]]"
       name="pds"
       value="[[value]]"
       data="[[data]]">
@@ -33,6 +35,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
