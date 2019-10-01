@@ -1,6 +1,6 @@
 # Django packages
 django==1.11.20
-django-redis==4.10.0
+django-redis==3.5.2
 django-nose==1.4.5
 nose-timer==0.7.1
 django-extensions==1.7.7
