@@ -78,10 +78,10 @@ ALLOWED_HOSTS = []
 
 CACHES = {
     "default": {
-        "BACKEND": "redis_cache.cache.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": REDIS_URL,
         "OPTIONS": {
-            "CLIENT_CLASS": "redis_cache.client.DefaultClient"
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
         "KEY_PREFIX": "PRP"
     }
