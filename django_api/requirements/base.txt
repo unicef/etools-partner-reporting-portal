@@ -1,6 +1,6 @@
 # Django packages
 django==1.11.20
-django-redis==4.9.0
+django-redis==4.10.0
 django-nose==1.4.5
 nose-timer==0.7.1
 django-extensions==1.7.7
@@ -61,9 +61,11 @@ git+https://github.com/jamescw/django-paintstore.git
 django-leaflet==0.19.0
 
 # Celery
-django-celery==3.2.2
+celery==3.1.26.post2
+django-celery-email==1.1.5
+django-celery==3.3.1
+redis==3.3.8
 kombu==3.0.37
-redis==2.10.6
 
 # Cron
 django-cron==0.5.0
