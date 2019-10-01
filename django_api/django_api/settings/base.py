@@ -107,7 +107,6 @@ INSTALLED_APPS = [
     'drfpasswordless',
     'django_filters',
     'djcelery',
-    'djcelery_email',
     'leaflet',
     'suit',
     'easy_pdf',
