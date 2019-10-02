@@ -2,14 +2,19 @@
 
 {% block content %}
     <p>Dear {{ user.get_full_name }},</p>
-    <p>You now have access to UNICEF's Partner Reporting Portal for:</p>
+    <p>Your role in UNICEF's Partner Reporting Portal is assigned.</p>
+    <p>You now have access to:</p>
     {% if portal == 'CLUSTER' %}
         <p>Cluster: {% if role.role == 'CLUSTER_SYSTEM_ADMIN' %}All clusters{% else %}{{ role.cluster.title }}{% endif %}</p>
     {% elif portal == 'IP' %}
-        <p>Workspace: {{ role.workspace.title }}</p>
+        <p>Country: {{ role.workspace.title }}</p>
+        <p>Role: {{ role.get_role_display }}</p>
     {% endif %}
-    <p>Permission: {{ role.get_role_display }}</p>
-    <p>For any queries, please refer to your Organization's administrator.</p>
-    <p>The portal is available here: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
-    <p>Thank you.</p>
+    <p>If you are the Authorized Officer, it is important that you make yourself familiar with the identity management options in the system and how the administration of the portal can be delegated to others in your organization.</p>
+    <p>You can get all of the information about the roles available in the system <a href="https://prphelp.zendesk.com/hc/en-us/articles/360033232631-PRP-User-Roles%5D">here</a>.</p>
+    <p>For any help with the first time registration process, please see <a href="https://prphelp.zendesk.com/hc/en-us/articles/360033550372-First-time-registration-in-the-Partner-Reporting-Portal%5D">this article</a>.</p>
+    <p>TO REGISTER FOR THE PORTAL follow this link: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
+    <p>Kind regards,</p>
+    <p>UNICEF</p>
+    <p>Please note that this is an automatically generated email. Responses are not monitored and cannot be replied to.</p>
 {% endblock content %}
