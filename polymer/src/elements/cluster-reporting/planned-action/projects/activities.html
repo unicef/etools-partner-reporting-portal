@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../project-activity-table.html">
+<link rel="import" href="../activities/editing-modal.html">
 
 <dom-module id="pa-project-details-activities">
   <template>
@@ -40,6 +41,8 @@
     </etools-prp-ajax>
 
     <page-body>
+      <planned-action-activity-editing-modal id="modal" edit-data="[[activityData]]"></planned-action-activity-editing-modal>
+
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
           Add Partner Activity
@@ -108,6 +111,10 @@
                 // TODO: error handling.
             });
         }, 100);
+      },
+
+      _openModal: function () {
+        this.$$('#modal').open();
       },
     });
   </script>
