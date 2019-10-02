@@ -14,9 +14,15 @@
 
 <dom-module id="pa-project-details-activities">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
+      }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
       }
     </style>
 
@@ -34,6 +40,12 @@
     </etools-prp-ajax>
 
     <page-body>
+      <div id="action">
+        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+          Add Partner Activity
+        </paper-button>
+      </div>
+
       <project-activity-table
         page="planned-action"
         project-id="[[projectId]]">
