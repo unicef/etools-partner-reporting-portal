@@ -58,11 +58,10 @@ FRONTEND_HOST = os.getenv(
     os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
 )
 
-# Sendgrid stuff
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
 
 DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.sendgrid.net')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_HOST_PORT', 587)
@@ -78,12 +77,9 @@ ALLOWED_HOSTS = []
 
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
+        'BACKEND': 'redis_cache.RedisCache',
         "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        },
-        "KEY_PREFIX": "PRP"
+        "KEY_PREFIX": "PRP",
     }
 }
 
@@ -106,7 +102,9 @@ INSTALLED_APPS = [
     'rest_framework_gis',
     'drfpasswordless',
     'django_filters',
-    'djcelery',
+    'django_celery_beat',
+    'django_celery_results',
+    'djcelery_email',
     'leaflet',
     'suit',
     'easy_pdf',
@@ -335,36 +333,36 @@ LOGGING = {
     }
 }
 
-import djcelery
-djcelery.setup_loader()
-BROKER_URL = REDIS_URL
-BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
-BROKER_TRANSPORT_OPTIONS = {
-    'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
+# Celery
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'application/text']
+CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': int(CELERY_BROKER_VISIBILITY_VAR)}  # 5 hours
 
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Sensible settings for celery
-CELERY_ALWAYS_EAGER = False
-CELERY_ACKS_LATE = True
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_PUBLISH_RETRY = True
-CELERY_DISABLE_RATE_LIMITS = False
+CELERY_WORKER_DISABLE_RATE_LIMITS = False
 
-# By default we will ignore result
-# If you want to see results and try out tasks interactively, change it to False
-# Or change this setting on tasks level
-CELERY_IGNORE_RESULT = True
+CELERY_TASK_IGNORE_RESULT = True
 CELERY_SEND_TASK_ERROR_EMAILS = False
-CELERY_TASK_RESULT_EXPIRES = 600
+CELERY_RESULT_EXPIRES = 600
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
-# Don't use pickle as serializer, json is much safer
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_ACCEPT_CONTENT = ['application/json']
-
-# CELERYD_HIJACK_ROOT_LOGGER = False
-CELERYD_PREFETCH_MULTIPLIER = 1
-# CELERYD_MAX_TASKS_PER_CHILD = 1000
+# django-post_office: https://github.com/ui/django-post_office
+POST_OFFICE = {
+    'DEFAULT_PRIORITY': 'now',
+    'BACKENDS': {
+        'default': 'djcelery_email.backends.CeleryEmailBackend'
+    }
+}
 
 LEAFLET_CONFIG = {
     'TILES': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',

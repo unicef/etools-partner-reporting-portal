@@ -1,5 +1,5 @@
 [{
-    "model": "djcelery.crontabschedule",
+    "model": "django_celery_beat.crontabschedule",
     "pk": 1,
     "fields": {
         "minute": "0",
@@ -9,28 +9,28 @@
         "month_of_year": "*"
     }
 }, {
-    "model": "djcelery.intervalschedule",
+    "model": "django_celery_beat.intervalschedule",
     "pk": 1,
     "fields": {
         "every": 30,
         "period": "minutes"
     }
 }, {
-    "model": "djcelery.intervalschedule",
+    "model": "django_celery_beat.intervalschedule",
     "pk": 2,
     "fields": {
         "every": 24,
         "period": "hours"
     }
 }, {
-    "model": "djcelery.intervalschedule",
+    "model": "django_celery_beat.intervalschedule",
     "pk": 3,
     "fields": {
         "every": 5,
         "period": "minutes"
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 1,
     "fields": {
         "name": "Due/Overdue report checker",
@@ -40,7 +40,7 @@
         "interval": 3
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 2,
     "fields": {
         "name": "Report generator",
@@ -50,7 +50,7 @@
         "interval": 3
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 3,
     "fields": {
         "name": "Workspace sync",
@@ -60,7 +60,7 @@
         "interval": 2
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 4,
     "fields": {
         "name": "Partner sync",
@@ -70,7 +70,7 @@
         "interval": 2
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 5,
     "fields": {
         "name": "ProgrammeDocument sync",
@@ -80,7 +80,7 @@
         "interval": 1
     }
 }, {
-    "model": "djcelery.periodictask",
+    "model": "django_celery_beat.periodictask",
     "pk": 6,
     "fields": {
         "name": "celery.backend_cleanup",
