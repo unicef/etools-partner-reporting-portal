@@ -15,8 +15,14 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8082')
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
-# other
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+CELERY_EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+POST_OFFICE = {
+    'DEFAULT_PRIORITY': 'now',
+    'BACKENDS': {
+        # Send email to console for local dev
+        'default': os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+    }
+}
 
 INSTALLED_APPS += [
     'debug_toolbar',
