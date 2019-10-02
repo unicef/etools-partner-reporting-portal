@@ -10,7 +10,7 @@ from rest_framework import status as statuses
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
-from djcelery.models import PeriodicTask
+from django_celery_beat.models import PeriodicTask
 
 from core.paginations import SmallPagination
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
