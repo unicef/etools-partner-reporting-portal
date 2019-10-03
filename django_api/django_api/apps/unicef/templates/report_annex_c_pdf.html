@@ -144,18 +144,66 @@
                         <tr>
                             <th rowspan="{{ output|length }}">{{ indicator.reportable.content_object.title }}</th>
                             <th>{{ indicator.title }}</th>
-                            <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target }}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
-                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td width="100px">{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
+                            <th>
+                                {% if indicator.is_number %}
+                                    {{ indicator.reportable.calculated_target }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.reportable.calculated_target|percentage }}
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.reportable.target.v }}/{{ indicator.reportable.target.d }}
+                                {% endif %}
+                            </th>
+                            <td width="100px">
+                                {% if indicator.is_number %}
+                                    {{ indicator.total.v|floatformat:"0" }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.total.c }}%
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.total.v }}/{{ indicator.total.d }}
+                                {% endif %}
+                            </td>
+                            <td width="100px">
+                                {% if indicator.is_number %}
+                                    {{ indicator.reportable.total.v|floatformat:"0" }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.reportable.total.c|percentage }}
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.reportable.total.v }}/{{ indicator.reportable.total.d }}
+                                {% endif %}
+                            </td>
                             <td class="{{ indicator.overall_status }}" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
                             <td rowspan="{{ output|length }}">{{ indicator.narrative_assessment|default:"---" }}</td>
                         </tr>
                     {% else %}
                         <tr>
                             <th>{{ indicator.title }}</th>
-                            <th>{% if indicator.is_number %}{{ indicator.reportable.calculated_target}}{% else %}{{ indicator.reportable.calculated_target|percentage }}{% endif %}</th>
-                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
-                            <td>{% if indicator.is_number %}{{ indicator.reportable.total.v|floatformat:"0" }}{% else %}{{ indicator.reportable.total.c|percentage }}{% endif %}</td>
+                            <th>
+                                {% if indicator.is_number %}
+                                    {{ indicator.reportable.calculated_target }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.reportable.calculated_target|percentage }}
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.reportable.target.v }}/{{ indicator.reportable.target.d }}
+                                {% endif %}
+                            </th>
+                            <td>
+                                {% if indicator.is_number %}
+                                    {{ indicator.total.v|floatformat:"0" }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.total.c }}%
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.total.v }}/{{ indicator.total.d }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if indicator.is_number %}
+                                    {{ indicator.reportable.total.v|floatformat:"0" }}
+                                {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
+                                    {{ indicator.reportable.total.c|percentage }}
+                                {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
+                                    {{ indicator.reportable.total.v }}/{{ indicator.reportable.total.d }}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
