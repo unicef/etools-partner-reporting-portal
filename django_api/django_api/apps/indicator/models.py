@@ -21,6 +21,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
     FINAL_OVERALL_STATUS,
+    REPORTING_TYPES,
     PRP_ROLE_TYPES)
 from core.models import TimeStampedExternalSourceModel
 from functools import reduce
@@ -870,9 +871,18 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
     reportable = instance.reportable
     blueprint = reportable.blueprint
-    # only accepted indicator reports should be used.
-    accepted_indicator_reports = reportable.indicator_reports.all().filter(
-        report_status=INDICATOR_REPORT_STATUS.accepted)
+
+    if instance.progress_report:
+        # Only Accepted indicator reports for QPR progress report should be used.
+        accepted_indicator_reports = IndicatorReport.objects.filter(
+            reportable=reportable,
+            report_status=INDICATOR_REPORT_STATUS.accepted,
+            progress_report__report_type=REPORTING_TYPES.QPR,
+        )
+    else:
+        # Only accepted indicator reports should be used.
+        accepted_indicator_reports = reportable.indicator_reports.all().filter(
+            report_status=INDICATOR_REPORT_STATUS.accepted)
 
     # Reset the reportable total
     reportable_total = {

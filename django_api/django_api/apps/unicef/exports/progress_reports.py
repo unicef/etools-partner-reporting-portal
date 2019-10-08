@@ -47,21 +47,29 @@ class ProgressReportDetailPDFExporter:
             ])
 
             for indicator in indicators:
-                is_percentage = indicator.is_percentage
+                is_percentage = indicator.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE
 
+                calculated_target = format_total_value_to_string(
+                    indicator.reportable.target,
+                    is_percentage=is_percentage,
+                    percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
+                )
                 total_cumulative_progress = format_total_value_to_string(
                     indicator.reportable.total,
-                    is_percentage=indicator.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE
+                    is_percentage=is_percentage,
+                    percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
                 )
                 achievement_in_reporting_period = format_total_value_to_string(
-                    indicator.total, is_percentage=is_percentage
+                    indicator.total,
+                    is_percentage=is_percentage,
+                    percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
                 )
 
                 indicator_table = [
                     [
                         HTMLTableCell(indicator.reportable.blueprint.title, rowspan=2, colspan=2),
                         HTMLTableHeader('Target'),
-                        HTMLTableCell(indicator.reportable.calculated_target),
+                        HTMLTableCell(calculated_target),
                     ],
                     [
                         HTMLTableHeader('Total cumulative progress'),
@@ -78,13 +86,19 @@ class ProgressReportDetailPDFExporter:
 
                 for location_data in indicator.indicator_location_data.all():
                     location_progress = format_total_value_to_string(
-                        location_data.disaggregation.get('()'), is_percentage=is_percentage
+                        location_data.disaggregation.get('()'),
+                        is_percentage=is_percentage,
+                        percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
                     )
                     if location_data.previous_location_data:
                         prev_value = location_data.previous_location_data.disaggregation.get('()', {})
                     else:
                         prev_value = {}
-                    previous_location_progress = format_total_value_to_string(prev_value, is_percentage=is_percentage)
+                    previous_location_progress = format_total_value_to_string(
+                        prev_value,
+                        is_percentage=is_percentage,
+                        percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
+                    )
 
                     location_table = [
                         [

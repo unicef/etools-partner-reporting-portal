@@ -77,7 +77,7 @@ class PartnerActivityFilter(django_filters.FilterSet):
         return queryset.filter(partner=value)
 
     def get_project(self, queryset, name, value):
-        return queryset.filter(project=value)
+        return queryset.filter(projects=value)
 
     def get_cluster_id(self, queryset, name, value):
         return queryset.filter(
