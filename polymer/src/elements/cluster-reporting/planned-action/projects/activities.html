@@ -41,7 +41,7 @@
     </etools-prp-ajax>
 
     <page-body>
-      <planned-action-add-activity-from-project-modal id="modal" edit-data="[[activityData]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-activity-from-project-modal id="modal" edit-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
 
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
@@ -64,6 +64,8 @@
         queryParams: Object,
 
         projectId: Number,
+
+        projectData: Object,
 
         responsePlanId: {
           type: String,

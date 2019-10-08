@@ -15,6 +15,7 @@
 <link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../endpoints.html">
@@ -24,9 +25,11 @@
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
-<link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../../error-box.html">
 
 <dom-module id="planned-action-add-activity-from-project-modal">
   <template>
@@ -126,10 +129,16 @@
       }
     </style>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <etools-prp-ajax
-        id="editActivity"
+        id="activity"
         url="[[activityUrl]]"
-        method="patch"
+        method="post"
         body="[[data]]"
         content-type="application/json">
     </etools-prp-ajax>
@@ -141,27 +150,37 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="objectives"
-        params="[[objectivesParams]]"
-        url="[[objectivesUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="projects"
         params="[[projectsParams]]"
         url="[[projectsUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="objectives"
+        params="[[objectivesParams]]"
+        url="[[objectivesUrl]]">
+    </etools-prp-ajax>
+
+    <template
+        is="dom-if"
+        if="[[_displayPartner(permissions)]]"
+        restamp="true">
+      <partner-dropdown-content
+          partners="{{partners}}">
+      </partner-dropdown-content>
+    </template>
+
     <paper-dialog
         id="dialog"
         with-backdrop
+        on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Partner Activity</h2>
+        <h2>Add activity</h2>
 
         <paper-icon-button
             class="self-center"
-            on-tap="close"
+            on-tap="_close"
             icon="icons:close">
         </paper-icon-button>
       </div>
@@ -170,285 +189,330 @@
         <error-box errors="[[errors]]"></error-box>
         <template
           is="dom-if"
-          if="[[_equals(mode, 'cluster')]]"
+          if="[[_displayPartner(permissions)]]"
           restamp="true">
-          <iron-form class="app-grid">
-            <div class="item">
-              <paper-dropdown-menu
-                  class="validate"
-                  label="Cluster"
-                  on-value-changed="_validate"
-                  always-float-label
-                  required>
-                <paper-listbox
-                    selected="{{data.cluster}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="clusters"
-                      is="dom-repeat"
-                      items="[[clusters]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-              </paper-dropdown-menu>
-            </div>
+          <etools-single-selection-menu
+            class="item validate full-width"
+            label="Partner"
+            options="[[partners]]"
+            option-value="id"
+            option-label="title"
+            selected="{{selectedPartner}}"
+            on-iron-activate="_validate"
+            trigger-value-change-event
+            required>
+          </etools-single-selection-menu>
+        </template>
 
-            <div class="item">
-              <etools-single-selection-menu
-                  class="validate"
-                  label="Cluster Activity"
-                  options="[[activities]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.cluster_activity}}"
-                  on-iron-activate="_validate"
-                  disabled="[[_equals(activities.length, 0)]]"
-                  trigger-value-change-event
-                  required>
-              </etools-single-selection-menu>
-            </div>
-
-            <header class="item-wide">
-              <h3>Projects ([[data.projects.length]])</h3>
-            </header>
+        <paper-radio-group
+            id="mode"
+            selected="{{mode}}">
+          <paper-radio-button name="cluster">
+            <strong>Add from Cluster Activities</strong>
+          </paper-radio-button>
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'cluster')]]">
             <template
-              is="dom-repeat"
-              items="{{data.projects}}">
-
-              <div class="row layout horizontal item-wide">
-                <div class="flex-none layout vertical center-center col-actions">
-                  <paper-icon-button
-                      index="[[index]]"
-                      class="remove-btn"
-                      data-index$="[[index]]"
-                      on-tap="_remove"
-                      icon="icons:cancel">
-                  </paper-icon-button>
-                  <paper-tooltip offset="5">Remove</paper-tooltip>
+                is="dom-if"
+                if="[[_equals(mode, 'cluster')]]"
+                restamp="true">
+              <div class="app-grid">
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Cluster"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.cluster.cluster}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          id="clusters"
+                          is="dom-repeat"
+                          items="[[clusters]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Activity"
+                      options="[[activities]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.cluster.cluster_activity}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(activities.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
                 </div>
 
-                <div class="flex">
-                  <div class="app-grid">
-                    <div class="item">
-                      <etools-single-selection-menu
-                          class="validate"
-                          label="Partner Project"
-                          options="[[projects]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{item.project_id}}"
-                          data-index$="[[index]]"
-                          on-iron-activate="_validate"
-                          disabled="[[_equals(projects.length, 0)]]"
-                          trigger-value-change-event
-                          required>
-                      </etools-single-selection-menu>
-                    </div>
+              </div>
 
-                    <div class="item">
-                      <paper-dropdown-menu
-                          class="validate"
-                          label="Status"
-                          on-value-changed="_validate"
-                          always-float-label
-                          required>
-                        <paper-listbox
-                            selected="{{item.status}}"
-                            attr-for-selected="value"
-                            slot="dropdown-content"
-                            class="dropdown-content">
-                          <template
-                              is="dom-repeat"
-                              items="[[statuses]]">
-                            <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                          </template>
-                        </paper-listbox>
-                      </paper-dropdown-menu>
-                    </div>
+              <template
+                is="dom-if"
+                if="[[data.cluster.cluster_activity]]"
+                restamp="true">
+                <header class="item-wide">
+                  <h3>Projects ([[data.cluster.projects.length]])</h3>
+                </header>
+              </template>
 
-                    <div class="item">
-                      <etools-prp-date-input
-                          class="start-date"
-                          label="Start date"
-                          value="{{item.start_date}}"
-                          error-message=""
-                          required
-                          no-init>
-                      </etools-prp-date-input>
-                      </etools-date-input>
-                    </div>
+              <template
+                is="dom-repeat"
+                items="{{data.cluster.projects}}">
 
-                    <div class="item">
-                      <etools-prp-date-input
-                          class="end-date"
-                          label="End date"
-                          value="{{item.end_date}}"
-                          error-message=""
-                          required
-                          no-init>
-                      </etools-prp-date-input>
+                <div class="row layout horizontal">
+                  <div class="flex-none layout vertical center-center col-actions">
+                    <paper-icon-button
+                        index="[[index]]"
+                        class="remove-btn"
+                        data-index$="[[index]]"
+                        on-tap="_remove"
+                        icon="icons:cancel">
+                    </paper-icon-button>
+                    <paper-tooltip offset="5">Remove</paper-tooltip>
+                  </div>
+
+                  <div class="flex">
+                    <div class="app-grid">
+                      <div class="item">
+                        <etools-single-selection-menu
+                            class="validate"
+                            label="Partner Project"
+                            options="[[projects]]"
+                            option-value="id"
+                            option-label="title"
+                            selected="{{item.project_id}}"
+                            data-index$="[[index]]"
+                            on-iron-activate="_validate"
+                            disabled="[[_equals(projects.length, 0)]]"
+                            trigger-value-change-event
+                            required>
+                        </etools-single-selection-menu>
+                      </div>
+
+                      <div class="item">
+                        <paper-dropdown-menu
+                            class="validate"
+                            label="Status"
+                            on-value-changed="_validate"
+                            always-float-label
+                            required>
+                          <paper-listbox
+                              selected="{{item.status}}"
+                              attr-for-selected="value"
+                              slot="dropdown-content"
+                              class="dropdown-content">
+                            <template
+                                is="dom-repeat"
+                                items="[[statuses]]">
+                              <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                            </template>
+                          </paper-listbox>
+                        </paper-dropdown-menu>
+                      </div>
+
+                      <div class="item">
+                        <etools-prp-date-input
+                            class="start-date"
+                            label="Start date"
+                            value="{{item.start_date}}"
+                            error-message=""
+                            required
+                            no-init>
+                        </etools-prp-date-input>
+                        </etools-date-input>
+                      </div>
+
+                      <div class="item">
+                        <etools-prp-date-input
+                            class="end-date"
+                            label="End date"
+                            value="{{item.end_date}}"
+                            error-message=""
+                            required
+                            no-init>
+                        </etools-prp-date-input>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </template>
+
+              <template
+                is="dom-if"
+                if="[[data.cluster.cluster_activity]]"
+                restamp="true">
+                <paper-button
+                    class="btn-primary add-project-btn"
+                    on-tap="_add">
+                  Add Project
+                </paper-button>
+              </template>
             </template>
+          </div>
 
-            <paper-button
-                class="btn-primary add-project-btn"
-                on-tap="_add">
-              Add Project
-            </paper-button>
+          <paper-radio-button name="custom">
+            <strong>Add Custom Activity</strong>
+          </paper-radio-button>
 
-          </iron-form>
-        </template>
-
-        <template
-            is="dom-if"
-            if="[[_equals(mode, 'custom')]]"
-            restamp="true">
-          <iron-form class="app-grid">
-            <div class="item">
-              <paper-dropdown-menu
-                  class="validate"
-                  label="Cluster"
-                  on-value-changed="_validate"
-                  always-float-label
-                  required>
-                <paper-listbox
-                    selected="{{data.cluster}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="custom_clusters"
-                      is="dom-repeat"
-                      items="[[clusters]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-              </paper-dropdown-menu>
-            </div>
-
-            <div class="item">
-              <etools-single-selection-menu
-                  class="validate"
-                  label="Cluster Objective"
-                  options="[[objectives]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.cluster_objective}}"
-                  on-iron-activate="_validate"
-                  disabled="[[_equals(objectives.length, 0)]]"
-                  trigger-value-change-event
-                  required>
-              </etools-single-selection-menu>
-            </div>
-
-            <div class="item item-wide">
-              <paper-input
-                  class="validate"
-                  label="Title"
-                  value="{{data.title}}"
-                  on-input="_validate"
-                  always-float-label
-                  required>
-              </paper-input>
-            </div>
-
-            <header class="item-wide">
-              <h3>Projects ([[data.projects.length]])</h3>
-            </header>
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'custom')]]">
             <template
-              is="dom-repeat"
-              items="{{data.projects}}">
-
-              <div class="row layout horizontal item-wide">
-                <div class="flex-none layout vertical center-center col-actions">
-                  <paper-icon-button
-                      index="[[index]]"
-                      class="remove-btn"
-                      data-index$="[[index]]"
-                      on-tap="_remove"
-                      icon="icons:cancel">
-                  </paper-icon-button>
-                  <paper-tooltip offset="5">Remove</paper-tooltip>
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+              <div class="app-grid">
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Cluster"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.cluster}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[clusters]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Cluster Objective"
+                      options="[[objectives]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.cluster_objective}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(objectives.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
+                </div>
+                <div class="item item-wide">
+                  <paper-input
+                      class="validate"
+                      label="Title"
+                      value="{{data.custom.title}}"
+                      on-input="_validate"
+                      always-float-label
+                      required>
+                  </paper-input>
                 </div>
 
-                <div class="flex">
-                  <div class="app-grid">
-                    <div class="item">
-                      <etools-single-selection-menu
-                          class="validate"
-                          label="Partner Project"
-                          options="[[projects]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{item.project_id}}"
+                <header class="item-wide">
+                  <h3>Projects ([[data.custom.projects.length]])</h3>
+                </header>
+
+                <template
+                  is="dom-repeat"
+                  items="{{data.custom.projects}}">
+
+                  <div class="row layout horizontal item-wide">
+                    <div class="flex-none layout vertical center-center col-actions">
+                      <paper-icon-button
+                          index="[[index]]"
+                          class="remove-btn"
                           data-index$="[[index]]"
-                          on-iron-activate="_validate"
-                          disabled="[[_equals(projects.length, 0)]]"
-                          trigger-value-change-event
-                          required>
-                      </etools-single-selection-menu>
+                          on-tap="_remove"
+                          icon="icons:cancel">
+                      </paper-icon-button>
+                      <paper-tooltip offset="5">Remove</paper-tooltip>
                     </div>
 
-                    <div class="item">
-                      <paper-dropdown-menu
-                          class="validate"
-                          label="Status"
-                          on-value-changed="_validate"
-                          always-float-label
-                          required>
-                        <paper-listbox
-                            selected="{{item.status}}"
-                            attr-for-selected="value"
-                            slot="dropdown-content"
-                            class="dropdown-content">
-                          <template
-                              is="dom-repeat"
-                              items="[[statuses]]">
-                            <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                          </template>
-                        </paper-listbox>
-                      </paper-dropdown-menu>
-                    </div>
+                    <div class="flex">
+                      <div class="app-grid">
+                        <div class="item">
+                          <etools-single-selection-menu
+                              class="validate"
+                              label="Partner Project"
+                              options="[[projects]]"
+                              option-value="id"
+                              option-label="title"
+                              selected="{{item.project_id}}"
+                              data-index$="[[index]]"
+                              on-iron-activate="_validate"
+                              disabled="[[_equals(projects.length, 0)]]"
+                              trigger-value-change-event
+                              required>
+                          </etools-single-selection-menu>
+                        </div>
 
-                    <div class="item">
-                      <etools-prp-date-input
-                          class="start-date"
-                          label="Start date"
-                          value="{{item.start_date}}"
-                          error-message=""
-                          required
-                          no-init>
-                      </etools-prp-date-input>
-                      </etools-date-input>
-                    </div>
+                        <div class="item">
+                          <paper-dropdown-menu
+                              class="validate"
+                              label="Status"
+                              on-value-changed="_validate"
+                              always-float-label
+                              required>
+                            <paper-listbox
+                                selected="{{item.status}}"
+                                attr-for-selected="value"
+                                slot="dropdown-content"
+                                class="dropdown-content">
+                              <template
+                                  is="dom-repeat"
+                                  items="[[statuses]]">
+                                <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                              </template>
+                            </paper-listbox>
+                          </paper-dropdown-menu>
+                        </div>
 
-                    <div class="item">
-                      <etools-prp-date-input
-                          class="end-date"
-                          label="End date"
-                          value="{{item.end_date}}"
-                          error-message=""
-                          required
-                          no-init>
-                      </etools-prp-date-input>
+                        <div class="item">
+                          <etools-prp-date-input
+                              class="start-date"
+                              label="Start date"
+                              value="{{item.start_date}}"
+                              error-message=""
+                              required
+                              no-init>
+                          </etools-prp-date-input>
+                          </etools-date-input>
+                        </div>
+
+                        <div class="item">
+                          <etools-prp-date-input
+                              class="end-date"
+                              label="End date"
+                              value="{{item.end_date}}"
+                              error-message=""
+                              required
+                              no-init>
+                          </etools-prp-date-input>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </template>
+
+                <paper-button
+                    class="btn-primary add-project-btn"
+                    on-tap="_add">
+                  Add Project
+                </paper-button>
+                
               </div>
             </template>
-
-            <paper-button
-                class="btn-primary add-project-btn"
-                on-tap="_add">
-              Add Project
-            </paper-button>
-          </iron-form>
-        </template>
+          </div>
+        </paper-radio-group>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -456,11 +520,11 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          Add activity
         </paper-button>
 
         <paper-button
-            on-tap="close">
+            on-tap="_close">
           Cancel
         </paper-button>
       </div>
@@ -484,11 +548,6 @@
 
         activitiesUrl: String,
 
-        editData: {
-          type: Object,
-          value: {},
-        },
-
         updatePending: {
           type: Boolean,
           value: false,
@@ -496,12 +555,12 @@
 
         mode: {
           type: String,
-          computed: '_setMode(editData)'
+          observer: '_setDefaults',
         },
 
         opened: {
           type: Boolean,
-          observer: false,
+          observer: '_onOpenedChanged',
         },
 
         responsePlanId: {
@@ -511,7 +570,7 @@
 
         activityUrl: {
           type: String,
-          computed: '_computeActivityUrl(responsePlanId, data.id)',
+          computed: '_computeActivityUrl(responsePlanId, mode)',
         },
 
         activitiesParams: {
@@ -519,6 +578,11 @@
           value: {
             page_size: 99999,
           },
+        },
+
+        clusters: {
+          type: Array,
+          statePath: 'responsePlans.current.clusters',
         },
 
         statuses: {
@@ -535,26 +599,9 @@
           statePath: 'location.id',
         },
 
-        clusters: {
-          type: Array,
-          statePath: 'responsePlans.current.clusters',
-        },
-
-        objectives: {
+        activities: {
           type: Array,
           value: [],
-        },
-
-        objectivesParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
-        },
-
-        objectivesUrl: {
-          type: String,
-          computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
         projects: {
@@ -574,96 +621,123 @@
           computed: '_computeProjectsUrl(responsePlanId)',
         },
 
+        objectives: {
+          type: Array,
+          value: [],
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        selectedPartner: {
+          type: String,
+          value: '',
+        },
+
+        objectivesUrl: {
+          type: String,
+          computed: '_computeObjectivesUrl(responsePlanId)',
+        },
+
         partner: {
+          type: Object,
+          computed: '_computePartner(storePartner, selectedPartner)'
+        },
+
+        storePartner: {
           type: Object,
           statePath: 'partner.current',
         },
 
-        partnerId: {
-          type: Number,
-          computed: '_computePartnerId(partner, editData.partner)',
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
         },
+
       },
 
       listeners: {
+        'mode.selected-changed': 'adjustPosition',
         'project-details-selection-refit': 'adjustPosition',
       },
 
       observers: [
-        '_fetchProjects(partnerId)',
-        '_fetchActivities(data.cluster)',
-        '_fetchObjectives(data.cluster)',
+        '_fetchProjects(partner)',
+        '_fetchActivities(data.cluster.cluster)',
+        '_fetchObjectives(data.custom.cluster)',
       ],
 
       _add: function () {
-        this.push('data.projects', {});
+        if (this.mode === 'cluster') {
+          this.push('data.cluster.projects', {});
+        } else {
+          this.push('data.custom.projects', {});
+        }
         this.fire('project-details-selection-refit');
       },
 
       _remove: function (e) {
         var currentIndex = +e.target.dataset.index;
-        this.splice('data.projects', currentIndex, 1);
+
+        if (this.mode === 'cluster') {
+          this.splice('data.cluster.projects', currentIndex, 1);
+        } else {
+          this.splice('data.custom.projects', currentIndex, 1);
+        }
+
         this.fire('project-details-selection-refit');
       },
 
       _setDefaults: function () {
-        this.set('data', Object.assign({},
-          {id: this.editData.id,
-          cluster: this.editData.cluster.id,
-          cluster_activity: null,
-          cluster_objective: this.editData.cluster_objective.id,
-          title: this.editData.title,
-          is_custom: this.editData.is_custom,
-          partner: this.editData.partner,
-          reportables: this.editData.reportables,
-          projects: this.editData.projects}));
-
-        if (this.editData.is_custom) {
-          this.set('data.title', this.editData.title);
-        } else {
-          this.set('data.cluster_activity', this.editData.cluster_activity.id);
-        }
-      },
-
-      open: function () {
-        this.set('opened', true);
-        this.set('refresh', true);
-        this._setDefaults();
-      },
-
-      close: function () {
-        this.set('data', {});
-        this.set('opened', false);
-        this.set('refresh', false);
+        this.set('data', {
+          cluster: {
+            projects: []
+          },
+          custom: {
+            projects: []
+          },
+        });
+        this.set('activities', []);
+        this.set('objectives', []);
         this.set('errors', {});
+      },
+
+      _onOpenedChanged: function (opened) {
+        if (opened) {
+          // this.set('mode', 'cluster');
+
+          // this.async(function () {
+          //   this.set('mode', 'cluster');
+          // });
+        }
       },
 
       _validate: function (e) {
         e.target.validate();
       },
 
-      _computePartnerId: function(partner, editPartner) {
-        return partner.id || editPartner.id;
+      _computePartner: function(storePartner, selectedPartner) {
+        return storePartner.id || selectedPartner || undefined;
       },
 
-      _computeActivityUrl: function (responsePlanId, activityId) {
-        return App.Endpoints.partnerActivityUpdate(responsePlanId, activityId);
+      _displayPartner: function (permissions) {
+        return permissions.addPartnerToProject;
       },
 
-      _computeObjectivesUrl: function (responsePlanId) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      _computeActivityUrl: function (responsePlanId, mode) {
+        return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
       _computeProjectsUrl: function (responsePlanId) {
         return App.Endpoints.plannedActions(responsePlanId);
       },
 
-      _setMode: function(editActivityData) {
-        if (editActivityData.is_custom) {
-          return 'custom';
-        } else {
-          return 'cluster';
-        }
+      _computeObjectivesUrl: function (responsePlanId) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
       _fetchActivities: function (clusterId) {
@@ -672,6 +746,7 @@
           return;
         }
         this.set('activities', []);
+        this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
             App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
@@ -681,27 +756,6 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _fetchObjectives: function (clusterId) {
-        var self = this;
-
-        if (typeof clusterId === 'undefined') {
-          return;
-        }
-
-        this.set('objectivesParams.cluster_id', clusterId);
-        this.set('objectives', []);
-
-        this.$.objectives.abort();
-
-        this.$.objectives.thunk()()
-            .then(function (res) {
-              self.set('objectives', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -726,6 +780,28 @@
             });
       },
 
+      _fetchObjectives: function (clusterId) {
+        var self = this;
+
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+
+        this.set('objectivesParams.cluster_id', clusterId);
+        this.set('objectives', []);
+        this.set('data.custom.cluster_objective', undefined);
+
+        this.$.objectives.abort();
+
+        this.$.objectives.thunk()()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       _save: function () {
         var self = this;
 
@@ -740,17 +816,39 @@
 
         this.set('updatePending', true);
 
-        this.$.editActivity.thunk()()
-            .then(function (res) {
-              self.fire('pa-activity-edited', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('updatePending', false);
-            });
+        this.$.activity.body = Object.assign({
+          partner: this.partner,
+        }, this.data[this.mode]);
+        this.$.activity.thunk()()
+          .then(function (res) {
+            self.fire('activity-added', res.data);
+            self.set('updatePending', false);
+            self.set('errors', {});
+            self._close();
+          })
+          .catch(function (err) {
+            self.set('errors', err.data);
+            self.set('updatePending', false);
+            self.fire('project-details-selection-refit');
+          });
+      },
+
+      _close: function (e) {
+        if (e.target.nodeName === 'PAPER-DIALOG' ||
+            e.target.nodeName === 'PAPER-BUTTON' ||
+            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          this.set('mode', '');
+          this.set('data', {});
+
+          this.set('objectives', []);
+          this.set('activities', []);
+
+          this.set('errors', {});
+
+          this.close();
+        } else {
+          return;
+        }
       },
     });
   </script>
