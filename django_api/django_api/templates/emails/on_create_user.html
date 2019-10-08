@@ -2,7 +2,12 @@
 
 {% block content %}
     <p>Dear {{ user.get_full_name }},</p>
-    <p>You now have access to UNICEF's Partner Reporting Portal. Click here to sign up: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
-    <p>For any queries, please refer to your Organization's administrator.</p>
-    <p>Thank you.</p>
+    <p>You have been granted access to the UNICEF Partner Reporting Portal. The portal will allow you to submit and view reports related to your UNICEF partnerships.</p>
+    <p>There are different roles available in the portal. You will receive a separate email that shows what role you have been assigned.</p>
+    <p>For any help with the first time registration process, please see <a href="https://prphelp.zendesk.com/hc/en-us/articles/360033550372-First-time-registration-in-the-Partner-Reporting-Portal%5D">this article</a>.</p>
+    <p>For explanation on what different roles are available in the portal can be found <a href="https://prphelp.zendesk.com/hc/en-us/articles/360033232631-PRP-User-Roles%5D">here</a>.</p>
+    <p>TO REGISTER FOR THE PORTAL follow this link: <a href="{{ portal_url }}">{{ portal_url }}</a></p>
+    <p>Kind regards,</p>
+    <p>UNICEF</p>
+    <p>Please note that this is an automatically generated email. Responses are not monitored and cannot be replied to.</p>
 {% endblock content %}

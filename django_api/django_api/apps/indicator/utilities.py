@@ -14,10 +14,20 @@ def convert_string_number_to_float(num):
     return float(num.replace(',', '')) if type(num) == str else float(num)
 
 
-def format_total_value_to_string(total, is_percentage=False):
+def format_total_value_to_string(total, is_percentage=False, percentage_display_type=None):
     if is_percentage:
-        value = total.get(ValueType.CALCULATED, 0)
-        formatter = format_percent
+        if percentage_display_type and percentage_display_type == 'ratio':
+            return f"{total.get(ValueType.VALUE, 0)}/{total.get(ValueType.DENOMINATOR, 1)}"
+        else:
+            numerator = total.get(ValueType.VALUE, 0)
+            denominator = total.get(ValueType.DENOMINATOR, 1)
+
+            if numerator == 0 and denominator == 0:
+                value = 0
+            else:
+                value = total.get(ValueType.VALUE, 0) / total.get(ValueType.DENOMINATOR, 1)
+
+            formatter = format_percent
     else:
         value = total.get(ValueType.VALUE, 0)
         formatter = format_number

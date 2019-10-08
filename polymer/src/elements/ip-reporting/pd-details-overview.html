@@ -205,7 +205,7 @@
           </li>
           <li class="item item-2-col">
             <labelled-item label="[[localize('disbursements')]]">
-              <span class="field-value">[[_computeFunds(pd.funds_received_to_date)]]</span>
+              <span class="field-value">[[pd.funds_received_to_date]] [[pd.cso_contribution_currency]]</span>
               <etools-prp-progress-bar
                 number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
               </etools-prp-progress-bar>
@@ -344,9 +344,9 @@
 
       _computeFunds: function (num) {
         if (num === null || num === -1) {
-          return num;
-        } else {
           return 'N/A';
+        } else {
+          return num / 100;
         }
       },
 

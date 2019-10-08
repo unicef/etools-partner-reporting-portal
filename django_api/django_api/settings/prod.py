@@ -23,10 +23,7 @@ WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = [DOMAIN_NAME, ]
 
 # other
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 SERVER_EMAIL = 'admin@' + DOMAIN_NAME
-
-
 
 INSTALLED_APPS += [
     'django_extensions',

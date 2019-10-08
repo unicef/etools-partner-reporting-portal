@@ -1409,12 +1409,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             if not content_object.partneractivityprojectcontext_set.exists():
                 raise ValidationError({
-                    "start_date_of_reporting_period": "This PartnerActivity does not have start date",
+                    "start_date_of_reporting_period": "This PartnerActivity does not have any ProjectContext",
                 })
 
             for context in content_object.partneractivityprojectcontext_set.all():
                 if validated_data['start_date_of_reporting_period'] < context.start_date:
-                    error_msg = "Start date of reporting period cannot come before the activity's start date"
+                    error_msg = "Start date of reporting period cannot come before the activity project context's start date"
 
                     raise ValidationError({
                         "start_date_of_reporting_period": error_msg,
@@ -1488,12 +1488,13 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         elif reportable_object_content_model == PartnerActivity:
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
 
-            if validated_data['start_date_of_reporting_period'] is not None and validated_data['start_date_of_reporting_period'] < content_object.start_date:
-                error_msg = "Start date of reporting period cannot come before the activity's start date"
+            for context in content_object.partneractivityprojectcontext_set.all():
+                if validated_data['start_date_of_reporting_period'] is not None and validated_data['start_date_of_reporting_period'] < context.start_date:
+                    error_msg = "Start date of reporting period cannot come before the activity project context's start date"
 
-                raise ValidationError({
-                    "start_date_of_reporting_period": error_msg,
-                })
+                    raise ValidationError({
+                        "start_date_of_reporting_period": error_msg,
+                    })
 
             # If PartnerActivity is adopted from CA,
             # Filter out IndicatorBlueprint instance
