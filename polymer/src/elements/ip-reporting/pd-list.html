@@ -142,7 +142,7 @@
                   value="[[pd.funds_received_to_date]]"
                   currency="[[pd.funds_received_to_date_currency]]">
               </etools-prp-currency>
-              ([[_toPercentage(pd.funds_received_to_date_percentage)]])
+              ([[_computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)]])
             </div>
             <div class="table-cell table-cell--text cell-reports">
               <a href="[[ pd.id ]]/view/reports">[[localize('reports')]]</a>
@@ -197,6 +197,14 @@
           type: Number,
           statePath: 'programmeDocuments.count',
         },
+      },
+
+      _computeFundsReceivedToDateCurrency: function (percentage) {
+        if (percentage === null || percentage === -1) {
+          return "N/A";
+        } else {
+          return percentage + "%";
+        }
       },
     });
   </script>
