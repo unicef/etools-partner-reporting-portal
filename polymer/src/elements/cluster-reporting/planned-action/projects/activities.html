@@ -79,7 +79,7 @@
 
         params: {
           type: Object,
-          computed: '_computeParams(queryParams, projectId)',
+          computed: '_computeParams(queryParams)',
         },
       },
 
@@ -100,7 +100,6 @@
       _onSuccess: function(e, data) {
         var path = '/planned-action/activity/' + String(data.id);
         var url = this.buildUrl(this._baseUrlCluster, path);
-        console.log('url', url);
         this.set('path', url);
       },
 
@@ -108,10 +107,8 @@
         return App.Endpoints.partnerActivityList(responsePlanId);
       },
 
-      _computeParams: function (queryParams, projectId) {
-        return Object.assign({}, queryParams, {
-          project: projectId,
-        });
+      _computeParams: function (queryParams) {
+        return Object.assign({}, queryParams);
       },
 
       _activitiesByPartnerProjectIdAjax: function () {
