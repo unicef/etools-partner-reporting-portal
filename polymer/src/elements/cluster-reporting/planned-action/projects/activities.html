@@ -11,7 +11,7 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../project-activity-table.html">
-<link rel="import" href="../activities/editing-modal.html">
+<link rel="import" href="../activities/add-activity-from-project-modal.html">
 
 <dom-module id="pa-project-details-activities">
   <template>
@@ -41,7 +41,7 @@
     </etools-prp-ajax>
 
     <page-body>
-      <planned-action-activity-editing-modal id="modal" edit-data="[[activityData]]"></planned-action-activity-editing-modal>
+      <planned-action-add-activity-from-project-modal id="modal" edit-data="[[activityData]]"></planned-action-add-activity-from-project-modal>
 
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
