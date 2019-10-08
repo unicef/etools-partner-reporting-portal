@@ -176,7 +176,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add activity</h2>
+        <h2>Add Partner Activity</h2>
 
         <paper-icon-button
             class="self-center"
@@ -446,7 +446,7 @@
                               options="[[projects]]"
                               option-value="id"
                               option-label="title"
-                              selected="{{item.project_id}}"
+                              selected="{{item.id}}"
                               data-index$="[[index]]"
                               on-iron-activate="_validate"
                               disabled="[[_equals(projects.length, 0)]]"
@@ -503,11 +503,11 @@
                   </div>
                 </template>
 
-                <paper-button
+                <!-- <paper-button
                     class="btn-primary add-project-btn"
                     on-tap="_add">
                   Add Project
-                </paper-button>
+                </paper-button> -->
                 
               </div>
             </template>
@@ -547,6 +547,8 @@
         data: Object,
 
         activitiesUrl: String,
+
+        projectData: Object,
 
         updatePending: {
           type: Boolean,
@@ -693,12 +695,13 @@
       },
 
       _setDefaults: function () {
+        console.log('here?', this.projectData);
         this.set('data', {
           cluster: {
             projects: []
           },
           custom: {
-            projects: []
+            projects: [this.projectData]
           },
         });
         this.set('activities', []);
