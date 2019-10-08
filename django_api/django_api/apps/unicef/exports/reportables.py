@@ -4,7 +4,7 @@ from babel.numbers import format_percent
 from django.utils import timezone
 from openpyxl.utils import get_column_letter
 
-from indicator.models import Disaggregation
+from indicator.models import Disaggregation, IndicatorBlueprint
 from indicator.utilities import format_total_value_to_string
 from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
@@ -101,11 +101,13 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
         previous_data = current_data.previous_location_data
         current_location_progress = format_total_value_to_string(
             current_data.disaggregation.get('()'),
-            is_percentage=current_data.indicator_report.is_percentage
+            is_percentage=current_data.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE,
+            percentage_display_type="ratio" if current_data.indicator_report.reportable.blueprint.display_type == 'ratio' else None
         )
         previous_location_progress = format_total_value_to_string(
             previous_data.disaggregation.get('()'),
-            is_percentage=previous_data.indicator_report.is_percentage
+            is_percentage=previous_data.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE,
+            percentage_display_type="ratio" if current_data.indicator_report.reportable.blueprint.display_type == 'ratio' else None
         ) if previous_data else ''
 
         previous_time_period = previous_data.indicator_report.display_time_period if previous_data else ''
