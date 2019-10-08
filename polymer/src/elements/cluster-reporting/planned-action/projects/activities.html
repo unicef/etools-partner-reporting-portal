@@ -45,7 +45,7 @@
 
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-          Add Partner Activity
+          Add Project Activity
         </paper-button>
       </div>
 
@@ -85,12 +85,24 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
       observers: [
         '_activitiesByPartnerProjectIdAjax(url, params)',
       ],
+
+      listeners: {
+        'modal.activity-added': '_onSuccess',
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/planned-action/activity/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        console.log('url', url);
+        this.set('path', url);
+      },
 
       _computeUrl: function (responsePlanId) {
         return App.Endpoints.partnerActivityList(responsePlanId);

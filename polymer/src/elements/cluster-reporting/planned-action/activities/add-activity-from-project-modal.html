@@ -176,7 +176,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Partner Activity</h2>
+        <h2>Add Project Activity</h2>
 
         <paper-icon-button
             class="self-center"
@@ -446,7 +446,7 @@
                               options="[[projects]]"
                               option-value="id"
                               option-label="title"
-                              selected="{{item.id}}"
+                              selected="[[item.project_id]]"
                               data-index$="[[index]]"
                               on-iron-activate="_validate"
                               disabled="[[_equals(projects.length, 0)]]"
@@ -695,13 +695,19 @@
       },
 
       _setDefaults: function () {
-        console.log('here?', this.projectData);
+        var simpleProjectData = {};
+
+        simpleProjectData.project_id = this.projectData.id;
+        simpleProjectData.status = this.projectData.status;
+        simpleProjectData.start_date = this.projectData.start_date;
+        simpleProjectData.end_date = this.projectData.end_date;
+
         this.set('data', {
           cluster: {
-            projects: []
+            projects: [simpleProjectData]
           },
           custom: {
-            projects: [this.projectData]
+            projects: [simpleProjectData]
           },
         });
         this.set('activities', []);
@@ -827,7 +833,7 @@
             self.fire('activity-added', res.data);
             self.set('updatePending', false);
             self.set('errors', {});
-            self._close();
+            self._close('saved');
           })
           .catch(function (err) {
             self.set('errors', err.data);
@@ -837,9 +843,11 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName === 'PAPER-DIALOG' ||
-            e.target.nodeName === 'PAPER-BUTTON' ||
-            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+        if (e === 'saved' ||
+          e.target.nodeName === 'PAPER-DIALOG' ||
+          e.target.nodeName === 'PAPER-BUTTON' ||
+          e.target.nodeName === 'PAPER-ICON-BUTTON'
+        ) {
           this.set('mode', '');
           this.set('data', {});
 
@@ -847,7 +855,7 @@
           this.set('activities', []);
 
           this.set('errors', {});
-
+          console.log('here!');
           this.close();
         } else {
           return;
