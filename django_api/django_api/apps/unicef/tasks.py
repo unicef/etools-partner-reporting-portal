@@ -231,6 +231,8 @@ def process_programme_documents(fast=False, area=False):
                             if not person:
                                 continue
 
+                            person.active = True
+                            person.save()
                             pd.unicef_focal_point.add(person)
 
                         # Create agreement_auth_officers
@@ -240,6 +242,8 @@ def process_programme_documents(fast=False, area=False):
                             if not person:
                                 continue
 
+                            person.active = True
+                            person.save()
                             pd.unicef_officers.add(person)
 
                             user.partner = partner
@@ -267,6 +271,8 @@ def process_programme_documents(fast=False, area=False):
                             if not person:
                                 continue
 
+                            person.active = True
+                            person.save()
                             pd.partner_focal_point.add(person)
 
                         # Create sections
