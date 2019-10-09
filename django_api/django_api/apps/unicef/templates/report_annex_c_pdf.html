@@ -157,7 +157,7 @@
                                 {% if indicator.is_number %}
                                     {{ indicator.total.v|floatformat:"0" }}
                                 {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
-                                    {{ indicator.total.c }}%
+                                    {{ indicator.total.c|percent_format }}
                                 {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
                                     {{ indicator.total.v }}/{{ indicator.total.d }}
                                 {% endif %}
@@ -166,7 +166,7 @@
                                 {% if indicator.is_number %}
                                     {{ indicator.reportable.total.v|floatformat:"0" }}
                                 {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
-                                    {{ indicator.reportable.total.c|percentage }}
+                                    {{ indicator.reportable.total.c|percent_format }}
                                 {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
                                     {{ indicator.reportable.total.v }}/{{ indicator.reportable.total.d }}
                                 {% endif %}
@@ -190,7 +190,7 @@
                                 {% if indicator.is_number %}
                                     {{ indicator.total.v|floatformat:"0" }}
                                 {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
-                                    {{ indicator.total.c }}%
+                                    {{ indicator.total.c|percent_format }}
                                 {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
                                     {{ indicator.total.v }}/{{ indicator.total.d }}
                                 {% endif %}
@@ -199,7 +199,7 @@
                                 {% if indicator.is_number %}
                                     {{ indicator.reportable.total.v|floatformat:"0" }}
                                 {% elif indicator.reportable.blueprint.display_type == 'percentage' %}
-                                    {{ indicator.reportable.total.c|percentage }}
+                                    {{ indicator.reportable.total.c|percent_format }}
                                 {% elif indicator.reportable.blueprint.display_type == 'ratio' %}
                                     {{ indicator.reportable.total.v }}/{{ indicator.reportable.total.d }}
                                 {% endif %}

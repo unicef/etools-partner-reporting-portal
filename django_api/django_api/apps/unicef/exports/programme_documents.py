@@ -160,9 +160,11 @@ class ProgrammeDocumentsPDFExporter:
 
         for pd in self.programme_documents.order_by('id'):
             if pd.budget:
-                funds_received_to_date_percentage = int(round(pd.funds_received_to_date * 100 / pd.budget, 0))
+                funds_received_to_date_percentage = pd.funds_received_to_date_percentage
             else:
                 funds_received_to_date_percentage = 0
+
+            funds_received_to_date_percentage = "%.2f" % funds_received_to_date_percentage
 
             rows.append([
                 HTMLTableCell(pd.title, rowspan=5),
