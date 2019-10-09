@@ -27,7 +27,7 @@
       }
     </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
       params-string="{{query}}"
@@ -62,6 +62,8 @@
 
       properties: {
         queryParams: Object,
+
+        path: String,
 
         projectId: Number,
 
