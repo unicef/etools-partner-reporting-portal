@@ -15,6 +15,14 @@ def percentage(value):
         return "N/A"
 
 
+@register.filter
+def percent_format(value):
+    try:
+        return "%.2f%%" % (float(value))
+    except ValueError:
+        return "N/A"
+
+
 @register.simple_tag(takes_context=True)
 def get_absolute_file_url(context, django_file, default='---'):
     request = context.get('request')
