@@ -117,7 +117,7 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             ],
             [
                 HTMLTableHeader('Current Progress'),
-                HTMLTableCell(format_percent(reportable.progress_percentage, '#%'), colspan=2),
+                HTMLTableCell(format_percent(reportable.progress_percentage / 100, '#%'), colspan=2),
             ],
         ]
 
