@@ -5,7 +5,7 @@ from django.utils import timezone
 from openpyxl.utils import get_column_letter
 
 from indicator.models import Disaggregation, IndicatorBlueprint
-from indicator.utilities import format_total_value_to_string, convert_string_number_to_float
+from indicator.utilities import format_total_value_to_string
 from indicator.constants import ValueType
 from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
