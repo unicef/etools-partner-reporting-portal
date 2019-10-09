@@ -256,21 +256,16 @@
 
               </div>
 
-              <template
-                is="dom-if"
-                if="[[data.cluster.cluster_activity]]"
-                restamp="true">
-                <header class="item-wide">
-                  <h3>Projects ([[data.cluster.projects.length]])</h3>
-                </header>
-              </template>
+              <header class="item-wide">
+                <h3>Projects ([[data.cluster.projects.length]])</h3>
+              </header>
 
               <template
                 is="dom-repeat"
                 items="{{data.cluster.projects}}">
 
                 <div class="row layout horizontal">
-                  <div class="flex-none layout vertical center-center col-actions">
+                  <!-- <div class="flex-none layout vertical center-center col-actions">
                     <paper-icon-button
                         index="[[index]]"
                         class="remove-btn"
@@ -279,12 +274,13 @@
                         icon="icons:cancel">
                     </paper-icon-button>
                     <paper-tooltip offset="5">Remove</paper-tooltip>
-                  </div>
+                  </div> -->
 
                   <div class="flex">
                     <div class="app-grid">
                       <div class="item">
                         <etools-single-selection-menu
+                            disabled
                             class="validate"
                             label="Partner Project"
                             options="[[projects]]"
@@ -301,6 +297,7 @@
 
                       <div class="item">
                         <paper-dropdown-menu
+                            disabled
                             class="validate"
                             label="Status"
                             on-value-changed="_validate"
@@ -322,6 +319,7 @@
 
                       <div class="item">
                         <etools-prp-date-input
+                            disabled
                             class="start-date"
                             label="Start date"
                             value="{{item.start_date}}"
@@ -334,6 +332,7 @@
 
                       <div class="item">
                         <etools-prp-date-input
+                            disabled
                             class="end-date"
                             label="End date"
                             value="{{item.end_date}}"
@@ -347,7 +346,7 @@
                 </div>
               </template>
 
-              <template
+              <!-- <template
                 is="dom-if"
                 if="[[data.cluster.cluster_activity]]"
                 restamp="true">
@@ -356,7 +355,7 @@
                     on-tap="_add">
                   Add Project
                 </paper-button>
-              </template>
+              </template> -->
             </template>
           </div>
 
@@ -426,7 +425,7 @@
                   items="{{data.custom.projects}}">
 
                   <div class="row layout horizontal item-wide">
-                    <div class="flex-none layout vertical center-center col-actions">
+                    <!-- <div class="flex-none layout vertical center-center col-actions">
                       <paper-icon-button
                           index="[[index]]"
                           class="remove-btn"
@@ -435,12 +434,13 @@
                           icon="icons:cancel">
                       </paper-icon-button>
                       <paper-tooltip offset="5">Remove</paper-tooltip>
-                    </div>
+                    </div> -->
 
                     <div class="flex">
                       <div class="app-grid">
                         <div class="item">
                           <etools-single-selection-menu
+                              disabled
                               class="validate"
                               label="Partner Project"
                               options="[[projects]]"
@@ -457,6 +457,7 @@
 
                         <div class="item">
                           <paper-dropdown-menu
+                              disabled
                               class="validate"
                               label="Status"
                               on-value-changed="_validate"
@@ -478,6 +479,7 @@
 
                         <div class="item">
                           <etools-prp-date-input
+                              disabled
                               class="start-date"
                               label="Start date"
                               value="{{item.start_date}}"
@@ -490,6 +492,7 @@
 
                         <div class="item">
                           <etools-prp-date-input
+                              disabled
                               class="end-date"
                               label="End date"
                               value="{{item.end_date}}"
