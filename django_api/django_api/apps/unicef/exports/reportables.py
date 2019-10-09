@@ -5,7 +5,8 @@ from django.utils import timezone
 from openpyxl.utils import get_column_letter
 
 from indicator.models import Disaggregation, IndicatorBlueprint
-from indicator.utilities import format_total_value_to_string
+from indicator.utilities import format_total_value_to_string, convert_string_number_to_float
+from indicator.constants import ValueType
 from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader
@@ -75,6 +76,29 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
         self.file_name = self.display_name + '.pdf'
 
     def get_reportable_header_table(self, reportable):
+        is_percentage = reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE
+
+        calculated_target = format_total_value_to_string(
+            reportable.target,
+            is_percentage=is_percentage,
+            percentage_display_type="ratio" if reportable.blueprint.display_type == 'ratio' else None
+        )
+
+        if reportable.blueprint.display_type == 'percentage':
+            calculated_baseline = "%.2f" % reportable.calculated_baseline * 100 if reportable.calculated_baseline * 100 != 0.0 else 0.0
+        else:
+            v = int(reportable.baseline.get(ValueType.VALUE, 0)) if reportable.baseline.get(ValueType.VALUE, 0) else 0
+            d = int(reportable.baseline.get(ValueType.DENOMINATOR, 1)) if reportable.baseline.get(ValueType.DENOMINATOR, 1) else 1
+
+            calculated_baseline = format_total_value_to_string(
+                {
+                    ValueType.VALUE: v,
+                    ValueType.DENOMINATOR: d
+                },
+                is_percentage=is_percentage,
+                percentage_display_type="ratio" if reportable.blueprint.display_type == 'ratio' else None
+            )
+
         return [
             [
                 HTMLTableHeader(reportable.blueprint.title, colspan=3, klass='section'),
@@ -85,11 +109,11 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             ],
             [
                 HTMLTableHeader('Baseline'),
-                HTMLTableCell(reportable.calculated_baseline, colspan=2),
+                HTMLTableCell(calculated_baseline, colspan=2),
             ],
             [
                 HTMLTableHeader('Target'),
-                HTMLTableCell(reportable.calculated_target, colspan=2),
+                HTMLTableCell(calculated_target, colspan=2),
             ],
             [
                 HTMLTableHeader('Current Progress'),

@@ -327,7 +327,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def funds_received_to_date_percentage(self):
-        return self.funds_received_to_date_percent
+        return self.funds_received_to_date_percent if self.funds_received_to_date_percent and self.funds_received_to_date_percent != -1 else 0
 
     @property
     def calculated_budget(self):

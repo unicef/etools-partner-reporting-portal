@@ -339,8 +339,8 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         report = self.get_object()
 
-        funds_received_to_date_percentage = "%.1f" % (
-            report.programme_document.funds_received_to_date * 100 / report.programme_document.budget
+        funds_received_to_date_percentage = "%.2f" % (
+            report.programme_document.funds_received_to_date_percentage
         ) if report.programme_document and report.programme_document.budget > 0 else 0
 
         data = {
