@@ -110,7 +110,9 @@
       },
 
       _computeParams: function (queryParams) {
-        return Object.assign({}, queryParams);
+        return Object.assign({}, queryParams, {
+          project: this.projectId
+        });
       },
 
       _activitiesByPartnerProjectIdAjax: function () {
