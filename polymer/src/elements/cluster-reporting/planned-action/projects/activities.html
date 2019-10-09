@@ -110,6 +110,8 @@
       },
 
       _computeParams: function (queryParams) {
+        delete queryParams.cluster_id; // Need to remove cluster_id property in order to get all activities
+        
         return Object.assign({}, queryParams, {
           project: this.projectId
         });
