@@ -175,7 +175,19 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Project Activity</h2>
+        <template
+            is="dom-if"
+            if="[[addExisting]]"
+            restamp="true">
+          <h2>Add Existing Project Activity</h2>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[!addExisting]]"
+            restamp="true">
+          <h2>Add New Project Activity</h2>
+        </template>
 
         <paper-icon-button
             class="self-center"
