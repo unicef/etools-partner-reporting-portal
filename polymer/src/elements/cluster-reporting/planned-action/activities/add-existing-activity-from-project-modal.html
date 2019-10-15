@@ -218,13 +218,13 @@
           <div class="item">
             <etools-single-selection-menu
                 class="validate"
-                label="Activity"
-                options="[[customActivities]]"
+                label="Partner Activity"
+                options="[[partnerActivities]]"
                 option-value="id"
                 option-label="title"
                 selected="{{data.partner_activity}}"
                 on-iron-activate="_validate"
-                disabled="[[_equals(customActivities.length, 0)]]"
+                disabled="[[_equals(partnerActivities.length, 0)]]"
                 trigger-value-change-event
                 required>
             </etools-single-selection-menu>
@@ -394,7 +394,7 @@
           value: [],
         },
 
-        customActivities: {
+        partnerActivities: {
           type: Array,
           value: [],
         },
@@ -461,7 +461,7 @@
 
       observers: [
         '_fetchActivities(data.cluster)',
-        '_fetchCustomActivities(data.cluster)',
+        '_fetchPartnerActivities(data.cluster)',
         '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
       ],
 
@@ -533,12 +533,12 @@
       //       });
       // },
 
-      _fetchCustomActivities: function (clusterId) {
+      _fetchPartnerActivities: function (clusterId) {
         var self = this;
         if (typeof clusterId === 'undefined') {
           return;
         }
-        this.set('customActivities', []);
+        this.set('partnerActivities', []);
         this.set('data.partner_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
@@ -548,7 +548,13 @@
 
         this.$.activities.thunk()()
             .then(function (res) {
-              self.set('customActivities', res.data.results);
+              var filteredActivities = res.data.results.filter(function (item) {
+                return item.projects.find(function (element) {
+                  return element.project_id === parseInt(self.projectData.id);
+                }) === undefined;
+              });
+              console.log('filteredActivities', filteredActivities);
+              self.set('partnerActivities', filteredActivities);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -608,6 +614,12 @@
         }
 
         this.set('updatePending', true);
+
+        var selectedPartnerActivity = this.partnerActivities.find(function (item) {
+          return item.id === self.data.partner_activity;
+        });
+
+        this.set('data.projects', selectedPartnerActivity.projects.concat(this.data.projects));
 
         this.$.activity.body = Object.assign({
           partner: this.partner,
