@@ -12,6 +12,7 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../project-activity-table.html">
 <link rel="import" href="../activities/add-activity-from-project-modal.html">
+<link rel="import" href="../activities/add-existing-activity-from-project-modal.html">
 
 <dom-module id="pa-project-details-activities">
   <template>
@@ -42,13 +43,14 @@
 
     <page-body>
       <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
 
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
           Add New Project Activity
         </paper-button>
 
-        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+        <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
           Add Existing Project Activity
         </paper-button>
       </div>
@@ -136,6 +138,10 @@
 
       _openModal: function (e) {
         this.$$('#modal').open();
+      },
+
+      _openExistingModal: function (e) {
+        this.$$('#existing-modal').open();
       },
     });
   </script>
