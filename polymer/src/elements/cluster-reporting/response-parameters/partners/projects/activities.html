@@ -10,12 +10,20 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../project-activity-table.html">
+<link rel="import" href="../../../planned-action/activities/add-activity-from-project-modal.html">
+<link rel="import" href="../../../planned-action/activities/add-existing-activity-from-project-modal.html">
 
 <dom-module id="rp-partner-project-details-activities">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
+      }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
       }
     </style>
 
@@ -33,6 +41,19 @@
     </etools-prp-ajax>
 
     <page-body>
+      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
+
+      <div id="action">
+        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+          Add New Project Activity
+        </paper-button>
+
+        <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
+          Add Existing Project Activity
+        </paper-button>
+      </div>
+      
       <project-activity-table
         page="response-parameters"
         project-id="[[projectId]]">
@@ -53,6 +74,8 @@
         queryParams: Object,
 
         projectId: Number,
+
+        projectData: Object,
 
         responsePlanId: {
           type: String,
@@ -101,6 +124,14 @@
         if (this.isDebouncerActive('activities-by-partner')) {
           this.cancelDebouncer('activities-by-partner');
         }
+      },
+
+      _openModal: function (e) {
+        this.$$('#modal').open();
+      },
+
+      _openExistingModal: function (e) {
+        this.$$('#existing-modal').open();
       },
     });
   </script>

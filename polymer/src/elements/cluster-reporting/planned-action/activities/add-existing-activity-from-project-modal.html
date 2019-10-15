@@ -148,11 +148,11 @@
         url="[[activitiesUrl]]">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
+    <!-- <etools-prp-ajax
         id="projects"
         params="[[projectsParams]]"
         url="[[projectsUrl]]">
-    </etools-prp-ajax>
+    </etools-prp-ajax> -->
 
     <etools-prp-ajax
         id="objectives"
@@ -193,268 +193,119 @@
           required>
         </etools-single-selection-menu>
 
-        <paper-radio-group
-            id="mode"
-            selected="{{mode}}">
-          <paper-radio-button name="cluster">
-            <strong>Add from Cluster Activities</strong>
-          </paper-radio-button>
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'cluster')]]">
-            <template
-                is="dom-if"
-                if="[[_equals(mode, 'cluster')]]"
-                restamp="true">
-              <div class="app-grid">
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Cluster"
-                      on-value-changed="_validate"
-                      disabled="[[_equals(selectedPartner, '')]]"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.cluster.cluster}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          id="clusters"
-                          is="dom-repeat"
-                          items="[[clusters]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Activity"
-                      options="[[activities]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.cluster.cluster_activity}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(activities.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
-
-              </div>
-
-              <header class="item-wide">
-                <h3>Projects ([[data.cluster.projects.length]])</h3>
-              </header>
-
-              <template
-                is="dom-repeat"
-                items="{{data.cluster.projects}}">
-
-                <div class="row layout horizontal">
-                  <div class="flex">
-                    <div class="app-grid">
-                      <div class="item">
-                        <etools-single-selection-menu
-                            disabled
-                            class="validate"
-                            label="Partner Project"
-                            options="[[projects]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{item.project_id}}"
-                            data-index$="[[index]]"
-                            on-iron-activate="_validate"
-                            disabled="[[_equals(projects.length, 0)]]"
-                            trigger-value-change-event
-                            required>
-                        </etools-single-selection-menu>
-                      </div>
-
-                      <div class="item">
-                        <paper-dropdown-menu
-                            disabled
-                            class="validate"
-                            label="Status"
-                            on-value-changed="_validate"
-                            always-float-label
-                            required>
-                          <paper-listbox
-                              selected="{{item.status}}"
-                              attr-for-selected="value"
-                              slot="dropdown-content"
-                              class="dropdown-content">
-                            <template
-                                is="dom-repeat"
-                                items="[[statuses]]">
-                              <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                            </template>
-                          </paper-listbox>
-                        </paper-dropdown-menu>
-                      </div>
-
-                      <div class="item">
-                        <etools-prp-date-input
-                            disabled
-                            class="start-date"
-                            label="Start date"
-                            value="{{item.start_date}}"
-                            error-message=""
-                            required
-                            no-init>
-                        </etools-prp-date-input>
-                        </etools-date-input>
-                      </div>
-
-                      <div class="item">
-                        <etools-prp-date-input
-                            disabled
-                            class="end-date"
-                            label="End date"
-                            value="{{item.end_date}}"
-                            error-message=""
-                            required
-                            no-init>
-                        </etools-prp-date-input>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </template>
-          </div>
-
-          <paper-radio-button name="custom">
-            <strong>Add from Custom Activity</strong>
-          </paper-radio-button>
-
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'custom')]]">
-            <template
-                is="dom-if"
-                if="[[_equals(mode, 'custom')]]"
-                restamp="true">
-              <div class="app-grid">
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Cluster"
-                      on-value-changed="_validate"
-                      disabled="[[_equals(selectedPartner, '')]]"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.custom.cluster}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[clusters]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Activity"
-                      options="[[customActivities]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.custom.custom_activity}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(customActivities.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
-
-                <header class="item-wide">
-                  <h3>Projects ([[data.custom.projects.length]])</h3>
-                </header>
-
+        <div class="app-grid">
+          <div class="item">
+            <paper-dropdown-menu
+                class="validate"
+                label="Cluster"
+                on-value-changed="_validate"
+                disabled="[[_equals(selectedPartner, '')]]"
+                always-float-label
+                required>
+              <paper-listbox
+                  selected="{{data.cluster}}"
+                  attr-for-selected="value"
+                  slot="dropdown-content"
+                  class="dropdown-content">
                 <template
-                  is="dom-repeat"
-                  items="{{data.custom.projects}}">
-
-                  <div class="row layout horizontal item-wide">
-                    <div class="flex">
-                      <div class="app-grid">
-                        <div class="item">
-                          <etools-single-selection-menu
-                              disabled
-                              class="validate"
-                              label="Partner Project"
-                              options="[[projects]]"
-                              option-value="id"
-                              option-label="title"
-                              selected="[[item.project_id]]"
-                              data-index$="[[index]]"
-                              on-iron-activate="_validate"
-                              disabled="[[_equals(projects.length, 0)]]"
-                              trigger-value-change-event
-                              required>
-                          </etools-single-selection-menu>
-                        </div>
-
-                        <div class="item">
-                          <paper-dropdown-menu
-                              disabled
-                              class="validate"
-                              label="Status"
-                              on-value-changed="_validate"
-                              always-float-label
-                              required>
-                            <paper-listbox
-                                selected="{{item.status}}"
-                                attr-for-selected="value"
-                                slot="dropdown-content"
-                                class="dropdown-content">
-                              <template
-                                  is="dom-repeat"
-                                  items="[[statuses]]">
-                                <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                              </template>
-                            </paper-listbox>
-                          </paper-dropdown-menu>
-                        </div>
-
-                        <div class="item">
-                          <etools-prp-date-input
-                              class="start-date"
-                              label="Start date"
-                              value="{{item.start_date}}"
-                              error-message=""
-                              required
-                              no-init>
-                          </etools-prp-date-input>
-                          </etools-date-input>
-                        </div>
-
-                        <div class="item">
-                          <etools-prp-date-input
-                              class="end-date"
-                              label="End date"
-                              value="{{item.end_date}}"
-                              error-message=""
-                              required
-                              no-init>
-                          </etools-prp-date-input>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    is="dom-repeat"
+                    items="[[clusters]]">
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                 </template>
-              </div>
-            </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
           </div>
-        </paper-radio-group>
+          <div class="item">
+            <etools-single-selection-menu
+                class="validate"
+                label="Activity"
+                options="[[customActivities]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.partner_activity}}"
+                on-iron-activate="_validate"
+                disabled="[[_equals(customActivities.length, 0)]]"
+                trigger-value-change-event
+                required>
+            </etools-single-selection-menu>
+          </div>
+
+          <header class="item-wide">
+            <h3>Projects ([[data.projects.length]])</h3>
+          </header>
+
+          <template
+            is="dom-repeat"
+            items="{{data.projects}}">
+
+            <div class="row layout horizontal item-wide">
+              <div class="flex">
+                <div class="app-grid">
+                  <div class="item">
+                    <etools-single-selection-menu
+                        disabled
+                        class="validate"
+                        label="Partner Project"
+                        options="[[data.projects]]"
+                        option-value="project_id"
+                        option-label="title"
+                        selected="[[item.project_id]]"
+                        data-index$="[[index]]"
+                        on-iron-activate="_validate"
+                        trigger-value-change-event
+                        required>
+                    </etools-single-selection-menu>
+                  </div>
+
+                  <div class="item">
+                    <paper-dropdown-menu
+                        disabled
+                        class="validate"
+                        label="Status"
+                        on-value-changed="_validate"
+                        always-float-label
+                        required>
+                      <paper-listbox
+                          selected="{{item.status}}"
+                          attr-for-selected="value"
+                          slot="dropdown-content"
+                          class="dropdown-content">
+                        <template
+                            is="dom-repeat"
+                            items="[[statuses]]">
+                          <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                        </template>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                  </div>
+
+                  <div class="item">
+                    <etools-prp-date-input
+                        class="start-date"
+                        label="Start date"
+                        value="{{item.start_date}}"
+                        error-message=""
+                        required
+                        no-init>
+                    </etools-prp-date-input>
+                    </etools-date-input>
+                  </div>
+
+                  <div class="item">
+                    <etools-prp-date-input
+                        class="end-date"
+                        label="End date"
+                        value="{{item.end_date}}"
+                        error-message=""
+                        required
+                        no-init>
+                    </etools-prp-date-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -495,11 +346,6 @@
         updatePending: {
           type: Boolean,
           value: false,
-        },
-
-        mode: {
-          type: String,
-          observer: '_setDefaults',
         },
 
         opened: {
@@ -553,22 +399,22 @@
           value: [],
         },
 
-        projects: {
-          type: Array,
-          value: [],
-        },
+        // projects: {
+        //   type: Array,
+        //   value: [],
+        // },
 
-        projectsParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
-        },
+        // projectsParams: {
+        //   type: Object,
+        //   value: {
+        //     page_size: 99999,
+        //   },
+        // },
 
-        projectsUrl: {
-          type: String,
-          computed: '_computeProjectsUrl(responsePlanId)',
-        },
+        // projectsUrl: {
+        //   type: String,
+        //   computed: '_computeProjectsUrl(responsePlanId)',
+        // },
 
         objectives: {
           type: Array,
@@ -610,67 +456,39 @@
       },
 
       listeners: {
-        'mode.selected-changed': 'adjustPosition',
         'project-details-selection-refit': 'adjustPosition',
       },
 
       observers: [
-        '_fetchProjects(partner)',
-        '_fetchActivities(data.cluster.cluster)',
-        '_fetchCustomActivities(data.custom.cluster)',
-        '_fetchActivityUpdateUrl(data.cluster.cluster_activity)',
-        '_fetchActivityUpdateUrl(data.custom.custom_activity)'
+        '_fetchActivities(data.cluster)',
+        '_fetchCustomActivities(data.cluster)',
+        '_fetchActivityUpdateUrl(data.cluster_activity)',
+        '_fetchActivityUpdateUrl(data.partner_activity)'
       ],
-
-      _add: function () {
-        if (this.mode === 'cluster') {
-          this.push('data.cluster.projects', {});
-        } else {
-          this.push('data.custom.projects', {});
-        }
-        this.fire('project-details-selection-refit');
-      },
-
-      _remove: function (e) {
-        var currentIndex = +e.target.dataset.index;
-
-        if (this.mode === 'cluster') {
-          this.splice('data.cluster.projects', currentIndex, 1);
-        } else {
-          this.splice('data.custom.projects', currentIndex, 1);
-        }
-
-        this.fire('project-details-selection-refit');
-      },
 
       _setDefaults: function () {
         var simpleProjectData = {};
 
         simpleProjectData.project_id = this.projectData.id;
+        simpleProjectData.title = this.projectData.title;
         simpleProjectData.status = this.projectData.status;
         simpleProjectData.start_date = this.projectData.start_date;
         simpleProjectData.end_date = this.projectData.end_date;
 
         this.set('data', {
-          cluster: {
-            projects: [simpleProjectData]
-          },
-          custom: {
-            projects: [simpleProjectData]
-          },
+          projects: [simpleProjectData]
         });
         this.set('activities', []);
         this.set('objectives', []);
         this.set('errors', {});
+
+        console.log('simpleProjectData', simpleProjectData)
+        console.log('this.data', this.data);
       },
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-          // this.set('mode', 'cluster');
-
-          // this.async(function () {
-          //   this.set('mode', 'cluster');
-          // });
+          this._setDefaults();
         }
       },
 
@@ -689,20 +507,17 @@
           return;
         }
 
-        if (this.mode === 'cluster' && this.data.cluster.cluster_activity !== undefined) {
-          selectedActivityId = this.data.cluster.cluster_activity;
-          console.error('need to set correct activityUrl for cluster!');
-        } else if (this.mode === 'custom' && this.data.custom.custom_activity !== undefined) {
-          selectedActivityId = this.data.custom.custom_activity;
+        if (this.data.partner_activity !== undefined) {
+          selectedActivityId = this.data.partner_activity;
           this.set('activityUrl', App.Endpoints.partnerActivityUpdate(responsePlanId, selectedActivityId));
         } else {
           return;
         }
       },
 
-      _computeProjectsUrl: function (responsePlanId) {
-        return App.Endpoints.plannedActions(responsePlanId);
-      },
+      // _computeProjectsUrl: function (responsePlanId) {
+      //   return App.Endpoints.plannedActions(responsePlanId);
+      // },
 
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
@@ -736,7 +551,7 @@
           return;
         }
         this.set('customActivities', []);
-        this.set('data.custom.custom_activity', undefined);
+        this.set('data.custom.partner_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
             App.Endpoints.partnerActivityList(this.responsePlanId)
@@ -752,23 +567,23 @@
             });
       },
 
-      _fetchProjects: function (partnerId) {
-        var self = this;
+      // _fetchProjects: function (partnerId) {
+      //   var self = this;
 
-        if (typeof partnerId === 'undefined') {
-          return;
-        }
+      //   if (typeof partnerId === 'undefined') {
+      //     return;
+      //   }
 
-        this.set('projectsParams.partner', partnerId);
+      //   this.set('projectsParams.partner', partnerId);
 
-        this.$.projects.thunk()()
-            .then(function (res) {
-              self.set('projects', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+      //   this.$.projects.thunk()()
+      //       .then(function (res) {
+      //         self.set('projects', res.data.results);
+      //       })
+      //       .catch(function (err) { // jshint ignore:line
+      //         // TODO: error handling
+      //       });
+      // },
 
       _fetchObjectives: function (clusterId) {
         var self = this;
@@ -808,7 +623,7 @@
 
         this.$.activity.body = Object.assign({
           partner: this.partner,
-        }, this.data[this.mode]);
+        }, this.data);
 
         console.log('this.$.activity.body', this.$.activity.body);
         // return;
@@ -833,7 +648,6 @@
           e.target.nodeName === 'PAPER-BUTTON' ||
           e.target.nodeName === 'PAPER-ICON-BUTTON'
         ) {
-          this.set('mode', '');
           this.set('data', {});
 
           this.set('objectives', []);

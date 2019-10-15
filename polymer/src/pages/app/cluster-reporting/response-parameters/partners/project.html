@@ -90,6 +90,7 @@
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
       <rp-partner-project-details-activities
+          project-data="[[projectData]]"
           project-id="[[parentRouteData.id]]">
       </rp-partner-project-details-activities>
     </template>
