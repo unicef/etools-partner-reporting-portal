@@ -137,7 +137,7 @@
     <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
-        method="post"
+        method="patch"
         body="[[data]]"
         content-type="application/json">
     </etools-prp-ajax>
@@ -462,8 +462,7 @@
       observers: [
         '_fetchActivities(data.cluster)',
         '_fetchCustomActivities(data.cluster)',
-        '_fetchActivityUpdateUrl(data.cluster_activity)',
-        '_fetchActivityUpdateUrl(data.partner_activity)'
+        '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
       ],
 
       _setDefaults: function () {
@@ -500,19 +499,8 @@
         return storePartner.id || selectedPartner || undefined;
       },
 
-      _fetchActivityUpdateUrl: function (responsePlanId) {
-        var selectedActivityId;
-
-        if (this.data === undefined) {
-          return;
-        }
-
-        if (this.data.partner_activity !== undefined) {
-          selectedActivityId = this.data.partner_activity;
-          this.set('activityUrl', App.Endpoints.partnerActivityUpdate(responsePlanId, selectedActivityId));
-        } else {
-          return;
-        }
+      _fetchActivityUpdateUrl: function (responsePlanId, activityId) {
+        this.set('activityUrl', App.Endpoints.partnerActivityUpdate(responsePlanId, activityId));
       },
 
       // _computeProjectsUrl: function (responsePlanId) {
@@ -523,27 +511,27 @@
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
-      _fetchActivities: function (clusterId) {
-        var self = this;
-        if (typeof clusterId === 'undefined') {
-          return;
-        }
-        this.set('activities', []);
-        this.set('data.cluster.cluster_activity', undefined);
-        this.set('activitiesParams.cluster_id', clusterId);
-        this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
-            + '?cluster_id=' + clusterId);
-        this.$.activities.abort();
+      // _fetchActivities: function (clusterId) {
+      //   var self = this;
+      //   if (typeof clusterId === 'undefined') {
+      //     return;
+      //   }
+      //   this.set('activities', []);
+      //   this.set('data.cluster.cluster_activity', undefined);
+      //   this.set('activitiesParams.cluster_id', clusterId);
+      //   this.set('activitiesUrl',
+      //       App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
+      //       + '?cluster_id=' + clusterId);
+      //   this.$.activities.abort();
 
-        this.$.activities.thunk()()
-            .then(function (res) {
-              self.set('activities', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+      //   this.$.activities.thunk()()
+      //       .then(function (res) {
+      //         self.set('activities', res.data.results);
+      //       })
+      //       .catch(function (err) { // jshint ignore:line
+      //         // TODO: error handling
+      //       });
+      // },
 
       _fetchCustomActivities: function (clusterId) {
         var self = this;
@@ -551,7 +539,7 @@
           return;
         }
         this.set('customActivities', []);
-        this.set('data.custom.partner_activity', undefined);
+        this.set('data.partner_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
             App.Endpoints.partnerActivityList(this.responsePlanId)
