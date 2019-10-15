@@ -160,14 +160,9 @@
         url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
-    <template
-        is="dom-if"
-        if="[[_displayPartner(permissions)]]"
-        restamp="true">
-      <partner-dropdown-content
-          partners="{{partners}}">
-      </partner-dropdown-content>
-    </template>
+    <partner-dropdown-content
+        partners="{{partners}}">
+    </partner-dropdown-content>
 
     <paper-dialog
         id="dialog"
@@ -186,22 +181,17 @@
 
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
-        <template
-          is="dom-if"
-          if="[[_displayPartner(permissions)]]"
-          restamp="true">
-          <etools-single-selection-menu
-            class="item validate full-width"
-            label="Partner"
-            options="[[partners]]"
-            option-value="id"
-            option-label="title"
-            selected="{{selectedPartner}}"
-            on-iron-activate="_validate"
-            trigger-value-change-event
-            required>
-          </etools-single-selection-menu>
-        </template>
+        <etools-single-selection-menu
+          class="item validate full-width"
+          label="Partner"
+          options="[[partners]]"
+          option-value="id"
+          option-label="title"
+          selected="{{selectedPartner}}"
+          on-iron-activate="_validate"
+          trigger-value-change-event
+          required>
+        </etools-single-selection-menu>
 
         <paper-radio-group
             id="mode"
@@ -691,10 +681,6 @@
 
       _computePartner: function(storePartner, selectedPartner) {
         return storePartner.id || selectedPartner || undefined;
-      },
-
-      _displayPartner: function (permissions) {
-        return permissions.addPartnerToProject;
       },
 
       _computeActivityUrl: function (responsePlanId, mode) {
