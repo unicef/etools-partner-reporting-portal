@@ -328,7 +328,7 @@
           </div>
 
           <paper-radio-button name="custom">
-            <strong>Add Custom Activity</strong>
+            <strong>Add from Custom Activity</strong>
           </paper-radio-button>
 
           <div
@@ -373,16 +373,6 @@
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
-                </div>
-                <div class="item item-wide">
-                  <paper-input
-                      class="validate"
-                      label="Title"
-                      value="{{data.custom.title}}"
-                      on-input="_validate"
-                      always-float-label
-                      required>
-                  </paper-input>
                 </div>
 
                 <header class="item-wide">
@@ -524,7 +514,7 @@
 
         activityUrl: {
           type: String,
-          computed: '_computeActivityUrl(responsePlanId, mode)',
+          value: '',
         },
 
         activitiesParams: {
@@ -628,6 +618,8 @@
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchCustomActivities(data.custom.cluster)',
+        '_fetchActivityUpdateUrl(data.cluster.cluster_activity)',
+        '_fetchActivityUpdateUrl(data.custom.custom_activity)'
       ],
 
       _add: function () {
@@ -690,8 +682,22 @@
         return storePartner.id || selectedPartner || undefined;
       },
 
-      _computeActivityUrl: function (responsePlanId, mode) {
-        return App.Endpoints.partnerActivity(responsePlanId, mode);
+      _fetchActivityUpdateUrl: function (responsePlanId) {
+        var selectedActivityId;
+
+        if (this.data === undefined) {
+          return;
+        }
+
+        if (this.mode === 'cluster' && this.data.cluster.cluster_activity !== undefined) {
+          selectedActivityId = this.data.cluster.cluster_activity;
+          console.error('need to set correct activityUrl for cluster!');
+        } else if (this.mode === 'custom' && this.data.custom.custom_activity !== undefined) {
+          selectedActivityId = this.data.custom.custom_activity;
+          this.set('activityUrl', App.Endpoints.partnerActivityUpdate(responsePlanId, selectedActivityId));
+        } else {
+          return;
+        }
       },
 
       _computeProjectsUrl: function (responsePlanId) {
@@ -803,6 +809,10 @@
         this.$.activity.body = Object.assign({
           partner: this.partner,
         }, this.data[this.mode]);
+
+        console.log('this.$.activity.body', this.$.activity.body);
+        // return;
+
         this.$.activity.thunk()()
           .then(function (res) {
             self.fire('activity-added', res.data);
