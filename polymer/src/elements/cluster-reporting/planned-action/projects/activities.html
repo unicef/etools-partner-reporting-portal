@@ -41,7 +41,7 @@
     </etools-prp-ajax>
 
     <page-body>
-      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]" add-existing="[[addExisting]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
 
       <div id="action">
         <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
@@ -76,11 +76,6 @@
         responsePlanId: {
           type: String,
           statePath: 'responsePlans.currentID',
-        },
-
-        addExisting: {
-          type: Boolean,
-          value: false
         },
 
         url: {
@@ -140,10 +135,6 @@
       },
 
       _openModal: function (e) {
-        if (e.target.textContent.trim() === 'Add Existing Project Activity') {
-          this.set('addExisting', true);
-        }
-
         this.$$('#modal').open();
       },
     });
