@@ -212,6 +212,7 @@
                       class="validate"
                       label="Cluster"
                       on-value-changed="_validate"
+                      disabled="[[_equals(selectedPartner, '')]]"
                       always-float-label
                       required>
                     <paper-listbox
@@ -343,6 +344,7 @@
                       class="validate"
                       label="Cluster"
                       on-value-changed="_validate"
+                      disabled="[[_equals(selectedPartner, '')]]"
                       always-float-label
                       required>
                     <paper-listbox
@@ -361,13 +363,13 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Cluster Objective"
-                      options="[[objectives]]"
+                      label="Activity"
+                      options="[[customActivities]]"
                       option-value="id"
                       option-label="title"
-                      selected="{{data.custom.cluster_objective}}"
+                      selected="{{data.custom.custom_activity}}"
                       on-iron-activate="_validate"
-                      disabled="[[_equals(objectives.length, 0)]]"
+                      disabled="[[_equals(customActivities.length, 0)]]"
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
@@ -556,6 +558,11 @@
           value: [],
         },
 
+        customActivities: {
+          type: Array,
+          value: [],
+        },
+
         projects: {
           type: Array,
           value: [],
@@ -620,7 +627,7 @@
       observers: [
         '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
-        '_fetchObjectives(data.custom.cluster)',
+        '_fetchCustomActivities(data.custom.cluster)',
       ],
 
       _add: function () {
@@ -711,6 +718,28 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchCustomActivities: function (clusterId) {
+        var self = this;
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+        this.set('customActivities', []);
+        this.set('data.custom.custom_activity', undefined);
+        this.set('activitiesParams.cluster_id', clusterId);
+        this.set('activitiesUrl',
+            App.Endpoints.partnerActivityList(this.responsePlanId)
+            + '?cluster_id=' + clusterId);
+        this.$.activities.abort();
+
+        this.$.activities.thunk()()
+            .then(function (res) {
+              self.set('customActivities', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
