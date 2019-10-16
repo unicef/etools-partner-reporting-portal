@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from unicef.models import LowerLevelOutput, ProgressReport
-from partner.models import PartnerProject, PartnerActivity, Partner
+from partner.models import PartnerProject, PartnerActivity, Partner, PartnerActivityProjectContext
 from cluster.models import ClusterObjective, ClusterActivity, Cluster
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
@@ -1229,6 +1229,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     target = serializers.JSONField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField(required=False, allow_null=True)
+    project_context_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = Reportable
@@ -1251,6 +1252,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'label',
             'numerator_label',
             'denominator_label',
+            'project_context_id',
         )
 
     def check_disaggregation(self, disaggregations):
@@ -1410,19 +1412,23 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
 
-            if not content_object.partneractivityprojectcontext_set.exists():
+            if 'project_context_id' not in validated_data:
                 raise ValidationError({
-                    "start_date_of_reporting_period": "This PartnerActivity does not have any ProjectContext",
+                    "project_context_id": "ProjectContext is required to create PartnerActivity Reportable",
                 })
 
-            for context in content_object.partneractivityprojectcontext_set.all():
-                if 'start_date_of_reporting_period' in validated_data \
-                        and validated_data['start_date_of_reporting_period'] < context.start_date:
-                    error_msg = "Start date of reporting period cannot come before the activity project context's start date"
+            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data['project_context_id'])
 
-                    raise ValidationError({
-                        "start_date_of_reporting_period": error_msg,
-                    })
+            if 'start_date_of_reporting_period' in validated_data \
+                    and validated_data['start_date_of_reporting_period'] < project_context.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity project context's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
+            validated_data['object_id'] = project_context.id
+            reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
         else:
             raise NotImplemented()
 
@@ -1493,13 +1499,30 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         elif reportable_object_content_model == PartnerActivity:
             content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
 
-            for context in content_object.partneractivityprojectcontext_set.all():
-                if validated_data['start_date_of_reporting_period'] is not None and validated_data['start_date_of_reporting_period'] < context.start_date:
-                    error_msg = "Start date of reporting period cannot come before the activity project context's start date"
+            if 'project_context_id' not in validated_data:
+                raise ValidationError({
+                    "project_context_id": "ProjectContext is required to update PartnerActivity Reportable",
+                })
 
-                    raise ValidationError({
-                        "start_date_of_reporting_period": error_msg,
-                    })
+            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data['project_context_id'])
+
+            if 'start_date_of_reporting_period' in validated_data \
+                    and validated_data['start_date_of_reporting_period'] < project_context.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity project context's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
+            validated_data['object_id'] = project_context.id
+            reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
+
+            if Reportable.objects.filter(
+                partner_activity_project_contexts=project_context,
+            ).exists():
+                raise ValidationError({
+                    "project_context_id": "PartnerActivity Reportable with this project context already exists",
+                })
 
             # If PartnerActivity is adopted from CA,
             # Filter out IndicatorBlueprint instance
