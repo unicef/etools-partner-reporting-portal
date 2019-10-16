@@ -45,6 +45,12 @@ export function partners(data) {
     return {type: PARTNERS, data};
 }
 
+export const APPEND_PARTNER = 'APPEND_PARTNER';
+
+export function append_partner(data) {
+    return {type: APPEND_PARTNER, data};
+}
+
 export const PARTNER_DETAILS = 'PARTNER_DETAILS';
 
 export function partnerDetails(data) {
