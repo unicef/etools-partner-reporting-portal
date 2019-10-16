@@ -250,7 +250,8 @@
                       value="{{ data.baseline }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
-                      on-input="_validate">
+                      on-input="_validate"
+                      required>
                     </json-field>
 
                     <json-field
@@ -260,7 +261,8 @@
                       value="{{ data.target }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
-                      on-input="_validate">
+                      on-input="_validate"
+                      required>
                     </json-field>
 
                     <template
@@ -407,7 +409,8 @@
                           label="Label"
                           on-input="_validate"
                           value="{{data.label}}"
-                          always-float-label>
+                          always-float-label
+                          required>
                         </paper-input>
                       </template>
 
@@ -421,7 +424,8 @@
                             label="Numerator Label"
                             on-input="_validate"
                             value="{{data.numerator_label}}"
-                            always-float-label>
+                            always-float-label
+                            required>
                           </paper-input>
 
                           <paper-input
@@ -429,7 +433,8 @@
                             label="Denominator Label"
                             on-input="_validate"
                             value="{{data.denominator_label}}"
-                            always-float-label>
+                            always-float-label
+                            required>
                           </paper-input>
                         </div>
                       </template>
@@ -447,7 +452,8 @@
                             label="Baseline"
                             on-input="_validate"
                             value="{{data.baseline}}"
-                            allowed-pattern="[+\-\d]">
+                            allowed-pattern="[+\-\d]"
+                            required>
                           </json-field>
 
                           <json-field
@@ -484,7 +490,8 @@
                             label="Baseline"
                             on-input="_validate"
                             value="{{data.baseline}}"
-                            allowed-pattern="[+\-\d]">
+                            allowed-pattern="[+\-\d]"
+                            required>
                           </json-field>
 
                           <json-field
@@ -642,7 +649,8 @@
                     label="Label"
                     on-input="_validate"
                     value="{{data.label}}"
-                    always-float-label>
+                    always-float-label
+                    required>
                   </paper-input>
                 </template>
 
@@ -656,7 +664,8 @@
                       label="Numerator Label"
                       on-input="_validate"
                       value="{{data.numerator_label}}"
-                      always-float-label>
+                      always-float-label
+                      required>
                     </paper-input>
 
                     <paper-input
@@ -664,7 +673,8 @@
                       label="Denominator Label"
                       on-input="_validate"
                       value="{{data.denominator_label}}"
-                      always-float-label>
+                      always-float-label
+                      required>
                     </paper-input>
                   </div>
                 </template>
@@ -682,7 +692,8 @@
                       label="Baseline"
                       on-input="_validate"
                       value="{{data.baseline}}"
-                      allowed-pattern="[+\-\d]">
+                      allowed-pattern="[+\-\d]"
+                      required>
                     </json-field>
 
                     <json-field
@@ -719,7 +730,8 @@
                       label="Baseline"
                       on-input="_validate"
                       value="{{data.baseline}}"
-                      allowed-pattern="[+\-\d]">
+                      allowed-pattern="[+\-\d]"
+                      required>
                     </json-field>
 
                     <json-field
@@ -1278,6 +1290,44 @@
           delete data.cs_dates;
         }
 
+        if (this.selectedIndicatorDetailType === 'percentage') {
+          data.baseline.d = 100;
+          data.target.d = 100;
+
+          data.locations.forEach(function (location) {
+            location.baseline.d = 100;
+            location.target.d = 100;
+          });
+        } else if (this.selectedIndicatorDetailType === 'number') {
+          data.baseline.d = 1;
+          data.target.d = 1;
+
+          data.locations.forEach(function (location) {
+            location.baseline.d = 1;
+            location.target.d = 1;
+          });
+        } else if (this.selectedIndicatorDetailType === 'ratio') {
+          data.baseline.v = parseInt(data.baseline.v);
+          data.target.v = parseInt(data.target.v);
+
+          data.baseline.d = parseInt(data.baseline.d);
+          data.target.d = parseInt(data.target.d);
+
+          data.baseline.c = data.baseline.v / data.baseline.d;
+          data.target.c = data.target.v / data.target.d;
+
+          data.locations.forEach(function (location) {
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            location.baseline.d = parseInt(location.baseline.d);
+            location.target.d = parseInt(location.target.d);
+
+            location.baseline.c = location.baseline.v / location.baseline.d;
+            location.target.c = location.target.v / location.target.d;
+          });
+        }
+
         return Object.assign(data, {
           object_id: this.objectId,
           object_type: this.objectType,
@@ -1331,84 +1381,27 @@
         }
 
         this.set('data.locations', changedLocations);
+        this._setDisaggregations();
 
-        if (this.mode === 'objectives') {
-          this._setDisaggregations();
+        var data = this._processData(this.get('data'));
 
-          var data = this.get('data');
+        this.set('data', data);
 
-          if (this.selectedIndicatorDetailType === 'percentage') {
-            data.baseline.d = 100;
-            data.target.d = 100;
+        this.$.indicators.body = data;
 
-            data.locations.forEach(function (location) {
-              location.baseline.d = 100;
-              location.target.d = 100;
-            });
-          } else if (this.selectedIndicatorDetailType === 'number') {
-            data.baseline.d = 1;
-            data.target.d = 1;
-
-            data.locations.forEach(function (location) {
-              location.baseline.d = 1;
-              location.target.d = 1;
-            });
-          }
-
-          data.baseline.v = parseInt(data.baseline.v);
-          data.target.v = parseInt(data.target.v);
-
-          data.baseline.d = parseInt(data.baseline.d);
-          data.target.d = parseInt(data.target.d);
-
-          data.baseline.c = data.baseline.v / data.baseline.d;
-          data.target.c = data.target.v / data.target.d;
-
-          data.locations.forEach(function (location) {
-            location.baseline.v = parseInt(location.baseline.v);
-            location.target.v = parseInt(location.target.v);
-
-            location.baseline.d = parseInt(location.baseline.d);
-            location.target.d = parseInt(location.target.d);
-
-            location.baseline.c = location.baseline.v / location.baseline.d;
-            location.target.c = location.target.v / location.target.d;
+        this.set('updatePending', true);
+        this.$.indicators.thunk()()
+          .then(function (res) {
+            self.fire('indicator-added', res.data);
+            self.set('updatePending', false);
+            self.set('errors', {});
+            self.close();
+          })
+          .catch(function (err) {
+            self.set('errors', err.data);
+            self.set('data.locations', rawLocations);
+            self.set('updatePending', false);
           });
-
-          this.set('data', data);
-
-          this.$.indicators.body = this.data;
-
-          this.$.indicators.thunk()()
-            .then(function (res) {
-              self.fire('indicator-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('data.locations', rawLocations);
-              self.set('updatePending', false);
-            });
-        } else {
-          this.set('updatePending', true);
-          this._setDisaggregations();
-          this.$.indicators.body = this._processData(this.data);
-
-          this.$.indicators.thunk()()
-            .then(function (res) {
-              self.fire('indicator-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('data.locations', rawLocations);
-              self.set('updatePending', false);
-            });
-        }
       },
 
       _close: function (e) {
