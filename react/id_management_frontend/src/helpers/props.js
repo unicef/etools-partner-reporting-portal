@@ -16,6 +16,7 @@ export function workspaceOptions(state) {
 }
 
 export function partnerOptions(state) {
+    console.log('state.partners', state.partners);
     return Array.isArray(state.partners) ? state.partners.map(item => ({
         value: String(item.id),
         label: item.title
