@@ -11,16 +11,24 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../project-activity-table.html">
+<link rel="import" href="../activities/add-activity-from-project-modal.html">
+<link rel="import" href="../activities/add-existing-activity-from-project-modal.html">
 
 <dom-module id="pa-project-details-activities">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
       }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
     </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
       params-string="{{query}}"
@@ -34,6 +42,19 @@
     </etools-prp-ajax>
 
     <page-body>
+      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
+
+      <div id="action">
+        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+          Add New Project Activity
+        </paper-button>
+
+        <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
+          Add Existing Project Activity
+        </paper-button>
+      </div>
+
       <project-activity-table
         page="planned-action"
         project-id="[[projectId]]">
@@ -48,7 +69,11 @@
       properties: {
         queryParams: Object,
 
+        path: String,
+
         projectId: Number,
+
+        projectData: Object,
 
         responsePlanId: {
           type: String,
@@ -62,12 +87,13 @@
 
         params: {
           type: Object,
-          computed: '_computeParams(queryParams, projectId)',
+          computed: '_computeParams(queryParams)',
         },
       },
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
@@ -75,13 +101,25 @@
         '_activitiesByPartnerProjectIdAjax(url, params)',
       ],
 
+      listeners: {
+        'modal.activity-added': '_onSuccess',
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/planned-action/activity/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
       _computeUrl: function (responsePlanId) {
         return App.Endpoints.partnerActivityList(responsePlanId);
       },
 
-      _computeParams: function (queryParams, projectId) {
+      _computeParams: function (queryParams) {
+        delete queryParams.cluster_id; // Need to remove cluster_id property in order to get all activities
+        
         return Object.assign({}, queryParams, {
-          project: projectId,
+          project: this.projectId
         });
       },
 
@@ -96,6 +134,14 @@
                 // TODO: error handling.
             });
         }, 100);
+      },
+
+      _openModal: function (e) {
+        this.$$('#modal').open();
+      },
+
+      _openExistingModal: function (e) {
+        this.$$('#existing-modal').open();
       },
     });
   </script>

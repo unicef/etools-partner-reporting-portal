@@ -31,7 +31,7 @@
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../error-box.html">
 
-<dom-module id="planned-action-activity-modal">
+<dom-module id="planned-action-add-activity-from-project-modal">
   <template>
     <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
@@ -149,9 +149,9 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="projects"
-        params="[[projectsParams]]"
-        url="[[projectsUrl]]">
+        id="partnerActivities"
+        params="[[activitiesParams]]"
+        url="[[partnerActivitiesUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -175,7 +175,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add activity</h2>
+        <h2>Add New Project Activity</h2>
 
         <paper-icon-button
             class="self-center"
@@ -186,22 +186,6 @@
 
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
-        <template
-          is="dom-if"
-          if="[[_displayPartner(permissions)]]"
-          restamp="true">
-          <etools-single-selection-menu
-            class="item validate full-width"
-            label="Partner"
-            options="[[partners]]"
-            option-value="id"
-            option-label="title"
-            selected="{{selectedPartner}}"
-            on-iron-activate="_validate"
-            trigger-value-change-event
-            required>
-          </etools-single-selection-menu>
-        </template>
 
         <paper-radio-group
             id="mode"
@@ -255,39 +239,24 @@
 
               </div>
 
-              <template
-                is="dom-if"
-                if="[[data.cluster.cluster_activity]]"
-                restamp="true">
-                <header class="item-wide">
-                  <h3>Projects ([[data.cluster.projects.length]])</h3>
-                </header>
-              </template>
+              <header class="item-wide">
+                <h3>Projects ([[data.cluster.projects.length]])</h3>
+              </header>
 
               <template
                 is="dom-repeat"
                 items="{{data.cluster.projects}}">
 
                 <div class="row layout horizontal">
-                  <div class="flex-none layout vertical center-center col-actions">
-                    <paper-icon-button
-                        index="[[index]]"
-                        class="remove-btn"
-                        data-index$="[[index]]"
-                        on-tap="_remove"
-                        icon="icons:cancel">
-                    </paper-icon-button>
-                    <paper-tooltip offset="5">Remove</paper-tooltip>
-                  </div>
-
                   <div class="flex">
                     <div class="app-grid">
                       <div class="item">
                         <etools-single-selection-menu
+                            disabled
                             class="validate"
                             label="Partner Project"
-                            options="[[projects]]"
-                            option-value="id"
+                            options="[[data.cluster.projects]]"
+                            option-value="project_id"
                             option-label="title"
                             selected="{{item.project_id}}"
                             data-index$="[[index]]"
@@ -300,6 +269,7 @@
 
                       <div class="item">
                         <paper-dropdown-menu
+                            disabled
                             class="validate"
                             label="Status"
                             on-value-changed="_validate"
@@ -321,6 +291,7 @@
 
                       <div class="item">
                         <etools-prp-date-input
+                            disabled
                             class="start-date"
                             label="Start date"
                             value="{{item.start_date}}"
@@ -333,6 +304,7 @@
 
                       <div class="item">
                         <etools-prp-date-input
+                            disabled
                             class="end-date"
                             label="End date"
                             value="{{item.end_date}}"
@@ -344,17 +316,6 @@
                     </div>
                   </div>
                 </div>
-              </template>
-
-              <template
-                is="dom-if"
-                if="[[data.cluster.cluster_activity]]"
-                restamp="true">
-                <paper-button
-                    class="btn-primary add-project-btn"
-                    on-tap="_add">
-                  Add Project
-                </paper-button>
               </template>
             </template>
           </div>
@@ -425,27 +386,17 @@
                   items="{{data.custom.projects}}">
 
                   <div class="row layout horizontal item-wide">
-                    <div class="flex-none layout vertical center-center col-actions">
-                      <paper-icon-button
-                          index="[[index]]"
-                          class="remove-btn"
-                          data-index$="[[index]]"
-                          on-tap="_remove"
-                          icon="icons:cancel">
-                      </paper-icon-button>
-                      <paper-tooltip offset="5">Remove</paper-tooltip>
-                    </div>
-
                     <div class="flex">
                       <div class="app-grid">
                         <div class="item">
                           <etools-single-selection-menu
+                              disabled
                               class="validate"
                               label="Partner Project"
-                              options="[[projects]]"
-                              option-value="id"
+                              options="[[data.custom.projects]]"
+                              option-value="project_id"
                               option-label="title"
-                              selected="{{item.project_id}}"
+                              selected="[[item.project_id]]"
                               data-index$="[[index]]"
                               on-iron-activate="_validate"
                               disabled="[[_equals(projects.length, 0)]]"
@@ -456,6 +407,7 @@
 
                         <div class="item">
                           <paper-dropdown-menu
+                              disabled
                               class="validate"
                               label="Status"
                               on-value-changed="_validate"
@@ -501,13 +453,6 @@
                     </div>
                   </div>
                 </template>
-
-                <paper-button
-                    class="btn-primary add-project-btn"
-                    on-tap="_add">
-                  Add Project
-                </paper-button>
-                
               </div>
             </template>
           </div>
@@ -534,7 +479,7 @@
 
   <script>
     Polymer({
-      is: 'planned-action-activity-modal',
+      is: 'planned-action-add-activity-from-project-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -546,6 +491,10 @@
         data: Object,
 
         activitiesUrl: String,
+
+        partnerActivitiesUrl: String,
+
+        projectData: Object,
 
         updatePending: {
           type: Boolean,
@@ -603,23 +552,6 @@
           value: [],
         },
 
-        projects: {
-          type: Array,
-          value: [],
-        },
-
-        projectsParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
-        },
-
-        projectsUrl: {
-          type: String,
-          computed: '_computeProjectsUrl(responsePlanId)',
-        },
-
         objectives: {
           type: Array,
           value: [],
@@ -665,7 +597,6 @@
       },
 
       observers: [
-        '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
@@ -692,12 +623,20 @@
       },
 
       _setDefaults: function () {
+        var simpleProjectData = {};
+
+        simpleProjectData.project_id = this.projectData.id;
+        simpleProjectData.title = this.projectData.title;
+        simpleProjectData.status = this.projectData.status;
+        simpleProjectData.start_date = this.projectData.start_date;
+        simpleProjectData.end_date = this.projectData.end_date;
+
         this.set('data', {
           cluster: {
-            projects: []
+            projects: [simpleProjectData]
           },
           custom: {
-            projects: []
+            projects: [simpleProjectData]
           },
         });
         this.set('activities', []);
@@ -731,16 +670,16 @@
         return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
-      _computeProjectsUrl: function (responsePlanId) {
-        return App.Endpoints.plannedActions(responsePlanId);
-      },
-
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
 
       _fetchActivities: function (clusterId) {
         var self = this;
+
+        this.set('partnerActivitiesUrl', App.Endpoints.partnerActivityList(this.responsePlanId)
+            + '?cluster_id=' + clusterId);
+
         if (typeof clusterId === 'undefined') {
           return;
         }
@@ -755,24 +694,21 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
+
+              return self.$.partnerActivities.thunk()();
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _fetchProjects: function (partnerId) {
-        var self = this;
-
-        if (typeof partnerId === 'undefined') {
-          return;
-        }
-
-        this.set('projectsParams.partner', partnerId);
-
-        this.$.projects.thunk()()
             .then(function (res) {
-              self.set('projects', res.data.results);
+              var adoptedClusterActivities = new Set();
+              res.data.results.forEach(function (item) {
+                if (item.cluster_activity !== null) {
+                  adoptedClusterActivities.add(item.cluster_activity.id);
+                }
+              });
+
+              self.set('activities', self.activities.filter(function (item) {
+                return adoptedClusterActivities.has(item.id) !== true;
+              }));
+
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -816,14 +752,14 @@
         this.set('updatePending', true);
 
         this.$.activity.body = Object.assign({
-          partner: this.partner,
+          partner: this.projectData.partner_id,
         }, this.data[this.mode]);
         this.$.activity.thunk()()
           .then(function (res) {
             self.fire('activity-added', res.data);
             self.set('updatePending', false);
             self.set('errors', {});
-            self._close();
+            self._close('saved');
           })
           .catch(function (err) {
             self.set('errors', err.data);
@@ -833,9 +769,11 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName === 'PAPER-DIALOG' ||
-            e.target.nodeName === 'PAPER-BUTTON' ||
-            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+        if (e === 'saved' ||
+          e.target.nodeName === 'PAPER-DIALOG' ||
+          e.target.nodeName === 'PAPER-BUTTON' ||
+          e.target.nodeName === 'PAPER-ICON-BUTTON'
+        ) {
           this.set('mode', '');
           this.set('data', {});
 
@@ -843,7 +781,6 @@
           this.set('activities', []);
 
           this.set('errors', {});
-
           this.close();
         } else {
           return;
