@@ -41,7 +41,8 @@
         if (num === 'N/A') {
           return 'N/A';
         }
-        return this.displayType !== 'percentage' ? Math.round(num * 100) : Math.round(num);
+        // round to two decimal places, more info here: https://stackoverflow.com/a/29494612
+        return this.displayType === 'percentage' ? Math.round(num * 100 * 1e2) / 1e2 : Math.round(num);
       }
 
     });
