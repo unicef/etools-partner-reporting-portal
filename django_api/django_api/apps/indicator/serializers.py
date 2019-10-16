@@ -346,6 +346,9 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             return None
 
     def get_total_against_in_need(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
@@ -2010,10 +2013,16 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 
@@ -2067,10 +2076,16 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     in_need = serializers.JSONField()
 
     def get_total_against_in_need(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
+        if obj.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            return obj.total['c']
+
         target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 
