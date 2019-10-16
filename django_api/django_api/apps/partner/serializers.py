@@ -511,12 +511,12 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
                 project = validated_context_data['project']
                 PartnerActivityProjectContext.objects.update_or_create(
                     defaults={
-                        'activity': partner_activity,
-                        'project': project,
+                        'start_date': validated_context_data['start_date'],
+                        'end_date': validated_context_data['end_date'],
+                        'status': validated_context_data['status'],
                     },
-                    start_date=validated_context_data['start_date'],
-                    end_date=validated_context_data['end_date'],
-                    status=validated_context_data['status'],
+                    activity=partner_activity,
+                    project=project,
                 )
 
         except Exception as e:

@@ -149,10 +149,16 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+        id="partnerActivities"
+        params="[[activitiesParams]]"
+        url="[[partnerActivitiesUrl]]">
+    </etools-prp-ajax>
+
+    <!-- <etools-prp-ajax
         id="projects"
         params="[[projectsParams]]"
         url="[[projectsUrl]]">
-    </etools-prp-ajax>
+    </etools-prp-ajax> -->
 
     <etools-prp-ajax
         id="objectives"
@@ -186,22 +192,6 @@
 
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
-        <template
-          is="dom-if"
-          if="[[_displayPartner(permissions)]]"
-          restamp="true">
-          <etools-single-selection-menu
-            class="item validate full-width"
-            label="Partner"
-            options="[[partners]]"
-            option-value="id"
-            option-label="title"
-            selected="{{selectedPartner}}"
-            on-iron-activate="_validate"
-            trigger-value-change-event
-            required>
-          </etools-single-selection-menu>
-        </template>
 
         <paper-radio-group
             id="mode"
@@ -271,8 +261,8 @@
                             disabled
                             class="validate"
                             label="Partner Project"
-                            options="[[projects]]"
-                            option-value="id"
+                            options="[[data.cluster.projects]]"
+                            option-value="project_id"
                             option-label="title"
                             selected="{{item.project_id}}"
                             data-index$="[[index]]"
@@ -409,8 +399,8 @@
                               disabled
                               class="validate"
                               label="Partner Project"
-                              options="[[projects]]"
-                              option-value="id"
+                              options="[[data.custom.projects]]"
+                              option-value="project_id"
                               option-label="title"
                               selected="[[item.project_id]]"
                               data-index$="[[index]]"
@@ -508,6 +498,8 @@
 
         activitiesUrl: String,
 
+        partnerActivitiesUrl: String,
+
         projectData: Object,
 
         updatePending: {
@@ -566,10 +558,10 @@
           value: [],
         },
 
-        projects: {
-          type: Array,
-          value: [],
-        },
+        // projects: {
+        //   type: Array,
+        //   value: [],
+        // },
 
         projectsParams: {
           type: Object,
@@ -578,10 +570,10 @@
           },
         },
 
-        projectsUrl: {
-          type: String,
-          computed: '_computeProjectsUrl(responsePlanId)',
-        },
+        // projectsUrl: {
+        //   type: String,
+        //   computed: '_computeProjectsUrl(responsePlanId)',
+        // },
 
         objectives: {
           type: Array,
@@ -628,7 +620,6 @@
       },
 
       observers: [
-        '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
@@ -658,6 +649,7 @@
         var simpleProjectData = {};
 
         simpleProjectData.project_id = this.projectData.id;
+        simpleProjectData.title = this.projectData.title;
         simpleProjectData.status = this.projectData.status;
         simpleProjectData.start_date = this.projectData.start_date;
         simpleProjectData.end_date = this.projectData.end_date;
@@ -701,9 +693,9 @@
         return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
-      _computeProjectsUrl: function (responsePlanId) {
-        return App.Endpoints.plannedActions(responsePlanId);
-      },
+      // _computeProjectsUrl: function (responsePlanId) {
+      //   return App.Endpoints.plannedActions(responsePlanId);
+      // },
 
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
@@ -711,6 +703,10 @@
 
       _fetchActivities: function (clusterId) {
         var self = this;
+
+        this.set('partnerActivitiesUrl', App.Endpoints.partnerActivityList(this.responsePlanId)
+            + '?cluster_id=' + clusterId);
+
         if (typeof clusterId === 'undefined') {
           return;
         }
@@ -725,29 +721,47 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
+
+              return self.$.partnerActivities.thunk()();
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _fetchProjects: function (partnerId) {
-        var self = this;
-
-        if (typeof partnerId === 'undefined') {
-          return;
-        }
-
-        this.set('projectsParams.partner', partnerId);
-
-        this.$.projects.thunk()()
             .then(function (res) {
-              self.set('projects', res.data.results);
+              console.log('res', res);
+              var adoptedClusterActivities = new Set();
+              res.data.results.forEach(function (item) {
+                console.log('self.activities', self.activities);
+                console.log('item.cluster_activity', item.cluster_activity);
+                if (item.cluster_activity !== null) {
+                  adoptedClusterActivities.add(item.cluster_activity.id);
+                }
+              });
+
+              self.set('activities', self.activities.filter(function (item) {
+                return adoptedClusterActivities.has(item.id) !== true;
+              }));
+
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
       },
+
+      // _fetchProjects: function (partnerId) {
+      //   var self = this;
+
+      //   if (typeof partnerId === 'undefined') {
+      //     return;
+      //   }
+
+      //   this.set('projectsParams.partner', partnerId);
+
+      //   this.$.projects.thunk()()
+      //       .then(function (res) {
+      //         self.set('projects', res.data.results);
+      //       })
+      //       .catch(function (err) { // jshint ignore:line
+      //         // TODO: error handling
+      //       });
+      // },
 
       _fetchObjectives: function (clusterId) {
         var self = this;
@@ -786,7 +800,7 @@
         this.set('updatePending', true);
 
         this.$.activity.body = Object.assign({
-          partner: this.partner,
+          partner: this.projectData.partner_id,
         }, this.data[this.mode]);
         this.$.activity.thunk()()
           .then(function (res) {

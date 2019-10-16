@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../etools-prp-permissions.html">
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../endpoints.html">
@@ -29,6 +30,10 @@
 
     <iron-location query="{{query}}"></iron-location>
 
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-query-params
       params-string="{{query}}"
       params-object="{{queryParams}}">
@@ -44,15 +49,20 @@
       <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
       <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
 
-      <div id="action">
-        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-          Add New Project Activity
-        </paper-button>
-
-        <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
-          Add Existing Project Activity
-        </paper-button>
-      </div>
+      <template
+          is="dom-if"
+          if="[[_displayButtons(permissions)]]"
+          restamp="true">
+        <div id="action">
+          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+            Add New Project Activity
+          </paper-button>
+  
+          <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
+            Add Existing Project Activity
+          </paper-button>
+        </div>
+      </template>
       
       <project-activity-table
         page="response-parameters"
@@ -96,6 +106,20 @@
       observers: [
         '_activitiesByPartnerProjectIdAjax(queryParams)',
       ],
+
+      listeners: {
+        'modal.activity-added': '_onSuccess',
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/response-parameters/partners/activities/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _displayButtons: function (permissions) {
+        return !permissions.viewPlannedAction;
+      },
 
       _computeUrl: function (responsePlanId) {
         return App.Endpoints.partnerActivityList(responsePlanId);

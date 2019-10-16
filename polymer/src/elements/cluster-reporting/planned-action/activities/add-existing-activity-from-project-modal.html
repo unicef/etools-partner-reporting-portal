@@ -181,17 +181,6 @@
 
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
-        <etools-single-selection-menu
-          class="item validate full-width"
-          label="Partner"
-          options="[[partners]]"
-          option-value="id"
-          option-label="title"
-          selected="{{selectedPartner}}"
-          on-iron-activate="_validate"
-          trigger-value-change-event
-          required>
-        </etools-single-selection-menu>
 
         <div class="app-grid">
           <div class="item">
@@ -199,7 +188,6 @@
                 class="validate"
                 label="Cluster"
                 on-value-changed="_validate"
-                disabled="[[_equals(selectedPartner, '')]]"
                 always-float-label
                 required>
               <paper-listbox
@@ -428,11 +416,6 @@
           },
         },
 
-        selectedPartner: {
-          type: String,
-          value: '',
-        },
-
         objectivesUrl: {
           type: String,
           computed: '_computeObjectivesUrl(responsePlanId)',
@@ -630,10 +613,10 @@
 
         this.$.activity.thunk()()
           .then(function (res) {
-            self.fire('activity-added', res.data);
             self.set('updatePending', false);
             self.set('errors', {});
             self._close('saved');
+            window.location.reload();
           })
           .catch(function (err) {
             self.set('errors', err.data);
