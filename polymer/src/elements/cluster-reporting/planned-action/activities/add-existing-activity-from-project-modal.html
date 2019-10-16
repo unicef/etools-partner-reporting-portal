@@ -148,12 +148,6 @@
         url="[[activitiesUrl]]">
     </etools-prp-ajax>
 
-    <!-- <etools-prp-ajax
-        id="projects"
-        params="[[projectsParams]]"
-        url="[[projectsUrl]]">
-    </etools-prp-ajax> -->
-
     <etools-prp-ajax
         id="objectives"
         params="[[objectivesParams]]"
@@ -387,23 +381,6 @@
           value: [],
         },
 
-        // projects: {
-        //   type: Array,
-        //   value: [],
-        // },
-
-        // projectsParams: {
-        //   type: Object,
-        //   value: {
-        //     page_size: 99999,
-        //   },
-        // },
-
-        // projectsUrl: {
-        //   type: String,
-        //   computed: '_computeProjectsUrl(responsePlanId)',
-        // },
-
         objectives: {
           type: Array,
           value: [],
@@ -443,7 +420,6 @@
       },
 
       observers: [
-        '_fetchActivities(data.cluster)',
         '_fetchPartnerActivities(data.cluster)',
         '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
       ],
@@ -463,9 +439,6 @@
         this.set('activities', []);
         this.set('objectives', []);
         this.set('errors', {});
-
-        console.log('simpleProjectData', simpleProjectData)
-        console.log('this.data', this.data);
       },
 
       _onOpenedChanged: function (opened) {
@@ -486,35 +459,9 @@
         this.set('activityUrl', App.Endpoints.partnerActivityUpdate(responsePlanId, activityId));
       },
 
-      // _computeProjectsUrl: function (responsePlanId) {
-      //   return App.Endpoints.plannedActions(responsePlanId);
-      // },
-
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
-
-      // _fetchActivities: function (clusterId) {
-      //   var self = this;
-      //   if (typeof clusterId === 'undefined') {
-      //     return;
-      //   }
-      //   this.set('activities', []);
-      //   this.set('data.cluster.cluster_activity', undefined);
-      //   this.set('activitiesParams.cluster_id', clusterId);
-      //   this.set('activitiesUrl',
-      //       App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
-      //       + '?cluster_id=' + clusterId);
-      //   this.$.activities.abort();
-
-      //   this.$.activities.thunk()()
-      //       .then(function (res) {
-      //         self.set('activities', res.data.results);
-      //       })
-      //       .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling
-      //       });
-      // },
 
       _fetchPartnerActivities: function (clusterId) {
         var self = this;
@@ -536,31 +483,12 @@
                   return element.project_id === parseInt(self.projectData.id);
                 }) === undefined;
               });
-              console.log('filteredActivities', filteredActivities);
               self.set('partnerActivities', filteredActivities);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
       },
-
-      // _fetchProjects: function (partnerId) {
-      //   var self = this;
-
-      //   if (typeof partnerId === 'undefined') {
-      //     return;
-      //   }
-
-      //   this.set('projectsParams.partner', partnerId);
-
-      //   this.$.projects.thunk()()
-      //       .then(function (res) {
-      //         self.set('projects', res.data.results);
-      //       })
-      //       .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling
-      //       });
-      // },
 
       _fetchObjectives: function (clusterId) {
         var self = this;
@@ -607,9 +535,6 @@
         this.$.activity.body = Object.assign({
           partner: this.partner,
         }, this.data);
-
-        console.log('this.$.activity.body', this.$.activity.body);
-        // return;
 
         this.$.activity.thunk()()
           .then(function (res) {

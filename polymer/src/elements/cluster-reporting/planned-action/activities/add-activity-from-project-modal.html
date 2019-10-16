@@ -154,12 +154,6 @@
         url="[[partnerActivitiesUrl]]">
     </etools-prp-ajax>
 
-    <!-- <etools-prp-ajax
-        id="projects"
-        params="[[projectsParams]]"
-        url="[[projectsUrl]]">
-    </etools-prp-ajax> -->
-
     <etools-prp-ajax
         id="objectives"
         params="[[objectivesParams]]"
@@ -558,23 +552,6 @@
           value: [],
         },
 
-        // projects: {
-        //   type: Array,
-        //   value: [],
-        // },
-
-        projectsParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
-        },
-
-        // projectsUrl: {
-        //   type: String,
-        //   computed: '_computeProjectsUrl(responsePlanId)',
-        // },
-
         objectives: {
           type: Array,
           value: [],
@@ -693,10 +670,6 @@
         return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
-      // _computeProjectsUrl: function (responsePlanId) {
-      //   return App.Endpoints.plannedActions(responsePlanId);
-      // },
-
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
       },
@@ -725,11 +698,8 @@
               return self.$.partnerActivities.thunk()();
             })
             .then(function (res) {
-              console.log('res', res);
               var adoptedClusterActivities = new Set();
               res.data.results.forEach(function (item) {
-                console.log('self.activities', self.activities);
-                console.log('item.cluster_activity', item.cluster_activity);
                 if (item.cluster_activity !== null) {
                   adoptedClusterActivities.add(item.cluster_activity.id);
                 }
@@ -744,24 +714,6 @@
               // TODO: error handling
             });
       },
-
-      // _fetchProjects: function (partnerId) {
-      //   var self = this;
-
-      //   if (typeof partnerId === 'undefined') {
-      //     return;
-      //   }
-
-      //   this.set('projectsParams.partner', partnerId);
-
-      //   this.$.projects.thunk()()
-      //       .then(function (res) {
-      //         self.set('projects', res.data.results);
-      //       })
-      //       .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling
-      //       });
-      // },
 
       _fetchObjectives: function (clusterId) {
         var self = this;
