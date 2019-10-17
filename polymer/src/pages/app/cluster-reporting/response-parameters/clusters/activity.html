@@ -101,6 +101,7 @@
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-clusters-activity-indicators
+        activity-data="[[data]]"
         activity-id="[[activityId]]"
         cluster-id="[[data.cluster]]">
       </rp-clusters-activity-indicators>
