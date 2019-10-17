@@ -6,6 +6,7 @@
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../styles/table-styles.html">
@@ -39,24 +40,24 @@
         params-object="{{resultsQueryParams}}">
     </iron-query-params>
 
-    <etools-content-panel panel-title="Submitted List of Constrained Partner Activity Indicator">
+    <etools-content-panel panel-title="[[localize('submitted_list_constrained')]]">
       <etools-data-table-header
           no-title
           no-collapse>
         <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
+          <div class="table-column">[[localize('cluster')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="title" flex-2>
-          <div class="table-column flex-2">Indicator</div>
+          <div class="table-column flex-2">[[localize('indicator')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="partner">
-          <div class="table-column">Partner</div>
+          <div class="table-column">[[localize('partner')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="last_reported">
-          <div class="table-column">Last reported</div>
+          <div class="table-column">[[localize('last_reported')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="progress_percentage" flex-2>
-          <div class="table-column">Current progress</div>
+          <div class="table-column">[[localize('current_progress')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -102,6 +103,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
