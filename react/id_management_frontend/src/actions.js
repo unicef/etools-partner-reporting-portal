@@ -33,10 +33,10 @@ export function clusters(data) {
     return {type: CLUSTERS, data};
 }
 
-export const CLUSTERS_FOR_PARTNER = 'CLUSTERS_FOR_PARTNER';
+export const PARTNER_CLUSTERS = 'PARTNER_CLUSTERS';
 
 export function clustersForPartner(data) {
-    return {type: CLUSTERS_FOR_PARTNER, data};
+    return {type: PARTNER_CLUSTERS, data};
 }
 
 export const OPTIONS = 'OPTIONS';

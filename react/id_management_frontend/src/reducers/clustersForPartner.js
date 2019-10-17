@@ -1,8 +1,8 @@
-import {CLUSTERS_FOR_PARTNER} from "../actions";
+import {PARTNER_CLUSTERS} from "../actions";
 
-export default function clustersForPartner(state = null, action) {
+export default function clustersForPartner(state = [], action) {
     switch (action.type) {
-        case CLUSTERS_FOR_PARTNER:
+        case PARTNER_CLUSTERS:
             return action.data;
         default:
             return state;

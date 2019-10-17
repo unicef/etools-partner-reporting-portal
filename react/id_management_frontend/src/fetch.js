@@ -30,6 +30,7 @@ export function fetch(option, id) {
         }
 
         let promise;
+
         switch (option) {
             case FETCH_OPTIONS.CLUSTERS:
                 promise = api.get("id-management/assignable-clusters/")
@@ -38,11 +39,11 @@ export function fetch(option, id) {
                     });
                 break;
             case FETCH_OPTIONS.CLUSTERS_FOR_PARTNER:
-                    promise = api.get("id-management/partners/${id}/clusters/")
-                        .then(res => {
-                            dispatch(clustersForPartner(res.data));
-                        });
-                    break;
+                promise = api.get(`id-management/partners/${id}/clusters/`)
+                    .then(res => {
+                        dispatch(clustersForPartner(res.data));
+                    });
+                break;
             case FETCH_OPTIONS.PARTNERS:
                 promise = api.get("id-management/assignable-partners/")
                     .then(res => {

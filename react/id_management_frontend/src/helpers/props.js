@@ -7,6 +7,13 @@ export function clusterOptions(state) {
     })) : []
 }
 
+export function clusterForPartnerOptions(state) {
+    return Array.isArray(state.clustersForPartner) ? state.clustersForPartner.map(item => ({
+        value: String(item.id),
+        label: item.full_title
+    })) : []
+}
+
 export function portal(state) {
     return state.portal;
 }
