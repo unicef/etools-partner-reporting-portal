@@ -7,6 +7,7 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../elements/etools-prp-auth.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
@@ -116,7 +117,7 @@
 
       <div class="row">
         <reports-list
-          label="List of overdue indicator reports"
+          label="[[localize('list_of_overdue_indicator')]]"
           collection="overdue_indicator_reports">
         </reports-list>
       </div>
@@ -143,7 +144,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
