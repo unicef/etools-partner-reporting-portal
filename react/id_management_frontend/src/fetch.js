@@ -1,10 +1,11 @@
 import store from "./store";
 import {api} from "./infrastructure/api";
-import {clusters, options, otherAo, partnerDetails, partners, userProfile, workspaces} from "./actions";
+import {clusters, clustersForPartner, options, otherAo, partnerDetails, partners, userProfile, workspaces} from "./actions";
 import {PRP_ROLE} from "./constants";
 
 export const FETCH_OPTIONS = {
     CLUSTERS: "CLUSTERS",
+    CLUSTERS_FOR_PARTNER: "CLUSTERS_FOR_PARTNER",
     PARTNERS: "PARTNERS",
     USER_PROFILE: "USER_PROFILE",
     WORKSPACES: "WORKSPACES",
@@ -36,6 +37,12 @@ export function fetch(option, id) {
                         dispatch(clusters(res.data));
                     });
                 break;
+            case FETCH_OPTIONS.CLUSTERS_FOR_PARTNER:
+                    promise = api.get("id-management/partners/${id}/clusters/")
+                        .then(res => {
+                            dispatch(clustersForPartner(res.data));
+                        });
+                    break;
             case FETCH_OPTIONS.PARTNERS:
                 promise = api.get("id-management/assignable-partners/")
                     .then(res => {
