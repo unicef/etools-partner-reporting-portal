@@ -87,6 +87,29 @@ class ClusterListAPIView(ListAPIView):
         return queryset
 
 
+class ClusterListForPartnerAPIView(ListAPIView):
+    """
+    Cluster object list API - GET
+    Authentication required.
+
+    Parameters:
+    - response_plan_id: Response Plan ID
+
+    Returns:
+        ClusterSimpleSerializer object list.
+    """
+    serializer_class = ClusterSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'pk'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+
+    def get_queryset(self, *args, **kwargs):
+        pk = self.kwargs.get(self.lookup_field)
+        queryset = Cluster.objects.filter(partners=pk)
+
+        return queryset
+
+
 class ClusterObjectiveAPIView(APIView):
     """
     ClusterObjective object API - GET/PATCH/PUT/DELETE

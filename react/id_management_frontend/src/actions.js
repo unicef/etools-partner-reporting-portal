@@ -33,6 +33,12 @@ export function clusters(data) {
     return {type: CLUSTERS, data};
 }
 
+export const PARTNER_CLUSTERS = 'PARTNER_CLUSTERS';
+
+export function clustersForPartner(data) {
+    return {type: PARTNER_CLUSTERS, data};
+}
+
 export const OPTIONS = 'OPTIONS';
 
 export function options(data, fields) {
@@ -43,6 +49,12 @@ export const PARTNERS = 'PARTNERS';
 
 export function partners(data) {
     return {type: PARTNERS, data};
+}
+
+export const APPEND_PARTNER = 'APPEND_PARTNER';
+
+export function append_partner(data) {
+    return {type: APPEND_PARTNER, data};
 }
 
 export const PARTNER_DETAILS = 'PARTNER_DETAILS';

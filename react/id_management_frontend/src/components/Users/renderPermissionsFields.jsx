@@ -13,7 +13,7 @@ import {userRoleInCluster, userRoleInWorkspace} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {filterOptionsValues} from "../../helpers/options";
 import withProps from "../hoc/withProps";
-import {clusterOptions, portal, user, workspaceOptions} from "../../helpers/props";
+import {clusterForPartnerOptions, portal, user, workspaceOptions} from "../../helpers/props";
 
 const title = {
     [PORTALS.IP]: "Role per Workspace",
@@ -32,14 +32,14 @@ const getSelectedOptions = (optionName, fields, index) => {
     return options;
 };
 
-const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterOptions}) => {
+const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterForPartnerOptions}) => {
     let showAdd;
 
     if (portal === PORTALS.IP) {
         showAdd = fields.length < workspaceOptions.length;
     }
     else {
-        showAdd = fields.length < clusterOptions.length;
+        showAdd = fields.length < clusterForPartnerOptions.length;
     }
 
     return (
@@ -53,7 +53,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                     const selectedClusters = getSelectedOptions("cluster", fields, index);
                     const selectedWorkspaces = getSelectedOptions("workspace", fields, index);
                     const filteredWorkspaceOptions = filterOptionsValues(workspaceOptions, selectedWorkspaces);
-                    const filteredClusterOptions = filterOptionsValues(clusterOptions, selectedClusters);
+                    const filteredClusterOptions = filterOptionsValues(clusterForPartnerOptions, selectedClusters);
 
                     let role;
 
@@ -117,13 +117,13 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
 };
 
 renderPermissionsFields.propTypes = {
-    clusterOptions: PropTypes.array,
     fields: PropTypes.any.isRequired,
     portal: PropTypes.string,
     selectedUser: PropTypes.object,
+    clusterForPartnerOptions: PropTypes.array.isRequired,
     user: PropTypes.object,
     workspaceOptions: PropTypes.array
 };
 
-export default withProps(clusterOptions, workspaceOptions, portal, user)(renderPermissionsFields);
+export default withProps(clusterForPartnerOptions, workspaceOptions, portal, user)(renderPermissionsFields);
 
