@@ -1093,6 +1093,9 @@
 
           this._fetchDisaggregations();
         }
+
+        console.log('this.data :', this.data);
+        console.log('this.mode :', this.mode);
       },
 
       _validate: function (e) {
@@ -1285,47 +1288,93 @@
 
       _processData: function (rawData) {
         var data = this._clone(rawData);
+        var invalidLocations = []
 
         if (data.frequency !== 'Csd') {
           delete data.cs_dates;
         }
 
-        if (this.selectedIndicatorDetailType === 'percentage') {
+        data.baseline.v = parseInt(data.baseline.v);
+        data.target.v = parseInt(data.target.v);
+
+        if (data.in_need !== undefined) {
+          data.in_need.v = parseInt(data.in_need.v);
+        }
+
+        if (data.blueprint.display_type === 'percentage') {
           data.baseline.d = 100;
           data.target.d = 100;
 
-          data.locations.forEach(function (location) {
+          if (data.in_need !== undefined) {
+            data.in_need.d = 100;
+          }
+
+          data.locations.forEach(function(location, idx, arr) {
             location.baseline.d = 100;
             location.target.d = 100;
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            if (data.in_need !== undefined) {
+              if (location.in_need !== undefined) {
+                location.in_need.d = 100;
+                location.in_need.v = parseInt(location.in_need.v);
+              } else {
+                invalidLocations.push('Location ' + location.title + 'does not have in need while indicator-level in need exists')
+              }
+            } else {
+              delete location.in_need
+            }
+
+            if (location.baseline.v > location.target.v) {
+              invalidLocations.push('Location ' + location.title + 'has the baseline greater than its target')
+            } else if (location.in_need !== undefined && location.target.v > location.in_need.v) {
+              invalidLocations.push('Location ' + location.title + 'has the target greater than its in need')
+            }
+
+            arr[idx] = location;
           });
-        } else if (this.selectedIndicatorDetailType === 'number') {
+        } else if (data.blueprint.display_type === 'number') {
           data.baseline.d = 1;
           data.target.d = 1;
+          data.in_need.d = 1;
 
-          data.locations.forEach(function (location) {
+          data.locations.forEach(function(location, idx, arr) {
             location.baseline.d = 1;
             location.target.d = 1;
-          });
-        } else if (this.selectedIndicatorDetailType === 'ratio') {
-          data.baseline.v = parseInt(data.baseline.v);
-          data.target.v = parseInt(data.target.v);
+            location.in_need.d = 1;
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+            location.in_need.v = parseInt(location.in_need.v);
 
+            arr[idx] = location;
+          });
+        } else if (data.blueprint.display_type === 'ratio') {
           data.baseline.d = parseInt(data.baseline.d);
           data.target.d = parseInt(data.target.d);
+          data.in_need.d = parseInt(data.in_need.d);
 
           data.baseline.c = data.baseline.v / data.baseline.d;
           data.target.c = data.target.v / data.target.d;
 
-          data.locations.forEach(function (location) {
+          data.locations.forEach(function(location, idx, arr) {
             location.baseline.v = parseInt(location.baseline.v);
             location.target.v = parseInt(location.target.v);
+            location.in_need.v = parseInt(location.in_need.v);
 
             location.baseline.d = parseInt(location.baseline.d);
             location.target.d = parseInt(location.target.d);
+            location.in_need.d = parseInt(location.in_need.d);
 
             location.baseline.c = location.baseline.v / location.baseline.d;
             location.target.c = location.target.v / location.target.d;
+
+            arr[idx] = location;
           });
+        }
+
+        if (invalidLocations.length !== 0) {
+          return invalidLocations;
         }
 
         return Object.assign(data, {
@@ -1380,10 +1429,21 @@
           return;
         }
 
+        console.log('this.data', this.data)
+
         this.set('data.locations', changedLocations);
         this._setDisaggregations();
 
+        console.log('this.data', this.data)
+
         var data = this._processData(this.get('data'));
+
+        if (data instanceof Array) {
+          this.set('errors', {locations: data})
+          return;
+        }
+
+        console.log('data', data)
 
         this.set('data', data);
 
@@ -1395,20 +1455,29 @@
             self.fire('indicator-added', res.data);
             self.set('updatePending', false);
             self.set('errors', {});
+            self.set('data', {});
+            self.set('clusters', []);
+            self.set('selectedCluster', '');
+            self.set('objectives', []);
+            self.set('selectedObjective', '');
+            self.set('activities', []);
+            self.set('selectedActivity', '');
+            self.set('indicators', []);
+            self.set('selectedIndicator', '');
+            self.set('selectedIndicatorDetailType', undefined);
             self.close();
           })
           .catch(function (err) {
             self.set('errors', err.data);
             self.set('data.locations', rawLocations);
             self.set('updatePending', false);
-          });
+          }).finally();
       },
 
       _close: function (e) {
         if (e.target.nodeName === 'PAPER-DIALOG' ||
             e.target.nodeName === 'PAPER-BUTTON' ||
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
-          this.set('mode', '');
           this.set('data', {});
 
           this.set('clusters', []);
