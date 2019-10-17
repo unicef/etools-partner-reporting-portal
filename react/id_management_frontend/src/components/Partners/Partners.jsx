@@ -10,6 +10,7 @@ import PageContent from "../common/PageContent";
 import PartnersFilter from "./PartnersFilter";
 import withSearch from "../hoc/withSearch";
 import PartnersList from "./PartnersList";
+import {append_partner} from '../../actions';
 import {FETCH_OPTIONS, fetch, fetchInvalidate} from "../../fetch";
 
 const header = "Partners";
@@ -43,8 +44,8 @@ class Partners extends Component {
         this.openPartnerDialog();
     }
 
-    onSave() {
-        const {dispatchInvalidatePartnerDetails, resetExpandedRows, reload, handleDialogClose} = this.props;
+    onSave(responseData) {
+        const {dispatchInvalidatePartnerDetails, dispatchAppendPartner, resetExpandedRows, reload, handleDialogClose} = this.props;
 
         handleDialogClose();
 
@@ -55,6 +56,14 @@ class Partners extends Component {
 
             dispatchInvalidatePartnerDetails(id);
             resetExpandedRows();
+        } else {
+            const { id, title, ocha_external_id } = responseData;
+            const newPartner = {
+                id,
+                title,
+                ocha_external_id
+            }
+            dispatchAppendPartner(newPartner)
         }
 
         reload();
@@ -114,6 +123,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
     return {
         dispatchFetchOptions: () => dispatch(fetch(FETCH_OPTIONS.PARTNERS_OPTIONS)),
+        dispatchAppendPartner: (data) => dispatch(append_partner(data)),
         dispatchFetchPartnerDetails: (id) => dispatch(fetch(FETCH_OPTIONS.PARTNER_DETAILS, id)),
         dispatchInvalidatePartnerDetails: (id) => dispatch(fetchInvalidate(FETCH_OPTIONS.PARTNER_DETAILS, id))
     }
@@ -133,6 +143,7 @@ Partners.propTypes = {
     dispatchFetchOptions: PropTypes.func.isRequired,
     dispatchFetchPartnerDetails: PropTypes.func.isRequired,
     dispatchInvalidatePartnerDetails: PropTypes.func.isRequired,
+    dispatchAppendPartner: PropTypes.func.isRequired,
     expandedRowIds: PropTypes.array.isRequired,
     filterChange: PropTypes.func,
     getQuery: PropTypes.func.isRequired,
