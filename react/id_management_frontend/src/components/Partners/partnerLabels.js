@@ -18,7 +18,7 @@ export default {
     totalCtCpHelper: "Total Cash Transferred for Country Programme",
     total_ct_cy: "Total ct cy",
     totalCtCyHelper: "Total Cash Transferred per Current Year",
-    vendor_number: "Vendor number",
+    unicef_vendor_number: "UNICEF Vendor number",
     alternate_id: "Alternate ID",
     rating: "Risk rating",
     type_of_assessment: "Type of assessment",
