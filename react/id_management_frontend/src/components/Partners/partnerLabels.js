@@ -14,7 +14,7 @@ export default {
     city: "City",
     postal_code: "Postal code",
     country_code: "Country code",
-    unicef_vendor_number: "UNICEF Vendor number",
+    unicef_vendor_number: "UNICEF vendor number",
     alternate_id: "Alternate ID",
     type_of_assessment: "Type of assessment",
     clusters: "Clusters"
