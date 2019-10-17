@@ -14,14 +14,8 @@ export default {
     city: "City",
     postal_code: "Postal code",
     country_code: "Country code",
-    total_ct_cp: "Total ct cp",
-    totalCtCpHelper: "Total Cash Transferred for Country Programme",
-    total_ct_cy: "Total ct cy",
-    totalCtCyHelper: "Total Cash Transferred per Current Year",
-    vendor_number: "Vendor number",
+    unicef_vendor_number: "UNICEF vendor number",
     alternate_id: "Alternate ID",
-    rating: "Risk rating",
     type_of_assessment: "Type of assessment",
-    basis_for_risk_rating: "Basis for risk rating",
     clusters: "Clusters"
 }
