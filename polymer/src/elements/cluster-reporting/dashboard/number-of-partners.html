@@ -5,6 +5,7 @@
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../etools-prp-number.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
 
@@ -17,7 +18,7 @@
     </style>
 
     <paper-card class="widget-container layout vertical">
-      <h3 class="widget-heading flex">Number of Contributing Partners</h3>
+      <h3 class="widget-heading flex">[[localize('number_of_contributing_partners')]]</h3>
 
       <div class="widget-figure flex">
         <etools-prp-number value="[[numberOfPartners]]"></etools-prp-number>
@@ -33,6 +34,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
