@@ -1,5 +1,8 @@
 {
   "en": {
+    "draft": "Draft",
+    "send_back_to_partner": "Send back to partner",
+    "view_feedback": "View feedback",
     "ip_reporting": "IP Reporting",
     "cluster_reporting": "Cluster Reporting",
     "change": "change",
@@ -395,6 +398,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "draft": "Draft",
+    "send_back_to_partner": "Send back to partner",
+    "view_feedback": "View feedback",
     "ip_reporting": "Reporting Partenaires UNICEF",
     "cluster_reporting": "Reporting Cluster",
     "change": "changer",
@@ -790,6 +796,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "draft": "Draft",
+    "send_back_to_partner": "Send back to partner",
+    "view_feedback": "View feedback",
     "ip_reporting": "Informe de IP",
     "cluster_reporting": "Informe de conglomerado",
     "change": "Cambio",
@@ -1185,6 +1194,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "draft": "Draft",
+    "send_back_to_partner": "Send back to partner",
+    "view_feedback": "View feedback",
     "ip_reporting": "Отчетность партнеров-исполнителей",
     "cluster_reporting": "Отчетность кластеров",
     "change": "изменение",
