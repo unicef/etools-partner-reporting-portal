@@ -5,6 +5,7 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../behaviors/chip.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../styles/buttons.html">
 
 <dom-module id="chip-disagg-value">
@@ -52,7 +53,7 @@
         class="add-chip"
         on-tap="_open"
         href="#">
-      &plus; Add
+      &plus; [[localize('add')]]
     </a>
 
     <paper-dialog
@@ -75,12 +76,12 @@
         <paper-button
             on-tap="_add"
             class="btn-primary">
-          Add
+          [[localize('add')]]
         </paper-button>
 
         <paper-button
             on-tap="_close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
     </paper-dialog>
@@ -92,6 +93,9 @@
 
       behaviors: [
         App.Behaviors.ChipBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
