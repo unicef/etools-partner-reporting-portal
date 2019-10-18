@@ -8,6 +8,7 @@
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../indicator-modal.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 <link rel="import" href="../../../../../styles/buttons.html">
@@ -51,7 +52,7 @@
           restamp="true">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Cluster Objective Indicator
+            [[localize('add_cluster_objective_indicator')]]
           </paper-button>
         </div>
       </template>
@@ -78,6 +79,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

@@ -1,5 +1,6 @@
 {
   "en": {
+    "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
@@ -399,6 +400,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
@@ -798,6 +800,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
@@ -1197,6 +1200,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
