@@ -148,30 +148,11 @@ class PartnerDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="total_ct_cp" label={labels.total_ct_cp}
-                                           textFieldProps={{helperText: labels.totalCtCpHelper}} optional/>
-                        </Grid>
-
-                        <Grid item md={6}>
-                            <TextFieldForm fieldName="total_ct_cy" label={labels.total_ct_cy}
-                                           textFieldProps={{helperText: labels.totalCtCyHelper}} optional/>
-                        </Grid>
-
-                        <Grid item md={6}>
-                            <TextFieldForm fieldName="vendor_number" label={labels.vendor_number} optional/>
+                            <TextFieldForm fieldName="unicef_vendor_number" label={labels.unicef_vendor_number} optional/>
                         </Grid>
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="alternate_id" label={labels.alternate_id} optional/>
-                        </Grid>
-
-                        <Grid item md={6}>
-                            <TextFieldForm fieldName="rating" label={labels.rating} optional/>
-                        </Grid>
-
-                        <Grid item md={6}>
-                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basis_for_risk_rating}
-                                           optional/>
                         </Grid>
 
                         <Grid item md={6}/>
