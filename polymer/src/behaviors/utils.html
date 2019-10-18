@@ -34,6 +34,12 @@
         );
       },
 
+      _localizeModalTitle: function (text, localize) {
+        if (text === 'Add Cluster Objective Indicator') {
+          return localize('add_cluster_objective_indicator');
+        }
+      },
+
       _toLowerCaseLocalized: function (text, localize) {
         return localize(text).toLowerCase();
       },

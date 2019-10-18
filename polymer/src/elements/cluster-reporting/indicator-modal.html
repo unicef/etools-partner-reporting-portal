@@ -25,6 +25,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
@@ -161,7 +162,7 @@
       opened="{{opened}}">
 
       <div class="header layout horizontal justified">
-        <h2>[[modalTitle]]</h2>
+        <h2>[[_localizeModalTitle(modalTitle, localize)]]</h2>
 
         <paper-icon-button
           class="self-center"
@@ -188,7 +189,7 @@
               on-change="adjustPosition">
 
               <paper-radio-button name="objectives">
-                <strong>Adopt from Cluster Objective</strong>
+                <strong>[[localize('adopt_from_cluster_objective')]]</strong>
               </paper-radio-button>
 
               <div
@@ -204,7 +205,7 @@
                       <etools-single-selection-menu
                         id="clustersDropdown"
                         class="validate"
-                        label="Clusters *"
+                        label="[[localize('clusters')]] *"
                         options="[[clusters]]"
                         option-value="id"
                         option-label="title"
@@ -218,7 +219,7 @@
                     <div class="item">
                       <etools-single-selection-menu
                           class="validate"
-                          label="Objective *"
+                          label="[[localize('objective')]] *"
                           options="[[objectives]]"
                           option-value="id"
                           option-label="title"
@@ -232,7 +233,7 @@
                     <div class="item full-width">
                       <etools-single-selection-menu
                         class="validate"
-                        label="Indicator *"
+                        label="[[localize('indicator')]] *"
                         options="[[indicators]]"
                         option-value="id"
                         option-label="title"
@@ -246,7 +247,7 @@
                     <json-field
                       class="item validate"
                       id="target"
-                      label="Baseline"
+                      label="[[localize('baseline')]]"
                       value="{{ data.baseline }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
@@ -256,7 +257,7 @@
                     <json-field
                       class="item validate"
                       id="total"
-                      label="Target"
+                      label="[[localize('target')]]"
                       value="{{ data.target }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
@@ -281,7 +282,7 @@
               </div>
 
               <paper-radio-button name="custom">
-                <strong>Custom</strong>
+                <strong>[[localize('custom')]]</strong>
               </paper-radio-button>
 
               <div
@@ -296,7 +297,7 @@
                     <div class="item full-width title">
                       <paper-input
                         class="validate"
-                        label="Title"
+                        label="[[localize('title')]]"
                         on-input="_validate"
                         value="{{data.blueprint.title}}"
                         always-float-label
@@ -308,9 +309,9 @@
                       <labelled-item label="Type">
                         <paper-radio-group
                             selected="{{data.blueprint.display_type}}">
-                          <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-                          <paper-radio-button name="percentage">Percent</paper-radio-button>
-                          <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                          <paper-radio-button name="number">[[localize('quantity')]]</paper-radio-button>
+                          <paper-radio-button name="percentage">[[localize('percent')]]</paper-radio-button>
+                          <paper-radio-button name="ratio">[[localize('ratio')]]</paper-radio-button>
                         </paper-radio-group>
                       </labelled-item>
                     </div>
@@ -319,7 +320,7 @@
                       <div class="layout horizontal">
                         <labelled-item
                           class="calculation-method"
-                          label="Calculation method across locations">
+                          label="[[localize('calculation_method_across_locations')]]">
                           <calculation-method
                             value="{{data.blueprint.calculation_formula_across_locations}}"
                             disabled="[[!isNumber]]">
@@ -328,7 +329,7 @@
 
                         <labelled-item
                           class="calculation-method"
-                          label="Calculation method across reporting periods">
+                          label="[[localize('calculation_method_across_reporting')]]">
                           <calculation-method
                             value="{{data.blueprint.calculation_formula_across_periods}}"
                             disabled="[[!isNumber]]">
@@ -340,7 +341,7 @@
                     <div class="item full-width">
                       <paper-input
                         class="validate"
-                        label="Comments (optional)"
+                        label="[[localize('comments')]]"
                         on-input="_validate"
                         value="{{data.comments}}"
                         always-float-label>
@@ -350,7 +351,7 @@
                     <div class="item full-width">
                       <paper-input
                         class="validate"
-                        label="Measurement specifications (optional)"
+                        label="[[localize('measurement_specifications')]]"
                         on-input="_validate"
                         value="{{data.measurement_specifications}}"
                         always-float-label>
@@ -361,7 +362,7 @@
                       <div class="app-grid double">
                         <etools-single-selection-menu
                           class="item validate pair"
-                          label="Frequency of reporting"
+                          label="[[localize('frequency_of_reporting')]]"
                           options="[[frequencies]]"
                           option-value="id"
                           option-label="title"
@@ -379,7 +380,7 @@
                           <etools-prp-chips
                             class="item validate"
                             value="{{data.cs_dates}}"
-                            label="Due date of report"
+                            label="[[localize('due_date_of_report')]]"
                             on-selected-chips-updated="_validate"
                             required>
                             <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
@@ -388,7 +389,7 @@
 
                         <etools-prp-date-input
                           class="item validate pair"
-                          label="Start date of reporting period"
+                          label="[[localize('start_date_reporting')]]"
                           value="{{data.start_date_of_reporting_period}}"
                           error-message=""
                           format="[[dateFormat]]"
@@ -404,7 +405,7 @@
                         restamp="true">
                         <paper-input
                           class="validate"
-                          label="Label"
+                          label="[[localize('label')]]"
                           on-input="_validate"
                           value="{{data.label}}"
                           always-float-label>
@@ -782,6 +783,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
