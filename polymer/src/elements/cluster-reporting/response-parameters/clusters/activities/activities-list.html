@@ -54,7 +54,7 @@
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
           <etools-data-table-column field="title" flex-3 sortable>
             <div class="table-column">[[localize('cluster_activity_title')]]</div>
