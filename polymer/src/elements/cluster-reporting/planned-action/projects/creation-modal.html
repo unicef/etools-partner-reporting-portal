@@ -193,7 +193,7 @@
 
     <iron-location path="{{ path }}"></iron-location>
 
-    <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
+    <cluster-dropdown-content clusters="{{ clusters }}" partner="{{ partnerForClusters }}"></cluster-dropdown-content>
 
     <template
       is="dom-if"
@@ -791,6 +791,11 @@
           computed: '_formatForMultiselect(clusters)',
         },
 
+        partnerForClusters: {
+          type: String,
+          value: ''
+        },
+
         statuses: {
           type: Array,
           value: [
@@ -892,6 +897,8 @@
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
+        '_updatePartnerForClusters(selectedPartner.id)',
+        '_updatePartnerForClusters(partnerID)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -909,6 +916,11 @@
             this.set('mode', 'custom');
           }
         });
+      },
+
+      _updatePartnerForClusters: function (partner) {
+        this.set('clusters', []);
+        this.set('partnerForClusters', partner);
       },
 
       _computeUrl: function (responsePlanID, mode, edit, data) {
@@ -1109,6 +1121,17 @@
             label: item.title,
           };
         });
+      },
+
+      _computePartnerForClusters: function () {
+        var partnerId = null;
+        if (this.selectedPartner !== undefined) {
+          partnerId = this.selectedPartner;
+        } else {
+          partnerId = this.partnerID;
+        }
+
+        return partnerId;
       },
 
       _setDefaults: function (edit) {
