@@ -167,7 +167,7 @@
 
         page_title: {
           type: String,
-          computed: '_computePageTitle(mode)',
+          computed: '_computePageTitle(mode, localize)',
         },
 
         dataUrl: {
@@ -194,13 +194,13 @@
         }
       },
 
-      _computePageTitle: function (mode) {
+      _computePageTitle: function (mode, localize) {
         switch (mode) {
           case 'partner':
-            return 'partner_dashboard';
+            return localize('partner_dashboard');
 
           case 'cluster':
-            return 'cluster_dashboard';
+            return localize('cluster_dashboard');
         }
       },
 
