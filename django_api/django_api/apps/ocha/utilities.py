@@ -63,10 +63,13 @@ def trim_list(object_list, api_data_type):
     out = []
     for obj in object_list:
         try:
-            out.append({
+            data = {
                 'id': obj['id'],
                 'name': obj['planVersion']['name'] if api_data_type == 'response_plan' else obj['name'],
-            })
+            }
+            # if api_data_type == 'partner_project':
+            #     data['clusters'] = obj
+            out.append(data)
         except KeyError:
             pass
     return sorted(out, key=lambda x: x['name'])

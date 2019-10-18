@@ -118,5 +118,19 @@ def finish_partner_project_import(project_id, external_id, response_plan_id=None
     ))
 
     project.clusters.add(*clusters)
+    for partner_cluster in project.partner.clusters.all():
+        non_partner_cluster_roles = partner_cluster.prp_roles.exclude(role=PRP_ROLE_TYPES.cluster_member)
+
+        for prp_role in non_partner_cluster_roles:
+            for ocha_cluster in clusters:
+                PRPRole.objects.update_or_create(
+                    user=prp_role.user,
+                    workspace=prp_role.workspace,
+                    cluster=ocha_cluster,
+                    defaults={
+                        'role': prp_role.role,
+                        'is_active': True,
+                    }
+                )
     project.partner.clusters.add(*clusters)
     import_project_details(project, external_id)
