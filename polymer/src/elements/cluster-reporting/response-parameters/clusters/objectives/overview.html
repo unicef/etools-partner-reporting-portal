@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../../elements/frequency-of-reporting.html">
 <link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -70,20 +71,20 @@
         </cluster-objectives-editing-modal>
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-            Edit Objective
+            [[localize('edit_objective')]]
           </paper-button>
         </div>
       </template>
-      <etools-content-panel panel-title="Cluster Objective Details">
+      <etools-content-panel panel-title="[[localize('cluster_objective_details')]]">
         <div class="row">
           <ul class="app-grid">
             <li class="item full-width">
-              <labelled-item label="Title">
+              <labelled-item label="[[localize('title')]]">
                 <span class="value">[[_withDefault(data.title, '')]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Cluster">
+              <labelled-item label="[[localize('cluster')]]">
                 <span class="value">[[_withDefault(data.cluster_title, '')]]</span>
               </labelled-item>
             </li>
@@ -99,6 +100,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

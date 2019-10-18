@@ -17,6 +17,7 @@
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../endpoints.html">
 
@@ -82,9 +83,9 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="overview">Overview</paper-tab>
-          <paper-tab name="indicators">Cluster Objective Indicators</paper-tab>
-          <paper-tab name="activities">Cluster Activity</paper-tab>
+          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+          <paper-tab name="indicators">[[localize('cluster_objective_indicators')]]</paper-tab>
+          <paper-tab name="activities">[[localize('cluster_activity')]]</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -115,6 +116,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
