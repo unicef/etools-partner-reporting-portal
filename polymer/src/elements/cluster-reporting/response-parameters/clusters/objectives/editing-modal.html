@@ -20,6 +20,7 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 
 <dom-module id="cluster-objectives-editing-modal">
   <template>
@@ -86,7 +87,7 @@
         with-backdrop
         opened="[[opened]]">
       <div class="header layout horizontal justified">
-        <h2>Edit Cluster Objective</h2>
+        <h2>[[localize('edit_cluster_objective')]]</h2>
           <paper-icon-button
               class="self-center"
               on-tap="close"
@@ -104,7 +105,7 @@
               <paper-input
                 class="item validate full-width"
                 id="title"
-                label="Cluster Objective Title"
+                label="[[localize('cluster_objective_title')]]"
                 value="{{data.title}}"
                 type="string"
                 on-input="_validate"
@@ -116,11 +117,11 @@
 
       <div class="buttons layout horizontal-reverse">
         <paper-button class="btn-primary" on-tap="_save" raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -134,7 +135,9 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
-        App.Behaviors.UtilsBehavior
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
