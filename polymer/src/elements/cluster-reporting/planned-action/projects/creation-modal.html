@@ -360,9 +360,6 @@
                   </span>
                 </div>
                 <div class="app-grid">
-                  <div class="item full-width">
-                    <error-box errors="[[errors]]"></error-box>
-                  </div>
                   <paper-input
                     class="item validate full-width"
                     id="title"
@@ -786,6 +783,11 @@
           statePath: 'partner.current.id',
         },
 
+        partnerProjects: {
+          type: Array,
+          statePath: 'partnerProjects.all',
+        },
+
         formattedClusters: {
           type: Array,
           computed: '_formatForMultiselect(clusters)',
@@ -1043,7 +1045,23 @@
           this.$.projects.thunk()()
             .then(function (res) {
               self.set('projectsLoading', false);
-              self.set('projects', res.data);
+
+              var filteredPartnerProjects = self.partnerProjects.filter(function (item) {
+                return item.is_ocha_imported === true;
+              });
+
+              console.log('res.data', res.data);
+              console.log('filteredPartnerProjects', filteredPartnerProjects);
+
+              var filteredResData = res.data.filter(function (item) {
+                return filteredPartnerProjects.find(function (element) {
+                  return element.title.trim() === item.name.trim();
+                }) === undefined;
+              });
+
+              console.log('filteredResData', filteredResData);
+
+              self.set('projects', filteredResData);
               self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
@@ -1182,8 +1200,13 @@
         this.set('data.locations', changedLocations);
 
         if (!this.data.partner_id) {
-          this.data.partner_id = this.partnerID;
+          this.data.partner_id = this.partnerForClusters;
         }
+        if (!this.data.partner_id) {
+          this.set('errors', 'No partner set - please set a partner.')
+          return;
+        }
+
         if (this.mode === 'ocha') {
           this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {
