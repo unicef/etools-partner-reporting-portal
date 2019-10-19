@@ -7,10 +7,10 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="paper-radio-group-custom.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../settings.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
@@ -182,7 +182,7 @@
             if="[[!_isClusterImo(prpRoles)]]"
             restamp="true">
 
-            <paper-radio-group
+            <paper-radio-group-custom
               id="mode"
               selected="{{ mode }}"
               on-change="adjustPosition">
@@ -308,12 +308,12 @@
 
                     <div class="item full-width">
                       <labelled-item label="Type">
-                        <paper-radio-group
+                        <paper-radio-group-custom
                             selected="{{data.blueprint.display_type}}">
                           <paper-radio-button name="number">Quantity (#)</paper-radio-button>
                           <paper-radio-button name="percentage">Percent</paper-radio-button>
                           <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                        </paper-radio-group>
+                        </paper-radio-group-custom>
                       </labelled-item>
                     </div>
 
@@ -526,7 +526,7 @@
 
                 </template>
               </div>
-            </paper-radio-group>
+            </paper-radio-group-custom>
           </template>
 
           <template
@@ -548,12 +548,12 @@
 
               <div class="item full-width">
                 <labelled-item label="Type">
-                  <paper-radio-group
+                  <paper-radio-group-custom
                       selected="{{data.blueprint.display_type}}">
                     <paper-radio-button name="number">Quantity (#)</paper-radio-button>
                     <paper-radio-button name="percentage">Percent</paper-radio-button>
                     <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                  </paper-radio-group>
+                  </paper-radio-group-custom>
                 </labelled-item>
               </div>
 
@@ -985,6 +985,14 @@
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
 
+      adjustPosition: function (e) {
+        e.stopPropagation();
+
+        this.debounce('adjust-position', function () {
+          this.$.dialog.refit();
+        }, 100);
+      },
+
       _isClusterImo: function (prpRoles) {
         var isImo = prpRoles.find(function (role) {
           return role.role === 'CLUSTER_IMO';
@@ -1050,6 +1058,21 @@
         this.set('data.disaggregations', selected);
       },
 
+      _disableOtherRadioButton: function() {
+        var self = this;
+        var radioGroup = this.$$('#mode');
+
+        if (radioGroup !== undefined) {
+          var otherRadio = Polymer.dom(radioGroup).children.find(function (element) {
+            return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
+          });
+
+          if (otherRadio !== undefined) {
+            otherRadio.disabled = true;
+          }
+        }
+      },
+
       _setDefaults: function (opened) {
         if (!opened) {
           return;
@@ -1070,6 +1093,8 @@
             target: {d: 1},
             baseline: {d: 1}
           });
+
+          this._disableOtherRadioButton();
 
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
         } else {
@@ -1093,10 +1118,8 @@
           this.set('indicatorsUrl', App.Endpoints.clusterIndicators());
 
           this._fetchDisaggregations();
+          this._disableOtherRadioButton();
         }
-
-        console.log('this.data :', this.data);
-        console.log('this.mode :', this.mode);
       },
 
       _validate: function (e) {
@@ -1495,12 +1518,8 @@
           return;
         }
 
-        console.log('this.data', this.data)
-
         this.set('data.locations', changedLocations);
         this._setDisaggregations();
-
-        console.log('this.data', this.data)
 
         var data = this._processData(this.get('data'));
 
@@ -1508,8 +1527,6 @@
           this.set('errors', {locations: data})
           return;
         }
-
-        console.log('data', data)
 
         this.set('data', data);
 
@@ -1531,6 +1548,10 @@
             self.set('indicators', []);
             self.set('selectedIndicator', '');
             self.set('selectedIndicatorDetailType', undefined);
+
+            if (this.modalTitle === 'Add Project Indicator') {
+              self.set('mode', '');
+            }
             self.close();
           })
           .catch(function (err) {
@@ -1544,6 +1565,11 @@
         if (e.target.nodeName === 'PAPER-DIALOG' ||
             e.target.nodeName === 'PAPER-BUTTON' ||
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
+          
+          if (this.modalTitle === 'Add Project Indicator') {
+            this.set('mode', '');
+          }
+
           this.set('data', {});
 
           this.set('clusters', []);
