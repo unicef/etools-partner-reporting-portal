@@ -3,8 +3,8 @@ import logging
 from celery import shared_task
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
-from core.models import ResponsePlan
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, PRP_ROLE_TYPES
+from core.models import ResponsePlan, PRPRole
 from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
 from ocha.imports.serializers import V1FundingSourceImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list
@@ -132,5 +132,6 @@ def finish_partner_project_import(project_id, external_id, response_plan_id=None
                         'is_active': True,
                     }
                 )
+
     project.partner.clusters.add(*clusters)
     import_project_details(project, external_id)

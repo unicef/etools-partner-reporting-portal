@@ -212,7 +212,7 @@ class IndicatorListAPIView(ListAPIView):
                 partner_projects__isnull=False)
         elif content_object == REPORTABLE_PA_CONTENT_OBJECT:
             queryset = Reportable.objects.filter(
-                partner_activities__isnull=False)
+                partner_activity_project_contexts__isnull=False)
         else:
             raise Http404
 
@@ -254,7 +254,7 @@ class IndicatorListAPIView(ListAPIView):
                 cluster_activities__cluster_objective__cluster__id__in=cluster_list))
             q_list.append(Q(partner_projects__clusters__id__in=cluster_list))
             q_list.append(Q(
-                partner_activities__project__clusters__id__in=cluster_list))
+                partner_activity_project_contexts__project__clusters__id__in=cluster_list))
 
         if pd_statuses:
             pd_status_list = map(
