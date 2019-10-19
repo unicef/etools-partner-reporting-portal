@@ -1050,16 +1050,11 @@
                 return item.is_ocha_imported === true;
               });
 
-              console.log('res.data', res.data);
-              console.log('filteredPartnerProjects', filteredPartnerProjects);
-
               var filteredResData = res.data.filter(function (item) {
                 return filteredPartnerProjects.find(function (element) {
                   return element.title.trim() === item.name.trim();
                 }) === undefined;
               });
-
-              console.log('filteredResData', filteredResData);
 
               self.set('projects', filteredResData);
               self.fire('details-loaded');
