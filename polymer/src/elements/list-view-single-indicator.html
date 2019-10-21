@@ -121,6 +121,14 @@
           [[indicator.blueprint.title]]
           <paper-tooltip>[[indicator.blueprint.title]]</paper-tooltip>
         </span>
+        <template
+          is="dom-if"
+          if="[[_equals(indicator.content_type_key, 'partner.partneractivityprojectcontext')]]"
+          restamp="[[true]]">
+          <span class="table-cell table-cell--text self-center">
+            [[indicator.content_object_title]]
+          </span>
+        </template>
         <span class="table-cell table-cell--text self-center">
           [[indicator.blueprint.calculation_formula_across_locations]]
         </span>
