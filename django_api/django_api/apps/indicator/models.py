@@ -433,12 +433,13 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
     reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
-    reportable_data_to_sync["content_object"] = pa
     reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
     reportable_data_to_sync["parent_indicator"] = ca_reportable
-    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
 
-    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+    for project_context in pa.partneractivityprojectcontext_set.all():
+        reportable_data_to_sync["content_object"] = project_context
+        pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+        pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
 
 
 def create_reportable_for_pp_from_ca_reportable(pp, ca_reportable):
