@@ -218,7 +218,10 @@ class IndicatorListAPIView(ListAPIView):
 
         object_id = self.request.query_params.get('object_id', None)
         if content_object is not None and object_id is not None:
-            queryset = queryset.filter(object_id=object_id)
+            if content_object == REPORTABLE_PA_CONTENT_OBJECT:
+                queryset = queryset.filter(partner_activity_project_contexts__activity=object_id)
+            else:
+                queryset = queryset.filter(object_id=object_id)
 
         q_list = []
 
