@@ -173,7 +173,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
         return '.'.join(obj.content_type.natural_key())
 
     def get_content_object_title(self, obj):
-        return obj.content_object.title
+        return obj.content_object.title if not isinstance(obj.content_object, PartnerActivityProjectContext) else obj.content_object.project.title
 
 
 class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSerializer):
