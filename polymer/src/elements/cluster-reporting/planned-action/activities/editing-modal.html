@@ -179,6 +179,7 @@
                   label="Cluster"
                   on-value-changed="_validate"
                   always-float-label
+                  disabled
                   required>
                 <paper-listbox
                     selected="{{data.cluster}}"
@@ -204,7 +205,7 @@
                   option-label="title"
                   selected="{{data.cluster_activity}}"
                   on-iron-activate="_validate"
-                  disabled="[[_equals(activities.length, 0)]]"
+                  disabled
                   trigger-value-change-event
                   required>
               </etools-single-selection-menu>
