@@ -52,6 +52,7 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
 class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     project_name = serializers.SerializerMethodField()
+    context_id = serializers.IntegerField(source="id")
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
@@ -60,6 +61,7 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
         model = PartnerActivityProjectContext
         fields = (
             'project_id',
+            'context_id',
             'project_name',
             'start_date',
             'end_date',

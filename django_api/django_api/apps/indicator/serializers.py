@@ -1269,7 +1269,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         Validates baseline, target, in-need
         """
         if 'baseline' not in validated_data:
-            if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
+            if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivityProjectContext):
                     raise ValidationError(
                         {"baseline": "baseline is required for IMO to create Indicator"}
                     )
@@ -1463,7 +1463,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     "project_context_id": "ProjectContext is required to create PartnerActivity Reportable",
                 })
 
-            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data['project_context_id'])
+            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
 
             if 'start_date_of_reporting_period' in validated_data \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
@@ -1607,7 +1607,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     "project_context_id": "ProjectContext is required to update PartnerActivity Reportable",
                 })
 
-            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data['project_context_id'])
+            project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
 
             if 'start_date_of_reporting_period' in validated_data \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
