@@ -77,6 +77,11 @@ from indicator.models import (
 )
 
 
+today = date.today()
+beginning_of_this_year = date(today.year, 1, 1)
+end_of_this_year = date(today.year, 12, 31)
+
+
 class TestPDReportsAPIView(BaseAPITestCase):
 
     def setUp(self):
@@ -1004,7 +1009,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.response_plan = ResponsePlanFactory(
+            workspace=self.workspace,
+            start=beginning_of_this_year,
+            end=end_of_this_year,
+        )
         self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.loc_type = GatewayTypeFactory(country=self.country, admin_level=3)
         self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
@@ -1044,6 +1053,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
+            start_date=date(today.year, 3, 1),
+            end_date=date(today.year, 10, 25),
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1303,6 +1314,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         pa = PartnerActivity.objects.filter(projects__isnull=False).first()
         self.data['object_id'] = pa.id
         self.data['object_type'] = 'partner.partneractivity'
+        self.data['start_date_of_reporting_period'] = str(date(today.year, 4, 1))
+        self.data['project_context_id'] = pa.partneractivityprojectcontext_set.first().id
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)

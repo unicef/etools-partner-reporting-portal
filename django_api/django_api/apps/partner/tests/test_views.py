@@ -59,11 +59,20 @@ from partner.models import (
 )
 
 
+today = datetime.date.today()
+beginning_of_this_year = datetime.date(today.year, 1, 1)
+end_of_this_year = datetime.date(today.year, 12, 31)
+
+
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.response_plan = ResponsePlanFactory(
+            workspace=self.workspace,
+            start=beginning_of_this_year,
+            end=end_of_this_year,
+        )
         self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.loc_type = GatewayTypeFactory(country=self.country)
         self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
@@ -556,7 +565,11 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.response_plan = ResponsePlanFactory(
+            workspace=self.workspace,
+            start=beginning_of_this_year,
+            end=end_of_this_year,
+        )
         self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.loc_type = GatewayTypeFactory(country=self.country)
         self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
@@ -588,6 +601,8 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
+            start_date=datetime.date(today.year, 3, 1),
+            end_date=datetime.date(today.year, 10, 25),
         )
 
         super().setUp()
@@ -656,7 +671,11 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
+        self.response_plan = ResponsePlanFactory(
+            workspace=self.workspace,
+            start=beginning_of_this_year,
+            end=end_of_this_year,
+        )
         self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.loc_type = GatewayTypeFactory(country=self.country)
         self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
@@ -696,6 +715,8 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
         self.project_context = PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
+            start_date=datetime.date(today.year, 3, 1),
+            end_date=datetime.date(today.year, 10, 25),
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -837,8 +858,8 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
     def test_create_project(self):
         project_data = {
             'title': 'Test Partner Project',
-            'start_date': '2013-01-01',
-            'end_date': '2018-01-01',
+            'start_date': str(beginning_of_this_year),
+            'end_date': str(end_of_this_year),
             'partner_id': self.response_plan.clusters.first().partners.first().id,
         }
 
@@ -868,8 +889,8 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
     def test_create_project_with_custom_fields(self):
         project_data = {
             'title': 'Test Partner Project',
-            'start_date': '2013-01-01',
-            'end_date': '2018-01-01',
+            'start_date': str(beginning_of_this_year),
+            'end_date': str(end_of_this_year),
             'partner_id': self.response_plan.clusters.first().partners.first().id,
             'custom_fields': [{
                 'name': 'Test Field 1',

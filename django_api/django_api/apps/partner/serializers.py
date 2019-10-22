@@ -52,7 +52,7 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
 class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     project_name = serializers.SerializerMethodField()
-    context_id = serializers.IntegerField(source="id")
+    context_id = serializers.IntegerField(source="id", read_only=True)
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
@@ -397,22 +397,22 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         first_cluster = project.clusters.first()
 
-        if validated_data['start_date'] < first_cluster.response_plan.start:
+        if 'start_date' in validated_data and validated_data['start_date'] < first_cluster.response_plan.start:
             raise serializers.ValidationError({
                 'start_date': "Project start date cannot be earlier than the response plan's start date"
             })
 
-        if validated_data['start_date'] > first_cluster.response_plan.end:
+        if 'start_date' in validated_data and validated_data['start_date'] > first_cluster.response_plan.end:
             raise serializers.ValidationError({
                 'start_date': "Project start date cannot be later than the response plan's end date"
             })
 
-        if validated_data['end_date'] < first_cluster.response_plan.start:
+        if 'end_date' in validated_data and validated_data['end_date'] < first_cluster.response_plan.start:
             raise serializers.ValidationError({
                 'end_date': "Project end date cannot be earlier than the response plan's start date"
             })
 
-        if validated_data['end_date'] > first_cluster.response_plan.end:
+        if 'end_date' in validated_data and validated_data['end_date'] > first_cluster.response_plan.end:
             raise serializers.ValidationError({
                 'end_date': "Project end date cannot be later than the response plan's end date"
             })
