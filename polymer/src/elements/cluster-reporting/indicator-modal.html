@@ -272,8 +272,6 @@
                       <div class="item full-width">
                         <indicator-locations-widget
                           class="validate"
-                          is-pai="[[isPAI(activityData)]]"
-                          editing="[[false]]"
                           indicator-type="[[selectedIndicatorDetailType]]"
                           value="{{ data.locations }}">
                         </indicator-locations-widget>
@@ -773,6 +771,8 @@
                 <indicator-locations-widget
                   class="validate"
                   indicator-type="[[data.blueprint.display_type]]"
+                  is-pai="[[_isPAI(activityData)]]"
+                  editing="[[false]]"
                   value="{{data.locations}}">
                 </indicator-locations-widget>
               </div>
@@ -1070,7 +1070,7 @@
         this.set('data.frequency', freq.id);
       },
 
-      isPAI: function (activityData) {
+      _isPAI: function (activityData) {
         return Object.keys(activityData).length !== 0;
       },
 
