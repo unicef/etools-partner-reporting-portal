@@ -318,8 +318,8 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
             Q(cluster__cluster_objectives__reportables=reportable_id) |
             Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
             Q(cluster__partner_projects__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__partner_activities__reportables=reportable_id),
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__partner_activity_project_contexts__reportables=reportable_id) |
+            Q(cluster__cluster_objectives__partner_activities__partner_activity_project_contexts__reportables=reportable_id),
         ).exists():
             self.permission_denied(request)
 
@@ -376,8 +376,8 @@ class IndicatorDataAPIView(APIView):
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
             Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj)
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__partner_activity_project_contexts__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__partner_activity_project_contexts__reportables__indicator_reports=obj)
         ).exists():
             self.permission_denied(request)
 
@@ -593,8 +593,8 @@ class IndicatorReportReviewAPIView(APIView):
             Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
             Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
             Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj),
+            Q(cluster__cluster_objectives__cluster_activities__partner_activities__partner_activity_project_contexts__reportables__indicator_reports=obj) |
+            Q(cluster__cluster_objectives__partner_activities__partner_activity_project_contexts__reportables__indicator_reports=obj),
         ).exists():
             self.permission_denied(request)
 
