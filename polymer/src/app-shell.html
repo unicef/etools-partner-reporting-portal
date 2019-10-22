@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../bower_components/etools-piwik-analytics/etools-piwik-analytics.html">
 
 <link rel="import" href="behaviors/localize.html">
 <link rel="import" href="behaviors/utils.html">
@@ -26,6 +27,8 @@
         height: 100%;
       }
     </style>
+
+    <etools-piwik-analytics user="[[profile]]" page="[[page]]"></etools-piwik-analytics>
 
     <app-redirect></app-redirect>
 
@@ -111,6 +114,11 @@
         error: {
           type: Boolean,
           value: false,
+        },
+
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
         }
       },
 
