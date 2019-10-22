@@ -245,7 +245,7 @@
                   value="{{item.baseline}}"
                   allowed-pattern="[+\-\d]"
                   disabled="[[!canEditDetails]]"
-                  required>
+                  required="[[baselineRequirement]]">
               </json-field>
 
               <template
@@ -303,12 +303,20 @@
           locations: Object,
           savedLocations: Object,
           pending: Object,
-          isPai: Boolean,
+          isPai: {
+            type: Boolean,
+            value: false,
+          },
           searchLocationType: String,
 
           editing: {
             type: Boolean,
             value: false,
+          },
+
+          baselineRequirement: {
+            type: Boolean,
+            computed: '_computeBaselineRequirement(isPai, editing)',
           },
 
           lockedItems: {
@@ -432,7 +440,13 @@
         },
 
         _computeIsNumber: function (type) {
+          console.log('isPai in locatiion :', this.isPai);
+          console.log('editing :', this.editing);
           return type === 'number';
+        },
+
+        _computeBaselineRequirement: function (isPai, editing) {
+          return isPai && !editing;
         },
 
         _computeLocationsUrl: function (responsePlanId) {

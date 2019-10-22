@@ -272,6 +272,8 @@
                       <div class="item full-width">
                         <indicator-locations-widget
                           class="validate"
+                          is-pai="[[isPAI(activityData)]]"
+                          editing="[[false]]"
                           indicator-type="[[selectedIndicatorDetailType]]"
                           value="{{ data.locations }}">
                         </indicator-locations-widget>
@@ -598,6 +600,26 @@
                   always-float-label>
                 </paper-input>
               </div>
+
+              <template
+              is="dom-if"
+              if="[[_equals(modalTitle, 'Add Activity Indicator')]]"
+              restamp="true">
+                <div class="item full-width">
+                  <etools-single-selection-menu
+                    class="item validate pair"
+                    label="Project context"
+                    options="[[activityData.projects]]"
+                    option-value="context_id"
+                    option-label="project_name"
+                    selected="{{data.project_context_id}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
+                    required>
+                  </etools-single-selection-menu>
+                </div>
+              </template>
 
               <div class="item full-width">
                 <div class="app-grid double">
@@ -1046,6 +1068,10 @@
           return;
         }
         this.set('data.frequency', freq.id);
+      },
+
+      isPAI: function (activityData) {
+        return Object.keys(activityData).length !== 0;
       },
 
       _setDisaggregations: function () {

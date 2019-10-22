@@ -181,6 +181,28 @@
             </paper-input>
           </div>
 
+
+          <template
+          is="dom-if"
+          if="[[isPAI]]"
+          restamp="true">
+            <div class="row">
+              <etools-single-selection-menu
+                class="item validate pair"
+                label="Project context"
+                options="[[projects]]"
+                option-value="context_id"
+                option-label="project_name"
+                selected="{{data.project_context_id}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                hide-search
+                disabled
+                required>
+              </etools-single-selection-menu>
+            </div>
+          </template>
+
           <div class="row">
             <div class="app-grid">
               <etools-single-selection-menu
@@ -403,6 +425,11 @@
           value: [],
         },
 
+        projects: {
+          type: Array,
+          computed: '_computeProjects(data)',
+        },
+
         frequencies: {
           type: Array,
           value: [
@@ -476,6 +503,16 @@
         }
       },
 
+      _computeProjects: function (data) {
+        console.log('this.data :', data);
+        if (this._computeIsPAI(data)) {
+          this.set('data.project_context_id', data.object_id);
+          return [{context_id: data.object_id, project_name: data.content_object_title}];
+        } else {
+          return [];
+        }
+      },
+
       _computeIsNumber: function (type) {
         return type === 'number';
       },
@@ -486,7 +523,7 @@
       },
 
       _computeIsPAI: function (data) {
-        return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivity';
+        return (data.content_type_key || '').split('.').pop().toLowerCase() === "partneractivityprojectcontext";
       },
 
       _computeMinDate: function (date) {
