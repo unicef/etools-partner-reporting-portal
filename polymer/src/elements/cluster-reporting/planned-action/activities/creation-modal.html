@@ -128,7 +128,7 @@
       }
     </style>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <cluster-dropdown-content clusters="{{clusters}}" partner="{{ partner }}"></cluster-dropdown-content>
 
     <etools-prp-permissions
       permissions="{{permissions}}">
@@ -665,7 +665,8 @@
       },
 
       observers: [
-        '_fetchProjects(partner)',
+        '_fetchProjects(partner, mode, data.cluster.cluster)',
+        '_fetchProjects(partner, mode, data.custom.cluster)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
@@ -748,8 +749,7 @@
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
-            + '?cluster_id=' + clusterId);
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId));
         this.$.activities.abort();
 
         this.$.activities.thunk()()
@@ -761,13 +761,17 @@
             });
       },
 
-      _fetchProjects: function (partnerId) {
+      _fetchProjects: function (partnerId, mode, clusterId) {
         var self = this;
+        if (this.data === undefined) {
+          return;
+        }
 
         if (typeof partnerId === 'undefined') {
           return;
         }
-
+        
+        this.set('projectsParams.cluster_id', clusterId);
         this.set('projectsParams.partner', partnerId);
 
         this.$.projects.thunk()()

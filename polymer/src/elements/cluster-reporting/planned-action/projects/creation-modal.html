@@ -193,7 +193,7 @@
 
     <iron-location path="{{ path }}"></iron-location>
 
-    <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
+    <cluster-dropdown-content clusters="{{ clusters }}" partner="{{ partnerForClusters }}"></cluster-dropdown-content>
 
     <template
       is="dom-if"
@@ -360,9 +360,6 @@
                   </span>
                 </div>
                 <div class="app-grid">
-                  <div class="item full-width">
-                    <error-box errors="[[errors]]"></error-box>
-                  </div>
                   <paper-input
                     class="item validate full-width"
                     id="title"
@@ -786,9 +783,19 @@
           statePath: 'partner.current.id',
         },
 
+        partnerProjects: {
+          type: Array,
+          statePath: 'partnerProjects.all',
+        },
+
         formattedClusters: {
           type: Array,
           computed: '_formatForMultiselect(clusters)',
+        },
+
+        partnerForClusters: {
+          type: String,
+          value: ''
         },
 
         statuses: {
@@ -892,6 +899,8 @@
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
+        '_updatePartnerForClusters(selectedPartner.id)',
+        '_updatePartnerForClusters(partnerID)',
       ],
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
@@ -909,6 +918,11 @@
             this.set('mode', 'custom');
           }
         });
+      },
+
+      _updatePartnerForClusters: function (partner) {
+        this.set('clusters', []);
+        this.set('partnerForClusters', partner);
       },
 
       _computeUrl: function (responsePlanID, mode, edit, data) {
@@ -1031,7 +1045,18 @@
           this.$.projects.thunk()()
             .then(function (res) {
               self.set('projectsLoading', false);
-              self.set('projects', res.data);
+
+              var filteredPartnerProjects = self.partnerProjects.filter(function (item) {
+                return item.is_ocha_imported === true;
+              });
+
+              var filteredResData = res.data.filter(function (item) {
+                return filteredPartnerProjects.find(function (element) {
+                  return element.title.trim() === item.name.trim();
+                }) === undefined;
+              });
+
+              self.set('projects', filteredResData);
               self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
@@ -1111,6 +1136,17 @@
         });
       },
 
+      _computePartnerForClusters: function () {
+        var partnerId = null;
+        if (this.selectedPartner !== undefined) {
+          partnerId = this.selectedPartner;
+        } else {
+          partnerId = this.partnerID;
+        }
+
+        return partnerId;
+      },
+
       _setDefaults: function (edit) {
         if (edit) {
           return;
@@ -1159,8 +1195,13 @@
         this.set('data.locations', changedLocations);
 
         if (!this.data.partner_id) {
-          this.data.partner_id = this.partnerID;
+          this.data.partner_id = this.partnerForClusters;
         }
+        if (!this.data.partner_id) {
+          this.set('errors', 'No partner set - please set a partner.')
+          return;
+        }
+
         if (this.mode === 'ocha') {
           this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {

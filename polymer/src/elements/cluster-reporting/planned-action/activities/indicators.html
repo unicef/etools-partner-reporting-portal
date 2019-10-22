@@ -57,12 +57,14 @@
       <indicator-modal
         id="indicatorModal"
         object-id="[[activityId]]"
+        activity-data="[[activityData]]"
         object-type="partner.partneractivity"
         modal-title="Add Activity Indicator">
       </indicator-modal>
 
       <list-view-indicators
           data="[[data]]"
+          type="pa"
           total-results="[[totalResults]]"
           is-custom="[[isCustom]]"
           can-edit="[[permissions.editIndicatorDetails]]">
@@ -81,6 +83,8 @@
 
       properties: {
         queryParams: Object,
+
+        activityData: Object,
 
         activityId: Number,
 

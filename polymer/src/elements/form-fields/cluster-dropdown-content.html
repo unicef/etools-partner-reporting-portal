@@ -15,7 +15,8 @@
 
     <etools-prp-ajax
       id="clusterNames"
-      url="[[clusterNamesUrl]]">
+      url="[[clusterNamesUrl]]"
+      params="[[params]]">
     </etools-prp-ajax>
   </template>
 
@@ -29,13 +30,18 @@
 
       properties: {
         partner: {
+          type: String,
+        },
+
+        params: {
           type: Object,
-          statePath: 'partner.current'
+          computed: '_computeParams(partner)',
         },
 
         clusterNamesUrl: {
           type: String,
           computed: '_computeClusterNamesUrl(responsePlanID)',
+          observer: '_fetchClusterNames'
         },
 
         responsePlanID: {
@@ -56,11 +62,18 @@
       },
 
       observers: [
-        '_fetchClusterNames(clusterNamesUrl)',
+        '_fetchClusterNames(clusterNamesUrl, params)',
       ],
 
       _computeClusterNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterNames(responsePlanID);
+      },
+
+      _computeParams: function(partner) {
+        if (partner) {
+          return {partner: partner};
+        }
+        return {};
       },
 
       _fetchClusterNames: function () {
@@ -75,7 +88,6 @@
           .catch(function (err) { // jshint ignore:line
             // TODO: error handling
           });
-
       },
 
       detached: function () {

@@ -7,10 +7,10 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="paper-radio-group-custom.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../settings.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
@@ -182,7 +182,7 @@
             if="[[!_isClusterImo(prpRoles)]]"
             restamp="true">
 
-            <paper-radio-group
+            <paper-radio-group-custom
               id="mode"
               selected="{{ mode }}"
               on-change="adjustPosition">
@@ -250,7 +250,8 @@
                       value="{{ data.baseline }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
-                      on-input="_validate">
+                      on-input="_validate"
+                      required>
                     </json-field>
 
                     <json-field
@@ -260,7 +261,8 @@
                       value="{{ data.target }}"
                       type="[[selectedIndicatorDetailType]]"
                       allowed-pattern="[+\-\d.]"
-                      on-input="_validate">
+                      on-input="_validate"
+                      required>
                     </json-field>
 
                     <template
@@ -306,12 +308,12 @@
 
                     <div class="item full-width">
                       <labelled-item label="Type">
-                        <paper-radio-group
+                        <paper-radio-group-custom
                             selected="{{data.blueprint.display_type}}">
                           <paper-radio-button name="number">Quantity (#)</paper-radio-button>
                           <paper-radio-button name="percentage">Percent</paper-radio-button>
                           <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                        </paper-radio-group>
+                        </paper-radio-group-custom>
                       </labelled-item>
                     </div>
 
@@ -407,7 +409,8 @@
                           label="Label"
                           on-input="_validate"
                           value="{{data.label}}"
-                          always-float-label>
+                          always-float-label
+                          required>
                         </paper-input>
                       </template>
 
@@ -421,7 +424,8 @@
                             label="Numerator Label"
                             on-input="_validate"
                             value="{{data.numerator_label}}"
-                            always-float-label>
+                            always-float-label
+                            required>
                           </paper-input>
 
                           <paper-input
@@ -429,7 +433,8 @@
                             label="Denominator Label"
                             on-input="_validate"
                             value="{{data.denominator_label}}"
-                            always-float-label>
+                            always-float-label
+                            required>
                           </paper-input>
                         </div>
                       </template>
@@ -447,7 +452,8 @@
                             label="Baseline"
                             on-input="_validate"
                             value="{{data.baseline}}"
-                            allowed-pattern="[+\-\d]">
+                            allowed-pattern="[+\-\d]"
+                            required>
                           </json-field>
 
                           <json-field
@@ -484,7 +490,8 @@
                             label="Baseline"
                             on-input="_validate"
                             value="{{data.baseline}}"
-                            allowed-pattern="[+\-\d]">
+                            allowed-pattern="[+\-\d]"
+                            required>
                           </json-field>
 
                           <json-field
@@ -519,7 +526,7 @@
 
                 </template>
               </div>
-            </paper-radio-group>
+            </paper-radio-group-custom>
           </template>
 
           <template
@@ -541,12 +548,12 @@
 
               <div class="item full-width">
                 <labelled-item label="Type">
-                  <paper-radio-group
+                  <paper-radio-group-custom
                       selected="{{data.blueprint.display_type}}">
                     <paper-radio-button name="number">Quantity (#)</paper-radio-button>
                     <paper-radio-button name="percentage">Percent</paper-radio-button>
                     <paper-radio-button name="ratio">Ratio</paper-radio-button>
-                  </paper-radio-group>
+                  </paper-radio-group-custom>
                 </labelled-item>
               </div>
 
@@ -591,6 +598,26 @@
                   always-float-label>
                 </paper-input>
               </div>
+
+              <template
+              is="dom-if"
+              if="[[_equals(modalTitle, 'Add Activity Indicator')]]"
+              restamp="true">
+                <div class="item full-width">
+                  <etools-single-selection-menu
+                    class="item validate pair"
+                    label="Project context"
+                    options="[[activityData.projects]]"
+                    option-value="context_id"
+                    option-label="project_name"
+                    selected="{{data.project_context_id}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
+                    required>
+                  </etools-single-selection-menu>
+                </div>
+              </template>
 
               <div class="item full-width">
                 <div class="app-grid double">
@@ -642,7 +669,8 @@
                     label="Label"
                     on-input="_validate"
                     value="{{data.label}}"
-                    always-float-label>
+                    always-float-label
+                    required>
                   </paper-input>
                 </template>
 
@@ -656,7 +684,8 @@
                       label="Numerator Label"
                       on-input="_validate"
                       value="{{data.numerator_label}}"
-                      always-float-label>
+                      always-float-label
+                      required>
                     </paper-input>
 
                     <paper-input
@@ -664,7 +693,8 @@
                       label="Denominator Label"
                       on-input="_validate"
                       value="{{data.denominator_label}}"
-                      always-float-label>
+                      always-float-label
+                      required>
                     </paper-input>
                   </div>
                 </template>
@@ -682,7 +712,8 @@
                       label="Baseline"
                       on-input="_validate"
                       value="{{data.baseline}}"
-                      allowed-pattern="[+\-\d]">
+                      allowed-pattern="[+\-\d]"
+                      required>
                     </json-field>
 
                     <json-field
@@ -719,7 +750,8 @@
                       label="Baseline"
                       on-input="_validate"
                       value="{{data.baseline}}"
-                      allowed-pattern="[+\-\d]">
+                      allowed-pattern="[+\-\d]"
+                      required>
                     </json-field>
 
                     <json-field
@@ -739,6 +771,8 @@
                 <indicator-locations-widget
                   class="validate"
                   indicator-type="[[data.blueprint.display_type]]"
+                  is-pai="[[_isPAI(activityData)]]"
+                  editing="[[false]]"
                   value="{{data.locations}}">
                 </indicator-locations-widget>
               </div>
@@ -973,6 +1007,14 @@
         '_fetchSelectedIndicatorDetailType(responsePlanId, selectedIndicator)',
       ],
 
+      adjustPosition: function (e) {
+        e.stopPropagation();
+
+        this.debounce('adjust-position', function () {
+          this.$.dialog.refit();
+        }, 100);
+      },
+
       _isClusterImo: function (prpRoles) {
         var isImo = prpRoles.find(function (role) {
           return role.role === 'CLUSTER_IMO';
@@ -980,6 +1022,7 @@
 
         if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator'
           || isImo !== undefined && this.modalTitle === 'Add Activity Indicator'
+          || isImo !== undefined && this.modalTitle === 'Add Cluster Activity Indicator'
         ) {
           this.set('mode', 'custom');
           return true;
@@ -1027,6 +1070,10 @@
         this.set('data.frequency', freq.id);
       },
 
+      _isPAI: function (activityData) {
+        return Object.keys(activityData).length !== 0;
+      },
+
       _setDisaggregations: function () {
         var selected = this.selectedDisaggregations ?
         this.selectedDisaggregations.map(function(dis) {
@@ -1035,6 +1082,21 @@
           };
         }) : [];
         this.set('data.disaggregations', selected);
+      },
+
+      _disableOtherRadioButton: function() {
+        var self = this;
+        var radioGroup = this.$$('#mode');
+
+        if (radioGroup !== undefined) {
+          var otherRadio = Polymer.dom(radioGroup).children.find(function (element) {
+            return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
+          });
+
+          if (otherRadio !== undefined) {
+            otherRadio.disabled = true;
+          }
+        }
       },
 
       _setDefaults: function (opened) {
@@ -1058,6 +1120,8 @@
             baseline: {d: 1}
           });
 
+          this._disableOtherRadioButton();
+
           this.set('indicatorsUrl', App.Endpoints.adoptedClusterIndicators());
         } else {
           this.set('selectedDisaggregations', []);
@@ -1080,6 +1144,7 @@
           this.set('indicatorsUrl', App.Endpoints.clusterIndicators());
 
           this._fetchDisaggregations();
+          this._disableOtherRadioButton();
         }
       },
 
@@ -1273,9 +1338,202 @@
 
       _processData: function (rawData) {
         var data = this._clone(rawData);
+        var invalidLocations = []
 
         if (data.frequency !== 'Csd') {
           delete data.cs_dates;
+        }
+
+        data.baseline.v = parseInt(data.baseline.v);
+        data.target.v = parseInt(data.target.v);
+
+        if (data.in_need !== undefined) {
+          data.in_need.v = parseInt(data.in_need.v);
+        }
+
+        if (data.blueprint === undefined) {
+          data.baseline.d = 1;
+          data.target.d = 1;
+
+          if (data.in_need !== undefined) {
+            data.in_need.d = 1;
+          }
+
+          data.locations.forEach(function(location, idx, arr) {
+            location.baseline.d = 1;
+            location.target.d = 1;
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            if (data.in_need !== undefined) {
+              if (location.in_need !== undefined) {
+                location.in_need.d = 1;
+                location.in_need.v = parseInt(location.in_need.v);
+
+                if (location.in_need.v > data.in_need.v) {
+                  invalidLocations.push('Location ' + location.title + ' has a greater in need than its indicator-level in need');
+                }
+              } else {
+                invalidLocations.push('Location ' + location.title + ' does not have in need while indicator level in need exists')
+              }
+            } else {
+              delete location.in_need
+            }
+
+            if (location.baseline.v > data.baseline.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater baseline than its indicator-level baseline');
+            }
+            if (location.target.v > data.target.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+            }
+
+            if (location.in_need !== undefined && location.target.v > location.in_need.v) {
+              invalidLocations.push('Location ' + location.title + ' has a target greater than its in need')
+            }
+
+            arr[idx] = location;
+          });
+        }
+
+        else if (data.blueprint.display_type === 'percentage') {
+          data.baseline.d = 100;
+          data.target.d = 100;
+
+          if (data.in_need !== undefined) {
+            data.in_need.d = 100;
+          }
+
+          data.locations.forEach(function(location, idx, arr) {
+            location.baseline.d = 100;
+            location.target.d = 100;
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            if (data.in_need !== undefined) {
+              if (location.in_need !== undefined) {
+                location.in_need.d = 100;
+                location.in_need.v = parseInt(location.in_need.v);
+
+                if (location.in_need.v > data.in_need.v) {
+                  invalidLocations.push('Location ' + location.title + ' has a greater in need than its indicator-level in need');
+                }
+              } else {
+                invalidLocations.push('Location ' + location.title + ' does not have in need while indicator level in need exists');
+              }
+            } else {
+              delete location.in_need
+            }
+
+            if (location.baseline.v > data.baseline.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater baseline than its indicator-level baseline');
+            }
+            if (location.target.v > data.target.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+            }
+
+            if (location.in_need !== undefined && location.target.v > location.in_need.v) {
+              invalidLocations.push('Location ' + location.title + ' has a target greater than its in need')
+            }
+
+            arr[idx] = location;
+          });
+        } else if (data.blueprint.display_type === 'number') {
+          data.baseline.d = 1;
+          data.target.d = 1;
+
+          if (data.in_need !== undefined) {
+            data.in_need.d = 1;
+          }
+
+          data.locations.forEach(function(location, idx, arr) {
+            location.baseline.d = 1;
+            location.target.d = 1;
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            if (data.in_need !== undefined) {
+              if (location.in_need !== undefined) {
+                location.in_need.d = 1;
+                location.in_need.v = parseInt(location.in_need.v);
+
+                if (location.in_need.v > data.in_need.v) {
+                  invalidLocations.push('Location ' + location.title + ' has a greater in need than its indicator-level in need');
+                }
+              } else {
+                invalidLocations.push('Location ' + location.title + ' does not have in need while indicator level in need exists')
+              }
+            } else {
+              delete location.in_need
+            }
+
+            if (location.baseline.v > data.baseline.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater baseline than its indicator-level baseline');
+            }
+            if (location.target.v > data.target.v) {
+              invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+            }
+
+            if (location.in_need !== undefined && location.target.v > location.in_need.v) {
+              invalidLocations.push('Location ' + location.title + ' has a target greater than its in need')
+            }
+
+            arr[idx] = location;
+          });
+        } else if (data.blueprint.display_type === 'ratio') {
+          data.baseline.d = parseInt(data.baseline.d);
+          data.target.d = parseInt(data.target.d);
+
+          if (data.in_need !== undefined) {
+            data.in_need.d = parseInt(data.in_need.d);
+            data.in_need.c = data.in_need.v / data.in_need.d;
+          }
+
+          data.baseline.c = data.baseline.v / data.baseline.d;
+          data.target.c = data.target.v / data.target.d;
+
+          data.locations.forEach(function(location, idx, arr) {
+            location.baseline.v = parseInt(location.baseline.v);
+            location.target.v = parseInt(location.target.v);
+
+            location.baseline.d = parseInt(location.baseline.d);
+            location.target.d = parseInt(location.target.d);
+
+            location.baseline.c = location.baseline.v / location.baseline.d;
+            location.target.c = location.target.v / location.target.d;
+
+            if (data.in_need !== undefined) {
+              if (location.in_need !== undefined) {
+                location.in_need.d = parseInt(location.in_need.d);
+                location.in_need.v = parseInt(location.in_need.v);
+                location.in_need.c = location.in_need.v / location.in_need.d;
+
+                if (location.in_need.c > data.in_need.c) {
+                  invalidLocations.push('Location ' + location.title + ' has a greater in need than its indicator-level in need');
+                }
+              } else {
+                invalidLocations.push('Location ' + location.title + ' does not have in need while indicator level in need exists')
+              }
+            } else {
+              delete location.in_need
+            }
+
+            if (location.baseline.c > data.baseline.c) {
+              invalidLocations.push('Location ' + location.title + ' has a greater baseline than its indicator-level baseline');
+            }
+            if (location.target.c > data.target.c) {
+              invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+            }
+
+            if (location.in_need !== undefined && location.target.c > location.in_need.c) {
+              invalidLocations.push('Location ' + location.title + ' has a target greater than its in need')
+            }
+
+            arr[idx] = location;
+          });
+        }
+
+        if (invalidLocations.length !== 0) {
+          return invalidLocations;
         }
 
         return Object.assign(data, {
@@ -1331,91 +1589,57 @@
         }
 
         this.set('data.locations', changedLocations);
+        this._setDisaggregations();
 
-        if (this.mode === 'objectives') {
-          this._setDisaggregations();
+        var data = this._processData(this.get('data'));
 
-          var data = this.get('data');
-
-          if (this.selectedIndicatorDetailType === 'percentage') {
-            data.baseline.d = 100;
-            data.target.d = 100;
-
-            data.locations.forEach(function (location) {
-              location.baseline.d = 100;
-              location.target.d = 100;
-            });
-          } else if (this.selectedIndicatorDetailType === 'number') {
-            data.baseline.d = 1;
-            data.target.d = 1;
-
-            data.locations.forEach(function (location) {
-              location.baseline.d = 1;
-              location.target.d = 1;
-            });
-          }
-
-          data.baseline.v = parseInt(data.baseline.v);
-          data.target.v = parseInt(data.target.v);
-
-          data.baseline.d = parseInt(data.baseline.d);
-          data.target.d = parseInt(data.target.d);
-
-          data.baseline.c = data.baseline.v / data.baseline.d;
-          data.target.c = data.target.v / data.target.d;
-
-          data.locations.forEach(function (location) {
-            location.baseline.v = parseInt(location.baseline.v);
-            location.target.v = parseInt(location.target.v);
-
-            location.baseline.d = parseInt(location.baseline.d);
-            location.target.d = parseInt(location.target.d);
-
-            location.baseline.c = location.baseline.v / location.baseline.d;
-            location.target.c = location.target.v / location.target.d;
-          });
-
-          this.set('data', data);
-
-          this.$.indicators.body = this.data;
-
-          this.$.indicators.thunk()()
-            .then(function (res) {
-              self.fire('indicator-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('data.locations', rawLocations);
-              self.set('updatePending', false);
-            });
-        } else {
-          this.set('updatePending', true);
-          this._setDisaggregations();
-          this.$.indicators.body = this._processData(this.data);
-
-          this.$.indicators.thunk()()
-            .then(function (res) {
-              self.fire('indicator-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('data.locations', rawLocations);
-              self.set('updatePending', false);
-            });
+        if (data instanceof Array) {
+          this.set('errors', {locations: data})
+          return;
         }
+
+        this.set('data', data);
+
+        this.$.indicators.body = data;
+
+        this.set('updatePending', true);
+        this.$.indicators.thunk()()
+          .then(function (res) {
+            self.fire('indicator-added', res.data);
+            self.set('updatePending', false);
+            self.set('errors', {});
+            self.set('data', {});
+            self.set('clusters', []);
+            self.set('selectedCluster', '');
+            self.set('objectives', []);
+            self.set('selectedObjective', '');
+            self.set('activities', []);
+            self.set('selectedActivity', '');
+            self.set('indicators', []);
+            self.set('selectedIndicator', '');
+            self.set('selectedIndicatorDetailType', undefined);
+
+            if (this.modalTitle === 'Add Project Indicator') {
+              self.set('mode', '');
+            }
+            self.close();
+          })
+          .catch(function (err) {
+            self.set('errors', err.data);
+            self.set('data.locations', rawLocations);
+            self.set('updatePending', false);
+          }).finally();
       },
 
       _close: function (e) {
         if (e.target.nodeName === 'PAPER-DIALOG' ||
             e.target.nodeName === 'PAPER-BUTTON' ||
             e.target.nodeName === 'PAPER-ICON-BUTTON') {
-          this.set('mode', '');
+
+          if (this.modalTitle === 'Add Project Indicator') {
+            this.set('mode', '');
+          }
+
           this.set('data', {});
 
           this.set('clusters', []);
