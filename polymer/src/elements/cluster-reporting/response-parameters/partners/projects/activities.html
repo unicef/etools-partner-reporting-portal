@@ -54,16 +54,16 @@
           if="[[_displayButtons(permissions)]]"
           restamp="true">
         <div id="action">
-          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+          <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
             Add New Project Activity
           </paper-button>
-  
-          <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
+
+          <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
             Add Existing Project Activity
           </paper-button>
         </div>
       </template>
-      
+
       <project-activity-table
         page="response-parameters"
         project-id="[[projectId]]">
@@ -150,11 +150,11 @@
         }
       },
 
-      _openModal: function (e) {
+      _openModal: function () {
         this.$$('#modal').open();
       },
 
-      _openExistingModal: function (e) {
+      _openExistingModal: function () {
         this.$$('#existing-modal').open();
       },
     });

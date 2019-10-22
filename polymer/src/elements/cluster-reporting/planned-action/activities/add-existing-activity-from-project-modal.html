@@ -537,7 +537,7 @@
         }, this.data);
 
         this.$.activity.thunk()()
-          .then(function (res) {
+          .then(function () {
             self.set('updatePending', false);
             self.set('errors', {});
             self._close('saved');

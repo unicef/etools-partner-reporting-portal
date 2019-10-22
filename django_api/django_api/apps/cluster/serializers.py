@@ -34,7 +34,7 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
             'title',
             'full_title',
         )
-    
+
     def get_full_title(self, obj):
         if obj.response_plan:
             return f'{obj.title} ({obj.response_plan.title} {obj.response_plan.workspace.title})'
