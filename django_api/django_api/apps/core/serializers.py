@@ -23,6 +23,8 @@ class WorkspaceSimpleSerializer(serializers.ModelSerializer):
 class WorkspaceSerializer(serializers.ModelSerializer):
 
     countries = CountrySerializer(many=True)
+    latitude = serializers.DecimalField(max_digits=8, decimal_places=5, coerce_to_string=False)
+    longitude = serializers.DecimalField(max_digits=8, decimal_places=5, coerce_to_string=False)
 
     class Meta:
         model = Workspace
@@ -30,6 +32,8 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'workspace_code',
+            'latitude',
+            'longitude',
             'countries',
             'business_area_code',
             'can_import_ocha_response_plans',
