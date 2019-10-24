@@ -32,7 +32,7 @@ from core.factories import (
     ClusterActivityPartnerActivityFactory,
     QuantityTypeIndicatorBlueprintFactory,
     QuantityReportableToClusterActivityFactory,
-    QuantityReportableToPartnerActivityFactory,
+    QuantityReportableToPartnerActivityProjectContextFactory,
     QuantityReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerProjectFactory,
     ClusterIndicatorReportFactory,
@@ -714,8 +714,8 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=self.blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=self.blueprint
         )
         self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
@@ -888,11 +888,11 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=self.blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=self.blueprint
         )
-        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_custom_activity, blueprint=self.blueprint
+        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=self.blueprint
         )
         self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
@@ -1079,8 +1079,8 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
         self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_custom_activity, blueprint=self.blueprint
+        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=self.blueprint
         )
         self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
@@ -1210,7 +1210,7 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
                 cluster_activity=self.activity,
                 partner=partner,
             )
-            self.project_context = PartnerActivityProjectContextFactory(
+            self.ca_project_context = PartnerActivityProjectContextFactory(
                 project=project,
                 activity=p_activity,
             )
@@ -1225,12 +1225,12 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
                 activity=p_custom_activity,
             )
 
-            partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-                content_object=p_activity, blueprint=self.blueprint,
+            partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+                content_object=self.ca_project_context, blueprint=self.blueprint,
                 parent_indicator=self.clusteractivity_reportable,
             )
-            custom_partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-                content_object=p_custom_activity, blueprint=self.blueprint
+            custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+                content_object=self.project_context, blueprint=self.blueprint
             )
 
             if idx == 0:

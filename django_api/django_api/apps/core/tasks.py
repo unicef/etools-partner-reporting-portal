@@ -64,7 +64,7 @@ def process_period_reports():
             for reportable in Reportable.objects.filter(
                 content_type__model__in=[
                     'partnerproject',
-                    'partneractivity',
+                    'partneractivityprojectcontext',
                     'clusterobjective'
                 ],
                 active=True
@@ -130,11 +130,9 @@ def process_period_reports():
                         else:
                             end_date = calculate_end_date_given_start_date(start_date, frequency)
 
-                        if reportable_type == 'partneractivity':
-                            projects = reportable.content_object.projects.all()
-
-                            for project in projects:
-                                create_ir_for_cluster(reportable, start_date, end_date, project)
+                        if reportable_type == 'partneractivityprojectcontext':
+                            project = reportable.content_object.project
+                            create_ir_for_cluster(reportable, start_date, end_date, project)
                         else:
                             project = None
                             if reportable_type == 'partnerproject':

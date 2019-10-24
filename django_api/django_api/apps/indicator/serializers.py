@@ -330,18 +330,18 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     cluster = serializers.SerializerMethodField()
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
-    cluster_partner_indicator_reportable_id = serializers.SerializerMethodField()
+    cluster_partner_indicator_reportable_ids = serializers.SerializerMethodField()
 
-    def get_cluster_partner_indicator_reportable_id(self, obj):
+    def get_cluster_partner_indicator_reportable_ids(self, obj):
         if not obj.ca_indicator_used_by_reporting_entity:
             return None
 
         try:
-            pai = obj.ca_indicator_used_by_reporting_entity.children.get(
-                partner_activities__partner=obj.content_object.cp_output.programme_document.partner,
+            pais = obj.ca_indicator_used_by_reporting_entity.children.filter(
+                partner_activity_project_contexts__project__partner=obj.content_object.cp_output.programme_document.partner,
             )
 
-            return pai.id
+            return list(pais.values_list('id', flat=True))
         except Reportable.DoesNotExist:
             return None
 
@@ -364,9 +364,9 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
                 and obj.content_object.clusters.exists():
             return obj.content_object.clusters.first().id
 
-        elif isinstance(obj.content_object, PartnerActivity) \
-                and obj.content_object.cluster_activity:
-            return obj.content_object.cluster_activity.cluster.id
+        elif isinstance(obj.content_object, PartnerActivityProjectContext) \
+                and obj.content_object.activity.cluster_activity:
+            return obj.content_object.activity.cluster_activity.cluster.id
 
         elif isinstance(obj.content_object, (ClusterObjective, ClusterActivity)):
             return obj.content_object.cluster.id
@@ -396,7 +396,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'total_against_in_need',
             'total_against_target',
             'ca_indicator_used_by_reporting_entity',
-            'cluster_partner_indicator_reportable_id',
+            'cluster_partner_indicator_reportable_ids',
         )
 
 
@@ -1464,6 +1464,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 })
 
             project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
+            content_object = project_context
 
             if 'start_date_of_reporting_period' in validated_data \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
@@ -1482,6 +1483,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             validated_data['object_id'] = project_context.id
             reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
+            reportable_object_content_model = PartnerActivityProjectContext
         else:
             raise NotImplemented()
 
@@ -1505,7 +1507,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         for loc_data in locations:
             # If partner updating partner activity indicator adopted from CA,
             # do not take out baseline and in-need at location level
-            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+            if reportable_object_content_model == PartnerActivityProjectContext and content_object.activity.cluster_activity and partner:
                 # Filter out location goal level baseline, in_need
                 loc_data.pop('baseline', None)
                 loc_data.pop('in_need', None)
@@ -1608,6 +1610,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 })
 
             project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
+            content_object = project_context
 
             if 'start_date_of_reporting_period' in validated_data \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
@@ -1627,6 +1630,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             validated_data['object_id'] = project_context.id
             reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
+            reportable_object_content_model = PartnerActivityProjectContext
 
             if Reportable.objects.filter(
                 partner_activity_project_contexts=project_context,
@@ -1645,7 +1649,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 validated_data.pop('target', None)
 
         # If partner updating partner activity indicator adopted from CA, do not process progress value as it is fixed
-        if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+        if reportable_object_content_model == PartnerActivityProjectContext and content_object.activity.cluster_activity and partner:
             pass
         else:
             self.check_progress_values(partner, reportable_object_content_model, validated_data)
@@ -1674,7 +1678,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
                 # If partner updating partner activity indicator adopted from CA,
                 # do not take out baseline and in-need at location level
-                if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+                if reportable_object_content_model == PartnerActivityProjectContext and content_object.activity.cluster_activity and partner:
                     # Filter out location goal level baseline, in_need
                     loc_goal.pop('baseline', None)
                     loc_goal.pop('in_need', None)
@@ -1720,7 +1724,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             # If partner updating partner activity indicator adopted from CA,
             # do not take out baseline and in-need at location level
-            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+            if reportable_object_content_model == PartnerActivityProjectContext and content_object.activity.cluster_activity and partner:
                 # Filter out location goal level baseline, in_need
                 data.pop('baseline', None)
                 data.pop('in_need', None)
@@ -1897,11 +1901,11 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             return obj.reportable.content_object.cluster
         elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
             return obj.reportable.content_object.cluster_objective.cluster
-        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            if obj.reportable.content_object.cluster_activity:
-                return obj.reportable.content_object.cluster_activity.cluster_objective.cluster
+        elif isinstance(obj.reportable.content_object, (PartnerActivityProjectContext, )):
+            if obj.reportable.content_object.activity.cluster_activity:
+                return obj.reportable.content_object.activity.cluster_activity.cluster_objective.cluster
             else:
-                return obj.reportable.content_object.cluster_objective.cluster
+                return obj.reportable.content_object.activity.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.clusters.first()
 
@@ -1916,9 +1920,9 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
-        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            if obj.reportable.content_object.projects.exists():
-                project = obj.reportable.content_object.projects.first()
+        elif isinstance(obj.reportable.content_object, (PartnerActivityProjectContext, )):
+            if obj.reportable.content_object.project:
+                project = obj.reportable.content_object.project
                 return {
                     "id": project.id,
                     "title": project.title
@@ -1927,8 +1931,9 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             return None
 
     def _get_partner(self, obj):
-        if isinstance(obj.reportable.content_object,
-                      (PartnerProject, PartnerActivity)):
+        if isinstance(obj.reportable.content_object, (PartnerActivityProjectContext, )):
+            return obj.reportable.content_object.activity.partner
+        elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.partner
         else:
             return None
@@ -1944,8 +1949,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return partner.id if partner else None
 
     def get_partner_activity(self, obj):
-        if isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
+        if isinstance(obj.reportable.content_object, (PartnerActivityProjectContext, )):
+            return {"id": obj.reportable.content_object.activity.id, "title": obj.reportable.content_object.activity.title}
         else:
             return None
 
@@ -1980,7 +1985,12 @@ class ReportableIdSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, obj):
-        return obj.blueprint.title + " (Cluster Activity)" if obj.children.exists() else obj.blueprint.title
+        if obj.children.exists():
+            return obj.blueprint.title + " (Cluster Activity)"
+        elif isinstance(obj.content_object, (PartnerActivityProjectContext, )):
+            return f"{obj.blueprint.title} (Project context -- {obj.content_object.project.title})"
+        else:
+            return obj.blueprint.title
 
 # PMP API Serializers
 
@@ -2093,16 +2103,16 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             return []
 
     def get_project(self, obj):
-        if isinstance(obj.content_object, PartnerActivity):
-            if obj.content_object.projects.exists():
-                return obj.content_object.projects.first().title
+        if isinstance(obj.content_object, PartnerActivityProjectContext):
+            if obj.content_object.project:
+                return obj.content_object.project.title
 
         return ""
 
     def get_cluster_activity(self, obj):
-        if isinstance(obj.content_object, PartnerActivity) \
-                and obj.content_object.cluster_activity:
-            return obj.content_object.cluster_activity.title
+        if isinstance(obj.content_object, PartnerActivityProjectContext) \
+                and obj.content_object.activity.cluster_activity:
+            return obj.content_object.activity.cluster_activity.title
         else:
             return ""
 
@@ -2162,9 +2172,9 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
             from partner.serializers import PartnerProjectSimpleSerializer
             return PartnerProjectSimpleSerializer(obj.content_object).data
 
-        elif isinstance(obj.content_object, (PartnerActivity, )):
-            from partner.serializers import PartnerActivitySimpleSerializer
-            return PartnerActivitySimpleSerializer(obj.content_object).data
+        elif isinstance(obj.content_object, (PartnerActivityProjectContext, )):
+            from partner.serializers import PartnerActivityProjectContextSerializer
+            return PartnerActivityProjectContextSerializer(obj.content_object).data
 
         elif isinstance(obj.content_object, (ClusterObjective, )):
             from cluster.serializers import ClusterObjectiveSerializer
@@ -2227,7 +2237,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         elif obj.content_type.model == "clusterobjective":
             return "Cluster Objective Indicator"
 
-        elif obj.content_type.model == "partneractivity":
+        elif obj.content_type.model == "partneractivityprojectcontext":
             return "Partner Activity Indicator"
 
         elif obj.content_type.model == "partnerproject":
@@ -2247,7 +2257,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 'partner', flat=True
             ).distinct().count()
 
-        elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
+        elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivityProjectContext):
             num_of_partners = 1
 
         else:
@@ -2300,7 +2310,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def get_progress_over_time(self, obj):
-        if obj.content_type.model == "partneractivity":
+        if obj.content_type.model == "partneractivityprojectcontext":
             progress_dict = dict()
 
             for ir in obj.indicator_reports.order_by('id'):
@@ -2336,10 +2346,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             ),
         }
 
-        if reportable.content_object.partner.title not in partner_progresses:
-            partner_progresses[reportable.content_object.partner.title] = list()
+        if reportable.content_object.activity.partner.title not in partner_progresses:
+            partner_progresses[reportable.content_object.activity.partner.title] = list()
 
-        partner_progresses[reportable.content_object.partner.title].append(data)
+        partner_progresses[reportable.content_object.activity.partner.title].append(data)
 
     def get_current_progress_by_partner(self, obj):
         partner_progresses = {}
@@ -2350,7 +2360,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 self._get_progress_by_partner(child, partner_progresses)
 
         # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
-        elif obj.content_type.model in ["partneractivity", "partnerproject"]:
+        elif obj.content_type.model in ["partneractivityprojectcontext", "partnerproject"]:
             self._get_progress_by_partner(obj, partner_progresses)
 
         # Consolidation for progress info
@@ -2394,8 +2404,14 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             reportable = ild.indicator_report.reportable
 
             partner_titles = set()
+
             if hasattr(reportable.content_object, 'partner'):
                 partner_title = reportable.content_object.partner.title \
+                    + " (" + str(reportable.total['c']) + ")"
+                partner_titles.add(partner_title)
+
+            elif hasattr(reportable.content_object, 'activity'):
+                partner_title = reportable.content_object.activity.partner.title \
                     + " (" + str(reportable.total['c']) + ")"
                 partner_titles.add(partner_title)
 
@@ -2455,7 +2471,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     def get_current_progress_by_project(self, obj):
         project_progresses = defaultdict()
 
-        if obj.content_type.model != "partneractivity":
+        if obj.content_type.model != "partneractivityprojectcontext":
             return project_progresses
 
         # Consolidation for progress info
@@ -2500,7 +2516,7 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         from cluster.models import Cluster
 
-        from partner.models import PartnerActivity
+        from partner.models import PartnerActivityProjectContext
 
         cluster = get_object_or_404(
             Cluster,
@@ -2521,18 +2537,18 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
                 "cluster": "Cluster does not belong to Partner",
             })
 
-        elif reportable.content_type.model_class() != PartnerActivity:
+        elif reportable.content_type.model_class() != PartnerActivityProjectContext:
             raise ValidationError({
                 "reportable": "Indicator is not PartnerActivity Indicator",
             })
 
-        elif reportable.content_type.model_class() == PartnerActivity \
-                and not reportable.content_object.cluster_activity:
+        elif reportable.content_type.model_class() == PartnerActivityProjectContext \
+                and not reportable.content_object.activity.cluster_activity:
             raise ValidationError({
                 "reportable": "Indicator is not PartnerActivity Indicator from ClusterActivity",
             })
 
-        elif reportable.content_object.cluster_activity.cluster != cluster:
+        elif reportable.content_object.activity.cluster_activity.cluster != cluster:
             raise ValidationError({
                 "reportable": "Indicator does not belong to Cluster",
             })

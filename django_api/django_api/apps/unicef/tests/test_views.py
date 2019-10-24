@@ -36,7 +36,7 @@ from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             ProgressReportIndicatorReportFactory,
                             QPRReportingPeriodDatesFactory,
                             QuantityReportableToLowerLevelOutputFactory,
-                            QuantityReportableToPartnerActivityFactory,
+                            QuantityReportableToPartnerActivityProjectContextFactory,
                             QuantityTypeIndicatorBlueprintFactory,
                             ResponsePlanFactory, SectionFactory,
                             WorkspaceFactory, faker)
@@ -131,8 +131,8 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -390,8 +390,8 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -604,8 +604,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(

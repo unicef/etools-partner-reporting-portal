@@ -45,7 +45,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterActivityFactory,
                             PartnerProjectFactory,
                             ClusterActivityPartnerActivityFactory,
-                            QuantityReportableToPartnerActivityFactory,
+                            QuantityReportableToPartnerActivityProjectContextFactory,
                             ClusterIndicatorReportFactory)
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
@@ -124,8 +124,8 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -382,6 +382,10 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             partner=self.partner,
             cluster_activity=self.activity,
         )
+        self.project_context = PartnerActivityProjectContextFactory(
+            project=self.project,
+            activity=self.p_activity,
+        )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -393,8 +397,8 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -729,8 +733,8 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(

@@ -415,8 +415,8 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         """
         from indicator.models import Reportable, IndicatorReport
         reportables = Reportable.objects.filter(
-            Q(partner_activities__cluster_activity__cluster_objective__cluster__in=clusters) |
-            Q(partner_activities__cluster_objective__cluster__in=clusters))
+            Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__in=clusters) |
+            Q(partner_activity_project_contexts__activity__cluster_objective__cluster__in=clusters))
         return IndicatorReport.objects.filter(
             reportable__in=reportables).order_by(
             '-time_period_end').distinct()
@@ -452,7 +452,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if partner:
             indicator_reports = indicator_reports.filter(
                 Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activities__partner=partner)
+                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
 
         if limit:
@@ -469,7 +469,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if partner:
             indicator_reports = indicator_reports.filter(
                 Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activities__partner=partner)
+                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
         indicator_reports = indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.accepted,

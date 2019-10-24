@@ -43,7 +43,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterActivityFactory,
                             PartnerProjectFactory,
                             ClusterActivityPartnerActivityFactory,
-                            QuantityReportableToPartnerActivityFactory,
+                            QuantityReportableToPartnerActivityProjectContextFactory,
                             ClusterIndicatorReportFactory)
 
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
@@ -115,8 +115,8 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -331,8 +331,8 @@ class V1ResponsePlanImportSerializerTest(TestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(

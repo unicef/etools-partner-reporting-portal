@@ -53,7 +53,7 @@ from core.factories import (CartoDBTableFactory,
                             ClusterActivityFactory,
                             PartnerProjectFactory,
                             ClusterActivityPartnerActivityFactory,
-                            QuantityReportableToPartnerActivityFactory,
+                            QuantityReportableToPartnerActivityProjectContextFactory,
                             ClusterIndicatorReportFactory)
 from core.tests.base import BaseAPITestCase
 from cluster.models import ClusterObjective, ClusterActivity
@@ -303,8 +303,8 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         self.partneractivity_reportable.disaggregations.clear()
@@ -423,8 +423,8 @@ class TestIndicatorListAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         self.partneractivity_reportable.disaggregations.clear()
@@ -548,7 +548,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
-            partner_activities__reportables__isnull=False,
+            partner_activity_project_contexts__reportables__isnull=False,
             locations__isnull=False
         ).distinct()
 
@@ -640,8 +640,8 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -853,8 +853,8 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -1067,8 +1067,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -1421,8 +1421,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -1972,8 +1972,8 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(
@@ -2234,8 +2234,8 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
 
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         LocationWithReportableLocationGoalFactory(

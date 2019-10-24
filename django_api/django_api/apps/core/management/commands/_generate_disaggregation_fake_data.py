@@ -260,8 +260,11 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
 
 
 def add_disaggregations_to_reportable(reportable, disaggregation_targets):
-    response_plan = getattr(reportable.content_object,
-                            'response_plan', None)
+    if reportable.content_type.model == 'partneractivityprojectcontext':
+        response_plan = reportable.content_object.project.response_plan
+    else:
+        response_plan = getattr(reportable.content_object,
+                                'response_plan', None)
 
     # Disaggregation generation
     for target in disaggregation_targets:

@@ -333,7 +333,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         ir_list = []
 
         for pa in pa_list:
-            ir_id = pa.reportables.values_list('indicator_reports', flat=True).latest('id')
+            ir_id = Reportable.objects.filter(partner_activity_project_contexts__activity=pa).values_list('indicator_reports', flat=True).latest('id')
 
             if ir_id:
                 ir_list.append(ir_id)
@@ -380,23 +380,23 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         q_list = []
 
         if 'activity' in self.context:
-            q_list.append(Q(partner_activities=self.context['activity']))
+            q_list.append(Q(partner_activity_project_contexts__activity=self.context['activity']))
 
         else:
-            q_list.append(Q(partner_activities__in=obj.partner_activities.all()))
+            q_list.append(Q(partner_activity_project_contexts__activity__in=obj.partner_activities.all()))
 
         if 'cluster' in self.context:
-            q_list.append(Q(partner_activities__partner__clusters=self.context['cluster']))
+            q_list.append(Q(partner_activity_project_contexts__activity__partner__clusters=self.context['cluster']))
 
         if 'project' in self.context:
-            q_list.append(Q(partner_activities__project=self.context['project']))
+            q_list.append(Q(partner_activity_project_contexts__activity__project=self.context['project']))
 
         if 'ca_indicator' in self.context:
-            q_list.append(Q(partner_activities__cluster_activity__reportables=self.context['ca_indicator']))
+            q_list.append(Q(partner_activity_project_contexts__activity__cluster_activity__reportables=self.context['ca_indicator']))
 
         if 'report_status' in self.context:
             q_list.append(Q(
-                partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']
+                partner_activity_project_contexts__reportables__indicator_reports__overall_status__iexact=self.context['report_status']
             ))
 
         id_list = Reportable.objects.annotate(title=F('blueprint__title')).filter(reduce(operator.and_, q_list)) \

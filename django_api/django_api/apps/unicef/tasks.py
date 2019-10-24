@@ -633,7 +633,7 @@ def process_programme_documents(fast=False, area=False):
 
                                     if partner_activity:
                                         # Force update on PA Reportable instance for location update
-                                        for pa_reportable in partner_activity.reportables.all():
+                                        for pa_reportable in Reportable.objects.filter(partner_activity_project_contexts__activity=partner_activity):
                                             llo_locations = reportable.locations.values_list('id', flat=True)
                                             pai_locations = pa_reportable.locations.values_list('id', flat=True)
                                             loc_diff = pai_locations.exclude(id__in=llo_locations)
