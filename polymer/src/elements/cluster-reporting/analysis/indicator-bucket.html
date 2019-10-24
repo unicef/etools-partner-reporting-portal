@@ -94,10 +94,10 @@
       }
     </style>
 
-    <etools-content-panel panel-title="[[prefix]] [[data.title]]">
+    <etools-content-panel panel-title="[[prefix]] [[_computeIndicatorTitle(data)]]">
       <dl class="cluster-objective">
         <dt>Cluster Objective:</dt>
-        <dd>[[_computeTitle(data)]]</dd>
+        <dd>[[_computeObjectiveTitle(data)]]</dd>
       </dl>
 
       <template
@@ -172,8 +172,16 @@
         this.$$('#collapse-' + e.target.toggles).toggle();
       },
 
-      _computeTitle: function (data) {
-        return data.cluster_objective_title === undefined ? data.title : data.cluster_objective_title;
+      _computeObjectiveTitle: function (data) {
+        if (data.type === 'partneractivityprojectcontext') {
+          return data.project_name;
+        } else {
+          return data.cluster_objective_title === undefined ? data.title : data.cluster_objective_title;
+        }
+      },
+
+      _computeIndicatorTitle: function (data) {
+        return data.type === 'partneractivityprojectcontext' ? data.project_name : data.title;
       },
 
       _computePrefix: function (data) {
@@ -182,6 +190,7 @@
           partnerproject: 'Partner Project',
           clusterobjective: 'Cluster Objective',
           clusteractivity: 'Cluster Activity',
+          partneractivityprojectcontext: 'Partner Activity (w/Project Context)',
         }[data.type];
 
         return prefix ? prefix + ':' : '';
