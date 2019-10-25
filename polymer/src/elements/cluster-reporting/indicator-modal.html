@@ -1600,6 +1600,7 @@
 
       _save: function () {
         var self = this;
+        var dataCopy = this._clone(this.data);
 
         var noLocationSet = false;
         var rawLocations = this.get('data.locations');
@@ -1666,7 +1667,7 @@
           })
           .catch(function (err) {
             self.set('errors', err.data);
-            self.set('data.locations', rawLocations);
+            self.set('data.locations', dataCopy.locations);
             self.set('updatePending', false);
           }).finally();
       },
