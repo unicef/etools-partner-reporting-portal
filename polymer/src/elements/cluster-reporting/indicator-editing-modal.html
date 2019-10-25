@@ -504,7 +504,6 @@
       },
 
       _computeProjects: function (data) {
-        console.log('this.data :', data);
         if (this._computeIsPAI(data)) {
           this.set('data.project_context_id', data.object_id);
           return [{context_id: data.object_id, project_name: data.content_object_title}];
