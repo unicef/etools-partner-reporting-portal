@@ -511,6 +511,8 @@
                       <indicator-locations-widget
                         class="validate"
                         indicator-type="[[data.blueprint.display_type]]"
+                        is-pai="[[_isPAI(activityData)]]"
+                        editing="[[false]]"
                         value="{{data.locations}}">
                       </indicator-locations-widget>
                     </div>
@@ -1071,6 +1073,7 @@
       },
 
       _isPAI: function (activityData) {
+        console.log('activityData', activityData)
         return Object.keys(activityData).length !== 0;
       },
 
