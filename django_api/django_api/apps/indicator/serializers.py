@@ -1395,14 +1395,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < objective.response_plan.start:
                 error_msg = "Start date of reporting period cannot come before the response plan's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > objective.response_plan.end:
                 error_msg = "Start date of reporting period cannot come after the response plan's end date"
 
@@ -1416,14 +1416,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < activity.response_plan.start:
                 error_msg = "Start date of reporting period cannot come before the response plan's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > activity.response_plan.end:
                 error_msg = "Start date of reporting period cannot come after the response plan's end date"
 
@@ -1437,14 +1437,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < content_object.start_date:
                 error_msg = "Start date of reporting period cannot come before the project's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > content_object.end_date:
                 error_msg = "Start date of reporting period cannot come after the project's end date"
 
@@ -1466,14 +1466,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
             content_object = project_context
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
                 error_msg = "Start date of reporting period cannot come before the activity project context's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > project_context.end_date:
                 error_msg = "Start date of reporting period cannot come after the project context's end date"
 
@@ -1542,16 +1542,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         if reportable_object_content_model == ClusterObjective:
             objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
+            content_object = objective
             validated_data['is_cluster_indicator'] = True
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < objective.response_plan.start:
                 error_msg = "Start date of reporting period cannot come before the response plan's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > objective.response_plan.end:
                 error_msg = "Start date of reporting period cannot come after the response plan's end date"
 
@@ -1563,16 +1564,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         elif reportable_object_content_model == ClusterActivity:
             activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
+            content_object = activity
             validated_data['is_cluster_indicator'] = True
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < activity.response_plan.start:
                 error_msg = "Start date of reporting period cannot come before the response plan's start date"
 
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > activity.response_plan.end:
                 error_msg = "Start date of reporting period cannot come after the response plan's end date"
 
@@ -1585,7 +1587,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         elif reportable_object_content_model == PartnerProject:
             content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < content_object.start_date:
                 error_msg = "Start date of reporting period cannot come before the project's start date"
 
@@ -1593,7 +1595,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     "start_date_of_reporting_period": error_msg,
                 })
 
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > content_object.end_date:
                 error_msg = "Start date of reporting period cannot come after the project's end date"
 
@@ -1612,7 +1614,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             project_context = get_object_or_404(PartnerActivityProjectContext, pk=validated_data.pop('project_context_id'))
             content_object = project_context
 
-            if 'start_date_of_reporting_period' in validated_data \
+            if 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] < project_context.start_date:
                 error_msg = "Start date of reporting period cannot come before the activity project context's start date"
 
@@ -1620,7 +1622,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     "start_date_of_reporting_period": error_msg,
                 })
 
-            elif 'start_date_of_reporting_period' in validated_data \
+            elif 'start_date_of_reporting_period' in validated_data and validated_data['start_date_of_reporting_period'] \
                     and validated_data['start_date_of_reporting_period'] > project_context.end_date:
                 error_msg = "Start date of reporting period cannot come after the project context's end date"
 
@@ -2346,10 +2348,15 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             ),
         }
 
-        if reportable.content_object.activity.partner.title not in partner_progresses:
-            partner_progresses[reportable.content_object.activity.partner.title] = list()
+        if isinstance(reportable.content_object, PartnerActivityProjectContext):
+            partner_title = reportable.content_object.activity.partner.title
+        else:
+            partner_title = reportable.content_object.partner.title
 
-        partner_progresses[reportable.content_object.activity.partner.title].append(data)
+        if partner_title not in partner_progresses:
+            partner_progresses[partner_title] = list()
+
+        partner_progresses[partner_title].append(data)
 
     def get_current_progress_by_partner(self, obj):
         partner_progresses = {}

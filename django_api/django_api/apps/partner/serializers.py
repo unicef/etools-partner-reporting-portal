@@ -52,6 +52,8 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
 class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     project_name = serializers.SerializerMethodField()
+    activity_name = serializers.SerializerMethodField()
+    cluster_objective_name = serializers.SerializerMethodField()
     context_id = serializers.IntegerField(source="id", read_only=True)
     start_date = serializers.DateField()
     end_date = serializers.DateField()
@@ -63,13 +65,21 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
             'project_id',
             'context_id',
             'project_name',
+            'activity_name',
+            'cluster_objective_name',
             'start_date',
             'end_date',
             'status',
         )
 
     def get_project_name(self, obj):
-        return obj.project.title if getattr(obj, 'project', None) else obj.title
+        return obj.project.title
+
+    def get_activity_name(self, obj):
+        return obj.activity.title
+
+    def get_cluster_objective_name(self, obj):
+        return obj.activity.cluster_objective.title if obj.activity.cluster_objective else obj.activity.cluster_activity.cluster_objective.title
 
 
 class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):

@@ -156,6 +156,8 @@
       ],
 
       properties: {
+        currentWorkspaceCoords: Array,
+
         loading: {
           type: Boolean,
           statePath: 'analysis.operationalPresence.mapLoading',
@@ -247,7 +249,25 @@
           type: Boolean,
           value: false,
         },
+
+        currentWorkspaceCode: {
+          type: String,
+          statePath: 'workspaces.current'
+        },
+
+        allWorkspaces: {
+          type: Array,
+          statePath: 'workspaces.all'
+        },
+
+        currentWorkspaceCoords: {
+          type: Array
+        }
       },
+
+      observers: [
+        '_setCurrentWorkspaceCoords(allWorkspaces, currentWorkspaceCode)'
+      ],
 
       _computeTileUrl: function (accessToken) {
         return [
@@ -255,6 +275,14 @@
           '?access_token=',
           accessToken,
         ].join('');
+      },
+
+      _setCurrentWorkspaceCoords: function (all, currentCode) {
+        var currentWorkspace = all.find(function (workspace) {
+          return workspace.code === currentCode;
+        });
+
+        this.set('currentWorkspaceCoords', [currentWorkspace.longitude, currentWorkspace.latitude]);
       },
 
       _getLegendIndex: function (properties, legend) {
@@ -314,7 +342,10 @@
               return feature.geometry.coordinates;
             })
             .forEach(traverse);
-
+        
+        if (map.features.length === 0) {
+          return this.currentWorkspaceCoords;
+        }
         return [
           minLon + (maxLon - minLon) / 2,
           minLat + (maxLat - minLat) / 2,
