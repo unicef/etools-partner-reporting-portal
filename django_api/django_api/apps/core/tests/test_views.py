@@ -152,7 +152,7 @@ class TestLocationListAPIView(BaseAPITestCase):
             'clusters__cluster_objectives__reportables__locations',
             'clusters__cluster_objectives__cluster_activities__reportables__locations',
             'clusters__partner_projects__reportables__locations',
-            'clusters__partner_projects__partner_activities__reportables__locations',
+            'clusters__partner_projects__partneractivityprojectcontext__reportables__locations',
         ).distinct()
         pks = []
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
@@ -173,7 +173,7 @@ class TestLocationListAPIView(BaseAPITestCase):
             'clusters__cluster_objectives__reportables__locations',
             'clusters__cluster_objectives__cluster_activities__reportables__locations',
             'clusters__partner_projects__reportables__locations',
-            'clusters__partner_projects__partner_activities__reportables__locations',
+            'clusters__partner_projects__partneractivityprojectcontext__reportables__locations',
         ).distinct()
         pks = []
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]

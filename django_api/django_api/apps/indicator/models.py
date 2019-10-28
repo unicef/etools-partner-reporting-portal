@@ -433,12 +433,13 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
     reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
-    reportable_data_to_sync["content_object"] = pa
     reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
     reportable_data_to_sync["parent_indicator"] = ca_reportable
-    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
 
-    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+    for project_context in pa.partneractivityprojectcontext_set.all():
+        reportable_data_to_sync["content_object"] = project_context
+        pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+        pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
 
 
 def create_reportable_for_pp_from_ca_reportable(pp, ca_reportable):
@@ -503,7 +504,7 @@ def create_pa_reportables_from_ca(pa, ca):
         ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
     """
 
-    if pa.reportables.count() > 0:
+    if Reportable.objects.filter(partner_activity_project_contexts__activity=pa).count() > 0:
         return
 
     for reportable in ca.reportables.all():
@@ -804,8 +805,8 @@ def send_notification_on_status_change(sender, instance, **kwargs):
         elif content_type_model == 'clusteractivity':
             cluster = content_object.cluster_objective.cluster
             indicator_type = 'cluster_activity'
-        elif content_type_model == 'partneractivity' and content_object.cluster_activity:
-            cluster = content_object.cluster_activity.cluster_objective.cluster
+        elif content_type_model == 'partneractivityprojectcontext' and content_object.activity.cluster_activity:
+            cluster = content_object.activity.cluster_activity.cluster_objective.cluster
             indicator_type = 'partner_activity'
         else:
             cluster = None

@@ -116,7 +116,7 @@ class ProgressReportXLSXReader(object):
                     # If does, use parent to check partner
                     if self.partner and ind.filter(indicator_report__parent__isnull=False):
                         if not ind.filter(
-                                indicator_report__parent__reportable__partner_activities__partner=self.partner
+                                indicator_report__parent__reportable__partner_activity_project_contexts__project__partner=self.partner
                         ).exists():
                             return "Parent of Indicator ID " \
                                 + ild_id \

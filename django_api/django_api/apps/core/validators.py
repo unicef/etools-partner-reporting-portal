@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.exceptions import ValidationError
 
 from cluster.models import ClusterObjective, ClusterActivity
-from partner.models import PartnerProject, PartnerActivity
+from partner.models import PartnerProject, PartnerActivity, PartnerActivityProjectContext
 
 
 class AddIndicatorObjectTypeValidator(object):
@@ -15,6 +15,7 @@ class AddIndicatorObjectTypeValidator(object):
             ClusterActivity,
             PartnerProject,
             PartnerActivity,
+            PartnerActivityProjectContext,
         }
 
         content_type = ContentType.objects.get_by_natural_key(*value.split('.'))

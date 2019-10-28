@@ -405,5 +405,10 @@ class PartnerActivityProjectContext(TimeStampedModel):
     status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
                               default=PARTNER_PROJECT_STATUS.ongoing)
 
+    reportables = GenericRelation(
+        'indicator.Reportable',
+        related_query_name='partner_activity_project_contexts'
+    )
+
     class Meta:
         unique_together = ('project', 'activity')

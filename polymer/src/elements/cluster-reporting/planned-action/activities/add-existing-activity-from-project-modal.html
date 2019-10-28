@@ -526,18 +526,21 @@
 
         this.set('updatePending', true);
 
+        var clonedData = this._clone(this.data); // make copy of data
+
         var selectedPartnerActivity = this.partnerActivities.find(function (item) {
           return item.id === self.data.partner_activity;
         });
 
-        this.set('data.projects', selectedPartnerActivity.projects.concat(this.data.projects));
+        var combinedProjects = selectedPartnerActivity.projects.concat(this.data.projects);
+        clonedData.projects = combinedProjects; // assign combined projects to cloned data instead of data directly to fix visual glitch
 
         this.$.activity.body = Object.assign({
           partner: this.partner,
-        }, this.data);
+        }, clonedData); // save cloned data and not regular data, since cloned data has the combined projects
 
         this.$.activity.thunk()()
-          .then(function (res) {
+          .then(function () {
             self.set('updatePending', false);
             self.set('errors', {});
             self._close('saved');

@@ -61,6 +61,15 @@
           <div class="table-column">[[localize('indicator')]]</div>
         </etools-data-table-column>
 
+        <template
+          is="dom-if"
+          if="[[showProjectContextColumn]]"
+          restamp="[[true]]">
+          <etools-data-table-column field="content_object_title">
+            <div class="table-column">Project context</div>
+          </etools-data-table-column>
+        </template>
+
         <etools-data-table-column field="blueprint.calculation_formula_across_locations">
           <div class="table-column">[[localize('calc_across_locations')]]</div>
         </etools-data-table-column>
@@ -212,6 +221,11 @@
           computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
         },
 
+        showProjectContextColumn: {
+          type: Boolean,
+          computed: '_computeShowProjectContextColumn(type)',
+        },
+
         showLocationsWarning: {
           type: Boolean,
           computed: '_computeShowLocationsWarning(isClusterApp, type, canEdit, data)',
@@ -241,6 +255,10 @@
         return baseConditionsMet && data.some(function (indicator) {
           return !indicator.locations.length;
         });
+      },
+
+      _computeShowProjectContextColumn: function (type) {
+        return type === 'pa';
       },
 
       _computeHaveReports: function (isClusterApp, type) {

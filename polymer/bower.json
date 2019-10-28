@@ -58,7 +58,8 @@
     "intl": "^1.2.5",
     "etools-file": "^1.2.4",
     "leaflet-map": "^1.2.0",
-    "paper-divider": "^1.0.0"
+    "paper-divider": "^1.0.0",
+    "etools-piwik-analytics": "git://github.com/unicef-polymer/etools-piwik-analytics#polymer-1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

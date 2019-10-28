@@ -244,7 +244,8 @@
                   on-input="_validate"
                   value="{{item.baseline}}"
                   allowed-pattern="[+\-\d]"
-                  disabled="[[!canEditDetails]]">
+                  disabled="[[!canEditDetails]]"
+                  required="[[baselineRequirement]]">
               </json-field>
 
               <template
@@ -302,12 +303,20 @@
           locations: Object,
           savedLocations: Object,
           pending: Object,
-          isPai: Boolean,
+          isPai: {
+            type: Boolean,
+            value: false,
+          },
           searchLocationType: String,
 
           editing: {
             type: Boolean,
             value: false,
+          },
+
+          baselineRequirement: {
+            type: Boolean,
+            computed: '_computeBaselineRequirement(isPai, editing)',
           },
 
           lockedItems: {
@@ -432,6 +441,10 @@
 
         _computeIsNumber: function (type) {
           return type === 'number';
+        },
+
+        _computeBaselineRequirement: function (isPai, editing) {
+          return isPai && !editing;
         },
 
         _computeLocationsUrl: function (responsePlanId) {
@@ -616,11 +629,11 @@
         },
 
         _getLocationAdminLevel: function (location) {
-          return location.loc_type ? location.loc_type : location.admin_level;
+          return location.loc_type >= 0 ? location.loc_type : location.admin_level;
         },
 
         _getLocationTitle: function (locations, location, locationId, index) {
-          var loc_type = location.loc_type ? location.loc_type : location.admin_level;
+          var loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
           var allLocations = this._getLocations(locations, loc_type, index);
 
           var targetLocation = allLocations.find(function (loc) {

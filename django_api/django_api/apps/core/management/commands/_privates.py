@@ -62,7 +62,8 @@ from core.factories import (
     QuantityReportableToPartnerProjectFactory,
     QuantityReportableToClusterObjectiveFactory,
     RatioReportableToClusterObjectiveFactory,
-    QuantityReportableToPartnerActivityFactory,
+    QuantityReportableToPartnerActivityProjectContextFactory,
+    PartnerActivityProjectContextFactory,
     QuantityReportableToClusterActivityFactory,
     ProgressReportIndicatorReportFactory,
     # QuantityIndicatorReportFactory,
@@ -520,8 +521,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 title="{} Partner Activity from CA".format(project.title)
             )
 
-            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa,
+            papc = PartnerActivityProjectContextFactory(
+                activity=pa,
+                project=project,
+                start_date=project.start_date,
+                end_date=project.end_date
+            )
+
+            reportable_to_pa = QuantityReportableToPartnerActivityProjectContextFactory(
+                content_object=papc,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
@@ -548,8 +556,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 title="{} Partner Activity".format(project.title)
             )
 
-            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa,
+            papc = PartnerActivityProjectContextFactory(
+                activity=pa,
+                project=project,
+                start_date=project.start_date,
+                end_date=project.end_date
+            )
+
+            reportable_to_pa = QuantityReportableToPartnerActivityProjectContextFactory(
+                content_object=papc,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
@@ -659,7 +674,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 # to be dual reporting enabled
                 if first_llo_indicator_flag:
                     cluster_activity_reportable = Reportable.objects.filter(
-                        cluster_activities__partner_activities__partner=pd.partner
+                        cluster_activities__partner_activity_project_contexts__activity__partner=pd.partner
                     ).first()
 
                 else:
@@ -781,7 +796,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         # Copy-paste from unicef/tasks.py
         # Force update on PA Reportable instance for location update
-        for pa_reportable in partner_activity.reportables.all():
+        for pa_reportable in Reportable.objects.filter(partner_activity_project_contexts__activity=partner_activity):
             pa_reportable.frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
             pa_reportable.save()
 

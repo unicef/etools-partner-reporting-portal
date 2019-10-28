@@ -52,6 +52,9 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
 class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
     project_id = serializers.IntegerField(source="id")
     project_name = serializers.SerializerMethodField()
+    activity_name = serializers.SerializerMethodField()
+    cluster_objective_name = serializers.SerializerMethodField()
+    context_id = serializers.IntegerField(source="id", read_only=True)
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     status = serializers.ChoiceField(choices=PARTNER_ACTIVITY_STATUS)
@@ -60,14 +63,23 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
         model = PartnerActivityProjectContext
         fields = (
             'project_id',
+            'context_id',
             'project_name',
+            'activity_name',
+            'cluster_objective_name',
             'start_date',
             'end_date',
             'status',
         )
 
     def get_project_name(self, obj):
-        return obj.project.title if getattr(obj, 'project', None) else obj.title
+        return obj.project.title
+
+    def get_activity_name(self, obj):
+        return obj.activity.title
+
+    def get_cluster_objective_name(self, obj):
+        return obj.activity.cluster_objective.title if obj.activity.cluster_objective else obj.activity.cluster_activity.cluster_objective.title
 
 
 class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):
@@ -342,6 +354,28 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
 
+        first_cluster = project.clusters.first()
+
+        if validated_data['start_date'] < first_cluster.response_plan.start:
+            raise serializers.ValidationError({
+                'start_date': "Project start date cannot be earlier than the response plan's start date"
+            })
+
+        if validated_data['start_date'] > first_cluster.response_plan.end:
+            raise serializers.ValidationError({
+                'start_date': "Project start date cannot be later than the response plan's end date"
+            })
+
+        if validated_data['end_date'] < first_cluster.response_plan.start:
+            raise serializers.ValidationError({
+                'end_date': "Project end date cannot be earlier than the response plan's start date"
+            })
+
+        if validated_data['end_date'] > first_cluster.response_plan.end:
+            raise serializers.ValidationError({
+                'end_date': "Project end date cannot be later than the response plan's end date"
+            })
+
         locations = self.initial_data.get('locations')
 
         if locations:
@@ -370,6 +404,28 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             cluster_ids = [c['id'] for c in clusters]
             project.clusters.clear()
             project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
+
+        first_cluster = project.clusters.first()
+
+        if 'start_date' in validated_data and validated_data['start_date'] < first_cluster.response_plan.start:
+            raise serializers.ValidationError({
+                'start_date': "Project start date cannot be earlier than the response plan's start date"
+            })
+
+        if 'start_date' in validated_data and validated_data['start_date'] > first_cluster.response_plan.end:
+            raise serializers.ValidationError({
+                'start_date': "Project start date cannot be later than the response plan's end date"
+            })
+
+        if 'end_date' in validated_data and validated_data['end_date'] < first_cluster.response_plan.start:
+            raise serializers.ValidationError({
+                'end_date': "Project end date cannot be earlier than the response plan's start date"
+            })
+
+        if 'end_date' in validated_data and validated_data['end_date'] > first_cluster.response_plan.end:
+            raise serializers.ValidationError({
+                'end_date': "Project end date cannot be later than the response plan's end date"
+            })
 
         locations = self.initial_data.get('locations')
 

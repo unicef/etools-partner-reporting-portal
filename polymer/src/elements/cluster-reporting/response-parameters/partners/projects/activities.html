@@ -28,7 +28,7 @@
       }
     </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <etools-prp-permissions
       permissions="{{permissions}}">
@@ -54,16 +54,16 @@
           if="[[_displayButtons(permissions)]]"
           restamp="true">
         <div id="action">
-          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+          <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
             Add New Project Activity
           </paper-button>
-  
-          <paper-button id="edit" on-tap="_openExistingModal" class="btn-primary" raised>
+
+          <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
             Add Existing Project Activity
           </paper-button>
         </div>
       </template>
-      
+
       <project-activity-table
         page="response-parameters"
         project-id="[[projectId]]">
@@ -77,6 +77,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
@@ -108,11 +109,11 @@
       ],
 
       listeners: {
-        'modal.activity-added': '_onSuccess',
+        'activity-added': '_onSuccess',
       },
 
       _onSuccess: function(e, data) {
-        var path = '/response-parameters/partners/activities/' + String(data.id);
+        var path = '/response-parameters/partners/activity/' + String(data.id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
       },
@@ -150,11 +151,11 @@
         }
       },
 
-      _openModal: function (e) {
+      _openModal: function () {
         this.$$('#modal').open();
       },
 
-      _openExistingModal: function (e) {
+      _openExistingModal: function () {
         this.$$('#existing-modal').open();
       },
     });
