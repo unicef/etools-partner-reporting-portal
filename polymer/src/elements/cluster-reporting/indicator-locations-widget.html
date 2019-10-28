@@ -444,8 +444,6 @@
         },
 
         _computeBaselineRequirement: function (isPai, editing) {
-          console.log('isPai in locatiion :', this.isPai);
-          console.log('editing :', this.editing);
           return isPai && !editing;
         },
 
@@ -631,11 +629,11 @@
         },
 
         _getLocationAdminLevel: function (location) {
-          return location.loc_type ? location.loc_type : location.admin_level;
+          return location.loc_type >= 0 ? location.loc_type : location.admin_level;
         },
 
         _getLocationTitle: function (locations, location, locationId, index) {
-          var loc_type = location.loc_type ? location.loc_type : location.admin_level;
+          var loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
           var allLocations = this._getLocations(locations, loc_type, index);
 
           var targetLocation = allLocations.find(function (loc) {
