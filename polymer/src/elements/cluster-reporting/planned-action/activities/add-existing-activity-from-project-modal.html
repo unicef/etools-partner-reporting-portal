@@ -533,11 +533,14 @@
         });
 
         var combinedProjects = selectedPartnerActivity.projects.concat(this.data.projects);
-        clonedData.projects = combinedProjects; // assign combined projects to cloned data instead of data directly to fix visual glitch
 
+        // assign combined projects to cloned data instead of data directly to fix visual glitch
+        clonedData.projects = combinedProjects;
+
+        // save cloned data and not regular data, since cloned data has the combined projects
         this.$.activity.body = Object.assign({
           partner: this.partner,
-        }, clonedData); // save cloned data and not regular data, since cloned data has the combined projects
+        }, clonedData);
 
         this.$.activity.thunk()()
           .then(function () {
