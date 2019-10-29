@@ -1,5 +1,8 @@
 {
   "en": {
+    "project_context": "Project Context",
+    "denominator_label": "Denominator Label",
+    "numerator_label": "Numerator Label",
     "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
@@ -401,6 +404,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "project_context": "Project Context",
+    "denominator_label": "Denominator Label",
+    "numerator_label": "Numerator Label",
     "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
@@ -802,6 +808,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "project_context": "Project Context",
+    "denominator_label": "Denominator Label",
+    "numerator_label": "Numerator Label",
     "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
@@ -1203,6 +1212,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "project_context": "Project Context",
+    "denominator_label": "Denominator Label",
+    "numerator_label": "Numerator Label",
     "location_goals_for_partners": "Location goals for partners",
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
