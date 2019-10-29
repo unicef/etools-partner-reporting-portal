@@ -1,5 +1,7 @@
 {
   "en": {
+    "disaggregation_by": "Disaggregation By",
+    "remove": "Remove",
     "project_context": "Project Context",
     "denominator_label": "Denominator Label",
     "numerator_label": "Numerator Label",
@@ -404,6 +406,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "disaggregation_by": "Disaggregation By",
+    "remove": "Remove",
     "project_context": "Project Context",
     "denominator_label": "Denominator Label",
     "numerator_label": "Numerator Label",
@@ -808,6 +812,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "disaggregation_by": "Disaggregation By",
+    "remove": "Remove",
     "project_context": "Project Context",
     "denominator_label": "Denominator Label",
     "numerator_label": "Numerator Label",
@@ -1212,6 +1218,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "disaggregation_by": "Disaggregation By",
+    "remove": "Remove",
     "project_context": "Project Context",
     "denominator_label": "Denominator Label",
     "numerator_label": "Numerator Label",
