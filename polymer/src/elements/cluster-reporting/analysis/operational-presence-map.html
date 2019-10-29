@@ -156,8 +156,6 @@
       ],
 
       properties: {
-        currentWorkspaceCoords: Array,
-
         loading: {
           type: Boolean,
           statePath: 'analysis.operationalPresence.mapLoading',
@@ -342,7 +340,7 @@
               return feature.geometry.coordinates;
             })
             .forEach(traverse);
-        
+
         if (map.features.length === 0) {
           return this.currentWorkspaceCoords;
         }
