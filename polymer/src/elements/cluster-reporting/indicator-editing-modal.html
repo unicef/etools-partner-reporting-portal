@@ -25,6 +25,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../error-box.html">
@@ -103,7 +104,7 @@
         opened="{{opened}}">
 
       <div class="header layout horizontal justified">
-        <h2>Edit Indicator</h2>
+        <h2>[[localize('edit_indicator')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -122,7 +123,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Title"
+                label="[[localize('title')]]"
                 on-input="_validate"
                 value="{{data.blueprint.title}}"
                 always-float-label
@@ -132,7 +133,7 @@
           </div>
 
           <div class="row">
-            <labelled-item label="Type">
+            <labelled-item label="[[localize('type')]]">
               <span class="indicator-type">[[indicatorType]]</span>
             </labelled-item>
           </div>
@@ -141,7 +142,7 @@
             <div class="layout horizontal">
               <labelled-item
                   class="calculation-method"
-                  label="Calculation method across locations">
+                  label="[[localize('calculation_method_across_locations')]]">
                 <calculation-method
                     value="{{data.blueprint.calculation_formula_across_locations}}"
                     readonly>
@@ -150,7 +151,7 @@
 
               <labelled-item
                   class="calculation-method"
-                  label="Calculation method across reporting periods">
+                  label="[[localize('calculation_method_across_reporting')]]">
                 <calculation-method
                     value="{{data.blueprint.calculation_formula_across_periods}}"
                     readonly>
@@ -162,7 +163,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Comments (optional)"
+                label="[[localize('comments')]]"
                 on-input="_validate"
                 value="{{data.comments}}"
                 disabled="[[!canEditDetails]]"
@@ -173,7 +174,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Measurement specifications (optional)"
+                label="[[localize('measurement_specifications')]]"
                 on-input="_validate"
                 value="{{data.measurement_specifications}}"
                 disabled="[[!canEditDetails]]"
@@ -189,7 +190,7 @@
             <div class="row">
               <etools-single-selection-menu
                 class="item validate pair"
-                label="Project context"
+                label="[[localize('project_context')]]"
                 options="[[projects]]"
                 option-value="context_id"
                 option-label="project_name"
@@ -207,7 +208,7 @@
             <div class="app-grid">
               <etools-single-selection-menu
                   class="item validate"
-                  label="Frequency of reporting"
+                  label="[[localize('frequency_of_reporting')]]"
                   options="[[frequencies]]"
                   option-value="id"
                   option-label="title"
@@ -226,7 +227,7 @@
                 <etools-prp-chips
                     class="item validate"
                     value="{{data.cs_dates}}"
-                    label="Due date of report"
+                    label="[[localize('due_date_of_report')]]"
                     on-selected-chips-updated="_validate"
                     disabled="[[!canEditDetails]]"
                     required>
@@ -241,7 +242,7 @@
 
               <etools-prp-date-input
                   class="item validate"
-                  label="Start date of reporting period"
+                  label="[[localize('start_date_reporting')]]"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
                   format="[[dateFormat]]"
@@ -258,7 +259,7 @@
                 restamp="true">
               <paper-input
                   class="validate"
-                  label="Label"
+                  label="[[localize('label')]]"
                   on-input="_validate"
                   value="{{data.label}}"
                   disabled="[[!canEditDetails]]"
@@ -273,7 +274,7 @@
               <div class="app-grid">
                 <paper-input
                     class="item validate"
-                    label="Numerator Label"
+                    label="[[localize('numerator_label')]]"
                     on-input="_validate"
                     value="{{data.numerator_label}}"
                     disabled="[[!canEditDetails]]"
@@ -282,7 +283,7 @@
 
                 <paper-input
                     class="item validate"
-                    label="Denominator Label"
+                    label="[[localize('denominator_label')]]"
                     on-input="_validate"
                     value="{{data.denominator_label}}"
                     disabled="[[!canEditDetails]]"
@@ -297,7 +298,7 @@
               <json-field
                   class="item validate"
                   type="[[data.blueprint.display_type]]"
-                  label="Baseline"
+                  label="[[localize('baseline')]]"
                   on-input="_validate"
                   value="{{data.baseline}}"
                   allowed-pattern="[+\-\d]"
@@ -311,7 +312,7 @@
                 <json-field
                     class="item validate"
                     type="[[data.blueprint.display_type]]"
-                    label="In need (optional)"
+                    label="[[localize('in_need')]]"
                     on-input="_validate"
                     value="{{data.in_need}}"
                     allowed-pattern="[+\-\d]"
@@ -322,7 +323,7 @@
               <json-field
                   class="item validate"
                   type="[[data.blueprint.display_type]]"
-                  label="Target"
+                  label="[[localize('target')]]"
                   on-input="_validate"
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
@@ -362,12 +363,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -383,6 +384,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
