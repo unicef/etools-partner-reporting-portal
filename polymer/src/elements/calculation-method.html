@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../behaviors/localize.html">
 
 <dom-module id="calculation-method">
   <template>
@@ -40,7 +42,7 @@
           <paper-radio-button
               name="[[item.id]]"
               disabled="[[disabled]]">
-            [[item.title]]
+            [[_localizeLowerCased(item.title, localize)]]
           </paper-radio-button>
         </template>
       </paper-radio-group>
@@ -57,6 +59,13 @@
   <script>
     Polymer({
       is: 'calculation-method',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         disabled: {
