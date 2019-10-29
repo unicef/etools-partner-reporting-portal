@@ -405,7 +405,7 @@
 
         indicatorType: {
           type: String,
-          computed: '_computeIndicatorType(data)',
+          computed: '_computeIndicatorType(data, localize)',
         },
 
         locationsUrl: {
@@ -493,16 +493,16 @@
         '_updateCSDates(data.start_date_of_reporting_period)',
       ],
 
-      _computeIndicatorType: function (data) {
+      _computeIndicatorType: function (data, localize) {
         switch (data.blueprint.display_type) {
           case 'number':
-            return 'Quantity (#)';
+            return localize('quantity');
 
           case 'percentage':
-            return 'Percent';
+            return localize('percent');
 
           case 'ratio':
-            return 'Ratio';
+            return localize('ratio');
         }
       },
 
