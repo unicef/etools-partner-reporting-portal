@@ -1,5 +1,8 @@
 {
   "en": {
+    "location_admin_level": "Location - administrative level",
+    "send_message_imo": "Send a message to IMO",
+    "to_propose_baseline": "To propose 'Baseline' and 'In need' for locations added by you, please contact IMO.",
     "disaggregation_by": "Disaggregation By",
     "remove": "Remove",
     "project_context": "Project Context",
@@ -406,6 +409,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "location_admin_level": "Location - administrative level",
+    "send_message_imo": "Send a message to IMO",
+    "to_propose_baseline": "To propose 'Baseline' and 'In need' for locations added by you, please contact IMO.",
     "disaggregation_by": "Disaggregation By",
     "remove": "Remove",
     "project_context": "Project Context",
@@ -812,6 +818,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "location_admin_level": "Location - administrative level",
+    "send_message_imo": "Send a message to IMO",
+    "to_propose_baseline": "To propose 'Baseline' and 'In need' for locations added by you, please contact IMO.",
     "disaggregation_by": "Disaggregation By",
     "remove": "Remove",
     "project_context": "Project Context",
@@ -1218,6 +1227,9 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "location_admin_level": "Location - administrative level",
+    "send_message_imo": "Send a message to IMO",
+    "to_propose_baseline": "To propose 'Baseline' and 'In need' for locations added by you, please contact IMO.",
     "disaggregation_by": "Disaggregation By",
     "remove": "Remove",
     "project_context": "Project Context",
