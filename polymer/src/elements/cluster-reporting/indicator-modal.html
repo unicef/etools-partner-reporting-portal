@@ -553,9 +553,9 @@
                 <labelled-item label="[[localize('type')]]">
                   <paper-radio-group-custom
                       selected="{{data.blueprint.display_type}}">
-                    <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-                    <paper-radio-button name="percentage">Percent</paper-radio-button>
-                    <paper-radio-button name="ratio">Ratio</paper-radio-button>
+                    <paper-radio-button name="number">[[localize('quantity')]]</paper-radio-button>
+                    <paper-radio-button name="percentage">[[localize('percent')]]</paper-radio-button>
+                    <paper-radio-button name="ratio">[[localize('ratio')]]</paper-radio-button>
                   </paper-radio-group-custom>
                 </labelled-item>
               </div>
@@ -669,7 +669,7 @@
                   restamp="true">
                   <paper-input
                     class="validate"
-                    label="Label"
+                    label="[[localize('label')]]"
                     on-input="_validate"
                     value="{{data.label}}"
                     always-float-label
@@ -684,7 +684,7 @@
                   <div class="app-grid double">
                     <paper-input
                       class="item validate pair"
-                      label="Numerator Label"
+                      label="[[localize('numerator_label')]]"
                       on-input="_validate"
                       value="{{data.numerator_label}}"
                       always-float-label
@@ -693,7 +693,7 @@
 
                     <paper-input
                       class="item validate pair"
-                      label="Denominator Label"
+                      label="[[localize('denominator_label')]]"
                       on-input="_validate"
                       value="{{data.denominator_label}}"
                       always-float-label
@@ -712,7 +712,7 @@
                     <json-field
                       class="item validate"
                       type="[[data.blueprint.display_type]]"
-                      label="Baseline"
+                      label="[[localize('baseline')]]"
                       on-input="_validate"
                       value="{{data.baseline}}"
                       allowed-pattern="[+\-\d]"
@@ -722,7 +722,7 @@
                     <json-field
                       class="item validate"
                       type="[[data.blueprint.display_type]]"
-                      label="In need (optional)"
+                      label="[[localize('in_need')]]"
                       on-input="_validate"
                       value="{{data.in_need}}"
                       allowed-pattern="[+\-\d]">
@@ -731,7 +731,7 @@
                     <json-field
                       class="item validate"
                       type="[[data.blueprint.display_type]]"
-                      label="Target"
+                      label="[[localize('target')]]"
                       on-input="_validate"
                       value="{{data.target}}"
                       allowed-pattern="[+\-\d]"
@@ -750,7 +750,7 @@
                     <json-field
                       class="item validate pair"
                       type="[[data.blueprint.display_type]]"
-                      label="Baseline"
+                      label="[[localize('baseline')]]"
                       on-input="_validate"
                       value="{{data.baseline}}"
                       allowed-pattern="[+\-\d]"
@@ -760,7 +760,7 @@
                     <json-field
                       class="item validate pair"
                       type="[[data.blueprint.display_type]]"
-                      label="Target"
+                      label="[[localize('target')]]"
                       on-input="_validate"
                       value="{{data.target}}"
                       allowed-pattern="[+\-\d]"
@@ -798,12 +798,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="_close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
