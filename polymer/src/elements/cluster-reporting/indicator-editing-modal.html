@@ -209,7 +209,7 @@
               <etools-single-selection-menu
                   class="item validate"
                   label="[[localize('frequency_of_reporting')]]"
-                  options="[[frequencies]]"
+                  options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
                   option-value="id"
                   option-label="title"
                   selected="{{data.frequency}}"
@@ -492,6 +492,15 @@
         '_setDefaults(opened)',
         '_updateCSDates(data.start_date_of_reporting_period)',
       ],
+
+      _computeLocalizedFrequencies: function (frequencies, localize) {
+        var self = this;
+
+        return frequencies.map(function (frequency) {
+          frequency.title = self._localizeLowerCased(frequency.title, localize);
+          return frequency;
+        });
+      },
 
       _computeIndicatorType: function (data, localize) {
         switch (data.blueprint.display_type) {

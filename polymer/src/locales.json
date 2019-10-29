@@ -1,5 +1,9 @@
 {
   "en": {
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "custom_specific_dates": "Custom specific dates",
     "invalid_method": "Invalid method",
     "edit_indicator": "Edit Indicator",
     "location_admin_level": "Location - administrative level",
@@ -412,6 +416,10 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "custom_specific_dates": "Custom specific dates",
     "invalid_method": "Invalid method",
     "edit_indicator": "Edit Indicator",
     "location_admin_level": "Location - administrative level",
@@ -824,6 +832,10 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "custom_specific_dates": "Custom specific dates",
     "invalid_method": "Invalid method",
     "edit_indicator": "Edit Indicator",
     "location_admin_level": "Location - administrative level",
@@ -1236,6 +1248,10 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "custom_specific_dates": "Custom specific dates",
     "invalid_method": "Invalid method",
     "edit_indicator": "Edit Indicator",
     "location_admin_level": "Location - administrative level",
