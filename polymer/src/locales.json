@@ -1,5 +1,7 @@
 {
   "en": {
+    "activity_details": "Activity Details",
+    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -416,6 +418,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "activity_details": "Activity Details",
+    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -832,6 +836,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "activity_details": "Activity Details",
+    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -1248,6 +1254,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "activity_details": "Activity Details",
+    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
