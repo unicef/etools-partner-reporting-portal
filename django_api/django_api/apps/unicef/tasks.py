@@ -533,7 +533,7 @@ def process_programme_documents(fast=False, area=False):
                                                     )
                                             else:
                                                 pp = PartnerProject.objects.get(
-                                                    external_id="{}/{}".format(area, item['id']),
+                                                    external_id="{}/{}".format(area, pd.id),
                                                     external_source=EXTERNAL_DATA_SOURCES.UNICEF
                                                 )
 
