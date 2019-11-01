@@ -529,7 +529,7 @@ def process_programme_documents(fast=False, area=False):
 
                                                 logger.info(
                                                         "Created a new PartnerProject "
-                                                        "from PD: " + str(item['reference_number'])
+                                                        "from PD: " + str(item['number'])
                                                     )
                                             else:
                                                 pp = PartnerProject.objects.get(
