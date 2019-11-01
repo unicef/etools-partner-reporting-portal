@@ -35,9 +35,7 @@
       },
 
       _localizeModalTitle: function (text, localize) {
-        if (text === 'Add Cluster Objective Indicator') {
-          return localize('add_cluster_objective_indicator');
-        }
+        return localize(text.toLowerCase().split(' ').join('_'));
       },
 
       _toLowerCaseLocalized: function (text, localize) {
