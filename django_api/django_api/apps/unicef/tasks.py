@@ -545,7 +545,6 @@ def process_programme_documents(fast=False, area=False):
                                                         title=cai.blueprint.title,
                                                         partner=pd.partner,
                                                         cluster_activity=cai.content_object,
-                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
                                                     PartnerActivityProjectContext.objects.update_or_create(
@@ -555,6 +554,7 @@ def process_programme_documents(fast=False, area=False):
                                                         },
                                                         start_date=item['start_date'],
                                                         end_date=item['end_date'],
+                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
                                                 except Exception as e:
