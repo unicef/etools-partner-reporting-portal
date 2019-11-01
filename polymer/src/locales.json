@@ -1,5 +1,6 @@
 {
   "en": {
+    "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
@@ -426,6 +427,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
@@ -852,6 +854,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
@@ -1278,6 +1281,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
