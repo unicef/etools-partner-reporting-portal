@@ -1,5 +1,6 @@
 {
   "en": {
+    "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
     "monthly": "Monthly",
@@ -18,6 +19,9 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "partner_projects": "Partner Project(s)",
+    "see_activity": "See activity",
+    "focal_point": "Focal Point",
     "add_cluster_activity_indicator": "Add Cluster Activity Indicator",
     "edit_cluster_activity": "Edit Cluster Activity",
     "edit_activity": "Edit Activity",
@@ -422,6 +426,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
     "monthly": "Monthly",
@@ -440,6 +445,9 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "partner_projects": "Projet(s) du partenaire",
+    "see_activity": "Voir l'activité",
+    "focal_point": "Point focal",
     "add_cluster_activity_indicator": "Ajouter un indicateur d'activité du cluster'",
     "edit_cluster_activity": "Éditer une activité du cluster",
     "edit_activity": "Éditer une activité",
@@ -844,6 +852,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
     "monthly": "Monthly",
@@ -862,6 +871,9 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "partner_projects": "Proyecto(s) socio",
+    "see_activity": "Véase la actividad",
+    "focal_point": "Punto focal",
     "add_cluster_activity_indicator": "Añada el indicador de la actividad del conglomerado",
     "edit_cluster_activity": "Edite la actividad del conglomerado",
     "edit_activity": "Edite la actividad",
@@ -1266,6 +1278,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "links": "Links",
     "activity_details": "Activity Details",
     "weekly": "Weekly",
     "monthly": "Monthly",
@@ -1284,6 +1297,9 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "partner_projects": "Проект(ы) партнера",
+    "see_activity": "Посмотреть мероприятие",
+    "focal_point": "Ответственное лицо",
     "add_cluster_activity_indicator": "Добавить индикатор вид деятельности кластера",
     "edit_cluster_activity": "Редактировать вид деятельности кластера",
     "edit_activity": "Редактировать мероприятие",
