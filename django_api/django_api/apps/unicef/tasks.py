@@ -523,6 +523,8 @@ def process_programme_documents(fast=False, area=False):
                                                     external_source=EXTERNAL_DATA_SOURCES.UNICEF,
                                                     title=item['title'],
                                                     partner=partner,
+                                                    start_date=item['start_date'],
+                                                    end_date=item['end_date'],
                                                 )
 
                                                 logger.info(
