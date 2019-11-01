@@ -1,7 +1,6 @@
 {
   "en": {
     "activity_details": "Activity Details",
-    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -20,6 +19,8 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "edit_cluster_activity": "Edit Cluster Activity",
+    "edit_activity": "Edit Activity",
     "contributing_partners": "Contributing Partners",
     "activity_indicators": "Activity Indicators",
     "locations_plural": "Locations",
@@ -421,7 +422,6 @@
   },
   "fr": {
     "activity_details": "Activity Details",
-    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -440,6 +440,8 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "edit_cluster_activity": "Éditer une activité du cluster",
+    "edit_activity": "Éditer une activité",
     "contributing_partners": "Partenaires contributeurs",
     "activity_indicators": "Indicateurs d'activité",
     "locations_plural": "Sites",
@@ -841,7 +843,6 @@
   },
   "es": {
     "activity_details": "Activity Details",
-    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -860,6 +861,8 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "edit_cluster_activity": "Edite la actividad del conglomerado",
+    "edit_activity": "Edite la actividad",
     "contributing_partners": "Socios contribuyentes",
     "activity_indicators": "Indicadores de actividad",
     "locations_plural": "Ubicaciónes",
@@ -1261,7 +1264,6 @@
   },
   "ru": {
     "activity_details": "Activity Details",
-    "edit_activity": "Edit Activity",
     "weekly": "Weekly",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
@@ -1280,6 +1282,8 @@
     "draft": "Draft",
     "send_back_to_partner": "Send back to partner",
     "view_feedback": "View feedback",
+    "edit_cluster_activity": "Редактировать вид деятельности кластера",
+    "edit_activity": "Редактировать мероприятие",
     "contributing_partners": "Cодействующих партнеров",
     "activity_indicators": "Индикаторы деятельности",
     "locations_plural": "Местоположениея",
