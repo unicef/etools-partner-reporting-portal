@@ -1,5 +1,7 @@
 {
   "en": {
+    "fields_title": "Field's Title",
+    "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
     "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
@@ -429,6 +431,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "fields_title": "Field's Title",
+    "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
     "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
@@ -858,6 +862,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "fields_title": "Field's Title",
+    "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
     "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
@@ -1287,6 +1293,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "fields_title": "Field's Title",
+    "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
     "part_of_a_joint_response_plan": "Part of a Joint Response Plan",
     "links": "Links",
