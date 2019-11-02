@@ -36,6 +36,7 @@
 <link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
@@ -234,7 +235,7 @@
       on-iron-overlay-closed="_close"
       opened="{{ opened }}">
       <div class="header layout horizontal justified">
-        <h2>[[_computeTitle(edit)]]</h2>
+        <h2>[[_computeLocalizedTitle(edit, localize)]]</h2>
         <paper-icon-button
           class="self-center"
           on-tap="_close"
@@ -258,7 +259,7 @@
               restamp="true">
               <etools-single-selection-menu
                 class="item validate full-width"
-                label="Partner"
+                label="[[localize('partner')]]"
                 options="[[partners]]"
                 option-value="id"
                 option-label="title"
@@ -285,7 +286,7 @@
                 <paper-radio-button
                   disabled="[[fromOchaDisabled]]"
                   name="ocha">
-                  <strong>From OCHA</strong>
+                  <strong>[[localize('from_ocha')]]</strong>
                 </paper-radio-button>
               </template>
             </template>
@@ -299,7 +300,7 @@
                 <div>
                   <etools-single-selection-menu
                     class="item validate full-width"
-                    label="Project"
+                    label="[[localize('project')]]"
                     options="[[formattedProjects]]"
                     option-value="id"
                     option-label="title"
@@ -316,7 +317,7 @@
                     restamp="true">
                     <message-box
                       type="warning">
-                      There are no OCHA projects assigned to this partner.
+                      [[localize('there_are_no_ocha_projects')]].
                     </message-box>
                   </template>
 
@@ -340,7 +341,7 @@
                 <paper-radio-button
                   disabled="[[customDisabled]]"
                   name="custom">
-                  <strong>Custom</strong>
+                  <strong>[[localize('custom')]]</strong>
                 </paper-radio-button>
               </template>
             </template>
@@ -352,18 +353,18 @@
                 restamp="true">
                 <div class="item full-width infobox">
                   <span class="item">
-                    <h4>Basic Project details</h4>
+                    <h4>[[localize('basic_project_details')]]</h4>
                   </span>
                   <span class="item justify-right">
                     <div class="red">*</div>
-                    <h4>Fields required</h4>
+                    <h4>[[localize('fields_required')]]</h4>
                   </span>
                 </div>
                 <div class="app-grid">
                   <paper-input
                     class="item validate full-width"
                     id="title"
-                    label="Title *"
+                    label="[[localize('title')]] *"
                     value="{{ data.title }}"
                     type="string"
                     required
@@ -373,7 +374,7 @@
                   <div class="item full-width">
                     <etools-multi-selection-menu
                       class="validate"
-                      label="Clusters *"
+                      label="[[localize('clusters')]] *"
                       options="[[formattedClusters]]"
                       selected-values="{{ selectedClusters }}"
                       on-selected-values-changed="_validate"
@@ -385,7 +386,7 @@
                   <div class="item">
                     <etools-prp-date-input
                       class="start-date"
-                      label="Start date *"
+                      label="[[localize('start_date')]] *"
                       value="{{ data.start_date }}"
                       error-message=""
                       required
@@ -396,7 +397,7 @@
                   <div class="item">
                     <etools-prp-date-input
                       class="end-date"
-                      label="End date *"
+                      label="[[localize('end_date')]] *"
                       value="{{ data.end_date }}"
                       error-message=""
                       required
@@ -406,7 +407,7 @@
                   <div class="row">
                     <paper-dropdown-menu
                       class="item validate"
-                      label="Status *"
+                      label="[[localize('status')]] *"
                       on-value-changed="_validate"
                       always-float-label
                       required>
@@ -434,7 +435,7 @@
                   <paper-input
                     class="item validate full-width"
                     id="description"
-                    label="Description *"
+                    label="[[localize('description')]] *"
                     value="{{ data.description }}"
                     type="string"
                     required
@@ -444,7 +445,7 @@
                   <paper-input
                     class="item validate"
                     id="total_budget"
-                    label="Total Budget"
+                    label="[[localize('total_budget')]]"
                     value="{{ data.total_budget }}"
                     type="number"
                     allowed-pattern="[+\-\d.]"
@@ -455,7 +456,7 @@
                   <paper-input
                     class="item validate full-width"
                     id="funding_source"
-                    label="Funding Source"
+                    label="[[localize('funding_source')]]"
                     value="{{ data.funding_source }}"
                     type="string"
                     on-input="_validate">
@@ -464,7 +465,7 @@
                   <paper-input
                     class="item validate full-width"
                     id="additional_information"
-                    label="Additional information (e.g. links)"
+                    label="[[localize('additional_information')]]"
                     value="{{ data.additional_information }}"
                     type="string"
                     on-input="_validate">
@@ -472,11 +473,11 @@
 
                   <div class="details-section item full-width">
                     <div class="layout horizontal center justified">
-                      <span class="details-text">Want to add more details to the Project info?</span>
+                      <span class="details-text">[[localize('want_to_add')]]</span>
                       <paper-button
                         class="btn-primary"
                         on-tap="_handleDetailsChange">
-                        [[_computeDetailsButtonMsg(detailsOpened)]]
+                        [[_computeLocalizedDetailsButtonMsg(detailsOpened, localize)]]
                         <div id="detailsIcon">
                           <iron-icon
                             icon="expand-more"
@@ -496,7 +497,7 @@
                         <paper-input
                           id="agencyAcronyms"
                           class="item validate"
-                          label="Name of Funding Agency (acronyms)"
+                          label="[[localize('name_of_funding_agency')]]"
                           value="{{ data.agency_name }}"
                           type="string"
                           on-input="_validate"
@@ -505,7 +506,7 @@
 
                         <etools-single-selection-menu
                           class="item validate"
-                          label="Type of Agency"
+                          label="[[localize('type_of_agency')]]"
                           options="[[agencyTypes]]"
                           option-value="title"
                           option-label="title"
@@ -518,7 +519,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="additional_implementing_partners"
-                          label="Additional implementing partners"
+                          label="[[localize('additional_implementing_partners')]]"
                           value="{{ data.additional_partners }}"
                           type="string"
                           on-input="_validate"
@@ -526,19 +527,19 @@
                         </paper-input>
 
                         <div class="full-width">
-                          <labelled-item label="Is this project part of a HRP or FA?">
+                          <labelled-item label="[[localize('is_this_project_hrp_fa')]]">
                             <paper-radio-group
                               selected="{{ data.part }}">
                               <paper-radio-button name="hrp">HRP</paper-radio-button>
                               <paper-radio-button name="fa">FA</paper-radio-button>
-                              <paper-radio-button name="no">No</paper-radio-button>
+                              <paper-radio-button name="no">[[localize('no')]]</paper-radio-button>
                             </paper-radio-group>
                           </labelled-item>
                         </div>
 
                         <etools-single-selection-menu
                           class="item validate"
-                          label="Prioritization Classification"
+                          label="[[localize('prioritization_classification')]]"
                           options="[[classifications]]"
                           option-value="title"
                           option-label="title"
@@ -551,7 +552,7 @@
                         <paper-input
                           class="item validate"
                           id="project_code"
-                          label="Project code in HRP"
+                          label="[[localize('project_code_hrp')]]"
                           value="{{ data.code }}"
                           type="string"
                           on-input="_validate"
@@ -561,7 +562,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="funding_requirements"
-                          label="Funding Requirements (US$)"
+                          label="[[localize('funding_requirements')]]"
                           value="{{ data.funding.required_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -573,7 +574,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="own_funding"
-                          label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
+                          label="[[localize('funding_received_confirmed_own_agency')]]"
                           value="{{ data.funding.internal_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -585,7 +586,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="cerf_funding"
-                          label="Funding received / confirmed from CERF (US$)"
+                          label="[[localize('funding_received_confirmed_cerf')]]"
                           value="{{ data.funding.cerf_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -597,7 +598,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="cbpf_funding"
-                          label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)"
+                          label="[[localize('funding_received_confirmed_cbpf')]]"
                           value="{{ data.funding.cbpf_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -609,7 +610,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="bilateral_funding"
-                          label="Funding received / confirmed from bilateral agreeements, not including UNICEF/WFP (US$)"
+                          label="[[localize('funding_received_confirmed_bilateral')]]"
                           value="{{ data.funding.bilateral_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -621,7 +622,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="unicef_funding"
-                          label="Funding received / confirmed from UNICEF including supplies cost (US$)"
+                          label="[[localize('funding_received_confirmed_unicef')]]"
                           value="{{ data.funding.unicef_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -633,7 +634,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="wfp_funding"
-                          label="Funding received / confirmed from WFP including supplies cost (US$)"
+                          label="[[localize('funding_received_confirmed_wfp')]]"
                           value="{{ data.funding.wfp_funding }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -645,7 +646,7 @@
                         <paper-input
                           class="item validate full-width"
                           id="funding_gap"
-                          label="Funding gap (US$)"
+                          label="[[localize('funding_gap')]]"
                           value="{{ data.funding.funding_gap }}"
                           type="number"
                           allowed-pattern="[+\-\d.]"
@@ -667,11 +668,11 @@
 
               <div class="buttons layout horizontal-reverse">
                 <paper-button class="btn-primary" on-tap="_save" raised>
-                  Save
+                  [[localize('save')]]
                 </paper-button>
 
                 <paper-button on-tap="_close">
-                  Cancel
+                  [[localize('cancel')]]
                 </paper-button>
               </div>
 
@@ -698,6 +699,8 @@
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -995,8 +998,8 @@
         this.detailsOpened = !this.detailsOpened;
       },
 
-      _computeTitle: function (edit) {
-        return (edit ? 'Edit' : 'Add') + ' Project';
+      _computeLocalizedTitle: function (edit, localize) {
+        return edit ? localize('edit_project') : localize('add_project');
       },
 
       _computeAjaxMethod: function (edit) {
@@ -1010,11 +1013,11 @@
           }).map(function(item) {return item.cluster.id;}) : [];
       },
 
-      _computeDetailsButtonMsg: function (detailsOpened) {
+      _computeLocalizedDetailsButtonMsg: function (detailsOpened, localize) {
         if (detailsOpened) {
-          return 'show less funding details';
+          return localize('show_less_funding_details');
         }
-        return 'show more funding details';
+        return localize('show_more_funding_details');
       },
 
       _resetOchaProjects: function (partner) {
