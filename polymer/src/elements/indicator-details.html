@@ -341,7 +341,7 @@
                                 is="dom-if"
                                 if="[[_equals(location.display_type, 'number')]]"
                                 restamp="true">
-                              <dt>[[localize('location_progress_against')]] [[location.reporting_entity.title]]:</dt>
+                              <dt>[[localize('location_progress_against')]] [[_localizeLowerCased(location.reporting_entity.title, localize)]]:</dt>
                               <dd>
                                 <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
                               </dd>
