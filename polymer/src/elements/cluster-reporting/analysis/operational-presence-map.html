@@ -3,6 +3,7 @@
 
 <link rel="import" href="../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="analysis-widget.html">
 
@@ -54,7 +55,7 @@
     </style>
 
     <analysis-widget
-        widget-title="Operational Presence Map"
+        widget-title="[[localize('operational_presence_map')]]"
         loading="[[loading]]">
       <template
           is="dom-if"
@@ -130,7 +131,7 @@
       </template>
 
       <div class="legend">
-        <h4>Number of partners:</h4>
+        <h4>[[localize('number_of_partners')]]:</h4>
         <ol>
           <template
               is="dom-repeat"
@@ -153,6 +154,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

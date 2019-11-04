@@ -5,6 +5,7 @@
 <link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
 a
@@ -22,7 +23,7 @@ a
     </style>
 
     <analysis-widget
-        widget-title="[[widgetTitle]]"
+        widget-title="[[_localizeLowerCased(widgetTitle, localize)]]"
         loading="[[loading]]">
       <div hidden$="[[!rows.length]]">
         <google-chart
@@ -48,6 +49,8 @@ a
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.AnalysisChart,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

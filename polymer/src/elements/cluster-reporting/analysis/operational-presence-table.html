@@ -4,6 +4,7 @@
 
 <link rel="import" href="analysis-widget.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../list-placeholder.html">
@@ -38,7 +39,7 @@ a
     </style>
 
     <analysis-widget
-        widget-title="Operational Presence Table"
+        widget-title="[[localize('operational_presence_table')]]"
         loading="[[loading]]">
 
       <div class="table-container">
@@ -46,7 +47,7 @@ a
             no-title
             no-collapse>
           <etools-data-table-column field="">
-            <div class="table-column">Location</div>
+            <div class="table-column">[[localize('location')]]</div>
           </etools-data-table-column>
 
           <template
@@ -110,6 +111,8 @@ a
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
