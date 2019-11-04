@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="status-badge.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../behaviors/localize.html">
 
 <dom-module id="project-status">
   <template>
@@ -13,7 +15,7 @@
         top: -2px;
       }
     </style>
-    <status-badge type="[[type]]" hide-icon></status-badge> [[label]]
+    <status-badge type="[[type]]" hide-icon></status-badge> [[_localizeLowerCased(label, localize)]]
   </template>
 
   <script>
@@ -33,6 +35,13 @@
           computed: '_computeLabel(status)',
         },
       },
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       _computeType: function(status) {
         switch (status) {
