@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../../redux/store.html">
 
@@ -13,7 +14,7 @@
     </style>
 
     <dropdown-filter
-      label="Indicator Type"
+      label="[[localize('indicator_type')]]"
       name="indicator_type"
       value="[[_withDefault(value, '')]]"
       data="[[data]]">
@@ -21,20 +22,14 @@
   </template>
 
   <script>
-    var options = [
-      {title: 'All', id: ''},
-      {title: 'Partner Activity', id: 'partner_activity'},
-      {title: 'Partner Project', id: 'partner_project'},
-      {title: 'Cluster Objective', id: 'cluster_objective'},
-      {title: 'Cluster Activity', id: 'cluster_activity'},
-    ];
-
     Polymer({
       is: 'cluster-indicator-type-filter',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -48,15 +43,32 @@
           statePath: 'userProfile.profile.prp_roles'
         },
 
+        options: {
+          type: Array,
+          computed: '_computeLocalizedOptions(localize)'
+        },
+
         data: {
           type: Array,
-          computed: '_computeData(isPartner)',
+          computed: '_computeData(isPartner, options)',
         },
 
         value: String,
       },
 
-      _computeData: function (isPartner) {
+      _computeLocalizedOptions: function (localize) {
+        var options = [
+          {title: localize('all'), id: ''},
+          {title: localize('partner_activity'), id: 'partner_activity'},
+          {title: localize('partner_project'), id: 'partner_project'},
+          {title: localize('cluster_objective'), id: 'cluster_objective'},
+          {title: localize('cluster_activity'), id: 'cluster_activity'},
+        ];
+
+        return options;
+      },
+
+      _computeData: function (isPartner, options) {
         if (isPartner) {
           return options.filter(function (option) {
             return option.id !== 'cluster_objective';
