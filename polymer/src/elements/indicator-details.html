@@ -315,7 +315,7 @@
                           is="dom-repeat"
                           items="[[topLevelLocation.byEntity]]"
                           as="location">
-                        <paper-tab>[[location.reporting_entity.title]]</paper-tab>
+                        <paper-tab>[[_localizeLowerCased(location.reporting_entity.title, localize)]]</paper-tab>
                       </template>
                     </paper-tabs>
                   </div>
