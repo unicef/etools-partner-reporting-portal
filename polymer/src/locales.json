@@ -1,5 +1,7 @@
 {
   "en": {
+    "add_new_project_activity": "Add New Project Activity",
+    "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
     "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
@@ -432,6 +434,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "add_new_project_activity": "Add New Project Activity",
+    "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
     "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
@@ -864,6 +868,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "add_new_project_activity": "Add New Project Activity",
+    "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
     "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
@@ -1296,6 +1302,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "add_new_project_activity": "Add New Project Activity",
+    "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
     "fields_value": "Field's Value",
     "there_are_no_ocha_projects": "There are no OCHA projects assigned to this partner",
