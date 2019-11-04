@@ -7,6 +7,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
+<link rel="import" href="../../../behaviors/localize.html">
 
 <dom-module id="cluster-objective-filter-multi">
   <template>
@@ -32,7 +33,7 @@
     </etools-prp-ajax>
 
     <dropdown-filter-multi
-        label="Cluster Objective"
+        label="[[localize('cluster_objective')]]"
         name="cluster_objectives"
         value="[[value]]"
         data="[[data]]"
@@ -47,6 +48,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.FilterDependenciesBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
