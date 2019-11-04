@@ -7,6 +7,7 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../etools-prp-number.html">
 <link rel="import" href="../../frequency-of-reporting.html">
@@ -101,11 +102,11 @@
       <div class="header layout horizontal justified">
         <div class="col flex-none">
           <dl class="indicator-data layout horizontal">
-            <dt>Indicator Type:</dt>
+            <dt>[[localize('indicator_type')]]:</dt>
             <dd>[[data.indicator_type]]</dd>
           </dl>
           <dl class="indicator-data layout horizontal">
-            <dt>Reporting Frequency:</dt>
+            <dt>[[localize('reporting_frequency')]]:</dt>
             <dd>
               <frequency-of-reporting
                   type="[[data.frequency]]">
@@ -113,14 +114,14 @@
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
-            <dt># of Partners Reporting:</dt>
+            <dt>[[localize('number_of_partners_reporting')]]:</dt>
             <dd>[[data.num_of_partners]]</dd>
           </dl>
         </div>
 
         <div class="col flex layout self-center">
           <dl class="indicator-data layout horizontal end-justified">
-            <dt>Reached:</dt>
+            <dt>[[localize('reached')]]:</dt>
             <dd>
               <strong>
                 <template
@@ -142,7 +143,7 @@
 
         <div class="col flex-none">
           <dl class="indicator-data layout horizontal">
-            <dt>Baseline:</dt>
+            <dt>[[localize('baseline')]]:</dt>
             <dd>
               <template
                   is="dom-if"
@@ -159,7 +160,7 @@
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
-            <dt>Target:</dt>
+            <dt>[[localize('target')]]:</dt>
             <dd>
               <template
                   is="dom-if"
@@ -176,7 +177,7 @@
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
-            <dt>In need:</dt>
+            <dt>[[localize('in_need_simple')]]:</dt>
             <dd>
               <template
                   is="dom-if"
@@ -248,6 +249,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
