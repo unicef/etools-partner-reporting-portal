@@ -1,5 +1,6 @@
 {
   "en": {
+    "partner_activity_project_context": "Partner Activity (w/Project Context)",
     "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
@@ -438,6 +439,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "partner_activity_project_context": "Partner Activity (w/Project Context)",
     "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
@@ -876,6 +878,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "partner_activity_project_context": "Partner Activity (w/Project Context)",
     "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
@@ -1314,6 +1317,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "partner_activity_project_context": "Partner Activity (w/Project Context)",
     "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
