@@ -1,5 +1,6 @@
 {
   "en": {
+    "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
@@ -436,6 +437,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
@@ -872,6 +874,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
@@ -1308,6 +1311,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "progress_against_cluster_target": "Progress against Cluster target",
     "add_new_project_activity": "Add New Project Activity",
     "add_existing_project_activity": "Add Existing Project Activity",
     "fields_title": "Field's Title",
