@@ -5,6 +5,7 @@
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../ip-reporting/partner-details.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
 
@@ -38,17 +39,17 @@
       }
     </style>
 
-    <etools-content-panel panel-title="Activity Details">
+    <etools-content-panel panel-title="[[localize('activity_details')]]">
         <div class="row">
           <ul class="app-grid">
             <li class="item full-width">
-              <labelled-item label="Title">
+              <labelled-item label="[[localize('title')]]">
                 <span class="value">[[activityData.title]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Cluster">
+              <labelled-item label="[[localize('cluster')]]">
                 <span class="value">[[activityData.cluster.name]]</span>
               </labelled-item>
             </li>
@@ -57,7 +58,7 @@
               is="dom-if"
               if="[[activityData.cluster_activity]]">
               <li class="item">
-                <labelled-item label="Cluster Activity">
+                <labelled-item label="[[localize('cluster_activity')]]">
                   <span class="value">[[activityData.cluster_activity.title]]</span>
                 </labelled-item>
               </li>
@@ -67,7 +68,7 @@
               is="dom-if"
               if="[[!activityData.cluster_activity]]">
               <li class="item">
-                <labelled-item label="Cluster Activity">
+                <labelled-item label="[[localize('cluster_activity')]]">
                   <span class="value">---</span>
                 </labelled-item>
               </li>
@@ -77,14 +78,14 @@
               is="dom-if"
               if="[[activityData.cluster_objective]]">
               <li class="item">
-                <labelled-item label="Cluster Objective">
+                <labelled-item label="[[localize('cluster_objective')]]">
                   <span class="value">[[activityData.cluster_objective.title]]</span>
                 </labelled-item>
               </li>
             </template>
 
             <li class="item">
-              <labelled-item label="Partner">
+              <labelled-item label="[[localize('partner')]]">
                 <span class="value">[[activityData.partner.title]]</span>
               </labelled-item>
             </li>
@@ -95,17 +96,17 @@
 
               <div>
                 <li class="item">
-                  <labelled-item label="Partner Project">
+                  <labelled-item label="[[localize('partner_project')]]">
                     <span class="value">[[item.project_name]]</span>
                   </labelled-item>
                 </li>
                 <li class="item">
-                  <labelled-item label="Start Date">
+                  <labelled-item label="[[localize('start_date')]]">
                     <span class="value">[[item.start_date]]</span>
                   </labelled-item>
                 </li>
                 <li class="item">
-                  <labelled-item label="End Date">
+                  <labelled-item label="[[localize('end_date')]]">
                     <span class="value">[[item.end_date]]</span>
                   </labelled-item>
                 </li>
@@ -124,6 +125,9 @@
 
     behaviors: [
       App.Behaviors.UtilsBehavior,
+      App.Behaviors.ReduxBehavior,
+      App.Behaviors.LocalizeBehavior,
+      Polymer.AppLocalizeBehavior,
     ],
 
     properties: {
