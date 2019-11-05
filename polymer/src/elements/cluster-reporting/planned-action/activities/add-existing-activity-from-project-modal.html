@@ -21,6 +21,7 @@
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
@@ -164,7 +165,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Existing Project Activity</h2>
+        <h2>[[localize('add_existing_project_activity')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -180,7 +181,7 @@
           <div class="item">
             <paper-dropdown-menu
                 class="validate"
-                label="Cluster"
+                label="[[localize('cluster')]]"
                 on-value-changed="_validate"
                 always-float-label
                 required>
@@ -200,7 +201,7 @@
           <div class="item">
             <etools-single-selection-menu
                 class="validate"
-                label="Partner Activity"
+                label="[[localize('partner_activity')]]"
                 options="[[partnerActivities]]"
                 option-value="id"
                 option-label="title"
@@ -213,7 +214,7 @@
           </div>
 
           <header class="item-wide">
-            <h3>Projects ([[data.projects.length]])</h3>
+            <h3>[[localize('projects')]] ([[data.projects.length]])</h3>
           </header>
 
           <template
@@ -227,7 +228,7 @@
                     <etools-single-selection-menu
                         disabled
                         class="validate"
-                        label="Partner Project"
+                        label="[[localize('partner_project')]]"
                         options="[[data.projects]]"
                         option-value="project_id"
                         option-label="title"
@@ -243,7 +244,7 @@
                     <paper-dropdown-menu
                         disabled
                         class="validate"
-                        label="Status"
+                        label="[[localize('status')]]"
                         on-value-changed="_validate"
                         always-float-label
                         required>
@@ -264,7 +265,7 @@
                   <div class="item">
                     <etools-prp-date-input
                         class="start-date"
-                        label="Start date"
+                        label="[[localize('start_date')]]"
                         value="{{item.start_date}}"
                         error-message=""
                         required
@@ -276,7 +277,7 @@
                   <div class="item">
                     <etools-prp-date-input
                         class="end-date"
-                        label="End date"
+                        label="[[localize('end_date')]]"
                         value="{{item.end_date}}"
                         error-message=""
                         required
@@ -295,12 +296,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Add activity
+          [[localize('add_activity')]]
         </paper-button>
 
         <paper-button
             on-tap="_close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -316,6 +317,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -359,11 +362,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         locationId: {
@@ -423,6 +422,14 @@
         '_fetchPartnerActivities(data.cluster)',
         '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
       ],
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
 
       _setDefaults: function () {
         var simpleProjectData = {};
