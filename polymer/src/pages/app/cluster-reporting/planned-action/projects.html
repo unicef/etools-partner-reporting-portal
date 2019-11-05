@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/filters.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
@@ -53,7 +54,7 @@
           restamp="true">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Project
+            [[localize('add_project')]]
           </paper-button>
         </div>
       </template>
@@ -81,6 +82,8 @@
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.SortingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
