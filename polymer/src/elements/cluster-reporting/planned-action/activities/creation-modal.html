@@ -589,11 +589,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         locationId: {
@@ -673,6 +669,14 @@
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
 
       _add: function () {
         if (this.mode === 'cluster') {
