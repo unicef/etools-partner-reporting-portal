@@ -87,7 +87,7 @@ class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProject
 
 
 class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
-    projects = PartnerActivityProjectContextSerializer(many=True)
+    projects = PartnerActivityProjectContextSerializer(source="partneractivityprojectcontext_set", many=True)
 
     class Meta:
         model = PartnerActivity

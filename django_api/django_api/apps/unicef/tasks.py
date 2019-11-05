@@ -523,15 +523,17 @@ def process_programme_documents(fast=False, area=False):
                                                     external_source=EXTERNAL_DATA_SOURCES.UNICEF,
                                                     title=item['title'],
                                                     partner=partner,
+                                                    start_date=item['start_date'],
+                                                    end_date=item['end_date'],
                                                 )
 
                                                 logger.info(
                                                         "Created a new PartnerProject "
-                                                        "from PD: " + str(item['reference_number'])
+                                                        "from PD: " + str(item['number'])
                                                     )
                                             else:
                                                 pp = PartnerProject.objects.get(
-                                                    external_id="{}/{}".format(area, item['id']),
+                                                    external_id="{}/{}".format(area, pd.id),
                                                     external_source=EXTERNAL_DATA_SOURCES.UNICEF
                                                 )
 
@@ -543,7 +545,6 @@ def process_programme_documents(fast=False, area=False):
                                                         title=cai.blueprint.title,
                                                         partner=pd.partner,
                                                         cluster_activity=cai.content_object,
-                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
                                                     PartnerActivityProjectContext.objects.update_or_create(
@@ -553,6 +554,7 @@ def process_programme_documents(fast=False, area=False):
                                                         },
                                                         start_date=item['start_date'],
                                                         end_date=item['end_date'],
+                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
                                                     )
 
                                                 except Exception as e:
