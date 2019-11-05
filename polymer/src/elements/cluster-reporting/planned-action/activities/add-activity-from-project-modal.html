@@ -21,6 +21,7 @@
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
@@ -175,7 +176,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add New Project Activity</h2>
+        <h2>[[localize('add_new_project_activity')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -191,7 +192,7 @@
             id="mode"
             selected="{{mode}}">
           <paper-radio-button name="cluster">
-            <strong>Add from Cluster Activities</strong>
+            <strong>[[localize('add_from_cluster_activities')]]</strong>
           </paper-radio-button>
           <div
               class="fields"
@@ -204,7 +205,7 @@
                 <div class="item">
                   <paper-dropdown-menu
                       class="validate"
-                      label="Cluster"
+                      label="[[localize('cluster')]]"
                       on-value-changed="_validate"
                       always-float-label
                       required>
@@ -225,7 +226,7 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Activity"
+                      label="[[localize('activity')]]"
                       options="[[activities]]"
                       option-value="id"
                       option-label="title"
@@ -240,7 +241,7 @@
               </div>
 
               <header class="item-wide">
-                <h3>Projects ([[data.cluster.projects.length]])</h3>
+                <h3>[[localize('projects')]] ([[data.cluster.projects.length]])</h3>
               </header>
 
               <template
@@ -254,7 +255,7 @@
                         <etools-single-selection-menu
                             disabled
                             class="validate"
-                            label="Partner Project"
+                            label="[[localize('partner_project')]]"
                             options="[[data.cluster.projects]]"
                             option-value="project_id"
                             option-label="title"
@@ -271,7 +272,7 @@
                         <paper-dropdown-menu
                             disabled
                             class="validate"
-                            label="Status"
+                            label="[[localize('status')]]"
                             on-value-changed="_validate"
                             always-float-label
                             required>
@@ -293,7 +294,7 @@
                         <etools-prp-date-input
                             disabled
                             class="start-date"
-                            label="Start date"
+                            label="[[localize('start_date')]]"
                             value="{{item.start_date}}"
                             error-message=""
                             required
@@ -306,7 +307,7 @@
                         <etools-prp-date-input
                             disabled
                             class="end-date"
-                            label="End date"
+                            label="[[localize('end_date')]]"
                             value="{{item.end_date}}"
                             error-message=""
                             required
@@ -321,7 +322,7 @@
           </div>
 
           <paper-radio-button name="custom">
-            <strong>Add Custom Activity</strong>
+            <strong>[[localize('add_custom_activity')]]</strong>
           </paper-radio-button>
 
           <div
@@ -335,7 +336,7 @@
                 <div class="item">
                   <paper-dropdown-menu
                       class="validate"
-                      label="Cluster"
+                      label="[[localize('cluster')]]"
                       on-value-changed="_validate"
                       always-float-label
                       required>
@@ -355,7 +356,7 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Cluster Objective"
+                      label="[[localize('cluster_objective')]]"
                       options="[[objectives]]"
                       option-value="id"
                       option-label="title"
@@ -369,7 +370,7 @@
                 <div class="item item-wide">
                   <paper-input
                       class="validate"
-                      label="Title"
+                      label="[[localize('title')]]"
                       value="{{data.custom.title}}"
                       on-input="_validate"
                       always-float-label
@@ -378,7 +379,7 @@
                 </div>
 
                 <header class="item-wide">
-                  <h3>Projects ([[data.custom.projects.length]])</h3>
+                  <h3>[[localize('projects')]] ([[data.custom.projects.length]])</h3>
                 </header>
 
                 <template
@@ -392,7 +393,7 @@
                           <etools-single-selection-menu
                               disabled
                               class="validate"
-                              label="Partner Project"
+                              label="[[localize('partner_project')]]"
                               options="[[data.custom.projects]]"
                               option-value="project_id"
                               option-label="title"
@@ -409,7 +410,7 @@
                           <paper-dropdown-menu
                               disabled
                               class="validate"
-                              label="Status"
+                              label="[[localize('status')]]"
                               on-value-changed="_validate"
                               always-float-label
                               required>
@@ -430,7 +431,7 @@
                         <div class="item">
                           <etools-prp-date-input
                               class="start-date"
-                              label="Start date"
+                              label="[[localize('start_date')]]"
                               value="{{item.start_date}}"
                               error-message=""
                               required
@@ -442,7 +443,7 @@
                         <div class="item">
                           <etools-prp-date-input
                               class="end-date"
-                              label="End date"
+                              label="[[localize('end_date')]]"
                               value="{{item.end_date}}"
                               error-message=""
                               required
@@ -464,12 +465,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Add activity
+          [[localize('add_activity')]]
         </paper-button>
 
         <paper-button
             on-tap="_close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -485,6 +486,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -535,11 +538,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         locationId: {
@@ -600,6 +599,14 @@
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
 
       _add: function () {
         if (this.mode === 'cluster') {
