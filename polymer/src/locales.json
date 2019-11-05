@@ -1,5 +1,7 @@
 {
   "en": {
+    "civil_society_organization": "Civil Society Organization",
+    "government": "Government",
     "location_admin_level": "Location - Admin level",
     "location_settings_for_indicator": "Location settings for indicator",
     "list_of_my_project_activities": "List of My Project Activities",
@@ -457,6 +459,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "civil_society_organization": "Civil Society Organization",
+    "government": "Government",
     "location_admin_level": "Location - Admin level",
     "location_settings_for_indicator": "Location settings for indicator",
     "list_of_my_project_activities": "List of My Project Activities",
@@ -914,6 +918,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "civil_society_organization": "Civil Society Organization",
+    "government": "Government",
     "location_admin_level": "Location - Admin level",
     "location_settings_for_indicator": "Location settings for indicator",
     "list_of_my_project_activities": "List of My Project Activities",
@@ -1371,6 +1377,8 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "civil_society_organization": "Civil Society Organization",
+    "government": "Government",
     "location_admin_level": "Location - Admin level",
     "location_settings_for_indicator": "Location settings for indicator",
     "list_of_my_project_activities": "List of My Project Activities",
