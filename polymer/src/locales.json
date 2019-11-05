@@ -1,5 +1,6 @@
 {
   "en": {
+    "list_of_my_project_activities": "List of My Project Activities",
     "high": "High",
     "medium": "Medium",
     "low": "Low",
@@ -454,6 +455,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "fr": {
+    "list_of_my_project_activities": "List of My Project Activities",
     "high": "High",
     "medium": "Medium",
     "low": "Low",
@@ -908,6 +910,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "es": {
+    "list_of_my_project_activities": "List of My Project Activities",
     "high": "High",
     "medium": "Medium",
     "low": "Low",
@@ -1362,6 +1365,7 @@
     "you_are_about_to_location": "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
   },
   "ru": {
+    "list_of_my_project_activities": "List of My Project Activities",
     "high": "High",
     "medium": "Medium",
     "low": "Low",
