@@ -803,11 +803,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         frequencies: {
@@ -845,23 +841,12 @@
 
         agencyTypes: {
           type: Array,
-          value: [
-            {title: 'UN Agency', id: 'UN Agency'},
-            {title: 'Government Organisation', id: 'Government Organisation'},
-            {title: 'International NGO', id: 'International NGO'},
-            {title: 'National NGO', id: 'National NGO'},
-            {title: 'Community based organisation', id: 'Community based organisation'},
-            {title: 'Other', id: 'Other'},
-          ],
+          computed: '_computeLocalizedAgencyTypes(localize)'
         },
 
         classifications: {
           type: Array,
-          value: [
-            {title: 'High', id: 'High'},
-            {title: 'Medium', id: 'Medium'},
-            {title: 'Low', id: 'Low'},
-          ]
+          computed: '_computeLocalizedClassifications(localize)'
         },
 
         selectedClusters: {
@@ -905,6 +890,33 @@
         '_updatePartnerForClusters(selectedPartner.id)',
         '_updatePartnerForClusters(partnerID)',
       ],
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
+
+      _computeLocalizedAgencyTypes: function (localize) {
+        return [
+          {title: localize('un_agency'), id: 'UN Agency'},
+          {title: localize('government_organization'), id: 'Government Organisation'},
+          {title: localize('international_ngo'), id: 'International NGO'},
+          {title: localize('national_ngo'), id: 'National NGO'},
+          {title: localize('community_based_organization'), id: 'Community based organisation'},
+          {title: localize('other'), id: 'Other'},
+        ];
+      },
+
+      _computeLocalizedClassifications: function (localize) {
+        return [
+          {title: localize('high'), id: 'High'},
+          {title: localize('medium'), id: 'Medium'},
+          {title: localize('low'), id: 'Low'},
+        ];
+      },
 
       _computeFromOchaDisabled: function (partner, selectedPartner) {
         return (!partner || !partner.ocha_external_id) &&
