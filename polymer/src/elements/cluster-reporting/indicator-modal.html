@@ -1115,7 +1115,7 @@
 
         if (this.mode === 'objectives') {
           this.set('data', {
-            partner_id: this.projectData.partner_id || this.partnerID,
+            partner_id: this.projectData ? this.projectData.partner_id : this.partnerID,
             partner_project_id: '',
             cluster_id: '',
             cluster_objective_id: '',
