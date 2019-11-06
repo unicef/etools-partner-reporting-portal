@@ -14,7 +14,7 @@ class PartnerAdmin(admin.ModelAdmin):
                     'external_id', 'ocha_external_id')
     list_filter = ('partner_type', 'country_code')
     search_fields = ('title', 'short_title', 'alternate_title', 'country_code')
-    raw_id_fields = ['clusters',]
+    raw_id_fields = ['clusters', ]
 
 
 class PartnerActivityProjectContextInline(admin.StackedInline):

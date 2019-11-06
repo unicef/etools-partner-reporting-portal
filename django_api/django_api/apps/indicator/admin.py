@@ -78,7 +78,7 @@ class DisaggregationValueAdmin(admin.ModelAdmin):
     list_display = ('disaggregation', 'value', 'external_id')
     # list_filter = ('disaggregation',)
     search_fields = ('value', 'disaggregation__name')
-    raw_id_fields = ['disaggregation',]
+    raw_id_fields = ['disaggregation', ]
 
 
 class ReportingEntityAdmin(admin.ModelAdmin):
