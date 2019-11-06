@@ -38,6 +38,10 @@
         return localize(text).toLowerCase();
       },
 
+      _localizeLowerCased: function (text, localize) {
+        return localize(text.split(' ').join('_').toLowerCase());
+      },
+
       _singularLocalized: function (text, localize) {
         return localize(text).substring(0, text.length - 1);
       },

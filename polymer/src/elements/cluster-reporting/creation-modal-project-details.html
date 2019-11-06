@@ -3,6 +3,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../ip-reporting/partner-details.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
@@ -42,53 +43,53 @@
         <div class="row">
           <ul class="app-grid">
             <li class="item full-width">
-              <labelled-item label="Title">
+              <labelled-item label="[[localize('title')]]">
                 <span class="value">[[projectData.name]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Clusters">
+              <labelled-item label="[[localize('clusters')]]">
                 <span class="value">[[_commaSeparatedValues(projectData.clusters)]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Start Date">
+              <labelled-item label="[[localize('start_date')]]">
                 <span class="value">[[projectData.startDate]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="End Date">
+              <labelled-item label="[[localize('end_date')]]">
                 <span class="value">[[projectData.endDate]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Total Budget">
+              <labelled-item label="[[localize('total_budget')]]">
                 <span class="value">
                   <etools-prp-number value="[[projectData.totalBudgetUSD]]"></etools-prp-number>
                 </span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Funding Source">
+              <labelled-item label="[[localize('funding_source')]]">
                 <span class="value">[[projectData.fundingSources]]</span>
                 </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Description">
+              <labelled-item label="[[localize('description')]]">
                 <span class="value">[[projectData.objective]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Additional Information (e.g. links)">
+              <labelled-item label="[[localize('additional_information')]]">
                 [[_withDefault(projectData.additional_information)]]
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Indicators">
+              <labelled-item label="[[localize('indicators')]]">
                 <ul class="indicators-list">
                   <template
                     is="dom-repeat"
@@ -110,6 +111,9 @@
 
     behaviors: [
       App.Behaviors.UtilsBehavior,
+      App.Behaviors.ReduxBehavior,
+      App.Behaviors.LocalizeBehavior,
+      Polymer.AppLocalizeBehavior,
     ],
 
     properties: {

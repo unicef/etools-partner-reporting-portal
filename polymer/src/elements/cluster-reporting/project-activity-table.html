@@ -12,6 +12,7 @@
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
@@ -57,18 +58,18 @@
       <etools-content-panel no-header>
         <etools-data-table-header
             no-collapse
-            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
           <etools-data-table-column field="cluster">
-            <div class="table-column">Cluster</div>
+            <div class="table-column">[[localize('cluster')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="status">
-            <div class="table-column">Status</div>
+            <div class="table-column">[[localize('status')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="project">
-            <div class="table-column">Project Activity</div>
+            <div class="table-column">[[localize('project_activity')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
-            <div class="table-column">Cluster Activity</div>
+            <div class="table-column">[[localize('cluster_activity')]]</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
@@ -133,6 +134,8 @@
           App.Behaviors.RoutingBehavior,
           App.Behaviors.DataTableBehavior,
           App.Behaviors.UtilsBehavior,
+          App.Behaviors.LocalizeBehavior,
+          Polymer.AppLocalizeBehavior,
         ],
 
         properties: {

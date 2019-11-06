@@ -7,6 +7,7 @@
 <link rel="import" href="../../../../filter-list.html">
 <link rel="import" href="../../../../filters/text-filter/text-filter.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../styles/filter-styles.html">
 
 
@@ -35,7 +36,7 @@
       <div class="app-grid">
         <text-filter
             class="item"
-            label="Search Cluster Objective Title"
+            label="[[localize('search_cluster_objective')]]"
             name="ref_title"
             value="[[queryParams.ref_title]]">
         </text-filter>
@@ -49,6 +50,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

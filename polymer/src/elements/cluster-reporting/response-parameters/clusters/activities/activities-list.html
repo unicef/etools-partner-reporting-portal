@@ -7,6 +7,7 @@
 <link rel="import" href="../../../../../behaviors/data-table.html">
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
@@ -53,16 +54,16 @@
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
           <etools-data-table-column field="title" flex-3 sortable>
-            <div class="table-column">Cluster Activity Title</div>
+            <div class="table-column">[[localize('cluster_activity_title')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
-            <div class="table-column">Cluster</div>
+            <div class="table-column">[[localize('cluster')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster_objective" sortable>
-             <div class="table-column">Cluster Objective Title</div>
+             <div class="table-column">[[localize('cluster_objective_title')]]</div>
           </etools-data-table-column>
         </template>
       </etools-data-table-header>
@@ -122,6 +123,8 @@
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

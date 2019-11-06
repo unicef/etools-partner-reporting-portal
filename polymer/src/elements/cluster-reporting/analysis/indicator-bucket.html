@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../etools-prp-progress-bar-alt.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="indicator-details.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 
@@ -115,7 +116,7 @@
 
     <etools-content-panel panel-title="[[prefix]] [[_computeIndicatorTitle(data)]]">
       <dl class="cluster-objective">
-        <dt>Cluster Objective:</dt>
+        <dt>[[localize('cluster_objective')]]:</dt>
         <dd>[[_computeObjectiveTitle(data)]]</dd>
       </dl>
 
@@ -125,7 +126,7 @@
         restamp="true"
       >
         <dl class="partner-project">
-          <dt>Partner Project:</dt>
+          <dt>[[localize('partner_project')]]:</dt>
           <dd>[[_computePartnerProjectTitle(data)]]</dd>
         </dl>
       </template>
@@ -147,7 +148,7 @@
 
           <div class="self-center flex-none">
             <dl class="indicator-progress layout horizontal">
-              <dt class="flex-none self-center">Against Target:</dt>
+              <dt class="flex-none self-center">[[localize('against_target')]]:</dt>
               <dd class="flex-none">
                 <etools-prp-progress-bar
                     number="[[indicator.total_against_target]]"
@@ -157,7 +158,7 @@
             </dl>
 
             <dl class="indicator-progress layout horizontal">
-                <dt class="flex-none self-center">Against In need:</dt>
+                <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
                 <dd class="flex-none">
                   <etools-prp-progress-bar-alt
                       number="[[indicator.total_against_in_need]]"
@@ -185,12 +186,18 @@
     Polymer({
       is: 'analysis-indicator-bucket',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
       properties: {
         data: Object,
 
         prefix: {
           type: String,
-          computed: '_computePrefix(data)',
+          computed: '_computePrefix(data, localize)',
         },
       },
 
@@ -222,13 +229,13 @@
         return data.type === 'partneractivityprojectcontext' ? data.activity_name : data.title;
       },
 
-      _computePrefix: function (data) {
+      _computePrefix: function (data, localize) {
         var prefix = {
-          partneractivity: 'Partner Activity',
-          partnerproject: 'Partner Project',
-          clusterobjective: 'Cluster Objective',
-          clusteractivity: 'Cluster Activity',
-          partneractivityprojectcontext: 'Partner Activity (w/Project Context)',
+          partneractivity: localize('partner_activity'),
+          partnerproject: localize('partner_project'),
+          clusterobjective: localize('cluster_objective'),
+          clusteractivity: localize('cluster_activity'),
+          partneractivityprojectcontext: localize('partner_activity_project_context'),
         }[data.type];
 
         return prefix ? prefix + ':' : '';

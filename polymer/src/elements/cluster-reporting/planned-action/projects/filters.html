@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../styles/filter-styles.html">
 <link rel="import" href="../../../filter-list.html">
 <link rel="import" href="../../../filters/text-filter/text-filter.html">
@@ -43,7 +44,7 @@
       <div class="app-grid">
         <text-filter
           class="item filter-2-col"
-          label="Project"
+          label="[[localize('project')]]"
           name="title"
           value="[[queryParams.title]]">
         </text-filter>
@@ -61,7 +62,7 @@
         <date-filter
           format="YYYY-MM-DD"
           class="item"
-          label="Start date"
+          label="[[localize('start_date')]]"
           name="start_date"
           value="[[_withDefault(queryParams.start_date, '')]]">
         </date-filter>
@@ -69,7 +70,7 @@
         <date-filter
           format="YYYY-MM-DD"
           class="item"
-          label="End date"
+          label="[[localize('end_date')]]"
           name="end_date"
           value="[[_withDefault(queryParams.end_date, '')]]">
         </date-filter>
@@ -83,6 +84,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

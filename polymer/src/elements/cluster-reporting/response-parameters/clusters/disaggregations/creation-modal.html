@@ -14,6 +14,7 @@
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 
 <link rel="import" href="../../../../etools-prp-chips.html">
 <link rel="import" href="../../../chip-disagg-value.html">
@@ -80,7 +81,7 @@
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Disaggregation</h2>
+        <h2>[[localize('add_disaggregation')]]</h2>
         <paper-icon-button
             class="self-center"
             on-tap="close"
@@ -100,7 +101,7 @@
                   class="validate"
                   id="name"
                   name="name"
-                  label="Disaggregation"
+                  label="[[localize('disaggregation')]]"
                   value="{{data.name}}"
                   on-input="_onInput"
                   on-blur="_formatName"
@@ -113,7 +114,7 @@
                   class="validate"
                   index="0"
                   name="values"
-                  label="Disaggregation group"
+                  label="[[localize('disaggregation_groups')]]"
                   value="{{data.choices}}"
                   on-selected-chips-updated="_onInput"
                   required>
@@ -127,11 +128,11 @@
 
       <div class="buttons layout horizontal-reverse">
         <paper-button class="btn-primary" on-tap="_save" raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button  on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -144,7 +145,9 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

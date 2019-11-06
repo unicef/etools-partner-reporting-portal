@@ -235,7 +235,7 @@
         <template is="dom-if" if="[[canEdit]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="#" on-tap="_openModal" data-modal-type="edit">
-              EDIT
+              [[localize('edit')]]
               <template
                   is="dom-if"
                   if="[[_showLocationsWarning(indicator, type)]]"
@@ -248,8 +248,8 @@
 
         <template is="dom-if" if="[[canEditLocations]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
-            <a href="#" on-tap="_openModal" data-modal-type="locations">LOCATIONS</a>
-            <paper-tooltip>Location goals for partners</paper-tooltip>
+            <a href="#" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</a>
+            <paper-tooltip>[[localize('location_goals_for_partners')]]</paper-tooltip>
           </span>
         </template>
       </div>

@@ -6,6 +6,7 @@
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 
 <dom-module id="custom-fields-widget">
   <template>
@@ -84,7 +85,7 @@
           nameid="[[field.id]]"
           name="customFieldTitle[[index]]"
           value=[[field.name]]
-          label="Field's Title"
+          label="[[localize('fields_title')]]"
           on-input="_updateCustomFieldTitle">
         </paper-input>
 
@@ -93,7 +94,7 @@
           valueid="[[field.id]]"
           name="customFieldDescription[[index]]"
           value=[[field.value]]
-          label="Field's Value"
+          label="[[localize('fields_value')]]"
           on-input="_updateCustomFieldDescription">
         </paper-input>
       </div>
@@ -104,12 +105,18 @@
     <paper-button
       class="btn-primary"
       on-tap="_add">
-        Add Custom Field
+        [[localize('add_custom_field')]]
     </paper-button>
   </template>
     <script>
       Polymer({
         is: 'custom-fields-widget',
+
+        behaviors: [
+          App.Behaviors.ReduxBehavior,
+          App.Behaviors.LocalizeBehavior,
+          Polymer.AppLocalizeBehavior,
+        ],
 
         properties: {
           fieldId: {

@@ -7,6 +7,7 @@
 <link rel="import" href="../../../../etools-prp-permissions.html">
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -55,11 +56,11 @@
           restamp="true">
         <div id="action">
           <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
-            Add New Project Activity
+            [[localize('add_new_project_activity')]]
           </paper-button>
 
           <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
-            Add Existing Project Activity
+            [[localize('add_existing_project_activity')]]
           </paper-button>
         </div>
       </template>
@@ -79,6 +80,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

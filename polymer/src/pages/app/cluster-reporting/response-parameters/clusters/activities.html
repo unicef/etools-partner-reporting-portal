@@ -6,6 +6,7 @@
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/filters.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal.html">
@@ -62,7 +63,7 @@
 
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Cluster Activity
+            [[localize('add_cluster_activity')]]
           </paper-button>
         </div>
       </template>
@@ -80,6 +81,8 @@
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.SortingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       observers: [

@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../etools-prp-number.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
 
@@ -18,7 +19,7 @@
     <paper-card class="widget-container">
       <div class="layout horizontal justified">
         <div class="self-center">
-          <h3 class="widget-heading">Number of non-Cluster Activities</h3>
+          <h3 class="widget-heading">[[localize('number_of_non_cluster')]]</h3>
         </div>
         <div>
           <div class="widget-figure">
@@ -37,6 +38,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

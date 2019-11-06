@@ -13,6 +13,7 @@
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../labelled-item.html">
 <link rel="import" href="../../../../list-placeholder.html">
@@ -96,18 +97,18 @@
     <div class="wrapper">
       <etools-content-panel no-header>
         <etools-data-table-header
-            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
           <etools-data-table-column field="cluster">
-            <div class="table-column">Partner</div>
+            <div class="table-column">[[localize('partner')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
-            <div class="table-column">Focal Point</div>
+            <div class="table-column">[[localize('focal_point')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="status">
-            <div class="table-column">E-mail</div>
+            <div class="table-column">[[localize('email')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="project">
-            <div class="table-column">Phone Number</div>
+            <div class="table-column">[[localize('phone_number')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="">
             <div class="table-column">&nbsp;</div>
@@ -144,14 +145,14 @@
                 [[_withDefault(item.phone_number)]]
               </div>
               <div class="table-cell table-cell--text cell-activity">
-                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">See activity</a>
+                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">[[localize('see_activity')]]</a>
               </div>
             </div>
             <div slot="row-data-details">
               <div class="row-data">
                 <div class="app-grid">
                   <div class="item full-width">
-                    <labelled-item label="Partner Projects(s)">
+                    <labelled-item label="[[localize('partner_projects')]]">
                       <div class="value">
                         <template
                             is="dom-repeat"
@@ -162,21 +163,21 @@
                     </labelled-item>
                   </div>
                   <div class="item">
-                    <labelled-item label="Cluster">
+                    <labelled-item label="[[localize('cluster')]]">
                       <div class="value truncate">
                         [[item.cluster]]
                       </div>
                     </labelled-item>
                   </div>
                   <div class="item">
-                    <labelled-item label="Address">
+                    <labelled-item label="[[localize('address')]]">
                       <div class="value truncate">
                         [[_formatAddress(item.street_address, item.city, item.postal_code)]]
                       </div>
                     </labelled-item>
                   </div>
                   <div class="item links">
-                    <labelled-item label="Links">
+                    <labelled-item label="[[localize('links')]]">
                       <div class="value">
                         <template
                             is="dom-repeat"
@@ -221,6 +222,8 @@
           App.Behaviors.RoutingBehavior,
           App.Behaviors.DataTableBehavior,
           App.Behaviors.UtilsBehavior,
+          App.Behaviors.LocalizeBehavior,
+          Polymer.AppLocalizeBehavior,
         ],
 
         properties: {

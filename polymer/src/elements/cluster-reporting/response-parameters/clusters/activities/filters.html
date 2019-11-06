@@ -7,6 +7,7 @@
 <link rel="import" href="../../../../filter-list.html">
 <link rel="import" href="../../../../filters/text-filter/text-filter.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../styles/filter-styles.html">
 
 <dom-module id="cluster-activities-filters">
@@ -34,7 +35,7 @@
       <div class="app-grid">
         <text-filter
             class="item"
-            label="Search Cluster Activity"
+            label="[[localize('search_cluster_activity')]]"
             name="title"
             value="[[queryParams.title]]">
         </text-filter>
@@ -48,6 +49,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

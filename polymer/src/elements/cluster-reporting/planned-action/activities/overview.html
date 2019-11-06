@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../activity-details.html">
 <link rel="import" href="editing-modal.html">
 
@@ -33,7 +34,7 @@
 
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-            Edit Activity
+            [[localize('edit_activity')]]
           </paper-button>
         </div>
       </template>
@@ -45,6 +46,12 @@
   <script>
     Polymer({
       is: 'pa-activity-details-overview',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         activityData: Object,

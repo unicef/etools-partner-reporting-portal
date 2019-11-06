@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../styles/filter-styles.html">
 <link rel="import" href="../../../../filter-list.html">
 <link rel="import" href="../../../../filters/text-filter/text-filter.html">
@@ -63,7 +64,7 @@
 
         <text-filter
           class="item filter-2-col"
-          label="Search Activity Title"
+          label="[[localize('search_activity_title')]]"
           name="activity"
           value="[[_withDefault(queryParams.activity, '')]]">
         </text-filter>
@@ -72,7 +73,7 @@
           class="item checkbox"
           name="custom"
           value="[[_withDefault(queryParams.custom, '')]]">
-          <span class="checkbox-label">Show only custom activities</span>
+          <span class="checkbox-label">[[localize('show_only_custom_activities')]]</span>
         </checkbox-filter>
       </div>
     </filter-list>
@@ -84,6 +85,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

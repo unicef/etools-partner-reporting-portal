@@ -19,6 +19,7 @@
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../styles/table-styles.html">
 
 <dom-module id="project-list-table">
@@ -74,26 +75,26 @@
     <div class="wrapper">
       <etools-content-panel no-header>
         <etools-data-table-header
-            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
           <etools-data-table-column field="title" sortable>
-            <div class="table-column">Project</div>
+            <div class="table-column">[[localize('project')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="clusters" sortable>
-            <div class="table-column">Cluster</div>
+            <div class="table-column">[[localize('cluster')]]</div>
           </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
             <etools-data-table-column field="partner" sortable>
-              <div class="table-column">Partner</div>
+              <div class="table-column">[[localize('partner')]]</div>
             </etools-data-table-column>
           </template>
           <etools-data-table-column field="status" sortable>
-            <div class="table-column">Status</div>
+            <div class="table-column">[[localize('status')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="Location">
-            <div class="table-column">Location</div>
+            <div class="table-column">[[localize('location')]]</div>
           </etools-data-table-column>
           <etools-data-table-column field="ocha">
-            <div class="table-column">From OCHA</div>
+            <div class="table-column">[[localize('from_ocha')]]</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
@@ -143,19 +144,19 @@
             <div slot="row-data-details">
               <div slot="row-data">
                 <div class="table-cell table-cell--text">
-                  <span class="label">Start Date</span>
+                  <span class="label">[[localize('start_date')]]</span>
                   [[project.start_date]]
-                  <span class="label">Total Budget</span>
+                  <span class="label">[[localize('total_budget')]]</span>
                   [[project.total_budget]]
                 </div>
                 <div class="table-cell table-cell--text">
-                  <span class="label">End Date</span>
+                  <span class="label">[[localize('end_date')]]</span>
                   [[project.end_date]]
-                  <span class="label">Funding Source</span>
+                  <span class="label">[[localize('funding_source')]]</span>
                   [[project.funding_source]]
                 </div>
                 <div class="table-cell table-cell--text">
-                  <span class="label">Part of a Joint Response Plan</span>
+                  <span class="label">[[localize('part_of_a_joint_response_plan')]]</span>
                   [[project.response_plan_title]]
                 </div>
               </div>
@@ -192,6 +193,8 @@
           App.Behaviors.RoutingBehavior,
           App.Behaviors.DataTableBehavior,
           App.Behaviors.UtilsBehavior,
+          App.Behaviors.LocalizeBehavior,
+          Polymer.AppLocalizeBehavior,
         ],
 
         properties: {

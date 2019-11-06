@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../settings.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
 
 <dom-module id="narrow-location-type-filter">
@@ -24,7 +25,7 @@
     </iron-query-params>
 
     <dropdown-filter
-        label="Narrow Location Type"
+        label="[[localize('narrow_location_type')]]"
         name="narrow_loc_type"
         value="[[fieldValue]]"
         data="[[data]]"
@@ -38,6 +39,9 @@
 
       behaviors: [
         App.Behaviors.FilterDependenciesBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

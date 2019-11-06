@@ -13,6 +13,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../behaviors/disaggregationHelpers.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
@@ -103,7 +104,7 @@
               if="[[labels]]"
               restamp="true">
               <dl class="data-key">
-                <dt>Label -</dt>
+                <dt>[[localize('label')]] -</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(data.display_type, 'number')]]"
@@ -130,7 +131,7 @@
               is="dom-if"
               if="[[dualReportingEnabled]]"
               restamp="true">
-            <h4>Progress against Cluster target:</h4>
+            <h4>[[localize('progress_against_cluster_target')]]:</h4>
           </template>
 
           <table class="vertical layout">
@@ -194,6 +195,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.DisaggregationHelpersBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

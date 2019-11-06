@@ -5,6 +5,7 @@
 <link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../etools-prp-number.html">
 <link rel="import" href="../../chart-legend.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
@@ -40,7 +41,7 @@
     </style>
 
     <paper-card class="widget-container">
-      <h3 class="widget-heading">Partner Activity Indicators by Progress Status</h3>
+      <h3 class="widget-heading">[[localize('partner_activity_indicators')]]</h3>
 
       <div class="app-grid">
         <div class="item">
@@ -69,6 +70,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -174,9 +177,13 @@
       _computeChartRows: function (labels) {
         var data = [].slice.call(arguments, 1);
 
+        var localizedLabels = labels.map(function (label) { // convert labels to localized label keys
+          return label.split(' ').join('_').toLowerCase();
+        });
+
         return data.map(function (count, index) {
           return [
-            labels[index],
+            localizedLabels[index],
             count,
           ];
         });

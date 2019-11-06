@@ -5,6 +5,7 @@
 
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list.html">
@@ -63,7 +64,7 @@
 
       <div id="action">
         <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Disaggregation
+          [[localize('add_disaggregation')]]
         </paper-button>
       </div>
     </template>
@@ -80,6 +81,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       observers: [

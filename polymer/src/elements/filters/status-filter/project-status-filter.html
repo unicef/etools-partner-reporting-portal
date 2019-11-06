@@ -38,15 +38,19 @@
       properties: {
         data: {
           type: Array,
-          value: [
-            {title: 'All', id: ''},
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         value: String,
+      },
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('all'), id: ''},
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
       },
     });
   </script>

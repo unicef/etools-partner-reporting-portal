@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/overview.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/indicators.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
@@ -79,7 +80,7 @@
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="activity">
+          class="above-title" name="[[localize('activity')]]">
       </page-badge>
 
       <div class="toolbar">
@@ -92,8 +93,8 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="overview">Overview</paper-tab>
-          <paper-tab name="indicators">Activity Indicators</paper-tab>
+          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+          <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -120,6 +121,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

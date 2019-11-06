@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/cluster-reporting/analysis/partners-per-type.html">
 <link rel="import" href="../../../../elements/cluster-reporting/analysis/partners-per-cluster.html">
@@ -101,9 +102,9 @@
 
     <etools-content-panel no-header>
       <header class="header layout horizontal justified">
-        <h2>Clusters</h2>
+        <h2>[[localize('clusters')]]</h2>
         <dl>
-          <dt>Number of Clusters:</dt>
+          <dt>[[localize('number_of_clusters')]]:</dt>
           <dd>[[numberOfClusters]]</dd>
         </dl>
       </header>
@@ -122,9 +123,9 @@
       </div>
 
       <header class="header layout horizontal justified">
-        <h2>Partners</h2>
+        <h2>[[localize('partners')]]</h2>
         <dl>
-          <dt>Number of Partners:</dt>
+          <dt>[[localize('number_of_partners')]]:</dt>
           <dd>[[numberOfPartners]]</dd>
         </dl>
       </header>
@@ -171,6 +172,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
