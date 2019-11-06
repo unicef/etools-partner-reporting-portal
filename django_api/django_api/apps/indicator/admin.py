@@ -26,6 +26,9 @@ class ReportableLocationGoalInline(admin.StackedInline):
     model = ReportableLocationGoal
     extra = 1
     min_num = 0
+    raw_id_fields = [
+        'location',
+    ]
 
 
 class ReportableAdmin(admin.ModelAdmin):
@@ -37,6 +40,13 @@ class ReportableAdmin(admin.ModelAdmin):
     list_filter = ('is_cluster_indicator', 'content_type')
     search_fields = ('context_code', 'means_of_verification', 'target',
                      'baseline', 'object_id', 'blueprint__title')
+    raw_id_fields = [
+        'blueprint',
+        'parent_indicator',
+        'locations',
+        'disaggregations',
+        'ca_indicator_used_by_reporting_entity',
+    ]
 
 
 class IndicatorReportAdmin(admin.ModelAdmin):
@@ -45,14 +55,17 @@ class IndicatorReportAdmin(admin.ModelAdmin):
                     'submission_date', 'frequency', 'total', 'reportable')
     list_filter = ('frequency', 'report_status', 'overall_status')
     search_fields = ('title', 'narrative_assessment', 'remarks',
-                     'reportable__blueprint__title')
+                     'reportable__blueprint__title',
+                     'progress_report__programme_document__title')
+    raw_id_fields = ['reportable', 'progress_report', 'parent', 'project']
 
 
 class IndicatorLocationDataAdmin(admin.ModelAdmin):
     list_display = ('indicator_report', 'location', 'num_disaggregation',
                     'level_reported')
     list_filter = ('num_disaggregation', 'level_reported',)
-    search_fields = ('indicator_report__title',)
+    search_fields = ('indicator_report__title', 'location__title')
+    raw_id_fields = ['location', 'indicator_report']
 
 
 class DisaggregationAdmin(admin.ModelAdmin):
@@ -63,8 +76,9 @@ class DisaggregationAdmin(admin.ModelAdmin):
 
 class DisaggregationValueAdmin(admin.ModelAdmin):
     list_display = ('disaggregation', 'value', 'external_id')
-    list_filter = ('disaggregation',)
-    search_fields = ('value',)
+    # list_filter = ('disaggregation',)
+    search_fields = ('value', 'disaggregation__name')
+    raw_id_fields = ['disaggregation',]
 
 
 class ReportingEntityAdmin(admin.ModelAdmin):

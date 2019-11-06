@@ -365,6 +365,7 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        verbose_name_plural = 'Partner activities'
         permissions = (
             ('imo_object', 'IMO Object'),
             ('partner_object', 'Partner Object'),

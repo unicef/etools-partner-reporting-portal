@@ -965,6 +965,7 @@ class ReportingEntity(TimeStampedModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name_plural = 'Reporting entities'
 
     def __str__(self):
         return "Reporting entity: {}".format(self.title)
@@ -1000,6 +1001,7 @@ class IndicatorLocationData(TimeStampedModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name_plural = 'Indicator location data'
         # TODO: enable
         # unique_together = ('indicator_report', 'location')
 

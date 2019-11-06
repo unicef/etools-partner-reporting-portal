@@ -296,6 +296,7 @@ class ClusterActivity(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
+        verbose_name_plural = 'Cluster activities'
         unique_together = (
             TimeStampedExternalSourceModel.Meta.unique_together
         )

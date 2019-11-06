@@ -89,6 +89,7 @@ class Country(TimeStampedModel):
 
     class Meta:
         ordering = ['name']
+        verbose_name_plural = 'Countries'
 
     def __str__(self):
         return self.name
@@ -219,6 +220,15 @@ class PRPRole(TimeStampedExternalSourceModel):
         blank=True, null=True
     )
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = 'PRP roles'
+        unique_together = (
+            'user',
+            'role',
+            'workspace',
+            'cluster',
+        )
 
     def __str__(self):
         return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
@@ -505,7 +515,7 @@ class GatewayType(TimeStampedModel):
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'Location Type'
+        verbose_name = 'Location type'
         unique_together = ('country', 'admin_level')
 
     def __str__(self):
@@ -642,6 +652,9 @@ class CartoDBTable(MPTTModel):
     )
 
     country = models.ForeignKey(Country, related_name="carto_db_tables")
+
+    class Meta:
+        verbose_name_plural = 'CartoDB tables'
 
     def __str__(self):
         return self.table_name

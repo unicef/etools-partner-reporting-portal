@@ -32,10 +32,10 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     ]
     list_filter = (
         'gateway',
-        'parent',
     )
     list_display = ('title', 'parent', 'gateway', 'p_code',)
     search_fields = ('title', 'p_code',)
+    raw_id_fields = ('parent', 'gateway')
 
     def get_form(self, request, obj=None, **kwargs):
         self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
@@ -59,6 +59,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
     )
 
     actions = ('import_sites',)
+    raw_id_fields = ('location_type', 'parent')
 
     def parent_table_name(self, obj):
         return obj.parent.table_name if obj.parent else "No parent"
@@ -91,6 +92,7 @@ class PRPRoleAdmin(admin.ModelAdmin):
     list_display = ('user', 'role', 'workspace', 'cluster')
     list_filter = ('role', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email')
+    raw_id_fields = ('user', 'cluster')
 
 
 admin.site.register(Workspace, WorkspaceAdmin)

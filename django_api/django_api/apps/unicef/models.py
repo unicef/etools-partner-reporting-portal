@@ -567,6 +567,7 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
     description = models.CharField(max_length=512, blank=True, null=True)
 
     class Meta:
+        verbose_name_plural = 'Reporting period dates'
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'report_type', 'programme_document')
         )
