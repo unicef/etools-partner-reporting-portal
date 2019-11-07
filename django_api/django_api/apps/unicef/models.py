@@ -592,6 +592,7 @@ class PDResultLink(TimeStampedExternalBusinessAreaModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name = 'Programme document result link'
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'external_cp_output_id')
         )
