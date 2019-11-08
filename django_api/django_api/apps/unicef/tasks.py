@@ -531,6 +531,9 @@ def process_programme_documents(fast=False, area=False):
                                                         "Created a new PartnerProject "
                                                         "from PD: " + str(item['number'])
                                                     )
+
+                                                pp.clusters.add(cai.content_object.cluster)
+                                                pp.locations.add(*cai.locations.all())
                                             else:
                                                 pp = PartnerProject.objects.get(
                                                     external_id="{}/{}".format(area, pd.id),

@@ -199,7 +199,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = JSONField(default=[])
+    custom_fields = JSONField(default=[], blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(
