@@ -15,7 +15,7 @@
       href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import"
       href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
+<!-- <link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html"> -->
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
@@ -43,6 +43,7 @@
 <link rel="import" href="../../../labelled-item.html">
 <link rel="import" href="../../../error-box.html">
 <link rel="import" href="../../indicator-locations-widget.html">
+<link rel="import" href="../../paper-radio-group-custom.html">
 
 
 <dom-module id="planned-action-projects-modal">
@@ -148,20 +149,20 @@
         display: none !important;
       }
 
-      paper-radio-group {
+      paper-radio-group-custom {
         display: block;
         padding-top: 16px;
       }
 
-      paper-radio-group > .fields {
+      paper-radio-group-custom > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
       }
 
-      paper-radio-group > .fields[empty] {
+      paper-radio-group-custom > .fields[empty] {
         padding: 0;
       }
 
-      paper-radio-group .app-grid {
+      paper-radio-group-custom .app-grid {
         margin: -var(--app-grid-gutter);
       }
 
@@ -271,7 +272,7 @@
               </etools-single-selection-menu>
             </template>
           </template>
-          <paper-radio-group
+          <paper-radio-group-custom
             id="mode"
             selected="{{ mode }}"
             on-change="adjustPosition">
@@ -528,12 +529,12 @@
 
                         <div class="full-width">
                           <labelled-item label="[[localize('is_this_project_hrp_fa')]]">
-                            <paper-radio-group
+                            <paper-radio-group-custom
                               selected="{{ data.part }}">
                               <paper-radio-button name="hrp">HRP</paper-radio-button>
                               <paper-radio-button name="fa">FA</paper-radio-button>
                               <paper-radio-button name="no">[[localize('no')]]</paper-radio-button>
-                            </paper-radio-group>
+                            </paper-radio-group-custom>
                           </labelled-item>
                         </div>
 
@@ -678,16 +679,11 @@
 
               <etools-loading active="[[updatePending]]"></etools-loading>
 
-
             </div>
+          </paper-radio-group-custom>
         </template>
-        </div>
-        </paper-radio-group>
-  </template>
-  </paper-dialog-scrollable>
-
-
-  </paper-dialog>
+      </paper-dialog-scrollable>
+    </paper-dialog>
   </template>
 
   <script>
