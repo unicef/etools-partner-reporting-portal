@@ -548,9 +548,9 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         for project_context in data['projects']:
             if PartnerActivity.objects.filter(
                 partner=data['partner'], cluster_activity=cluster_activity,
-                project=project_context.project
+                projects=project_context['project']
             ).exists():
-                error_msg = f'Please note that below activity has already been adopted under the context of Project: {project_context.project.title}'
+                error_msg = "Please note that below activity has already been adopted under the project: " + project_context['project'].title
                 raise serializers.ValidationError({
                     'projects': error_msg,
                 })
@@ -615,9 +615,9 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
         for project_context in data['projects']:
             if PartnerActivity.objects.filter(
                 partner=data['partner'], cluster_objective=cluster_objective,
-                project=project_context.project
+                projects=project_context['project']
             ).exists():
-                error_msg = f'Please note that below activity has already been adopted under the context of Project: {project_context.project.title}'
+                error_msg = "Please note that below activity has already been adopted under the project: " + project_context['project'].title
                 raise serializers.ValidationError({
                     'projects': error_msg,
                 })
