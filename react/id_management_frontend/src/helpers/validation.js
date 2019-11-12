@@ -15,7 +15,7 @@ export const email = (value) => {
 };
 
 export const phoneNumber = (value) => {
-    if (value && !/^\+?[1-9]\d{1,14}$/.test(value.trim())) {
+    if (value && !/^\+?[0-9]\d{1,14}$/.test(value.trim())) {
         return 'Invalid phone number';
     }
 };
