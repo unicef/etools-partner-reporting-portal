@@ -15,6 +15,7 @@ help:
 	@echo '   make migrate                    run local migrations '
 	@echo '   make loaddata                   load fixtures '
 	@echo '   make run                        run local instance '
+	@echo '   make export                     export ENV Vars '
 
 
 test:
@@ -29,3 +30,6 @@ loaddata:
 
 run:
 	${ENV_VARS} python manage.py runserver
+
+export:
+	export ${ENV_VARS}
