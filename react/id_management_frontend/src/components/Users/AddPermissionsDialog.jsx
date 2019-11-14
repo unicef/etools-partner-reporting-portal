@@ -24,7 +24,13 @@ export class AddPermissionsDialog extends Component {
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
-        props.dispatchFetchClustersForPartner(props.user.partner.id)
+        console.log('props', props);
+
+        if (!props.user.partner) {
+            props.dispatchFetchClusters();
+        } else {
+            props.dispatchFetchClustersForPartner(props.user.partner.id)
+        }
     }
 
     onSubmit(values) {
@@ -84,12 +90,14 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
     return {
         dispatchFetchClustersForPartner: (partner_id) => dispatch(fetch(FETCH_OPTIONS.CLUSTERS_FOR_PARTNER, partner_id)),
+        dispatchFetchClusters: () => dispatch(fetch(FETCH_OPTIONS.CLUSTERS)),
     }
 };
 
 AddPermissionsDialog.propTypes = {
     error: PropTypes.string,
     handleSubmit: PropTypes.func.isRequired,
+    dispatchFetchClusters: PropTypes.func.isRequired,
     dispatchFetchClustersForPartner: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
