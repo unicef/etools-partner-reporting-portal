@@ -13,7 +13,7 @@ import {userRoleInCluster, userRoleInWorkspace} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {filterOptionsValues} from "../../helpers/options";
 import withProps from "../hoc/withProps";
-import {clusterForPartnerOptions, portal, user, workspaceOptions} from "../../helpers/props";
+import {clusterForPartnerOptions, clusterOptions, portal, user, workspaceOptions} from "../../helpers/props";
 
 const title = {
     [PORTALS.IP]: "Role per Workspace",
@@ -32,14 +32,16 @@ const getSelectedOptions = (optionName, fields, index) => {
     return options;
 };
 
-const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterForPartnerOptions}) => {
+const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions, user, clusterForPartnerOptions, clusterOptions}) => {
     let showAdd;
 
     if (portal === PORTALS.IP) {
         showAdd = fields.length < workspaceOptions.length;
     }
-    else {
+    else if (clusterForPartnerOptions.length) {
         showAdd = fields.length < clusterForPartnerOptions.length;
+    } else {
+        showAdd = fields.length < clusterOptions.length;
     }
 
     return (
@@ -54,6 +56,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                     const selectedWorkspaces = getSelectedOptions("workspace", fields, index);
                     const filteredWorkspaceOptions = filterOptionsValues(workspaceOptions, selectedWorkspaces);
                     const filteredClusterOptions = filterOptionsValues(clusterForPartnerOptions, selectedClusters);
+                    const filteredClusters = filterOptionsValues(clusterOptions, selectedClusters);
 
                     let role;
 
@@ -94,9 +97,13 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                                       options={filteredWorkspaceOptions}
                                                       maxMenuHeight={maxMenuHeight}/>}
 
-                                    {portal === PORTALS.CLUSTER &&
+                                    {portal === PORTALS.CLUSTER && clusterForPartnerOptions.length > 0 &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusterOptions} maxMenuHeight={maxMenuHeight}/>}
+
+                                    {portal === PORTALS.CLUSTER && clusterOptions.length > 0 &&
+                                    <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
+                                                      options={filteredClusters} maxMenuHeight={maxMenuHeight}/>}
                                 </Grid>
 
                                 <Grid item md={6}>
@@ -121,9 +128,10 @@ renderPermissionsFields.propTypes = {
     portal: PropTypes.string,
     selectedUser: PropTypes.object,
     clusterForPartnerOptions: PropTypes.array.isRequired,
+    clusterOptions: PropTypes.array.isRequired,
     user: PropTypes.object,
     workspaceOptions: PropTypes.array
 };
 
-export default withProps(clusterForPartnerOptions, workspaceOptions, portal, user)(renderPermissionsFields);
+export default withProps(clusterForPartnerOptions, clusterOptions, workspaceOptions, portal, user)(renderPermissionsFields);
 
