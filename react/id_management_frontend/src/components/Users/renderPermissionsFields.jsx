@@ -44,11 +44,6 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
         showAdd = fields.length < clusterOptions.length;
     }
 
-    console.log('clusterForPartnerOptions', clusterForPartnerOptions);
-    console.log('clusterOptions', clusterOptions);
-
-    console.log('fields', fields);
-
     return (
         <div>
             <Typography variant="caption" gutterBottom>{title[portal]}</Typography>

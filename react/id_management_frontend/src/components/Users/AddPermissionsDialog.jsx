@@ -24,8 +24,6 @@ export class AddPermissionsDialog extends Component {
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
-        console.log('props', props);
-
         if (!props.user.partner) {
             props.dispatchFetchClusters();
         } else {
