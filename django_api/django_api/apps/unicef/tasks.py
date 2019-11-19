@@ -364,8 +364,12 @@ def process_programme_documents(fast=False, area=False):
                                 # Iterate over indicators
                                 for i in d['indicators']:
                                     # Check if indicator is cluster indicator
-                                    i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
-                                    i['is_unicef_hf_indicator'] = i['is_high_frequency']
+                                    if i['cluster_indicator_id']:
+                                        i['is_cluster_indicator'] = True
+                                        i['is_unicef_hf_indicator'] = True
+                                    else:
+                                        i['is_cluster_indicator'] = False
+                                        i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
                                     # If indicator is not cluster, create Blueprint
                                     # otherwise use parent Blueprint
