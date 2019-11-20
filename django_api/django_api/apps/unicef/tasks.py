@@ -38,7 +38,7 @@ from indicator.models import (
     Reportable,
     DisaggregationValue,
     ReportableLocationGoal,
-    create_pa_reportables_from_ca,
+    create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
 )
 
@@ -513,94 +513,114 @@ def process_programme_documents(fast=False, area=False):
                                     # Associate this LLO Reportable with ClusterActivity Reportable
                                     # for dual reporting
                                     if 'cluster_indicator_id' in i and i['cluster_indicator_id'] is not None:
+                                        cai = None
+                                        pp = None
+                                        partner_activity = None
+                                        papc = None
+
                                         try:
                                             cai = Reportable.objects.get(id=int(i['cluster_indicator_id']))
                                             reportable.ca_indicator_used_by_reporting_entity = cai
 
-                                            # Partner Project for this PD check
-                                            if not PartnerProject.objects.filter(
+                                        except Exception as e:
+                                            logger.exception(
+                                                "Cannot find ClusterActivity Indicator from this UNICEF indicator's cluster reference"
+                                                "for dual reporting - skipping link!: " + str(e)
+                                            )
+                                            continue
+
+                                        # Partner Project for this PD check
+                                        if not PartnerProject.objects.filter(
+                                            external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                            external_source=EXTERNAL_DATA_SOURCES.UNICEF
+                                        ).exists():
+                                            pp = PartnerProject.objects.create(
                                                 external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF,
+                                                title=item['title'],
+                                                partner=partner,
+                                                start_date=item['start_date'],
+                                                end_date=item['end_date'],
+                                            )
+
+                                            logger.info(
+                                                    "Created a new PartnerProject "
+                                                    "from PD: " + str(item['number'])
+                                                )
+
+                                            pp.clusters.add(cai.content_object.cluster)
+                                            pp.locations.add(*cai.locations.all())
+                                        else:
+                                            pp = PartnerProject.objects.get(
+                                                external_id="{}/{}".format(area, pd.id),
                                                 external_source=EXTERNAL_DATA_SOURCES.UNICEF
-                                            ).exists():
-                                                pp = PartnerProject.objects.create(
-                                                    external_id="{}/{}".format(workspace.business_area_code, pd.id),
-                                                    external_source=EXTERNAL_DATA_SOURCES.UNICEF,
-                                                    title=item['title'],
-                                                    partner=partner,
-                                                    start_date=item['start_date'],
-                                                    end_date=item['end_date'],
+                                            )
+
+                                        # Force adoption of PartnerActivity from ClusterActivity Indicator
+                                        if pd.partner.id not in cai.content_object.partner_activities.values_list(
+                                                'partner', flat=True):
+                                            try:
+                                                partner_activity = PartnerActivity.objects.create(
+                                                    title=cai.blueprint.title,
+                                                    partner=pd.partner,
+                                                    cluster_activity=cai.content_object,
                                                 )
 
-                                                logger.info(
-                                                        "Created a new PartnerProject "
-                                                        "from PD: " + str(item['number'])
-                                                    )
-
-                                                pp.clusters.add(cai.content_object.cluster)
-                                                pp.locations.add(*cai.locations.all())
-                                            else:
-                                                pp = PartnerProject.objects.get(
-                                                    external_id="{}/{}".format(area, pd.id),
-                                                    external_source=EXTERNAL_DATA_SOURCES.UNICEF
+                                            except Exception as e:
+                                                logger.exception(
+                                                    "Cannot force adopt PartnerActivity from ClusterActivity "
+                                                    "for dual reporting - skipping link!: " + str(e)
                                                 )
+                                                continue
 
-                                            # Force adoption of PartnerActivity from ClusterActivity Indicator
-                                            if pd.partner.id not in cai.content_object.partner_activities.values_list(
-                                                    'partner', flat=True):
-                                                try:
-                                                    partner_activity = PartnerActivity.objects.create(
-                                                        title=cai.blueprint.title,
-                                                        partner=pd.partner,
-                                                        cluster_activity=cai.content_object,
-                                                    )
+                                        try:
+                                            papc = PartnerActivityProjectContext.objects.update_or_create(
+                                                defaults={
+                                                    'activity': partner_activity,
+                                                    'project': pp,
+                                                },
+                                                start_date=item['start_date'],
+                                                end_date=item['end_date'],
+                                                status=PARTNER_ACTIVITY_STATUS.ongoing,
+                                            )
 
-                                                    PartnerActivityProjectContext.objects.update_or_create(
-                                                        defaults={
-                                                            'activity': partner_activity,
-                                                            'project': pp,
-                                                        },
-                                                        start_date=item['start_date'],
-                                                        end_date=item['end_date'],
-                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
-                                                    )
+                                        except Exception as e:
+                                            logger.exception(
+                                                "Cannot force adopt project context on PartnerActivity from ClusterActivity "
+                                                "for dual reporting - skipping link!: " + str(e)
+                                            )
+                                            continue
 
-                                                except Exception as e:
-                                                    logger.exception(
-                                                        "Cannot force adopt PartnerActivity and its project context from ClusterActivity "
-                                                        "for dual reporting - skipping link!: " + str(e)
-                                                    )
-                                                    continue
-                                                else:
-                                                    try:
-                                                        # Grab Cluster Activity instance from
-                                                        # this newly created Partner Activity instance
-                                                        create_pa_reportables_from_ca(
-                                                            partner_activity, cai.content_object
-                                                        )
-                                                    except Exception as e:
-                                                        logger.exception(
-                                                            "Cannot create Reportables for adopted "
-                                                            "PartnerActivity from ClusterActivity "
-                                                            "for dual reporting - skipping link!: " + str(e)
-                                                        )
+                                        try:
+                                            # Grab Cluster Activity instance from
+                                            # this newly created Partner Activity instance
+                                            create_papc_reportables_from_ca(
+                                                papc, cai.content_object
+                                            )
+                                        except Exception as e:
+                                            logger.exception(
+                                                "Cannot create Reportables for adopted "
+                                                "PartnerActivity from ClusterActivity "
+                                                "for dual reporting - skipping link!: " + str(e)
+                                            )
 
-                                                        partner_activity.delete()
-                                                        continue
+                                            partner_activity.delete()
+                                            continue
 
-                                                    try:
-                                                        # Grab Cluster Activity instance from
-                                                        # this newly created Partner Activity instance
-                                                        create_reportable_for_pp_from_ca_reportable(
-                                                            pp, cai
-                                                        )
-                                                    except Exception as e:
-                                                        logger.exception(
-                                                            "Cannot create Reportables for PD Partner Project "
-                                                            "from referenced Cluster Activity Reportable "
-                                                            " - skipping link!: " + str(e)
-                                                        )
+                                        try:
+                                            # Grab Cluster Activity instance from
+                                            # this newly created Partner Activity instance
+                                            create_reportable_for_pp_from_ca_reportable(
+                                                pp, cai
+                                            )
+                                        except Exception as e:
+                                            logger.exception(
+                                                "Cannot create Reportables for PD Partner Project "
+                                                "from referenced Cluster Activity Reportable "
+                                                " - skipping link!: " + str(e)
+                                            )
 
-                                                        continue
+                                            continue
 
                                         except Reportable.DoesNotExist:
                                             logger.exception(
