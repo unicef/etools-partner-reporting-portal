@@ -38,11 +38,13 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
     if (portal === PORTALS.IP) {
         showAdd = fields.length < workspaceOptions.length;
     }
-    else if (clusterForPartnerOptions.length) {
+    else if (clusterForPartnerOptions.length && selectedUser.user_type === 'PARTNER') {
         showAdd = fields.length < clusterForPartnerOptions.length;
     } else {
         showAdd = fields.length < clusterOptions.length;
     }
+
+    console.log('selectedUser', selectedUser);
 
     return (
         <div>
@@ -81,6 +83,9 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
 
                     const maxMenuHeight = 120;
 
+                    console.log('clusterForPartnerOptions', clusterForPartnerOptions);
+                    console.log('clusterOptions', clusterOptions);
+
                     return (
                         <FieldsArrayItem key={index}>
                             <Grid container justify="flex-end">
@@ -97,11 +102,11 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                                       options={filteredWorkspaceOptions}
                                                       maxMenuHeight={maxMenuHeight}/>}
 
-                                    {portal === PORTALS.CLUSTER && clusterForPartnerOptions.length > 0 &&
+                                    {portal === PORTALS.CLUSTER && clusterForPartnerOptions.length > 0 && selectedUser.user_type === 'PARTNER' &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusterOptions} maxMenuHeight={maxMenuHeight}/>}
 
-                                    {portal === PORTALS.CLUSTER && clusterOptions.length > 0 &&
+                                    {portal === PORTALS.CLUSTER && clusterOptions.length > 0 && selectedUser.user_type !== 'PARTNER' &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusters} maxMenuHeight={maxMenuHeight}/>}
                                 </Grid>
