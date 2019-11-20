@@ -44,8 +44,6 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
         showAdd = fields.length < clusterOptions.length;
     }
 
-    console.log('selectedUser', selectedUser);
-
     return (
         <div>
             <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
@@ -83,9 +81,6 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
 
                     const maxMenuHeight = 120;
 
-                    console.log('clusterForPartnerOptions', clusterForPartnerOptions);
-                    console.log('clusterOptions', clusterOptions);
-
                     return (
                         <FieldsArrayItem key={index}>
                             <Grid container justify="flex-end">
@@ -106,7 +101,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusterOptions} maxMenuHeight={maxMenuHeight}/>}
 
-                                    {portal === PORTALS.CLUSTER && clusterOptions.length > 0 && selectedUser.user_type !== 'PARTNER' &&
+                                    {portal === PORTALS.CLUSTER && clusterOptions.length > 0 && !clusterForPartnerOptions.length &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusters} maxMenuHeight={maxMenuHeight}/>}
                                 </Grid>
