@@ -38,7 +38,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
     if (portal === PORTALS.IP) {
         showAdd = fields.length < workspaceOptions.length;
     }
-    else if (clusterForPartnerOptions.length && selectedUser.user_type === 'PARTNER') {
+    else if (clusterForPartnerOptions.length && selectedUser.user_type === "PARTNER") {
         showAdd = fields.length < clusterForPartnerOptions.length;
     } else {
         showAdd = fields.length < clusterOptions.length;
@@ -97,7 +97,7 @@ const renderPermissionsFields = ({selectedUser, fields, portal, workspaceOptions
                                                       options={filteredWorkspaceOptions}
                                                       maxMenuHeight={maxMenuHeight}/>}
 
-                                    {portal === PORTALS.CLUSTER && clusterForPartnerOptions.length > 0 && selectedUser.user_type === 'PARTNER' &&
+                                    {portal === PORTALS.CLUSTER && clusterForPartnerOptions.length > 0 && selectedUser.user_type === "PARTNER" &&
                                     <SearchSelectForm fieldName={`${item}.cluster`} label={labels.cluster}
                                                       options={filteredClusterOptions} maxMenuHeight={maxMenuHeight}/>}
 
