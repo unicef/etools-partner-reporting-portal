@@ -578,12 +578,12 @@ def process_programme_documents(fast=False, area=False):
                                         try:
                                             papc, created = PartnerActivityProjectContext.objects.update_or_create(
                                                 defaults={
-                                                    'activity': partner_activity,
-                                                    'project': pp,
+                                                    'start_date': item['start_date'],
+                                                    'end_date': item['end_date'],
+                                                    'status': PARTNER_ACTIVITY_STATUS.ongoing,
                                                 },
-                                                start_date=item['start_date'],
-                                                end_date=item['end_date'],
-                                                status=PARTNER_ACTIVITY_STATUS.ongoing,
+                                                project=pp,
+                                                activity=partner_activity,
                                             )
 
                                         except Exception as e:
