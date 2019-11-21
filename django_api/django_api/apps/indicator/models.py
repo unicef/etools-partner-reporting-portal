@@ -546,7 +546,7 @@ def create_papc_reportables_from_ca(papc, ca):
         ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
     """
 
-    if Reportable.objects.filter(partner_activity_project_contexts=papc.id).count() > 0:
+    if Reportable.objects.filter(partner_activity_project_contexts=papc).count() > 0:
         return
 
     for reportable in ca.reportables.all():

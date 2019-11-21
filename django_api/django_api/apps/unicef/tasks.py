@@ -576,7 +576,7 @@ def process_programme_documents(fast=False, area=False):
                                             partner_activity = cai.content_object.partner_activities.get(partner=pd.partner)
 
                                         try:
-                                            papc = PartnerActivityProjectContext.objects.update_or_create(
+                                            papc, created = PartnerActivityProjectContext.objects.update_or_create(
                                                 defaults={
                                                     'activity': partner_activity,
                                                     'project': pp,
