@@ -552,7 +552,7 @@ def process_programme_documents(fast=False, area=False):
                                             pp.locations.add(*cai.locations.all())
                                         else:
                                             pp = PartnerProject.objects.get(
-                                                external_id="{}/{}".format(area, pd.id),
+                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
                                                 external_source=EXTERNAL_DATA_SOURCES.UNICEF
                                             )
 
