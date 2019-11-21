@@ -373,8 +373,10 @@ def get_latest_pr_by_type(pd, report_type):
             .filter(report_type="QPR").order_by('start_date').last()
 
     if report_type == "HR":
+        # Ordering by id since reporting period can now alternate
+        # from cluster indicator segregation
         return pd.progress_reports \
-            .filter(report_type="HR").order_by('start_date').last()
+            .filter(report_type="HR").order_by('id').last()
 
     if report_type == "SR":
         return pd.progress_reports \
