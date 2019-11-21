@@ -531,11 +531,11 @@ def process_programme_documents(fast=False, area=False):
 
                                         # Partner Project for this PD check
                                         if not PartnerProject.objects.filter(
-                                            external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                            external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
                                             external_source=EXTERNAL_DATA_SOURCES.UNICEF
                                         ).exists():
                                             pp = PartnerProject.objects.create(
-                                                external_id="{}/{}".format(workspace.business_area_code, pd.id),
+                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
                                                 external_source=EXTERNAL_DATA_SOURCES.UNICEF,
                                                 title=item['title'],
                                                 partner=partner,
