@@ -717,7 +717,9 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                     # We may have to recalculate latest progress report and re-assign is_final flag again
                     if is_final_hr_req:
                         pd.progress_reports.filter(report_type="HR", is_final=True).update(is_final=False)
-                        pd.progress_reports.filter(report_type="HR").order_by('id').last().update(is_final=True)
+                        latest_hr = pd.progress_reports.filter(report_type="HR").order_by('id').last()
+                        latest_hr.is_final = True
+                        latest_hr.save()
 
 
 def create_ir_for_cluster(reportable, start_date, end_date, project):
