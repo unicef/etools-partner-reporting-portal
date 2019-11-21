@@ -572,6 +572,8 @@ def process_programme_documents(fast=False, area=False):
                                                     "for dual reporting - skipping link!: " + str(e)
                                                 )
                                                 continue
+                                        else:
+                                            partner_activity = cai.content_object.partner_activities.get(partner=pd.partner)
 
                                         try:
                                             papc = PartnerActivityProjectContext.objects.update_or_create(
