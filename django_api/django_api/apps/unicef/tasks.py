@@ -612,9 +612,10 @@ def process_programme_documents(fast=False, area=False):
                                         try:
                                             # Grab Cluster Activity instance from
                                             # this newly created Partner Activity instance
-                                            create_reportable_for_pp_from_ca_reportable(
-                                                pp, cai
-                                            )
+                                            if not pp.reportables.filter(parent_indicator=cai).exists():
+                                                create_reportable_for_pp_from_ca_reportable(
+                                                    pp, cai
+                                                )
                                         except Exception as e:
                                             logger.exception(
                                                 "Cannot create Reportables for PD Partner Project "
