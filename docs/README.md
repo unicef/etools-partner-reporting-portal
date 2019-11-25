@@ -12,7 +12,7 @@ PRP is an open-source project and can be found on [Github](https://github.com/un
 
 ## IP and Cluster Reporting
 
-PRP consists of two somewhat distinct user experiences targeting different but potentially overlapping use-cases. This is what is referred to as [IP](https://github.com/unicef/etools-partner-reporting-portal/tree/4210b652f2748069ce5e2223b85f475ba3480729/docs/product-end-user-documentation/ip-reporting/README.md) and [Cluster Reporting](https://github.com/unicef/etools-partner-reporting-portal/tree/4210b652f2748069ce5e2223b85f475ba3480729/docs/product-end-user-documentation/cluster-reporting/README.md). More details if you click on each of them in the left hand navigation.
+PRP consists of two somewhat distinct user experiences targeting different but potentially overlapping use-cases. This is what is referred to as [IP](product-end-user-documentation/ip-reporting/) and [Cluster Reporting](product-end-user-documentation/cluster-reporting/). More details if you click on each of them in the left hand navigation.
 
 Both of these sub-systems is built on top of the same [data model](technical-documentation/data-model.md) and all the data is stored in the same database. 
 

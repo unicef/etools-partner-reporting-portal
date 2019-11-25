@@ -1,20 +1,8 @@
 # Releases / Changelog\*
 
-## 1.0.1 - 2018....
+## 1.0.0 - 2019.09.24
 
-### Fixed
-
-* TBD
-
-### Changed
-
-* TBD
-
-## 1.0.0 - 2018....
-
-### Added
-
-* First MVP release of the PRP platform.
+* First MVP production release of the PRP-IP platform.
 
 
 

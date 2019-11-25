@@ -8,7 +8,6 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -31,6 +30,7 @@
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../paper-radio-group-custom.html">
 
 <dom-module id="planned-action-activity-modal">
   <template>
@@ -103,20 +103,20 @@
         border-right: 1px solid var(--paper-grey-400);
       }
 
-      paper-radio-group {
+      paper-radio-group-custom {
         display: block;
         padding-top: 16px;
       }
 
-      paper-radio-group > .fields {
+      paper-radio-group-custom > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
       }
 
-      paper-radio-group > .fields[empty] {
+      paper-radio-group-custom > .fields[empty] {
         padding: 0;
       }
 
-      paper-radio-group .app-grid {
+      paper-radio-group-custom .app-grid {
         margin: -var(--app-grid-gutter);
       }
 
@@ -204,7 +204,7 @@
           </etools-single-selection-menu>
         </template>
 
-        <paper-radio-group
+        <paper-radio-group-custom
             id="mode"
             selected="{{mode}}">
           <paper-radio-button name="cluster">
@@ -512,7 +512,7 @@
               </div>
             </template>
           </div>
-        </paper-radio-group>
+        </paper-radio-group-custom>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">

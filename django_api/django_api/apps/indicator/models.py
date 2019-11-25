@@ -442,6 +442,31 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
         pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
 
 
+def create_reportable_for_papc_from_ca_reportable(papc, ca_reportable):
+    """
+    Copies one CA reportable instance to a partner activity project context.
+
+    Arguments:
+        papc {partner.models.PartnerActivityProjectContext} -- PartnerActivityProjectContext to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    """
+
+    if ca_reportable.content_object != papc.activity.cluster_activity:
+        raise serializers.ValidationError("The Parent-child relationship is not valid")
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+
+    reportable_data_to_sync["content_object"] = papc
+    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
 def create_reportable_for_pp_from_ca_reportable(pp, ca_reportable):
     """
     Copies one CA reportable instance to a partner activity.
@@ -509,6 +534,23 @@ def create_pa_reportables_from_ca(pa, ca):
 
     for reportable in ca.reportables.all():
         create_reportable_for_pa_from_ca_reportable(pa, reportable)
+
+
+def create_papc_reportables_from_ca(papc, ca):
+    """
+    Creates a set of PartnerActivityProjectContext Reportable instances from
+    ClusterActivity instance to target PartnerActivityProjectContext instance
+
+    Arguments:
+        papc {partner.models.PartnerActivityProjectContext} -- Target PartnerActivityProjectContext instance
+        ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
+    """
+
+    if Reportable.objects.filter(partner_activity_project_contexts=papc).count() > 0:
+        return
+
+    for reportable in ca.reportables.all():
+        create_reportable_for_papc_from_ca_reportable(papc, reportable)
 
 
 def create_pa_reportables_for_new_ca_reportable(instance):

@@ -16,7 +16,11 @@ from cluster.serializers import (
     ClusterObjectiveSerializer
 )
 
-from indicator.models import create_pa_reportables_from_ca
+from indicator.models import (
+    create_pa_reportables_from_ca,
+    get_reportable_data_to_clone,
+    Reportable
+)
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
@@ -612,16 +616,6 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 )
             })
 
-        for project_context in data['projects']:
-            if PartnerActivity.objects.filter(
-                partner=data['partner'], cluster_objective=cluster_objective,
-                projects=project_context['project']
-            ).exists():
-                error_msg = "Please note that below activity has already been adopted under the project: " + project_context['project'].title
-                raise serializers.ValidationError({
-                    'projects': error_msg,
-                })
-
         data['cluster_objective'] = cluster_objective
 
         return data
@@ -780,6 +774,19 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
                     'status': validated_context_data['status']
                 }
             )
+
+            if created and instance.cluster_activity:
+                reportables = instance.cluster_activity.reportables.all()
+
+                for reportable in reportables:
+                    reportable_data_to_sync = get_reportable_data_to_clone(reportable)
+                    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+                    reportable_data_to_sync["blueprint"] = reportable.blueprint
+                    reportable_data_to_sync["parent_indicator"] = reportable
+
+                    reportable_data_to_sync["content_object"] = obj
+                    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+                    pa_reportable.disaggregations.add(*reportable.disaggregations.all())
 
         return instance
 
