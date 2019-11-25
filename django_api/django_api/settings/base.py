@@ -55,7 +55,7 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
 )
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'

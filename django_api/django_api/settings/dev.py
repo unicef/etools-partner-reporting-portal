@@ -11,7 +11,7 @@ IS_DEV = True
 IS_STAGING = False
 
 # domains/hosts etc.
-DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8082')
+DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8081')
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
@@ -41,6 +41,6 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-CORS_ORIGIN_WHITELIST += ('localhost:8082', )
+CORS_ORIGIN_WHITELIST += ('localhost:8082', 'localhost:8081')
 
 FIXTURE_DIRS += ["fixtures"]

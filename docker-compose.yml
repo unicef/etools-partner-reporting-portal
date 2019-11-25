@@ -37,7 +37,7 @@ services:
       context: ./nginx_proxy
       dockerfile: ./Dockerfile
     ports:
-      - "8082:80"
+      - "8081:80"
     depends_on:
       - django_api
       - polymer
