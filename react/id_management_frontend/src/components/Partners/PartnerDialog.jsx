@@ -119,7 +119,7 @@ class PartnerDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions} optional/>
+                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions} selectFieldProps={{disabled: true}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
