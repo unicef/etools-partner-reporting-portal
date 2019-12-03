@@ -4,13 +4,14 @@ import DialogActions from "../common/DialogActions";
 import TextFieldForm from "../form/TextFieldForm";
 import {Grid, Button} from "@material-ui/core";
 import {email, phoneNumber} from "../../helpers/validation";
-import {reduxForm} from 'redux-form';
+import {reduxForm, change} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
 import SearchSelectForm from "../form/SearchSelectForm";
 import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 import partnerLabels from "./partnerLabels";
@@ -64,6 +65,7 @@ class PartnerDialog extends Component {
             this.setState({ csoSelected: true });
         } else {
             this.setState({ csoSelected: false });
+            this.props.dispatch(change('addPartnerForm', 'cso_type', ''));
         }
     }
 
@@ -205,6 +207,10 @@ const title = {
     edit: "Edit Partner"
 };
 
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({change}, dispatch);
+}
+
 const mapStateToProps = (state, ownProps) => {
     const {partner} = ownProps;
 
@@ -232,4 +238,4 @@ const mapStateToProps = (state, ownProps) => {
 export default withProps(
     clusterOptions,
     partnerTypeOptions
-)(connect(mapStateToProps)(reduxForm({form: "addPartnerForm", enableReinitialize: true})(PartnerDialog)));
+)(connect(mapStateToProps, mapDispatchToProps)(reduxForm({form: "addPartnerForm", enableReinitialize: true})(PartnerDialog)));
