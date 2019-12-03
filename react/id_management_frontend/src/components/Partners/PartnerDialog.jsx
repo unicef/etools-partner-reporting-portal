@@ -24,11 +24,13 @@ class PartnerDialog extends Component {
         super(props);
 
         this.state = {
-            loading: false
+            loading: false,
+            csoSelected: false
         };
 
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     onSubmit(values) {
@@ -53,6 +55,15 @@ class PartnerDialog extends Component {
 
         onClose();
         reset();
+    }
+
+    handleChange(e) {
+        console.log('e.target.value', e.target.value);
+        if (e.target.value === 'CSO') {
+            this.setState({ csoSelected: true });
+        } else {
+            this.setState({ csoSelected: false });
+        }
     }
 
     render() {
@@ -115,11 +126,12 @@ class PartnerDialog extends Component {
 
                         <Grid item md={6}>
                             <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}
-                                        optional/>
+                                        onChange={this.handleChange} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions} selectFieldProps={{disabled: true}} optional/>
+                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions}
+                                        selectFieldProps={{disabled: !this.state.csoSelected}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
