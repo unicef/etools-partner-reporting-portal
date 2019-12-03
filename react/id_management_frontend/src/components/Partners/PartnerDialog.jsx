@@ -53,12 +53,13 @@ class PartnerDialog extends Component {
     onClose() {
         const {reset, onClose} = this.props;
 
+        this.setState({ csoSelected: false });
+
         onClose();
         reset();
     }
 
     handleChange(e) {
-        console.log('e.target.value', e.target.value);
         if (e.target.value === 'CSO') {
             this.setState({ csoSelected: true });
         } else {
