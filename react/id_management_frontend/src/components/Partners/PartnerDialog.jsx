@@ -61,11 +61,11 @@ class PartnerDialog extends Component {
     }
 
     handleChange(e) {
-        if (e.target.value === 'CSO') {
+        if (e.target.value === "CSO") {
             this.setState({ csoSelected: true });
         } else {
             this.setState({ csoSelected: false });
-            this.props.dispatch(change('addPartnerForm', 'cso_type', ''));
+            this.props.dispatch(change("addPartnerForm", "cso_type", ""));
         }
     }
 
