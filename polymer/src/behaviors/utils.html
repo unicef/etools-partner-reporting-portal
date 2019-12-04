@@ -125,7 +125,7 @@
 
       _toPercentage: function (value) {
         return value == null /* undefinded & null */ ? // jshint ignore:line
-            value : Math.floor(value * 100) + '%';
+            value : Math.floor(value * 100) / 100 + '%';
       },
 
       _formatIndicatorValue: function(indicatorType, value, percentize) {
