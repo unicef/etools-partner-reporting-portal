@@ -38,6 +38,7 @@ class SelectForm extends Component {
             sections,
             multiple,
             textFieldProps,
+            onChange
         } = this.props;
 
         return (
@@ -67,6 +68,7 @@ class SelectForm extends Component {
                         fullWidth
                         infoText={infoText}
                         values={sections ? R.reduce((current, [_, nextValues]) => R.concat(current, nextValues), [], values) : values}
+                        onChange={onChange}
                     >
                         {renderSelectOptions(fieldName, values, sections)}
                     </Field>
