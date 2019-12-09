@@ -14,6 +14,7 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../list-placeholder.html">
@@ -146,8 +147,8 @@
                 <div class="table-cell table-cell--text">
                   <span class="label">[[localize('start_date')]]</span>
                   [[project.start_date]]
-                  <span class="label">[[localize('total_budget')]]</span>
-                  [[project.total_budget]]
+                  <span class="label">[[localize('total_budget')]] (USD)</span>
+                  <etools-prp-number value="[[project.total_budget]]"></etools-prp-number>
                 </div>
                 <div class="table-cell table-cell--text">
                   <span class="label">[[localize('end_date')]]</span>
