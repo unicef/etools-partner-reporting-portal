@@ -396,6 +396,10 @@
           computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
+        currentPartnerId: {
+          type: Number
+        },
+
         partner: {
           type: Object,
           computed: '_computePartner(storePartner, selectedPartner)'
@@ -445,6 +449,7 @@
         this.set('activities', []);
         this.set('objectives', []);
         this.set('errors', {});
+        this.set('currentPartnerId', this.projectData.partner_id);
       },
 
       _onOpenedChanged: function (opened) {
