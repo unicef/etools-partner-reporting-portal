@@ -494,7 +494,12 @@
                   return element.project_id === parseInt(self.projectData.id);
                 }) === undefined;
               });
-              self.set('partnerActivities', filteredActivities);
+              console.log('filteredActivities', filteredActivities);
+              var currentPartnerActivities = filteredActivities.filter(function (activity) {
+                return activity.partner.id === self.currentPartnerId;
+              });
+              self.set('partnerActivities', currentPartnerActivities);
+              console.log('self.partnerActivities', self.partnerActivities);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
