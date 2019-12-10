@@ -1,5 +1,6 @@
 {
   "en": {
+    "if_one_or_more_disaggregation": "If one or more disaggregation box is unchecked, the reporting table will be simplified.",
     "civil_society_organization": "Civil Society Organization",
     "government": "Government",
     "location_admin_level": "Location - Admin level",
