@@ -388,9 +388,14 @@
             computed: '_computeAjaxData(maxAdminLevel)',
           },
 
+          currentUserRoles: {
+            type: Array,
+            statePath: 'userProfile.profile.prp_roles'
+          },
+
           canEditDetails: {
             type: Boolean,
-            computed: '_computeCanEditDetails(editing, parentIndicatorId, isPai, permissions)',
+            computed: '_computeCanEditDetails(currentUserRoles, editing, parentIndicatorId, isPai, permissions)',
           },
 
           canMessageIMO: {
@@ -476,7 +481,14 @@
               });
         },
 
-        _computeCanEditDetails: function (editing, parentIndicatorId, isPAI, permissions) {
+        _computeCanEditDetails: function (currentUserRoles, editing, parentIndicatorId, isPAI, permissions) {
+          var isUserImo = currentUserRoles.find(function (role) {
+            return role.role === 'CLUSTER_IMO';
+          });
+          if (isUserImo !== undefined) {
+            return true;
+          }
+
           return !editing ||
               (permissions.createClusterEntities && !isPAI) ||
               (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
