@@ -486,6 +486,11 @@
           },
           computed: '_computeMinDate(data.start_date_of_reporting_period)',
         },
+        
+        currentUserRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles'
+        }
       },
 
       observers: [
@@ -529,6 +534,8 @@
       },
 
       _computeCanEditDetails: function (permissions, data, isPAI) {
+        console.log('this.currentUserRoles', this.currentUserRoles);
+        console.log('this.data', this.data);
         return (permissions.createClusterEntities && !isPAI) ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
