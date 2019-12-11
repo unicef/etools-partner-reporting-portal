@@ -32,7 +32,7 @@ We are using this component for custom specific dates in indicator modals for ex
 
 ## Tell us about the build process. Any reason for not using ‘polymer build’?
 
-PRP frontend app is using gulp to initiate build process. You can check out `gulpfile.js` in polymer folder for the details. PRP gulp build process is inspired by PMP frontend app build process. There should be a lot of similarities from there. PRP app is lintedd, is minified, and is bundled to serve the folder for any deployment.
+PRP frontend app is using gulp to initiate build process. You can check out `gulpfile.js` in polymer folder for the details. PRP gulp build process is inspired by PMP frontend app build process. There should be a lot of similarities from there. PRP app is linted, is minified, and is bundled to serve the folder for any deployment.
 
 We are not using `polymer build` command to do this in alignment with PMP app processes.
 
