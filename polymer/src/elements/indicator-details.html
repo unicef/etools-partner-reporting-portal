@@ -296,6 +296,12 @@
                       <div class="self-center">[[localize('enter_data_location')]]</div>
                       <div>
                         <paper-button
+                          class="btn-primary"
+                          on-tap="_confirmAutofill"
+                          raised>
+                          Autofill
+                        </paper-button>
+                        <paper-button
                             class="btn-primary"
                             modal-index="[[topLevelLocationIndex]]"
                             on-tap="_openModal"
@@ -729,6 +735,10 @@
 
       attached: function () {
         this.set('opened', {});
+      },
+
+      _confirmAutofill: function () {
+        console.log('autofill pressed!');
       },
     });
   </script>
