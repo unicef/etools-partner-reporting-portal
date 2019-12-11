@@ -123,8 +123,13 @@
 
         canAddIndicator: {
           type: Boolean,
-          computed: '_computeCanAddIndicator(permissions, clusterId)',
+          computed: '_computeCanAddIndicator(currentUserRoles, permissions, clusterId)',
         },
+
+        currentUserRoles: {
+          type: Array,
+          statePath: 'userProfile.profile.prp_roles'
+        }
       },
 
       listeners: {
@@ -170,7 +175,14 @@
           });
       },
 
-      _computeCanAddIndicator: function (permissions, clusterId) {
+      _computeCanAddIndicator: function (currentUserRoles, permissions, clusterId) {
+        var isUserImo = currentUserRoles.find(function (role) {
+          return role.role === 'CLUSTER_IMO';
+        });
+        if (isUserImo !== undefined) {
+          return true;
+        }
+
         return permissions.createClusterEntities &&
             permissions.createClusterEntitiesForCluster(clusterId);
       },
