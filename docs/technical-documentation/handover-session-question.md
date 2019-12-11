@@ -59,7 +59,7 @@ labelled-item is a simple UI component to show primary/secondary texts at the sa
 
 ## Paper-input being used in places where 2000 characters expected. Any reason for not using paper-textarea?
 
-It was a decision that the multi-column UI behavior on such long text was not adopted. Therefore, we chose paper-input instead to achieve this.
+It was a decision that the multi-column UI behavior on such long text was not adopted. Therefore, we chose paper-input instead to achieve this. Also, paper-textarea listens to a different DOM event compared to paper-input.
 
 ## What’s the difference between `Progress Report` file downloaded from `Download Report in standard Template Format` and `Progress Summary` downloaded from `XLS/PDF` links? At first glance they seem very similar.
 
