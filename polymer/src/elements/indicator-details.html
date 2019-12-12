@@ -19,6 +19,7 @@
 <link rel="import" href="disaggregations/disaggregation-modal.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="pull-modal.html">
+<link rel="import" href="autofill-confirm-modal.html">
 <link rel="import" href="../endpoints.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
@@ -297,6 +298,7 @@
                       <div>
                         <paper-button
                           class="btn-primary"
+                          modal-index="[[topLevelLocationIndex]]"
                           on-tap="_confirmAutofill"
                           raised>
                           Autofill
@@ -378,6 +380,14 @@
                     </div>
                   </template>
                 </iron-pages>
+
+                <template
+                    is="dom-if"
+                    if="[[!_equals(computedMode, 'view')]]">
+                  <autofill-confirm-modal
+                    id="autofill-confirm-modal-[[topLevelLocationIndex]]">
+                  </autofill-confirm-modal>
+                </template>
   
                 <template
                     is="dom-if"
@@ -737,8 +747,9 @@
         this.set('opened', {});
       },
 
-      _confirmAutofill: function () {
+      _confirmAutofill: function (e) {
         console.log('autofill pressed!');
+        this.$$('#autofill-confirm-modal-' + e.target.modalIndex).open();
       },
     });
   </script>
