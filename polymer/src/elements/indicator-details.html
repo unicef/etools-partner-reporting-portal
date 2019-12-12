@@ -583,6 +583,7 @@
 
       listeners: {
         'locations-updated': '_onLocationsUpdated',
+        'autofill': '_onAutofill',
       },
 
       _fetchData: function () {
@@ -751,6 +752,10 @@
         console.log('autofill pressed!');
         this.$$('#autofill-confirm-modal-' + e.target.modalIndex).open();
       },
+
+      _onAutofill: function (e) {
+        console.log('autofill completed!', e.detail);
+      }
     });
   </script>
 </dom-module>

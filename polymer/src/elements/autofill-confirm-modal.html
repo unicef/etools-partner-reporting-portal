@@ -18,6 +18,7 @@
       :host {
         display: block;
         --paper-dialog: {
+          width: 575px;
           &>* {
             margin: 0;
           }
@@ -41,12 +42,13 @@
 
       <h3>
         Are you sure you want to fill all fields for this location with a value of 0?
+        This will overwrite any data already entered in this location.
       </h3>
 
       <div class="buttons layout horizontal-reverse">
         <paper-button
             class="btn-primary"
-            on-tap="_save"
+            on-tap="_autofill"
             raised>
           Autofill
         </paper-button>
@@ -71,6 +73,7 @@
       ],
 
       properties: {
+        id: String
       },
 
       listeners: {
@@ -78,6 +81,12 @@
         'disaggregation-modal-refit': 'adjustPosition',
         'disaggregation-modal-confirm': '_confirm',
       },
+
+      _autofill: function () {
+        console.log('autofilling!', this.id);
+        this.fire('autofill', this.id)
+        this.close();
+      }
     });
   </script>
 </dom-module>
