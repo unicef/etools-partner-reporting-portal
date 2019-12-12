@@ -15,6 +15,17 @@
 <dom-module id="autofill-confirm-modal">
   <template>
     <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+        --paper-dialog: {
+          &>* {
+            margin: 0;
+          }
+        };
+      }
+      h3 {
+        margin: 24px;
+      }
     </style>
 
     <paper-dialog
@@ -28,12 +39,16 @@
         </paper-icon-button>
       </div>
 
+      <h3>
+        Are you sure you want to fill all fields for this location with a value of 0?
+      </h3>
+
       <div class="buttons layout horizontal-reverse">
         <paper-button
             class="btn-primary"
             on-tap="_save"
             raised>
-          [[localize('save')]]
+          Autofill
         </paper-button>
 
         <paper-button
