@@ -94,9 +94,8 @@
 
       _autofill: function () {
         var table = this.getContentChildNodes('.table')[0];
-        console.log('autofilling!', this.id);
-        console.log('table', table);
-        this.fire('autofill', this.id)
+        table.autofill();
+        // this.fire('autofill')
         this.close();
       }
     });
