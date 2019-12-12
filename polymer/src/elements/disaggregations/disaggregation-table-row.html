@@ -28,6 +28,7 @@
             <disaggregation-table-cell-number
                 coords="[[item.key]]"
                 data="[[item.data]]"
+                autofill="[[autofill]]"
                 editable="[[editable]]">
             </disaggregation-table-cell-number>
           </template>
@@ -114,6 +115,8 @@
         indicatorType: String,
 
         rowType: String,
+
+        autofill: Boolean,
 
         editable: {
           type: Number,

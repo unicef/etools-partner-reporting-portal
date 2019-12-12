@@ -19,6 +19,7 @@
         <disaggregation-field
           key="v"
           value="[[data.v]]"
+          autofill="[[autofill]]"
           coords="[[coords]]">
         </disaggregation-field>
       </editable>
@@ -40,6 +41,7 @@
         data: Object,
         coords: String,
         editable: Number,
+        autofill: Boolean,
       },
 
       attached: function () {

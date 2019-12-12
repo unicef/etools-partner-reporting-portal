@@ -153,6 +153,7 @@
               <one-disaggregation
                   data="[[viewData]]"
                   mapping="[[formattedMapping]]"
+                  autofill="[[willAutofill]]"
                   editable="[[editable]]">
               </one-disaggregation>
             </template>
@@ -203,6 +204,11 @@
         data: Object,
         labels: Object,
         totals: Object,
+
+        willAutofill: {
+          type: Boolean,
+          value: false
+        },
 
         byEntity: {
           type: Array,
@@ -408,11 +414,6 @@
             });
       },
 
-      autofill: function () {
-        console.log('this.formattedMapping', this.formattedMapping);
-        // this.save();
-      },
-
       _triggerModalRefit: function (e) {
         e.stopPropagation();
 
@@ -491,6 +492,11 @@
           this.set('totals', {});
         }
       },
+
+      _onAutofill: function () {
+        this.set('willAutofill', true);
+        console.log('this.willAutofill', this.willAutofill);
+      }
     });
   </script>
 </dom-module>

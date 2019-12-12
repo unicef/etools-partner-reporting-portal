@@ -53,6 +53,8 @@
 
         validator: String,
 
+        autofill: Boolean,
+
         value: {
           type: Number,
           notify: true,
@@ -63,6 +65,10 @@
           notify: true,
         },
       },
+
+      observers: [
+        '_onAutofill(autofill)'
+      ],
 
       listeners: {
         'field.input': '_handleInput',
@@ -75,6 +81,7 @@
       attached: function () {
         this.$.field.validate();
         this.fire('register-field', this);
+        console.log('this.autofill', this.autofill);
       },
 
       // Cant deregister fields in lifecycle hooks due to:
@@ -100,6 +107,15 @@
           key: this.coords,
           value: this._toNumericValues(change),
         });
+      },
+
+      _onAutofill: function (autofill) {
+        console.log('autofill', autofill);
+        if (!autofill) {
+          return;
+        }
+        console.log('autofill in disaggregation-field.html!', autofill);
+        this._handleInput({ target: { value: 0 } })
       },
     });
   </script>

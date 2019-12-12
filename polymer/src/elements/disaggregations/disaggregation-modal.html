@@ -69,6 +69,13 @@
         </paper-button>
 
         <paper-button
+            class="btn-primary"
+            on-tap="_autofill"
+            raised>
+          Autofill
+        </paper-button>
+
+        <paper-button
             on-tap="close">
           [[localize('cancel')]]
         </paper-button>
@@ -133,6 +140,13 @@
           result: result,
         });
       },
+
+      _autofill: function () {
+        console.log('autofilling!');
+        var table = this.getContentChildNodes('.table')[0];
+
+        table._onAutofill();
+      }
 
     });
   </script>
