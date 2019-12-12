@@ -385,7 +385,15 @@
                     is="dom-if"
                     if="[[!_equals(computedMode, 'view')]]">
                   <autofill-confirm-modal
-                    id="autofill-confirm-modal-[[topLevelLocationIndex]]">
+                      id="autofill-confirm-modal-[[topLevelLocationIndex]]">
+                    <disaggregation-table
+                        data="[[topLevelLocation.byEntity.0]]"
+                        by-entity="[[topLevelLocation.byEntity]]"
+                        mapping="[[disaggregations.disagg_lookup_map]]"
+                        labels="[[disaggregations.labels]]"
+                        indicator-id="[[indicatorId]]"
+                        editable="1">
+                    </disaggregation-table>
                   </autofill-confirm-modal>
                 </template>
   
@@ -755,6 +763,7 @@
 
       _onAutofill: function (e) {
         console.log('autofill completed!', e.detail);
+        console.log('this.locationData', this.locationData[e.detail[e.detail.length - 1]]);
       }
     });
   </script>

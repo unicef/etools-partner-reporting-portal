@@ -27,6 +27,9 @@
       h3 {
         margin: 24px;
       }
+      .hidden {
+        display: none;
+      }
     </style>
 
     <paper-dialog
@@ -44,6 +47,13 @@
         Are you sure you want to fill all fields for this location with a value of 0?
         This will overwrite any data already entered in this location.
       </h3>
+
+      <div class="hidden">
+        <content
+            select="disaggregation-table"
+            class="table">
+        </content>
+      </div>
 
       <div class="buttons layout horizontal-reverse">
         <paper-button
@@ -83,7 +93,9 @@
       },
 
       _autofill: function () {
+        var table = this.getContentChildNodes('.table')[0];
         console.log('autofilling!', this.id);
+        console.log('table', table);
         this.fire('autofill', this.id)
         this.close();
       }
