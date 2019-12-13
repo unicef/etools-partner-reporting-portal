@@ -81,7 +81,6 @@
       attached: function () {
         this.$.field.validate();
         this.fire('register-field', this);
-        console.log('this.autofill', this.autofill);
       },
 
       // Cant deregister fields in lifecycle hooks due to:
@@ -110,11 +109,11 @@
       },
 
       _onAutofill: function (autofill) {
-        console.log('autofill', autofill);
         if (!autofill) {
           return;
         }
         console.log('autofill in disaggregation-field.html!', autofill);
+        this.set('value', 0);
         this._handleInput({ target: { value: 0 } })
       },
     });

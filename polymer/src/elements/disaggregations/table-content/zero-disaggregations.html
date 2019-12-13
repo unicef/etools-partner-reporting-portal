@@ -13,6 +13,7 @@
         level-reported="[[data.level_reported]]"
         indicator-type="[[data.display_type]]"
         row-type="totalsRow"
+        autofill="[[autofill]]"
         editable="[[editable]]">
     </disaggregation-table-row>
 
@@ -26,6 +27,8 @@
         editable: Number,
 
         data: Object,
+
+        autofill: Boolean,
 
         totalRow: {
           type: Array,
