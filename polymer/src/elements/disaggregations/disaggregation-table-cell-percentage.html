@@ -53,6 +53,7 @@
               key="v"
               min="0"
               value="[[data.v]]"
+              autofill="[[autofill]]"
               coords="[[coords]]">
             </disaggregation-field>
           </div>
@@ -63,6 +64,7 @@
               min="0"
               value="[[data.d]]"
               coords="[[coords]]"
+              autofill="[[autofill]]"
               validator="[[vName]]">
             </disaggregation-field>
           </div>
@@ -95,6 +97,7 @@
         vName: String,
         editable: Number,
         localData: Object,
+        autofill: Boolean,
 
         data: {
           type: Object,
