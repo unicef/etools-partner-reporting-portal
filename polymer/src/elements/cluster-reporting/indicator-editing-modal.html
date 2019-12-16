@@ -486,11 +486,6 @@
           },
           computed: '_computeMinDate(data.start_date_of_reporting_period)',
         },
-        
-        currentUserRoles: {
-          type: Array,
-          statePath: 'userProfile.profile.prp_roles'
-        }
       },
 
       observers: [
@@ -534,13 +529,6 @@
       },
 
       _computeCanEditDetails: function (permissions, data, isPAI) {
-        var isUserImo = this.currentUserRoles.find(function (role) {
-          return role.role === 'CLUSTER_IMO';
-        });
-        if (isUserImo !== undefined) {
-          return true;
-        }
-
         return (permissions.createClusterEntities && !isPAI) ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
