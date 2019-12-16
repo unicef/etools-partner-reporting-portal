@@ -529,7 +529,7 @@
       },
 
       _computeCanEditDetails: function (permissions, data, isPAI) {
-        return (permissions.createClusterEntities && !isPAI) ||
+        return permissions.createClusterEntities ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 

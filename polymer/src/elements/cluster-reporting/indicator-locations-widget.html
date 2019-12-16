@@ -478,7 +478,7 @@
 
         _computeCanEditDetails: function (editing, parentIndicatorId, isPAI, permissions) {
           return !editing ||
-              (permissions.createClusterEntities && !isPAI) ||
+              permissions.createClusterEntities ||
               (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
         },
 
