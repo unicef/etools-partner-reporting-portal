@@ -33,3 +33,6 @@ run:
 
 export:
 	export ${ENV_VARS}
+
+lint:
+	flake8 .
