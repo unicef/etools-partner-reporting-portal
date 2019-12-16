@@ -1429,7 +1429,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             "programme-document-indicators",
             args=[self.workspace.pk],
         )
-        reportable, pr = self._setup_reportable(report_status=report_status)
+        reportable, __ = self._setup_reportable(report_status=report_status)
 
         # expect results
         response = self.client.get(
