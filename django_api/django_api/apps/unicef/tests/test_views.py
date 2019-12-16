@@ -11,7 +11,7 @@ from core.common import (INDICATOR_REPORT_STATUS, OVERALL_STATUS,
                          PR_ATTACHMENT_TYPES, PROGRESS_REPORT_STATUS,
                          PRP_ROLE_TYPES)
 from core.factories import (
-    AbstractReportableFactory, CartoDBTableFactory, ClusterActivityFactory,
+    CartoDBTableFactory, ClusterActivityFactory,
     ClusterActivityPartnerActivityFactory, ClusterFactory,
     ClusterIndicatorReportFactory, ClusterObjectiveFactory,
     ClusterPRPRoleFactory, CountryFactory, DisaggregationFactory,
@@ -27,7 +27,7 @@ from core.factories import (
     QuantityReportableToLowerLevelOutputFactory,
     QuantityReportableToPartnerActivityProjectContextFactory,
     QuantityTypeIndicatorBlueprintFactory, ResponsePlanFactory, SectionFactory,
-    WorkspaceFactory, faker, RatioReportableToLowerLevelOutputFactory)
+    WorkspaceFactory, faker)
 from core.management.commands._generate_disaggregation_fake_data import \
     generate_3_num_disagg_data
 from core.models import Location
@@ -1429,11 +1429,6 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             "programme-document-indicators",
             args=[self.workspace.pk],
         )
-        qs = Reportable.objects.filter(
-            lower_level_outputs__isnull=False,
-            indicator_reports__progress_report__status=report_status,
-        )
-
         reportable, pr = self._setup_reportable(report_status=report_status)
 
         # expect results
