@@ -839,9 +839,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export(self, mock_create, mock_clean, mock_send):
-        # ensure at least one report has status overdue
+        # ensure at least one report has status submitted
         report = self.queryset.first()
-        report.status = PROGRESS_REPORT_STATUS.overdue
+        report.status = PROGRESS_REPORT_STATUS.submitted
         report.save()
 
         url = reverse(
@@ -856,11 +856,11 @@ class TestProgressReportAPIView(BaseAPITestCase):
             disposition.endswith('Progress Report(s) Summary.xlsx"'),
         )
         self.reports = self.queryset.filter(
-            status=PROGRESS_REPORT_STATUS.overdue
+            status=PROGRESS_REPORT_STATUS.submitted
         )
         self.assertTrue(len(self.reports))
         self.assertTrue(string_in_download(
-            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.submitted],
             response,
         ))
 
@@ -905,7 +905,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
             response,
         ))
-        self.assertTrue(string_in_download(
+        # Only submitted and accepted are allowed to be exported
+        self.assertFalse(string_in_download(
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.due],
             response,
         ))
@@ -967,7 +968,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
             response,
         ))
-        self.assertTrue(string_in_download(
+        # Only submitted and accepted are allowed to be exported
+        self.assertFalse(string_in_download(
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
             response,
         ))
