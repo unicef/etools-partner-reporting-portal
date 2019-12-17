@@ -469,7 +469,7 @@
 
         canEditDetails: {
           type: Boolean,
-          computed: '_computeCanEditDetails(permissions, data, isPAI)',
+          computed: '_computeCanEditDetails(permissions, data)',
         },
 
         dateFormat: {
@@ -528,7 +528,7 @@
         return type === 'number';
       },
 
-      _computeCanEditDetails: function (permissions, data, isPAI) {
+      _computeCanEditDetails: function (permissions, data) {
         return permissions.createClusterEntities ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
