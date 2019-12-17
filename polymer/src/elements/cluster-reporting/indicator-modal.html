@@ -1467,6 +1467,12 @@
               );
             }
 
+            if (location.in_need !== undefined && location.target.v > location.in_need.v) {
+              invalidLocations.push(
+                'Location ' + location.title + ' has a target greater than its in need'
+              );
+            }
+
             arr[idx] = location;
           });
         } else if (data.blueprint.display_type === 'number') {
@@ -1566,6 +1572,12 @@
             if (location.baseline.c > data.baseline.c) {
               invalidLocations.push(
                 'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
+              );
+            }
+
+            if (location.in_need !== undefined && location.target.c > location.in_need.c) {
+              invalidLocations.push(
+                'Location ' + location.title + ' has a target greater than its in need'
               );
             }
 
