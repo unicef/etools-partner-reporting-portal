@@ -1466,11 +1466,6 @@
                 'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
               );
             }
-            if (location.target.v > data.target.v) {
-              invalidLocations.push(
-                'Location ' + location.title + ' has a greater target than its indicator-level target'
-              );
-            }
 
             if (location.in_need !== undefined && location.target.v > location.in_need.v) {
               invalidLocations.push(
@@ -1577,11 +1572,6 @@
             if (location.baseline.c > data.baseline.c) {
               invalidLocations.push(
                 'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
-              );
-            }
-            if (location.target.c > data.target.c) {
-              invalidLocations.push(
-                'Location ' + location.title + ' has a greater target than its indicator-level target'
               );
             }
 
