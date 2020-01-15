@@ -155,11 +155,11 @@
       },
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       _openExistingModal: function () {
-        this.$$('#existing-modal').open();
+        this.shadowRoot.querySelector('#existing-modal').open();
       },
     });
   </script>

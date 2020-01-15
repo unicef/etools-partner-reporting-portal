@@ -124,8 +124,8 @@
 
         e.stopPropagation();
 
-        var v = this.$$('#v');
-        var d = this.$$('#d');
+        var v = this.shadowRoot.querySelector('#v');
+        var d = this.shadowRoot.querySelector('#d');
 
         if (typeof value.v !== 'undefined') {
           d.validate();
@@ -161,7 +161,7 @@
           validatorName: vName,
           validatorType: 'validator',
           validate: function (value) {
-            return Number(value) !== 0 || Number(this.$$('#v').getField().value) === 0;
+            return Number(value) !== 0 || Number(this.shadowRoot.querySelector('#v').getField().value) === 0;
           }.bind(this),
         };
 

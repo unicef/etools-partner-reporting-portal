@@ -836,18 +836,18 @@
       },
 
       _sendBack: function () {
-        this.$$('#sendBackModal').open();
+        this.shadowRoot.querySelector('#sendBackModal').open();
 
         this.async(function () {
-          this.$$('#viewMenu').select(2);
+          this.shadowRoot.querySelector('#viewMenu').select(2);
         });
       },
 
       _viewFeedback: function () {
-        this.$$('#feedbackModal').open();
+        this.shadowRoot.querySelector('#feedbackModal').open();
 
         this.async(function () {
-          this.$$('#nonViewMenu').select(1);
+          this.shadowRoot.querySelector('#nonViewMenu').select(1);
         });
       },
 

@@ -1068,7 +1068,7 @@
       },
 
       _setFrequency: function (e, data) {
-        var freq = this.$$('#frequencies').itemForElement(data.value);
+        var freq = this.shadowRoot.querySelector('#frequencies').itemForElement(data.value);
         if (!freq) {
           return;
         }
@@ -1091,7 +1091,7 @@
 
       _disableOtherRadioButton: function() {
         var self = this;
-        var radioGroup = this.$$('#mode');
+        var radioGroup = this.shadowRoot.querySelector('#mode');
 
         if (radioGroup !== undefined) {
           var otherRadio = Polymer.dom(radioGroup).children.find(function (element) {

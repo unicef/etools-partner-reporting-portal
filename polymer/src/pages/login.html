@@ -272,8 +272,8 @@
 
       submit: function() {
         var self = this;
-        this.$$('#email').validate();
-        if (this.$$('#email').invalid) {
+        this.shadowRoot.querySelector('#email').validate();
+        if (this.shadowRoot.querySelector('#email').invalid) {
           return;
         }
         var thunk = this.$.login.thunk();
