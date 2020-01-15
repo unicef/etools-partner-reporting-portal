@@ -102,12 +102,6 @@
         },
       },
 
-      listeners: {
-        'ajax.response': '_handleResponse',
-        'ajax.request': '_handleRequest',
-        'ajax.error': '_handleError',
-      },
-
       _computeHeaders: function (headers, token) {
         return Object.assign({}, {
           Authorization: 'Bearer ' + token,
@@ -181,6 +175,29 @@
         if (this.lastRequest) {
           this.lastRequest.xhr.abort();
         }
+      },
+
+      _addEventListeners: function () {
+        this._handleResponse = this._handleResponse.bind(this);
+        this.addEventListener('ajax.response', this._handleResponse);
+        this._handleRequest = this._handleRequest.bind(this);
+        this.addEventListener('ajax.request', this._handleRequest);
+        this._handleError = this._handleError.bind(this);
+        this.addEventListener('ajax.error', this._handleError);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('ajax.response', this._handleResponse);
+        this.removeEventListener('ajax.request', this._handleRequest);
+        this.removeEventListener('ajax.error', this._handleError);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

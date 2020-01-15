@@ -219,19 +219,19 @@
       </div>
 
       <etools-prp-printer selector=".printme">
-        
+
         <div id="tabs-pages-container">
           <div id="tabs-list-container">
             <div class="tabs-header-container">
               <div class="header">
                 <h3 class="locations-heading">[[localize('data_for_locations')]]</h3>
-      
+
                 <paper-icon-button
                     class="print-btn"
                     icon="icons:print">
                 </paper-icon-button>
               </div>
-      
+
               <div hidden aria-hidden="true">
                 <template
                     is="dom-if"
@@ -241,7 +241,7 @@
                     <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
                   </dl>
                 </template>
-      
+
                 <template
                     is="dom-if"
                     if="[[indicatorName]]">
@@ -250,7 +250,7 @@
                     <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
                   </dl>
                 </template>
-      
+
                 <template
                     is="dom-if"
                     if="[[indicatorStatus]]">
@@ -261,7 +261,7 @@
                       report-type="[[reportType]]">
                   </report-status>
                 </template>
-      
+
                 <div class="printme" style="margin-bottom: 2em;"></div>
               </div>
             </div>
@@ -280,7 +280,7 @@
               </template>
             </paper-listbox>
           </div>
-  
+
           <iron-pages selected="{{selected}}" id="pages-container">
             <template
                 is="dom-repeat"
@@ -305,7 +305,7 @@
                       </div>
                     </div>
                   </template>
-    
+
                   <div id="reporting-tabs-list">
                     <paper-tabs
                         selected="{{topLevelLocation.selected}}"
@@ -320,7 +320,7 @@
                     </paper-tabs>
                   </div>
                 </div>
-  
+
                 <iron-pages selected="{{topLevelLocation.selected}}" id="page-view-container">
                   <template
                       is="dom-repeat"
@@ -335,7 +335,7 @@
                               <dd style="display: inline; margin: 0;">[[location.location.title]] - [[location.reporting_entity.title]]</dd>
                             </dl>
                           </div>
-  
+
                           <dl>
                             <template
                                 is="dom-if"
@@ -360,7 +360,7 @@
                               <dd>[[_formatIndicatorValue(location.display_type, location.previous_location_progress.c, 1)]]</dd>
                             </template>
                           </dl>
-  
+
                           <disaggregation-table
                               class="printme"
                               data="[[location]]"
@@ -372,7 +372,7 @@
                     </div>
                   </template>
                 </iron-pages>
-  
+
                 <template
                     is="dom-if"
                     if="[[!_equals(computedMode, 'view')]]">
@@ -416,7 +416,7 @@
                         </dl>
                       </div>
                     </div>
-  
+
                     <template
                         is="dom-if"
                         if="[[_computeTableVisibility(opened, topLevelLocationIndex)]]"
@@ -563,10 +563,6 @@
           type: Boolean,
           computed: '_computeIsHfIndicator(disaggregations)'
         },
-      },
-
-      listeners: {
-        'locations-updated': '_onLocationsUpdated',
       },
 
       _fetchData: function () {
@@ -727,8 +723,22 @@
         return reportStatus === 'Sub' || reportStatus === 'Acc';
       },
 
+      _addEventListeners: function () {
+        this._onLocationsUpdated = this._onLocationsUpdated.bind(this);
+        this.addEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
       attached: function () {
         this.set('opened', {});
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

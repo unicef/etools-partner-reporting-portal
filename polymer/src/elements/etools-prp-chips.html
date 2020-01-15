@@ -115,10 +115,6 @@
         },
       },
 
-      listeners: {
-        'chip-add': '_onChipAdd',
-      },
-
       validate: function () {
         this.set('_invalid', this.invalid);
       },
@@ -131,11 +127,11 @@
         return 'chip__content' + (disabled ? ' chip__content--disabled' : '');
       },
 
-      _onChipAdd: function (e, chip) {
+      _onChipAdd: function (e) {
         e.stopPropagation();
 
-        if (this.value.indexOf(chip) === -1) {
-          this.set('value', this.value.concat(chip));
+        if (this.value.indexOf(e.detail) === -1) {
+          this.set('value', this.value.concat(e.detail));
           this.fire('selected-chips-updated');
         }
       },
@@ -150,7 +146,21 @@
         this.fire('selected-chips-updated');
       },
 
+      _addEventListeners: function () {
+        this._onChipAdd = this._onChipAdd.bind(this);
+        this.addEventListener('chip-add', this._onChipAdd);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('chip-add', this._onChipAdd);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         this.set('value', []);
       },
     });

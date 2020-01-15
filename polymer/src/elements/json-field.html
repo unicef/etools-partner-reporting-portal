@@ -154,10 +154,6 @@
         },
       },
 
-      listeners: {
-        'value-changed': '_onValueChanged',
-      },
-
       _computeDisabled: function (disabled, disableDenominator) {
         return disabled || disableDenominator;
       },
@@ -215,6 +211,23 @@
 
       _onValueChanged: function (e) {
         e.stopPropagation();
+      },
+
+      _addEventListeners: function () {
+        this._onValueChanged = this._onValueChanged.bind(this);
+        this.addEventListener('value-changed', this._onValueChanged);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('value-changed', this._onValueChanged);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

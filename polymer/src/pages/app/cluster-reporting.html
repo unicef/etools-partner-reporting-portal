@@ -96,10 +96,6 @@
         '_routePageChanged(routeData.page)',
       ],
 
-      listeners: {
-        'refresh-plan-list': '_fetchResponsePlans',
-      },
-
       _routePageChanged: function (page) {
         switch (page) {
           case 'select-plan':
@@ -141,6 +137,23 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _addEventListeners: function () {
+        this._fetchResponsePlans = this._fetchResponsePlans.bind(this);
+        this.addEventListener('refresh-plan-list', this._fetchResponsePlans);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('refresh-plan-list', this._fetchResponsePlans);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

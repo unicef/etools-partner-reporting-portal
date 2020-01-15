@@ -289,10 +289,6 @@
         '_setDefaults(opened)',
       ],
 
-      listeners: {
-        'indicator-locations-modal-refit': 'adjustPosition',
-      },
-
       _computeUpdateUrl: function (data) {
         return App.Endpoints.indicatorPerLocationVars(data.id);
       },
@@ -364,6 +360,24 @@
               self.set('errors', err.data);
             });
       },
+
+      _addEventListeners: function () {
+        this.adjustPosition = this.adjustPosition.bind(this);
+        this.addEventListener('indicator-locations-modal-refit', this.adjustPosition);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('indicator-locations-modal-refit', this.adjustPosition);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
+      },
+
     });
   </script>
 </dom-module>
