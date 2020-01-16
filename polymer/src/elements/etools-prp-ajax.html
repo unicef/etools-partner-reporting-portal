@@ -179,6 +179,7 @@
       },
 
       _addEventListeners: function () {
+        // TODO: (dci) it seems these are not triggered, need to be checked, maybe can be removed ?
         this._handleResponse = this._handleResponse.bind(this);
         this.addEventListener('ajax.response', this._handleResponse);
         this._handleRequest = this._handleRequest.bind(this);
