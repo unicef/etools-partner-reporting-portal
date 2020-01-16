@@ -360,13 +360,14 @@
       _addEventListeners: function () {
         this._onDeleteFile = this._onDeleteFile.bind(this);
         this.addEventListener('delete-file', this._onDeleteFile);
-        this._onProgressChanged = this._onProgressChanged.bind(this);
-        this.addEventListener('prp-file-progress-changed', this._onProgressChanged);
+        // TODO(dci): NOT FOUND !!!
+        // this._onProgressChanged = this._onProgressChanged.bind(this);
+        // this.addEventListener('prp-file-progress-changed', this._onProgressChanged);
       },
 
       _removeEventListeners: function () {
         this.removeEventListener('delete-file', this._onDeleteFile);
-        this.removeEventListener('prp-file-progress-changed', this._onProgressChanged);
+        // this.removeEventListener('prp-file-progress-changed', this._onProgressChanged);
       },
 
       attached: function () {

@@ -112,9 +112,9 @@
         this._fetchData();
       },
 
-      _onRefreshReport: function (e, reportId) {
+      _onRefreshReport: function (e) {
         e.stopPropagation();
-
+        const reportId = e.detail;
         var ajax = document.createElement('etools-prp-ajax');
 
         ajax.url = App.Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);

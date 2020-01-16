@@ -113,7 +113,8 @@
         return (method || '').toUpperCase();
       },
 
-      _handleResponse: function (e, request) {
+      _handleResponse: function (e) {
+        const request = e.detail;
         var token = request.xhr.getResponseHeader('token');
 
         if (token) {
