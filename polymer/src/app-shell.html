@@ -182,7 +182,7 @@
 
       _addEventListeners: function () {
         this._handleError = this._handleError.bind(this);
-        this.root.addEventListener('error', this._handleError);
+        this.shadowRoot.addEventListener('error', this._handleError);
         this._onSignOut = this._onSignOut.bind(this);
         this.addEventListener('sign-out', this._onSignOut);
         this._onTokenError = this._onTokenError.bind(this);
@@ -190,7 +190,7 @@
       },
 
       _removeEventListeners: function () {
-        this.root.removeEventListener('error', this._handleError);
+        this.shadowRoot.removeEventListener('error', this._handleError);
         this.removeEventListener('sign-out', this._onSignOut);
         this.removeEventListener('token-error', this._onTokenError);
       },
