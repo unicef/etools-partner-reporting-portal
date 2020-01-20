@@ -59,10 +59,6 @@
         }
       },
 
-      listeners: {
-        'field.value-changed': '_handleInput',
-      },
-
       _handleInput: function () {
         var newValue = this.$.field.value;
         this.fire('filter-changed', {
@@ -71,8 +67,22 @@
         });
       },
 
+      _addEventListeners: function () {
+        this._handleInput = this._handleInput.bind(this);
+        this.addEventListener('field.value-changed', this._handleInput);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('field.value-changed', this._handleInput);
+      },
+
       attached: function () {
+        this._addEventListeners();
         this._filterReady();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

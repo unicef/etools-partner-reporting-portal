@@ -129,21 +129,15 @@
         },
       },
 
-      listeners: {
-        'report-submit-confirm': '_onConfirm',
-        'report-submitted': '_onContentsChanged',
-        'report-reviewed': '_onContentsChanged',
-      },
-
       _computeIsIMOClusters: function (profile) {
         return profile.prp_roles ? profile.prp_roles.some(function (role) {
           return role.role === App.Constants.PRP_ROLE.CLUSTER_IMO;
         }) : [];
       },
 
-      _onConfirm: function (e, result) {
+      _onConfirm: function (e) {
         e.stopPropagation();
-
+        const result = e.detail;
         if (!this.isIMO) {
           this.$.confirm.run({
             body:
@@ -175,6 +169,28 @@
         } else {
           // Let the parent component handle the event
         }
+      },
+
+      _addEventListeners: function () {
+        this._onConfirm = this._onConfirm.bind(this);
+        this.addEventListener('report-submit-confirm', this._onConfirm);
+        this._onContentsChanged = this._onContentsChanged.bind(this);
+        this.addEventListener('report-submitted', this._onContentsChanged);
+        this.addEventListener('report-reviewed', this._onContentsChanged);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('report-submit-confirm', this._onConfirm);
+        this.removeEventListener('report-submitted', this._onContentsChanged);
+        this.removeEventListener('report-reviewed', this._onContentsChanged);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>
