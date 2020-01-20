@@ -633,11 +633,6 @@
         },
       },
 
-      listeners: {
-        'report-complete': '_onReportComplete',
-        'reportable-meta-changed': '_updateMeta',
-      },
-
       _calculationFormulaAcrossPeriods: function (indicator) {
         return indicator.reportable.blueprint.display_type === 'ratio'
           ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
@@ -758,9 +753,9 @@
         this.set('busy', false);
       },
 
-      _onReportComplete: function (e, data) {
+      _onReportComplete: function (e) {
         e.stopPropagation();
-
+        const data = e.detail;
         this.dispatch(
           App.Actions.ClusterIndicatorReports.updateSingle(
             data.indicatorId,
@@ -771,12 +766,12 @@
         );
       },
 
-      _updateMeta: function (e, data) {
+      _updateMeta: function (e) {
         var self = this;
         var updateThunk;
 
         e.stopPropagation();
-
+        const data = e.detail;
         this.set('reportMeta', data);
 
         updateThunk = this.$.update.thunk();
@@ -863,10 +858,27 @@
         }
       },
 
+      _addEventListeners: function () {
+        this._onReportComplete = this._onReportComplete.bind(this);
+        this.addEventListener('report-complete', this._onReportComplete);
+        this._updateMeta = this._updateMeta.bind(this);
+        this.addEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('report-complete', this._onReportComplete);
+        this.removeEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
         this.$.submit.abort();
         this.$.error.close();
         this.$.update.abort();
+        this._removeEventListeners();
       },
     });
   </script>

@@ -124,11 +124,6 @@
         },
       },
 
-      listeners: {
-        'indicatorModal.indicator-added': '_onSuccess',
-        'indicator-edited': '_onSuccess',
-      },
-
       observers: [
         '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
       ],
@@ -169,6 +164,25 @@
       _computeCanAddIndicator: function (permissions, clusterId) {
         return permissions.createClusterEntities &&
             permissions.createClusterEntitiesForCluster(clusterId);
+      },
+
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('indicatorModal.indicator-added', this._onSuccess);
+        this.addEventListener('indicator-edited', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('indicatorModal.indicator-added', this._onSuccess);
+        this.removeEventListener('indicator-edited', this._onSuccess);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

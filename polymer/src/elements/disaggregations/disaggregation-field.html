@@ -64,17 +64,27 @@
         },
       },
 
-      listeners: {
-        'field.input': '_handleInput',
-      },
-
       ready: function () {
         this.$.field.validate();
       },
 
+      _addEventListeners: function () {
+        this._handleInput = this._handleInput.bind(this);
+        this.addEventListener('field.input', this._handleInput);
+      },
+
       attached: function () {
+        this._addEventListeners();
         this.$.field.validate();
         this.fire('register-field', this);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('field.input', this._handleInput);
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
 
       // Cant deregister fields in lifecycle hooks due to:
