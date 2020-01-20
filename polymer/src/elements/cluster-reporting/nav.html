@@ -51,7 +51,10 @@
 
     <paper-listbox
       id="menu"
-      selected="{{ selected }}">
+      selected="{{ selected }}"
+      attr-for-selected="name"
+      selectable=".selectable"
+      key-event-target="null">
 
       <div class="nav-content">
         <div>
