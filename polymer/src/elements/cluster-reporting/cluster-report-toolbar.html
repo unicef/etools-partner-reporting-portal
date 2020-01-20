@@ -74,10 +74,6 @@
         },
       },
 
-      listeners: {
-        'file-uploaded': '_onFileUploaded',
-      },
-
       _computeImportTemplateUrl: function (responsePlanId, query, submitted) {
         return this._appendQuery(
           App.Endpoints.clusterIndicatorReportsImportTemplate(responsePlanId),
@@ -102,6 +98,23 @@
         e.stopPropagation();
 
         this.fire('template-file-uploaded');
+      },
+
+      _addEventListeners: function () {
+        this._onFileUploaded = this._onFileUploaded.bind(this);
+        this.addEventListener('file-uploaded', this._onFileUploaded);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('file-uploaded', this._onFileUploaded);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

@@ -369,11 +369,6 @@
 
       },
 
-      listeners: {
-        'details-loaded': 'adjustPosition',
-        'mode.selected-changed': 'adjustPosition',
-      },
-
       observers: [
         '_fetchPlans(mode, ochaPlansUrl)',
         '_fetchConfig(mode, configUrl)',
@@ -523,6 +518,25 @@
             self.set('errors', err.data);
             self.set('updatePending', false);
           });
+      },
+
+      _addEventListeners: function () {
+        this.adjustPosition = this.adjustPosition.bind(this);
+        this.addEventListener('details-loaded', this.adjustPosition);
+        this.addEventListener('mode.selected-changed', this.adjustPosition);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('details-loaded', this.adjustPosition);
+        this.removeEventListener('mode.selected-changed', this.adjustPosition);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

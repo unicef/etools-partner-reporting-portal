@@ -48,10 +48,6 @@
         },
       },
 
-      listeners: {
-        'field.iron-select': '_handleChange',
-      },
-
       _handleChange: function () {
         this.async(function () {
           this.fire('filter-changed', {
@@ -65,6 +61,23 @@
         if (data.length) {
           this._filterReady();
         }
+      },
+
+      _addEventListeners: function () {
+        this._handleChange = this._handleChange.bind(this);
+        this.addEventListener('field.iron-select', this._handleChange);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('field.iron-select', this._handleChange);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

@@ -565,10 +565,6 @@
         },
       },
 
-      listeners: {
-        'locations-updated': '_onLocationsUpdated',
-      },
-
       _fetchData: function () {
         var disaggregationsThunk = this.$.disaggregations.thunk();
 
@@ -727,8 +723,22 @@
         return reportStatus === 'Sub' || reportStatus === 'Acc';
       },
 
+      _addEventListeners: function () {
+        this._onLocationsUpdated = this._onLocationsUpdated.bind(this);
+        this.addEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
       attached: function () {
         this.set('opened', {});
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

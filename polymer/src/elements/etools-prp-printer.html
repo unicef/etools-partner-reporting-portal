@@ -20,10 +20,6 @@
         printWindow: Object,
       },
 
-      listeners: {
-        tap: '_onTap',
-      },
-
       _onTap: function (e) {
         if (!e.target.classList.contains('print-btn')) {
           return;
@@ -58,6 +54,24 @@
           this.set('printWindow', null);
         }, 100);
       },
+
+      _addEventListeners: function () {
+        this._onTap = this._onTap.bind(this);
+        this.addEventListener('tap', this._onTap);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('tap', this._onTap);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
+      },
+
     });
   </script>
 </dom-module>

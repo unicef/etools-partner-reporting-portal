@@ -41,20 +41,33 @@
         App.Behaviors.UtilsBehavior,
       ],
 
-      listeners: {
-        'filter-changed': '_onFilterChanged',
-      },
-
-      _onFilterChanged: function (e, data) {
+      _onFilterChanged: function (e) {
         var change = {
           page: 1,
         };
-
+        const data = e.detail;
         change[data.name] = data.value;
 
         e.stopPropagation();
 
         this.set('queryParams', Object.assign({}, this.queryParams, change));
+      },
+
+      _addEventListeners: function () {
+        this._onFilterChanged = this._onFilterChanged.bind(this);
+        this.addEventListener('filter-changed', this._onFilterChanged);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('filter-changed', this._onFilterChanged);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

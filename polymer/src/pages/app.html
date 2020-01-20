@@ -194,11 +194,6 @@
         '_handleWorkspaceChange(currentWorkspace, workspaces)',
       ],
 
-      listeners: {
-        'notify': '_notify',
-        'fetch-profile': '_fetchProfile',
-      },
-
       _redirectToWorkspace: function (workspace) {
         var code = workspace.code;
 
@@ -210,13 +205,12 @@
         this.set('route.path', '/' + this.routeData.workspace_code + '/' + app);
       },
 
-      _handleWorkspacesAsync: function (e, change) {
+      _handleWorkspacesAsync: function (e) {
         var workspace;
-
+        const change = e.detail;
         try {
           if (change.value.length) {
-            this.unlisten(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
-
+            this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync);
             workspace = change.value[0];
 
             this._redirectToWorkspace(workspace);
@@ -238,7 +232,8 @@
             this._redirectToWorkspace(workspace);
           } else {
             // Wait until workspaces are available, then pick one & redirect
-            this.listen(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
+            this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
+            this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync);
           }
         } else if (!this._workspaceCode) {
           this.dispatch(App.Actions.setWorkspace(workspace_code));
@@ -297,9 +292,9 @@
         this.dispatch(App.Actions.Location.set(currentWorkspaceData.id));
       },
 
-      _notify: function (e, options) {
+      _notify: function (e) {
         e.stopPropagation();
-
+        const options = e.detail;
         try {
           if (options.text) {
             this.$[options.type].text = options.text;
@@ -314,16 +309,33 @@
         return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
       },
 
+      _addEventListeners: function () {
+        this._notify = this._notify.bind(this);
+        this.addEventListener('notify', this._notify);
+        this._fetchProfile = this._fetchProfile.bind(this);
+        this.addEventListener('fetch-profile', this._fetchProfile);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('notify', this._notify);
+        this.removeEventListener('fetch-profile', this._fetchProfile);
+      },
+
       attached: function () {
+        this._addEventListeners();
         var interventionsThunk = this.$.interventions.thunk();
 
         Promise.all([
           this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk)),
           this._fetchProfile(),
         ])
-            .catch(function () {
-              window.location.href = '/landing';
-            });
+          .catch(function () {
+            window.location.href = '/landing';
+          });
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

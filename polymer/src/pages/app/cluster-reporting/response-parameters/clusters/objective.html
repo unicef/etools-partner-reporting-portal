@@ -148,10 +148,6 @@
         '_updateUrlTab(routeData.tab)',
       ],
 
-      listeners: {
-      'objective-edited': '_onSuccess',
-      },
-
       _onSuccess: function() {
         this._getObjectiveAjax();
       },
@@ -190,8 +186,22 @@
           });
       },
 
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('objective-edited', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('objective-edited', this._onSuccess);
+      },
+
       attached: function () {
+        this._addEventListeners();
         this._getObjectiveAjax();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

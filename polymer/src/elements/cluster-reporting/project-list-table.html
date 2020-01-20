@@ -233,11 +233,6 @@
           this.shadowRoot.querySelector('#modal').open();
         },
 
-        listeners: {
-          'page-number-changed': '_tableContentChanged',
-          'details-opened-changed': '_detailsChange'
-        },
-
         _detailUrl: function(project, query) {
           var path = '/response-parameters/partners/project/' + project.id;
           if (this.page === 'planned-action') {
@@ -247,10 +242,26 @@
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
 
-        detached: function () {
-          this.openedDetails.length = 0;
+        _addEventListeners: function () {
+          this._tableContentChanged = this._tableContentChanged.bind(this);
+          this.addEventListener('page-number-changed', this._tableContentChanged);
+          this._detailsChange = this._detailsChange.bind(this);
+          this.addEventListener('details-opened-changed', this._detailsChange);
         },
 
+        _removeEventListeners: function () {
+          this.removeEventListener('page-number-changed', this._tableContentChanged);
+          this.removeEventListener('details-opened-changed', this._detailsChange);
+        },
+
+        attached: function () {
+          this._addEventListeners();
+        },
+
+        detached: function () {
+          this._removeEventListeners();
+          this.openedDetails.length = 0;
+        },
       });
     </script>
   </dom-module>
