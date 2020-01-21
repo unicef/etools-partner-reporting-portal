@@ -1,5 +1,4 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-submenu.html">
 <link rel="import" href="../../../bower_components/app-route/app-route.html">
@@ -10,6 +9,8 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="../../../bower_components/paper-divider/paper-divider.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -49,7 +50,7 @@
       params-object="{{ queryParams }}">
     </iron-query-params>
 
-    <paper-menu
+    <paper-listbox
       id="menu"
       selected="{{ selected }}"
       attr-for-selected="name"
@@ -71,7 +72,7 @@
                   <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
                 </a>
               </paper-item>
-              <paper-menu class="menu-content">
+              <paper-listbox class="menu-content">
                 <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
                   <a href="[[_appendQuery(clustersUrl, clusterQuery)]]">[[localize('clusters')]]</a>
                 </paper-item>
@@ -79,7 +80,7 @@
                   <a href="[[_appendQuery(partnersUrl, clusterQuery)]]">[[localize('partners')]]</a>
                   </a>
                 </paper-item>
-              </paper-menu>
+              </paper-listbox>
             </paper-submenu>
           </div>
 
@@ -129,7 +130,7 @@
           </paper-item>
         </div>
       </div>
-    </paper-menu>
+    </paper-listbox>
   </template>
 
   <script>

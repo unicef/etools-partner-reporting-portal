@@ -9,8 +9,8 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
@@ -174,15 +174,15 @@
         padding: 25px;
       }
 
-      paper-menu {
+      paper-listbox {
         white-space: nowrap;
       }
 
-      paper-menu a {
+      paper-listbox a {
         color: inherit;
       }
 
-      paper-menu iron-icon {
+      paper-listbox iron-icon {
         margin-right: .25em;
       }
 
@@ -366,10 +366,10 @@
 
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-menu
-                    id="viewMenu"
-                    class="dropdown-content"
-                    selected="2">
+                  <paper-listbox
+                      id="viewMenu"
+                      class="dropdown-content"
+                      selected="2">
                     <template
                       is="dom-if"
                       if="[[canSendBack]]">
@@ -390,7 +390,7 @@
                     </a>
 
                     <div></div>
-                  </paper-menu>
+                  </paper-listbox>
                 </paper-menu-button>
               </template>
 
@@ -405,17 +405,17 @@
                 </feedback-modal>
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-menu
-                    id="nonViewMenu"
-                    class="dropdown-content"
-                    selected="1">
+                  <paper-listbox
+                      id="nonViewMenu"
+                      class="dropdown-content"
+                      selected="1">
                     <paper-icon-item on-tap="_viewFeedback">
                       <iron-icon icon="icons:announcement" item-icon></iron-icon>
                       [[localize('view_feedback')]]
                     </paper-icon-item>
 
                     <div></div>
-                  </paper-menu>
+                  </paper-listbox>
                 </paper-menu-button>
               </template>
             </div>
