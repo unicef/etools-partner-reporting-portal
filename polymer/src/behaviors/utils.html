@@ -199,8 +199,8 @@
       },
 
       _dateRangeValid: function (start, end) {
-        var startField = this.$$(start);
-        var endField = this.$$(end);
+        var startField = this.shadowRoot.querySelector(start);
+        var endField = this.shadowRoot.querySelector(end);
         var startValue = startField.value;
         var endValue = endField.value;
 

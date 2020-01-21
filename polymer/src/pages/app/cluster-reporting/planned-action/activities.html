@@ -69,7 +69,7 @@
       is: 'planned-action-activities-list',
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       observers: [

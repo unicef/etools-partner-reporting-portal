@@ -70,7 +70,7 @@
       is: 'planned-action-projects-list',
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       observers: [

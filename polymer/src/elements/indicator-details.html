@@ -626,11 +626,11 @@
       },
 
       _openModal: function (e) {
-        this.$$('#modal-' + e.target.modalIndex).open();
+        this.shadowRoot.querySelector('#modal-' + e.target.modalIndex).open();
       },
 
       _openPullModal: function (e) {
-        this.$$('#pull-modal-' + e.target.modalIndex).open();
+        this.shadowRoot.querySelector('#pull-modal-' + e.target.modalIndex).open();
       },
 
       _updateModals: function (e, data) {
