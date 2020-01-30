@@ -484,15 +484,19 @@
       },
 
       _addEventListeners: function () {
-        this._registerField = this._registerField.bind(this);
-        this.addEventListener('register-field', this._registerField);
-        this._fieldValueChanged = this._fieldValueChanged.bind(this);
-        this.addEventListener('field-value-changed', this._fieldValueChanged);
+        if (this.editableBool){
+          this._registerField = this._registerField.bind(this);
+          this.addEventListener('register-field', this._registerField);
+          this._fieldValueChanged = this._fieldValueChanged.bind(this);
+          this.addEventListener('field-value-changed', this._fieldValueChanged);
+        }
       },
 
       _removeEventListeners: function () {
-        this.removeEventListener('register-field', this._registerField);
-        this.removeEventListener('field-value-changed', this._fieldValueChanged);
+        if (this.editableBool){
+          this.removeEventListener('register-field', this._registerField);
+          this.removeEventListener('field-value-changed', this._fieldValueChanged);
+        }
       },
 
       detached: function () {
