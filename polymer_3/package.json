@@ -4,12 +4,9 @@
   "description": "Partner Reporting Portal",
   "repository": {
     "type": "git",
-    "url": "git@github.com:PolymerElements/generator-polymer-init-custom-build"
+    "url": "git@github.com:unicef/etools-partner-reporting-portal"
   },
   "license": "http://polymer.github.io/LICENSE.txt",
-  "bugs": {
-    "url": "https://github.com/PolymerElements/generator-polymer-init-custom-build/issues"
-  },
   "engines": {
     "node": ">=4.0"
   },
