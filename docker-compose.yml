@@ -41,6 +41,7 @@ services:
     depends_on:
       - django_api
       - polymer
+      - polymer_3
 
   django_api:
     image: unicef/etools-prp
