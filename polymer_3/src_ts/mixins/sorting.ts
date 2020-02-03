@@ -33,6 +33,9 @@ function SortingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     detached() {
       this.removeEventListener('sort-changed', this._sortOrderChanged as any);
+      if (this._sortOrderDebouncer && this._sortOrderDebouncer.isActive()) {
+        this._sortOrderDebouncer?.cancel();
+      }
     }
 
   }
