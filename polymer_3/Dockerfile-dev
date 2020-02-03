@@ -9,5 +9,5 @@ RUN npm install -g typescript
 
 WORKDIR /code
 
-EXPOSE 8082
+EXPOSE 8084
 CMD ["npm", "run", "dev"]
