@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
-import App from '../constants';
+import Constants from '../constants';
 import 'numeral/min/numeral.min.js';
 
 /**
@@ -76,7 +76,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         '<div class="tooltip-content">',
         '<div>' + title + '</div>',
         '<div class="number-of-partners">',
-        numeral(data.length).format(App.Constants.FORMAT_NUMBER_DEFAULT),
+        numeral(data.length).format(Constants.FORMAT_NUMBER_DEFAULT),
         '</div>',
         '<div>' + this._joinWithComma(data) + '</div>',
         '</div>',
@@ -104,8 +104,8 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       return obj ? obj.v / obj.d : 0;
     }
 
-    ready() {
-      super.ready();
+    connectedCallback() {
+      super.connectedCallback();
 
       this.addChartStyle();
     }

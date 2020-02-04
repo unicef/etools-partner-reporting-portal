@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
-import App from '../constants';
+import Settings from '../settings';
 
 /**
  * @polymer
@@ -11,7 +11,7 @@ function ResponsiveMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class ResponsiveClass extends baseClass {
 
     @property({type: String, readOnly: true})
-    desktopLayoutQuery: string = App.Settings.layout.threshold;
+    desktopLayoutQuery: string = Settings.layout.threshold;
 
     @property({type: Object})
     isDesktop: GenericObject = {
