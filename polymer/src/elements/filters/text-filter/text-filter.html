@@ -16,6 +16,7 @@
         type="[[type]]"
         label="[[label]]"
         value="[[value]]"
+        on-value-changed="_filterValueChanged"
         always-float-label>
     </paper-input>
   </template>
@@ -37,35 +38,26 @@
         },
       },
 
-      _handleInput: function () {
+      _filterValueChanged: function () {
         this.debounce('input', function propagateChange() {
-          var newValue = this.$.field.value.trim();
+          if(this.$.field.value) {
+            var newValue = this.$.field.value.trim();
 
-          if (newValue !== this.lastValue) {
-            this.fire('filter-changed', {
-              name: this.name,
-              value: newValue,
-            });
+            if (newValue !== this.lastValue) {
+              this.fire('filter-changed', {
+                name: this.name,
+                value: newValue,
+              });
+            }
           }
         }, this._debounceDelay);
       },
 
-      _addEventListeners: function () {
-        this._handleInput = this._handleInput.bind(this);
-        this.addEventListener('field.input', this._handleInput);
-      },
-
-      _removeEventListeners: function () {
-        this.removeEventListener('field.input', this._handleInput);
-      },
-
       attached: function () {
-        this._addEventListeners();
         this._filterReady();
       },
 
       detached: function () {
-        this._removeEventListeners();
         if (this.isDebouncerActive('input')) {
           this.cancelDebouncer('input');
         }
