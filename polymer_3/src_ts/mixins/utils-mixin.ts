@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import '../settings';
+import Settings from '../settings';
 
 declare const moment: any;
 
@@ -291,7 +291,8 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     public _normalizeDate (date: any) {
-      return moment(date, App.Settings.dateFormat).startOf('day').toDate();
+
+      return moment(date, Settings.dateFormat).startOf('day').toDate();
     }
 
   }

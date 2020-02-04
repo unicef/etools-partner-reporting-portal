@@ -1,6 +1,6 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor} from '../typings/globals.types';
-import '../settings';
+import Settings from '../settings';
 
 
 /**
@@ -12,7 +12,7 @@ function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseCla
   class ProgressReportUtilsClass extends baseClass{
 
     public _isReadOnlyReport(report: any) {
-      return App.Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
+      return Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
     }
 
     _getMode(report: any, permissions: any) {
