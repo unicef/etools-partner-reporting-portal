@@ -26,12 +26,16 @@ function SortingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         });
     }
 
-    attached() {
+    connectedCallback() {
+      super.connectedCallback();
+
       this._sortOrderChanged = this._sortOrderChanged.bind(this);
       this.addEventListener('sort-changed', this._sortOrderChanged as any);
     }
 
-    detached() {
+    disconnectedCallback() {
+      super.disconnectedCallback();
+
       this.removeEventListener('sort-changed', this._sortOrderChanged as any);
       if (this._sortOrderDebouncer && this._sortOrderDebouncer.isActive()) {
         this._sortOrderDebouncer.cancel();

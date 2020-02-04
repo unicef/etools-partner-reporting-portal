@@ -104,9 +104,14 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       return obj ? obj.v / obj.d : 0;
     }
 
-    attached() {
-      const style = document.createElement('style');
+    ready() {
+      super.ready();
 
+      this.addChartStyle();
+    }
+
+    addChartStyle() {
+      const style = document.createElement('style');
       style.innerHTML = this.tooltipStyles;
 
       const googleChart = this.shadowRoot!.querySelector('google-chart');

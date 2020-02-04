@@ -31,11 +31,15 @@ function FilterMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       });
     }
 
-    attached() {
+    connectedCallback() {
+      super.connectedCallback();
+
       fireEvent(this, 'register-filter', this.name);
     }
 
-    detached() {
+    disconnectedCallback() {
+      super.disconnectedCallback();
+
       fireEvent(this, 'deregister-filter', this.name);
     }
   }
