@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
-import AppConstants from '../constants';
+import App from '../constants';
 import 'numeral/min/numeral.min.js';
 
 /**
@@ -76,7 +76,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         '<div class="tooltip-content">',
         '<div>' + title + '</div>',
         '<div class="number-of-partners">',
-        numeral(data.length).format(AppConstants.FORMAT_NUMBER_DEFAULT),
+        numeral(data.length).format(App.Constants.FORMAT_NUMBER_DEFAULT),
         '</div>',
         '<div>' + this._joinWithComma(data) + '</div>',
         '</div>',
