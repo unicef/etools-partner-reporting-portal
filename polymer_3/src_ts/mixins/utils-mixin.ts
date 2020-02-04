@@ -235,8 +235,6 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return true;
     }
 
-    public _noop() {}
-
     public _withDefaultParams(queryParams: any) {
       return Object.assign({}, queryParams, {
         page: 1,
