@@ -54,7 +54,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     ].join('\n');
 
     @property({type: Object})
-    _baseOptions: GenericObject = {
+    _baseOptions = {
       bar: {
         groupWidth: 20,
       },
