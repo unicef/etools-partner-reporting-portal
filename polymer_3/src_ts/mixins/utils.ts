@@ -1,5 +1,6 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor} from '../typings/globals.types';
+import {Constructor, GenericObject} from '../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import '../settings';
 
 declare const moment: any;
@@ -8,7 +9,6 @@ declare const moment: any;
 /**
  * @polymer
  * @mixinFunction
- * @appliesMixin EndpointsMixin
  */
 function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
@@ -62,7 +62,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         defaultValue : value;
     }
 
-    public _withDefaultFrom(obj: any, key: any, defaultValue: any) {
+    public _withDefaultFrom(obj: GenericObject, key: string, defaultValue: any) {
       if (typeof defaultValue === 'undefined') {
         defaultValue = '...';
       }
@@ -165,7 +165,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return items.join(', ');
     }
 
-    public _commaSeparatedDictValues(items: any, key: any) {
+    public _commaSeparatedDictValues(items: any, key: string) {
       let newList = (items || []).map(function(item) {
         return item[key];
       });
@@ -268,19 +268,19 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return str.slice(0, len) + (str.length > len ? '…' : '');
     }
 
-    public _cancelDebouncers(debouncers: any) {
-      debouncers.forEach(function (debouncer) {
-        if (this.isDebouncerActive(debouncer)) {
-          this.cancelDebouncer(debouncer);
+    public _cancelDebouncers(debouncers: Debouncer[]) {
+      debouncers.forEach(debouncer => {
+        if (debouncer.isActive()) {
+          debouncer.cancel();
         }
       }, this);
     }
 
-    public _prop(obj: any, key: any) {
+    public _prop(obj: GenericObject, key: string) {
       return obj[key];
     }
 
-    public _omit(src: any, keys: any) {
+    public _omit(src: any, keys: string[]) {
       return Object.keys(src)
         .filter(function (key) {
           return keys.indexOf(key) === -1;
