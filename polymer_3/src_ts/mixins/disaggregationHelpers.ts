@@ -158,9 +158,9 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       data = Object.assign({}, data, tmpTotals1);
 
-      var tKey = this.formatKey('');
+      const tKey = this.formatKey('');
 
-      var tFields = this.extractFields(data, tRe);
+      const tFields = this.extractFields(data, tRe);
 
       tmpTotals2[tKey] = this.sumDisaggValues(tFields, this.divideBy(2));
 

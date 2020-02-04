@@ -105,7 +105,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     }
 
     attached() {
-      var style = document.createElement('style');
+      const style = document.createElement('style');
 
       style.innerHTML = this.tooltipStyles;
 

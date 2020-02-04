@@ -10,7 +10,7 @@ function DisaggregationMixin<T extends Constructor<PolymerElement>>(baseClass: T
 
     //Used to display rows for two and three disaggregations.
     //It will NOT work for one and zero disaggregations.
-    _determineRows(self: any, rows: any[], columns: any[]) {
+    _determineRows(self: any, rows: GenericObject[], columns: GenericObject[]) {
       let rowsForDisplay: GenericObject[] = [];
 
       rows.forEach(function(x) {
@@ -45,8 +45,8 @@ function DisaggregationMixin<T extends Constructor<PolymerElement>>(baseClass: T
     // structures them in "()" format for lookup.
     _formatDisaggregationIds(unsortedIds: any[]) {
       // IDs must be in ascending order.
-      var ids = unsortedIds.sort(function(a, b) {return a - b;});
-      var sortedString = '';
+      const ids = unsortedIds.sort(function(a, b) {return a - b;});
+      let sortedString = '';
 
       if (ids.length === 1) {
         sortedString = ids[0] + ',';

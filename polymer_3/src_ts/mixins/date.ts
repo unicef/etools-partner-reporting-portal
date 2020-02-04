@@ -14,7 +14,7 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         format = 'D MMM YYYY';
       }
       if (typeof dateString === 'string' && dateString !== '') {
-        var date = this.getUTCDate(dateString);
+        const date = this.getUTCDate(dateString);
         if (date.toString() !== 'Invalid Date') {
           // using moment.utc() ensures that the date will not be changed
           // no matter timezone the user has set
@@ -26,7 +26,7 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     prepareDate(dateString: string) {
       if (typeof dateString === 'string' && dateString !== '') {
-        var date = new Date(dateString);
+        let date = new Date(dateString);
         if (date.toString() === 'Invalid Date') {
           date = new Date();
         }
@@ -41,10 +41,10 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
      * Make sure you also have the data-selector attribute set on the input field.
      */
     openDatePicker(event: CustomEvent) {
-      var id = (event.target as any).getAttribute('data-selector');
+      const id = (event.target as any).getAttribute('data-selector');
       if (id) {
-        var datepickerId = '#' + id;
-        var datePicker = this.shadowRoot!.querySelector(datepickerId);
+        const datepickerId = '#' + id;
+        const datePicker = this.shadowRoot!.querySelector(datepickerId);
         if (datePicker) {
           (datePicker as any).open = true;
         }
@@ -57,11 +57,11 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }
       if (typeof firstDateString === 'string' && firstDateString !== '' &&
         typeof secondDateString === 'string' && secondDateString !== '') {
-        var firstDate = this.getUTCDate(firstDateString);
-        var secondDate = this.getUTCDate(secondDateString);
+        const firstDate = this.getUTCDate(firstDateString);
+        const secondDate = this.getUTCDate(secondDateString);
         if (firstDate.toString() !== 'Invalid Date' && secondDate.toString() !== 'Invalid Date') {
-          var mFirstDate = moment.utc(firstDate);
-          var mSecondDate = moment.utc(secondDate);
+          const mFirstDate = moment.utc(firstDate);
+          const mSecondDate = moment.utc(secondDate);
           return mSecondDate.diff(mFirstDate, unit);
         }
       }
@@ -70,8 +70,8 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     getMaxDateStr(d1Str: string, d2Str: string) {
       // TODO: optimize this
-      var d1 = this.getUTCDate(d1Str);
-      var d2 = this.getUTCDate(d2Str);
+      const d1 = this.getUTCDate(d1Str);
+      const d2 = this.getUTCDate(d2Str);
       if (d1.toString() === 'Invalid Date' && d2.toString() !== 'Invalid Date') {
         return d2Str;
       } else if (d1.toString() !== 'Invalid Date' && d2.toString() === 'Invalid Date') {

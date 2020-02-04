@@ -37,7 +37,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _updateQueryParams(pageSize: number, pageNumber: number) {
-      var newParams = Object.assign({}, this.queryParams, {
+      const newParams = Object.assign({}, this.queryParams, {
         page_size: pageSize,
         page: pageNumber,
       });
@@ -47,12 +47,12 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _detailsChange(event: CustomEvent) {
-      var element = event.composedPath()[0];
-      var isOpen = element && element.detailsOpened;
+      const element = event.composedPath()[0];
+      const isOpen = element && element.detailsOpened;
       if (isOpen) {
         return this.push('openedDetails', element);
       }
-      var index = this.openedDetails.indexOf(element);
+      const index = this.openedDetails.indexOf(element);
       if (index !== -1) {
         return this.splice('openedDetails', index, 1);
       }
@@ -62,7 +62,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._tableContentDebouncer = Debouncer.debounce(this._tableContentDebouncer,
         timeOut.after(100),
         () => {
-          var tempList = this.openedDetails.slice();
+          const tempList = this.openedDetails.slice();
           tempList.forEach((detail: any) => detail.detailsOpened = false);
         });
     }
