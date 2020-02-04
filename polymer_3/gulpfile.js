@@ -22,5 +22,5 @@ const spawnOptions = {
  */
 gulp.task('serve', () => {
   spawn('tsc --skipLibCheck', ['--watch'], spawnOptions);
-  spawn('polymer', ['serve -H 0.0.0.0 -p 8082'], spawnOptions);
+  spawn('polymer', ['serve -H 0.0.0.0 -p 8084'], spawnOptions);
 });
