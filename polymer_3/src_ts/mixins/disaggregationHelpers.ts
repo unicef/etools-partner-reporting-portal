@@ -222,6 +222,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       return Object.assign({}, tmpTotals1, tmpTotals2, tmpTotals3);
     }
+
   }
   return DisaggregationHelpersClass;
 }

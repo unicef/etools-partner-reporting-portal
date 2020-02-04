@@ -94,6 +94,7 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     getUTCDate(dateStr: string) {
       return new Date(dateStr + ' UTC');
     }
+
   }
   return DateClass;
 }
