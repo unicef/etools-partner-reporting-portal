@@ -4,8 +4,8 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/iron-icons/iron-icons';
 
 import Constants from '../constants';
-import {property} from "@polymer/decorators/lib/decorators";
-import {GenericObject} from "../typings/globals.types";
+import {property} from '@polymer/decorators/lib/decorators';
+import {GenericObject} from '../typings/globals.types';
 // <link rel="import" href="../styles/buttons.html">
 
 
