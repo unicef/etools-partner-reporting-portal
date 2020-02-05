@@ -14,7 +14,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     public _selectedChanged(selected: any) {
-      this.async(function () {
+      setTimeout(function () {
         this._forEach('paper-submenu', function (submenu) {
           let isSelected = !!this.shadowRoot.querySelector('[name="' + selected + '"]');
 
@@ -37,7 +37,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       // Don't toggle submenus
       this._forEach('.menu-trigger', function (trigger) {
         trigger.addEventListener('tap', function (e) {
-          if (Polymer.dom(trigger).parentNode.opened) {
+          if (trigger.parentNode.opened) {
             e.stopPropagation();
           }
         });
