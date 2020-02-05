@@ -3,8 +3,6 @@ import {PolymerElement, html} from '@polymer/polymer';
 /**
  * @polymer
  * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
  */
 class PageBody extends PolymerElement{
     public static get template() {
