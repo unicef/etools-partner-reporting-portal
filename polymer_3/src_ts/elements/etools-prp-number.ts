@@ -1,13 +1,8 @@
-
 import {PolymerElement, html} from '@polymer/polymer';
-import Constants from '../constants';
 import '@polymer/polymer/lib/elements/dom-if';
 import {property} from '@polymer/decorators';
+import Constants from '../constants';
 import './numeral-js';
-
-// <link rel="import" href="../../bower_components/numeral-js/numeral-js.html">
-
-//(dci)
 
 /**
  * @polymer

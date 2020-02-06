@@ -20,6 +20,7 @@ import UtilsMixin from '../mixins/utils-mixin';
 /**
  * @polymer
  * @appliesMixin LocalizeMixin
+ * @appliesMixin UtilsBehavior
  */
 class CalculationMethod extends UtilsMixin(LocalizeMixin(PolymerElement)) {
 
