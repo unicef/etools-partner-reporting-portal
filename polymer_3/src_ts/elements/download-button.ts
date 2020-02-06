@@ -24,7 +24,7 @@ class DownloadButton extends PolymerElement{
           target="_blank">
         <paper-button class="btn-primary">
           <iron-icon icon="icons:file-download"></iron-icon>
-<!--          <content></content>-->
+          <slot></slot>
         </paper-button>
       </a>
     
