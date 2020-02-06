@@ -22,34 +22,50 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     All: 'all',
   };
 
+  const buildQuery = (chunks: any[]): string => {
+    return chunks.map(function(chunk) {
+      switch (typeof chunk) {
+        case 'string':
+          return chunk;
+
+        case 'object':
+          return buildQuery(Object.keys(chunk).map(function(key) {
+            return [
+              encodeURIComponent(key),
+              encodeURIComponent(chunk[key]),
+            ].join('=');
+          }));
+      }
+    }).join('&');
+  }
+
   class UtilsClass extends baseClass {
 
-
-
-    public _equals (a: any, b: any) {
+    _equals(a: any, b: any) {
       return a === b;
     }
 
-    public _forEach (selector: any, fn: any) {
+    _forEach(selector: any, fn: any) {
       [].forEach.call(
-        let elem = this.shadowRoot.querySelector(selector);
-        this.elem.fn;
+        this.shadowRoot!.querySelector(selector),
+        fn,
+        this
       );
     }
 
-    public _toLowerCaseLocalized (text: string, localize: any) {
+    _toLowerCaseLocalized(text: string, localize: any) {
       return localize(text).toLowerCase();
     }
 
-    public _localizeLowerCased (text: string, localize: any) {
+    _localizeLowerCased(text: string, localize: any) {
       return localize(text.split(' ').join('_').toLowerCase());
     }
 
-    public _singularLocalized (text: string, localize: any) {
+    _singularLocalized(text: string, localize: any) {
       return localize(text).substring(0, text.length - 1);
     }
 
-    public _withDefault (value: any, defaultValue: any, localize: any) {
+    _withDefault(value: any, defaultValue: any, localize: any) {
       if (typeof defaultValue === 'undefined') {
         defaultValue = '...';
       }
@@ -62,7 +78,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         defaultValue : value;
     }
 
-    public _withDefaultFrom(obj: GenericObject, key: string, defaultValue: any) {
+    _withDefaultFrom(obj: GenericObject, key: string, defaultValue: any) {
       if (typeof defaultValue === 'undefined') {
         defaultValue = '...';
       }
@@ -70,19 +86,19 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return obj[key] || defaultValue;
     }
 
-    public _debug(val: any) {
+    _debug(val: any) {
       return JSON.stringify(val, null, 2);
     }
 
-    public _log(val: any) {
+    _log(val: any) {
       console.log('_log', val);
     }
 
-    public _toNumber(val: string) {
+    _toNumber(val: string) {
       return Number(val);
     }
 
-    public _capitalizeFirstLetter(text: string, localize: any) {
+    _capitalizeFirstLetter(text: string, localize: any) {
       if (localize !== undefined) {
         return localize(text);
       }
@@ -92,20 +108,21 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }
     }
 
-    public _notFound() {
+    _notFound() {
       window.location.href = '/not-found';
     }
 
-    public _clone(val: any) {
-      let typeStr = Object.prototype.toString.call(val);
+    _clone(val: any) {
+      const typeStr = Object.prototype.toString.call(val);
+      const self = this;
 
       switch (typeStr) {
         case '[object Array]':
-          return val.map(_clone);
+          return val.map(self._clone);
 
         case '[object Object]':
-          return Object.keys(val).reduce(function (prev, curr) {
-            prev[curr] = _clone(val[curr]);
+          return Object.keys(val).reduce(function(prev, curr) {
+            prev[curr] = self._clone(val[curr]);
 
             return prev;
           }, {});
@@ -115,10 +132,10 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }
     }
 
-    public _deferred() {
-      let defer = {};
+    _deferred() {
+      let defer: GenericObject = {};
 
-      defer.promise = new Promise(function (resolve, reject) {
+      defer.promise = new Promise(function(resolve, reject) {
         defer.resolve = resolve;
         defer.reject = reject;
       });
@@ -126,12 +143,12 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return defer;
     }
 
-    public _toPercentage(value: any) {
+    _toPercentage(value: any) {
       return value == null /* undefinded & null */ ? // jshint ignore:line
         value : Math.floor(value * 100) + '%';
     }
 
-    public _formatIndicatorValue(indicatorType: any, value: any, percentize: any) {
+    _formatIndicatorValue(indicatorType: any, value: any, percentize: any) {
       if (value == null /* undefinded & null */) { // jshint ignore:line
         return value;
       }
@@ -140,7 +157,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
       switch (indicatorType) {
         case 'percentage':
-          if(!percentize){
+          if (!percentize) {
             return this._toPercentage(value);
           }
           return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';
@@ -151,21 +168,21 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }
     }
 
-    public _displayClusterHeader(subpage: any, needsHeaderList: any) {
+    _displayClusterHeader(subpage: any, needsHeaderList: any) {
       if (needsHeaderList.indexOf(subpage) >= 0) {
         return true;
       }
       return false;
     }
 
-    public _commaSeparated(items: any) {
+    _commaSeparated(items: any) {
       if (!items) {
         return '';
       }
       return items.join(', ');
     }
 
-    public _commaSeparatedDictValues(items: any, key: string) {
+    _commaSeparatedDictValues(items: any, key: string) {
       let newList = (items || []).map(function(item) {
         return item[key];
       });
@@ -173,11 +190,11 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return this._commaSeparated(newList);
     }
 
-    public _commaSeparatedValues(list: any) {
+    _commaSeparatedValues(list: any) {
       return (list || []).join(', ');
     }
 
-    public _formatAddress(street: string, city: string, zip: string) {
+    _formatAddress(street: string, city: string, zip: string) {
       if (!(street || city || zip)) {
         return undefined;
       } else if (!street) {
@@ -187,26 +204,26 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }
     }
 
-    public _fieldsAreValid() {
+    _fieldsAreValid() {
       let valid;
       let fields = [].slice.call(
-        this.shadowRoot.querySelector('.validate')
+        this.shadowRoot!.querySelector('.validate')
       );
 
-      fields.forEach(function (field) {
+      fields.forEach(function(field: any) {
         field.validate();
       });
 
-      valid = fields.every(function (field) {
+      valid = fields.every(function(field: any) {
         return !field.invalid;
       });
 
       return valid;
     }
 
-    public _dateRangeValid(start: any, end: any) {
-      let startField = this.shadowRoot.querySelector(start);
-      let endField = this.shadowRoot.querySelector(end);
+    _dateRangeValid(start: any, end: any) {
+      let startField = this.shadowRoot!.querySelector(start);
+      let endField = this.shadowRoot!.querySelector(end);
       let startValue = startField.value;
       let endValue = endField.value;
 
@@ -235,18 +252,18 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return true;
     }
 
-    public _withDefaultParams(queryParams: any) {
+    _withDefaultParams(queryParams: any) {
       return Object.assign({}, queryParams, {
         page: 1,
         page_size: 10,
       });
     }
 
-    public _appendQuery(url: string) {
+    _appendQuery(url: string) {
       return url + '?' + buildQuery([].slice.call(arguments, 1));
     }
 
-    public _cloneNode(node: any) {
+    _cloneNode(node: any) {
       let newNode = node.cloneNode(true);
 
       for (let prop in node.properties) {
@@ -258,15 +275,15 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return newNode;
     }
 
-    public _identity(arg: any) {
+    _identity(arg: any) {
       return arg;
     }
 
-    public _truncate(str: string, len: number) {
+    _truncate(str: string, len: number) {
       return str.slice(0, len) + (str.length > len ? '…' : '');
     }
 
-    public _cancelDebouncers(debouncers: Debouncer[]) {
+    _cancelDebouncers(debouncers: Debouncer[]) {
       debouncers.forEach(debouncer => {
         if (debouncer.isActive()) {
           debouncer.cancel();
@@ -274,32 +291,29 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       }, this);
     }
 
-    public _prop(obj: GenericObject, key: string) {
+    _prop(obj: GenericObject, key: string) {
       return obj[key];
     }
 
-    public _omit(src: any, keys: string[]) {
+    _omit(src: any, keys: string[]) {
       return Object.keys(src)
-        .filter(function (key) {
+        .filter(function(key) {
           return keys.indexOf(key) === -1;
         })
-        .reduce(function (acc, key) {
+        .reduce(function(acc, key) {
           acc[key] = src[key];
 
           return acc;
         }, {});
     }
 
-    public _normalizeDate (date: any) {
-
+    _normalizeDate(date: any) {
       return moment(date, Settings.dateFormat).startOf('day').toDate();
     }
 
   }
+  return UtilsClass;
 
 }
 
 export default UtilsMixin;
-
-
-

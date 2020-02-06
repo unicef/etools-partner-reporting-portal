@@ -14,8 +14,8 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     public _selectedChanged(selected: any) {
-      setTimeout(function () {
-        this._forEach('paper-submenu', function (submenu) {
+      setTimeout(function() {
+        this._forEach('paper-submenu', function(submenu) {
           let isSelected = !!this.shadowRoot.querySelector('[name="' + selected + '"]');
 
           switch (true) {
@@ -35,8 +35,8 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     public attached() {
       // Don't toggle submenus
-      this._forEach('.menu-trigger', function (trigger) {
-        trigger.addEventListener('tap', function (e) {
+      this._forEach('.menu-trigger', function(trigger) {
+        trigger.addEventListener('tap', function(e) {
           if (trigger.parentNode.opened) {
             e.stopPropagation();
           }
@@ -45,7 +45,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
   }
-
+  return PageNavClass;
 }
 
 export default PageNavMixin;

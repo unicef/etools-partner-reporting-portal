@@ -21,6 +21,7 @@ function ErrorHandlerMixin<T extends Constructor<PolymerElement>>(baseClass: T) 
 
         switch (xhr.status) {
           case 403: // FIXME: 401?
+            // (dci)
             App.Store.dispatch(App.Actions.userLogout())
               .then(function() {
                 location.pathname = '/landing';
