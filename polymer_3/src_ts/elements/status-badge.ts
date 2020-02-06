@@ -60,8 +60,6 @@ class StatusBadge extends PolymerElement{
 
     _computeColor(type : string) {
       switch (type) {
-        case 'default':
-          return '#0099ff';
         case 'success':
           return '#009951';
         case 'error':
@@ -73,6 +71,8 @@ class StatusBadge extends PolymerElement{
         case 'no-status':
           return '#273d48';
       }
+      //case 'default':
+      return '#0099ff';
     };
 }
 
