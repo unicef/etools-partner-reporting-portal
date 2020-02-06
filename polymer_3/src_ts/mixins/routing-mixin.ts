@@ -8,7 +8,7 @@ import {Constructor} from '../typings/globals.types';
  * @mixinFunction
  */
 function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
-  class RoutingClass extends baseClass{
+  class RoutingClass extends baseClass {
 
     @property({type: String})
     _$currentWorkspace!: string;
@@ -51,7 +51,7 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     public attached() {
-      setTimeout(function () {
+      setTimeout(function() {
         if (typeof this.dispatch !== 'function') { // Duck typing
           throw new Error(BEHAVIOR_NAME + ' requires ReduxBehavior');
         }
@@ -59,6 +59,7 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
   }
+  return RoutingClass;
 }
 
 export default RoutingMixin;
