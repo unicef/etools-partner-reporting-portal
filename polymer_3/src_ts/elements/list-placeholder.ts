@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
-import LocalizeMixin from '../mixins/localize';
+import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
 
 class ListPlaceholder extends LocalizeMixin(PolymerElement){
