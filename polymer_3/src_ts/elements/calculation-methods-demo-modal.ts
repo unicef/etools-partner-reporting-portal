@@ -8,7 +8,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/paper-styles/typography';
 import {GenericObject} from '../typings/globals.types';
-import ModalMixin from '../mixins/modal';
+import ModalMixin from '../mixins/modal-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import './calculation-methods-demo-locations.js';
 import './calculation-methods-demo-periods.js';

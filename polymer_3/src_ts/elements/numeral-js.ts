@@ -1,8 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import 'numeral/min/numeral.min.js';
-import {numeral} from 'numeral/min/numeral.min.js';
 import '@polymer/polymer/lib/elements/dom-if';
+declare const numeral: any;
 
 /**
  * @polymer

@@ -4,7 +4,7 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-button/paper-button.js';
 import './calculation-methods-demo-modal.js';
 import {CalculationMethodsDemoModalEl} from './calculation-methods-demo-modal';
-import LocalizeMixin from '../mixins/localize';
+import LocalizeMixin from '../mixins/localize-mixin';
 
 //(dci)
 // < link rel = "import" href = "../styles/buttons.html" >

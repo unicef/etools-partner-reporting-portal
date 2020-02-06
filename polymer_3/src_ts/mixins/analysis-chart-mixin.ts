@@ -2,7 +2,7 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
 import Constants from '../constants';
-import 'numeral/min/numeral.min.js';
+declare const numeral: any;
 
 /**
  * @polymer
