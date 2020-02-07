@@ -1,16 +1,15 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
-import from '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import from '@polymer/paper-listbox/paper-listbox';
-import from '@polymer/paper-item/paper-item';
-import from '@polymer/app-localize-behavior/app-localize-behavior';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
+import '@polymer/app-localize-behavior/app-localize-behavior';
 
 // <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 // <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 // <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 // <link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 import LocalizeMixin from '../mixins/localize-mixin';
-import { GenericObject } from '../typings/globals.types';
 // <link rel="import" href="../behaviors/localize.html">
 // <link rel="import" href="../redux/actions/localize.html">
 
@@ -18,7 +17,6 @@ import { GenericObject } from '../typings/globals.types';
  * @polymer
  * @customElement
  * @mixinFunction
- * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
 class LanguageDropdown extends LocalizeMixin(PolymerElement){
@@ -117,7 +115,7 @@ class LanguageDropdown extends LocalizeMixin(PolymerElement){
 
     //I believe I did not quite do this correctly.....
     //please review it
-    _languageSelected(e: GenericObject) {
+    _languageSelected(e: CustomEvent) {
         var allLanguages = Object.keys(this.availableLanguages);
 
         if (allLanguages.includes(this.current) === false) {
@@ -133,7 +131,7 @@ class LanguageDropdown extends LocalizeMixin(PolymerElement){
         this.dispatch(App.Actions.Localize.set(newLanguage));
       }
 
-      _computeLanguage(data: Array, current: String) {
+      _computeLanguage(data: any[], current: String) {
         return data.filter(function (language: string) {
           return language === current;
         })[0];

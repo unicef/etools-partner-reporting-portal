@@ -2,8 +2,6 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-// import {connect} from 'pwa-helpers/connect-mixin';
-// import {store} from 'pwa-helpers/demo/store';
 
 //<link rel="import" href="../behaviors/utils.html">
 //<link rel="import" href="../redux/store.html">
@@ -41,7 +39,7 @@ class ReportingPeriod extends LocalizeMixin(UtilsMixin(PolymerElement)){
     }
 
     @property({type: String})
-    range!: string;
+    range = null;
     //TODO: need to be checked the code made by @lajos 
     // properties: {
     //     range: {

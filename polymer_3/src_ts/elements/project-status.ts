@@ -51,7 +51,8 @@ class ProjectStatus extends LocalizeMixin(UtilsMixin(PolymerElement)){
           case 'Com':
             return 'success';
         }
-      },
+        return;
+      }
 
       _computeLabel(status: String) {
         switch (status) {
@@ -62,7 +63,8 @@ class ProjectStatus extends LocalizeMixin(UtilsMixin(PolymerElement)){
           case 'Com':
             return 'Completed';
         }
-      },
+        return;
+      }
 }
 
 window.customElements.define('project-status', ProjectStatus);

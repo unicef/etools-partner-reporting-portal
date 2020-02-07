@@ -25,7 +25,7 @@ class ListPlaceholder extends LocalizeMixin(PolymerElement){
     //@lajos
     //needs to be checked if defined correctly bellow
     @property({type: Array})
-    data!: GenericObject[];
+    data!: any[];
     @property({type: Boolean})
     loading: boolean = false;
     @property({type: String})
@@ -37,7 +37,7 @@ class ListPlaceholder extends LocalizeMixin(PolymerElement){
     @property({type: Boolean, computed: '_computeAriaHidden(hidden)'})
     ariaHidden!: boolean;
    
-    _computeHidden(data: GenericObject[], loading: boolean) {
+    _computeHidden(data: any[], loading: boolean) {
         return loading || !!data.length;
     };
 
