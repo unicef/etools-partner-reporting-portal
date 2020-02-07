@@ -9,10 +9,10 @@ import {property} from "@polymer/decorators/lib/decorators";
  */
 class PageTitle extends PolymerElement{
     @property({type: String})
-    baseTitle: string = 'PRP';
+    baseTitle = 'PRP';
 
   @property({type: String})
-  divider: string = '|';
+  divider = '|';
 
   @property({type: String})
   title!: string;

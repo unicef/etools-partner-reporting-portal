@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import LocalizeMixin from '../mixins/localize-mixin';
-import {GenericObject} from '../typings/globals.types';
+import { GenericObject } from '../typings/globals.types';
 
 class ListPlaceholder extends LocalizeMixin(PolymerElement){
     public static get template() {
@@ -25,9 +25,11 @@ class ListPlaceholder extends LocalizeMixin(PolymerElement){
     //@lajos
     //needs to be checked if defined correctly bellow
     @property({type: Array})
-    data!: any[];
+    data!: GenericObject[];
+
     @property({type: Boolean})
     loading: boolean = false;
+
     @property({type: String})
     message = 'no_results_found';
     
@@ -37,7 +39,7 @@ class ListPlaceholder extends LocalizeMixin(PolymerElement){
     @property({type: Boolean, computed: '_computeAriaHidden(hidden)'})
     ariaHidden!: boolean;
    
-    _computeHidden(data: any[], loading: boolean) {
+    _computeHidden(data: GenericObject[], loading: boolean) {
         return loading || !!data.length;
     };
 

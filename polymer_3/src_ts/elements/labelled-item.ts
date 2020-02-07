@@ -1,5 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
+//@TODO @lajos to be refactored when styles will be migrated
 //<link rel="import" href="../styles/shared-styles.html">
 
 /**
@@ -43,7 +44,7 @@ class LabelledItem extends PolymerElement{
         <dl class="labelled-item">
             <dt class$="labelled-item__label [[labelClassName]]">[[label]]</dt>
             <dd class="labelled-item__content">
-                <content></content>
+                <slot></slot>
             </dd>
         </dl>
       `;

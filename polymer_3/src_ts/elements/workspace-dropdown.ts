@@ -117,7 +117,6 @@ class WorkspaceDropdown extends RoutingMixin(PolymerElement){
         })[0];
       }
 
-      //workspace assumed string...????
       _computeSelected(data: any[], workspace: string) {
         return data.indexOf(workspace);
       }

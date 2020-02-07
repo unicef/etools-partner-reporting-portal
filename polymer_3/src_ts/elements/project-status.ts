@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
-import from "./status-badge.ts";
+import from "./status-badge";
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 

@@ -59,6 +59,7 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
   }
+  return RoutingClass;
 }
 
 export default RoutingMixin;
