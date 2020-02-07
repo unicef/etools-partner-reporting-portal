@@ -6,8 +6,6 @@ import {GenericObject} from '../typings/globals.types';
 /**
  * @polymer
  * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
  */
 class ErrorBoxErrors extends PolymerElement{
   public static get template(){

@@ -5,8 +5,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 /**
  * @polymer
  * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
  */
 class EtoolsPrpWorkspaces extends PolymerElement{
 
