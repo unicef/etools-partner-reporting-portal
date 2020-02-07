@@ -9,7 +9,7 @@ import Settings from '../settings';
  */
 function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
-  class ProgressReportUtilsClass extends baseClass{
+  class ProgressReportUtilsClass extends baseClass {
 
     public _isReadOnlyReport(report: any) {
       return Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
@@ -36,7 +36,7 @@ function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseCla
       return report.is_final && report.report_type.toLowerCase() !== 'sr';
     }
   }
-
+  return ProgressReportUtilsClass;
 }
 
 export default ProgressReportUtilsMixin;
