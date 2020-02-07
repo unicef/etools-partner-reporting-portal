@@ -104,7 +104,7 @@ class CalculationMethod extends UtilsMixin(LocalizeMixin(PolymerElement)) {
   readOnlyLabel!: string;
 
   _computeReadonlyLabel(value: any, choices: any[]) {
-    var method = choices.find(function(choice) {
+    const method = choices.find(function(choice) {
       return choice.id === value;
     });
 

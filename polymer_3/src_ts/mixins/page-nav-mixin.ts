@@ -33,7 +33,9 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       });
     }
 
-    public attached() {
+    connectedCallback() {
+      super.connectedCallback();
+
       // Don't toggle submenus
       this._forEach('.menu-trigger', function(trigger) {
         trigger.addEventListener('tap', function(e) {
