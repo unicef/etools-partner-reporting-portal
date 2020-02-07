@@ -10,37 +10,38 @@ import {fireEvent} from '../utils/fire-custom-event';
 function NotificationsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class NotificationsClass extends baseClass {
 
-    public _notify(type, options) {
-      fireEvent(this,'notify', Object.assign({
+    _notify(type: any, options?: any) {
+      fireEvent(this, 'notify', Object.assign({
         type: type,
       }, options));
     }
 
-    public _notifyChangesSaved(options) {
+    _notifyChangesSaved(options?: any) {
       this._notify('changes-saved', options);
     }
 
-    public _notifyServerError(options) {
+    _notifyServerError(options?: any) {
       this._notify('server-error', options);
     }
 
-    public _notifyFileUploaded(options) {
+    _notifyFileUploaded(options?: any) {
       this._notify('file-uploaded', options);
     }
 
-    public _notifyFileDeleted(options) {
+    _notifyFileDeleted(options?: any) {
       this._notify('file-deleted', options);
     }
 
-    public _notifyMessageSent(options) {
+    _notifyMessageSent(options?: any) {
       this._notify('message-sent', options);
     }
 
-    public _notifyErrorMessage(options) {
+    _notifyErrorMessage(options?: any) {
       this._notify('error-message', options);
     }
 
   }
+  return NotificationsClass;
 }
 
 export default NotificationsMixin;
