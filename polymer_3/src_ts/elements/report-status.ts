@@ -2,6 +2,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import './status-badge';
 import LocalizeMixin from '../mixins/localize-mixin';
+import "@polymer/polymer/lib/elements/dom-if";
 
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../behaviors/localize.html">

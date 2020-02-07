@@ -8,8 +8,8 @@ import {property} from "@polymer/decorators/lib/decorators";
  * @appliesMixin LocalizeMixin
  */
 class PageTitle extends PolymerElement{
-    @property({type: String})
-    baseTitle = 'PRP';
+  @property({type: String})
+  baseTitle = 'PRP';
 
   @property({type: String})
   divider = '|';

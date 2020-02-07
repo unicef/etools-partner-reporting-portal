@@ -49,7 +49,7 @@ class MessageBox extends PolymerElement{
               <iron-icon icon="icons:info"></iron-icon>
           </div>
           <div class="self-center">
-              <content></content>
+              <slot></slot>
           </div>
         </div>
       `;
