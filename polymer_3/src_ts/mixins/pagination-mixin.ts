@@ -67,7 +67,9 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         });
     }
 
-    detached() {
+    disconnectedCallback() {
+      super.disconnectedCallback();
+
       if (this._tableContentDebouncer && this._tableContentDebouncer.isActive()) {
         this._tableContentDebouncer.cancel();
       }

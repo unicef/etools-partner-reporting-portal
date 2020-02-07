@@ -50,7 +50,9 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return baseUrl + tail;
     }
 
-    public attached() {
+    connectedCallback() {
+      super.connectedCallback();
+
       setTimeout(function() {
         if (typeof this.dispatch !== 'function') { // Duck typing
           throw new Error(BEHAVIOR_NAME + ' requires ReduxBehavior');
