@@ -28,7 +28,7 @@ function reportsByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.pdId] = action.data;
 
@@ -37,11 +37,11 @@ function reportsByPDReducer(state = {}, action: any) {
 
     case Constants.SET_PD_REPORT:
       return (function () {
-        var change = {};
+        let change = {};
 
-        var reports = state[action.pdId] || [];
+        let reports = state[action.pdId] || [];
 
-        var index = reports.findIndex(function (report) {
+        let index = reports.findIndex(function (report) {
           return Number(report.id) === Number(action.data.id);
         });
 
@@ -58,7 +58,7 @@ function reportsByPDReducer(state = {}, action: any) {
 
     case Constants.UPDATE_PD_REPORT:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.pdId] = (state[action.pdId] || []).map(function (report) {
           return Number(report.id) === Number(action.reportId) ?
@@ -76,7 +76,7 @@ function reportsByPDReducer(state = {}, action: any) {
          * of them, to be consistent :(
          */
 
-        var change = {};
+        let change = {};
 
         change[action.pdId] = state[action.pdId].map(function (report) {
           if (Number(report.id) !== Number(action.reportId)) {
@@ -112,7 +112,7 @@ function reportsCountByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS_COUNT:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.pdId] = action.count;
 

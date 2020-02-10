@@ -11,8 +11,8 @@ export const fetchConfig = function (thunk: any, selector: any) {
     dispatch(configLoadingStart());
 
     return thunk()
-      .then(function (res) {
-        var data = res.data;
+      .then(function (res: any) {
+        let data = res.data;
 
         dispatch(setConfig(data));
         dispatch(configLoadingStop());

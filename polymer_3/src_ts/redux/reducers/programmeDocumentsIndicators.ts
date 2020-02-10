@@ -16,7 +16,7 @@ function byPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.pdId] = action.indicatorData;
 
@@ -35,7 +35,7 @@ function loadingByPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS_LOADING:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.pdId] = action.loading;
 

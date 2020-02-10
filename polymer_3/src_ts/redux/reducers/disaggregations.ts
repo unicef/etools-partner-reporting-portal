@@ -14,7 +14,7 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_DISAGGREGATIONS:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.indicatorId] = action.data;
 
@@ -23,9 +23,9 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
 
     case Constants.SET_DISAGGREGATIONS_FOR_LOCATION:
       return (function () {
-        var newState = Object.assign({}, state);
-        var locations;
-        var index;
+        let newState = Object.assign({}, state);
+        let locations;
+        let index;
 
         try {
           locations = newState[action.indicatorId].indicator_location_data;
@@ -42,9 +42,9 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
 
     case Constants.SET_PROGRESS_FOR_LOCATION:
       return (function () {
-        var newState = Object.assign({}, state);
-        var locations;
-        var index;
+        let newState = Object.assign({}, state);
+        let locations;
+        let index;
 
         try {
           locations = newState[action.indicatorId].indicator_location_data;

@@ -125,7 +125,7 @@ function indicatorsReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.partnerActivityId] = action.data;
         return Object.assign({}, state, change);
@@ -143,7 +143,7 @@ function indicatorsCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID_COUNT:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.partnerActivityId] = action.count;
         return Object.assign({}, state, change);

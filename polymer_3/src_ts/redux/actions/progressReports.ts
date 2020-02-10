@@ -8,7 +8,7 @@ export const progressReportsFetch = function (progressReportsThunk: any) {
 
     return progressReportsThunk()
       .then(function (res: any) {
-        var progressReportsData = res.data;
+        let progressReportsData = res.data;
 
         dispatch(progressReportsSet(progressReportsData.results));
         dispatch(progressReportsSetCount(progressReportsData.count));

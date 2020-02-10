@@ -20,8 +20,8 @@ export const pdReportsAttachmentsSync = function (attachmentsThunk: any, reportI
 
 export const pdReportsAttachmentsSet = function (reportId: string, data: any, res: any) {
   if (res.status === 204) {
-    var resUrl = res.xhr.responseURL.split('/');
-    var deletedAttachmentId = resUrl[resUrl.length - 2];
+    let resUrl = res.xhr.responseURL.split('/');
+    let deletedAttachmentId = resUrl[resUrl.length - 2];
 
     return {
       type: Constants.SET_PD_REPORT_ATTACHMENT,

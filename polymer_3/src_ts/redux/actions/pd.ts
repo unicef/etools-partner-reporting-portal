@@ -8,7 +8,7 @@ export const pdFetch = function (pdThunk: any) {
 
     return pdThunk()
       .then(function (res: any) {
-        var pdData = res.data;
+        let pdData = res.data;
 
         dispatch(pdSet(pdData.results));
         dispatch(pdSetCount(pdData.count));

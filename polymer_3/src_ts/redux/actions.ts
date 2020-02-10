@@ -75,7 +75,7 @@ export const fetchWorkspaces = function (interventionsThunk: any) {
   return function (dispatch: any) {
     return interventionsThunk()
       .then(function (res: any) {
-        var workspaces = (res.data || [])
+        let workspaces = (res.data || [])
           .map(function (workspace: any) {
             return {
               id: workspace.id,
@@ -163,7 +163,7 @@ export const fetchProgrammeDocuments = function (pdThunk: any) {
   return function (dispatch: any) {
     return pdThunk()
       .then(function (res: any) {
-        var pdData = res.data;
+        let pdData = res.data;
 
         dispatch(setProgrammeDocuments(pdData));
       });
@@ -181,7 +181,7 @@ export const fetchProgrammeDocumentDetails = function (pdDetailsThunk: any) {
   return function (dispatch: any) {
     return pdDetailsThunk()
       .then(function (res: any) {
-        var pdDetailsData = res.data;
+        let pdDetailsData = res.data;
         dispatch(setProgrammeDocumentDetails(pdDetailsData));
       });
   };

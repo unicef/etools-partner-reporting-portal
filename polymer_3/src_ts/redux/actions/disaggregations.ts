@@ -5,7 +5,7 @@ export const disaggregationsFetch = function (disaggregationsThunk: any, indicat
   return function (dispatch: any) {
     return disaggregationsThunk()
       .then(function (res: any) {
-        var firstItem = res.data[0];
+        let firstItem = res.data[0];
 
         dispatch(disaggregationsSet(indicatorId, firstItem));
       });

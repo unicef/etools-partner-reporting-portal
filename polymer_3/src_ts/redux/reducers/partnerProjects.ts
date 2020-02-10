@@ -68,7 +68,7 @@ function activitiesByPartnerProjectIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
@@ -86,7 +86,7 @@ function activitiesByPartnerProjectIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT:
       return (function () {
-        var change = {};
+        let change = {};
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);
       }());
@@ -113,7 +113,7 @@ function indicatorsReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
@@ -131,7 +131,7 @@ function indicatorsCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);

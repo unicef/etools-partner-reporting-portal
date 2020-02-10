@@ -14,15 +14,15 @@ export const ProgrammeDocumentReportsAttachments = combineReducers({
 });
 
 function updateForReport(state: any, reportId: any, newValue: any) {
-  var change = {};
-  var isNew = true;
+  let change = {};
+  let isNew = true;
 
   if (newValue instanceof Array === true
     || newValue instanceof Boolean === true) {
     change[reportId] = newValue;
   } else if (newValue instanceof Object === true) {
     if (newValue.action !== undefined && newValue.action === 'delete') {
-      var newAttachments = state[reportId].filter(function (attachment: any) {
+      let newAttachments = state[reportId].filter(function (attachment: any) {
         return attachment.id !== newValue.id;
       });
 
