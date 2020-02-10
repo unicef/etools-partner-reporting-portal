@@ -1,4 +1,4 @@
-import Constants from '../../../constants';
+import Constants from '../../constants';
 
 //use instead of App.Actions.Localize.set
 export const localizeSet = (language: string) => {

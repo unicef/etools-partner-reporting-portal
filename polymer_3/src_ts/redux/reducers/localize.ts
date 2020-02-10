@@ -1,5 +1,5 @@
-import {GenericObject} from '../../../typings/globals.types';
-import Constants from '../../../constants';
+import {GenericObject} from '../../typings/globals.types';
+import Constants from '../../constants';
 
 let availableLangs: GenericObject;
 

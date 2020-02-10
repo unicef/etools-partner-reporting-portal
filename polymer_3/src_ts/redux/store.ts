@@ -12,6 +12,7 @@ import {Auth} from './reducers/auth';
 import {Workspaces} from './reducers/workspaces';
 import {Location} from './reducers/location';
 import {App} from './reducers/app';
+import {Partner} from './reducers/partner';
 
 
 declare global {

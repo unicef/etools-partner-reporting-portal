@@ -1,4 +1,4 @@
-import Constants from '../../constants';
+import Constants from '../constants';
 
 // L11N
 export const setL11NResources = function (resources: []) {

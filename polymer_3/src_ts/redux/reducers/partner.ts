@@ -1,5 +1,5 @@
-import {GenericObject} from '../../../typings/globals.types';
-import Constants from '../../../constants';
+import {GenericObject} from '../../typings/globals.types';
+import Constants from '../../constants';
 
 export class PartnerState {
   current: GenericObject = {}
