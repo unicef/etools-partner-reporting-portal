@@ -1,6 +1,8 @@
-import {PolymerElement} from '@polymer/polymer';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {store} from '../redux/store';
+import {setToken} from '../redux/actions';
 
 
 /**
@@ -9,9 +11,9 @@ import {property} from '@polymer/decorators/lib/decorators';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpAuth extends (UtilsMixin(PolymerElement)){
+class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)){
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(state.auth.token)'})
   token!: string;
   // statePath: 'auth.token'
 
@@ -21,10 +23,10 @@ class EtoolsPrpAuth extends (UtilsMixin(PolymerElement)){
   connectedCallback() {
     super.connectedCallback();
     // Use saved token, if present
-    let savedToken = localStorage.getItem(this.token);
+    let savedToken = localStorage.getItem('token');
 
     if (savedToken && !this.token) {
-      localStorage.setItem('etools-prp-auth-token', String(savedToken));
+      store.dispatch(setToken(savedToken));
     }
   }
 
