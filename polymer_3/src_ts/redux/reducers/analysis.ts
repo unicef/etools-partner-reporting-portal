@@ -133,7 +133,7 @@ function indicatorDataByIdReducer(state = {}, action: any) {
   }
 }
 
-function indicatorDataLoadingByIdReducer(state: {}, action: any) {
+function indicatorDataLoadingByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_START:
       return (function () {
