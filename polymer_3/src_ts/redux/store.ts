@@ -14,6 +14,9 @@ import {Location} from './reducers/location';
 import {App} from './reducers/app';
 import {Partner} from './reducers/partner';
 import {Indicators} from './reducers/indicators';
+import {ProgrammeDocuments} from './reducers/programmeDocuments';
+import {Analysis} from './reducers/analysis';
+import {Config} from './reducers/config';
 
 
 declare global {
@@ -35,7 +38,7 @@ let rootReducer = combineReducers({
   app: App,
   partner: Partner,
   indicators: Indicators,
-  // programmeDocuments: ProgrammeDocuments,
+  programmeDocuments: ProgrammeDocuments,
   // programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
   // programmeDocumentDetails: ProgrammeDocumentDetails,
   // programmeDocumentReports: ProgrammeDocumentReports,
@@ -51,8 +54,8 @@ let rootReducer = combineReducers({
   // clusterIndicatorReports: ClusterIndicatorReports,
   // clusterDashboardData: ClusterDashboardData,
   // userProfile: UserProfile,
-  // analysis: Analysis,
-  // config: Config
+  analysis: Analysis,
+  config: Config
 });
 
 export const store = createStore(

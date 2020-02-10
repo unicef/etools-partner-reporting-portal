@@ -17,7 +17,7 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
     return pathValue;
   }
 
-  getReduxStateArray(pathValue: Array<GenericObject>) {
+  getReduxStateArray(pathValue: []) {
     return [...pathValue];
   }
 

@@ -20,11 +20,11 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
   app!: string;
 
-  // statePath: 'workspaces.current',
+  //DONE statePath: 'workspaces.current',
   @property({type: String, computed: 'getReduxStateValue(state.workspaces.current)'})
   workspace!: string;
 
-  // statePath: 'userProfile.profile',
+  //DONE statePath: 'userProfile.profile',
   @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
   profile!: GenericObject;
 
