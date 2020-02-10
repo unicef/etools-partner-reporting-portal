@@ -3,8 +3,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-
-// <link rel="import" href="../../bower_components/iron-location/iron-query-params.html">
+import '@polymer/iron-location/iron-query-params';
 // <link rel="import" href="../styles/buttons.html">
 
 

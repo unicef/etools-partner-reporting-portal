@@ -1,10 +1,9 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-
-// <link rel="import" href="etools-prp-number.html">
-import LocalizeMixin from '../mixins/localize';
-import {property} from "@polymer/decorators/lib/decorators";
+import './etools-prp-number';
+import LocalizeMixin from '../mixins/localize-mixin';
+import {property} from '@polymer/decorators/lib/decorators';
 
 
 /**

@@ -9,9 +9,9 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 // <link rel="import" href="../../bower_components/etools-file/etools-file.html">
 
-// <link rel="import" href="../behaviors/utils.html">
-import ModalMixin from '../mixins/modal';
-// <link rel="import" href="../behaviors/notifications.html">
+import UtilsMixin from '../mixins/utils-mixin';
+import ModalMixin from '../mixins/modal-mixin';
+import NotificationsMixin from '../mixins/notifications-mixin';
 // <link rel="import" href="../styles/buttons.html">
 // <link rel="import" href="../styles/modal.html">
 // <link rel="import" href="etools-prp-ajax.html">
@@ -23,8 +23,10 @@ import './error-box';
  * @customElement
  * @mixinFunction
  * @appliesMixin ModalMixin
+ * @appliesMixin UtilsMixin
+ * @appliesMixin NotificationsMixin
  */
-class UploadButton extends (ModalMixin(PolymerElement)){
+class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElement)))){
   public static get template(){
     return html`
   

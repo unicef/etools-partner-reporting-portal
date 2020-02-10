@@ -4,10 +4,8 @@ import '@polymer/iron-icons/iron-icons';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+import './error-box-errors';
 
-
-
-// <link rel="import" href="error-box-errors.html">
 
 /**
  * @polymer

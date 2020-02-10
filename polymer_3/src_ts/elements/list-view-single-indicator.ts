@@ -12,13 +12,13 @@ import './etools-prp-number';
 
 // <link rel="import" href="../styles/table-styles.html">
 // <link rel="import" href="../styles/shared-styles.html">
-import LocalizeMixin from '../mixins/localize';
-import UtilsMixin from '../mixins/utils';
-import {property} from "@polymer/decorators/lib/decorators";
-import {GenericObject} from "../typings/globals.types";
-// <link rel="import" href="../behaviors/routing.html">
+import LocalizeMixin from '../mixins/localize-mixin';
+import UtilsMixin from '../mixins/utils-mixin';
+import RoutingMixin from '../mixins/routing-mixin';
+import './etools-prp-permissions';
+import {property} from '@polymer/decorators/lib/decorators';
+import {GenericObject} from '../typings/globals.types';
 // <link rel="import" href="status-badge.html">
-// <link rel="import" href="etools-prp-permissions.html">
 // <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
 // <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
 
@@ -28,9 +28,10 @@ import {GenericObject} from "../typings/globals.types";
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin Localize
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
  */
-class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(PolymerElement))){
+class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(PolymerElement)))){
   public static get template(){
     return html`
       <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">

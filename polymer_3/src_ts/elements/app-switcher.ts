@@ -6,8 +6,8 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import {connect} from 'pwa-helpers/connect-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+import '@polymer/paper-styles/typography';
 // import {store} from 'pwa-helpers/demo/store';
-// <link rel='import' href='../../bower_components/paper-styles/typography.html'>
 // <link rel='import' href='../redux/store.html'>
 // <link rel='import' href='../behaviors/routing.html'>
 

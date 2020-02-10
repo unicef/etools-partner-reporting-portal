@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import UtilsMixin from '../mixins/utils-mixin';
-import LocalizeMixin from '../mixins/localize';
+import LocalizeMixin from '../mixins/localize-mixin';
 import {connect} from 'pwa-helpers/connect-mixin';
 import {store} from 'pwa-helpers/demo/store';
 import {property} from '@polymer/decorators/lib/decorators';

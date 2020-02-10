@@ -7,11 +7,10 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 
-import DataTableMixin from '../mixins/data-table';
-import PaginationMixin from '../mixins/pagination';
-import UtilsMixin '../mixins/utils';
-import LocalizeMixin from '../mixins/localize';
-import PaginationMixin from '../mixins/pagination';
+import DataTableMixin from '../mixins/data-table-mixin';
+import UtilsMixin from '../mixins/utils-mixin';
+import LocalizeMixin from '../mixins/localize-mixin';
+import PaginationMixin from '../mixins/pagination-mixin';
 
 import './list-view-single-indicator';
 import './list-placeholder';
@@ -27,11 +26,11 @@ import {GenericObject} from '../typings/globals.types';
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin DataTable
- * @appliesMixin Pagination
- * @appliesMixin Localize
+ * @appliesMixin DataTableMixin
+ * @appliesMixin PaginationMixin
+ * @appliesMixin LocalizeMixin
  */
-class ListViewIndicators extends (UtilsMixin(DataTable(PaginationMixin(LocalizeMixin(PolymerElement))))){
+class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(PolymerElement))))){
 
   public static get template(){
     return html`
