@@ -30,6 +30,7 @@ import './status-badge.js';
 import './etools-prp-ajax';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 // (dci)
 
 // <link rel="import" href="../behaviors/modal.html">
@@ -52,7 +53,7 @@ import Endpoints from '../endpoints';
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(PolymerElement))) {
+class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -211,8 +212,8 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(PolymerElement)
   @property({type: Object})
   postBody: GenericObject = {};
 
-  //  statePath: 'location.id'
-  @property({type: String})
+  // DONE statePath: 'location.id'
+  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
   workspaceId!: string;
 
   @property({type: String})
@@ -235,11 +236,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(PolymerElement)
   _save() {
     const self = this;
     this.$.pull.thunk()()
-      .then(function() {
+      .then(function () {
         self.close();
         fireEvent(self, 'locations-updated');
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
@@ -255,11 +256,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(PolymerElement)
 
     const thunk = this.$.reports.thunk();
     thunk()
-      .then(function(res: GenericObject) {
+      .then(function (res: GenericObject) {
         self.set('data', {'reports': res.data});
         self.set('opened', true);
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
