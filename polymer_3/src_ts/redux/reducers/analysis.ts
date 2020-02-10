@@ -121,7 +121,7 @@ function indicatorDataByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ANALYSIS_INDICATOR_DATA:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.indicatorId] = action.data;
 
@@ -133,11 +133,11 @@ function indicatorDataByIdReducer(state = {}, action: any) {
   }
 }
 
-function indicatorDataLoadingByIdReducer(state: {}, action: any) {
+function indicatorDataLoadingByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_START:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.indicatorId] = true;
 
@@ -146,7 +146,7 @@ function indicatorDataLoadingByIdReducer(state: {}, action: any) {
 
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_STOP:
       return (function () {
-        var change = {};
+        let change = {};
 
         change[action.indicatorId] = false;
 

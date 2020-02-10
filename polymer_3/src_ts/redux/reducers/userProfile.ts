@@ -4,7 +4,7 @@ export class UserProfileState {
   profile = {}
 };
 
-export const UserProfile = (state = {}, action: any) => {
+export const UserProfile = (state = {profile: {}}, action: any) => {
   switch (action.type) {
     case Constants.SET_USER_PROFILE:
       return {

@@ -18,6 +18,15 @@ import {ProgrammeDocuments} from './reducers/programmeDocuments';
 import {Analysis} from './reducers/analysis';
 import {Config} from './reducers/config';
 import {UserProfile} from './reducers/userProfile';
+import {ProgrammeDocumentsIndicators} from './reducers/programmeDocumentsIndicators';
+import {ProgrammeDocumentDetails} from './reducers/programmeDocumentDetails';
+import {ProgrammeDocumentReports} from './reducers/programmeDocumentReports';
+import {ProgrammeDocumentReportsAttachments} from './reducers/programmeDocumentReportsAttachments';
+import {ProgressReports} from './reducers/progressReports';
+import {ResponsePlans} from './reducers/responsePlans';
+import {Disaggregations} from './reducers/disaggregations';
+import {PartnerProjects} from './reducers/partnerProjects';
+import {PartnerActivities} from './reducers/partnerActivities';
 
 
 declare global {
@@ -27,7 +36,6 @@ declare global {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
   }
 }
-
 
 var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -40,15 +48,15 @@ let rootReducer = combineReducers({
   partner: Partner,
   indicators: Indicators,
   programmeDocuments: ProgrammeDocuments,
-  // programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
-  // programmeDocumentDetails: ProgrammeDocumentDetails,
-  // programmeDocumentReports: ProgrammeDocumentReports,
-  // programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachments,
-  // progressReports: ProgressReports,
-  // responsePlans: ResponsePlans,
-  // disaggregations: Disaggregations,
-  // partnerProjects: PartnerProjects,
-  // partnerActivities: PartnerActivities,
+  programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
+  programmeDocumentDetails: ProgrammeDocumentDetails,
+  programmeDocumentReports: ProgrammeDocumentReports,
+  programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachments,
+  progressReports: ProgressReports,
+  responsePlans: ResponsePlans,
+  disaggregations: Disaggregations,
+  partnerProjects: PartnerProjects,
+  partnerActivities: PartnerActivities,
   // clusterActivities: ClusterActivities,
   // clusterObjectives: ClusterObjectives,
   // clusterDisaggregations: ClusterDisaggregations,

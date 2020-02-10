@@ -47,7 +47,7 @@ export const fetchIndicatorDetails = function (indicatorsThunk: any, id: string)
     dispatch(indicatorDetailsLoadingStart());
     return indicatorsThunk()
       .then(function (res: any) {
-        var formattedById = {};
+        let formattedById = {};
         formattedById[id] = res.data;
         dispatch(indicatorDetailsLoadingStop());
         dispatch(setIndicatorDetails(formattedById));

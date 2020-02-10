@@ -20,7 +20,7 @@ export const Auth = (state = INITIAL_STATE, action: any) => {
 
     case Constants.SET_ACCOUNT_TYPE:
       return (function () {
-        var isPartner = !!action.data.partner;
+        let isPartner = !!action.data.partner;
 
         return isPartner ?
           Constants.ACCOUNT_TYPE_PARTNER :
