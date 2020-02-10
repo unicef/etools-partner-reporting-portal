@@ -89,23 +89,23 @@ const clusterActivitiesPartnersSetLoadingStart = function () {
 
 
 //App.Actions.ClusterActivities.indicators = {
-fetch = function (thunk, clusterActivityId) {
-  return function (dispatch) {
-    dispatch(App.Actions.ClusterActivities.indicators.setLoadingStart());
+export const clusterActivitiesIndicatorsFetch = function (thunk: any, clusterActivityId: string) {
+  return function (dispatch: any) {
+    dispatch(clusterActivitiesIndicatorsSetLoadingStart());
     return thunk()
-      .then(function (res) {
-        dispatch(App.Actions.ClusterActivities.indicators.setIndicators(
+      .then(function (res: any) {
+        dispatch(clusterActivitiesIndicatorsSetIndicators(
           clusterActivityId, res.data.results
         ));
-        dispatch(App.Actions.ClusterActivities.indicators.setCount(
+        dispatch(clusterActivitiesIndicatorsSetCount(
           clusterActivityId, res.data.count
         ));
-        dispatch(App.Actions.ClusterActivities.indicators.setLoadingStop());
+        dispatch(clusterActivitiesIndicatorsSetLoadingStop());
       });
   };
 }
 
-setIndicators = function (clusterActivityId, data) {
+export const clusterActivitiesIndicatorsSetIndicators = function (clusterActivityId: string, data: any) {
   return {
     type: Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID,
     clusterActivityId: clusterActivityId,
@@ -113,7 +113,7 @@ setIndicators = function (clusterActivityId, data) {
   };
 }
 
-setCount = function (clusterActivityId, count) {
+export const clusterActivitiesIndicatorsSetCount = function (clusterActivityId: string, count: number) {
   return {
     type: Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID_COUNT,
     clusterActivityId: clusterActivityId,
@@ -121,13 +121,13 @@ setCount = function (clusterActivityId, count) {
   };
 }
 
-setLoadingStop = function () {
+const clusterActivitiesIndicatorsSetLoadingStop = function () {
   return {
     type: Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP,
   };
 }
 
-setLoadingStart = function () {
+const clusterActivitiesIndicatorsSetLoadingStart = function () {
   return {
     type: Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_START,
   };
