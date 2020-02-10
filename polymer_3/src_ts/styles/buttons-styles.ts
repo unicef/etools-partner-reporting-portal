@@ -1,8 +1,6 @@
 import {html} from '@polymer/polymer/polymer-element';
 
-
 export const buttonsStyles = html`
-
   <style>
   
     paper-button[raised].btn-primary {
@@ -19,5 +17,4 @@ export const buttonsStyles = html`
     }
     
   </style>
-
 `;
