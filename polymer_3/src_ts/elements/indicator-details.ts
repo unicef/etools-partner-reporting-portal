@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 import '@polymer/paper-tabs/paper-tab.js';
@@ -29,6 +29,10 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event.js';
 import {GenericObject} from '../typings/globals.types.js';
 import Endpoints from '../endpoints';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {store} from '../redux/store';
+// @ts-ignore
+import {currentProgrammeDocuments} from '../redux/selectors/programmeDocuments';
 
 // (dci)
 // <link rel="import" href="../redux/store.html">
@@ -48,7 +52,7 @@ import Endpoints from '../endpoints';
  * @appliesMixin EndpointsMixin
  * @appliesMixin UtilsMixin
  */
-class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -502,8 +506,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
   @property({type: Boolean})
   initialized: boolean = false;
 
-  //  statePath: App.Selectors.ProgrammeDocuments.current
-  @property({type: Object})
+  //DONE  statePath: App.Selectors.ProgrammeDocuments.current
+  @property({type: Object, computed: 'currentProgrammeDocuments(state)'})
   currentPD!: GenericObject;
 
   @property({type: Boolean, computed: '_computeHasPD(currentPD)'})
@@ -515,8 +519,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
   @property({type: Object, computed: '_computeParams(indicatorId, currentPD)'})
   params!: GenericObject;
 
-  //statePath: 'disaggregations.byIndicator'
-  @property({type: Object})
+  //DONE statePath: 'disaggregations.byIndicator'
+  @property({type: Object, computed: 'getReduxStateObject(state.disaggregations.byIndicator)'})
   data!: GenericObject;
 
   @property({type: Object, computed: '_computeDisaggregations(data, indicatorId)'})
@@ -525,8 +529,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
   @property({type: Array, computed: '_computeLocationData(disaggregations.indicator_location_data)'})
   locationData!: GenericObject[];
 
-  // statePath: 'programmeDocumentReports.current.mode'
-  @property({type: String})
+  //DONE statePath: 'programmeDocumentReports.current.mode'
+  @property({type: String, computed: 'getReduxStateValue(state.programmeDocumentReports.current.mode)'})
   mode: string = '';
 
   @property({type: String})
@@ -553,7 +557,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
     // Cancel the pending request, if any
     this.$.disaggregations.abort();
 
-    return this.dispatch(
+    return store.dispatch(
       App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
     );
   }
@@ -568,10 +572,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
     this.set('initialized', true);
 
     this._fetchData()
-      .then(function() {
+      .then(function () {
         self.set('loading', false);
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function (err) { // jshint ignore:line
         // TODO: error handling
       });
   }
@@ -648,7 +652,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
     fireEvent(this, 'refresh-report', this.indicatorId);
 
     const allComplete = this.disaggregations.indicator_location_data
-      .every(function(location: GenericObject) {
+      .every(function (location: GenericObject) {
         return location.is_complete;
       });
 
@@ -664,7 +668,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
 
   _computeLocationData(rawLocationData: any[]) {
     const byLocation = (rawLocationData || [])
-      .reduce(function(acc, location) {
+      .reduce(function (acc, location) {
         const locationId = location.location.id;
 
         if (typeof acc[locationId] === 'undefined') {
@@ -683,10 +687,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(PolymerElement)) {
       }, {});
 
     return Object.keys(byLocation)
-      .map(function(key) {
+      .map(function (key) {
         return byLocation[key];
       })
-      .sort(function(a, b) {
+      .sort(function (a, b) {
         return b.is_master_location_data - a.is_master_location_data;
       });
   }

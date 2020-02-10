@@ -1,7 +1,7 @@
-import {PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import RoutingMixin from '../mixins/routing-mixin';
 import {GenericObject} from '../typings/globals.types';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 //<link rel="import" href="../redux/store.html">
 // behaviors: [
@@ -14,18 +14,18 @@ import {GenericObject} from '../typings/globals.types';
  * @customElement
  * @appliesMixin RoutingMixin
  */
-class AppRedirect extends RoutingMixin(PolymerElement) {
+class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
-  // statePath: 'app.current',
-  @property({type: String})
+  //DONE statePath: 'app.current',
+  @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
   app!: string;
 
   // statePath: 'workspaces.current',
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(state.workspaces.current)'})
   workspace!: string;
 
   // statePath: 'userProfile.profile',
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
   profile!: GenericObject;
 
 

@@ -13,6 +13,7 @@ import {Workspaces} from './reducers/workspaces';
 import {Location} from './reducers/location';
 import {App} from './reducers/app';
 import {Partner} from './reducers/partner';
+import {Indicators} from './reducers/indicators';
 
 
 declare global {
@@ -34,24 +35,24 @@ let rootReducer = combineReducers({
   app: App,
   partner: Partner,
   indicators: Indicators,
-  programmeDocuments: ProgrammeDocuments,
-  programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
-  programmeDocumentDetails: ProgrammeDocumentDetails,
-  programmeDocumentReports: ProgrammeDocumentReports,
-  programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachments,
-  progressReports: ProgressReports,
-  responsePlans: ResponsePlans,
-  disaggregations: Disaggregations,
-  partnerProjects: PartnerProjects,
-  partnerActivities: PartnerActivities,
-  clusterActivities: ClusterActivities,
-  clusterObjectives: ClusterObjectives,
-  clusterDisaggregations: ClusterDisaggregations,
-  clusterIndicatorReports: ClusterIndicatorReports,
-  clusterDashboardData: ClusterDashboardData,
-  userProfile: UserProfile,
-  analysis: Analysis,
-  config: Config
+  // programmeDocuments: ProgrammeDocuments,
+  // programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
+  // programmeDocumentDetails: ProgrammeDocumentDetails,
+  // programmeDocumentReports: ProgrammeDocumentReports,
+  // programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachments,
+  // progressReports: ProgressReports,
+  // responsePlans: ResponsePlans,
+  // disaggregations: Disaggregations,
+  // partnerProjects: PartnerProjects,
+  // partnerActivities: PartnerActivities,
+  // clusterActivities: ClusterActivities,
+  // clusterObjectives: ClusterObjectives,
+  // clusterDisaggregations: ClusterDisaggregations,
+  // clusterIndicatorReports: ClusterIndicatorReports,
+  // clusterDashboardData: ClusterDashboardData,
+  // userProfile: UserProfile,
+  // analysis: Analysis,
+  // config: Config
 });
 
 export const store = createStore(

@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-ajax/iron-ajax.js';
 import {IronAjaxElement} from '@polymer/iron-ajax/iron-ajax';
@@ -6,6 +6,9 @@ import UtilsMixin from '../mixins/utils-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import {GenericObject} from '../typings/globals.types';
 import {fireEvent} from '../utils/fire-custom-event';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {setToken, resetToken} from '../redux/actions';
+import {store} from '../redux/store';
 
 //<link rel="import" href="../redux/store.html">
 // <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
@@ -22,7 +25,7 @@ import {fireEvent} from '../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin NotificationsMixin
  */
-class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
+class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -54,8 +57,8 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
     </iron-ajax>
   `;
   }
-  //  statePath: 'auth.token',
-  @property({type: String})
+  // DONE statePath: 'auth.token',
+  @property({type: String, computed: 'getReduxStateValue(state.auth.token)'})
   token!: string;
 
   @property({type: Object})
@@ -84,6 +87,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
 
   @property({type: Array, notify: true})
   activeRequests!: GenericObject[];
+
 
   _computeHeaders(headers: GenericObject, token: string) {
     return Object.assign({}, {
@@ -119,7 +123,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
     const token = request.xhr.getResponseHeader('token');
 
     if (token) {
-      this.dispatch(App.Actions.setToken(token));
+      store.dispatch(setToken(token));
     }
 
     fireEvent(this, ['response'].concat(arguments));
@@ -131,7 +135,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
 
   _handleError() {
     if (this.lastError && this.lastError.status === 401) {
-      this.dispatch(App.Actions.resetToken());
+      store.dispatch(resetToken());
     }
 
     if (this.lastError && this.lastError.status === 500) {
@@ -159,14 +163,14 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(PolymerElement)) {
 
   thunk() {
     const self = this;
-    return (function() {
+    return (function () {
       const req = self.generateRequest();
 
       return req.completes
-        .then(function() {
+        .then(function () {
           return self._buildResponse(req);
         })
-        .catch(function() {
+        .catch(function () {
           return Promise.reject(self._buildResponse(req));
         });
     }.bind(this));
