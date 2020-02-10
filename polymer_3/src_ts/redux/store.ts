@@ -17,6 +17,7 @@ import {Indicators} from './reducers/indicators';
 import {ProgrammeDocuments} from './reducers/programmeDocuments';
 import {Analysis} from './reducers/analysis';
 import {Config} from './reducers/config';
+import {UserProfile} from './reducers/userProfile';
 
 
 declare global {
@@ -53,7 +54,7 @@ let rootReducer = combineReducers({
   // clusterDisaggregations: ClusterDisaggregations,
   // clusterIndicatorReports: ClusterIndicatorReports,
   // clusterDashboardData: ClusterDashboardData,
-  // userProfile: UserProfile,
+  userProfile: UserProfile,
   analysis: Analysis,
   config: Config
 });
