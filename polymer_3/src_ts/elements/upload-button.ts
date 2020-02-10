@@ -12,10 +12,10 @@ import '@polymer/paper-icon-button';
 import UtilsMixin from '../mixins/utils-mixin';
 import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
+import './etools-prp-ajax';
+import './error-box';
 // <link rel="import" href="../styles/buttons.html">
 // <link rel="import" href="../styles/modal.html">
-// <link rel="import" href="etools-prp-ajax.html">
-import './error-box';
 
 
 /**
@@ -48,12 +48,12 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
         }
       </style>  
       
-<!--      <etools-prp-ajax-->
-<!--          id="upload"-->
-<!--          method="post"-->
-<!--          url="[[url]]"-->
-<!--          body="[[payload]]">-->
-<!--      </etools-prp-ajax>-->
+      <etools-prp-ajax
+          id="upload"
+          method="post"
+          url="[[url]]"
+          body="[[payload]]">
+      </etools-prp-ajax>
     
       <paper-button
           class="btn-primary"
