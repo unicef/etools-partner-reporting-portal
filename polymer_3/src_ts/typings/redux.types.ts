@@ -13,6 +13,10 @@ import {ProgrammeDocumentDetailsState} from '../redux/reducers/programmeDocument
 import {ProgrammeDocumentReportsState} from '../redux/reducers/programmeDocumentReports';
 import {ProgrammeDocumentReportsAttachmentsState} from '../redux/reducers/programmeDocumentReportsAttachments';
 import {ProgressReportsState} from '../redux/reducers/progressReports';
+import {ResponsePlansState} from '../redux/reducers/responsePlans';
+import {DisaggregationsState} from '../redux/reducers/disaggregations';
+import {PartnerProjectsState} from '../redux/reducers/partnerProjects';
+import {PartnerActivitiesState} from '../redux/reducers/partnerActivities';
 
 
 
@@ -29,6 +33,10 @@ export interface RootState {
   programmeDocumentReports: ProgrammeDocumentReportsState,
   programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachmentsState,
   progressReports: ProgressReportsState,
+  responsePlans: ResponsePlansState,
+  disaggregations: DisaggregationsState,
+  partnerProjects: PartnerProjectsState,
+  partnerActivities: PartnerActivitiesState,
 
   userProfile: UserProfileState,
   analysis: AnalysisState,
