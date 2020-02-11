@@ -38,11 +38,11 @@ declare global {
   interface Window {
     process?: Record<string, any>;
     /* eslint-disable-next-line no-undef */
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+    __REDUX_DEVTOOLS_EXTENSION__?: typeof compose;
   }
 }
 
-var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION__ || compose;
 
 let rootReducer = combineReducers({
   localize: Localize,

@@ -3,7 +3,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/paper-button/paper-button.js';
-import '@polymer/etools-loading/etools-loading.js'
+import '@unicef-polymer/etools-loading/etools-loading.js'
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/polymer/lib/elements/dom-if';
 import LocalizeMixin from '../mixins/localize-mixin';

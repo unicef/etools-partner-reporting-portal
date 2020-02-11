@@ -1,9 +1,9 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-radio-button/paper-radio-button.js';
-import {mixinBehaviors} from '@polymer/polymer/lib/legacy/class';
-import {AppLocalizeBehavior} from '@polymer/app-localize-behavior/app-localize-behavior';
+import '@polymer/app-localize-behavior/app-localize-behavior';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import LocalizeMixin from '../mixins/localize-mixin';
@@ -22,7 +22,7 @@ import UtilsMixin from '../mixins/utils-mixin';
  * @appliesMixin LocalizeMixin
  * @appliesMixin UtilsBehavior
  */
-class CalculationMethod extends UtilsMixin(LocalizeMixin(PolymerElement)) {
+class CalculationMethod extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`

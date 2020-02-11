@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {Constructor} from '../typings/globals.types';
-
+import {store} from '../redux/store';
 
 /**
  * @polymer
@@ -25,9 +25,11 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     @property({type: String, computed: '_$computeBaseUrlCluster(_$currentWorkspace, _$currentApp, _$currentPlan)'})
     _baseUrlCluster!: string;
 
+    private BEHAVIOR_NAME = 'RoutingBehavior';
+
 
     public _$computeBaseUrl(workspace: string, app: string) {
-      return '/app/' + workspace + '/' + app;
+      return '/app_poly3/' + workspace + '/' + app;
     }
 
     public _$computeBaseUrlCluster(workspace: string, app: string, planId: string) {
@@ -53,9 +55,10 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     connectedCallback() {
       super.connectedCallback();
 
+      const self = this;
       setTimeout(function() {
-        if (typeof this.dispatch !== 'function') { // Duck typing
-          throw new Error(BEHAVIOR_NAME + ' requires ReduxBehavior');
+        if (typeof store.dispatch !== 'function') { // Duck typing
+          throw new Error(self.BEHAVIOR_NAME + ' requires ReduxBehavior');
         }
       });
     }

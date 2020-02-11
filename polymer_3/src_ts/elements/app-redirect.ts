@@ -1,13 +1,8 @@
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import RoutingMixin from '../mixins/routing-mixin';
 import {GenericObject} from '../typings/globals.types';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
-
-//<link rel="import" href="../redux/store.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.RoutingBehavior,
-// ],
+import {getDomainByEnv} from '../config';
 
 /**
  * @polymer
@@ -16,15 +11,12 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
  */
 class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
-  //DONE statePath: 'app.current',
   @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
   app!: string;
 
-  //DONE statePath: 'workspaces.current',
   @property({type: String, computed: 'getReduxStateValue(state.workspaces.current)'})
   workspace!: string;
 
-  //DONE statePath: 'userProfile.profile',
   @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
   profile!: GenericObject;
 
@@ -36,8 +28,8 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _redirectIfNeeded(app: string, workspace: string, access: string[]) {
-    if (!access.length) {
-      location.href = '/unauthorized';
+    if (!access || !access.length) {
+      location.href = getDomainByEnv() + '/src/pages/unauthorized';
     } else if (access.indexOf(app) === -1) {
       location.href = this.buildBaseUrl(workspace, access[0]);
     }

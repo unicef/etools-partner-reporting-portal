@@ -1,16 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import {connect} from 'pwa-helpers/connect-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import '@polymer/paper-styles/typography';
-// import {store} from 'pwa-helpers/demo/store';
-// <link rel='import' href='../redux/store.html'>
-// <link rel='import' href='../behaviors/routing.html'>
-
+import RoutingMixin from '../mixins/progress-report-utils-mixin';
 
 /**
  * @polymer
@@ -18,7 +15,7 @@ import '@polymer/paper-styles/typography';
  * @mixinFunction
  * @appliesMixin RoutingMixin
  */
-class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
+class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
   public static get template() {
 
     return html`
@@ -84,7 +81,7 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
         background: var(--paper-grey-200);
       }
       </style>
-      
+
       <paper-menu-button
           vertical-align="top"
           dynamic-align>
@@ -107,7 +104,7 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
           </ul>
         </aside>
       </paper-menu-button>
-    
+
     `;
   }
 
@@ -139,7 +136,6 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
 
   public _navigate(e) {
     e.preventDefault();
-
     location.href = e.target.href;
   }
 

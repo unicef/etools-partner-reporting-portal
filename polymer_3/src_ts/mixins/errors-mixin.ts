@@ -1,12 +1,13 @@
-import {PolymerElement} from '@polymer/polymer';
 import {Constructor} from '../typings/globals.types';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {store} from '../redux/store';
+import {userLogout} from '../redux/actions'
 
-
-/** (dci) TODO: need to import redux
+/**
  * @polymer
  * @mixinFunction
  */
-function ErrorHandlerMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
+function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class ErrorHandlerClass extends baseClass {
 
     _handleError(e: CustomEvent) {
@@ -21,8 +22,8 @@ function ErrorHandlerMixin<T extends Constructor<PolymerElement>>(baseClass: T) 
 
         switch (xhr.status) {
           case 403: // FIXME: 401?
-            // (dci) uncomment when redux is available
-            //App.Store.dispatch(App.Actions.userLogout())
+            // (dci)
+            store.dispatch(userLogout())
             //.then(function() {
             location.pathname = '/landing';
             //});
