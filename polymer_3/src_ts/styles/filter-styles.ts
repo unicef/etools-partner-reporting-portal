@@ -1,10 +1,10 @@
-import { html } from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer/polymer-element.js';
 
 export const filterStyles = html`
-    <style>
+  <style>
     :host {
-        margin-bottom: 25px;
-        --app-grid-gutter: 15px;
+      margin-bottom: 25px;
+      --app-grid-gutter: 15px;
     }
-    </style>`
-;
+  </style>`
+  ;
