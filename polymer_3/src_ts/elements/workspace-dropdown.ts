@@ -17,10 +17,10 @@ import RoutingMixin from '../mixins/routing-mixin';
  * @mixinFunction
  * @appliesMixin RoutingMixin
  */
-class WorkspaceDropdown extends RoutingMixin(PolymerElement){
-    public static get template() {
-        return html`
-        <style>
+class WorkspaceDropdown extends RoutingMixin(PolymerElement) {
+  public static get template() {
+    return html`
+      <style>
         :host {
             display: block;
             position: relative;
@@ -71,55 +71,55 @@ class WorkspaceDropdown extends RoutingMixin(PolymerElement){
             white-space: nowrap;
             cursor: pointer;
         }
-        </style>
+      </style>
 
-        <paper-dropdown-menu label="[[workspace.name]]" noink no-label-float>
+      <paper-dropdown-menu label="[[workspace.name]]" noink no-label-float>
         <paper-listbox
-            class="dropdown-content"
-            on-iron-select="_workspaceSelected"
-            selected="[[selected]]">
-            <template id="repeat" is="dom-repeat" items="[[data]]">
+          class="dropdown-content"
+          on-iron-select="_workspaceSelected"
+          selected="[[selected]]">
+          <template id="repeat" is="dom-repeat" items="[[data]]">
             <paper-item>[[item.name]]</paper-item>
-            </template>
+          </template>
         </paper-listbox>
-        </paper-dropdown-menu>
-      `;
+      </paper-dropdown-menu>`
+      ;
+  }
+
+  @property({type: Object, computed: '_computeWorkspace(data, current)'})
+  properties = null;
+
+  @property({type: Number, computed: '_computeSelected(data, workspace)'})
+  selected = 0;
+
+  @property({type: String})
+  current!: string;
+
+  @property({type: Array})
+  data!: any[];
+
+  _workspaceSelected(e: CustomEvent) {
+    var newCode = this.$.repeat.itemForElement(e.detail.item).code;
+
+    if (newCode === this.current) {
+      return;
     }
 
-    @property({type: Object, computed: '_computeWorkspace(data, current)'})
-    properties = null;
+    this.dispatch(App.Actions.setWorkspace(newCode));
 
-    @property({type: Number, computed: '_computeSelected(data, workspace)'})
-    selected = 0;
+    window.location.href = this.buildUrl(this._baseUrl, '/');
+  }
 
-    @property({type: String})
-    current!: string;
+  //code is defined current...assumed it will be number
+  _computeWorkspace(data: any[], code: number) {
+    return data.filter(function(workspace) {
+      return workspace.code === code;
+    })[0];
+  }
 
-    @property({type: Array})
-    data!: any[];
-
-    _workspaceSelected(e: CustomEvent) {
-        var newCode = this.$.repeat.itemForElement(e.detail.item).code;
-
-        if (newCode === this.current) {
-          return;
-        }
-
-        this.dispatch(App.Actions.setWorkspace(newCode));
-
-        window.location.href = this.buildUrl(this._baseUrl, '/');
-      }
-
-      //code is defined current...assumed it will be number
-      _computeWorkspace(data: any[], code: number) {
-        return data.filter(function (workspace) {
-          return workspace.code === code;
-        })[0];
-      }
-
-      _computeSelected(data: any[], workspace: string) {
-        return data.indexOf(workspace);
-      }
+  _computeSelected(data: any[], workspace: string) {
+    return data.indexOf(workspace);
+  }
 }
 
 window.customElements.define('workspace-dropdown', WorkspaceDropdown);

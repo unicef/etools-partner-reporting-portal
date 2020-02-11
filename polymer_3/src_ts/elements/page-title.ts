@@ -7,7 +7,7 @@ import {property} from "@polymer/decorators/lib/decorators";
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class PageTitle extends PolymerElement{
+class PageTitle extends PolymerElement {
   @property({type: String})
   baseTitle = 'PRP';
 
@@ -19,7 +19,7 @@ class PageTitle extends PolymerElement{
 
   static get observers() {
     return [
-        '_setDocumentTitle(title, divider, baseTitle)',
+      '_setDocumentTitle(title, divider, baseTitle)',
     ];
   }
 

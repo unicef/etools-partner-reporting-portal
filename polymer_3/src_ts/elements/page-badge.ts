@@ -5,10 +5,10 @@ import {property} from "@polymer/decorators/lib/decorators";
  * @polymer
  * @customElement
  */
-class PageBadge extends PolymerElement{
-    public static get template() {
-        return html`
-        <style>
+class PageBadge extends PolymerElement {
+  public static get template() {
+    return html`
+      <style>
         :host {
             display: inline-block;
             border-radius: 1px;
@@ -18,14 +18,14 @@ class PageBadge extends PolymerElement{
             background-color: var(--paper-grey-500);
             color: white;
         }
-        </style>
+      </style>
 
-        [[name]]
-      `;
-    }
+      [[name]]`
+      ;
+  }
 
-    @property({type: String})
-    name!: string;
+  @property({type: String})
+  name!: string;
 }
 
 window.customElements.define('page-badge', PageBadge);

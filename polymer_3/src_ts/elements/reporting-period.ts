@@ -15,17 +15,17 @@ import LocalizeMixin from '../mixins/localize-mixin';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-    //TODO: need to be checked the code made by @lajos 
-    // behaviors: [
-    //     App.Behaviors.UtilsBehavior,
-    //     App.Behaviors.ReduxBehavior,
-    //     App.Behaviors.LocalizeBehavior,
-    //     Polymer.AppLocalizeBehavior,
-    //   ],
-class ReportingPeriod extends LocalizeMixin(UtilsMixin(PolymerElement)){
-    public static get template() {
-        return html`
-        <style>
+//TODO: need to be checked the code made by @lajos
+// behaviors: [
+//     App.Behaviors.UtilsBehavior,
+//     App.Behaviors.ReduxBehavior,
+//     App.Behaviors.LocalizeBehavior,
+//     Polymer.AppLocalizeBehavior,
+//   ],
+class ReportingPeriod extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+  public static get template() {
+    return html`
+      <style>
         :host {
             display: inline-block;
             padding: 1px 3px;
@@ -41,12 +41,12 @@ class ReportingPeriod extends LocalizeMixin(UtilsMixin(PolymerElement)){
         }
         </style>
 
-        [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>
-      `;
-    }
+        [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>`
+      ;
+  }
 
-    @property({type: String})
-    range = null;
+  @property({type: String})
+  range = null;
 }
 
 window.customElements.define('reporting-period', ReportingPeriod);
