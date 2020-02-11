@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-button/paper-button.js';
@@ -20,13 +21,8 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import './error-modal';
 import './etools-prp-number';
 import './etools-prp-ajax';
-
-// (dci) import ajax ???
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../redux/actions/localize.html">
+import '../styles/buttons-styles';
+import '../styles/modal-styles';
 
 // <!-- behaviors: [
 // App.Behaviors.ReduxBehavior,
@@ -44,7 +40,7 @@ import './etools-prp-ajax';
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixin(PolymerElement)))) {
+class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
