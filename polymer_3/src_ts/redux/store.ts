@@ -27,6 +27,11 @@ import {ResponsePlans} from './reducers/responsePlans';
 import {Disaggregations} from './reducers/disaggregations';
 import {PartnerProjects} from './reducers/partnerProjects';
 import {PartnerActivities} from './reducers/partnerActivities';
+import {ClusterActivities} from './reducers/clusterActivities';
+import {ClusterDashboardData} from './reducers/clusterDashboardData';
+import {ClusterObjectives} from './reducers/clusterObjectives';
+import {ClusterDisaggregations} from './reducers/clusterDisaggregations';
+import {ClusterIndicatorReports} from './reducers/clusterIndicatorReports';
 
 
 declare global {
@@ -57,11 +62,11 @@ let rootReducer = combineReducers({
   disaggregations: Disaggregations,
   partnerProjects: PartnerProjects,
   partnerActivities: PartnerActivities,
-  // clusterActivities: ClusterActivities,
-  // clusterObjectives: ClusterObjectives,
-  // clusterDisaggregations: ClusterDisaggregations,
-  // clusterIndicatorReports: ClusterIndicatorReports,
-  // clusterDashboardData: ClusterDashboardData,
+  clusterActivities: ClusterActivities,
+  clusterObjectives: ClusterObjectives,
+  clusterDisaggregations: ClusterDisaggregations,
+  clusterIndicatorReports: ClusterIndicatorReports,
+  clusterDashboardData: ClusterDashboardData,
   userProfile: UserProfile,
   analysis: Analysis,
   config: Config

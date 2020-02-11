@@ -17,6 +17,11 @@ import {ResponsePlansState} from '../redux/reducers/responsePlans';
 import {DisaggregationsState} from '../redux/reducers/disaggregations';
 import {PartnerProjectsState} from '../redux/reducers/partnerProjects';
 import {PartnerActivitiesState} from '../redux/reducers/partnerActivities';
+import {ClusterActivitiesState} from '../redux/reducers/clusterActivities';
+import {ClusterDashboardDataState} from '../redux/reducers/clusterDashboardData';
+import {ClusterObjectivesState} from '../redux/reducers/clusterObjectives';
+import {ClusterDisaggregationsState} from '../redux/reducers/clusterDisaggregations';
+import {ClusterIndicatorReportsState} from '../redux/reducers/clusterIndicatorReports';
 
 
 
@@ -37,7 +42,11 @@ export interface RootState {
   disaggregations: DisaggregationsState,
   partnerProjects: PartnerProjectsState,
   partnerActivities: PartnerActivitiesState,
-
+  clusterActivities: ClusterActivitiesState,
+  clusterObjectives: ClusterObjectivesState,
+  clusterDisaggregations: ClusterDisaggregationsState,
+  clusterIndicatorReports: ClusterIndicatorReportsState,
+  clusterDashboardData: ClusterDashboardDataState,
   userProfile: UserProfileState,
   analysis: AnalysisState,
   config: ConfigState
