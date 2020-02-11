@@ -3,8 +3,8 @@ import "@polymer/iron-flex-layout/iron-flex-layout";
 // <link rel="import" href="../../bower_components/polymer/polymer.html">
 // <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-export const Modal = html`
-        <style>
+export const pageNavStyles = html`
+    <style>
         :host {
             --paper-item-selected: {
                 color: var(--theme-primary-color);
@@ -87,4 +87,5 @@ export const Modal = html`
             justify-content: space-between;
             height: calc(100vh - 80px);
         }
-        </style>`;
+    </style>`
+;

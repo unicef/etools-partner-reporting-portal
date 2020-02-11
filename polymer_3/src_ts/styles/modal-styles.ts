@@ -3,8 +3,8 @@ import "@polymer/paper-styles/typography";
 // <link rel="import" href="../../bower_components/polymer/polymer.html">
 // <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-export const Modal = html`
-        <style>
+export const modalStyles = html`
+    <style>
         .header {
             height: 48px;
             padding: 0 24px;
@@ -15,7 +15,6 @@ export const Modal = html`
 
         .header h2 {
             @apply --paper-font-title;
-
             margin: 0;
             line-height: 48px;
         }
@@ -28,4 +27,5 @@ export const Modal = html`
         .buttons {
             padding: 24px;
         }
-        </style>`;
+    </style>`
+;
