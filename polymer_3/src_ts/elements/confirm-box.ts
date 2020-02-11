@@ -6,6 +6,7 @@ import '@polymer/iron-icons/iron-icons';
 import Constants from '../constants';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+import {ConfirmBoxElem} from '../typings/entities.types';
 // <link rel="import" href="../styles/buttons.html">
 
 
@@ -97,10 +98,10 @@ class ConfirmBox extends PolymerElement{
   position!: string;
 
   @property({type: Object})
-  config: GenericObject = { okLabel: 'Continue',
+  config: ConfirmBoxElem = { okLabel: 'Continue',
                             cancelLabel: 'Cancel',
                             maxWidth: '100%',
-                            mode: Constants.CONFIRM_INLINE}
+                            mode: Constants.CONFIRM_INLINE};
 
   _computePosition(config: GenericObject) {
     switch (config.mode) {
