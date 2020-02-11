@@ -34,7 +34,9 @@ function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         });
     }
 
-    detached() {
+    disconnectedCallback() {
+      super.disconnectedCallback();
+
       if (this._adjustPositionDebouncer && this._adjustPositionDebouncer.isActive()) {
         this._adjustPositionDebouncer.cancel();
       }
