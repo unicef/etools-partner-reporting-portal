@@ -5,3 +5,10 @@ export interface Workspace {
   latitude: string;
   longitude: string;
 }
+
+export interface ConfirmBoxElem {
+  okLabel: string,
+  cancelLabel: string,
+  maxWidth: string,
+  mode: string;
+}
