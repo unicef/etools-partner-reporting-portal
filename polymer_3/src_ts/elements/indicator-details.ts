@@ -1,36 +1,37 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/paper-tabs/paper-tab.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-icons/maps-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/paper-item/paper-item.js';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/paper-tabs/paper-tab';
+import '@polymer/paper-tabs/paper-tabs';
+import '@polymer/iron-pages/iron-pages';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons/maps-icons';
+import '@polymer/paper-button/paper-button';
+import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 
 import '../utils/fire-custom-event';
-import './etools-prp-ajax.js';
-import './etools-prp-number.js';
-import './status-badge.js';
-import './etools-prp-printer.js';
-import '../disaggregations/disaggregation-table.js';
-import '../disaggregations/disaggregation-modal.js';
-import './report-status.js';
-import './pull-modal.js';
+import './etools-prp-ajax';
+import './etools-prp-number';
+import './status-badge';
+import './etools-prp-printer';
+import '../disaggregations/disaggregation-table';
+import '../disaggregations/disaggregation-modal';
+import './report-status';
+import './pull-modal';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {fireEvent} from '../utils/fire-custom-event.js';
-import {GenericObject} from '../typings/globals.types.js';
+import {fireEvent} from '../utils/fire-custom-event';
+import {GenericObject} from '../typings/globals.types';
 import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {store} from '../redux/store';
+import {buttonsStyles} from '../styles/buttons-styles';
 // @ts-ignore
 import {currentProgrammeDocuments} from '../redux/selectors/programmeDocuments';
 
@@ -56,7 +57,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    <style include="button-styles iron-flex iron-flex-alignment app-grid-style">
+    ${buttonsStyles} 
+    <style>
       :host {
         display: block;
         width: 100%;

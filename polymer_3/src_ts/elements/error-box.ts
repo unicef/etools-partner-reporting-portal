@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/iron-icon/iron-icon';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
@@ -16,7 +16,7 @@ import './error-box-errors';
 class ErrorBox extends UtilsMixin(PolymerElement){
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
+      <style>
         :host {
           color: var(--paper-input-container-invalid-color, --error-color);
         }

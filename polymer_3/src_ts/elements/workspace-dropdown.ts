@@ -1,13 +1,14 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-repeat';
 
-import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
-import "@polymer/paper-listbox/paper-listbox";
-import "@polymer/paper-item/paper-item";
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import RoutingMixin from '../mixins/routing-mixin';
-import {store} from "../redux/store";
-import {setWorkspace} from "../redux/actions";
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {store} from '../redux/store';
+import {setWorkspace} from '../redux/actions';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
  * @polymer

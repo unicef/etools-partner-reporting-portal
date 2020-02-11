@@ -1,6 +1,6 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/iron-ajax/iron-ajax.js';
+import '@polymer/iron-ajax/iron-ajax';
 import {IronAjaxElement} from '@polymer/iron-ajax/iron-ajax';
 import UtilsMixin from '../mixins/utils-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';

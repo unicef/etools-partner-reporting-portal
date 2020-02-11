@@ -1,16 +1,16 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/paper-dialog/paper-dialog';
+import '@polymer/paper-button/paper-button';
+import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/paper-styles/typography';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/iron-location/iron-location';
+import '@polymer/paper-input/paper-input';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-if';
 import {GenericObject} from '../typings/globals.types';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -20,6 +20,8 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import './error-modal';
 import './etools-prp-number';
 import './etools-prp-ajax';
+import {buttonsStyles} from "../styles/buttons-styles";
+import {modalStyles} from "../styles/modal-styles";
 
 // (dci) import ajax ???
 // <link rel="import" href="../styles/buttons.html">
@@ -48,7 +50,8 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
 
   static get template() {
     return html`
-    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+    ${buttonsStyles} ${modalStyles}
+    <style>
       :host {
         display: block;
         --paper-dialog: {

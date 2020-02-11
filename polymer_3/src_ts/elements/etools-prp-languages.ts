@@ -1,4 +1,3 @@
-
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {GenericObject} from '../typings/globals.types';

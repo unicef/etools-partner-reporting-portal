@@ -1,8 +1,8 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/paper-input/paper-input';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import './labelled-item';
 import {GenericObject} from '../typings/globals.types';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -16,7 +16,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
-    <style include="app-grid-style">
+    <style>
       :host {
         display: block;
 

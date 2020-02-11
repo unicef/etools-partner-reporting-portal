@@ -1,8 +1,8 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import PaginationMixin from '../mixins/pagination-mixin';
 import {GenericObject} from '../typings/globals.types';
 

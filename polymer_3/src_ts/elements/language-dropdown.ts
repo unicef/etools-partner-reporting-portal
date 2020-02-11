@@ -1,10 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/app-localize-behavior/app-localize-behavior';
-import "@polymer/polymer/lib/elements/dom-repeat";
+import '@polymer/polymer/lib/elements/dom-repeat';
 
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';

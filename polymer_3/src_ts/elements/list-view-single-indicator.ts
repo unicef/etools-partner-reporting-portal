@@ -1,8 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/polymer/lib/elements/dom-if';
 
 // <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
 import './etools-prp-progress-bar';
@@ -16,9 +18,11 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
 import './etools-prp-permissions';
+import './status-badge';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
-// <link rel="import" href="status-badge.html">
+import {tableStyles} from '../styles/table-styles';
+import {sharedStyles} from '../styles/shared-styles';
 // <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
 // <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
 
@@ -34,6 +38,7 @@ import {GenericObject} from '../typings/globals.types';
 class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(PolymerElement)))){
   public static get template(){
     return html`
+        ${tableStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">
         :host {
           display: block;

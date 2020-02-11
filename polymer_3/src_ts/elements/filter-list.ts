@@ -1,10 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/etools-loading/etools-loading.js'
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '@polymer/paper-button/paper-button';
+import '@polymer/etools-loading/etools-loading';
+import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/polymer/lib/elements/dom-if';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
@@ -26,7 +26,7 @@ class FilterList extends LocalizeMixin(PolymerElement) {
 
   static get template() {
     return html`
-    <style include="iron-flex">
+    <style>
       :host {
         background-color: #f9f9f9;
         display: block;

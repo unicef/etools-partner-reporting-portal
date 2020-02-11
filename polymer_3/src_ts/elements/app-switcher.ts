@@ -1,8 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/paper-menu-button/paper-menu-button.js';
+import '@polymer/paper-menu-button/paper-menu-button';
 import '@polymer/iron-icons/iron-icons';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import {connect} from 'pwa-helpers/connect-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
@@ -22,7 +24,7 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
   public static get template() {
 
     return html`
-      <style include="iron-flex">
+      <style>
         :host {
         --paper-icon-button: {
           color: rgba(255, 255, 255, 0.7);

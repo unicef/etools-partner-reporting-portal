@@ -1,10 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-query-params';
-// <link rel="import" href="../styles/buttons.html">
+import {buttonsStyles} from '../styles/buttons-styles';
 
 
 /**
@@ -16,8 +16,8 @@ import '@polymer/iron-location/iron-query-params';
 class EtoolsPrpToolbar extends (UtilsMixin(PolymerElement)){
   public static get template(){
     return html`
-    
-      <style include="iron-flex iron-flex-reverse button-styles">
+        ${buttonsStyles}
+      <style>
         :host {
           display: block;
           margin: 25px 0;

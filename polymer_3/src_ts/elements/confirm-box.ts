@@ -1,13 +1,15 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/paper-button/paper-button';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/polymer/lib/elements/dom-if';
 
 import Constants from '../constants';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {ConfirmBoxElem} from '../typings/entities.types';
-// <link rel="import" href="../styles/buttons.html">
+import {buttonsStyles} from '../styles/buttons-styles';
 
 
 /**
@@ -19,7 +21,8 @@ import {ConfirmBoxElem} from '../typings/entities.types';
 class ConfirmBox extends PolymerElement{
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+        ${buttonsStyles}
+      <style>
         :host {
           display: block;
         }

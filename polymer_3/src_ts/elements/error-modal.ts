@@ -1,15 +1,16 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {connect} from 'pwa-helpers/connect-mixin';
 import {store} from 'pwa-helpers/demo/store';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+import {buttonsStyles} from '../styles/buttons-styles';
 
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../styles/buttons.html">
 
 
 /**
@@ -22,7 +23,8 @@ import {GenericObject} from '../typings/globals.types';
 class ErrorModal extends connect(store)(LocalizeMixin(UtilsMixin(PolymerElement))){
   public static get template(){
     return html`
-      <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+        ${buttonsStyles}
+      <style>
         :host {
           --paper-dialog: {
             width: 500px;
