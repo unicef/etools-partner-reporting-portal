@@ -108,7 +108,9 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeBackUrl(back, _baseUrl, app)'})
   backUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(userProfile.profile)'})
+  //TODO @lajos, check fi correct
+  // statePath: 'app.current',
+  @property({type: String, computed: 'getReduxStateValue(app.current)'})
   app!: string;
 
   //@lajos: defined tail as back is defined String

@@ -59,7 +59,8 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Boolean})
   final = false;
 
-  @property({type: String, computed: 'getReduxStateValue(userProfile.profile)'})
+  //statePath: 'app.current',
+  @property({type: String, computed: 'getReduxStateValue(app.current)'})
   app!: string;
 
   @property({type: String})
