@@ -10,9 +10,9 @@ import "@polymer/app-localize-behavior/app-localize-behavior";
 import "../style/shared-styles";
 import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 // <link rel="import" href="../behaviors/localize.html">
-// <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../behaviors/routing.html">
 // <link rel="import" href="../styles/shared-styles.html">
 
@@ -23,7 +23,7 @@ import RoutingMixin from '../mixins/routing-mixin';
  * @appliesMixin LocalizeMixin
  * @appliesMixin RoutingMixin
  */
-class PageHeader extends LocalizeMixin(RoutingMixin(PolymerElement)) {
+class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles">
@@ -105,12 +105,10 @@ class PageHeader extends LocalizeMixin(RoutingMixin(PolymerElement)) {
   @property({type: String})
   back!: string;
 
-  @property({type: String, compute: '_computeBackUrl(back, _baseUrl, app)'})
+  @property({type: String, computed: '_computeBackUrl(back, _baseUrl, app)'})
   backUrl!: string;
 
-  //TODO @lajos, check fi correct
-  // statePath: 'app.current',
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(userProfile.profile)'})
   app!: string;
 
   //@lajos: defined tail as back is defined String

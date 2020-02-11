@@ -1,15 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 
 import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
 import "@polymer/paper-listbox/paper-listbox";
 import "@polymer/paper-item/paper-item";
 import RoutingMixin from '../mixins/routing-mixin';
-
-
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../behaviors/routing.html">
+import {store} from "../redux/store";
+import {setWorkspace} from "../redux/actions";
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 /**
  * @polymer
@@ -17,7 +15,7 @@ import RoutingMixin from '../mixins/routing-mixin';
  * @mixinFunction
  * @appliesMixin RoutingMixin
  */
-class WorkspaceDropdown extends RoutingMixin(PolymerElement) {
+class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   public static get template() {
     return html`
       <style>
@@ -105,7 +103,7 @@ class WorkspaceDropdown extends RoutingMixin(PolymerElement) {
       return;
     }
 
-    this.dispatch(App.Actions.setWorkspace(newCode));
+    store.dispatch(setWorkspace(newCode));
 
     window.location.href = this.buildUrl(this._baseUrl, '/');
   }

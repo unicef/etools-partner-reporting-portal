@@ -1,13 +1,9 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
-import from "./status-badge";
+import "./status-badge";
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-
-// <link rel="import" href="../../bower_components/polymer/polymer.html">
-// <link rel="import" href="status-badge.html">
-// <link rel="import" href="../behaviors/utils.html">
-// <link rel="import" href="../behaviors/localize.html">
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 /**
  * @polymer
@@ -16,7 +12,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectStatus extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+class ProjectStatus extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style>

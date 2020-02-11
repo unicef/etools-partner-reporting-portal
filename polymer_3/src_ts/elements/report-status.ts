@@ -1,8 +1,9 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import './status-badge';
 import LocalizeMixin from '../mixins/localize-mixin';
 import "@polymer/polymer/lib/elements/dom-if";
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../behaviors/localize.html">
@@ -15,7 +16,7 @@ import "@polymer/polymer/lib/elements/dom-if";
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class ReportStatus extends LocalizeMixin(PolymerElement) {
+class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
   public static get template() {
     return html`
       <style>
@@ -39,11 +40,7 @@ class ReportStatus extends LocalizeMixin(PolymerElement) {
       </template>`
       ;
   }
-  // behaviors: [
-  //   App.Behaviors.ReduxBehavior,
-  //   App.Behaviors.LocalizeBehavior,
-  //   Polymer.AppLocalizeBehavior,
-  // ],
+
   @property({type: String})
   status!: string;
 
@@ -62,8 +59,7 @@ class ReportStatus extends LocalizeMixin(PolymerElement) {
   @property({type: Boolean})
   final = false;
 
-  //statePath: 'app.current',
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(userProfile.profile)'})
   app!: string;
 
   @property({type: String})

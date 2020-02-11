@@ -1,12 +1,8 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-
-//<link rel="import" href="../behaviors/utils.html">
-//<link rel="import" href="../redux/store.html">
-//<link rel="import" href="../behaviors/localize.html">
-//<link rel="import" href="../redux/actions/localize.html">
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 /**
  * @polymer
@@ -22,7 +18,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
 //     App.Behaviors.LocalizeBehavior,
 //     Polymer.AppLocalizeBehavior,
 //   ],
-class ReportingPeriod extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+class ReportingPeriod extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style>

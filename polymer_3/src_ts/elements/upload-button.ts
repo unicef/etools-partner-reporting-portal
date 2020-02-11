@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
@@ -14,6 +14,9 @@ import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import './etools-prp-ajax';
 import './error-box';
+import "../styles/button-styles.ts"
+import "../styles/modal-styles.ts"
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 // <link rel="import" href="../styles/buttons.html">
 // <link rel="import" href="../styles/modal.html">
 
@@ -26,66 +29,66 @@ import './error-box';
  * @appliesMixin UtilsMixin
  * @appliesMixin NotificationsMixin
  */
-class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElement)))){
-  public static get template(){
+class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement)))) {
+  public static get template() {
     return html`
-  
+
       <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           --etools-file-main-btn-color: var(--theme-primary-color);
-  
+
           --paper-dialog: {
             width: 400px;
-  
+
             & > * {
               margin: 0;
             }
           };
         }
-  
+
         .row {
           margin: 16px 0;
         }
-      </style>  
-      
+      </style>
+
       <etools-prp-ajax
           id="upload"
           method="post"
           url="[[url]]"
           body="[[payload]]">
       </etools-prp-ajax>
-    
+
       <paper-button
           class="btn-primary"
           on-tap="_openModal">
         <iron-icon icon="icons:file-upload"></iron-icon>
         <slot></slot>
       </paper-button>
-      
+
       <paper-dialog
         id="dialog"
         with-backdrop
         opened="{{opened}}">
-  
+
         <div class="header layout horizontal justified">
           <h2>
             <slot>[[modalTitle]]</slot>
           </h2>
-  
+
           <paper-icon-button
             class="self-center"
             on-tap="close"
             icon="icons:close">
           </paper-icon-button>
         </div>
-  
+
         <paper-dialog-scrollable>
           <template
               is="dom-if"
               if="[[opened]]"
               restamp="true">
             <error-box errors="[[errors]]"></error-box>
-  
+
             <div class="row">
               <etools-file
                   files="{{files}}"
@@ -97,7 +100,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
             </div>
           </template>
         </paper-dialog-scrollable>
-  
+
         <div class="buttons layout horizontal-reverse">
           <paper-button
               on-tap="_save"
@@ -105,17 +108,17 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
               raised>
             Save
           </paper-button>
-  
+
           <paper-button
               on-tap="close">
             Cancel
           </paper-button>
         </div>
-  
+
         <etools-loading active="[[pending]]"></etools-loading>
       </paper-dialog>
-    
-    
+
+
     `;
   }
 
@@ -131,7 +134,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
   @property({type: String})
   modalTitle!: string;
 
-  static get observers(){
+  static get observers() {
     return ['_setDefaults(opened)'];
   }
 
@@ -167,7 +170,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
         self._notifyFileUploaded();
         self.fire('file-uploaded');
       })
-      .catch(function (res) {
+      .catch(function(res) {
         self.set('errors', res.data);
         self.set('pending', false);
       });
@@ -183,7 +186,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(PolymerElem
     this.set('pending', false);
   }
 
-  disconnectedCallback(){
+  disconnectedCallback() {
     super.disconnectedCallback();
     this._cancelDebouncers([
       'set-payload',
