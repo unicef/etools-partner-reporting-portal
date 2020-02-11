@@ -1,4 +1,3 @@
-
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog.js';
@@ -22,7 +21,7 @@ import './etools-prp-number';
  * @polymer
  * @customElement
  * @appliesMixin ModalMixin
- * @appliesMixin UtilsBehavior
+ * @appliesMixin UtilsMixin
  */
 class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement)) {
 
