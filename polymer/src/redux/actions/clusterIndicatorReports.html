@@ -35,14 +35,14 @@
       fetchSingle: function (reportThunk, reportId) {
         return function (dispatch) {
           return reportThunk()
-              .then(function (res) {
-                dispatch(
-                  App.Actions.ClusterIndicatorReports.updateSingle(
-                    reportId,
-                    res.data
-                  )
-                );
-              });
+            .then(function (res) {
+              dispatch(
+                App.Actions.ClusterIndicatorReports.updateSingle(
+                  reportId,
+                  res.data
+                )
+              );
+            });
         };
       },
 
@@ -81,12 +81,12 @@
       update: function (updateThunk, reportId) {
         return function (dispatch) {
           return updateThunk()
-              .then(function (res) {
-                dispatch(App.Actions.ClusterIndicatorReports.updateSingle(
-                  reportId,
-                  res.data
-                ));
-              });
+            .then(function (res) {
+              dispatch(App.Actions.ClusterIndicatorReports.updateSingle(
+                reportId,
+                res.data
+              ));
+            });
         };
       },
 
