@@ -20,7 +20,6 @@ import './pages/unauthorized';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
 import {reset, userLogout, setL11NResources} from './redux/actions';
-import {store} from './redux/store';
 import {getDomainByEnv} from './config';
 
 // behaviors: [
@@ -177,11 +176,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   _onSignOut() {
     const self = this;
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
-    store.dispatch(userLogout(thunk));
+    this.reduxStore.dispatch(userLogout(thunk));
     //(dci) it was a then before
     setTimeout(() => {
       self._goToLanding();
-      store.dispatch(reset());
+      this.reduxStore.dispatch(reset());
     });
     //     .catch(function(err: any) { //jshint ignore:line
     //   // TODO: error handling
@@ -197,7 +196,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _handleResources(resources: []) {
-    store.dispatch(setL11NResources(resources));
+    this.reduxStore.dispatch(setL11NResources(resources));
   }
 
   _addEventListeners() {

@@ -12,11 +12,9 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import Endpoints from '../endpoints';
 import {fetchWorkspaces, reset, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
-import {store} from '../redux/store';
 import {GenericObject, Route} from '../typings/globals.types';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
-import {RootState} from '../typings/redux.types';
 import '../pages/app/ip-reporting';
 
 //(dci)
@@ -212,7 +210,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     let workspace;
 
     if (!workspaceCodeFromUrl) {
-      //store.dispatch(reset()); // Switch workspace === wipe all the data
+      //this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
 
       if (this.workspaces && this.workspaces.length) {
 
@@ -227,7 +225,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       //   this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
       // }
     } else if (!this._workspaceCode) {
-      store.dispatch(setWorkspace(workspaceCodeFromUrl));
+      this.reduxStore.dispatch(setWorkspace(workspaceCodeFromUrl));
     }
   }
 
@@ -244,7 +242,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (!app) {
         self._redirectToApp(defaultApp!);
       } else if (!self._app) {
-        store.dispatch(setApp(app));
+        this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
         console.log('localstorage', app);
@@ -302,7 +300,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return workspace.code === currentWorkspace;
     })[0];
 
-    store.dispatch(locationSet(currentWorkspaceData.id));
+    this.reduxStore.dispatch(locationSet(currentWorkspaceData.id));
   }
 
   _notify(e: CustomEvent) {
@@ -318,7 +316,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _fetchProfile() {
     const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
-    return store.dispatch(fetchUserProfile(userProfileThunk));
+    return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
   }
 
   _addEventListeners() {
@@ -339,7 +337,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this._addEventListeners();
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
     await Promise.all([
-      store.dispatch(fetchWorkspaces(interventionsThunk)),
+      this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
       this._fetchProfile(),
     ])
       .catch(function (err: any) {

@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
@@ -8,6 +8,7 @@ import "@polymer/polymer/lib/elements/dom-repeat";
 
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 // <link rel="import" href="../redux/actions/localize.html">
 
 /**
@@ -16,7 +17,7 @@ import {GenericObject} from '../typings/globals.types';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class LanguageDropdown extends LocalizeMixin(PolymerElement) {
+class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
   public static get template() {
     return html`
       <style>
@@ -116,7 +117,7 @@ class LanguageDropdown extends LocalizeMixin(PolymerElement) {
     var allLanguages = Object.keys(this.availableLanguages);
 
     if (allLanguages.includes(this.current) === false) {
-      this.dispatch(App.Actions.Localize.set('en'));
+      //this.dispatch(App.Actions.Localize.set('en'));
     }
 
     var newLanguage = this.$.repeat.itemForElement(e.detail.item);
@@ -125,11 +126,11 @@ class LanguageDropdown extends LocalizeMixin(PolymerElement) {
       return;
     }
 
-    this.dispatch(App.Actions.Localize.set(newLanguage));
+    //this.dispatch(App.Actions.Localize.set(newLanguage));
   }
 
   _computeLanguage(data: any[], current: String) {
-    return data.filter(function(language: string) {
+    return data.filter(function (language: string) {
       return language === current;
     })[0];
   }

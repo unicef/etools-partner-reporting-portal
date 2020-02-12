@@ -8,7 +8,6 @@ import {GenericObject} from '../typings/globals.types';
 import {fireEvent} from '../utils/fire-custom-event';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {setToken, resetToken} from '../redux/actions';
-import {store} from '../redux/store';
 
 //<link rel="import" href="../redux/store.html">
 // <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
@@ -123,7 +122,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     const token = request.xhr.getResponseHeader('token');
 
     if (token) {
-      store.dispatch(setToken(token));
+      this.reduxStore.dispatch(setToken(token));
     }
 
     fireEvent(this, ['response'].concat(arguments));
@@ -135,7 +134,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
 
   _handleError() {
     if (this.lastError && this.lastError.status === 401) {
-      store.dispatch(resetToken());
+      this.reduxStore.dispatch(resetToken());
     }
 
     if (this.lastError && this.lastError.status === 500) {

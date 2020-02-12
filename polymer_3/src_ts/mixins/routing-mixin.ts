@@ -1,6 +1,5 @@
 import {property} from '@polymer/decorators';
 import {Constructor} from '../typings/globals.types';
-import {store} from '../redux/store';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
@@ -56,8 +55,8 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
       super.connectedCallback();
 
       const self = this;
-      setTimeout(function () {
-        if (typeof store.dispatch !== 'function') { // Duck typing
+      setTimeout(() => {
+        if (typeof this.reduxStore.dispatch !== 'function') { // Duck typing
           throw new Error(self.BEHAVIOR_NAME + ' requires ReduxBehavior');
         }
       });

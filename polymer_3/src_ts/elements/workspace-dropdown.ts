@@ -5,7 +5,6 @@ import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
 import "@polymer/paper-listbox/paper-listbox";
 import "@polymer/paper-item/paper-item";
 import RoutingMixin from '../mixins/routing-mixin';
-import {store} from "../redux/store";
 import {setWorkspace} from "../redux/actions";
 import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
@@ -103,14 +102,14 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
       return;
     }
 
-    store.dispatch(setWorkspace(newCode));
+    this.reduxStore.dispatch(setWorkspace(newCode));
 
     window.location.href = this.buildUrl(this._baseUrl, '/');
   }
 
   //code is defined current...assumed it will be number
   _computeWorkspace(data: any[], code: number) {
-    return data.filter(function(workspace) {
+    return data.filter(function (workspace) {
       return workspace.code === code;
     })[0];
   }

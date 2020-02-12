@@ -1,7 +1,6 @@
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {store} from '../redux/store';
 import {setToken} from '../redux/actions';
 
 
@@ -11,7 +10,7 @@ import {setToken} from '../redux/actions';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)){
+class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String, computed: 'getReduxStateValue(state.auth.token)'})
   token!: string;
@@ -26,7 +25,7 @@ class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)){
     let savedToken = localStorage.getItem('token');
 
     if (savedToken && !this.token) {
-      store.dispatch(setToken(savedToken));
+      this.reduxStore.dispatch(setToken(savedToken));
     }
   }
 

@@ -1,6 +1,5 @@
 import {Constructor} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {store} from '../redux/store';
 import {userLogout} from '../redux/actions'
 
 /**
@@ -23,7 +22,7 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
         switch (xhr.status) {
           case 403: // FIXME: 401?
             // (dci)
-            store.dispatch(userLogout())
+            this.reduxStore.dispatch(userLogout())
             //.then(function() {
             location.pathname = '/landing';
             //});

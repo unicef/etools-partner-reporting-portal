@@ -20,11 +20,11 @@ class EtoolsPrpLanguages extends PolymerElement {
   }
 
   // statePath: 'localize.language',
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
   _current!: string;
 
   // statePath: 'localize.resources',
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateArray(rootState.localize.resources)'})
   _all!: GenericObject;
 
   @property({type: String, notify: true, computed: '_computeCurrent(_current)'})

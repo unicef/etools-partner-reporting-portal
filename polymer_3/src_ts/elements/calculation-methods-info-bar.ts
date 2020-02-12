@@ -5,6 +5,7 @@ import '@polymer/paper-button/paper-button.js';
 import './calculation-methods-demo-modal.js';
 import {CalculationMethodsDemoModalEl} from './calculation-methods-demo-modal';
 import LocalizeMixin from '../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../ReduxConnectedElement.js';
 
 //(dci)
 // < link rel = "import" href = "../styles/buttons.html" >
@@ -21,7 +22,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
  * @customElement
  * @appliesMixin LocalizeMixin
  */
-class CalculationMethodsInfoBar extends LocalizeMixin(PolymerElement) {
+class CalculationMethodsInfoBar extends LocalizeMixin(ReduxConnectedElement) {
 
   static get template() {
     return html`
