@@ -1,11 +1,16 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-checkbox/paper-checkbox.html">
+import {PolymerElement, html} from '@polymer/polymer';
+import "@polymer/paper-checkbox/paper-checkbox";
 
-<link rel="import" href="../../../behaviors/filter.html">
-<link rel="import" href="../../../behaviors/utils.html">
 
-<dom-module id="checkbox-filter">
-  <template>
+// <link rel="import" href="../../../behaviors/filter.html">
+// <link rel="import" href="../../../behaviors/utils.html">
+/**
+ * @polymer
+ * @customElement
+ */
+class CheckboxFilter extends PolymerElement {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -20,68 +25,61 @@
         id="field"
         name="[[name]]"
         checked="{{checked}}">
-      <content></content>
+      <slot></slot>
     </paper-checkbox>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'checkbox-filter',
+  // behaviors: [
+  //   App.Behaviors.FilterBehavior,
+  //   App.Behaviors.UtilsBehavior,
+  // ],
 
-      behaviors: [
-        App.Behaviors.FilterBehavior,
-        App.Behaviors.UtilsBehavior,
-      ],
+  @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
+  checked!: boolean;
 
-      properties: {
-        checked: {
-          type: Boolean,
-          computed: '_computeChecked(value)',
-        },
+  @property({type: String})
+  value = '';
 
-        value: {
-          type: String,
-          value: '',
-        },
-      },
+  _handleInput() {
+    this.debounce('change', function propagateChange() {
+      var newValue = '' + this._toNumber(this.$.field.checked);
 
-      _handleInput: function () {
-        this.debounce('change', function propagateChange() {
-          var newValue = '' + this._toNumber(this.$.field.checked);
+      if (newValue !== this.lastValue) {
+        this.fire('filter-changed', {
+          name: this.name,
+          value: newValue,
+        });
+      }
+    }, this._debounceDelay);
+  };
 
-          if (newValue !== this.lastValue) {
-            this.fire('filter-changed', {
-              name: this.name,
-              value: newValue,
-            });
-          }
-        }, this._debounceDelay);
-      },
+  _computeChecked(value) {
+    return value ? !!this._toNumber(value) : false;
+  }
 
-      _computeChecked: function (value) {
-        return value ? !!this._toNumber(value) : false;
-      },
+  _addEventListeners() {
+    this._handleInput = this._handleInput.bind(this);
+    this.addEventListener('field.change', this._handleInput);
+  }
 
-      _addEventListeners: function () {
-        this._handleInput = this._handleInput.bind(this);
-        this.addEventListener('field.change', this._handleInput);
-      },
+  _removeEventListeners() {
+    this.removeEventListener('field.change', this._handleInput);
+  }
 
-      _removeEventListeners: function () {
-        this.removeEventListener('field.change', this._handleInput);
-      },
+  attached() {
+    this._addEventListeners();
+    this._filterReady();
+  }
 
-      attached: function () {
-        this._addEventListeners();
-        this._filterReady();
-      },
+  detached() {
+    this._removeEventListeners();
+    if (this.isDebouncerActive('change')) {
+      this.cancelDebouncer('change');
+    }
+  }
+}
 
-      detached: function () {
-        this._removeEventListeners();
-        if (this.isDebouncerActive('change')) {
-          this.cancelDebouncer('change');
-        }
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('checkbox-filter', CheckboxFilter);
+
+// export {CheckboxFilter as CheckboxFilterEl};
