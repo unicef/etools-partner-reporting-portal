@@ -3,7 +3,7 @@ import {GenericObject} from '../../typings/globals.types';
 import Constants from '../../constants';
 
 export class ProgrammeDocumentsIndicatorsState {
-  byId: GenericObject = {};
+  byPd: GenericObject = {};
   loading: GenericObject = {};
 }
 

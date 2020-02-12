@@ -13,7 +13,7 @@ import UtilsMixin from '../mixins/utils-mixin';
 import Endpoints from '../endpoints';
 import {fetchWorkspaces, reset, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {store} from '../redux/store';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject, Route} from '../typings/globals.types';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
 import {RootState} from '../typings/redux.types';
@@ -144,7 +144,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 
   @property({type: Object})
-  routeData!: GenericObject;
+  route!: Route;
+
+  @property({type: Object})
+  routeData!: {workspace_code: string, app: string};
 
   @property({type: String, observer: '_pageChanged'})
   page!: string;
@@ -185,10 +188,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const code = workspace.code;
 
     this.set('route.path', '/' + code + '/');
-    this.set('routeData.workspace_code', code);
+    //this.set('routeData.workspace_code', code);
   }
 
   _redirectToApp(app: string) {
+    debugger;
     this.set('route.path', `/${this.routeData.workspace_code}/${app}`);
   }
 
@@ -228,23 +232,22 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeAppChanged(app: string) {
-    if (app === undefined) {
-      return;
-    }
     const self = this;
     setTimeout(() => {
-      const defaultApp = localStorage.getItem('defaultApp') || 'ip-reporting';
+      let defaultApp = localStorage.getItem('defaultApp');
+      defaultApp = defaultApp ?
+       /** Remove quotes "" */ this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
 
       if (!self.routeData.workspace_code) {
         return;
       }
-
       if (!app) {
-        self._redirectToApp(defaultApp);
+        self._redirectToApp(defaultApp!);
       } else if (!self._app) {
         store.dispatch(setApp(app));
 
         // Store selected app
+        console.log('localstorage', app);
         localStorage.setItem('defaultApp', app);
 
         // Render
@@ -253,6 +256,13 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         localStorage.setItem('defaultApp', app);
       }
     });
+  }
+
+  cleanUpStorageVal(val: string) {
+    if (val.indexOf('"') === 0 && val.lastIndexOf('"') === val.length - 1) {
+      return val.slice(1, val.length - 1);
+    }
+    return val;
   }
 
   _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[]) {
@@ -270,10 +280,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   //   }
   // }
 
-  async _pageChanged(page: string) {
-
+  _pageChanged(page: string) {
+    debugger;
     const resolvedPageUrl = `./app/${page}.js`;//getDomainByEnv() + `/src/pages
-    await import(resolvedPageUrl).catch((err: any) => {
+    import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
     });
@@ -323,12 +333,12 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.removeEventListener('fetch-profile', this._fetchProfile);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
 
     this._addEventListeners();
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
-    Promise.all([
+    await Promise.all([
       store.dispatch(fetchWorkspaces(interventionsThunk)),
       this._fetchProfile(),
     ])

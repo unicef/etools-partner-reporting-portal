@@ -4,14 +4,25 @@ import {connect} from 'pwa-helpers/connect-mixin';
 import {property} from '@polymer/decorators';
 import {RootState} from './typings/redux.types';
 import {GenericObject} from './typings/globals.types';
+import clone from 'lodash-es/clone';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   @property({type: Object})
   rootState!: RootState;
 
+  private sDebouncer!: Debouncer;
+
   stateChanged(state: RootState) {
-    this.rootState = state; // Assign by reference to reduce memory, clone before actual use
-    console.log('stateChanged...');
+    this.sDebouncer = Debouncer.debounce(this.sDebouncer,
+      timeOut.after(50),
+      () => {
+        if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
+          this.rootState = state; // Assign by reference to reduce memory, clone before actual use
+          console.log('stateChanged...', this);
+        }
+      });
   }
 
   getReduxStateValue(pathValue: string) {

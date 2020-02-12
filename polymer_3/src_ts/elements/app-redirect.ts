@@ -31,7 +31,6 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
     if (!app || !workspace) {
       return;
     }
-    debugger;
     if (!access || !access.length) {
       location.href = getDomainByEnv() + '/src/pages/unauthorized';
     } else if (access.indexOf(app) === -1) {

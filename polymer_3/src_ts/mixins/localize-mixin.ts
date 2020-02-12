@@ -10,11 +10,11 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
   class LocalizeClass extends baseClass {
 
     //DONE statePath: 'localize.language'
-    @property({type: String, computed: 'getReduxStateValue(state.localize.language)'})
+    @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
     language!: string;
 
     //DONE statePath: 'localize.resources'
-    @property({type: Object, computed: 'getReduxStateArray(state.localize.resources)'})
+    @property({type: Object, computed: 'getReduxStateArray(rootState.localize.resources)'})
     resources!: GenericObject;
 
     localize(text: string) {
