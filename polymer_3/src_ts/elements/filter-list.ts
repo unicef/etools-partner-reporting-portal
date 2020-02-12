@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
@@ -8,7 +8,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/polymer/lib/elements/dom-if';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
-
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
 // (dci)
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions/localize.html">
@@ -22,7 +22,7 @@ import {GenericObject} from '../typings/globals.types';
  * @polymer
  * @customElement
  */
-class FilterList extends LocalizeMixin(PolymerElement) {
+class FilterList extends LocalizeMixin(ReduxConnectedElement) {
 
   static get template() {
     return html`
@@ -54,7 +54,7 @@ class FilterList extends LocalizeMixin(PolymerElement) {
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <content></content>
+    <slot></slot>
 
     <template
         is="dom-if"
@@ -155,7 +155,7 @@ class FilterList extends LocalizeMixin(PolymerElement) {
     const self = this;
 
     this.set('queryParams', Object.keys(this.queryParams)
-      .reduce(function(prev, curr) {
+      .reduce(function(prev: any, curr) {
         if (self.filters.indexOf(curr) === -1) {
           prev[curr] = self.queryParams[curr];
         } else {
