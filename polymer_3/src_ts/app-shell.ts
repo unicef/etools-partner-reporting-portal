@@ -128,8 +128,8 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   public static get observers() {
     return [
-      '_routePageChanged(routeData.page)',
-      '_handleResources(resources)',
+      '_routePageChanged(routeData.page)'
+      //**'_handleResources(resources)', */ TODO AppLocalizeBehavior
     ]
   }
 
@@ -195,9 +195,9 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     return authenticated ? '/app_poly3' : '/landing';
   }
 
-  _handleResources(resources: []) {
-    this.reduxStore.dispatch(setL11NResources(resources));
-  }
+  // _handleResources(resources: []) {
+  //   this.reduxStore.dispatch(setL11NResources(resources));
+  // }
 
   _addEventListeners() {
     this._handleError = this._handleError.bind(this);

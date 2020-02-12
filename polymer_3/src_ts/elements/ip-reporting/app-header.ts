@@ -10,6 +10,7 @@ import '../language-dropdown';
 import '../etools-prp-workspaces';
 import '../etools-prp-languages';
 import '../user-profile/profile-dropdown';
+import {property} from '@polymer/decorators';
 
 
 /**
@@ -59,11 +60,6 @@ class IpReportingAppHeader extends PolymerElement {
       }
     </style>
 
-    <etools-prp-languages
-        all="{{languages}}"
-        current="{{language}}">
-    </etools-prp-languages>
-
     <etools-prp-workspaces
         all="{{workspaces}}"
         current="{{workspace}}">
@@ -98,6 +94,12 @@ class IpReportingAppHeader extends PolymerElement {
     </app-header-layout>
   `;
   }
+
+  @property({type: Array, computed: 'getReduxStateArray(rootState.localize.resources)'})
+  languages!: [];
+
+  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
+  language!: string;
 }
 
 window.customElements.define('ip-reporting-app-header', IpReportingAppHeader);

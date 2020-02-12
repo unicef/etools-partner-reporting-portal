@@ -10,6 +10,7 @@ import {GenericObject} from '../typings/globals.types';
 // ],
 
 /**
+ * Why the fuck is this components needed????!!!FUCKKKKKKKKKKKKKKK
  * @polymer
  * @customElement
  */

@@ -17,24 +17,23 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   private sDebouncer!: Debouncer;
 
   stateChanged(state: RootState) {
-    console.log('ARE STATES EQUAL?', this.rootState == state);// Why aren't they equal???
+    //console.log('ARE STATES EQUAL?', this.rootState == state);
     this.sDebouncer = Debouncer.debounce(this.sDebouncer,
       timeOut.after(50),
       () => {
-        if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
-          this.rootState = state; // Assign by reference to reduce memory, clone before actual use
-          console.log('stateChanged...', this);
-        }
+        //if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
+        this.rootState = state; // Assign by reference to reduce memory, clone before actual use
+        console.log('stateChanged...', this);
+        //}
       });
   }
   connectedCallback() {
     this.reduxStore = store;
     super.connectedCallback();
-    //this.reduxStore = store;
   }
 
   getReduxStateValue(pathValue: string) {
-    console.log(pathValue);
+    // console.log(pathValue);
     return pathValue;
   }
 
@@ -42,7 +41,7 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
     if (pathValue === undefined) {
       return undefined;
     }
-    console.log(pathValue);
+    //console.log(pathValue);
     return [...pathValue];
   }
 
@@ -50,7 +49,7 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
     if (pathValue === undefined) {
       return undefined;
     }
-    console.log(pathValue);
+    // console.log(pathValue);
     return {...pathValue};
   }
 }

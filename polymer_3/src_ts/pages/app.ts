@@ -279,7 +279,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   // }
 
   _pageChanged(page: string) {
-    debugger;
     const resolvedPageUrl = `./app/${page}.js`;//getDomainByEnv() + `/src/pages
     import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
@@ -292,7 +291,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _handleWorkspaceChange(currentWorkspace: string, workspaces: any[]) {
-    if (!currentWorkspace || !workspaces.length) {
+    if (!currentWorkspace || !workspaces || !workspaces.length) {
       return;
     }
 
@@ -300,7 +299,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return workspace.code === currentWorkspace;
     })[0];
 
-    this.reduxStore.dispatch(locationSet(currentWorkspaceData.id));
+    //this.reduxStore.dispatch(locationSet(currentWorkspaceData.id)); TODO
   }
 
   _notify(e: CustomEvent) {

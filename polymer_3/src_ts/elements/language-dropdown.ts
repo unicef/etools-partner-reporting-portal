@@ -9,6 +9,7 @@ import "@polymer/polymer/lib/elements/dom-repeat";
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {localizeSet} from '../redux/actions/localize';
 // <link rel="import" href="../redux/actions/localize.html">
 
 /**
@@ -96,15 +97,12 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
   language!: string;
 
   // statePath: 'localize.resources',
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateArray(rootState.localize.resources)'})
   availableLanguages!: GenericObject;
 
   @property({type: Number, computed: '_computeSelected(data, language)'})
   selected = 0;
 
-  //needs to be checked if it is OK, originals bellow
-  // current: String,
-  // data: Array,
   @property({type: String})
   current!: string;
 
@@ -117,7 +115,7 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
     var allLanguages = Object.keys(this.availableLanguages);
 
     if (allLanguages.includes(this.current) === false) {
-      //this.dispatch(App.Actions.Localize.set('en'));
+      this.reduxStore.dispatch(localizeSet('en'));
     }
 
     var newLanguage = this.$.repeat.itemForElement(e.detail.item);
@@ -126,7 +124,7 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
       return;
     }
 
-    //this.dispatch(App.Actions.Localize.set(newLanguage));
+    this.reduxStore.dispatch(localizeSet(newLanguage));
   }
 
   _computeLanguage(data: any[], current: String) {
@@ -136,6 +134,9 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _computeSelected(data: any[], language: String) {
+    if (!data || !data.length || !language) {
+      return;
+    }
     return data.indexOf(language);
   }
 }
