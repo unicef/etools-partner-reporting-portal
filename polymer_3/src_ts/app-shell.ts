@@ -103,6 +103,12 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     `;
   }
 
+  @property({type: Object})
+  routeData!: GenericObject;
+
+  @property({type: Object})
+  subroute!: GenericObject;
+
   @property({type: String, observer: '_pageChanged'})
   page!: string;
 
@@ -133,10 +139,14 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
+    if (page === 'app_poly3') {
+      page = 'app';
+    }
     const validPages = ['app', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
+      //page = 'app'
       location.pathname = '/app';
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
@@ -152,11 +162,12 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   async _pageChanged(page: string) {
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(`component import failed...${resolvedPageUrl}`);
-      console.log(err);
-      this._notFound();
-    });
+    //`./pages/${page}.js`;
+    await import(resolvedPageUrl)
+      .catch((err: any) => {
+        console.log(err);
+        this._notFound();
+      });
   }
 
   _onSignOut() {

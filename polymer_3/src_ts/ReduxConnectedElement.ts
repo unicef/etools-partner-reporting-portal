@@ -7,10 +7,11 @@ import {GenericObject} from './typings/globals.types';
 
 export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   @property({type: Object})
-  state!: RootState;
+  elState!: RootState;
 
   stateChanged(state: RootState) {
-    this.state = state; // Assign by reference to reduce memory, clone before actual use
+    this.elState = state; // Assign by reference to reduce memory, clone before actual use
+    console.log('stateChanged...');
   }
 
   getReduxStateValue(pathValue: string) {
@@ -18,10 +19,16 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   }
 
   getReduxStateArray(pathValue: []) {
+    if (pathValue === undefined) {
+      return undefined;
+    }
     return [...pathValue];
   }
 
   getReduxStateObject(pathValue: GenericObject) {
+    if (pathValue === undefined) {
+      return undefined;
+    }
     return {...pathValue};
   }
 }

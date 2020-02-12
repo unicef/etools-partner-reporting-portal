@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import "@polymer/polymer/lib/elements/dom-if";
 import "@polymer/paper-styles/typography";
@@ -7,10 +8,9 @@ import "@polymer/paper-icon-button/paper-icon-button";
 import "@polymer/iron-flex-layout/iron-flex-layout-classes";
 import "@polymer/app-localize-behavior/app-localize-behavior";
 
-import "../style/shared-styles";
+import '../styles/shared-styles';
 import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
 
 // <link rel="import" href="../behaviors/localize.html">
 // <link rel="import" href="../behaviors/routing.html">

@@ -16,6 +16,8 @@ import {store} from '../redux/store';
 import {GenericObject} from '../typings/globals.types';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
+import {RootState} from '../typings/redux.types';
+import '../pages/app/ip-reporting';
 
 //(dci)
 // App.Behaviors.UtilsBehavior,
@@ -140,26 +142,33 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   `;
   }
 
+
+  @property({type: Object})
+  routeData!: GenericObject;
+
   @property({type: String, observer: '_pageChanged'})
   page!: string;
 
   @property({type: String})
   interventionsUrl: string = Endpoints.interventions();
 
-  @property({type: String, computed: 'getReduxStateValue(workspaces.current)'})
+  @property({type: String, computed: 'getReduxStateValue(elState.workspaces.current)'})
   _workspaceCode!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(elState.app.current)'})
   _app!: string;
 
   @property({type: String})
   profileUrl: string = Endpoints.userProfile();
 
-  @property({type: Array, computed: 'getReduxStateArray(userProfile.profile.prp_roles)'})
+  @property({type: Array, computed: 'getReduxStateArray(elState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
 
-  @property({type: Array, computed: 'getReduxStateArray(userProfile.profile.access)'})
+  @property({type: Array, computed: 'getReduxStateArray(elState.userProfile.profile.access)'})
   access!: [];
+
+  @property({type: Array, computed: 'getReduxStateArray(elState.workspaces.all)'})
+  workspaces!: any[];
 
   @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
   userHasPrpRolesOrAccess!: boolean;
@@ -173,24 +182,22 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _redirectToWorkspace(workspace: GenericObject) {
-    var code = workspace.code;
+    const code = workspace.code;
 
     this.set('route.path', '/' + code + '/');
     this.set('routeData.workspace_code', code);
   }
 
   _redirectToApp(app: string) {
-    console.log('_redirectToApp...' + this.routeData.workspace_code);
-    this.set('route.path', '/' + this.routeData.workspace_code + '/' + app);
+    this.set('route.path', `/${this.routeData.workspace_code}/${app}`);
   }
 
   _handleWorkspacesAsync(e: CustomEvent) {
-    var workspace;
     const change = e.detail;
     try {
       if (change.value.length) {
         this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync as any);
-        workspace = change.value[0];
+        let workspace = change.value[0];
 
         this._redirectToWorkspace(workspace);
       }
@@ -198,12 +205,12 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeWorkspaceChanged(workspace_code: any) {
-    var workspace;
+    let workspace;
 
     if (!workspace_code) {
       store.dispatch(reset()); // Switch workspace === wipe all the data
 
-      if (this.workspaces.length) {
+      if (this.workspaces && this.workspaces.length) {
 
         // Default to first
         workspace = this.workspaces[0];
@@ -222,28 +229,25 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _routeAppChanged(app: string) {
     const self = this;
     setTimeout(() => {
-      (function() {
-        console.log('_routeAppChanged...' + this.routeData.workspace_code);
-        var defaultApp = localStorage.getItem('defaultApp') || 'ip-reporting';
+      const defaultApp = localStorage.getItem('defaultApp') || 'ip-reporting';
 
-        if (!self.routeData.workspace_code) {
-          return;
-        }
+      if (!self.routeData.workspace_code) {
+        return;
+      }
 
-        if (!app) {
-          self._redirectToApp(defaultApp);
-        } else if (!self._app) {
-          store.dispatch(setApp(app));
+      if (!app) {
+        self._redirectToApp(defaultApp);
+      } else if (!self._app) {
+        store.dispatch(setApp(app));
 
-          // Store selected app
-          localStorage.setItem('defaultApp', app);
+        // Store selected app
+        localStorage.setItem('defaultApp', app);
 
-          // Render
-          self.page = app;
-        } else {
-          localStorage.setItem('defaultApp', app);
-        }
-      });
+        // Render
+        self.page = app;
+      } else {
+        localStorage.setItem('defaultApp', app);
+      }
     });
   }
 
@@ -251,9 +255,20 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return !!prpRoles.length || !!access.length;
   }
 
-  async _pageChanged(page: string) {
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/${page}.js`;
+  // stateChanged(state: RootState) {
+  //   if (!this.routeData.workspace_code && state.workspaces.all && state.workspaces.all.length) {
+  //     debugger;
+  //     this.set('routeData.workspace_code', state.workspaces.all[0].code);
+  //     // @@@!!!
+  //     setTimeout(() => {
+  //       this._routeAppChanged('');
+  //     }, 100);
+  //   }
+  // }
 
+  async _pageChanged(page: string) {
+
+    const resolvedPageUrl = `./app/${page}.js`;//getDomainByEnv() + `/src/pages
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
@@ -288,8 +303,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _fetchProfile() {
-    var userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
-
+    const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
     return store.dispatch(fetchUserProfile(userProfileThunk));
   }
 
@@ -309,8 +323,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     super.connectedCallback();
 
     this._addEventListeners();
-    var interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
-
+    const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
     Promise.all([
       store.dispatch(fetchWorkspaces(interventionsThunk)),
       this._fetchProfile(),

@@ -17,6 +17,15 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
     @property({type: Object, computed: 'getReduxStateArray(state.localize.resources)'})
     resources!: GenericObject;
 
+    localize(text: string) {
+      return this.capitalize(text.split('_').join(' '));
+    }
+
+    capitalize(s: string) {
+      if (typeof s !== 'string') return ''
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+
   }
 
   return LocalizeClass;

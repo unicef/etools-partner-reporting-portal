@@ -2,18 +2,18 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-item/paper-item.js';
-import '@polymer/app-layout/paper-divider/paper-divider.js';
-import '@polymer/app-layout/iron-icon/iron-icon.js';
-import '@polymer/app-layout/iron-icons/iron-icons.js';
-import '@polymer/app-layout/iron-icons/social-icons.js';
-import '@polymer/iron-pages/paper-listbox/paper-listbox.js';
+// import '@polymer/paper-divider/paper-divider.js';
+import '@polymer/iron-icon/iron-icon.js';
+import '@polymer/iron-icons/iron-icons.js';
+import '@polymer/iron-icons/social-icons.js';
+import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import PageNavMixin from '../../mixins/page-nav-mixin';
 import '../etools-prp-permissions';
-// <link rel="import" href="../../styles/page-nav.html">
+import {pageNavStyles} from '../../styles/page-nav-styles';
 
 // (dci)
 // behaviors: [
@@ -38,7 +38,14 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
 
   static get template() {
     return html`
-    <style include="page-nav-styles"></style>
+    ${pageNavStyles}
+    <style>
+      .nav-content paper-item{
+        min-height: 48px;
+        padding: 0px 16px;
+      }
+
+    </style>
 
     <etools-prp-permissions
       permissions="{{ permissions }}">
@@ -79,7 +86,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
           </paper-item>
 
           <template is="dom-if" if="[[permissions.accessIpIdManagement]]" restamp="true">
-            <paper-divider></paper-divider>
+          <!-- <paper-divider></paper-divider> -->
 
             <paper-item name="id-management" on-tap="goToIdManagement">
               <a href="/id-management/ip-reporting/">
@@ -92,7 +99,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
         </div>
 
         <div>
-          <paper-divider></paper-divider>
+          <!-- <paper-divider></paper-divider> -->
           <paper-item name="indicators">
             <a href="https://prphelp.zendesk.com/" target="_blank">
               <span><iron-icon icon="communication:import-contacts" role="presentation"></iron-icon>[[localize('knowledge_base')]]</span>

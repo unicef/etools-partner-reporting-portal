@@ -10,8 +10,9 @@ import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import '../../elements/ip-reporting/nav';
 import '../../elements/ip-reporting/app-header';
-import '../../elements/page-title.html';
-// import '../../styles/app-theme-ip.html';
+import '../../elements/page-title';
+import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
@@ -34,28 +35,30 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
-    <style include="app-theme-ip-styles">
+    ${appThemeIpStyles}
+    <style>
       :host {
         display: block;
       }
-
       app-drawer {
         --app-drawer-width: 225px;
         --app-drawer-content-container: {
           box-shadow: 1px 0 2px 1px rgba(0, 0, 0, .1);
         }
       }
-
       app-toolbar {
         background: var(--theme-primary-color);
       }
-
       .mode {
         font-size: 16px;
         text-transform: uppercase;
         color: var(--theme-primary-text-color-light);
         cursor: default;
         user-select: none;
+      }
+      .content-align {
+        @apply --layout-horizontal;
+        @apply --layout-center;
       }
     </style>
 
@@ -68,10 +71,10 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         tail="{{subroute}}">
     </app-route>
 
-    <app-drawer-layout persistent responsive-width="0px">
-      <app-drawer>
+    <app-drawer-layout fullbleed responsive-width="0px">
+      <app-drawer id="drawer" slot="drawer">
         <app-header fixed>
-          <app-toolbar>
+          <app-toolbar sticky class="content-align">
             <div class="mode">
               IP
               <br>
@@ -142,7 +145,7 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   async _pageChanged(page: string) {
-    var resolvedPageUrl = getDomainByEnv() + `/src/pages/ip-reporting/${page}.js`;
+    var resolvedPageUrl = `./ip-reporting/${page}.js`; //getDomainByEnv() + `/src/pages
 
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
