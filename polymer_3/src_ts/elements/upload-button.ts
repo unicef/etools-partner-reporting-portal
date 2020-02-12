@@ -20,6 +20,7 @@ import './error-box';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
+import {fireEvent} from '../utils/fire-custom-event';
 
 
 /**
@@ -141,7 +142,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
 
   _openModal() {
     const dialog = this.shadowRoot!.querySelector('dialog');
-    dialog.open();
+    dialog!.open();
   }
 
   _save() {
@@ -160,16 +161,16 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     }
 
     const upload = this.shadowRoot!.querySelector('upload');
-    upload.body = data;
+    upload!.body = data;
 
     this.set('pending', true);
 
-    upload.thunk()
+    upload!.thunk()
       .then(() => {
         self.set('pending', false);
         self.close();
         self._notifyFileUploaded();
-        self.fire('file-uploaded');
+        fireEvent(this,'file-uploaded');
       })
       .catch(function(res) {
         self.set('errors', res.data);
