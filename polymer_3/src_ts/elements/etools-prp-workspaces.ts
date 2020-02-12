@@ -1,18 +1,19 @@
-import {PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 
 /**
+ * Why the f$%& is this component needed?
  * @polymer
  * @customElement
  */
-class EtoolsPrpWorkspaces extends PolymerElement{
+class EtoolsPrpWorkspaces extends ReduxConnectedElement {
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _current!: string;
   // statePath: 'workspaces.current'
 
-  @property({type: Array})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   _all!: any[];
   // statePath: 'workspaces.all'
 

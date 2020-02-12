@@ -175,7 +175,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   public static get observers() {
     return [
-      '_routeWorkspaceChanged(routeData.workspace_code)',
+      '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
       '_routeAppChanged(routeData.app)',
       '_handleWorkspaceChange(currentWorkspace, workspaces)',
     ]
@@ -204,14 +204,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     } catch (err) {}
   }
 
-  _routeWorkspaceChanged(workspace_code: any) {
-    if (workspace_code === undefined) {
-      return;
-    }
+  _routeWorkspaceChanged(workspaceCodeFromUrl: any) {
     let workspace;
 
-    if (!workspace_code) {
-      store.dispatch(reset()); // Switch workspace === wipe all the data
+    if (!workspaceCodeFromUrl) {
+      //store.dispatch(reset()); // Switch workspace === wipe all the data
 
       if (this.workspaces && this.workspaces.length) {
 
@@ -219,13 +216,14 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         workspace = this.workspaces[0];
 
         this._redirectToWorkspace(workspace);
-      } else {
-        // Wait until workspaces are available, then pick one & redirect
-        this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-        this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
       }
+      //  else { //Cant' find any component that fires an 'all-changed' event
+      //   // Wait until workspaces are available, then pick one & redirect
+      //   this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
+      //   this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
+      // }
     } else if (!this._workspaceCode) {
-      store.dispatch(setWorkspace(workspace_code));
+      store.dispatch(setWorkspace(workspaceCodeFromUrl));
     }
   }
 
