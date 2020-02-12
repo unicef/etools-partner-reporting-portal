@@ -205,6 +205,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeWorkspaceChanged(workspace_code: any) {
+    if (workspace_code === undefined) {
+      return;
+    }
     let workspace;
 
     if (!workspace_code) {
@@ -227,6 +230,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeAppChanged(app: string) {
+    if (app === undefined) {
+      return;
+    }
     const self = this;
     setTimeout(() => {
       const defaultApp = localStorage.getItem('defaultApp') || 'ip-reporting';

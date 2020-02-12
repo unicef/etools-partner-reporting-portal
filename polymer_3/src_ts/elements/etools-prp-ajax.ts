@@ -58,7 +58,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   `;
   }
   // DONE statePath: 'auth.token',
-  @property({type: String, computed: 'getReduxStateValue(state.auth.token)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.auth.token)'})
   token!: string;
 
   @property({type: Object})

@@ -139,7 +139,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    debugger;
     const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
