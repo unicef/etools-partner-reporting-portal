@@ -152,22 +152,22 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String})
   interventionsUrl: string = Endpoints.interventions();
 
-  @property({type: String, computed: 'getReduxStateValue(elState.workspaces.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _workspaceCode!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(elState.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   _app!: string;
 
   @property({type: String})
   profileUrl: string = Endpoints.userProfile();
 
-  @property({type: Array, computed: 'getReduxStateArray(elState.userProfile.profile.prp_roles)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
 
-  @property({type: Array, computed: 'getReduxStateArray(elState.userProfile.profile.access)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.access)'})
   access!: [];
 
-  @property({type: Array, computed: 'getReduxStateArray(elState.workspaces.all)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   workspaces!: any[];
 
   @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
@@ -284,7 +284,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    let currentWorkspaceData = workspaces.filter(function(workspace) {
+    let currentWorkspaceData = workspaces.filter(function (workspace) {
       return workspace.code === currentWorkspace;
     })[0];
 
@@ -328,7 +328,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       store.dispatch(fetchWorkspaces(interventionsThunk)),
       this._fetchProfile(),
     ])
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         window.location.href = '/landing';
       });
   }

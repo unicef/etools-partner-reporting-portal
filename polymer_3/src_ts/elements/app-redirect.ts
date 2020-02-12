@@ -11,13 +11,13 @@ import {getDomainByEnv} from '../config';
  */
 class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
-  @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.workspaces.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
 
-  @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
 
@@ -28,6 +28,10 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _redirectIfNeeded(app: string, workspace: string, access: string[]) {
+    if (!app || !workspace) {
+      return;
+    }
+    debugger;
     if (!access || !access.length) {
       location.href = getDomainByEnv() + '/src/pages/unauthorized';
     } else if (access.indexOf(app) === -1) {

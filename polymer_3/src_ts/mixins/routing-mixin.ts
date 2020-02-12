@@ -1,22 +1,22 @@
-import {PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {Constructor} from '../typings/globals.types';
 import {store} from '../redux/store';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
  * @polymer
  * @mixinFunction
  */
-function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
+function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class RoutingClass extends baseClass {
 
-    @property({type: String})
+    @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
     _$currentWorkspace!: string;
 
-    @property({type: String})
+    @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
     _$currentApp!: string;
 
-    @property({type: String})
+    @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
     _$currentPlan!: string;
 
     @property({type: String, computed: '_$computeBaseUrl(_$currentWorkspace, _$currentApp)'})
@@ -56,7 +56,7 @@ function RoutingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       super.connectedCallback();
 
       const self = this;
-      setTimeout(function() {
+      setTimeout(function () {
         if (typeof store.dispatch !== 'function') { // Duck typing
           throw new Error(self.BEHAVIOR_NAME + ' requires ReduxBehavior');
         }

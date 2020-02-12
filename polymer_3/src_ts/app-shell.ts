@@ -76,9 +76,9 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         selected="[[page]]"
         attr-for-selected="name"
         role="main">
-      <template is="dom-if" if="[[_equals(page, 'app')]]" restamp="true">
+      <template is="dom-if" if="[[_equals(page, 'app_poly3')]]" restamp="true">
         <page-app
-            name="app"
+            name="app_poly3"
             route="{{subroute}}">
         </page-app>
       </template>
@@ -124,7 +124,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   @property({type: Boolean})
   error: boolean = false;
 
-  @property({type: Object, computed: 'getReduxStateValue(state.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateValue(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
   public static get observers() {
@@ -139,15 +139,13 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    if (page === 'app_poly3') {
-      page = 'app';
-    }
-    const validPages = ['app', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
+    debugger;
+    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      //page = 'app'
-      location.pathname = '/app';
+      //page = 'app_poly3'
+      location.pathname = '/app_poly3';
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
     } else {
@@ -161,7 +159,14 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   async _pageChanged(page: string) {
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/${page}.js`;
+    // TODO : remove after migration is finished and we no longer use app_poly3
+    let componentName = '';
+    if (page === 'app_poly3') {
+      componentName = 'app';
+    } else {
+      componentName = page;
+    }
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
     //`./pages/${page}.js`;
     await import(resolvedPageUrl)
       .catch((err: any) => {
@@ -189,7 +194,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _computeRedirectPath(authenticated: boolean) {
-    return authenticated ? '/app' : '/landing';
+    return authenticated ? '/app_poly3' : '/landing';
   }
 
   _handleResources(resources: []) {
