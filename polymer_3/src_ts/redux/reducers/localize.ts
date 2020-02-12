@@ -1,39 +1,44 @@
 import {GenericObject} from '../../typings/globals.types';
 import Constants from '../../constants';
+import {combineReducers} from 'redux';
 
 let availableLangs: GenericObject;
 
 export class LocaLizeState {
   language: string = "en";
   resources = [];
+}
 
-  constructor() {
-    var currentLanguage = navigator.language.split('-')[0];
-    if (typeof this.language === 'undefined') {
-      this.language = currentLanguage;
-    }
+export const Localize = combineReducers({
+  language: languageReducer,
+  resources: resourcesReducer,
+});
 
-    if (availableLangs !== undefined && !availableLangs.includes(this.language)) {
-      this.language = 'en';
-    }
+
+function languageReducer(state: string, action: any) {
+  var currentLanguage = navigator.language.split('-')[0];
+  if (typeof state === 'undefined') {
+    state = currentLanguage;
+  }
+
+  if (availableLangs !== undefined && !availableLangs.includes(state)) {
+    state = 'en';
+  }
+
+  switch (action.type) {
+    case Constants.SET_LANGUAGE:
+      return action.language;
+
+    default:
+      return state;
   }
 }
 
-const INITIAL_STATE = new LocaLizeState();
-
-export const Localize = (state = INITIAL_STATE, action: any) => {
+function resourcesReducer(state = [], action: any) {
   switch (action.type) {
-    case Constants.SET_LANGUAGE:
-      return {
-        ...state,
-        language: action.language
-      };
     case Constants.SET_L11N_RESOURCES:
       availableLangs = Object.keys(action.resources);
-      return {
-        ...state,
-        resources: action.resources
-      };
+      return action.resources;
 
     default:
       return state;
