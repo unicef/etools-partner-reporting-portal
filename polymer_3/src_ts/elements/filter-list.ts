@@ -10,15 +10,6 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
-// (dci)
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions/localize.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
-
 /**
  * @polymer
  * @customElement
@@ -55,7 +46,7 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <content></content>
+    <slot></slot>
 
     <template
         is="dom-if"
@@ -156,7 +147,7 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
     const self = this;
 
     this.set('queryParams', Object.keys(this.queryParams)
-      .reduce(function (prev, curr) {
+      .reduce(function(prev: any, curr) {
         if (self.filters.indexOf(curr) === -1) {
           prev[curr] = self.queryParams[curr];
         } else {
