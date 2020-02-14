@@ -12,7 +12,7 @@ import {setToken} from '../redux/actions';
  */
 class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)) {
 
-  @property({type: String, computed: 'getReduxStateValue(state.auth.token)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.auth.token)'})
   token!: string;
   // statePath: 'auth.token'
 

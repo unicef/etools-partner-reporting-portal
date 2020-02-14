@@ -7,7 +7,6 @@ import '@polymer/app-layout/app-drawer/app-drawer.js';
 import '@polymer/app-layout/app-header/app-header.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import '../../elements/ip-reporting/nav';
 import '../../elements/ip-reporting/app-header';
 import '../../elements/page-title';
@@ -16,14 +15,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import {getDomainByEnv} from '../../config';
 
-// behaviors: [
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
 
 /**
  * @polymer

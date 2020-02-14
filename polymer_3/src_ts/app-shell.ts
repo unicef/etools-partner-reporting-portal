@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 
 import LocalizeMixin from './mixins/localize-mixin';
 import UtilsMixin from './mixins/utils-mixin';
@@ -128,8 +127,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   public static get observers() {
     return [
-      '_routePageChanged(routeData.page)'
-      //**'_handleResources(resources)', */ TODO AppLocalizeBehavior
+      '_routePageChanged(routeData.page)',
     ]
   }
 
@@ -195,10 +193,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     return authenticated ? '/app_poly3' : '/landing';
   }
 
-  // _handleResources(resources: []) {
-  //   this.reduxStore.dispatch(setL11NResources(resources));
-  // }
-
   _addEventListeners() {
     this._handleError = this._handleError.bind(this);
     this.addEventListener('error', this._handleError as any);
@@ -216,8 +210,8 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   connectedCallback() {
     super.connectedCallback();
-    //(dci)
-    // this.loadResources(this.resolveUrl('locales.json'));
+
+    this.loadResources(getDomainByEnv() + '/src/locales.json');
     this._addEventListeners();
   }
 

@@ -3,19 +3,10 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-radio-button/paper-radio-button.js';
-import '@polymer/app-localize-behavior/app-localize-behavior';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
-
-//(dci)
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
 
 /**
  * @polymer

@@ -3,7 +3,6 @@ import {html} from '@polymer/polymer/polymer-element.js';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 import '@polymer/paper-styles/typography.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import Endpoints from '../endpoints';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '../elements/etools-prp-ajax';
@@ -12,13 +11,12 @@ import '../elements/message-box';
 import '../elements/page-body';
 import '../elements/user-profile/profile-dropdown';
 import {fireEvent} from '../utils/fire-custom-event';
-// (dci)
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
 
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ */
 class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
   public static get template() {

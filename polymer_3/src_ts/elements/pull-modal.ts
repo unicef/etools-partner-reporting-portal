@@ -37,8 +37,6 @@ import Endpoints from '../endpoints';
 // <link rel="import" href="../styles/buttons.html">
 // <link rel="import" href="../styles/modal.html">
 // <link rel="import" href="../styles/table-styles.html">
-// <link rel="import" href="../behaviors/utils.html">
-// <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions.html">
 // <link rel="import" href="../behaviors/notifications.html">
 // behaviors: [
@@ -212,8 +210,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   @property({type: Object})
   postBody: GenericObject = {};
 
-  // DONE statePath: 'location.id'
-  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   workspaceId!: string;
 
   @property({type: String})

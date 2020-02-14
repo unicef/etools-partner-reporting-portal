@@ -1,21 +1,19 @@
-
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import '../../../elements/page-header';
 import '../../../elements/page-body';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 
-// TO BE DONE
+// (dci) TO BE DONE
 // import '../../../elements/ip-reporting/partner-details';
 // import '../../../elements/ip-reporting/risk-rating';
 
-//(dci)
-// behaviors: [
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
-
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin LocalizeMixin
+ */
 class PageIpReportingOverview extends LocalizeMixin(ReduxConnectedElement) {
 
   public static get template() {

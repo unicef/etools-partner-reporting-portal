@@ -2,12 +2,13 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icons/image-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import '@polymer/paper-styles/typography';
-import RoutingMixin from '../mixins/progress-report-utils-mixin';
+import RoutingMixin from '../mixins/routing-mixin';
 
 /**
  * @polymer
@@ -82,14 +83,9 @@ class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
       }
       </style>
 
-      <paper-menu-button
-          vertical-align="top"
-          dynamic-align>
-        <paper-icon-button
-            icon="icons:apps"
-            class="dropdown-trigger">
-        </paper-icon-button>
-        <aside class="dropdown-content">
+      <paper-menu-button vertical-align="top" dynamic-align>
+        <paper-icon-button icon="icons:apps" slot="dropdown-trigger"></paper-icon-button>
+        <aside slot="dropdown-content">
           <h3>Select an application</h3>
           <ul class="apps layout horizontal">
             <template is="dom-repeat" items="[[profile.access]]">
@@ -108,17 +104,14 @@ class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
     `;
   }
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
-  // statePath: 'app.current'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
-  // statePath: 'workspaces.current'
 
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
-  // statePath: 'userProfile.profile'
 
   public _getAppLabel(app: string) {
     switch (app.toLowerCase()) {
@@ -128,13 +121,14 @@ class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
       case 'cluster-reporting':
         return 'Cluster Portal';
     }
+    return '';
   }
 
   public _getSelectedClassName(app: string, currentApp: string) {
     return app === currentApp ? 'selected' : '';
   }
 
-  public _navigate(e) {
+  public _navigate(e: CustomEvent) {
     e.preventDefault();
     location.href = e.target.href;
   }

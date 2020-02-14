@@ -520,7 +520,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   params!: GenericObject;
 
   //DONE statePath: 'disaggregations.byIndicator'
-  @property({type: Object, computed: 'getReduxStateObject(state.disaggregations.byIndicator)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.disaggregations.byIndicator)'})
   data!: GenericObject;
 
   @property({type: Object, computed: '_computeDisaggregations(data, indicatorId)'})
@@ -530,7 +530,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   locationData!: GenericObject[];
 
   //DONE statePath: 'programmeDocumentReports.current.mode'
-  @property({type: String, computed: 'getReduxStateValue(state.programmeDocumentReports.current.mode)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode: string = '';
 
   @property({type: String})
@@ -572,10 +572,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     this.set('initialized', true);
 
     this._fetchData()
-      .then(function () {
+      .then(function() {
         self.set('loading', false);
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
   }
@@ -652,7 +652,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     fireEvent(this, 'refresh-report', this.indicatorId);
 
     const allComplete = this.disaggregations.indicator_location_data
-      .every(function (location: GenericObject) {
+      .every(function(location: GenericObject) {
         return location.is_complete;
       });
 
@@ -668,7 +668,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   _computeLocationData(rawLocationData: any[]) {
     const byLocation = (rawLocationData || [])
-      .reduce(function (acc, location) {
+      .reduce(function(acc, location) {
         const locationId = location.location.id;
 
         if (typeof acc[locationId] === 'undefined') {
@@ -687,10 +687,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }, {});
 
     return Object.keys(byLocation)
-      .map(function (key) {
+      .map(function(key) {
         return byLocation[key];
       })
-      .sort(function (a, b) {
+      .sort(function(a, b) {
         return b.is_master_location_data - a.is_master_location_data;
       });
   }

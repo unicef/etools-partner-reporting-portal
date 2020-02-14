@@ -7,7 +7,6 @@ import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icons/social-icons.js';
 import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';

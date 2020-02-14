@@ -3,7 +3,6 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import UtilsMixin from '../../mixins/utils-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
-import ModalMixin from '../../mixins/modal-mixin';
 import {GenericObject} from '../../typings/globals.types';
 
 import '@polymer/app-layout/app-grid/app-grid-style.js';
@@ -158,14 +157,14 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Boolean})
   opened = false;
 
-  @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
 
   @property({type: Array, computed: '_computePrpRoles(profile, portal)'})
   prpRoles!: any[];
 
-  @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   portal!: string;
 
 

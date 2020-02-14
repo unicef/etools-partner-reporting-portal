@@ -8,18 +8,10 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles';
 import '@polymer/iron-collapse/iron-collapse.js';
 import '@polymer/iron-icons/social-icons.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import './user-profile-dialog';
 import {UserProfileDialogEl} from './user-profile-dialog';
-
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ]
 
 /**
  * @polymer
@@ -92,7 +84,7 @@ class ProfileDropdown extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, reflectToAttribute: true})
   dropdownOpened = '';
 
-  @property({type: Object, computed: 'getReduxStateObject(state.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
 

@@ -23,7 +23,6 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
       () => {
         //if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
         this.rootState = state; // Assign by reference to reduce memory, clone before actual use
-        console.log('stateChanged...', this);
         //}
       });
   }

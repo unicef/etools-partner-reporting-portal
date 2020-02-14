@@ -3,12 +3,11 @@ import '@polymer/app-layout/app-header/app-header.js';
 import '@polymer/app-layout/app-header-layout/app-header-layout.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '../etools-logo';
+import '@polymer/iron-icons/iron-icons.js';
+import {etoolsLogo} from '../etools-logo';
 import '../app-switcher';
 import '../workspace-dropdown';
 import '../language-dropdown';
-import '../etools-prp-workspaces';
-import '../etools-prp-languages';
 import '../user-profile/profile-dropdown';
 import {property} from '@polymer/decorators';
 
@@ -21,6 +20,7 @@ class IpReportingAppHeader extends PolymerElement {
 
   static get template() {
     return html`
+
     <style>
       :host {
         display: block;
@@ -30,6 +30,9 @@ class IpReportingAppHeader extends PolymerElement {
 
       app-header {
         background: var(--theme-page-header-background-color);
+        position: fixed;
+        left: 225px;
+        right: 0px;
       }
 
       app-toolbar {
@@ -60,19 +63,14 @@ class IpReportingAppHeader extends PolymerElement {
       }
     </style>
 
-    <etools-prp-workspaces
-        all="{{workspaces}}"
-        current="{{workspace}}">
-    </etools-prp-workspaces>
-
-    <app-header-layout>
+    <app-header-layout fullbleed>
       <app-header fixed>
         <app-toolbar>
           <div class="wrapper">
             <div class="app-switcher-container">
               <app-switcher></app-switcher>
             </div>
-            <etools-logo size="120" text-color="#fff"></etools-logo>
+            ${etoolsLogo}
           </div>
 
 
@@ -95,7 +93,7 @@ class IpReportingAppHeader extends PolymerElement {
   `;
   }
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.localize.resources)'})
+  @property({type: Array, computed: 'getReduxStateObject(rootState.localize.resources)'})
   languages!: [];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})

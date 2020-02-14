@@ -10,7 +10,6 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-form/iron-form.js';
-import '@polymer/app-localize-behavior/app-localize-behavior.js';
 
 import Endpoints from '../endpoints';
 import ResponsiveMixin from '../mixins/responsive-mixin'
@@ -21,15 +20,12 @@ import '../elements/etools-prp-ajax';
 import '../elements/page-title';
 import '../styles/app-theme-ip-styles';
 
-// (dci)
-// behaviors: [
-//   App.Behaviors.ResponsiveBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   Polymer.IronA11yKeysBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
-
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin ResponsiveMixin
+ * @appliesMixin LocalizeMixin
+ */
 class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
   public static get template() {

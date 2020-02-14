@@ -3,14 +3,12 @@ import {property} from "@polymer/decorators/lib/decorators";
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
-import '@polymer/app-localize-behavior/app-localize-behavior';
-import "@polymer/polymer/lib/elements/dom-repeat";
+import '@polymer/polymer/lib/elements/dom-repeat';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
-import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {localizeSet} from '../redux/actions/localize';
-// <link rel="import" href="../redux/actions/localize.html">
 
 /**
  * @polymer
@@ -18,7 +16,7 @@ import {localizeSet} from '../redux/actions/localize';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
+class LanguageDropdown extends ReduxConnectedElement {
   public static get template() {
     return html`
       <style>
@@ -76,7 +74,7 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
       </style>
 
       <paper-dropdown-menu label="[[language]]" noink no-label-float>
-        <paper-listbox
+        <paper-listbox slot="dropdown-content"
             class="dropdown-content"
             on-iron-select="_languageSelected"
             selected="[[selected]]">
@@ -86,40 +84,29 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
         </paper-listbox>
       </paper-dropdown-menu>`
   };
-  // behaviors: [
-  //     App.Behaviors.ReduxBehavior,
-  //     App.Behaviors.LocalizeBehavior,
-  //     Polymer.AppLocalizeBehavior,
-  //   ],
 
-  // statePath: 'localize.language',
   @property({type: String, computed: '_computeLanguage(data, current)'})
   language!: string;
 
-  // statePath: 'localize.resources',
-  @property({type: Object, computed: 'getReduxStateArray(rootState.localize.resources)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.localize.resources)'})
   availableLanguages!: GenericObject;
 
   @property({type: Number, computed: '_computeSelected(data, language)'})
   selected = 0;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
   current!: string;
 
-  @property({type: Array})
+  @property({type: Array, computed: '_computeLanguages(availableLanguages)'})
   data!: any[];
 
-  //I believe I did not quite do this correctly.....
-  //please review it
   _languageSelected(e: CustomEvent) {
-    var allLanguages = Object.keys(this.availableLanguages);
+    const allLanguages = Object.keys(this.availableLanguages);
 
     if (allLanguages.includes(this.current) === false) {
       this.reduxStore.dispatch(localizeSet('en'));
     }
-
-    var newLanguage = this.$.repeat.itemForElement(e.detail.item);
-
+    const newLanguage = (this.$.repeat as DomRepeat).itemForElement(e.detail.item);
     if (newLanguage === this.current) {
       return;
     }
@@ -128,7 +115,7 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _computeLanguage(data: any[], current: String) {
-    return data.filter(function (language: string) {
+    return data.filter(function(language: string) {
       return language === current;
     })[0];
   }
@@ -139,6 +126,11 @@ class LanguageDropdown extends LocalizeMixin(ReduxConnectedElement) {
     }
     return data.indexOf(language);
   }
+
+  _computeLanguages(availableLanguages: GenericObject) {
+    return Object.keys(availableLanguages).slice();
+  }
+
 }
 
 window.customElements.define('language-dropdown', LanguageDropdown);
