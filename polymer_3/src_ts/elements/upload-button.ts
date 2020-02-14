@@ -14,11 +14,9 @@ import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import './etools-prp-ajax';
 import './error-box';
-import "../styles/button-styles.ts"
-import "../styles/modal-styles.ts"
+import '../styles/buttons-styles';
+import '../styles/modal-styles';
 import {ReduxConnectedElement} from "../ReduxConnectedElement";
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
 
 
 /**

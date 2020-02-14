@@ -3,20 +3,12 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/paper-button/paper-button.js';
-import '@polymer/etools-loading/etools-loading.js'
+import '@unicef-polymer/etools-loading/etools-loading.js'
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/polymer/lib/elements/dom-if';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
-// (dci)
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions/localize.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
  * @polymer

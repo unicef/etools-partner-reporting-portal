@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-tooltip/paper-tooltip';
@@ -18,6 +19,7 @@ import RoutingMixin from '../mixins/routing-mixin';
 import './etools-prp-permissions';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+
 // <link rel="import" href="status-badge.html">
 // <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
 // <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
@@ -31,75 +33,75 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin LocalizeMixin
  * @appliesMixin RoutingMixin
  */
-class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(PolymerElement)))){
-  public static get template(){
+class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(ReduxConnectedElement)))) {
+  public static get template() {
     return html`
       <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">
         :host {
           display: block;
-  
+
           --etools-prp-progress-bar-height: 14px;
-  
+
           --list-row-collapse-wrapper: {
             padding: 0;
             background: white;
           }
-  
+
           --etools-prp-progress-bar: {
             display: block;
             width: calc(100% - 35px);
           };
-  
+
           --iron-icon: {
             vertical-align: text-bottom;
           };
-  
+
           --iron-icon-width: 16px;
           --iron-icon-height: 16px;
         }
-  
+
         a {
           @apply --link;
         }
-  
+
         .indicator-progress {
           margin: 0;
           font-size: 11px;
           line-height: 1;
         }
-  
+
         .indicator-progress:not(:last-child) {
           margin-bottom: 6px;
         }
-  
+
         .indicator-progress dt {
           width: 100px;
           margin-right: 10px;
           text-align: right;
           color: var(--theme-secondary-text-color);
         }
-  
+
         .indicator-progress dd {
           margin: 0;
         }
-  
+
         etools-prp-progress-bar {
           @apply --etools-prp-progress-bar;
         }
-  
+
         .table-cell--action {
           text-align: right;
         }
-  
+
         .locations-warning {
           color: #ffcc00;
         }
       </style>
-      
+
       <etools-prp-permissions
           permissions="{{permissions}}">
       </etools-prp-permissions>
-  
+
       <template
           is="dom-if"
           if="[[canEdit]]"
@@ -109,7 +111,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
             edit-data="[[indicator]]">
         </indicator-edit-modal>
       </template>
-  
+
       <template
           is="dom-if"
           if="[[canEditLocations]]"
@@ -119,7 +121,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
             edit-data="[[indicator]]">
         </indicator-locations-modal>
       </template>
-      
+
       <etools-data-table-row on-opened-changed="_handleOpenedChanged">
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
@@ -219,7 +221,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
                   </template>
                 </dd>
               </dl>
-  
+
               <template is="dom-if" if="[[isClusterApp]]" restamp="true">
                 <dl class="indicator-progress layout horizontal">
                     <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
@@ -233,13 +235,13 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
               </template>
             </div>
           </span>
-  
+
           <template is="dom-if" if="[[hasReports]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
               <a href="[[indicatorReportsUrl]]">[[localize('reports')]]</a>
             </span>
           </template>
-  
+
           <template is="dom-if" if="[[canEdit]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
               <a href="#" on-tap="_openModal" data-modal-type="edit">
@@ -253,7 +255,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
               </a>
             </span>
           </template>
-  
+
           <template is="dom-if" if="[[canEditLocations]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
               <a href="#" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</a>
@@ -268,7 +270,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
           </ip-reporting-indicator-details>
         </div>
       </etools-data-table-row>
-      
+
     `;
   }
 
@@ -284,12 +286,12 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
   @property({type: String, computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)'})
   indicatorReportsUrl!: string;
 
-  @property({type: Boolean computed: '_computeIsClusterApp(appName)'})
+  @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;
 
   @property({type: String})
   appName!: string;
-    // statePath: 'app.current',
+  // statePath: 'app.current',
 
   @property({type: String})
   type: string = '';

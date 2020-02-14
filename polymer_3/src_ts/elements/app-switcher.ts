@@ -1,16 +1,14 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icons/image-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import {connect} from 'pwa-helpers/connect-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import '@polymer/paper-styles/typography';
-// import {store} from 'pwa-helpers/demo/store';
-// <link rel='import' href='../redux/store.html'>
-// <link rel='import' href='../behaviors/routing.html'>
-
+import RoutingMixin from '../mixins/routing-mixin';
 
 /**
  * @polymer
@@ -18,7 +16,7 @@ import '@polymer/paper-styles/typography';
  * @mixinFunction
  * @appliesMixin RoutingMixin
  */
-class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
+class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
   public static get template() {
 
     return html`
@@ -84,15 +82,10 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
         background: var(--paper-grey-200);
       }
       </style>
-      
-      <paper-menu-button
-          vertical-align="top"
-          dynamic-align>
-        <paper-icon-button
-            icon="icons:apps"
-            class="dropdown-trigger">
-        </paper-icon-button>
-        <aside class="dropdown-content">
+
+      <paper-menu-button vertical-align="top" dynamic-align>
+        <paper-icon-button icon="icons:apps" slot="dropdown-trigger"></paper-icon-button>
+        <aside slot="dropdown-content">
           <h3>Select an application</h3>
           <ul class="apps layout horizontal">
             <template is="dom-repeat" items="[[profile.access]]">
@@ -107,21 +100,18 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
           </ul>
         </aside>
       </paper-menu-button>
-    
+
     `;
   }
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
-  // statePath: 'app.current'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
-  // statePath: 'workspaces.current'
 
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
-  // statePath: 'userProfile.profile'
 
   public _getAppLabel(app: string) {
     switch (app.toLowerCase()) {
@@ -131,15 +121,15 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
       case 'cluster-reporting':
         return 'Cluster Portal';
     }
+    return '';
   }
 
   public _getSelectedClassName(app: string, currentApp: string) {
     return app === currentApp ? 'selected' : '';
   }
 
-  public _navigate(e) {
+  public _navigate(e: CustomEvent) {
     e.preventDefault();
-
     location.href = e.target.href;
   }
 

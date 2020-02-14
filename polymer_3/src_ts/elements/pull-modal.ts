@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-button/paper-button.js';
@@ -7,7 +8,7 @@ import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/etools-loading/etools-loading.js';
+import '@unicef-polymer/etools-loading/etools-loading.js';
 
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-styles/typography.js';
@@ -30,15 +31,12 @@ import './status-badge.js';
 import './etools-prp-ajax';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
 // (dci)
 
 // <link rel="import" href="../behaviors/modal.html">
 // <link rel="import" href="../styles/buttons.html">
 // <link rel="import" href="../styles/modal.html">
 // <link rel="import" href="../styles/table-styles.html">
-// <link rel="import" href="../behaviors/utils.html">
-// <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions.html">
 // <link rel="import" href="../behaviors/notifications.html">
 // behaviors: [
@@ -212,8 +210,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   @property({type: Object})
   postBody: GenericObject = {};
 
-  // DONE statePath: 'location.id'
-  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   workspaceId!: string;
 
   @property({type: String})
@@ -236,11 +233,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   _save() {
     const self = this;
     this.$.pull.thunk()()
-      .then(function () {
+      .then(function() {
         self.close();
         fireEvent(self, 'locations-updated');
       })
-      .catch(function (err: any) {
+      .catch(function(err: any) {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
@@ -256,11 +253,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
     const thunk = this.$.reports.thunk();
     thunk()
-      .then(function (res: GenericObject) {
+      .then(function(res: GenericObject) {
         self.set('data', {'reports': res.data});
         self.set('opened', true);
       })
-      .catch(function (err: any) {
+      .catch(function(err: any) {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }

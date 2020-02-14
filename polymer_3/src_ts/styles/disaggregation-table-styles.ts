@@ -1,8 +1,6 @@
 import {html} from '@polymer/polymer/polymer-element.js';
-import "@polymer/iron-flex-layout/iron-flex-layout-classes"
-// <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-
-import {printStyles} from "./print-styles.ts";
+import "@polymer/iron-flex-layout/iron-flex-layout-classes.js"
+import {printStyles} from "./print-styles";
 // <link rel="import" href="print.html">
 
 export const disaggregationTableStyles = html`

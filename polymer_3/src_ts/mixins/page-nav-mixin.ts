@@ -14,9 +14,10 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     public _selectedChanged(selected: any) {
+      const self = this;
       setTimeout(function() {
-        this._forEach('paper-submenu', function(submenu) {
-          let isSelected = !!this.shadowRoot.querySelector('[name="' + selected + '"]');
+        self.shadowRoot!.querySelectorAll('paper-submenu').forEach((submenu: any) => {
+          let isSelected = !!self.shadowRoot.querySelector('[name="' + selected + '"]');
 
           switch (true) {
             case !submenu.opened && isSelected:
@@ -30,15 +31,15 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
               break;
           }
         });
-      });
+      }, 200);
     }
 
     connectedCallback() {
       super.connectedCallback();
 
       // Don't toggle submenus
-      this._forEach('.menu-trigger', function(trigger) {
-        trigger.addEventListener('tap', function(e) {
+      this.shadowRoot!.querySelectorAll('.menu-trigger').forEach((trigger: any) => {
+        trigger.addEventListener('tap', function(e: CustomEvent) {
           if (trigger.parentNode.opened) {
             e.stopPropagation();
           }
