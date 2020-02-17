@@ -38,7 +38,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   public static get template(){
     return html`
         ${tableStyles}
-      <style>
+      <style include="iron-flex iron-flex-factors data-table-styles">
         :host {
           --ecp-content: {
             padding: 1px 0 0;

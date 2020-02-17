@@ -12,8 +12,6 @@ import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
 import './etools-prp-number';
 
-// <link rel="import" href="../styles/table-styles.html">
-// <link rel="import" href="../styles/shared-styles.html">
 import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
@@ -39,7 +37,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Pol
   public static get template(){
     return html`
         ${tableStyles} ${sharedStyles}
-      <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">
+      <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles">
         :host {
           display: block;
   

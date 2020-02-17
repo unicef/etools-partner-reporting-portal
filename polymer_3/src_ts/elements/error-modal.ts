@@ -24,7 +24,7 @@ class ErrorModal extends connect(store)(LocalizeMixin(UtilsMixin(PolymerElement)
   public static get template(){
     return html`
         ${buttonsStyles}
-      <style>
+      <style include="iron-flex iron-flex-reverse iron-flex-alignment">
         :host {
           --paper-dialog: {
             width: 500px;

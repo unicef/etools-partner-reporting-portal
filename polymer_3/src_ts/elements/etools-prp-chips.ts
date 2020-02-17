@@ -18,7 +18,7 @@ class EtoolsPrpChips extends PolymerElement{
   public static get template(){
     return html`
         ${sharedStyles}
-      <style>
+      <style include="iron-flex">
         :host {
           display: block;
           padding: 8px 0;

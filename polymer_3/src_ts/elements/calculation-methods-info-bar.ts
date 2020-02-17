@@ -27,7 +27,7 @@ class CalculationMethodsInfoBar extends LocalizeMixin(PolymerElement) {
   static get template() {
     return html`
     ${buttonsStyles} ${tableStyles}
-    <style include="data-table-styles">
+    <style include="data-table-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         background: #FCFCFC;

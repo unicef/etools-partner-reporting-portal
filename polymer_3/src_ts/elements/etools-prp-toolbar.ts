@@ -17,7 +17,7 @@ class EtoolsPrpToolbar extends (UtilsMixin(PolymerElement)){
   public static get template(){
     return html`
         ${buttonsStyles}
-      <style>
+      <style include="iron-flex iron-flex-reverse">
         :host {
           display: block;
           margin: 25px 0;

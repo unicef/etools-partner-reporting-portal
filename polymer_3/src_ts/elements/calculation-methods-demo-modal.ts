@@ -17,10 +17,6 @@ import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 
 
-// (dci)
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
-
 /**
  * @polymer
  * @customElement
@@ -32,7 +28,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   static get template() {
     return html`
     ${buttonsStyles} ${modalStyles} 
-    <style>
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {

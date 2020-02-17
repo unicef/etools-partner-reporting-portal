@@ -16,7 +16,7 @@ import './error-box-errors';
 class ErrorBox extends UtilsMixin(PolymerElement){
   public static get template() {
     return html`
-      <style>
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           color: var(--paper-input-container-invalid-color, --error-color);
         }

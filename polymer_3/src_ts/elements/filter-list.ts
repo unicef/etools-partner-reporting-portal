@@ -26,7 +26,7 @@ class FilterList extends LocalizeMixin(PolymerElement) {
 
   static get template() {
     return html`
-    <style>
+    <style include="iron-flex">
       :host {
         background-color: #f9f9f9;
         display: block;

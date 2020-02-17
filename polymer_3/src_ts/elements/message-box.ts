@@ -11,7 +11,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 class MessageBox extends PolymerElement {
   public static get template() {
     return html`
-      <style>
+      <style include="iron-flex iron-flex-alignment">
         :host {
             display: block;
           }

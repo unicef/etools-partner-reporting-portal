@@ -18,7 +18,7 @@ class CalculationMethodsDemoPeriods extends PolymerElement {
   static get template() {
     return html`
       ${buttonsStyles} ${modalStyles}
-    <style>
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 

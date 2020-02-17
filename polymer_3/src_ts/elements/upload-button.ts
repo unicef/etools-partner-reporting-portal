@@ -35,7 +35,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
   public static get template() {
     return html`
         ${buttonsStyles} ${modalStyles}
-      <style>
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           --etools-file-main-btn-color: var(--theme-primary-color);
 

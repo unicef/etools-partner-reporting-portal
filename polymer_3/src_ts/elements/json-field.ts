@@ -16,7 +16,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
-    <style>
+    <style include="app-grid-style">
       :host {
         display: block;
 

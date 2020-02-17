@@ -58,7 +58,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   static get template() {
     return html`
     ${buttonsStyles} 
-    <style>
+    <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
         width: 100%;

@@ -16,7 +16,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 class ChartLegend extends LocalizeMixin(PolymerElement){
   public static get template(){
     return html`
-      <style>
+      <style include="iron-flex iron-flex-alignment">
         :host {
           display: block;
         }

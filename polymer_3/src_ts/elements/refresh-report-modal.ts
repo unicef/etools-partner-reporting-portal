@@ -24,8 +24,6 @@ import {buttonsStyles} from "../styles/buttons-styles";
 import {modalStyles} from "../styles/modal-styles";
 
 // (dci) import ajax ???
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions.html">
 // <link rel="import" href="../redux/actions/localize.html">
@@ -51,7 +49,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
   static get template() {
     return html`
     ${buttonsStyles} ${modalStyles}
-    <style>
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {

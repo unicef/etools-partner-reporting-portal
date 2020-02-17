@@ -35,9 +35,6 @@ import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 // (dci)
 
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
-// <link rel="import" href="../styles/table-styles.html">
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions.html">
 // behaviors: [
@@ -59,8 +56,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   static get template() {
     return html`
     ${tableStyles} ${buttonsStyles} ${modalStyles}
-    <style
-      include="data-table-styles">
+    <style include="data-table-styles iron-flex iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 

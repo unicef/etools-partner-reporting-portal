@@ -24,7 +24,7 @@ class AppSwitcher extends connect(store)(RoutingMixin(PolymerElement)) {
   public static get template() {
 
     return html`
-      <style>
+      <style include="iron-flex">
         :host {
         --paper-icon-button: {
           color: rgba(255, 255, 255, 0.7);
