@@ -618,7 +618,7 @@
       },
 
       _remove: function (e) {
-        var currentIndex = +e.target.dataset.index;
+        var currentIndex = +Polymer.dom(e).localTarget.dataset.index;
 
         if (this.mode === 'cluster') {
           this.splice('data.cluster.projects', currentIndex, 1);
@@ -662,7 +662,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {
@@ -776,10 +776,10 @@
       },
 
       _close: function (e) {
-        if (e === 'saved' ||
-          e.target.nodeName === 'PAPER-DIALOG' ||
-          e.target.nodeName === 'PAPER-BUTTON' ||
-          e.target.nodeName === 'PAPER-ICON-BUTTON'
+        if(e === 'saved' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-DIALOG' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-BUTTON' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-ICON-BUTTON'
         ) {
           this.set('mode', '');
           this.set('data', {});

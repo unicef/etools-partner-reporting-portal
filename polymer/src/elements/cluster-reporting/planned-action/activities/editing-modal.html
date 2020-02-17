@@ -608,7 +608,7 @@
       },
 
       _remove: function (e) {
-        var currentIndex = +e.target.dataset.index;
+        var currentIndex = +Polymer.dom(e).localTarget.dataset.index;
         this.splice('data.projects', currentIndex, 1);
         this.fire('project-details-selection-refit');
       },
@@ -646,7 +646,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _computePartnerId: function(partner, editPartner) {

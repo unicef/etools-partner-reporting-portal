@@ -192,7 +192,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _save: function () {

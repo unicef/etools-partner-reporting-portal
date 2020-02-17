@@ -143,7 +143,7 @@
       ],
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _setDefaults: function (opened, indicatorId, clusterId) {
