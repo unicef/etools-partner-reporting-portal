@@ -1,10 +1,11 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
 import './calculation-methods-demo-modal';
 import {CalculationMethodsDemoModalEl} from './calculation-methods-demo-modal';
 import LocalizeMixin from '../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {tableStyles} from '../styles/table-styles';
 
@@ -22,7 +23,7 @@ import {tableStyles} from '../styles/table-styles';
  * @customElement
  * @appliesMixin LocalizeMixin
  */
-class CalculationMethodsInfoBar extends LocalizeMixin(PolymerElement) {
+class CalculationMethodsInfoBar extends LocalizeMixin(ReduxConnectedElement) {
 
   static get template() {
     return html`

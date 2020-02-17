@@ -7,9 +7,9 @@ import {property} from '@polymer/decorators/lib/decorators';
  * @polymer
  * @customElement
  */
-class EtoolsPrpTheme extends PolymerElement{
+class EtoolsPrpTheme extends PolymerElement {
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   _app!: string;
   // statePath: 'app.current',
 

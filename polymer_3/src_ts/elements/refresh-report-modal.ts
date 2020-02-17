@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-button/paper-button';
@@ -44,7 +45,7 @@ import {modalStyles} from "../styles/modal-styles";
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixin(PolymerElement)))) {
+class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`

@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/paper-radio-group/paper-radio-group';
@@ -32,8 +33,9 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
  */
-class ReportableMeta extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -309,9 +311,10 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(PolymerElement)) {
       // }
       (this.$.refresh as RefreshReportModalEl).close();
     }
-
   }
-  window.customElements.define('reportable-meta', ReportableMeta);
+
+}
+window.customElements.define('reportable-meta', ReportableMeta);
 
 export {ReportableMeta as ReportableMetaEl};
 

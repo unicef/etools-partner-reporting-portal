@@ -1,12 +1,10 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@polymer/polymer/lib/elements/dom-repeat';
+import {html} from '@polymer/polymer';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {connect} from 'pwa-helpers/connect-mixin';
-import {store} from 'pwa-helpers/demo/store';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 
 // <link rel="import" href="../redux/store.html">
@@ -20,8 +18,8 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ErrorModal extends connect(store)(LocalizeMixin(UtilsMixin(PolymerElement))){
-  public static get template(){
+class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
         ${buttonsStyles}
       <style include="iron-flex iron-flex-reverse iron-flex-alignment">
@@ -29,14 +27,14 @@ class ErrorModal extends connect(store)(LocalizeMixin(UtilsMixin(PolymerElement)
           --paper-dialog: {
             width: 500px;
             padding: 24px;
-  
+
             & > * {
               margin: 0;
             }
           }
         }
       </style>
-    
+
       <paper-dialog
           with-backdrop
           opened="{{opened}}">
@@ -107,7 +105,7 @@ class ErrorModal extends connect(store)(LocalizeMixin(UtilsMixin(PolymerElement)
         case 'You have not completed Proposed way forward field on Other Info tab.':
           return localize('not_completed_proposed_way');
         case 'You have not completed all indicator location data across all indicator reports for this progress' +
-        ' report.':
+          ' report.':
           return localize('not_completed_indicator_location');
         default:
           return error;
