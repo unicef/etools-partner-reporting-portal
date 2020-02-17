@@ -30,6 +30,7 @@
         invalid="{{invalid}}"
         validator="[[validator]]"
         min="[[min]]"
+        on-value-changed="_inputValueChanged"
         no-label-float
         required
         auto-validate>
@@ -64,10 +65,6 @@
         },
       },
 
-      listeners: {
-        'field.input': '_handleInput',
-      },
-
       ready: function () {
         this.$.field.validate();
       },
@@ -75,6 +72,9 @@
       attached: function () {
         this.$.field.validate();
         this.fire('register-field', this);
+      },
+
+      detached: function () {
       },
 
       // Cant deregister fields in lifecycle hooks due to:
@@ -91,7 +91,7 @@
         return this.$.field;
       },
 
-      _handleInput: function (e) {
+      _inputValueChanged: function (e) {
         var change = {};
 
         change[this.key] = e.target.value;

@@ -40,15 +40,15 @@
       @media (min-width: 600px) {
         :host {
           --login-container-inner-layout: {
-            @apply(--layout-vertical);
-            @apply(--layout-center-justified);
+            @apply --layout-vertical;
+            @apply --layout-center-justified;
           };
         }
       }
 
       .login-container {
-        @apply(--layout-horizontal);
-        @apply(--layout-center-justified);
+        @apply --layout-horizontal;
+        @apply --layout-center-justified;
 
         box-sizing: border-box;
         min-height: 100%;
@@ -57,7 +57,7 @@
       }
 
       .login-container-inner {
-        @apply(--login-container-inner-layout);
+        @apply --login-container-inner-layout;
       }
 
       paper-card {
@@ -76,7 +76,7 @@
       }
 
       .header h1 {
-        @apply(--paper-font-subhead);
+        @apply --paper-font-subhead;
 
         margin: 0;
       }
@@ -87,7 +87,7 @@
       }
 
       .login-buttons-label {
-        @apply(--paper-font-headline);
+        @apply --paper-font-headline;
 
         margin: 0 0 .75em;
         color: var(--theme-primary-text-color-light);
@@ -95,7 +95,7 @@
       }
 
       .login-buttons ul {
-        @apply(--layout-vertical);
+        @apply --layout-vertical;
 
         padding: 0;
         margin: 0;
@@ -103,8 +103,8 @@
       }
 
       .login-buttons li {
-        @apply(--layout-horizontal);
-        @apply(--layout-center-justified);
+        @apply --layout-horizontal;
+        @apply --layout-center-justified;
       }
 
       .login-buttons li:not(:last-child) {
@@ -272,8 +272,8 @@
 
       submit: function() {
         var self = this;
-        this.$$('#email').validate();
-        if (this.$$('#email').invalid) {
+        this.shadowRoot.querySelector('#email').validate();
+        if (this.shadowRoot.querySelector('#email').invalid) {
           return;
         }
         var thunk = this.$.login.thunk();

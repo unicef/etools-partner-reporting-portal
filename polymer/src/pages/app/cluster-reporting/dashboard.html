@@ -52,7 +52,7 @@
       }
 
       .item-wide {
-        @apply(--app-grid-expandible-item);
+        @apply --app-grid-expandible-item;
       }
     </style>
 
@@ -180,10 +180,6 @@
         '_fetchData(dataUrl, queryParams)',
       ],
 
-      listeners: {
-        'report-submitted': '_fetchData',
-      },
-
       _computeMode: function (accountType) {
         switch (accountType) {
           case App.Constants.ACCOUNT_TYPE_PARTNER:
@@ -218,7 +214,21 @@
         }, 300);
       },
 
+      _addEventListeners: function () {
+        this._fetchData = this._fetchData.bind(this);
+        this.addEventListener('report-submitted', this._fetchData);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('report-submitted', this._fetchData);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         if (this.isDebouncerActive('fetch-data')) {
           this.cancelDebouncer('fetch-data');
         }

@@ -23,8 +23,8 @@
 
       div#action {
         margin: 25px 0;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified)
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
     </style>
 
@@ -127,11 +127,6 @@
         '_indicatorsAjax(queryParams, activityId)',
       ],
 
-      listeners: {
-        'indicator-edited': '_onSuccess',
-        'indicator-added': '_onSuccess',
-      },
-
       _computeCurrentIndicators: function(activityId, allIndicators) {
         return allIndicators[activityId];
       },
@@ -169,6 +164,25 @@
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
+      },
+
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('indicator-edited', this._onSuccess);
+        this.addEventListener('indicator-added', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('indicator-edited', this._onSuccess);
+        this.removeEventListener('indicator-added', this._onSuccess);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

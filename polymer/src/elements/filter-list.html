@@ -21,8 +21,8 @@
       }
 
       div#action {
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified);
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
 
       paper-button {
@@ -95,16 +95,9 @@
         '_updateLoading(filters.splices, filtersReady.*)',
       ],
 
-      listeners: {
-        'filter-changed': '_onFilterChanged',
-        'register-filter': '_registerFilter',
-        'filter-ready': '_filterReady',
-        'deregister-filter': '_deregisterFilter',
-      },
-
-      _onFilterChanged: function (e, change) {
+      _onFilterChanged: function (e) {
         e.stopPropagation();
-
+        const change = e.detail;
         /**
          * If we ever decide to debounce accross filters,
          * here's the place to put the logic for it.
@@ -125,9 +118,9 @@
         });
       },
 
-      _registerFilter: function (e, name) {
+      _registerFilter: function (e) {
         e.stopPropagation();
-
+        const name = e.detail;
         if (this.ignoredFilters.indexOf(name) !== -1) {
           return;
         }
@@ -135,9 +128,9 @@
         this.push('filters', name);
       },
 
-      _deregisterFilter: function (e, name) {
+      _deregisterFilter: function (e) {
         e.stopPropagation();
-
+        const name = e.detail;
         var index = this.filters.indexOf(name);
 
         if (index === -1) {
@@ -147,9 +140,9 @@
         this.splice('filters', index, 1);
       },
 
-      _filterReady: function (e, name) {
+      _filterReady: function (e) {
         e.stopPropagation();
-
+        const name = e.detail;
         if (this.ignoredFilters.indexOf(name) !== -1) {
           return;
         }
@@ -194,9 +187,32 @@
         });
       },
 
+      _addEventListeners: function () {
+        this._onFilterChanged = this._onFilterChanged.bind(this);
+        this.addEventListener('filter-changed', this._onFilterChanged);
+        this._registerFilter = this._registerFilter.bind(this);
+        this.addEventListener('register-filter', this._registerFilter);
+        this._filterReady = this._filterReady.bind(this);
+        this.addEventListener('filter-ready', this._filterReady);
+        this._deregisterFilter = this._deregisterFilter.bind(this);
+        this.addEventListener('deregister-filter', this._deregisterFilter);
+      },
+
       attached: function () {
         this.set('filters', []);
         this.set('filtersReady', {});
+        this._addEventListeners();
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('filter-changed', this._onFilterChanged);
+        this.removeEventListener('register-filter', this._registerFilter);
+        this.removeEventListener('filter-ready', this._filterReady);
+        this.removeEventListener('deregister-filter', this._deregisterFilter);
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

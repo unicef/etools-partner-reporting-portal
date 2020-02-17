@@ -212,7 +212,7 @@
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
-        var narrativeTextInput = this.$$('#narrative_assessment');
+        var narrativeTextInput = this.shadowRoot.querySelector('#narrative_assessment');
 
         if (this.toggle === 'Edit' && field.id === 'toggle-button') {
           narrativeTextInput.disabled = false;
@@ -305,7 +305,7 @@
           this.set(['localData', 'narrative_assessment'],
             Polymer.dom(this.root).querySelectorAll('labelled-item')[1].querySelector('paper-input').value);
         }
-        
+
         if (this.isDebouncerActive('local-data-changed')) {
           this.cancelDebouncer('local-data-changed');
         }

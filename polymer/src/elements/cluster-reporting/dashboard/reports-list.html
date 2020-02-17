@@ -97,10 +97,6 @@
         },
       },
 
-      listeners: {
-        'report-submit-confirm': '_onConfirm',
-      },
-
       _refresh: function () {
         // Force re-render:
         this.set('active', false);
@@ -120,9 +116,9 @@
         }) : false;
       },
 
-      _onConfirm: function (e, result) {
+      _onConfirm: function (e) {
         e.stopPropagation();
-
+        const result = e.detail;
         if (!this.isIMO) {
           this.$.confirm.run({
             body:
@@ -142,6 +138,24 @@
           });
         }
       },
+
+      _addEventListeners: function () {
+        this._onConfirm = this._onConfirm.bind(this);
+        this.addEventListener('report-submit-confirm', this._onConfirm);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('report-submit-confirm', this._onConfirm);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
+      },
+
     });
   </script>
 </dom-module>

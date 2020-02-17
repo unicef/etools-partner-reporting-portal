@@ -142,6 +142,9 @@
 
         switch (indicatorType) {
           case 'percentage':
+            if(!percentize){
+              return this._toPercentage(value);
+            }
             return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';
           case 'ratio':
             return _value + ':1';
@@ -204,8 +207,8 @@
       },
 
       _dateRangeValid: function (start, end) {
-        var startField = this.$$(start);
-        var endField = this.$$(end);
+        var startField = this.shadowRoot.querySelector(start);
+        var endField = this.shadowRoot.querySelector(end);
         var startValue = startField.value;
         var endValue = endField.value;
 
