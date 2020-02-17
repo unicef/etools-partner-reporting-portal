@@ -776,14 +776,11 @@
       },
 
       _close: function (e) {
-        let validClose = e === 'saved';
-        if(!validClose){
-          const nodeName = Polymer.dom(e).localTarget.nodeName;
-          validClose = (nodeName === 'PAPER-DIALOG' ||
-          nodeName === 'PAPER-BUTTON' ||
-          nodeName === 'PAPER-ICON-BUTTON');
-        }
-        if (validClose) {
+        if(e === 'saved' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-DIALOG' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-BUTTON' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-ICON-BUTTON'
+        ) {
           this.set('mode', '');
           this.set('data', {});
 
