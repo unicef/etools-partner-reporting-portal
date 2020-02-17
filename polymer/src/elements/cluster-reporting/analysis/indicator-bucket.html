@@ -206,7 +206,7 @@
       },
 
       _toggle: function (e) {
-        this.$$('#collapse-' + e.target.toggles).toggle();
+        this.$$('#collapse-' + Polymer.dom(e).localTarget.toggles).toggle();
       },
 
       _computeObjectiveTitle: function (data) {

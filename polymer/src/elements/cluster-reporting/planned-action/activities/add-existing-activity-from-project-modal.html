@@ -459,7 +459,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {
@@ -571,11 +571,14 @@
       },
 
       _close: function (e) {
-        if (e === 'saved' ||
-          e.target.nodeName === 'PAPER-DIALOG' ||
-          e.target.nodeName === 'PAPER-BUTTON' ||
-          e.target.nodeName === 'PAPER-ICON-BUTTON'
-        ) {
+        let validClose = e === 'saved';
+        if(!validClose){
+          const nodeName = Polymer.dom(e).localTarget.nodeName;
+          validClose = (nodeName === 'PAPER-DIALOG' ||
+          nodeName === 'PAPER-BUTTON' ||
+          nodeName === 'PAPER-ICON-BUTTON');
+        }
+        if (validClose) {
           this.set('data', {});
 
           this.set('objectives', []);

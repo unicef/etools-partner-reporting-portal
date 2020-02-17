@@ -209,12 +209,12 @@
         },
 
         _remove: function (e) {
-          var toRemove = +e.target.index;
+          var toRemove = +Polymer.dom(e).localTarget.index;
           this.splice('value', toRemove, 1);
         },
 
         _setDisaggregation: function (e, data) {
-          var index = +e.target.index;
+          var index = +Polymer.dom(e).localTarget.index;
 
           var id;
           if (data.value) {
@@ -247,7 +247,7 @@
         },
 
         _validate: function (e) {
-          e.target.validate();
+          Polymer.dom(e).localTarget.validate();
         },
 
         validate: function () {

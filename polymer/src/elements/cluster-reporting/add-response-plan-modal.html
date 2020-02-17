@@ -413,7 +413,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        Polymer.dom(e).localTarget.validate();
       },
 
       _computeFormattedPlans: function (plans) {

@@ -241,7 +241,7 @@
       },
 
       _onRadioChange: function (e) {
-        this.selectedType = e.target.selected;
+        this.selectedType = Polymer.dom(e).localTarget.selected;
       },
 
       _totalSum: function (data) {

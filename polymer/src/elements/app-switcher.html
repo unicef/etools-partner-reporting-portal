@@ -144,7 +144,7 @@
       _navigate: function (e) {
         e.preventDefault();
 
-        location.href = e.target.href;
+        location.href = Polymer.dom(e).localTarget.href;
       },
     });
   </script>

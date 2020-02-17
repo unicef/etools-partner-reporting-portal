@@ -25,7 +25,7 @@
       },
 
       _onTap: function (e) {
-        if (!e.target.classList.contains('print-btn')) {
+        if (!Polymer.dom(e).localTarget.classList.contains('print-btn')) {
           return;
         }
 
