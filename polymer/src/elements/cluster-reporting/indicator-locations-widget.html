@@ -407,7 +407,7 @@
             return;
           }
 
-          event.path.forEach(function (node) {
+          Polymer.dom(event).path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
               index = node.dataset.index;  // Grab index of current location widget component
               return;
