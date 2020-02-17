@@ -290,7 +290,7 @@
 
       //Gets correct target element when using Chrome.
       _handleRadioButtonChange: function(e) {
-        const target = Polymer.dom(e).localTarget;
+        var target = Polymer.dom(e).localTarget;
         if (target.id === 'onRadio' || target.id === 'offRadio') {
           target = target.parentNode.parentNode;
         }
