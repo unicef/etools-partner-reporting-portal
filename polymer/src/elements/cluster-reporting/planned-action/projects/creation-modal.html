@@ -1127,7 +1127,7 @@
       },
 
       _validate: function (e) {
-        Polymer.dom(e).localTarget.validate();
+        _getValidateTarget(e).validate();
       },
 
       _redirectToDetail: function (id) {

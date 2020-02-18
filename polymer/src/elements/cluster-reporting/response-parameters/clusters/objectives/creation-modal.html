@@ -222,7 +222,7 @@
       },
 
       _validate: function (e) {
-        Polymer.dom(e).localTarget.validate();
+        _getValidateTarget(e).validate();
       },
 
       _save: function () {

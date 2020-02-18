@@ -688,7 +688,7 @@
       },
 
       _remove: function (e) {
-        var currentIndex = +Polymer.dom(e).localTarget.dataset.index;
+        var currentIndex = +e.target.dataset.index;
 
         if (this.mode === 'cluster') {
           this.splice('data.cluster.projects', currentIndex, 1);
@@ -724,7 +724,7 @@
       },
 
       _validate: function (e) {
-        Polymer.dom(e).localTarget.validate();
+        _getValidateTarget(e).validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {

@@ -537,7 +537,7 @@
 
         _remove: function (e) {
           var value = this.get('value');
-          var toRemove = +Polymer.dom(e).localTarget.dataset.index;
+          var toRemove = +e.target.dataset.index;
           var pending = this.get('pending');
           var locations = this.get('locations');
 
@@ -551,7 +551,7 @@
         },
 
         _validate: function (e) {
-          Polymer.dom(e).localTarget.validate();
+          _getValidateTarget(e).validate();
         },
 
         _onLocTypeChanged: function (event, data) {
