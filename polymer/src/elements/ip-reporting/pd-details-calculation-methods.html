@@ -324,8 +324,8 @@
       },
 
       _onValueChanged: function (e) {
-        var newValue = Polymer.dom(e).localTarget.selected;
-        var data = Polymer.dom(e).localTarget.dataset;
+        var newValue = e.target.selected;
+        var data = e.target.dataset;
         var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
 
         this.set([
