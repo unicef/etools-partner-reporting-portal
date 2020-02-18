@@ -142,7 +142,7 @@
 
       _onChipRemove: function (e) {
         var value = this.value.slice();
-        var toRemove = +Polymer.dom(e).localTarget.index;
+        var toRemove = +e.target.index;
 
         value.splice(toRemove, 1);
 
