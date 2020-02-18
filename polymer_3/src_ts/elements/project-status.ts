@@ -1,9 +1,9 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
-import "./status-badge";
+import {property} from '@polymer/decorators/lib/decorators';
+import './status-badge';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
  * @polymer

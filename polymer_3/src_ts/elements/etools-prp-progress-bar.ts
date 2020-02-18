@@ -2,8 +2,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-progress/paper-progress';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-
-// <link rel="import" href="../styles/progress-bar.html">
+import {progressBarStyles} from '../styles/progress-bar-styles';
 
 
 /**
@@ -15,8 +14,8 @@ import {property} from '@polymer/decorators/lib/decorators';
 class EtoolsPrpProgressBar extends (UtilsMixin(PolymerElement)){
   public static get template() {
     return html`
-
-        <style include="progress-bar">
+        ${progressBarStyles}
+        <style>
           .percentage {
             vertical-align: middle;
             line-height: 15px;

@@ -1,11 +1,13 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 
 import DataTableMixin from '../mixins/data-table-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -17,6 +19,7 @@ import './list-placeholder';
 import './message-box';
 import './etools-prp-permissions';
 import {GenericObject} from '../typings/globals.types';
+import {tableStyles} from '../styles/table-styles';
 
 // <link rel="import" href="../styles/table-styles.html">
 
@@ -34,8 +37,8 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
 
   public static get template() {
     return html`
-
-      <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+        ${tableStyles}
+      <style include="iron-flex iron-flex-factors data-table-styles">
         :host {
           --ecp-content: {
             padding: 1px 0 0;

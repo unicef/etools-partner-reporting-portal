@@ -1,14 +1,13 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
-
-import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
-import "@polymer/paper-listbox/paper-listbox";
-import "@polymer/paper-item/paper-item";
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-repeat';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import RoutingMixin from '../mixins/routing-mixin';
 import {setWorkspace} from "../redux/actions";
 import {ReduxConnectedElement} from "../ReduxConnectedElement";
-import '@polymer/polymer/lib/elements/dom-repeat';
-import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 import {GenericObject} from '../typings/globals.types';
 
 /**
@@ -99,7 +98,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   data!: any[];
 
   _workspaceSelected(e: CustomEvent) {
-    var newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
+    let newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
 
     if (newCode === this.current) {
       return;

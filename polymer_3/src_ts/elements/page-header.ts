@@ -7,13 +7,10 @@ import "@polymer/iron-icons/iron-icons";
 import "@polymer/paper-icon-button/paper-icon-button";
 import "@polymer/iron-flex-layout/iron-flex-layout-classes";
 
-import '../styles/shared-styles';
 import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
+import {sharedStyles} from '../styles/shared-styles';
 
-// <link rel="import" href="../behaviors/localize.html">
-// <link rel="import" href="../behaviors/routing.html">
-// <link rel="import" href="../styles/shared-styles.html">
 
 /**
  * @polymer
@@ -25,7 +22,8 @@ import RoutingMixin from '../mixins/routing-mixin';
 class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles">
+        ${sharedStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-factors">
         :host {
           --header-gutter: 25px;
 

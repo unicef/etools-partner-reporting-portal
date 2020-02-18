@@ -5,10 +5,10 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {buttonsStyles} from '../styles/buttons-styles';
 
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../styles/buttons.html">
 
 
 /**
@@ -21,7 +21,8 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+        ${buttonsStyles}
+      <style include="iron-flex iron-flex-reverse iron-flex-alignment">
         :host {
           --paper-dialog: {
             width: 500px;

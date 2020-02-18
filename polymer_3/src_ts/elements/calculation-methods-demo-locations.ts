@@ -1,10 +1,12 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/paper-styles/typography';
 import './etools-prp-number';
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
 
 /**
  * @polymer
@@ -14,7 +16,8 @@ class CalculationMethodsDemoLocations extends PolymerElement {
 
   static get template() {
     return html`
-        <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+        ${buttonsStyles} ${modalStyles} 
+        <style include="iron-flex-alignment iron-flex-reverse">
           :host {
             display: block;
 

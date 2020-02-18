@@ -2,19 +2,20 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-radio-group/paper-radio-group.js';
-import '@polymer/paper-radio-button/paper-radio-button.js';
-import '@polymer/paper-input/paper-input.js';
+import '@polymer/paper-radio-group/paper-radio-group';
+import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-input/paper-input';
 import './labelled-item';
 import './report-status';
 import {RefreshReportModalEl} from './refresh-report-modal';
 import './refresh-report-modal';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import {GenericObject} from '../typings/globals.types';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
+import {buttonsStyles} from '../styles/buttons-styles';
 
 // (dci)
 // <link rel="import" href="../redux/actions/localize.html">
@@ -38,7 +39,8 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
-    <style include="button-styles">
+    ${buttonsStyles}
+    <style>
       :host {
         display: block;
 

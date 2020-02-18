@@ -2,7 +2,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icons/image-icons.html';
+import '@polymer/iron-icons/image-icons';
 
 /**
  * @polymer
