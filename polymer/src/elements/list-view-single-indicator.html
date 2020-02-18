@@ -326,7 +326,7 @@
       },
 
       _openModal: function (e) {
-        this.$$('#modal-' + Polymer.dom(e).localTarget.dataset.modalType).open();
+        this.$$('#modal-' + e.target.dataset.modalType).open();
       },
 
       _computeIsClusterApp: function(appName) {

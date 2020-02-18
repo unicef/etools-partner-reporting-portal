@@ -556,7 +556,7 @@
       },
 
       _validate: function (e) {
-        Polymer.dom(e).localTarget.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _showCSD: function (frequency) {
