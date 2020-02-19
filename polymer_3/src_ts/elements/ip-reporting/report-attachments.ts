@@ -1,23 +1,22 @@
 import {html} from '@polymer/polymer';
-import Endpoints from "../../endpoints";
-import UtilsMixin from "../../mixins/utils-mixin";
-import NotificationsMixin from "../../mixins/notifications-mixin";
-import LocalizeMixin from "../../mixins/localize-mixin";
+import UtilsMixin from '../../mixins/utils-mixin';
+import NotificationsMixin from '../../mixins/notifications-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
 // <link rel="import" href="../../../bower_components/etools-file/etools-file.html">
 // <link rel="import" href="../../redux/actions/localize.html">
 // <link rel="import" href="../../redux/store.html">
 // <link rel="import" href="../../redux/actions/pdReportsAttachments.html">
 // <link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
 import '../etools-prp-ajax';
-import {ReduxConnectedElement} from "../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import '@polymer/polymer/lib/elements/dom-if';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import {programmeDocumentReportsAttachmentsCurrent} from "../../redux/selectors/programmeDocumentReportsAttachments";
 import {programmeDocumentReportsAttachmentsPending} from "../../redux/selectors/programmeDocumentReportsAttachments";
-import {GenericObject} from "../../typings/globals.types";
-import {pdReportsAttachmentsSync} from "../../redux/actions/pdReportsAttachments";
-import {Debouncer} from "@polymer/polymer/lib/utils/debounce";
-import {timeOut} from "@polymer/polymer/lib/utils/async";
+import {GenericObject} from '../../typings/globals.types';
+import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 
 /**
