@@ -33,7 +33,7 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computePartnerNamesUrl(responsePlanID)', observer: '_fetchPartnerNames'})
   partnerNamesUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.app.current)'})
