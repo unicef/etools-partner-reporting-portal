@@ -1,14 +1,28 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/moment-element/moment-import.html">
-<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../../bower_components/etools-datepicker/etools-datepicker.html">
+import {html} from '@polymer/polymer';
+//@Lajos Needs to BE CHECKED
+import '@polymer/moment-element/moment-import';
 
-<link rel="import" href="../../../behaviors/filter.html">
-<link rel="import" href="../../../behaviors/date.html">
+import '@polymer/paper-input/paper-input';
+import '@polymer/iron-icons/iron-icons';
+//<link rel="import" href="../../../../bower_components/etools-datepicker/etools-datepicker.html">
+import '@unicef-polymer/etools-datepicker/etools-datepicker';
 
-<dom-module id="date-filter">
-  <template>
+
+import FilterMixin from '../../../mixins/filter-mixin';
+import DateMixin from '../../../mixins/date-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {fireEvent} from '../../../utils/fire-custom-event';
+
+
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin FilterMixin
+ * @appliesMixin DateMixin
+ */
+class DateFilter extends FilterMixin(DateMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display:block;
@@ -32,58 +46,48 @@
         prefix>
       </etools-datepicker-button>
     </paper-input>
-  </template>
-  <script>
-    Polymer({
-      is: 'date-filter',
+  `;
+  }
 
-      behaviors: [
-        App.Behaviors.FilterBehavior,
-        App.Behaviors.DateBehavior,
-      ],
 
-      properties: {
-        value: String,
+  @property({type: String})
+  value!: string;
 
-        type: {
-          type: String,
-          value: 'text',
-        },
-        jsonValue: {
-          value: null,
-          notify: true
-        },
-        format: {
-          type: String,
-          value: 'DD MMM YYYY'
-        }
-      },
+  @property({type: String})
+  type = 'text';
 
-      _handleInput: function () {
-        var newValue = this.$.field.value;
-        this.fire('filter-changed', {
-          name: this.name,
-          value: newValue,
-        });
-      },
+  @property({type: null, notify: 'true'})
+  jsonValue!: null;
 
-      _addEventListeners: function () {
-        this._handleInput = this._handleInput.bind(this);
-        this.addEventListener('field.value-changed', this._handleInput);
-      },
+  @property({type: String})
+  format = 'DD MMM YYYY';
 
-      _removeEventListeners: function () {
-        this.removeEventListener('field.value-changed', this._handleInput);
-      },
-
-      attached: function () {
-        this._addEventListeners();
-        this._filterReady();
-      },
-
-      detached: function () {
-        this._removeEventListeners();
-      },
+  _handleInput() {
+    var newValue = this.$.field.value;
+    //initially this.fire
+    fireEvent('filter-changed', {
+      name: this.name,
+      value: newValue,
     });
-  </script>
-</dom-module>
+  };
+
+  _addEventListeners() {
+    this._handleInput = this._handleInput.bind(this);
+    this.addEventListener('field.value-changed', this._handleInput);
+  };
+
+  _removeEventListeners() {
+    this.removeEventListener('field.value-changed', this._handleInput);
+  };
+
+  attached() {
+    this._addEventListeners();
+    this._filterReady();
+  };
+
+  detached() {
+    this._removeEventListeners();
+  };
+}
+
+window.customElements.define('date-filter', DateFilter);

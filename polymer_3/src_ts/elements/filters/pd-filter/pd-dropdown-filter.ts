@@ -1,14 +1,19 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
-
-<dom-module id="pd-dropdown-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -27,64 +32,49 @@
       value="[[value]]"
       data="[[data]]">
     </dropdown-filter-multi>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'pd-dropdown-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)', observer: '_fetchPDs'})
+  programmeDocumentsUrl!: string;
 
-      properties: {
-        programmeDocumentsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentsUrl(locationId)',
-          observer: '_fetchPDs',
-        },
+  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  locationId!: string;
 
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
+  @property({type: String})
+  computedValue!: string;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: String})
+  value!: string;
 
-        value: String,
-      },
+  @property({type: Array})
+  data = [];
 
-      _computeProgrammeDocumentsUrl: function (locationId) {
-        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
+  _computeProgrammeDocumentsUrl(locationId: string) {
+    return locationId ? Endpoints.programmeDocuments(locationId) : '';
+  };
 
-      _fetchPDs: function (url) {
-        var self = this;
+  _fetchPDs(url: string) {
+    var self = this;
 
-        if (!url) {
-          return;
-        }
+    if (!url) {
+      return;
+    }
 
-        this.$.programmeDocuments.abort();
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
+      .then(function(res) {
+        self.set('data', res.data.results);
+      })
+      .catch(function(err) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-        this.$.programmeDocuments.thunk()()
-            .then(function (res) {
-              self.set('data', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+  detached() {
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();;
+  };
+}
 
-      detached: function () {
-        this.$.programmeDocuments.abort();
-      },
-
-    });
-  </script>
-</dom-module>
+window.customElements.define('pd-dropdown-filter', PDDropdownFilter);

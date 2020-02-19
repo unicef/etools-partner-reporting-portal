@@ -1,13 +1,20 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="partner-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -25,80 +32,75 @@
       value="[[computedValue]]"
       data="[[data]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'partner-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeUrl(responsePlanID)', observer: '_fetchPartnerNames'})
+  partnerNamesUrl!: string;
 
-      properties: {
-        data: Array,
-        value: String,
-        computedValue: String,
-        required: Boolean,
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-        partnerNamesUrl: {
-          type: String,
-          computed: '_computeUrl(responsePlanID)',
-          observer: '_fetchPartnerNames',
-        },
+  @property({type: String})
+  computedValue!: string;
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
-      },
+  @property({type: String})
+  value!: string;
 
-      observers: [
-        '_computeValue(data, value)',
-      ],
+  @property({type: Array})
+  data = [];
 
-      _computeUrl: function (responsePlanID) {
-        return App.Endpoints.clusterPartnerNames(responsePlanID);
-      },
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  };
 
-      _computeValue: function (data, value) {
-        this.debounce('compute-value', function () {
-          var index = data.findIndex(function (item) {
-            return value === String(item.id);
-          });
+  static get observers() {
+    return ['_computeValue(data, value)'];
+  }
 
-          this.set('computedValue', data[index === -1 ? 0 : index].id);
-        }, 100);
-      },
+  _computeUrl(responsePlanID: string) {
+    return Endpoints.clusterPartnerNames(responsePlanID);
+  };
 
-      _fetchPartnerNames: function () {
-        var self = this;
+  _computeValue(data, value) {
+    this._debouncer = Polymer.Debouncer.debounce('compute-value',
+      Polymer.Async.timeOut.after(250),
+      function() {
+        var index = data.findIndex(function(item) {
+          return value === String(item.id);
+        });
 
-        this.$.partnerNames.abort();
+        this.set('computedValue', data[index === -1 ? 0 : index].id);
+      }, 100);
+  };
 
-        this.$.partnerNames.thunk()()
-            .then(function (res) {
-              var data = (self.required ? [] : [{
-                id: '',
-                title: 'All',
-              }]).concat(res.data);
+  _fetchPartnerNames() {
+    var self = this;
 
-              self.set('data', data);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+    // this.$.partnerNames.abort();
+    (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
+    (this.$.activities as EtoolsPrpAjaxEl).thunk()()
+      .then(function(res: any) {
+        var data = (self.required ? [] : [{
+          id: '',
+          title: 'All',
+        }]).concat(res.data);
 
-      detached: function () {
-        this.$.partnerNames.abort();
+        self.set('data', data);
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-        if (this.isDebouncerActive('compute-value')) {
-          this.cancelDebouncer('compute-value');
-        }
-      },
-    });
-  </script>
-</dom-module>
+  detached() {
+    (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
+
+    if (Debouncer.isActive('compute-value')) {
+      Debouncer.cancel('compute-value');
+    }
+  };
+}
+
+window.customElements.define('partner-filter', PartnerFilter);

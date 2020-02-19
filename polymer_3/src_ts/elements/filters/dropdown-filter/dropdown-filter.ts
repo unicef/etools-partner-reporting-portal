@@ -1,17 +1,24 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '@polymer/paper-item/paper-item';
+import '@polymer/paper-listbox/paper-listbox';
+//<link rel="import" href="../../../polyfills/es6-shim.html">\
 
-<link rel="import" href="../../../polyfills/es6-shim.html">
-<link rel="import" href="../../../behaviors/filter.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
+import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
+import FilterMixin from '../../../mixins/filter-mixin';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {fireEvent} from '../../../utils/fire-custom-event';
 
-
-<dom-module id="dropdown-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin FilterMixin
+ * @appliesMixin LocalizeMixin
+ */
+class DropdownFilter extends FilterMixin(LocalizeMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -43,80 +50,68 @@
         </template>
       </paper-listbox>
     </paper-dropdown-menu>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'dropdown-filter',
 
-      behaviors: [
-        App.Behaviors.FilterBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Boolean})
+  disabled!: boolean;
 
-      properties: {
-        data: {
-          type: Array,
-          value: [],
-          observer: '_handleData',
-        },
+  @property({type: Number})
+  selected!: number;
 
-        value: {
-          type: String,
-          value: '',
-        },
+  @property({type: String})
+  value = '';
 
-        selected: Number,
+  @property({type: Array, observer: '_handleData'})
+  data = [];
 
-        disabled: Boolean
-      },
 
-      observers: [
-        '_updateSelected(value, data)',
-      ],
+  public static get observers() {
+    return [
+      '_updateSelected(value, data)',
+    ]
+  }
 
-      _handleChange: function (e) {
-        var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+  _handleChange(e: CustomEvent) {
+    var newValue = this.$.repeat.itemForElement(e.detail.item).id;
 
-        this.fire('filter-changed', {
-          name: this.name,
-          value: String(newValue),
-        });
-      },
-
-      _updateSelected: function (value, data) {
-        this.async(function () {
-          this.set('selected', data.findIndex(function (item) {
-            return String(item.id) === String(value);
-          }));
-        });
-      },
-
-      _handleData: function (data) {
-        if (data.length) {
-          this._filterReady();
-        }
-      },
-
-      _addEventListeners: function () {
-        this._handleChange = this._handleChange.bind(this);
-        this.addEventListener('field.iron-select', this._handleChange);
-      },
-
-      _removeEventListeners: function () {
-        this.removeEventListener('field.iron-select', this._handleChange);
-      },
-
-      attached: function () {
-        this._addEventListeners();
-      },
-
-      detached: function () {
-        this._removeEventListeners();
-      },
+    fireEvent('filter-changed', {
+      name: this.name,
+      value: String(newValue),
     });
-  </script>
-</dom-module>
+  };
+
+  _updateSelected(value: String, data: any) {
+    this.async(function() {
+      this.set('selected', data.findIndex(function(item: any) {
+        return String(item.id) === String(value);
+      }));
+    });
+  };
+
+  _handleData(data: any) {
+    if (data.length) {
+      this._filterReady();
+    }
+  };
+
+  _addEventListeners() {
+    this._handleChange = this._handleChange.bind(this);
+    this.addEventListener('field.iron-select', this._handleChange);
+  };
+
+  _removeEventListeners() {
+    this.removeEventListener('field.iron-select', this._handleChange);
+  };
+
+  attached() {
+    this._addEventListeners();
+  };
+
+  detached() {
+    this._removeEventListeners();
+  };
+}
+
+window.customElements.define('dropdown-filter', DropdownFilter);

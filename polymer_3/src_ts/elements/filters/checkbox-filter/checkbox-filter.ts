@@ -1,8 +1,9 @@
 import {html} from '@polymer/polymer';
-import "@polymer/paper-checkbox/paper-checkbox";
+import '@polymer/paper-checkbox/paper-checkbox';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
 // <link rel="import" href="../../../behaviors/filter.html">
 // <link rel="import" href="../../../behaviors/utils.html">
 /**
@@ -20,7 +21,7 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
         display: block;
       }
 
-      ::content .checkbox-label {
+      ::slotted() .checkbox-label {
         font-size: 12px;
       }
     </style>
@@ -46,16 +47,18 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
   value = '';
 
   _handleInput() {
-    this.debounce('change', function propagateChange() {
-      var newValue = '' + this._toNumber(this.$.field.checked);
+    this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+      Polymer.Async.timeOut.after(250),
+      () => {
+        var newValue = '' + this._toNumber(this.$.field.checked);
 
-      if (newValue !== this.lastValue) {
-        this.fire('filter-changed', {
-          name: this.name,
-          value: newValue,
-        });
-      }
-    }, this._debounceDelay);
+        if (newValue !== this.lastValue) {
+          this.fire('filter-changed', {
+            name: this.name,
+            value: newValue,
+          });
+        }
+      }, this._debounceDelay);
   };
 
   _computeChecked(value: string) {
@@ -78,8 +81,8 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
 
   detached() {
     this._removeEventListeners();
-    if (this.isDebouncerActive('change')) {
-      this.cancelDebouncer('change');
+    if (Debouncer.isActive('change')) {
+      Debouncer.cancel('change');
     }
   }
 }

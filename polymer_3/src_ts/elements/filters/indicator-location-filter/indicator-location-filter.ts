@@ -1,13 +1,19 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="indicator-location-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -25,62 +31,45 @@
         value="[[value]]"
         data="[[data]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'indicator-location-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanID)', observer: '_fetchLocationNames'})
+  locationNamesUrl!: string;
 
-      properties: {
-        locationNamesUrl: {
-          type: String,
-          computed: '_computeLocationNamesUrl(responsePlanID)',
-          observer: '_fetchLocationNames',
-        },
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: String})
+  value = '';
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: Array})
+  data = [];
 
-        value: String,
-      },
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  };
 
-      _computeLocationNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterIndicatorLocations(responsePlanID);
-      },
+  _fetchLocationNames() {
+    var self = this;
 
-      _fetchLocationNames: function () {
-        var self = this;
+    (this.$.locationNames as EtoolsPrpAjaxEl).abort();
+    (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
+      .then(function(res: any) {
+        self.set('data', [{
+          id: '',
+          title: 'All',
+        }].concat(res.data));
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-        this.$.locationNames.abort();
+  detached() {
+    (this.$.locationNames as EtoolsPrpAjaxEl).abort();
+  };
+}
 
-        this.$.locationNames.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      detached: function () {
-        this.$.locationNames.abort();
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('indicator-location-filter', IndicatorLocationFilter);

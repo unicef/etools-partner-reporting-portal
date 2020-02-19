@@ -1,12 +1,16 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {PolymerElement, html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-
-<dom-module id="partner-project-filter-multi">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ */
+class PartnerProjectFilterMulti extends PolymerElement {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -24,57 +28,52 @@
         value="[[value]]"
         data="[[data]]">
     </dropdown-filter-multi>
-	</template>
+  `;
+  }
 
-	<script>
-    Polymer({
-      is: 'partner-project-filter-multi',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
+  @property({type: String, computed: '_computePartnerProjectsUrl(responsePlanId)', observer: '_fetchPartnerProjects'})
+  partnerProjectsUrl!: string;
 
-      properties: {
-        partnerProjectsUrl: {
-          type: String,
-          computed: '_computePartnerProjectsUrl(responsePlanId)',
-          observer: '_fetchPartnerProjects',
-        },
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-        responsePlanId: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: Array})
+  data = [];
 
-        value: String,
-      },
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  };
 
-      _computePartnerProjectsUrl: function (responsePlanId) {
-        return App.Endpoints.plannedActions(responsePlanId);
-      },
+  static get observers() {
+    return ['_computeValue(data, value)'];
+  }
 
-      _fetchPartnerProjects: function () {
-        var self = this;
 
-        this.$.partnerProjects.abort();
+  _computeUrl(responsePlanID: string) {
+    return Endpoints.plannedActions(responsePlanID);
+  };
 
-        this.$.partnerProjects.thunk()()
-            .then(function (res) {
-              self.set('data', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+  _fetchPartnerProjects() {
+    var self = this;
 
-      detached: function () {
-        this.$.partnerProjects.abort();
-      },
-    });
-  </script>
-</dom-module>
+    // this.$.partnerProjects.abort();
+    (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
+    (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
+      .then(function(res: any) {
+        self.set('data', res.data.results);
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
+
+  detached() {
+    (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
+  };
+}
+
+window.customElements.define('partner-project-filter-multi', PartnerProjectFilterMulti);

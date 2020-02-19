@@ -1,14 +1,24 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import "../dropdown-filter/searchable-dropdown-filter.html";
+import "../../etools-prp-ajax.html";
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import Endpoints from "../../../endpoints";
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 
-<dom-module id="location-filter-multi">
-  <template>
+
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin FilterDependenciesMixin
+ */
+class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -26,63 +36,54 @@
         value="[[value]]"
         data="[[data]]">
     </dropdown-filter-multi>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'location-filter-multi',
+  @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
+  locationsUrl = '';
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: 'getReduxStateArray(state.location.id)'})
+  locationId = [];
 
-      properties: {
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(locationId)',
-          observer: '_fetchLocations',
-        },
+  @property({type: Array})
+  data!: any;
 
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
+  @property({type: Boolean})
+  pending = false;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: String})
+  value!: string;
 
-        value: String,
-      },
+  //@Lajos not sure about this
+  static get observers() {
+    return ['_fetchLocations(locationsUrl, params)'];
+  }
 
-      _computeLocationsUrl: function (locationId) {
-        return locationId ? App.Endpoints.locations(locationId) : '';
-      },
+  _computeActivitiesUrl(locationId: string) {
+    return locationId ? Endpoints.locations(locationId) : '';
+  };
 
-      _fetchLocations: function (url) {
-        var self = this;
+  _fetchLocations(url: string) {
+    var self = this;
 
-        if (!url) {
-          return;
-        }
+    if (!url) {
+      return;
+    }
 
-        this.$.locations.abort();
+    (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-        this.$.locations.thunk()()
-            .then(function (res) {
-              self.set('data', res.data);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
+    (this.$.locations as EtoolsPrpAjaxEl).thunk()
+      .then(function(res: any) {
+        self.set('data', res.data);
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-      detached: function () {
-        this.$.locations.abort();
-      },
-    });
-  </script>
-</dom-module>
+  detached() {
+    (this.$.locations as EtoolsPrpAjaxEl).abort();
+  };
+}
+
+window.customElements.define('location-filter-multi', LocationFilterMulti);

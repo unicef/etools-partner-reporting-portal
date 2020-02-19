@@ -1,14 +1,19 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
-
-<dom-module id="location-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -26,66 +31,49 @@
         value="[[value]]"
         data="[[data]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'location-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
+  locationsUrl!: string;
 
-      properties: {
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(locationId)',
-          observer: '_fetchLocations',
-        },
+  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  locationId!: string;
 
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
+  @property({type: String})
+  value = '';
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: Array})
+  data = [];
 
-        value: String,
-      },
+  _computeLocationsUrl(locationId: string) {
+    return locationId ? Endpoints.locations(locationId) : '';
+  };
 
-      _computeLocationsUrl: function (locationId) {
-        return locationId ? App.Endpoints.locations(locationId) : '';
-      },
+  _fetchLocations(url: string) {
+    var self = this;
 
-      _fetchLocations: function (url) {
-        var self = this;
+    if (!url) {
+      return;
+    }
 
-        if (!url) {
-          return;
-        }
+    (this.$.locations as EtoolsPrpAjaxEl).abort();
+    (this.$.locations as EtoolsPrpAjaxEl).thunk()()
+      .then(function(res: any) {
+        self.set('data', [{
+          id: '',
+          title: 'All',
+        }].concat(res.data));
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-        this.$.locations.abort();
+  detached() {
+    (this.$.locations as EtoolsPrpAjaxEl).abort();
+  };
+}
 
-        this.$.locations.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      detached: function () {
-        this.$.locations.abort();
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('location-filter', LocationFilter);

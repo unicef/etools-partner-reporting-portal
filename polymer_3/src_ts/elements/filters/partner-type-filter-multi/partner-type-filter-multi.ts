@@ -1,10 +1,16 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="partner-type-filter-multi">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class PartnerTypeFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -18,43 +24,28 @@
         data="[[data]]"
         hide-search>
     </dropdown-filter-multi>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'partner-type-filter-multi',
+  @property({type: Array})
+  data = [
+    {
+      id: 'B/M',
+      title: 'Bilateral / Multilateral',
+    },
+    {
+      id: 'CSO',
+      title: 'Civil Society Organization',
+    },
+    {
+      id: 'Gov',
+      title: 'Government',
+    },
+    {
+      id: 'UNA',
+      title: 'UN Agency',
+    },
+  ];
+}
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
-
-      properties: {
-        data: {
-          type: Array,
-          value: [
-            {
-              id: 'B/M',
-              title: 'Bilateral / Multilateral',
-            },
-            {
-              id: 'CSO',
-              title: 'Civil Society Organization',
-            },
-            {
-              id: 'Gov',
-              title: 'Government',
-            },
-            {
-              id: 'UNA',
-              title: 'UN Agency',
-            },
-          ],
-        },
-
-        value: String,
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('partner-type-filter-multi', PartnerTypeFilterMulti);

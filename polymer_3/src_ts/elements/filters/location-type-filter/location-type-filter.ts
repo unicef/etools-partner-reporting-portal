@@ -1,11 +1,17 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import Settings from '../../../settings';
+import '../dropdown-filter/searchable - dropdown - filter';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../../../settings.html">
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="location-type-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -18,41 +24,28 @@
       value="[[value]]"
       data="[[data]]">
     </dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'location-type-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Number})
+  maxLocType = Settings.cluster.maxLocType;
 
-      properties: {
-        maxLocType: {
-          type: Number,
-          value: App.Settings.cluster.maxLocType,
-        },
+  @property({type: Array, computed: '_computeData(maxLocType)'})
+  data!: any;
 
-        data: {
-          type: Array,
-          computed: '_computeData(maxLocType)',
-        },
+  @property({type: String})
+  value = '';
 
-        value: String,
-      },
+  _computeData(maxLocType: number) {
+    return Array.apply(null, Array(maxLocType + 1))
+      .map(function(_, index) {
+        return {
+          id: String(index),
+          title: 'Admin' + index,
+        };
+      });
+  },
+}
 
-      _computeData: function (maxLocType) {
-        return Array.apply(null, Array(maxLocType + 1))
-            .map(function (_, index) {
-              return {
-                id: String(index),
-                title: 'Admin' + index,
-              };
-            });
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('location-type-filter', LocationTypeFilter);

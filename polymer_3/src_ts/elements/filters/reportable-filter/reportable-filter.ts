@@ -1,13 +1,20 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import '../../../redux/selectors/llos';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../redux/selectors/llos.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
-
-<dom-module id="reportable-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -21,46 +28,32 @@
         value="[[value]]"
         data="[[options]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'reportable-filter',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Array, computed: '_computeOptions(data)'})
+  options!: any;
 
-      properties: {
-        value: String,
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          statePath: App.Selectors.LLOs.all,
-        },
+  @property({type: Array, computed: 'getReduxStateArray(state.App.Selectors.LLOs.all)'})
+  data = [];
 
-        options: {
-          type: Array,
-          value: [],
-          computed: '_computeOptions(data)',
-        },
-      },
-
-      _computeOptions: function (data) {
-        var other = data.map(function (item) {
-          return {
-            id: String(item.id),
-            title: item.title,
-          };
-        });
-
-        return [{
-          id: '',
-          title: 'All',
-        }].concat(other);
-      },
+  _computeOptions(data: any) {
+    var other = data.map(function(item: any) {
+      return {
+        id: String(item.id),
+        title: item.title,
+      };
     });
-  </script>
-</dom-module>
+
+    return [{
+      id: '',
+      title: 'All',
+    }].concat(other);
+  };
+}
+
+window.customElements.define('reportable-filter', ReportableFilters);

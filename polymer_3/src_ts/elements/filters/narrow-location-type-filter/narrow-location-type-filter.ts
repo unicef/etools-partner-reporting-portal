@@ -1,14 +1,22 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+import {html} from '@polymer/polymer';
+import Settings from '../../../settings';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import Endpoints from "../../../endpoints";
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
-<link rel="import" href="../../../settings.html">
-<link rel="import" href="../../../behaviors/filter-dependencies.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
-
-<dom-module id="narrow-location-type-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin FilterDependenciesMixin
+ */
+class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -31,75 +39,57 @@
         data="[[data]]"
         disabled="[[disabled]]">
     </dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'narrow-location-type-filter',
 
-      behaviors: [
-        App.Behaviors.FilterDependenciesBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Number})
+  maxLocType = Settings.cluster.maxLocType;
 
-      properties: {
-        data: {
-          type: Array,
-          computed: '_computeData(params, maxLocType)',
-        },
+  @property({type: Array, computed: '_computeData(params, maxLocType)'})
+  data!: any;
 
-        maxLocType: {
-          type: Number,
-          value: App.Settings.cluster.maxLocType,
-        },
+  @property({type: Boolean, computed: '_computeDisabled(data)'})
+  disabled!: boolean;
 
-        disabled: {
-          type: Boolean,
-          computed: '_computeDisabled(data)',
-        },
+  @property({type: String, computed: '_computeFieldValue(value, data, params.loc_type, maxLocType)'})
+  fieldValue!: string;
 
-        fieldValue: {
-          type: String,
-          computed: '_computeFieldValue(value, data, params.loc_type, maxLocType)',
-        },
+  @property({type: String})
+  value = '';
 
-        value: String,
+  _computeData(params: any, maxLocType: number) {
+    var validData = Array.apply(null, Array(maxLocType + 1))
+      .map(function(_, index) {
+        return {
+          id: String(index),
+          title: 'Admin' + index,
+        };
+      })
+      .slice(Number(params.loc_type) + 1);
+
+    return [
+      {
+        id: '',
+        title: 'None',
       },
+    ].concat(validData);
+  };
 
-      _computeData: function (params, maxLocType) {
-        var validData = Array.apply(null, Array(maxLocType + 1))
-            .map(function (_, index) {
-              return {
-                id: String(index),
-                title: 'Admin' + index,
-              };
-            })
-            .slice(Number(params.loc_type) + 1);
+  _computeDisabled(data: any) {
+    return data && data.length === 1;
+  };
 
-        return [
-          {
-            id: '',
-            title: 'None',
-          },
-        ].concat(validData);
-      },
+  _computeFieldValue(value: string, data: any, locType: string, maxLocType: number) {
+    switch (true) {
+      case !value:
+      case data.length === 1:
+        return data[0].id;
 
-      _computeDisabled: function (data) {
-        return data && data.length === 1;
-      },
+      default:
+        return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
+    }
+  };
+}
 
-      _computeFieldValue: function (value, data, locType, maxLocType) {
-        switch (true) {
-          case !value:
-          case data.length === 1:
-            return data[0].id;
-
-          default:
-            return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
-        }
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('narrow-location-type-filter', NarrowLocationTypeFilter);

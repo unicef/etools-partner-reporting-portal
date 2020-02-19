@@ -1,12 +1,20 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/dropdown - filter - multi'
+import {store} from "../../../redux/store"
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import UtilsMixin from '../../../mixins/utils-mixin';
+import {ReduxConnectedElement} from '../../../ ReduxConnectedElement';
 
-<link rel="import" href="../../../behaviors/utils.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
-<link rel="import" href="../../../redux/store.html">
-
-<dom-module id="cluster-indicator-type-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin UtilsMixin
+ */
+class ClusterIndicatorTypeFilter extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -19,70 +27,51 @@
       value="[[_withDefault(value, '')]]"
       data="[[data]]">
     </dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'cluster-indicator-type-filter',
+  @property({type: Boolean, computed: '_computeRole(currentUserRoles)'})
+  isPartner!: boolean;
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Array, computed: 'getReduxStateArray(state.userProfile.profile.prp_roles)'})
+  currentUserRoles!: any;
 
-      properties: {
-        isPartner: {
-          type: Boolean,
-          computed: '_computeRole(currentUserRoles)',
-        },
+  @property({type: Array})
+  data = [];
 
-        currentUserRoles: {
-          type: Array,
-          statePath: 'userProfile.profile.prp_roles'
-        },
+  @property({type: Array, computed: '_computeLocalizedOptions(localize)'})
+  options!: any;
 
-        options: {
-          type: Array,
-          computed: '_computeLocalizedOptions(localize)'
-        },
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          computed: '_computeData(isPartner, options)',
-        },
+  _computeLocalizedOptions(localize: any) {
+    var options = [
+      {title: localize('all'), id: ''},
+      {title: localize('partner_activity'), id: 'partner_activity'},
+      {title: localize('partner_project'), id: 'partner_project'},
+      {title: localize('cluster_objective'), id: 'cluster_objective'},
+      {title: localize('cluster_activity'), id: 'cluster_activity'},
+    ];
 
-        value: String,
-      },
+    return options;
+  };
 
-      _computeLocalizedOptions: function (localize) {
-        var options = [
-          {title: localize('all'), id: ''},
-          {title: localize('partner_activity'), id: 'partner_activity'},
-          {title: localize('partner_project'), id: 'partner_project'},
-          {title: localize('cluster_objective'), id: 'cluster_objective'},
-          {title: localize('cluster_activity'), id: 'cluster_activity'},
-        ];
+  _computeData(isPartner: boolean, options: any) {
+    if (isPartner) {
+      return options.filter(function(option: any) {
+        return option.id !== 'cluster_objective';
+      });
+    }
 
-        return options;
-      },
+    return options;
+  },
 
-      _computeData: function (isPartner, options) {
-        if (isPartner) {
-          return options.filter(function (option) {
-            return option.id !== 'cluster_objective';
-          });
-        }
-
-        return options;
-      },
-
-      _computeRole: function (roles) {
-        return roles.every(function (role) {
-          return role.role !== 'CLUSTER_IMO';
-        });
-      },
+  _computeRole(roles: any) {
+    return roles.every(function(role: any) {
+      return role.role !== 'CLUSTER_IMO';
     });
-  </script>
-</dom-module>
+  },
+}
+
+window.customElements.define('cluster-indicator-type-filter', ClusterIndicatorTypeFilter);

@@ -1,16 +1,24 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+import {html} from '@polymer/polymer';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '../dropdown-filter/dropdown-filter-multi';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import Endpoints from '../../../endpoints';
+import {GenericObject} from '../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/filter-dependencies.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="cluster-objective-filter-multi">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin FilterDependenciesMixin
+ */
+class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -39,90 +47,71 @@
         data="[[data]]"
         disabled="[[pending]]">
     </dropdown-filter-multi>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'cluster-objective-filter-multi',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.FilterDependenciesBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeObjectivesUrl(responsePlanId)'})
+  objectivesUrl!: string;
 
-      properties: {
-        objectivesUrl: {
-          type: String,
-          computed: '_computeObjectivesUrl(responsePlanId)',
-        },
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-        responsePlanId: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: Array})
+  data = [];
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: Object, computed: '_computeObjectivesParams(params)', observer: '_fetchObjectives'})
+  objectivesParams!: GenericObject;
 
-        objectivesParams: {
-          type: Object,
-          computed: '_computeObjectivesParams(params)',
-          observer: '_fetchObjectives',
-        },
+  @property({type: String})
+  value!: string;
 
-        pending: {
-          type: Boolean,
-          value: false,
-        },
+  @property({type: Boolean})
+  pending = false;
 
-        value: String,
-      },
+  _computeObjectivesUrl(responsePlanId: string) {
+    return Endpoints.responseParametersClusterObjectives(responsePlanId);
+  },
 
-      _computeObjectivesUrl: function (responsePlanId) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
-      },
+  _computeObjectivesParams(params: GenericObject) {
+    var objectivesParams = {
+      page_size: 99999,
+    };
 
-      _computeObjectivesParams: function (params) {
-        var objectivesParams = {
-          page_size: 99999,
-        };
+    if (params.clusters) {
+      objectivesParams.cluster_ids = params.clusters;
+    }
 
-        if (params.clusters) {
-          objectivesParams.cluster_ids = params.clusters;
-        }
+    return objectivesParams;
+  },
 
-        return objectivesParams;
-      },
+  _fetchObjectives() {
+    this._debouncer = Polymer.Debouncer.debounce('fetch-objectives',
+      Polymer.Async.timeOut.after(250),
+      function() {
+        var self = this;
+        const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
+        this.set('pending', true);
 
-      _fetchObjectives: function () {
-        this.debounce('fetch-objectives', function () {
-          var self = this;
+        (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
-          this.set('pending', true);
+        thunk()
+          .then(function(res: any) {
+            self.set('pending', false);
+            self.set('data', res.data.results);
+          })
+          .catch(function(err: any) { // jshint ignore:line
+            // TODO: error handling
+            self.set('pending', false);
+          });
+      });
+  };
 
-          this.$.objectives.abort();
+  detached() {
+    if (Debouncer.isActive('fetch-objectives')) {
+      Debouncer.cancel('fetch-objectives');
+    }
+  },
+}
 
-          this.$.objectives.thunk()()
-              .then(function (res) {
-                self.set('pending', false);
-                self.set('data', res.data.results);
-              })
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-                self.set('pending', false);
-              });
-        });
-      },
-
-      detached: function () {
-        if (this.isDebouncerActive('fetch-objectives')) {
-          this.cancelDebouncer('fetch-objectives');
-        }
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('cluster-objective-filter-multi', ClusterObjectiveFilterMulti);

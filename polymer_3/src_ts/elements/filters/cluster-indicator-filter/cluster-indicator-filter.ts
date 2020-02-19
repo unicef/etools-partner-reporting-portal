@@ -1,13 +1,22 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import "../dropdown-filter/dropdown-filter-multi";
+import "../../etools-prp-ajax";
+import "../../../endpoints";
+import {store} from "../../../redux/store"
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import Endpoints from "../../../endpoints"
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="cluster-indicator-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin LocalizeMixin
+ */
+class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -25,62 +34,45 @@
         value="[[value]]"
         data="[[data]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'cluster-indicator-filter',
+  @property({type: String, computed: '_computeIndicatorNamesUrl(responsePlanID)', observer: '_fetchIndicatorNames'})
+  indicatorNamesUrl!: string;
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-      properties: {
-        indicatorNamesUrl: {
-          type: String,
-          computed: '_computeIndicatorNamesUrl(responsePlanID)',
-          observer: '_fetchIndicatorNames',
-        },
+  @property({type: Array})
+  data = [];
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  _computeIndicatorNamesUrl(responsePlanId: string) {
+    return Endpoints.clusterNames(responsePlanId);
+  };
 
-        value: String,
-      },
+  _fetchIndicatorNames() {
+    var self = this;
+    const thunk = (this.$.indicatorNames as EtoolsPrpAjaxEl).thunk();
+    (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
 
-      _computeIndicatorNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterIndicatorNames(responsePlanID);
-      },
+    thunk()
+      .then(function(res: any) {
+        self.set('data', [{
+          id: '',
+          title: 'All',
+        }].concat(res.data));
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-      _fetchIndicatorNames: function () {
-        var self = this;
+  detached() {
+    (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
+  };
+}
 
-        this.$.indicatorNames.abort();
-
-        this.$.indicatorNames.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      detached: function () {
-        this.$.indicatorNames.abort();
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('cluster-indicator-filter', ClusterIndicatorFilter);

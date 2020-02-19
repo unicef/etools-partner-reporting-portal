@@ -1,16 +1,25 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+import {html} from '@polymer/polymer';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '../dropdown-filter/dropdown-filter-multi';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from ''../../../ ReduxConnectedElement';
+import Endpoints from "../../../endpoints";
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import {GenericObject} from '../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/filter-dependencies.html">
-<link rel="import" href="../../../behaviors/localize.html">
 
-<dom-module id="cluster-project-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin FilterDependenciesMixin
+ */
+class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -38,74 +47,60 @@
         value="[[value]]"
         data="[[data]]">
     </searchable-dropdown-filter>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'cluster-project-filter',
+  @property({type: Object})
+  queryParams!: GenericObject;
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.FilterDependenciesBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: '_computeProjectNamesUrl(responsePlanID)'})
+  projectNamesUrl = '';
 
-      properties: {
-        queryParams: Object,
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-        projectNamesUrl: {
-          type: String,
-          computed: '_computeProjectNamesUrl(responsePlanID)',
-        },
+  @property({type: Array})
+  data = [];
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  static get observers() {
+    return ['_fetchProjectNames(projectNamesUrl, params)'];
+  }
 
-        value: String,
-      },
+  _computeProjectNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterProjectNames(responsePlanID);
+  };
 
-      observers: [
-        '_fetchProjectNames(projectNamesUrl, params)',
-      ],
+  _fetchProjectNames() {
+    this._debouncer = Polymer.Debouncer.debounce('fetch-project-names',
+      Polymer.Async.timeOut.after(250),
+      function() {
+        var self = this;
+        const thunk = (this.$.projectNames as EtoolsPrpAjaxEl).thunk();
+        (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-      _computeProjectNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterProjectNames(responsePlanID);
-      },
+        thunk()
+          .then(function(res: any) {
+            self.set('data', [{
+              id: '',
+              title: 'All',
+            }].concat(res.data));
+          })
+          .catch(function(err: any) { // jshint ignore:line
+            // TODO: error handling
+          });
+      }, 100);
+  };
 
-      _fetchProjectNames: function () {
-        this.debounce('fetch-project-names', function () {
-          var self = this;
+  detached() {
+    (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-          this.$.projectNames.abort();
+    if (Debouncer.isActive('fetch-project-names')) {
+      Debouncer.cancel('fetch-project-names');
+    }
+  };
+}
 
-          this.$.projectNames.thunk()()
-              .then(function (res) {
-                self.set('data', [{
-                  id: '',
-                  title: 'All',
-                }].concat(res.data));
-              })
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        }, 100);
-      },
-
-      detached: function () {
-        this.$.projectNames.abort();
-
-        if (this.isDebouncerActive('fetch-project-names')) {
-          this.cancelDebouncer('fetch-project-names');
-        }
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('cluster-project-filter', ClusterProjectFilter);

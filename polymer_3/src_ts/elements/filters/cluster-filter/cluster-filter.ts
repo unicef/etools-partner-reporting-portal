@@ -1,12 +1,12 @@
 import {html} from '@polymer/polymer';
-import "@polymer/iron-location/iron-location";
-import "@polymer/iron-location/iron-query-params";
-import "../dropdown-filter/searchable-dropdown-filter.html";
-import "../../etools-prp-ajax.html";
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '../dropdown-filter/searchable-dropdown-filter.html';
+import '../../etools-prp-ajax.html";
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
-import Endpoints from "../../../endpoints";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import Endpoints from ''../../../ endpoints';
 import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 
@@ -104,17 +104,3 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
 }
 
 window.customElements.define('cluster-filter', ClusterFilter);
-
-
-
-
-// <link rel="import" href = "../../../../bower_components/polymer/polymer.html" >
-// <link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-// <link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
-
-// <link rel="import" href="../dropdown-filter/dropdown-filter.html">
-// <link rel="import" href="../../etools-prp-ajax.html">
-// <link rel="import" href="../../../endpoints.html">
-// <link rel="import" href="../../../redux/store.html">
-// <link rel="import" href="../../../behaviors/localize.html">
-// <link rel="import" href="../../../behaviors/filter-dependencies.html">

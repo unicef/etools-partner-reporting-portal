@@ -1,11 +1,18 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+import {html} from '@polymer/polymer';
+import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
+import FilterMixin from '../../../mixins/filter-mixin';
+//<link rel="import" href="../../../polyfills/es6-shim.html">
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {fireEvent} from '../../../utils/fire-custom-event';
 
-<link rel="import" href="../../../polyfills/es6-shim.html">
-<link rel="import" href="../../../behaviors/filter.html">
-
-<dom-module id="dropdown-filter-multi">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin FilterMixin
+ */
+class DropdownFilterMulti extends FilterMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -26,74 +33,66 @@
         hide-search="[[hideSearch]]"
         disabled="[[disabled]]">
     </etools-multi-selection-menu>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'dropdown-filter-multi',
 
-      behaviors: [
-        App.Behaviors.FilterBehavior,
-      ],
+  @property({type: Boolean})
+  disabled!: boolean;
 
-      properties: {
-        disabled: Boolean,
-        hideSearch: Boolean,
+  @property({type: Boolean})
+  hideSearch!: boolean;
 
-        data: {
-          type: Array,
-          value: function () {
-            return [];
-          },
-          observer: '_handleData',
-        },
+  @property({type: Array, observer: '_handleData'})
+  data = function() {
+    return [];
+  };
 
-        selectedValues: {
-          type: Array,
-          value: function () {
-            return [];
-          },
-        },
-      },
+  @property({type: Array})
+  selectedValues = function() {
+    return [];
+  };
 
-      observers: [
-        '_setSelectedValues(value, data)',
-      ],
+  public static get observers() {
+    return [
+      '_setSelectedValues(value, data)',
+    ]
+  }
+  _handleChange(e: CustomEvent, change: any) {
+    var newValue;
 
-      _handleChange: function (e, change) {
-        var newValue;
+    if (change.path === 'selectedValues.splices') {
+      newValue = change.value.indexSplices[0].object;
+    } else if (!change.path) {
+      newValue = change.value;
+    }
 
-        if (change.path === 'selectedValues.splices') {
-          newValue = change.value.indexSplices[0].object;
-        } else if (!change.path) {
-          newValue = change.value;
-        }
+    if (typeof newValue === 'undefined') {
+      return;
+    }
 
-        if (typeof newValue === 'undefined') {
-          return;
-        }
-
-        this.fire('filter-changed', {
-          name: this.name,
-          value: String(newValue || ''),
-        });
-      },
-
-      _handleData: function (data) {
-        if (data.length) {
-          this._filterReady();
-        } else if (this.name === 'location') {
-          // Locations get populated by PDs so user can filter by location, so if there are no PDs,
-          // there are no locations - in that case, fire filterReady method to have filters stop loading.
-          this._filterReady();
-        }
-      },
-
-      _setSelectedValues: function (value) {
-        this.async(function () {
-          this.set('selectedValues', value.split(',').filter(Boolean));
-        });
-      },
+    //@Lajos please take a look
+    fireEvent('filter-changed', {
+      name: this.name,
+      value: String(newValue || ''),
     });
-  </script>
-</dom-module>
+  };
+
+  _handleData(data) {
+    if (data.length) {
+      this._filterReady();
+    } else if (this.name === 'location') {
+      // Locations get populated by PDs so user can filter by location, so if there are no PDs,
+      // there are no locations - in that case, fire filterReady method to have filters stop loading.
+      this._filterReady();
+    }
+  };
+
+  _setSelectedValues(value: any) {
+    this.async(function() {
+      this.set('selectedValues', value.split(',').filter(Boolean));
+    });
+  };
+}
+
+window.customElements.define('dropdown-filter-multi', DropdownFilterMulti);

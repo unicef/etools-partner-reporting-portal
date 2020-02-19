@@ -1,10 +1,19 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+import {html} from '@polymer/polymer';
+//@Lajos needs to be checked
+import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
+import FilterMixin from '../../../mixins/filter-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {GenericObject} from '../../../typings/globals.types';
+import {fireEvent} from '../../../utils/fire-custom-event';
 
-<link rel="import" href="../../../behaviors/filter.html">
-
-<dom-module id="searchable-dropdown-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin FilterMixin
+ */
+class SearchableDropdownFilter extends FilterMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -22,63 +31,53 @@
         disabled="[[disabled]]"
         trigger-value-change-event>
     </etools-single-selection-menu>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'searchable-dropdown-filter',
 
-      behaviors: [
-        App.Behaviors.FilterBehavior,
-      ],
+  @property({type: Boolean})
+  disabled!: boolean;
 
-      properties: {
-        disabled: Boolean,
-        selectedItem: Object,
+  @property({type: Object})
+  selectedItem!: GenericObject;
 
-        data: {
-          type: Array,
-          value: [],
-          observer: '_handleData'
-        },
+  @property({type: String})
+  value = '';
 
-        value: {
-          type: String,
-          value: '',
-        },
-      },
+  @property({type: Array, observer: '_handleData'})
+  data = [];
 
-      _handleChange: function () {
-        this.async(function () {
-          this.fire('filter-changed', {
-            name: this.name,
-            value: String(this.selectedItem.id),
-          });
-        });
-      },
-
-      _handleData: function (data) {
-        if (data.length) {
-          this._filterReady();
-        }
-      },
-
-      _addEventListeners: function () {
-        this._handleChange = this._handleChange.bind(this);
-        this.addEventListener('field.iron-select', this._handleChange);
-      },
-
-      _removeEventListeners: function () {
-        this.removeEventListener('field.iron-select', this._handleChange);
-      },
-
-      attached: function () {
-        this._addEventListeners();
-      },
-
-      detached: function () {
-        this._removeEventListeners();
-      },
+  _handleChange() {
+    this.async(function() {
+      fireEvent('filter-changed', {
+        name: this.name,
+        value: String(this.selectedItem.id),
+      });
     });
-  </script>
-</dom-module>
+  };
+
+  _handleData(data: any) {
+    if (data.length) {
+      this._filterReady();
+    }
+  };
+
+  _addEventListeners() {
+    this._handleChange = this._handleChange.bind(this);
+    this.addEventListener('field.iron-select', this._handleChange);
+  };
+
+  _removeEventListeners() {
+    this.removeEventListener('field.iron-select', this._handleChange);
+  };
+
+  attached() {
+    this._addEventListeners();
+  };
+
+  detached() {
+    this._removeEventListeners();
+  };
+}
+
+window.customElements.define('searchble-dropdown-filter', SearchableDropdownFilter);

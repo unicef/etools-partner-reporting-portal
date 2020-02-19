@@ -1,15 +1,16 @@
 import {html} from '@polymer/polymer';
-import "@polymer/iron-location/iron-location";
-import "@polymer/iron-location/iron-query-params";
-import "../dropdown-filter/searchable-dropdown-filter.html";
-import "../../etools-prp-ajax.html";
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '../dropdown-filter/searchable-dropdown-filter.html';
+import '../../etools-prp-ajax.html';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
-import Endpoints from "../../../endpoints";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import Endpoints from '../../../endpoints';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
-import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 
 
 /**
@@ -82,29 +83,33 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
   };
 
   _fetchActivities() {
-    this.debounce('fetch-activities', function() {
-      var self = this;
 
-      activities.abort();
+    this._debouncer = Polymer.Debouncer.debounce('fetch-activities',
+      Polymer.Async.timeOut.after(250),
+      () => {
+        var self = this;
 
-      this.$.activities.thunk()()
-        .then(function(res) {
-          self.set('data', [{
-            id: '',
-            title: 'All',
-          }].concat(res.data.results));
-        })
-        .catch(function(err) { // jshint ignore:line
-          // TODO: error handling
-        });
-    }, 100);
+        //activities.abort();
+        (this.$.activities as EtoolsPrpAjaxEl).abort();
+        (this.$.activities as EtoolsPrpAjaxEl).thunk()()
+          .then(function(res: any) {
+            self.set('data', [{
+              id: '',
+              title: 'All',
+            }].concat(res.data.results));
+          })
+          .catch(function(err: any) { // jshint ignore:line
+            // TODO: error handling
+          });
+
+      });
   };
 
   detached() {
-    this.$.activities.abort();
+    (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-    if (this.isDebouncerActive('fetch-activities')) {
-      this.cancelDebouncer('fetch-activities');
+    if (Debouncer.isActive('fetch-activities')) {
+      Debouncer.cancel('fetch-activities');
     }
   };
 }

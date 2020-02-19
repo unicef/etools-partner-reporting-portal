@@ -1,13 +1,18 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable - dropdown - filter';
+import '../elements/etools-prp-ajax';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import '../../../redux/selectors/llos';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
-<link rel="import" href="../../../behaviors/utils.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
-<link rel="import" href="../../../redux/store.html">
-
-<dom-module id="project-status-filter">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ */
+class ProjectStatusFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -21,37 +26,23 @@
       value="[[_withDefault(value, '')]]"
       data="[[data]]">
     </dropdown-filter>
+  `;
+  }
 
-  </template>
+  @property({type: String})
+  value!: string;
 
-  <script>
-    Polymer({
-      is: 'project-status-filter',
+  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  data = [];
 
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  _computeLocalizedStatuses(localize: any) {
+    return [
+      {title: localize('all'), id: ''},
+      {title: localize('ongoing'), id: 'Ong'},
+      {title: localize('planned'), id: 'Pla'},
+      {title: localize('completed'), id: 'Com'},
+    ];
+  };
+}
 
-      properties: {
-        data: {
-          type: Array,
-          computed: '_computeLocalizedStatuses(localize)'
-        },
-
-        value: String,
-      },
-
-      _computeLocalizedStatuses: function (localize) {
-        return [
-          {title: localize('all'), id: ''},
-          {title: localize('ongoing'), id: 'Ong'},
-          {title: localize('planned'), id: 'Pla'},
-          {title: localize('completed'), id: 'Com'},
-        ];
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('project-status-filter', ProjectStatusFilter);

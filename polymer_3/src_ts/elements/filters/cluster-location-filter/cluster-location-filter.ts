@@ -1,13 +1,19 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/localize.html">
-
-<dom-module id="cluster-location-filter">
-  <template>
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/dropdown-filter-multi';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import '../../../endpoints';
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import Endpoints from '../../../endpoints';
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin LocalizeMixin
+ */
+class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -26,61 +32,45 @@
         data="[[data]]">
     </searchable-dropdown-filter>
   </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'cluster-location-filter',
+  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanID)', observer: '_fetchLocationNames'})
+  locationNamesUrl!: string;
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  responsePlanId!: string;
 
-      properties: {
-        locationNamesUrl: {
-          type: String,
-          computed: '_computeLocationNamesUrl(responsePlanID)',
-          observer: '_fetchLocationNames',
-        },
+  @property({type: Array})
+  data = [];
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: String})
+  value!: string;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterLocationNames(responsePlanID);
+  };
 
-        value: String,
-      },
+  _fetchLocationNames() {
+    var self = this;
+    const thunk = (this.$.locationNames as EtoolsPrpAjaxEl).thunk();
+    (this.$.locationNames as EtoolsPrpAjaxEl).abort();
 
-      _computeLocationNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterLocationNames(responsePlanID);
-      },
+    thunk()
+      .then(function(res: any) {
+        self.set('data', [{
+          id: '',
+          title: 'All',
+        }].concat(res.data));
+      })
+      .catch(function(err: any) { // jshint ignore:line
+        // TODO: error handling
+      });
+  };
 
-      _fetchLocationNames: function () {
-        var self = this;
+  detached() {
+    (this.$.locationNames as EtoolsPrpAjaxEl).abort();
+  };
+}
 
-        this.$.locationNames.abort();
-
-        this.$.locationNames.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      detached: function () {
-        this.$.locationNames.abort();
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('cluster-location-filter', ClusterLocationFilter);

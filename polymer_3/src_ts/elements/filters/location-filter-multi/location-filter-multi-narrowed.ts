@@ -1,17 +1,27 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+import {html} from '@polymer/polymer';
+import "@polymer/iron-location/iron-location";
+import "@polymer/iron-location/iron-query-params";
+import "../dropdown-filter/searchable-dropdown-filter.html";
+import "../../etools-prp-ajax.html";
+import '../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 
-<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/filter-dependencies.html">
-<link rel="import" href="../../../behaviors/localize.html">
-<link rel="import" href="../../../redux/actions/localize.html">
+import LocalizeMixin from '../../../mixins/localize-mixin';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import Endpoints from "../../../endpoints";
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
-<dom-module id="location-filter-multi-narrowed">
-  <template>
+
+/**
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin FilterDependenciesMixin
+ */
+class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
+  static get template() {
+    return html`
     <style>
       :host {
         display: block;
@@ -41,83 +51,68 @@
         data="[[data]]"
         disabled="[[pending]]">
     </dropdown-filter-multi>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'location-filter-multi-narrowed',
+  @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
+  locationsUrl = '';
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.FilterDependenciesBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: String, computed: 'getReduxStateArray(state.responsePlans.currentID)'})
+  responsePlanId = [];
 
-      properties: {
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(responsePlanId)',
-        },
+  @property({type: Array})
+  data!: any;
 
-        responsePlanId: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+  @property({type: Boolean})
+  pending = false;
 
-        data: {
-          type: Array,
-          value: [],
-        },
+  @property({type: String})
+  value!: string;
 
-        pending: {
-          type: Boolean,
-          value: false,
-        },
+  static get observers() {
+    return ['_fetchLocations(locationsUrl, params)'];
+  }
 
-        value: String,
-      },
+  _computeActivitiesUrl(responsePlanId: string) {
+    return Endpoints.clusterLocationNames(responsePlanId);
+  };
 
-      observers: [
-        '_fetchLocations(locationsUrl, params)',
-      ],
+  _fetchActivities() {
 
-      _computeLocationsUrl: function (responsePlanId) {
-        return App.Endpoints.clusterLocationNames(responsePlanId);
-      },
+    this._debouncer = Polymer.Debouncer.debounce('fetch-locations',
+      Polymer.Async.timeOut.after(250),
+      () => {
+        var self = this;
+        this.set('pending', true);
 
-      _fetchLocations: function () {
-        this.debounce('fetch-locations', function () {
-          var self = this;
+        (this.$.locations as EtoolsPrpAjaxEl).abort();
+        (this.$.locations as EtoolsPrpAjaxEl).thunk()()
+          .then(function(res: any) {
+            self.set('pending', false);
+            self.set('data', res.data.results);
+          })
+          .catch(function(err: any) { // jshint ignore:line
+            // TODO: error handling
+            self.set('pending', false);
+          });
 
-          this.set('pending', true);
+      });
+  };
 
-          this.$.locations.abort();
+  _onValueChanged(e: CustomEvent) {
 
-          this.$.locations.thunk()()
-              .then(function (res) {
-                self.set('pending', false);
-                self.set('data', res.data.results);
-              })
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-                self.set('pending', false);
-              });
-        });
-      },
+    if (e.detail.value === '') {
+      return;
+    }
+  };
 
-      _onValueChanged: function (e) {
+  detached() {
+    (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-        if (e.detail.value === '') {
-          return;
-        }
-      },
+    if (Debouncer.isActive('fetch-locations')) {
+      Debouncer.cancel('fetch-locations');
+    }
+  };
+}
 
-      detached: function () {
-        if (this.isDebouncerActive('fetch-locations')) {
-          this.cancelDebouncer('fetch-locations');
-        }
-      },
-    });
-  </script>
-</dom-module>
+window.customElements.define('location-filter-multi-narrowed', LocationFilterMultiNarrowed);
