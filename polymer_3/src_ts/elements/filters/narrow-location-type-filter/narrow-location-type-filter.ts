@@ -1,10 +1,10 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import Settings from '../../../settings';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
-import Endpoints from "../../../endpoints";
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 

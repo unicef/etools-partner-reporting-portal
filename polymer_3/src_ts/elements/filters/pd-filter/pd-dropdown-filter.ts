@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
@@ -64,7 +65,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res) {
+      .then(function(res: any) {
         self.set('data', res.data.results);
       })
       .catch(function(err) { // jshint ignore:line
@@ -72,7 +73,8 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();;
   };
 }

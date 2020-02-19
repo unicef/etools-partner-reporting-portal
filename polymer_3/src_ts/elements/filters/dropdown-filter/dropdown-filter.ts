@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '@polymer/paper-item/paper-item';
 import '@polymer/paper-listbox/paper-listbox';
@@ -105,11 +106,13 @@ class DropdownFilter extends FilterMixin(LocalizeMixin(ReduxConnectedElement)) {
     this.removeEventListener('field.iron-select', this._handleChange);
   };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     this._removeEventListeners();
   };
 }

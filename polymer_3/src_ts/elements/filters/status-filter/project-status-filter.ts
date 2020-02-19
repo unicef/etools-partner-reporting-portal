@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '../elements/etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';

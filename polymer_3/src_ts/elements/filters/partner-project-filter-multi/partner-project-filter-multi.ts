@@ -1,14 +1,16 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from "../../../endpoints";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
  * @customElement
  */
-class PartnerProjectFilterMulti extends PolymerElement {
+class PartnerProjectFilterMulti extends ReduxConnectedElement {
   static get template() {
     return html`
     <style>
@@ -66,12 +68,13 @@ class PartnerProjectFilterMulti extends PolymerElement {
       .then(function(res: any) {
         self.set('data', res.data.results);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
   };
 }

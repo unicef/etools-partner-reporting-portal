@@ -6,6 +6,7 @@ import Endpoints from "../../../endpoints";
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {property} from '@polymer/decorators';
 
 /**
  * @polymer
@@ -94,7 +95,8 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
     if (Debouncer.isActive('compute-value')) {

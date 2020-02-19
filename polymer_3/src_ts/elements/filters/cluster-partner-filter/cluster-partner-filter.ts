@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter-multi';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
@@ -50,7 +51,7 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     const thunk = (this.$.partnerNames as EtoolsPrpAjaxEl).thunk();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
-    .thunk()
+    thunk()
       .then(function(res: any) {
         self.set('data', [{
           id: '',
@@ -62,7 +63,8 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
   };
 }

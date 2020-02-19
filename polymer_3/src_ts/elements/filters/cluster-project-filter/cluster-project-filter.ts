@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/dropdown-filter-multi';
@@ -94,7 +95,8 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
       }, 100);
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
     if (Debouncer.isActive('fetch-project-names')) {

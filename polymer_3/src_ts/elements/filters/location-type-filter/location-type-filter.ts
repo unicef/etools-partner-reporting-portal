@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import Settings from '../../../settings';
 import '../dropdown-filter/searchable - dropdown - filter';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -45,7 +45,7 @@ class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
           title: 'Admin' + index,
         };
       });
-  },
+  };
 }
 
 window.customElements.define('location-type-filter', LocationTypeFilter);

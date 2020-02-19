@@ -1,8 +1,8 @@
-import {html} from '@polymer/polymer';
+import {html, PolymerElement} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
 import FilterMixin from '../../../mixins/filter-mixin';
 //<link rel="import" href="../../../polyfills/es6-shim.html">
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
 /**
@@ -10,7 +10,7 @@ import {fireEvent} from '../../../utils/fire-custom-event';
  * @customElement
  * @appliesMixin FilterMixin
  */
-class DropdownFilterMulti extends FilterMixin(ReduxConnectedElement) {
+class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   static get template() {
     return html`
     <style>

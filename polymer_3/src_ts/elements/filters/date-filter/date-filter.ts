@@ -1,4 +1,5 @@
-import {html} from '@polymer/polymer';
+import {html, PolymerElement} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 //@Lajos Needs to BE CHECKED
 import '@polymer/moment-element/moment-import';
 
@@ -7,10 +8,8 @@ import '@polymer/iron-icons/iron-icons';
 //<link rel="import" href="../../../../bower_components/etools-datepicker/etools-datepicker.html">
 import '@unicef-polymer/etools-datepicker/etools-datepicker';
 
-
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
 
@@ -20,7 +19,7 @@ import {fireEvent} from '../../../utils/fire-custom-event';
  * @appliesMixin FilterMixin
  * @appliesMixin DateMixin
  */
-class DateFilter extends FilterMixin(DateMixin(ReduxConnectedElement)) {
+class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   static get template() {
     return html`
     <style>
@@ -55,7 +54,7 @@ class DateFilter extends FilterMixin(DateMixin(ReduxConnectedElement)) {
 
   @property({type: String})
   type = 'text';
-
+  //@Lajos needs to be investigated
   @property({type: null, notify: 'true'})
   jsonValue!: null;
 

@@ -1,8 +1,8 @@
-import {html} from '@polymer/polymer';
+import {html, PolymerElement} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 //@Lajos needs to be checked
 import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {GenericObject} from '../../../typings/globals.types';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
@@ -11,7 +11,7 @@ import {fireEvent} from '../../../utils/fire-custom-event';
  * @customElement
  * @appliesMixin FilterMixin
  */
-class SearchableDropdownFilter extends FilterMixin(ReduxConnectedElement) {
+class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   static get template() {
     return html`
     <style>
@@ -71,11 +71,13 @@ class SearchableDropdownFilter extends FilterMixin(ReduxConnectedElement) {
     this.removeEventListener('field.iron-select', this._handleChange);
   };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     this._removeEventListeners();
   };
 }

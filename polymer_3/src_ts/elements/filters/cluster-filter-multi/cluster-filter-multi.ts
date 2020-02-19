@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import "../dropdown-filter/dropdown-filter-multi";
 import "../../etools-prp-ajax";
 import "../../../endpoints";
-import {store} from "../../../redux/store"
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import Endpoints from "../../../endpoints"
@@ -67,7 +67,8 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     (this.$.clusters as EtoolsPrpAjaxEl).abort();
   };
 }

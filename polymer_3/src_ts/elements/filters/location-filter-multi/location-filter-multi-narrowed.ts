@@ -11,6 +11,7 @@ import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import Endpoints from "../../../endpoints";
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {property} from '@polymer/decorators';
 
 
 /**
@@ -106,7 +107,8 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     }
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
 
     if (Debouncer.isActive('fetch-locations')) {

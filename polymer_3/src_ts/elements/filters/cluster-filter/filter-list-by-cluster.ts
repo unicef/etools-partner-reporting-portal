@@ -1,4 +1,5 @@
-import {html} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../../../polyfills/es6-shim';
@@ -6,7 +7,6 @@ import '../../../polyfills/es6-shim';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import '../../filters/cluster-filter/cluster-filter';
 //<link rel="import" href = "../../filters/cluster-filter/cluster-filter.html" >
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -14,7 +14,7 @@ import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class FilterListByCluster extends UtilsMixin(ReduxConnectedElement) {
+class FilterListByCluster extends UtilsMixin(PolymerElement) {
   static get template() {
     return html`
     : host {

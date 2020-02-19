@@ -1,9 +1,10 @@
 import {html} from '@polymer/polymer';
-import '@polymer/paper-input/paper-input'
-import Endpoints from "../../../endpoints";
+import '@polymer/paper-input/paper-input';
+import {property} from '@polymer/decorators';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+
 
 /**
  * @polymer
@@ -53,11 +54,13 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
       }, this._debounceDelay);
   };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._filterReady();
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     if (Debouncer.isActive('input')) {
       Debouncer.cancel('input');
     }

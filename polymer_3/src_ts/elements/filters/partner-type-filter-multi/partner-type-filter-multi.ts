@@ -2,6 +2,7 @@ import {html} from '@polymer/polymer';
 import '../dropdown-filter/searchable - dropdown - filter';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {property} from '@polymer/decorators';
 
 /**
  * @polymer

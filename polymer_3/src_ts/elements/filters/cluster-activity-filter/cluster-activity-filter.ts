@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/searchable-dropdown-filter.html';
@@ -11,7 +12,6 @@ import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-
 
 /**
  * @polymer

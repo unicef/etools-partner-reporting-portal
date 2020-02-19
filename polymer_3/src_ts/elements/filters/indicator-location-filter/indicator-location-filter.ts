@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable - dropdown - filter';
 import '../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
@@ -62,12 +63,13 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           title: 'All',
         }].concat(res.data));
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
   };
 }

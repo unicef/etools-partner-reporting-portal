@@ -1,4 +1,5 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/dropdown-filter-multi';
@@ -107,7 +108,8 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     if (Debouncer.isActive('fetch-objectives')) {
       Debouncer.cancel('fetch-objectives');
     }

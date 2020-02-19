@@ -1,9 +1,9 @@
-import {html} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-checkbox/paper-checkbox';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
+import {property} from '@polymer/decorators';
 // <link rel="import" href="../../../behaviors/filter.html">
 // <link rel="import" href="../../../behaviors/utils.html">
 /**
@@ -13,7 +13,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
  * @appliesMixin UtilsMixin
  * @appliesMixin FilterMixin
  */
-class CheckboxFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
+class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   static get template() {
     return html`
     <style>
@@ -74,12 +74,14 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
     this.removeEventListener('field.change', this._handleInput);
   }
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
     this._filterReady();
   }
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     this._removeEventListeners();
     if (Debouncer.isActive('change')) {
       Debouncer.cancel('change');

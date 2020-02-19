@@ -1,9 +1,10 @@
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown - filter - multi'
-import {store} from "../../../redux/store"
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
-import {ReduxConnectedElement} from '../../../ ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+
 
 /**
  * @polymer
