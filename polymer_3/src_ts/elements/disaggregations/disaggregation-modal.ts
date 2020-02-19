@@ -114,7 +114,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
         self.set('updatePending', false);
       });
-  },
+  };
 
   _confirm(e: CustomEvent) {
     e.stopPropagation();
@@ -124,7 +124,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
         'Do you want to continue?',
       result: e.detail,
     });
-  },
+  };
 
   _addEventListeners() {
     this.close = this.close.bind(this);
@@ -133,19 +133,21 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     this.addEventListener('disaggregation-modal-refit', this.adjustPosition);
     this._confirm = this._confirm.bind(this);
     this.addEventListener('disaggregation-modal-confirm', this._confirm);
-  },
+  };
 
   _removeEventListeners() {
     this.removeEventListener('dialog.iron-overlay-closed', this.close);
     this.removeEventListener('disaggregation-modal-refit', this.adjustPosition);
     this.removeEventListener('disaggregation-modal-confirm', this._confirm);
-  },
+  };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
-  },
+  };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     this._removeEventListeners();
   };
 
