@@ -1,11 +1,9 @@
 import {PolymerElement} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 
 /**
  * @polymer
  * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
  */
 class PageTitle extends PolymerElement {
   @property({type: String})

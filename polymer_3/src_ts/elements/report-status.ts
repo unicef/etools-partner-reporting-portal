@@ -1,14 +1,13 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import './status-badge';
 import LocalizeMixin from '../mixins/localize-mixin';
-import "@polymer/polymer/lib/elements/dom-if";
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import '@polymer/polymer/lib/elements/dom-if';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 // <link rel="import" href="../redux/store.html">
 // <link rel="import" href="../behaviors/localize.html">
 // <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="status-badge.html">
 
 /**
  * @polymer
@@ -59,10 +58,7 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Boolean})
   final = false;
 
-  //statePath: 'app.current',
-
-  @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
-
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
   @property({type: String})

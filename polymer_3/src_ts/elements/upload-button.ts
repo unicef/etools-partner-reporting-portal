@@ -1,12 +1,15 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog/paper-dialog';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
+import '@polymer/polymer/lib/elements/dom-if';
 // <link rel="import" href="../../bower_components/etools-file/etools-file.html">
 
 import UtilsMixin from '../mixins/utils-mixin';
@@ -14,11 +17,10 @@ import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import './etools-prp-ajax';
 import './error-box';
-import "../styles/button-styles.ts"
-import "../styles/modal-styles.ts"
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
+import {fireEvent} from '../utils/fire-custom-event';
 
 
 /**
@@ -32,8 +34,8 @@ import {ReduxConnectedElement} from "../ReduxConnectedElement";
 class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
-
-      <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+        ${buttonsStyles} ${modalStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           --etools-file-main-btn-color: var(--theme-primary-color);
 
@@ -140,7 +142,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
 
   _openModal() {
     const dialog = this.shadowRoot!.querySelector('dialog');
-    dialog.open();
+    dialog!.open();
   }
 
   _save() {
@@ -159,16 +161,16 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     }
 
     const upload = this.shadowRoot!.querySelector('upload');
-    upload.body = data;
+    upload!.body = data;
 
     this.set('pending', true);
 
-    upload.thunk()
+    upload!.thunk()
       .then(() => {
         self.set('pending', false);
         self.close();
         self._notifyFileUploaded();
-        self.fire('file-uploaded');
+        fireEvent(this,'file-uploaded');
       })
       .catch(function(res) {
         self.set('errors', res.data);

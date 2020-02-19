@@ -1,38 +1,40 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/paper-tabs/paper-tab.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-icons/maps-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/paper-item/paper-item.js';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/paper-tabs/paper-tab';
+import '@polymer/paper-tabs/paper-tabs';
+import '@polymer/iron-pages/iron-pages';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons/maps-icons';
+import '@polymer/paper-button/paper-button';
+import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 
 import '../utils/fire-custom-event';
-import './etools-prp-ajax.js';
-import './etools-prp-number.js';
-import './status-badge.js';
-import './etools-prp-printer.js';
-import '../disaggregations/disaggregation-table.js';
-import '../disaggregations/disaggregation-modal.js';
-import './report-status.js';
-import './pull-modal.js';
+import './etools-prp-ajax';
+import './etools-prp-number';
+import './status-badge';
+import './etools-prp-printer';
+import '../disaggregations/disaggregation-table';
+import '../disaggregations/disaggregation-modal';
+import './report-status';
+import './pull-modal';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {fireEvent} from '../utils/fire-custom-event.js';
-import {GenericObject} from '../typings/globals.types.js';
+import {fireEvent} from '../utils/fire-custom-event';
+import {GenericObject} from '../typings/globals.types';
 import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {store} from '../redux/store';
+import {buttonsStyles} from '../styles/buttons-styles';
 // @ts-ignore
 import {currentProgrammeDocuments} from '../redux/selectors/programmeDocuments';
+import {disaggregationsFetch} from '../redux/actions/disaggregations';
 
 // (dci)
 // <link rel="import" href="../redux/store.html">
@@ -56,7 +58,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    <style include="button-styles iron-flex iron-flex-alignment app-grid-style">
+    ${buttonsStyles} 
+    <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
         width: 100%;
@@ -520,7 +523,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   params!: GenericObject;
 
   //DONE statePath: 'disaggregations.byIndicator'
-  @property({type: Object, computed: 'getReduxStateObject(state.disaggregations.byIndicator)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.disaggregations.byIndicator)'})
   data!: GenericObject;
 
   @property({type: Object, computed: '_computeDisaggregations(data, indicatorId)'})
@@ -530,7 +533,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   locationData!: GenericObject[];
 
   //DONE statePath: 'programmeDocumentReports.current.mode'
-  @property({type: String, computed: 'getReduxStateValue(state.programmeDocumentReports.current.mode)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode: string = '';
 
   @property({type: String})
@@ -557,8 +560,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     // Cancel the pending request, if any
     this.$.disaggregations.abort();
 
-    return store.dispatch(
-      App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
+    return this.reduxStore.dispatch(
+      disaggregationsFetch(disaggregationsThunk, String(this.indicatorId))
     );
   }
 
@@ -572,10 +575,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     this.set('initialized', true);
 
     this._fetchData()
-      .then(function () {
+      .then(function() {
         self.set('loading', false);
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
   }
@@ -652,7 +655,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     fireEvent(this, 'refresh-report', this.indicatorId);
 
     const allComplete = this.disaggregations.indicator_location_data
-      .every(function (location: GenericObject) {
+      .every(function(location: GenericObject) {
         return location.is_complete;
       });
 
@@ -668,7 +671,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   _computeLocationData(rawLocationData: any[]) {
     const byLocation = (rawLocationData || [])
-      .reduce(function (acc, location) {
+      .reduce(function(acc, location) {
         const locationId = location.location.id;
 
         if (typeof acc[locationId] === 'undefined') {
@@ -687,10 +690,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }, {});
 
     return Object.keys(byLocation)
-      .map(function (key) {
+      .map(function(key) {
         return byLocation[key];
       })
-      .sort(function (a, b) {
+      .sort(function(a, b) {
         return b.is_master_location_data - a.is_master_location_data;
       });
   }

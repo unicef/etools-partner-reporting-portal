@@ -1,6 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import './etools-prp-number';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';

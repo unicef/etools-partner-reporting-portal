@@ -1,13 +1,14 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
-
-import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
-import "@polymer/paper-listbox/paper-listbox";
-import "@polymer/paper-item/paper-item";
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-repeat';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import RoutingMixin from '../mixins/routing-mixin';
-import {store} from "../redux/store";
 import {setWorkspace} from "../redux/actions";
 import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {GenericObject} from '../typings/globals.types';
 
 /**
  * @polymer
@@ -72,7 +73,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
       </style>
 
       <paper-dropdown-menu label="[[workspace.name]]" noink no-label-float>
-        <paper-listbox
+        <paper-listbox slot="dropdown-content"
           class="dropdown-content"
           on-iron-select="_workspaceSelected"
           selected="[[selected]]">
@@ -85,34 +86,36 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   }
 
   @property({type: Object, computed: '_computeWorkspace(data, current)'})
-  properties = null;
+  workspace!: GenericObject;
 
-  @property({type: Number, computed: '_computeSelected(data, workspace)'})
+  @property({type: Number, computed: '_computeSelected(data, current)'})
   selected = 0;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   current!: string;
 
-  @property({type: Array})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   data!: any[];
 
   _workspaceSelected(e: CustomEvent) {
-    var newCode = this.$.repeat.itemForElement(e.detail.item).code;
+    let newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
 
     if (newCode === this.current) {
       return;
     }
 
-    store.dispatch(setWorkspace(newCode));
+    this.reduxStore.dispatch(setWorkspace(newCode));
 
     window.location.href = this.buildUrl(this._baseUrl, '/');
   }
 
   //code is defined current...assumed it will be number
   _computeWorkspace(data: any[], code: number) {
-    return data.filter(function(workspace) {
-      return workspace.code === code;
-    })[0];
+    if (data) {
+      return data.filter(function(workspace) {
+        return workspace.code === code;
+      })[0];
+    }
   }
 
   _computeSelected(data: any[], workspace: string) {

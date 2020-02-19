@@ -1,20 +1,16 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {html} from '@polymer/polymer';
 import {property} from "@polymer/decorators/lib/decorators";
 import "@polymer/polymer/lib/elements/dom-if";
 import "@polymer/paper-styles/typography";
 import "@polymer/iron-icons/iron-icons";
 import "@polymer/paper-icon-button/paper-icon-button";
 import "@polymer/iron-flex-layout/iron-flex-layout-classes";
-import "@polymer/app-localize-behavior/app-localize-behavior";
 
-import "../style/shared-styles";
 import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {sharedStyles} from '../styles/shared-styles';
 
-// <link rel="import" href="../behaviors/localize.html">
-// <link rel="import" href="../behaviors/routing.html">
-// <link rel="import" href="../styles/shared-styles.html">
 
 /**
  * @polymer
@@ -26,7 +22,8 @@ import {ReduxConnectedElement} from "../ReduxConnectedElement";
 class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles">
+        ${sharedStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-factors">
         :host {
           --header-gutter: 25px;
 
@@ -108,9 +105,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeBackUrl(back, _baseUrl, app)'})
   backUrl!: string;
 
-  //TODO @lajos, check fi correct
-  // statePath: 'app.current',
-  @property({type: String, computed: 'getReduxStateValue(app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
   //@lajos: defined tail as back is defined String

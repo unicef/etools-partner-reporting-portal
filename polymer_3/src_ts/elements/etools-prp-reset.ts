@@ -11,7 +11,7 @@ import {GenericObject} from '../typings/globals.types';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpReset extends (UtilsMixin(PolymerElement)){
+class EtoolsPrpReset extends (UtilsMixin(PolymerElement)) {
 
   @property({type: Object, notify: true})
   reset!: GenericObject;
@@ -27,7 +27,7 @@ class EtoolsPrpReset extends (UtilsMixin(PolymerElement)){
 
   _trigerred() {
 
-    Debouncer.debounce( this.trigger, () => {
+    Debouncer.debounce(this.trigger, () => {// TODO!!!
       if (this.get('skipInitial') && this.get('isInitial')) {
         this.set('isInitial', false);
 

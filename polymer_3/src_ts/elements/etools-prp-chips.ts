@@ -1,11 +1,13 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import './labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../utils/fire-custom-event';
-
-// <link rel="import" href="labelled-item.html">
-// <link rel="import" href="../styles/shared-styles.html">
+import {sharedStyles} from '../styles/shared-styles';
 
 
 /**
@@ -15,7 +17,8 @@ import {fireEvent} from '../utils/fire-custom-event';
 class EtoolsPrpChips extends PolymerElement{
   public static get template(){
     return html`
-      <style include="iron-flex shared-styles">
+        ${sharedStyles}
+      <style include="iron-flex">
         :host {
           display: block;
           padding: 8px 0;

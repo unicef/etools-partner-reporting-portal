@@ -1,11 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 
 import DataTableMixin from '../mixins/data-table-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -17,6 +19,7 @@ import './list-placeholder';
 import './message-box';
 import './etools-prp-permissions';
 import {GenericObject} from '../typings/globals.types';
+import {tableStyles} from '../styles/table-styles';
 
 // <link rel="import" href="../styles/table-styles.html">
 
@@ -30,36 +33,36 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin PaginationMixin
  * @appliesMixin LocalizeMixin
  */
-class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(PolymerElement))))){
+class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(ReduxConnectedElement))))) {
 
-  public static get template(){
+  public static get template() {
     return html`
-    
-      <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+        ${tableStyles}
+      <style include="iron-flex iron-flex-factors data-table-styles">
         :host {
           --ecp-content: {
             padding: 1px 0 0;
           };
         }
-  
+
         message-box {
           margin: 25px 25px 0;
         }
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-      
+
       <etools-prp-permissions
           permissions="{{permissions}}">
       </etools-prp-permissions>
-      
+
       <etools-content-panel panel-title="[[localize('list_of_indicators')]]">
       <template
           is="dom-if"
@@ -73,11 +76,11 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
       <etools-data-table-header
           id="listHeader"
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
-  
+
           <etools-data-table-column field="indicator">
             <div class="table-column">[[localize('indicator')]]</div>
           </etools-data-table-column>
-  
+
           <template
             is="dom-if"
             if="[[showProjectContextColumn]]"
@@ -86,31 +89,31 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
               <div class="table-column">[[localize('project_context')]]</div>
             </etools-data-table-column>
           </template>
-  
+
           <etools-data-table-column field="blueprint.calculation_formula_across_locations">
             <div class="table-column">[[localize('calc_across_locations')]]</div>
           </etools-data-table-column>
-  
+
           <etools-data-table-column field="blueprint.calculation_formula_across_periods">
             <div class="table-column">[[localize('calc_across_periods')]]</div>
           </etools-data-table-column>
-  
+
           <etools-data-table-column field="indicator">
             <div class="table-column">[[localize('baseline')]]</div>
           </etools-data-table-column>
-  
+
           <etools-data-table-column field="indicator">
             <div class="table-column">[[localize('target')]]</div>
           </etools-data-table-column>
-  
+
           <etools-data-table-column field="indicator">
             <div class="table-column">[[localize('achieved')]]</div>
           </etools-data-table-column>
-  
+
           <etools-data-table-column field="progress_percentage" sortable flex-2>
               <div class="table-column">[[localize('current_progress')]]</div>
           </etools-data-table-column>
-  
+
           <template
             is="dom-if"
             if="[[haveReports]]"
@@ -119,7 +122,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
               <div class="table-column">&nbsp;</div>
             </etools-data-table-column>
           </template>
-  
+
           <template
               is="dom-if"
               if="[[canEdit]]"
@@ -128,7 +131,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
               <div class="table-column">&nbsp;</div>
             </etools-data-table-column>
           </template>
-  
+
           <template
               is="dom-if"
               if="[[canEditLocations]]"
@@ -138,7 +141,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
             </etools-data-table-column>
           </template>
         </etools-data-table-header>
-  
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -147,7 +150,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
             on-page-size-changed="_pageSizeChanged"
             on-page-number-changed="_pageNumberChanged">
         </etools-data-table-footer>
-  
+
         <template id="list"
                   is="dom-repeat"
                   items="[[data]]"
@@ -160,9 +163,9 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
               type="[[type]]">
           </list-view-single-indicator>
         </template>
-  
+
         <list-placeholder data="[[data]]"></list-placeholder>
-  
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -171,10 +174,10 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
             on-page-size-changed="_pageSizeChanged"
             on-page-number-changed="_pageNumberChanged">
         </etools-data-table-footer>
-  
+
       </etools-content-panel>
-      
-    
+
+
     `;
   }
 
@@ -235,12 +238,12 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
 
   _addEventListeners() {
     this.addEventListener('page-number-changed', this._tableContentChanged);
-    this.addEventListener('details-opened-changed', this._detailsChange);
+    this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('page-number-changed', this._tableContentChanged);
-    this.removeEventListener('details-opened-changed', this._detailsChange);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _computeCanEditLocations(isClusterApp: boolean, type: string, permissions: GenericObject) {
@@ -254,7 +257,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   _computeShowLocationsWarning(isClusterApp: boolean, type: string, canEdit: boolean, data: GenericObject) {
     let baseConditionsMet = isClusterApp && type !== 'ca' && canEdit;
 
-    return baseConditionsMet && data.some( (indicator: GenericObject) => {
+    return baseConditionsMet && data.some((indicator: GenericObject) => {
       return !indicator.locations.length;
     });
   }

@@ -3,7 +3,8 @@ import {
   createStore,
   compose,
   applyMiddleware,
-  combineReducers
+  combineReducers,
+  StoreEnhancer
 } from 'redux';
 
 import thunk from 'redux-thunk';
@@ -42,7 +43,12 @@ declare global {
   }
 }
 
-var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+// Sets up a Chrome extension for time travel debugging.
+// See https://github.com/zalmoxisus/redux-devtools-extension for more information.
+const devCompose: <Ext0, StateExt0>(
+  f1: StoreEnhancer<Ext0, StateExt0>
+) => StoreEnhancer<Ext0, StateExt0> =
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 let rootReducer = combineReducers({
   localize: Localize,
@@ -74,5 +80,5 @@ let rootReducer = combineReducers({
 
 export const store = createStore(
   rootReducer,
-  composeEnhancers(applyMiddleware(thunk))
+  devCompose(applyMiddleware(thunk))
 );
