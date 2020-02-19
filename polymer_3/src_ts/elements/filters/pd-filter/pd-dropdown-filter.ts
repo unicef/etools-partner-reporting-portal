@@ -40,7 +40,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)', observer: '_fetchPDs'})
   programmeDocumentsUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
   @property({type: String})

@@ -39,7 +39,7 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
   locationsUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
   @property({type: String})

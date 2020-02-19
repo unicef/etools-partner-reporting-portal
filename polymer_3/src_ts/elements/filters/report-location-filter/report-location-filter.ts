@@ -39,10 +39,10 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computeLocationsUrl(locationId, reportId)', observer: '_fetchLocations'})
   locationsUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.programmeDocumentReports.current.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
   reportId!: string;
 
   @property({type: String})
@@ -57,9 +57,9 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _fetchLocations() {
     var self = this;
-
+    const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
-    (this.$.locations as EtoolsPrpAjaxEl).thunk()
+    thunk()
       .then(function(res: any) {
         self.set('options', [{
           id: '',

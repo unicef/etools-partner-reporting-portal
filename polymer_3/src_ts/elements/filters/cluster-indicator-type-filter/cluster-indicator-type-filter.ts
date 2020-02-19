@@ -34,7 +34,7 @@ class ClusterIndicatorTypeFilter extends LocalizeMixin(UtilsMixin(ReduxConnected
   @property({type: Boolean, computed: '_computeRole(currentUserRoles)'})
   isPartner!: boolean;
 
-  @property({type: Array, computed: 'getReduxStateArray(state.userProfile.profile.prp_roles)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   currentUserRoles!: any;
 
   @property({type: Array})

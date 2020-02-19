@@ -58,7 +58,7 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
   @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
   locationsUrl = '';
 
-  @property({type: String, computed: 'getReduxStateArray(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateArray(rootState.responsePlans.currentID)'})
   responsePlanId = [];
 
   @property({type: Array})

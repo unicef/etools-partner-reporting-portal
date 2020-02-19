@@ -56,7 +56,7 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)'})
   clusterNamesUrl = '';
 
-  @property({type: String, computed: 'getReduxStatevalue(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStatevalue(rootState.responsePlans.currentID)'})
   responsePlanID = [];
 
   @property({type: Array})

@@ -57,7 +57,7 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
   @property({type: String, computed: '_computeProjectNamesUrl(responsePlanID)'})
   projectNamesUrl = '';
 
-  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: Array})

@@ -43,7 +43,7 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
   @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
   locationsUrl = '';
 
-  @property({type: String, computed: 'getReduxStateArray(state.location.id)'})
+  @property({type: String, computed: 'getReduxStateArray(rootState.location.id)'})
   locationId = [];
 
   @property({type: Array})

@@ -38,7 +38,7 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   value!: string;
 
-  @property({type: Array, computed: 'getReduxStateArray(state.App.Selectors.LLOs.all)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.App.Selectors.LLOs.all)'})
   data = [];
 
   _computeOptions(data: any) {

@@ -65,7 +65,7 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
   @property({type: String, computed: '_computeActivitiesUrl(responsePlanId)'})
   activitiesUrl = '';
 
-  @property({type: Array, computed: 'getReduxStateArray(state.app.current)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.app.current)'})
   data = [];
 
   @property({type: Object})

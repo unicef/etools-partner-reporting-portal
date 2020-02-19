@@ -37,7 +37,7 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
   @property({type: String, computed: '_computePartnerProjectsUrl(responsePlanId)', observer: '_fetchPartnerProjects'})
   partnerProjectsUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: String})

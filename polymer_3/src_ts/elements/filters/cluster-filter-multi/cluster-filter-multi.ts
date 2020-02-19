@@ -40,7 +40,7 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computeClustersUrl(responsePlanId)', observer: '_fetchClusters'})
   clustersUrl!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(state.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: Array})
