@@ -60,7 +60,7 @@ class DropdownFormInput extends PolymerElement {
   }
 
   _getValue(e: CustomEvent) {
-    var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+    const newValue = this.$.repeat.itemForElement(e.detail.item).id;
     this.value = newValue;
   }
 

@@ -137,7 +137,7 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   async _pageChanged(page: string) {
-    var resolvedPageUrl = `./ip-reporting/${page}.js`; //getDomainByEnv() + `/src/pages
+    const resolvedPageUrl = `./ip-reporting/${page}.js`; //getDomainByEnv() + `/src/pages
 
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);

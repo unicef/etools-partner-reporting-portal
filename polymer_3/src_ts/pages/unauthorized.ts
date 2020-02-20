@@ -103,7 +103,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    var self = this;
+    const self = this;
 
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {

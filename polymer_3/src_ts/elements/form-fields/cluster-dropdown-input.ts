@@ -71,7 +71,7 @@ class ClusterDropdownInput extends ReduxConnectedElement {
   }
 
   _fetchClusterNames() {
-    var self = this;
+    const self = this;
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 

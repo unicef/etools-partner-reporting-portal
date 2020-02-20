@@ -308,7 +308,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   progressBarType!: string;
 
 
-  _openModal(e) {
+  _openModal(e: CustomEvent) {
     this.shadowRoot.querySelector('#modal-' + e.target.dataset.modalType).open();
   }
 
@@ -321,7 +321,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
-    var query_params = 'results/draft?page_size=10&page=1&indicator_type=';
+    let query_params = 'results/draft?page_size=10&page=1&indicator_type=';
 
     if (indicator.content_type_key === 'cluster.clusterobjective') {
       query_params += 'cluster_objective';

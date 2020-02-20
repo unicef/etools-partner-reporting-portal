@@ -178,7 +178,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
   _computePrpRoles(profile: GenericObject, portal: string) {
     return (profile.prp_roles || []).map(function(role: any) {
-      var result = '';
+      let result = '';
 
       if (role.cluster && portal === 'cluster-reporting') {
         result += role.cluster.full_title;

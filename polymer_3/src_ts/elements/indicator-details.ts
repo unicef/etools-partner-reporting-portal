@@ -30,24 +30,12 @@ import {fireEvent} from '../utils/fire-custom-event';
 import {GenericObject} from '../typings/globals.types';
 import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {store} from '../redux/store';
 import {buttonsStyles} from '../styles/buttons-styles';
 // @ts-ignore
-import {currentProgrammeDocuments} from '../redux/selectors/programmeDocuments';
+import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
 import {disaggregationsFetch} from '../redux/actions/disaggregations';
 
-// (dci)
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../redux/selectors/programmeDocuments.html">
-// <link rel="import" href="../styles/buttons.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+
 /**
  * @polymer
  * @customElement
@@ -58,7 +46,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    ${buttonsStyles} 
+    ${buttonsStyles}
     <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
@@ -510,7 +498,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   initialized: boolean = false;
 
   //DONE  statePath: App.Selectors.ProgrammeDocuments.current
-  @property({type: Object, computed: 'currentProgrammeDocuments(state)'})
+  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
   currentPD!: GenericObject;
 
   @property({type: Boolean, computed: '_computeHasPD(currentPD)'})
