@@ -12,6 +12,7 @@ import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -78,14 +79,16 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
     return ['_fetchActivities(activitiesUrl, params)'];
   }
 
+  private _debouncer!: Debouncer;
+
   _computeActivitiesUrl(responsePlanId: string) {
     return Endpoints.partnerActivityList(responsePlanId);
   };
 
   _fetchActivities() {
 
-    this._debouncer = Polymer.Debouncer.debounce('fetch-activities',
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       () => {
         var self = this;
 
@@ -108,8 +111,8 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
   detached() {
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-    if (Debouncer.isActive('fetch-activities')) {
-      Debouncer.cancel('fetch-activities');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 }

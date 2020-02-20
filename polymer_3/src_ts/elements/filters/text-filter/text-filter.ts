@@ -4,7 +4,8 @@ import {property} from '@polymer/decorators';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-
+import { timeOut } from '@polymer/polymer/lib/utils/async';
+import { fireEvent } from '../../../utils/fire-custom-event';
 
 /**
  * @polymer
@@ -37,21 +38,23 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
   @property({type: String})
   type = 'text';
 
+  private _debouncer!: Debouncer;
+
   _filterValueChanged() {
-    this._debouncer = Polymer.Debouncer.debounce('input',
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       function propagateChange() {
         if (this.$.field.value) {
           var newValue = this.$.field.value.trim();
 
           if (newValue !== this.lastValue) {
-            this.fire('filter-changed', {
+            fireEvent(this, 'filter-changed', {
               name: this.name,
               value: newValue,
             });
           }
         }
-      }, this._debounceDelay);
+      });
   };
 
   connectedCallback() {
@@ -61,8 +64,8 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
 
   disconnectedCallback() {
     super.connectedCallback();
-    if (Debouncer.isActive('input')) {
-      Debouncer.cancel('input');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 }

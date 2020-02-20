@@ -12,6 +12,7 @@ import Endpoints from "../../../endpoints";
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 
 
 /**
@@ -74,14 +75,16 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     return ['_fetchLocations(locationsUrl, params)'];
   }
 
+  private _debouncer!: Debouncer;
+
   _computeActivitiesUrl(responsePlanId: string) {
     return Endpoints.clusterLocationNames(responsePlanId);
   };
 
   _fetchActivities() {
 
-    this._debouncer = Polymer.Debouncer.debounce('fetch-locations',
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       () => {
         var self = this;
         this.set('pending', true);
@@ -111,8 +114,8 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     super.disconnectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-    if (Debouncer.isActive('fetch-locations')) {
-      Debouncer.cancel('fetch-locations');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 }

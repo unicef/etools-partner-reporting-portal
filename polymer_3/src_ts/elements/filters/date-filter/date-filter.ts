@@ -55,8 +55,8 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   @property({type: String})
   type = 'text';
   //@Lajos needs to be investigated
-  @property({type: null, notify: 'true'})
-  jsonValue!: null;
+  @property({type: any, notify: 'true'})
+  jsonValue!: any;
 
   @property({type: String})
   format = 'DD MMM YYYY';
@@ -64,7 +64,7 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   _handleInput() {
     var newValue = this.$.field.value;
     //initially this.fire
-    fireEvent('filter-changed', {
+    fireEvent(this, 'filter-changed', {
       name: this.name,
       value: newValue,
     });
@@ -79,12 +79,14 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
     this.removeEventListener('field.value-changed', this._handleInput);
   };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
     this._filterReady();
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
     this._removeEventListeners();
   };
 }

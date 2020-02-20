@@ -49,7 +49,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
 
   _handleChange() {
     this.async(function() {
-      fireEvent('filter-changed', {
+      fireEvent(this, 'filter-changed', {
         name: this.name,
         value: String(this.selectedItem.id),
       });

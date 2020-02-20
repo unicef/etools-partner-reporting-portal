@@ -4,6 +4,8 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
 import {property} from '@polymer/decorators';
+import { fireEvent } from '../../../utils/fire-custom-event';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 // <link rel="import" href="../../../behaviors/filter.html">
 // <link rel="import" href="../../../behaviors/utils.html">
 /**
@@ -46,19 +48,21 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   @property({type: String})
   value = '';
 
+  private _debouncer!: Debouncer;
+
   _handleInput() {
-    this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       () => {
         var newValue = '' + this._toNumber(this.$.field.checked);
 
         if (newValue !== this.lastValue) {
-          this.fire('filter-changed', {
+          fireEvent(this, 'filter-changed', {
             name: this.name,
             value: newValue,
           });
         }
-      }, this._debounceDelay);
+      });
   };
 
   _computeChecked(value: string) {
@@ -83,8 +87,8 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   disconnectedCallback() {
     super.connectedCallback();
     this._removeEventListeners();
-    if (Debouncer.isActive('change')) {
-      Debouncer.cancel('change');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   }
 }

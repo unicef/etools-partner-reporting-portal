@@ -77,7 +77,7 @@ class DropdownFilter extends FilterMixin(LocalizeMixin(ReduxConnectedElement)) {
   _handleChange(e: CustomEvent) {
     var newValue = this.$.repeat.itemForElement(e.detail.item).id;
 
-    fireEvent('filter-changed', {
+    fireEvent(this, 'filter-changed', {
       name: this.name,
       value: String(newValue),
     });

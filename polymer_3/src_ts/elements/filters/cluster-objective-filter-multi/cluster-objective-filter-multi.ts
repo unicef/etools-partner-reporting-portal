@@ -10,6 +10,7 @@ import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import Endpoints from '../../../endpoints';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -84,11 +85,13 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
     }
 
     return objectivesParams;
-  },
+  };
+
+  private _debouncer!: Debouncer;
 
   _fetchObjectives() {
-    this._debouncer = Polymer.Debouncer.debounce('fetch-objectives',
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+     timeOut.after(250),
       function() {
         var self = this;
         const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
@@ -110,8 +113,8 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (Debouncer.isActive('fetch-objectives')) {
-      Debouncer.cancel('fetch-objectives');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   },
 }

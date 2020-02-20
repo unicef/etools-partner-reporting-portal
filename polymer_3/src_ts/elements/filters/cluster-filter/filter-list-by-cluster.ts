@@ -60,13 +60,15 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
 
   _removeEventListeners() {
     this.removeEventListener('filter-changed', this._onFilterChanged);
-  },
+  };
 
-  attached() {
+  connectedCallback() {
+    super.connectedCallback();
     this._addEventListeners();
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
     this._removeEventListeners();
   };
 }

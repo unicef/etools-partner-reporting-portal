@@ -72,13 +72,13 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
     }
 
     //@Lajos please take a look
-    fireEvent('filter-changed', {
+    fireEvent(this, 'filter-changed', {
       name: this.name,
       value: String(newValue || ''),
     });
   };
 
-  _handleData(data) {
+  _handleData(data: any) {
     if (data.length) {
       this._filterReady();
     } else if (this.name === 'location') {

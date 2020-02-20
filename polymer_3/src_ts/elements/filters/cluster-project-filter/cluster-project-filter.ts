@@ -5,11 +5,12 @@ import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/dropdown-filter-multi';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from ''../../../ ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import Endpoints from "../../../endpoints";
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 
 
 /**
@@ -70,13 +71,15 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
     return ['_fetchProjectNames(projectNamesUrl, params)'];
   }
 
+  private _debouncer!: Debouncer;
+
   _computeProjectNamesUrl(responsePlanID: string) {
     return Endpoints.clusterProjectNames(responsePlanID);
   };
 
   _fetchProjectNames() {
-    this._debouncer = Polymer.Debouncer.debounce('fetch-project-names',
-      Polymer.Async.timeOut.after(250),
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       function() {
         var self = this;
         const thunk = (this.$.projectNames as EtoolsPrpAjaxEl).thunk();
@@ -92,15 +95,15 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
           .catch(function(err: any) { // jshint ignore:line
             // TODO: error handling
           });
-      }, 100);
+      });
   };
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-    if (Debouncer.isActive('fetch-project-names')) {
-      Debouncer.cancel('fetch-project-names');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 }

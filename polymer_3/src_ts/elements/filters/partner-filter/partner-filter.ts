@@ -7,6 +7,7 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -60,20 +61,22 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     return ['_computeValue(data, value)'];
   }
 
+  private _debouncer!: Debouncer;
+
   _computeUrl(responsePlanID: string) {
     return Endpoints.clusterPartnerNames(responsePlanID);
   };
 
-  _computeValue(data, value) {
-    this._debouncer = Polymer.Debouncer.debounce('compute-value',
-      Polymer.Async.timeOut.after(250),
+  _computeValue(data: any, value: string) {
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
       function() {
         var index = data.findIndex(function(item) {
           return value === String(item.id);
         });
 
         this.set('computedValue', data[index === -1 ? 0 : index].id);
-      }, 100);
+      });
   };
 
   _fetchPartnerNames() {
@@ -99,8 +102,8 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.connectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
-    if (Debouncer.isActive('compute-value')) {
-      Debouncer.cancel('compute-value');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 }

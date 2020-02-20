@@ -6,9 +6,12 @@ import '../../etools-prp-ajax.html";
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
-import Endpoints from ''../../../ endpoints';
+import Endpoints from '../../../endpoints';
 import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
+import { EtoolsPrpAjaxEl } from '../../etools-prp-ajax';
 
 /**
  * @polymer
@@ -70,18 +73,22 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
     return ['_fetchClusterNames(clusterNamesUrl, params)'];
   };
 
+  private _debouncer!: Debouncer;
+
   _computeClusterNamesUrl(responsePlanID: string) {
     return Endpoints.clusterNames(responsePlanID);
   };
 
   _fetchClusterNames() {
-    this.debounce('fetch-cluster-names', function() {
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
+      () => {
       var self = this;
+      const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
+      (this.$.clusters as EtoolsPrpAjaxEl).abort();
 
-      this.$.clusterNames.abort();
-
-      this.$.clusterNames.thunk()()
-        .then(function(res) {
+      thunk()
+        .then(function(res: any) {
           self.set('data', [{
             id: '',
             title: 'All',
@@ -90,14 +97,15 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
         .catch(function(err) { // jshint ignore:line
           // TODO: error handling
         });
-    }, 100);
+    });
   };
 
-  detached() {
-    this.$.clusterNames.abort();
+  disconnectedCallback() {
+    super.connectedCallback();
+    (this.$.clusters as EtoolsPrpAjaxEl).abort();
 
-    if (this.isDebouncerActive('fetch-cluster-names')) {
-      this.cancelDebouncer('fetch-cluster-names');
+    if (this._debouncer.isActive()) {
+      this._debouncer.cancel();
     }
   };
 
