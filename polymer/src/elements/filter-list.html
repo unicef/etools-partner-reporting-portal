@@ -190,7 +190,7 @@
         setTimeout(() => {
           var filtersCount = this.filters.length - this.ignoredFilters.length;
           var readyCount = Object.keys(this.filtersReady).length;
-          console.log(this.filters, this.filtersReady);
+
           this.set('loading', readyCount < filtersCount);
         });
       },
