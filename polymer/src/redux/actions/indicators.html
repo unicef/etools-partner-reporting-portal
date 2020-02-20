@@ -60,7 +60,7 @@
               dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
               dispatch(App.Actions.Indicators.setIndicatorDetails(formattedById));
             })
-            .catch(function () {
+            .catch(function (err) {
               dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
             });
         };

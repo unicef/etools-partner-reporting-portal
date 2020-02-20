@@ -23,7 +23,7 @@
       },
 
       _filterReady: function () {
-        this.async(function () {
+        setTimeout(() => {
           this.fire('filter-ready', this.name);
         });
       },
