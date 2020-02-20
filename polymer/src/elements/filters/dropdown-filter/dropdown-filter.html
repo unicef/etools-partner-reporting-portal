@@ -92,7 +92,7 @@
       },
 
       _updateSelected: function (value, data) {
-        this.async(function () {
+        setTimeout(function () {
           this.set('selected', data.findIndex(function (item) {
             return String(item.id) === String(value);
           }));

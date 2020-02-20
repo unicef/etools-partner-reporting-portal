@@ -90,7 +90,7 @@
       },
 
       _setSelectedValues: function (value) {
-        this.async(function () {
+        setTimeout(function () {
           this.set('selectedValues', value.split(',').filter(Boolean));
         });
       },

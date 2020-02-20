@@ -53,7 +53,7 @@
       },
 
       _handleChange: function () {
-        this.async(function () {
+        setTimeout(function () {
           this.fire('filter-changed', {
             name: this.name,
             value: String(this.selectedItem.id),
