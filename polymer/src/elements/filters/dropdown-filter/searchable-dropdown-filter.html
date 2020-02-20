@@ -11,16 +11,8 @@
       }
     </style>
 
-    <etools-single-selection-menu
-        id="field"
-        label="[[label]]"
-        options="[[data]]"
-        option-value="id"
-        option-label="title"
-        selected="[[value]]"
-        selected-item="{{selectedItem}}"
-        disabled="[[disabled]]"
-        trigger-value-change-event>
+    <etools-single-selection-menu id="field" label="[[label]]" options="[[data]]" option-value="id" option-label="title"
+      selected="[[value]]" selected-item="{{selectedItem}}" disabled="[[disabled]]" trigger-value-change-event>
     </etools-single-selection-menu>
   </template>
 
@@ -53,7 +45,7 @@
       },
 
       _handleChange: function () {
-        setTimeout(() => {
+        this.async(function () {
           this.fire('filter-changed', {
             name: this.name,
             value: String(this.selectedItem.id),

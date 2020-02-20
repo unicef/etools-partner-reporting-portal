@@ -110,7 +110,7 @@
          * here's the place to put the logic for it.
          */
 
-        setTimeout(() => {
+        this.async(function () {
           var newParams = Object.assign({}, this.queryParams);
 
           if (change.value && change.value.length) {
@@ -187,7 +187,7 @@
       },
 
       _updateLoading: function () {
-        setTimeout(() => {
+        this.async(function () {
           var filtersCount = this.filters.length - this.ignoredFilters.length;
           var readyCount = Object.keys(this.filtersReady).length;
 
