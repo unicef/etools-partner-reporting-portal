@@ -15,11 +15,13 @@ import {modalStyles} from '../../styles/modal-styles'
 import '../etools-prp-number';
 import '../../redux/selectors/programmeDocumentDetails';
 import '../../redux/selectors/programmeDocuments';
+import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
 
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
+import { store } from '../../redux/store';
 //<link rel="import" href="js/authorized-officer-modal-functions.html">
 
 // @Lajos
@@ -173,8 +175,9 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Redux
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
-
-        self.dispatch(App.Actions.PDReports.updateSingle(
+        //@Lajos: for bellow: App.Actions.PDReports.updateSingle
+        //which fucntions should be
+        store.dispatch(pdReportsUpdateSingle(
           self.pdId,
           self.reportId,
           res.data
@@ -182,7 +185,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Redux
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch(function(res) {
+      .catch(function(res: any) {
         var errors = res.data.non_field_errors;
         self.close();
         return self.$.error.open(errors);

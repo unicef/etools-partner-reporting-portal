@@ -8,11 +8,8 @@ import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/etools-content-panel/etools-content-panel';
 import '@polymer/etools-loading/etools-loading';
-
-import {store} from '../../redux/store';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import action from '../../redux/actions';
 import '../labelled-item';
 import '../../redux/selectors/partner';
 import {GenericObject} from '../../typings/globals.types';

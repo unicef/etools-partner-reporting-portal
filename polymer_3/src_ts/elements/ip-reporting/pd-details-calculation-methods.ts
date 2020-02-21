@@ -1,35 +1,62 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
+import '@polymer/paper-radio-group/paper-radio-group';
+import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-button/paper-button';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@unicef-polymer/etoolsetools-loading/etools-loading';
+import '@unicef-polymer/etools-data-table/etools-data-table';
+//<link rel="import" href="../../polyfills/es6-shim.html">
+import Constants from '../../constants';
+import {store} from '../../redux/store';
+import '../../redux/actions';
+import UtilsMixin from '../../mixins/utils-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
+import {currentProgramDocuments} from '../../redux/selectors/programmeDocument';
+import '../../redux/selectors/programmeDocumentIndicators';
+import DataTableMixin from '../../mixins/data-table-mixin';
+import NotificationsMixin from '../../mixins/notifications-mixin';
+import '../page-body';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {pdIndicatorsFetch} from '../../redux/actions/pdIndicators';
+import {pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
+import {pdFetch} from '../../redux/actions/pd';
+import '../etools-prp-permissions';
+import '../confirm-box';
+import {tableStyles} from '../../styles/table-styles';
+import {buttonsStyles} from '../../styles/buttons-styles';
+import {GenericObject} from '../../typings/globals.types';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
+//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
+// @Lajos
+// behaviors: [
+//   behaviors: [
+  // App.Behaviors.ReduxBehavior,
+  // App.Behaviors.UtilsBehavior,
+  // App.Behaviors.DataTableBehavior,
+  // App.Behaviors.NotificationsBehavior,
+  // App.Behaviors.LocalizeBehavior,
+  // Polymer.AppLocalizeBehavior,
+// ],
+// ],
 
-<link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="../../constants.html">
-<link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../behaviors/localize.html">
-<link rel="import" href="../../redux/actions/localize.html">
-<link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../behaviors/notifications.html">
-<link rel="import" href="../page-body.html">
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-permissions.html">
-<link rel="import" href="../confirm-box.html">
-<link rel="import" href="../../styles/table-styles.html">
-<link rel="import" href="../../styles/buttons.html">
-<link rel="import" href="../calculation-methods-info-bar.html">
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin DataTableMixin
+ * @appliesMixin NotificationsMixin
+ */
+class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixin(NotificationsMixin(ReduxConnectedElement)))) {
 
-<link rel="import" href="js/pd-details-calculation-methods-functions.html">
-
-<dom-module id="pd-details-calculation-methods">
-  <template>
-    <style include="button-styles data-table-styles table-styles iron-flex iron-flex-reverse">
+  static get template() {
+    return html`
+    ${buttonsStyles} ${tableStyles}
+    <style include="data-table-styles iron-flex iron-flex-reverse">
       :host {
         display: block;
 
@@ -219,192 +246,169 @@
     </page-body>
 
     <confirm-box id="confirm"></confirm-box>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'pd-details-calculation-methods',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.DataTableBehavior,
-        App.Behaviors.NotificationsBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
 
-      properties: {
-        localData: Object,
-        permissions: Object,
 
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
+  @property({type: Object})
+  localData!: GenericObject;
 
-        pdId: {
-          type: String,
-          statePath: 'programmeDocuments.current',
-        },
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  locationId!: string;
 
-        loading: {
-          type: Boolean,
-          statePath: App.Selectors.ProgrammeDocumentIndicators.loading,
-        },
+  //@Lajos bellowes needs to be checked for states
+  @property({type: Boolean, computed: 'currentProgramDocuments(state)'})
+  pdId!: boolean;
 
-        data: {
-          typ: Array,
-          statePath: App.Selectors.ProgrammeDocumentIndicators.all,
-          observer: '_initLocalData',
-        },
+  @property({type: Boolean, computed: 'pdIndicatorsLoading(state)'})
+  loading!: boolean;
 
-        formattedData: {
-          type: Array,
-          computed: '_computeFormattedData(data)',
-        },
+  @property({type: Array, computed: 'pdIndicatorsAll(state)', observer: '_initLocalData'})
+  data!: any;
 
-        indicatorsUrl: {
-          type: String,
-          computed: '_computeIndicatorsUrl(locationId, pdId)',
-          observer: '_fetchData',
-        },
+  @property({type: Array, computed: '_computeFormattedData(data)'})
+  formattedData!: any;
 
-        programmeDocumentsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentsUrl(locationId)',
-        },
+  @property({type: String, computed: '_computeIndicatorsUrl(locationId, pdId)', observer: '_fetchData'})
+  indicatorsUrl!: string;
 
-        pdReportsCount: {
-          type: Object,
-          statePath: 'programmeDocumentReports.countByPD',
-          observer: '_getPdReports',
-        },
-      },
+  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
+  programmeDocumentsUrl!: string;
 
-      _initLocalData: function (data) {
-        this.set('localData', this._clone(data));
-      },
+  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
+  pdReportsCount!: GenericObject;
 
-      _computeIndicatorsUrl: function (locationId, pdId) {
-        return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
-      },
+  private _debouncer!: Debouncer;
 
-      _computeProgrammeDocumentsUrl: function (locationId) {
-        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
+  _initLocalData(data: any) {
+    this.set('localData', this._clone(data));
+  };
 
-      _computeFormattedData: function (data) {
-        return PdDetailsCalculationMethodsUtils.computeFormattedData(data);
-      },
+  _computeIndicatorsUrl(locationId: string, pdId: boolean) {
+    return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
+  };
 
-      _computeSelected: function (data, scope) {
-        return PdDetailsCalculationMethodsUtils.computeSelected(data, scope);
-      },
+  _computeProgrammeDocumentsUrl(locationId: string) {
+    return locationId ? Endpoints.programmeDocuments(locationId) : '';
+  };
 
-      _computeDisabled: function (display_type) {
-        return PdDetailsCalculationMethodsUtils.computeDisabled(display_type);
-      },
+  _computeFormattedData(data: any) {
+    return PdDetailsCalculationMethodsUtils.computeFormattedData(data);
+  };
 
-      _fetchData: function (url) {
-        if (!url) {
-          return;
-        }
+  _computeSelected(data: any, scope: any) {
+    return PdDetailsCalculationMethodsUtils.computeSelected(data, scope);
+  };
 
-        this.debounce('fetch-data', function () {
-          var indicatorsThunk = this.$.indicators.thunk();
+  _computeDisabled(display_type: any) {
+    return PdDetailsCalculationMethodsUtils.computeDisabled(display_type);
+  };
 
-          this.$.indicators.abort();
+  _fetchData(url: string) {
+    if (!url) {
+      return;
+    }
 
-          this.dispatch(App.Actions.PDIndicators.fetch(indicatorsThunk, this.pdId))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        });
-      },
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
+      () => {
+      var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
-      _onValueChanged: function (e) {
-        var newValue = e.target.selected;
-        var data = e.target.dataset;
-        var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
+      (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-        this.set([
-          'localData.ll_outputs_and_indicators',
-          indices.lloIndex,
-          'indicators',
-          indices.indicatorIndex,
-          data.scope,
-        ], newValue);
-      },
-
-      _save: function () {
-        var self = this;
-
-        this._confirmIntent()
-            .then(function () {
-              var updateThunk = self.$.update.thunk();
-
-              return self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
-            })
-            .then(this._notifyChangesSaved.bind(this))
-            .catch(this._noop);
-      },
-
-      _confirmIntent: function () {
-        var deferred = this._deferred();
-
-        this.$.confirm.run({
-          body:
-              'Please make sure the calculation methods for your indicators are ' +
-              'properly configured. Changing calculation methods would recalculate ' +
-              'progress reports for your indicators!',
-          result: deferred,
-          maxWidth: '500px',
-          mode: App.Constants.CONFIRM_MODAL,
-        });
-
-        return deferred.promise;
-      },
-
-      _canEdit: function (item, permissions) {
-        return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
-      },
-
-      _canSave: function (permissions) {
-        return PdDetailsCalculationMethodsUtils.canSave(permissions);
-      },
-
-      detached: function () {
-        this.$.indicators.abort();
-
-        if (this.isDebouncerActive('fetch-data')) {
-          this.cancelDebouncer('fetch-data');
-        }
-      },
-
-      _getPdReports: function () {
-        // Status being present prevents Redux / res.data from getting reports,
-        // preventing pd-details title from rendering. In that case (which we
-        // check by seeing if this.pdReportsCount is present), just get the reports again
-        if (this.pdReportsCount[this.pdId] === undefined) {
-          this.debounce('fetch-pds', function () {
-            var pdThunk = this.$.programmeDocuments;
-            pdThunk.params = {
-              page: 1,
-              page_size: 10,
-              programme_document: this.pdId
-            };
-
-            // Cancel the pending request, if any
-            this.$.programmeDocuments.abort();
-
-            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-          }, 100);
-        }
-      },
+      this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
     });
-  </script>
-</dom-module>
+  };
+
+  _onValueChanged(e: CustomEvent) {
+    var newValue = e.target.selected;
+    var data = e.target.dataset;
+    var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
+
+    this.set([
+      'localData.ll_outputs_and_indicators',
+      indices.lloIndex,
+      'indicators',
+      indices.indicatorIndex,
+      data.scope,
+    ], newValue);
+  };
+
+  _save() {
+    var self = this;
+
+    this._confirmIntent()
+        .then(function () {
+          var updateThunk = self.$.update.thunk();
+
+          return store.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
+        })
+        .then(this._notifyChangesSaved.bind(this))
+        .catch(this._noop);
+  };
+
+  _confirmIntent() {
+    var deferred = this._deferred();
+    //@lajos: not sure about his bellow
+    this.$.confirm.run({
+      body:
+          'Please make sure the calculation methods for your indicators are ' +
+          'properly configured. Changing calculation methods would recalculate ' +
+          'progress reports for your indicators!',
+      result: deferred,
+      maxWidth: '500px',
+      //where to find it?
+      mode: Constants.CONFIRM_MODAL,
+    });
+
+    return deferred.promise;
+  };
+
+  _canEdit(item: any, permissions: any) {
+    return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
+  };
+
+  _canSave(permissions: any) {
+    return PdDetailsCalculationMethodsUtils.canSave(permissions);
+  };
+
+  detached() {
+    (this.$.indicators as EtoolsPrpAjaxEl).abort();
+
+    if(this._debouncer.isActive()){
+      this._debouncer.cancel();
+    }
+  };
+
+  _getPdReports() {
+    // Status being present prevents Redux / res.data from getting reports,
+    // preventing pd-details title from rendering. In that case (which we
+    // check by seeing if this.pdReportsCount is present), just get the reports again
+    if (this.pdReportsCount[this.pdId] === undefined) {
+      this._debouncer = Debouncer.debounce(this._debouncer,
+        timeOut.after(250),
+        () => {
+        var pdThunk = this.$.programmeDocuments;
+        pdThunk.params = {
+          page: 1,
+          page_size: 10,
+          programme_document: this.pdId
+        };
+        // Cancel the pending request, if any
+        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+
+        this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      });
+    }
+  }
+}
+
+window.customElements.define('pd-details-calculation-methods', PdDetailsCalculationMethods);

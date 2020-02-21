@@ -1,28 +1,40 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-spinner/paper-spinner.html">
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 
-<link rel="import" href="../../settings.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/programmeDocuments.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../styles/table-styles.html">
+import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/paper-spinner/paper-spinner';
+import '@unicef-polymer/etoolsetools-loading/etools-loading';
+import '../../settings';
+import {store} from '../../redux/store';
+import {currentProgramDocuments} from '../../redux/selectors/programmeDocument';
+import UtilsMixin from '../../mixins/utils-mixin';
+import NotificationsMixin from '../../mixins/notifications-mixin';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 
-<link rel="import" href="../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/sorting.html">
-<link rel="import" href="../../behaviors/notifications.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/programmeDocuments.html">
-<link rel="import" href="../../endpoints.html">
+//<link rel="import" href="js/pd-details-doc-download-functions">
+//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
+// @Lajos
+// behaviors: [
+//   behaviors: [
+  // App.Behaviors.UtilsBehavior,
+  // App.Behaviors.ReduxBehavior,
+  // App.Behaviors.NotificationsBehavior
+// ],
+// ],
 
-<link rel="import" href="js/pd-details-doc-download-functions.html">
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin NotificationsMixin
+ */
+class PdDetailsDocDownload extends UtilsMixin(NotificationsMixin(ReduxConnectedElement)) {
 
-<dom-module id="pd-details-doc-download">
-  <template>
+  static get template() {
+    return html`
     <style>
       .spinner-size {
         width: 19px;
@@ -42,72 +54,54 @@
         id="pddoc"
         url="[[pdDocumentUrl]]">
     </etools-prp-ajax>
+  `;
+  }
 
 
-  </template>
-  <script>
-    Polymer({
-      is: 'pd-details-doc-download',
-
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.NotificationsBehavior
-      ],
-
-      properties: {
-        spinnerActive: {
-          type: Boolean,
-          value: false
-        },
-        pd: {
-          type: Object,
-          value: {},
-          statePath: App.Selectors.ProgrammeDocuments.current
-        },
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
-
-        pdDocumentUrl: {
-          type: String,
-          computed: '_computeDocUrl(locationId, pd.id)'
-        },
-        docUrl: {
-          type: String
-        }
-      },
-
-      _computeDocUrl: function (locationId, pdId) {
-        return PdDetailsDocDownloadUtils.computeDocUrl(locationId, pdId);
-      },
-
-      _openDoc: function (e) {
-        var self = this;
-        e.preventDefault();
-        this.set('spinnerActive', true);
-        this.$.pddoc.thunk()()
-            .then(function (res) {
-              self.set('spinnerActive', false);
-              console.log(res);
-              if (res.status !== 200 || !res.data.signed_pd_document_file) {
-                // Fire Toast with error
-                self._notifyServerError();
-                console.error(res);
-              } else {
-                var anchor = document.createElement('a');
-                anchor.setAttribute('href', res.data.signed_pd_document_file);
-                anchor.setAttribute('target', '_blank');
-                anchor.dispatchEvent(new MouseEvent('click',
-                  {bubbles: true, cancelable: true, view: window})
-                );
-                anchor.delete();
-              }
-            });
-      }
-      });
-    </script>
 
 
-</dom-module>
+  @property({type: Boolean})
+  spinnerActive!: boolean;
+
+  //@Lajos bellowes needs to be checked for states
+  @property({type: Object, computed: 'currentProgramDocuments(state)'})
+  pd = {};
+
+
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  locationId!: string;
+
+  @property({type: String, computed: '_computeDocUrl(locationId, pd.id)'})
+  pdDocumentUrl!: string;
+
+  @property({type: String})
+  docUrl!: string;
+
+  _openDoc(e: CustomEvent) {
+    var self = this;
+    e.preventDefault();
+    this.set('spinnerActive', true);
+    const thunk = (this.$.pddoc as EtoolsPrpAjaxEl).thunk();
+    
+    thunk()
+        .then(function (res: any) {
+          self.set('spinnerActive', false);
+          // console.log(res);
+          if (res.status !== 200 || !res.data.signed_pd_document_file) {
+            // Fire Toast with error
+            self._notifyServerError();
+            console.error(res);
+          } else {
+            var anchor = document.createElement('a');
+            anchor.setAttribute('href', res.data.signed_pd_document_file);
+            anchor.setAttribute('target', '_blank');
+            anchor.dispatchEvent(new MouseEvent('click',
+              {bubbles: true, cancelable: true, view: window})
+            );
+            anchor.delete();
+          }
+        });
+  }
+}
+
+window.customElements.define('pd-details-doc-download', PdDetailsDocDownload);

@@ -10,12 +10,13 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {EtoolsPrpNumberEl} from '../etools-prp-number';
-import action from '../../redux/actions';
+import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../labelled-item';
 import '../report-status';
 import '../disaggregations/disaggregation-table';
 import '../list-placeholder';
 import {GenericObject} from '../../typings/globals.types';
+import { Indicators } from '../../redux/reducers/indicators';
 
 //<link rel="import" href="js/ip-reporting-indicator-details-functions.html">
 
@@ -285,15 +286,15 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
 
   _openChanged() {
     if (this.isOpen) {
-      var thunk = this.$.indicatorDetail.thunk();
+      var thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
       //need to check
-      var action = App.Actions.Indicators;
-      action.dispatch(action.fetchIndicatorDetails(thunk, this.indicator.id))
+      var action = Indicators;
+      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
         .catch(function(err) { // jshint ignore:line
           // TODO: error handling.
         });
     } else {
-      this.$.indicatorDetail.abort();
+      (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
     }
   };
 }

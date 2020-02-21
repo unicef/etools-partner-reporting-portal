@@ -1,18 +1,41 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
 
-<link rel="import" href="../list-placeholder.html">
-<link rel="import" href="../../styles/table-styles.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../behaviors/localize.html">
-<link rel="import" href="../../redux/actions/localize.html">
+import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/paper-spinner/paper-spinner';
+import '@unicef-polymer/etoolsetools-loading/etools-loading';
+import '../../settings';
+import UtilsMixin from '../../mixins/utils-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
+import {tableStyles} from '../../styles/table-styles';
 
-<link rel="import" href="js/pd-details-reporting-requirements-functions.html">
+//<link rel="import" href="js/pd-details-doc-download-functions">
+//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
+// @Lajos
+// behaviors: [
+//   behaviors: [
+  // App.Behaviors.UtilsBehavior,
+  //       App.Behaviors.ReduxBehavior,
+  //       App.Behaviors.LocalizeBehavior,
+  //       Polymer.AppLocalizeBehavior,
+// ],
+// ],
 
-<dom-module id="pd-details-reporting-requirements">
-  <template>
-    <style include="data-table-styles table-styles">
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ */
+class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+//not sure about data table styles....
+  static get template() {
+    return html`
+    ${tableStyles}
+    <style include="data-table-styles">
       :host {
         display: block;
 
@@ -70,28 +93,22 @@
           message="No reports found">
       </list-placeholder>
     </section>
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'pd-details-reporting-requirements',
+  @property({type: Array})
+  data!: any;
 
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
-        Polymer.AppLocalizeBehavior,
-      ],
+  @property({type: Boolean})
+  loading!: boolean;
 
-      properties: {
-        data: Array,
-        loading: Boolean,
-        title: String,
-      },
+  @property({type: String})
+  title!: String;
+  
 
-      _getReportName: function (type, index, localize) {
-        return PdDetailsReportingRequirementsUtils.getReportName(type, index, localize);
-      },
-    });
-  </script>
-</dom-module>
+  _getReportName(type: any, index: any, localize: any) {
+    return PdDetailsReportingRequirementsUtils.getReportName(type, index, localize);
+  };
+}
+
+window.customElements.define('pd-details-reporting-requirements', PdDetailsReportingRequirements);

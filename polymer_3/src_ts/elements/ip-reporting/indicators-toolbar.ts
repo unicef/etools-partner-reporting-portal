@@ -1,7 +1,5 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {html} from '@polymer/polymer';
+import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import Endpoints from '../../endpoints';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-toolbar';
 import '../download-button';
@@ -20,7 +18,7 @@ import '../download-button';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class IndicatorsToolbar extends UtilsMixin(ReduxConnectedElement) {
+class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`

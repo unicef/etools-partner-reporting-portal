@@ -1,18 +1,44 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+import {property} from '@polymer/decorators';
+import {html} from '@polymer/polymer';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
 
-<link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
-<link rel="import" href="../../elements/ip-reporting/pd-reports-toolbar.html">
-<link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/actions.html">
+import '../ip-reporting/pd-report-filters';
+import '../ip-reporting/pd-reports-toolbar';
+import '../ip-reporting/pd-reports-list';
+import '../../settings';
+import {tableStyles} from '../../styles/table-styles';
+import { ReduxConnectedElement } from '../../ReduxConnectedElement';
+import { GenericObject } from '../../typings/globals.types';
+import Endpoints from '../../endpoints';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import { store } from '../../redux/store';
+import { pdReportsFetch } from '../../redux/actions/pdReports';
+//<link rel="import" href="../../polyfills/es6-shim.html">
+//<link rel="import" href="js/pd-details-reports-functions.html">
 
-<link rel="import" href="js/pd-details-reports-functions.html">
+// @Lajos
+// behaviors: [
+//   behaviors: [
+  // App.Behaviors.UtilsBehavior,
+  //       App.Behaviors.ReduxBehavior,
+  //       App.Behaviors.LocalizeBehavior,
+  //       Polymer.AppLocalizeBehavior,
+// ],
+// ],
 
-<dom-module id="pd-details-reports">
-  <template>
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ */
+class PdDetailsReport extends ReduxConnectedElement {
+//not sure about data table styles....
+  static get template() {
+    return html`
+    ${tableStyles}
     <style include="data-table-styles table-styles">
       :host {
         display: block;
@@ -45,119 +71,70 @@
       <pd-reports-list></pd-reports-list>
     </page-body>
 
-  </template>
+  `;
+  }
 
-  <script>
-    Polymer({
-      is: 'pd-details-reports',
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  locationId!: string;
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
+  pdId!: string;
 
-      properties: {
-        pdId: {
-          type: String,
-          statePath: 'programmeDocuments.current',
-        },
+  @property({type: String, computed: '_computePDReportsUrl(locationId)'})
+  pdReportsUrl!: string;
 
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
+  @property({type: Object, computed: '_computePDReportsParams(pdId, queryParams)'})
+  pdReportsParams!: GenericObject;
 
-        pdReportsUrl: {
-          type: String,
-          computed: '_computePDReportsUrl(locationId)',
-        },
+  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
+  programmeDocumentsUrl!: string;
 
-        pdReportsParams: {
-          type: Object,
-          computed: '_computePDReportsParams(pdId, queryParams)',
-        },
+  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
+  pdReportsCount!: GenericObject;
 
-        programmeDocumentsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentsUrl(locationId)',
-        },
+  @property({type: String, computed:'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
+  pdReportsId!: string;
+ 
+  private _debouncer!: Debouncer;
 
-        pdReportsId: {
-          type: String,
-          statePath: 'programmeDocumentReports.current.id',
-        },
+  public static get observers() {
+    return [
+      '_handleInputChange(pdReportsUrl, pdReportsParams)',
+    ]
+  }
 
-        pdReportsCount: {
-          type: Object,
-          statePath: 'programmeDocumentReports.countByPD',
-          observer: '_getPdReports',
-        }
-      },
+  _computePDReportsUrl(locationId: string) {
+    return PdDetailsReportsUtils.computePDReportsUrl(locationId);
+  };
 
-      observers: [
-        '_handleInputChange(pdReportsUrl, pdReportsParams)',
-      ],
+  _computePDReportsParams(pdId: string, queryParams: string) {
+    return PdDetailsReportsUtils.computePDReportsParams(pdId, queryParams);
+  };
 
-      _computePDReportsUrl: function (locationId) {
-        return PdDetailsReportsUtils.computePDReportsUrl(locationId);
-      },
+  _computeProgrammeDocumentsUrl(locationId: string) {
+    return locationId ? Endpoints.programmeDocuments(locationId) : '';
+  };
 
-      _computePDReportsParams: function (pdId, queryParams) {
-        return PdDetailsReportsUtils.computePDReportsParams(pdId, queryParams);
-      },
+  _handleInputChange(url: string) {
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
+      () => {
+      var pdReportsThunk;
+      if (!url) {
+        return;
+      }
 
-      _computeProgrammeDocumentsUrl: function (locationId) {
-        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
+      pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
 
-      _handleInputChange: function (url) {
-        this.debounce('fetch-data', function () {
-          var pdReportsThunk;
+      // Cancel the pending request, if any
+      (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-          if (!url) {
-            return;
-          }
-
-          pdReportsThunk = this.$.pdReports.thunk();
-
-          // Cancel the pending request, if any
-          this.$.pdReports.abort();
-
-          this.dispatch(App.Actions.PDReports.fetch(pdReportsThunk, this.pdId))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        }, 300);
-      },
-
-      detached: function () {
-        if (this.isDebouncerActive('fetch-data')) {
-          this.cancelDebouncer('fetch-data');
-        }
-      },
-
-      _getPdReports: function () {
-        // Status being present prevents res.data from getting reports,
-        // preventing pd-details title from rendering. Deleting the status
-        // can resolve this issue, and filter will still work
-        if (this.pdReportsCount[this.pdId] > 0 && this.pdReportsId === '') {
-          this.debounce('fetch-pds', function () {
-            var pdThunk = this.$.programmeDocuments;
-            pdThunk.params = {
-              page: 1,
-              page_size: 10,
-              programme_document: this.pdId
-            };
-
-            // Cancel the pending request, if any
-            this.$.programmeDocuments.abort();
-
-            this.dispatch(App.Actions.PD.fetch(pdThunk.thunk()))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-          }, 100);
-        }
-      },
+      store.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
     });
-  </script>
-</dom-module>
+  };
+}
+
+window.customElements.define('pd-details-reports', PdDetailsReport);
