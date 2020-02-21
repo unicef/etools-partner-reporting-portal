@@ -1,0 +1,414 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators';
+import '@polymer/paper-radio-group/paper-radio-group';
+import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-button/paper-button';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@unicef-polymer/etoolsetools-loading/etools-loading';
+import '@unicef-polymer/etools-data-table/etools-data-table';
+//<link rel="import" href="../../polyfills/es6-shim.html">
+import Constants from '../../constants';
+import {store} from '../../redux/store';
+import '../../redux/actions';
+import UtilsMixin from '../../mixins/utils-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
+import {currentProgramDocuments} from '../../redux/selectors/programmeDocument';
+import '../../redux/selectors/programmeDocumentIndicators';
+import DataTableMixin from '../../mixins/data-table-mixin';
+import NotificationsMixin from '../../mixins/notifications-mixin';
+import '../page-body';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {pdIndicatorsFetch} from '../../redux/actions/pdIndicators';
+import {pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
+import {pdFetch} from '../../redux/actions/pd';
+import '../etools-prp-permissions';
+import '../confirm-box';
+import {tableStyles} from '../../styles/table-styles';
+import {buttonsStyles} from '../../styles/buttons-styles';
+import {GenericObject} from '../../typings/globals.types';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
+import { timeOut } from '@polymer/polymer/lib/utils/async';
+//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
+// @Lajos
+// behaviors: [
+//   behaviors: [
+  // App.Behaviors.ReduxBehavior,
+  // App.Behaviors.UtilsBehavior,
+  // App.Behaviors.DataTableBehavior,
+  // App.Behaviors.NotificationsBehavior,
+  // App.Behaviors.LocalizeBehavior,
+  // Polymer.AppLocalizeBehavior,
+// ],
+// ],
+
+/**
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin DataTableMixin
+ * @appliesMixin NotificationsMixin
+ */
+class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixin(NotificationsMixin(ReduxConnectedElement)))) {
+
+  static get template() {
+    return html`
+    ${buttonsStyles} ${tableStyles}
+    <style include="data-table-styles iron-flex iron-flex-reverse">
+      :host {
+        display: block;
+
+        --data-table-header: {
+          height: auto;
+        };
+
+        --header-title: {
+          display: none;
+        };
+      }
+
+      .wrapper {
+        min-height: 80px;
+        position: relative;
+      }
+
+      .pd-output {
+        --list-bg-color: var(--paper-grey-200);
+
+        font-weight: bold;
+      }
+
+      paper-radio-button {
+        padding: 0 !important;
+      }
+
+      paper-radio-button:not(:first-child) {
+        margin-left: 12px;
+      }
+
+      .buttons {
+        margin: 1em 0;
+      }
+    </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="indicators"
+        url="[[indicatorsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        method="post"
+        url="[[indicatorsUrl]]"
+        body="[[localData]]"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <page-body>
+      <calculation-methods-info-bar></calculation-methods-info-bar>
+      <etools-data-table-header no-collapse>
+        <etools-data-table-column>
+          <div class="table-column">[[localize('indicators_for_pd')]]</div>
+        </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
+        </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <div class="wrapper">
+        <template
+            is="dom-repeat"
+            items="[[formattedData]]"
+            initial-count="[[pageSize]]">
+          <template
+              is="dom-if"
+              if="[[_equals(item.type, 'label')]]"
+              restamp="true">
+            <etools-data-table-row
+                class="pd-output"
+                no-collapse>
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">[[item.text]]</div>
+              </div>
+            </etools-data-table-row>
+          </template>
+
+          <template
+              is="dom-if"
+              if="[[_equals(item.type, 'data')]]"
+              restamp="true">
+            <etools-data-table-row no-collapse>
+              <div slot="row-data">
+                <div class="table-cell">[[item.data.title]]</div>
+                <div class="table-cell">
+                  <template
+                      is="dom-if"
+                      if="[[_canEdit(item, permissions)]]">
+                    <paper-radio-group
+                        data-id$="[[item.data.id]]"
+                        data-llo-id$="[[item.llo_id]]"
+                        data-scope="calculation_formula_across_locations"
+                        on-paper-radio-group-changed="_onValueChanged"
+                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                      <paper-radio-button
+                          name="sum"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('sum')]]
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="max"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('max')]]
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="avg"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('avg')]]
+                      </paper-radio-button>
+                    </paper-radio-group>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[!_canEdit(item, permissions)]]">
+                    [[item.data.calculation_formula_across_locations]]
+                  </template>
+                </div>
+                <div class="table-cell">
+                  <template
+                      is="dom-if"
+                      if="[[_canEdit(item, permissions)]]">
+                    <paper-radio-group
+                        data-id$="[[item.data.id]]"
+                        data-llo-id$="[[item.llo_id]]"
+                        data-scope="calculation_formula_across_periods"
+                        on-paper-radio-group-changed="_onValueChanged"
+                        selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]"
+                        disabled="[[_computeDisabled(item.data)]]">
+                      <paper-radio-button
+                          name="sum"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('sum')]]
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="max"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('max')]]
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="avg"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        [[localize('avg')]]
+                      </paper-radio-button>
+                    </paper-radio-group>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[!_canEdit(item, permissions)]]">
+                    [[item.data.calculation_formula_across_periods]]
+                  </template>
+                </div>
+              </div>
+            </etools-data-table-row>
+          </template>
+        </template>
+
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+
+      <template
+          is="dom-if"
+          if="[[_canSave(permissions)]]"
+          restamp="true">
+        <div class="buttons layout horizontal-reverse">
+          <paper-button
+              on-tap="_save"
+              class="btn-primary"
+              disabled="[[loading]]"
+              raised>
+            [[localize('save')]]
+          </paper-button>
+        </div>
+      </template>
+    </page-body>
+
+    <confirm-box id="confirm"></confirm-box>
+  `;
+  }
+
+
+
+
+  @property({type: Object})
+  localData!: GenericObject;
+
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  locationId!: string;
+
+  //@Lajos bellowes needs to be checked for states
+  @property({type: Boolean, computed: 'currentProgramDocuments(state)'})
+  pdId!: boolean;
+
+  @property({type: Boolean, computed: 'pdIndicatorsLoading(state)'})
+  loading!: boolean;
+
+  @property({type: Array, computed: 'pdIndicatorsAll(state)', observer: '_initLocalData'})
+  data!: any;
+
+  @property({type: Array, computed: '_computeFormattedData(data)'})
+  formattedData!: any;
+
+  @property({type: String, computed: '_computeIndicatorsUrl(locationId, pdId)', observer: '_fetchData'})
+  indicatorsUrl!: string;
+
+  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
+  programmeDocumentsUrl!: string;
+
+  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
+  pdReportsCount!: GenericObject;
+
+  private _debouncer!: Debouncer;
+
+  _initLocalData(data: any) {
+    this.set('localData', this._clone(data));
+  };
+
+  _computeIndicatorsUrl(locationId: string, pdId: boolean) {
+    return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
+  };
+
+  _computeProgrammeDocumentsUrl(locationId: string) {
+    return locationId ? Endpoints.programmeDocuments(locationId) : '';
+  };
+
+  _computeFormattedData(data: any) {
+    return PdDetailsCalculationMethodsUtils.computeFormattedData(data);
+  };
+
+  _computeSelected(data: any, scope: any) {
+    return PdDetailsCalculationMethodsUtils.computeSelected(data, scope);
+  };
+
+  _computeDisabled(display_type: any) {
+    return PdDetailsCalculationMethodsUtils.computeDisabled(display_type);
+  };
+
+  _fetchData(url: string) {
+    if (!url) {
+      return;
+    }
+
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(250),
+      () => {
+      var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+
+      (this.$.indicators as EtoolsPrpAjaxEl).abort();
+
+      this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+    });
+  };
+
+  _onValueChanged(e: CustomEvent) {
+    var newValue = e.target.selected;
+    var data = e.target.dataset;
+    var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
+
+    this.set([
+      'localData.ll_outputs_and_indicators',
+      indices.lloIndex,
+      'indicators',
+      indices.indicatorIndex,
+      data.scope,
+    ], newValue);
+  };
+
+  _save() {
+    var self = this;
+
+    this._confirmIntent()
+        .then(function () {
+          var updateThunk = self.$.update.thunk();
+
+          return store.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
+        })
+        .then(this._notifyChangesSaved.bind(this))
+        .catch(this._noop);
+  };
+
+  _confirmIntent() {
+    var deferred = this._deferred();
+    //@lajos: not sure about his bellow
+    this.$.confirm.run({
+      body:
+          'Please make sure the calculation methods for your indicators are ' +
+          'properly configured. Changing calculation methods would recalculate ' +
+          'progress reports for your indicators!',
+      result: deferred,
+      maxWidth: '500px',
+      //where to find it?
+      mode: Constants.CONFIRM_MODAL,
+    });
+
+    return deferred.promise;
+  };
+
+  _canEdit(item: any, permissions: any) {
+    return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
+  };
+
+  _canSave(permissions: any) {
+    return PdDetailsCalculationMethodsUtils.canSave(permissions);
+  };
+
+  detached() {
+    (this.$.indicators as EtoolsPrpAjaxEl).abort();
+
+    if(this._debouncer.isActive()){
+      this._debouncer.cancel();
+    }
+  };
+
+  _getPdReports() {
+    // Status being present prevents Redux / res.data from getting reports,
+    // preventing pd-details title from rendering. In that case (which we
+    // check by seeing if this.pdReportsCount is present), just get the reports again
+    if (this.pdReportsCount[this.pdId] === undefined) {
+      this._debouncer = Debouncer.debounce(this._debouncer,
+        timeOut.after(250),
+        () => {
+        var pdThunk = this.$.programmeDocuments;
+        pdThunk.params = {
+          page: 1,
+          page_size: 10,
+          programme_document: this.pdId
+        };
+        // Cancel the pending request, if any
+        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+
+        this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      });
+    }
+  }
+}
+
+window.customElements.define('pd-details-calculation-methods', PdDetailsCalculationMethods);
