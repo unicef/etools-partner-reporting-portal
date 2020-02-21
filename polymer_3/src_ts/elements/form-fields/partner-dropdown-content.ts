@@ -66,7 +66,7 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   }
 
   _fetchPartnerNames() {
-    var self = this;
+    const self = this;
 
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 

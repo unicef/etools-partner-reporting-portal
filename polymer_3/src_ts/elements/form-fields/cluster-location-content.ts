@@ -41,7 +41,7 @@ class ClusterLocationContent extends ReduxConnectedElement {
   }
 
   _fetchLocationNames() {
-    var self = this;
+    const self = this;
 
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
 
