@@ -82,7 +82,7 @@
 
         loading: {
           type: Boolean,
-          value: false,
+          value: true,
         },
 
         hideClear: {
@@ -190,11 +190,17 @@
         this.async(function () {
           var filtersCount = this.filters.length - this.ignoredFilters.length;
           var readyCount = Object.keys(this.filtersReady).length;
-
-          this.set('loading', readyCount < filtersCount);
+          if (readyCount === filtersCount) {
+            this.set('loading', false);
+          }
         });
       },
 
+      attached() {
+        this.async(function () {
+          this.loading = false;
+        }, 2000);
+      }
     });
   </script>
 </dom-module>
