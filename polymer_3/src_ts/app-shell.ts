@@ -122,7 +122,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   @property({type: Boolean})
   error: boolean = false;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
   public static get observers() {

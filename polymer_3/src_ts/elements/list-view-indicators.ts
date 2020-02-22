@@ -1,4 +1,5 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
@@ -20,8 +21,6 @@ import './message-box';
 import './etools-prp-permissions';
 import {GenericObject} from '../typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
-
-// <link rel="import" href="../styles/table-styles.html">
 
 
 /**
@@ -176,8 +175,6 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
         </etools-data-table-footer>
 
       </etools-content-panel>
-
-
     `;
   }
 
@@ -217,9 +214,8 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   @property({type: Boolean, computed: '_computeHaveReports(isClusterApp, type)'})
   haveReports!: boolean;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
-  // statePath: 'app.current',
 
   @property({type: Boolean, computed: '_computeCanEditLocations(isClusterApp, type, permissions)'})
   canEditLocations!: boolean;

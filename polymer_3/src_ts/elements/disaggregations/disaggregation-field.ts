@@ -2,17 +2,17 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-input/paper-input';
-import DisaggregationMixin from '../../mixins/disaggregations-mixin';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
+import DisaggregationFieldMixin from '../../mixins/disaggregation-field-mixin';
 import {fireEvent} from '../../utils/fire-custom-event';
-//<link rel="import" href="../../behaviors/disaggregation-field.html">
-
+import {GenericObject} from '../../typings/globals.types';
 
 /**
  * @polymer
  * @customElement
- * @appliesMixin DisaggregationMixin
+ * @appliesMixin DisaggregationFieldMixin
  */
-class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
+class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement) {
   public static get template() {
     // language=HTML
     return html`
@@ -69,11 +69,11 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
 
 
   ready() {
-    this.$.field.validate();
+    (this.$.field as PaperInputElement).validate();
   };
 
   attached() {
-    this.$.field.validate();
+    (this.$.field as PaperInputElement).validate();
     fireEvent(this, 'register-field', this);
   };
 
@@ -87,7 +87,7 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
   // detached: function () {}
 
   validate() {
-    return this.$.field.validate();
+    return (this.$.field as PaperInputElement).validate();
   };
 
   getField() {
@@ -95,7 +95,7 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
   };
 
   _inputValueChanged(e: CustomEvent) {
-    var change = {};
+    let change: GenericObject = {};
 
     change[this.key] = e.target.value;
 

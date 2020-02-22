@@ -65,7 +65,7 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     `;
   }
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.partner.current)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
   @property({type: Boolean, computed: 'partnerLoading(rootState)'})

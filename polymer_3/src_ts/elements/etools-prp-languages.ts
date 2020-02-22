@@ -1,29 +1,22 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {GenericObject} from '../typings/globals.types';
-
-//(dci)
-//<link rel="import" href="../redux/store.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-// ],
 
 /**
  * @polymer
  * @customElement
  */
-class EtoolsPrpLanguages extends PolymerElement {
+class EtoolsPrpLanguages extends ReduxConnectedElement {
 
   static get template() {
     return html``;
   }
 
-  // statePath: 'localize.language',
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
   _current!: string;
 
-  // statePath: 'localize.resources',
-  @property({type: Object})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.localize.resources)'})
   _all!: GenericObject;
 
   @property({type: String, notify: true, computed: '_computeCurrent(_current)'})

@@ -9,15 +9,6 @@ import {fireEvent} from '../utils/fire-custom-event';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {setToken, resetToken} from '../redux/actions';
 
-//<link rel="import" href="../redux/store.html">
-// <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
-// <link rel="import" href="../../bower_components/polymer-cookie/polymer-cookie.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.NotificationsBehavior,
-// ],
-
 /**
  * @polymer
  * @customElement
@@ -56,7 +47,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     </iron-ajax>
   `;
   }
-  // DONE statePath: 'auth.token',
+
   @property({type: String, computed: 'getReduxStateValue(rootState.auth.token)'})
   token!: string;
 
@@ -162,14 +153,14 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
 
   thunk() {
     const self = this;
-    return (function () {
+    return (function() {
       const req = self.generateRequest();
 
       return req.completes
-        .then(function () {
+        .then(function() {
           return self._buildResponse(req);
         })
-        .catch(function () {
+        .catch(function() {
           return Promise.reject(self._buildResponse(req));
         });
     }.bind(this));

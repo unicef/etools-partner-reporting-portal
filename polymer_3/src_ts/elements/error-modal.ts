@@ -7,10 +7,6 @@ import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions/localize.html">
-
-
 /**
  * @polymer
  * @customElement
@@ -78,7 +74,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.set('errors', errors);
     this.set('opened', true);
 
-    this.set('_result', new Promise(function (resolve) {
+    this.set('_result', new Promise(function(resolve) {
       self.addEventListener('opened-changed', function onOpenedChanged() {
         self.removeEventListener('opened-changed', onOpenedChanged);
 
@@ -94,7 +90,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    let localizedErrors = errors.map(function (error) {
+    let localizedErrors = errors.map(function(error) {
       switch (error) {
         case 'You have not selected overall status for one of Outputs':
           return localize('not_selected_overall_status');

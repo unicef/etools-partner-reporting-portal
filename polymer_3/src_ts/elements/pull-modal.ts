@@ -33,16 +33,7 @@ import Endpoints from '../endpoints';
 import {tableStyles} from '../styles/table-styles';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
-// (dci)
-
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ModalBehavior,
-//   App.Behaviors.NotificationsBehavior,
-// ],
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
  * @polymer
@@ -232,7 +223,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
   _save() {
     const self = this;
-    this.$.pull.thunk()()
+    (this.$.pull as EtoolsPrpAjaxEl).thunk()()
       .then(function() {
         self.close();
         fireEvent(self, 'locations-updated');
@@ -249,9 +240,9 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
   open() {
     const self = this;
-    this.$.reports.abort();
+    (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    const thunk = this.$.reports.thunk();
+    const thunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then(function(res: GenericObject) {
         self.set('data', {'reports': res.data});
