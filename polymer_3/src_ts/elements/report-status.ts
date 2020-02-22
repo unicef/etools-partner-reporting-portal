@@ -1,13 +1,9 @@
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import './status-badge';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
-
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../behaviors/localize.html">
-// <link rel="import" href="../redux/actions/localize.html">
 
 /**
  * @polymer

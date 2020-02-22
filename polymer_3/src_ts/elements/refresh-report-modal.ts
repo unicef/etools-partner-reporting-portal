@@ -23,19 +23,7 @@ import './etools-prp-number';
 import './etools-prp-ajax';
 import {buttonsStyles} from "../styles/buttons-styles";
 import {modalStyles} from "../styles/modal-styles";
-
-// (dci) import ajax ???
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../redux/actions/localize.html">
-
-// <!-- behaviors: [
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.ModalBehavior,
-// App.Behaviors.UtilsBehavior,
-// App.Behaviors.RoutingBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
  * @polymer
@@ -134,7 +122,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
     const self = this;
     this.set('busy', true);
 
-    const refreshThunk = this.$.refreshReport.thunk();
+    const refreshThunk = (this.$.refreshReport as EtoolsPrpAjaxEl).thunk();
     refreshThunk()
       .then(function() {
         window.location.reload();

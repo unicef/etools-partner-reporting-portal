@@ -17,18 +17,6 @@ import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
 import {buttonsStyles} from '../styles/buttons-styles';
 
-// (dci)
-// <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../behaviors/progressReportUtils.html">
-// <link rel="import" href="../styles/buttons.html">
-
-// <!-- behaviors: [
-// App.Behaviors.UtilsBehavior,
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
-// ]
-
 /**
  * @polymer
  * @customElement
@@ -212,7 +200,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _handleInput(event: CustomEvent) {
-    let field = event.composedPath()[0];
+    let field = event.composedPath()[0] as GenericObject;
     const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment');
 
     if (narrativeTextInput && this.toggle === 'Edit' && field.id === 'toggle-button') {

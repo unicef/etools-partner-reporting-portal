@@ -1,7 +1,5 @@
 import {html} from '@polymer/polymer/polymer-element.js';
 import "@polymer/iron-flex-layout/iron-flex-layout";
-// <link rel="import" href="../../bower_components/polymer/polymer.html">
-// <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 export const pageNavStyles = html`
   <style>

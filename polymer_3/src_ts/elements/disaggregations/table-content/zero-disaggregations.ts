@@ -2,21 +2,20 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {disaggregationTableStyles} from '../../../styles/disaggregation-table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../typings/globals.types';
-
-// <link rel="import" href="../disaggregation-table-row.html">
+import '../disaggregation-table-row';
 
 
 /**
  * @polymer
  * @customElement
  */
-class ZeroDisaggregations extends PolymerElement{
-  public static get template(){
+class ZeroDisaggregations extends PolymerElement {
+  public static get template() {
     // language=HTML
     return html`
         ${disaggregationTableStyles}
       <style></style>
-        
+
       <disaggregation-table-row
           data="[[totalRow]]"
           level-reported="[[data.level_reported]]"

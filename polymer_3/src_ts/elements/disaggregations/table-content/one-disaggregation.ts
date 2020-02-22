@@ -5,8 +5,7 @@ import DisaggregationMixin from '../../../mixins/disaggregations-mixin';
 import {disaggregationTableStyles} from '../../../styles/disaggregation-table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../typings/globals.types';
-
-// <link rel="import" href="../disaggregation-table-row.html">
+import '../disaggregation-table-row';
 
 
 /**
@@ -19,14 +18,14 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
   public static get template() {
     // language=HTML
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style></style>
-      
+
       <tr class='horizontal layout headerRow'>
         <th></th>
         <th>Total</th>
       </tr>
-      
+
       <template is="dom-repeat"
                 items="[[rows]]"
                 as="row">
@@ -38,7 +37,7 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
             editable="[[editable]]">
         </disaggregation-table-row>
       </template>
-      
+
       <disaggregation-table-row
           data="[[totalRow]]"
           level-reported="[[data.level_reported]]"
@@ -80,9 +79,10 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
     };
   }
 
-  _determineRows(columns: any[], data: any[]) {
-    return columns.map(function (z) {
-      let formatted = this._formatDisaggregationIds([z.id]);
+  _determineRows(columns: any[], data: GenericObject) {
+    const self = this;
+    return columns.map(function(z) {
+      let formatted = self._formatDisaggregationIds([z.id]);
 
       return {
         title: z.value,
