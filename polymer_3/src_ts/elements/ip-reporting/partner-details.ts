@@ -1,8 +1,6 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-
-
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
@@ -11,18 +9,9 @@ import '@polymer/etools-loading/etools-loading';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import '../labelled-item';
-import '../../redux/selectors/partner';
+import {partnerLoading} from '../../redux/selectors/partner';
 import {GenericObject} from '../../typings/globals.types';
-
-//<link rel="import" href="js/partner-details-functions.html">
-
-// @Lajos
-// behaviors: [
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {computePartnerType} from './js/partner-details-functions';
 
 /**
  * @polymer
@@ -31,7 +20,7 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -141,20 +130,20 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
 
-
-
-  @property({type: Object, computed: 'getReduxStateObject(state.partner.current)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
-  @property({type: Boolean, computed: 'getReduxStateValue(state.App.Selectors.Partner.loading)'})
+  @property({type: Boolean, computed: 'partnerLoading(rootState)'})
   loading!: boolean;
 
   static get observers() {
     return ['_getDataByKey(dataDict)'];
   }
+
   _computePartnerType(partner: GenericObject) {
-    return PartnerDetailsUtils.computePartnerType(partner, this._withDefault);
-  };
+    return computePartnerType(partner, this._withDefault);
+  }
+
 }
 
 window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);

@@ -1,14 +1,12 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
+import '../dropdown-filter/searchable-dropdown-filter';
 import '@polymer/paper-item/paper-item';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 import '@polymer/paper-listbox/paper-listbox';
-//<link rel="import" href="../../../polyfills/es6-shim.html">\
-
-import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
 import FilterMixin from '../../../mixins/filter-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
 /**
@@ -17,7 +15,7 @@ import {fireEvent} from '../../../utils/fire-custom-event';
  * @appliesMixin FilterMixin
  * @appliesMixin LocalizeMixin
  */
-class DropdownFilter extends FilterMixin(LocalizeMixin(ReduxConnectedElement)) {
+class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
     <style>
@@ -84,37 +82,37 @@ class DropdownFilter extends FilterMixin(LocalizeMixin(ReduxConnectedElement)) {
   };
 
   _updateSelected(value: String, data: any) {
-    this.async(function() {
+    setTimeout(() => {
       this.set('selected', data.findIndex(function(item: any) {
         return String(item.id) === String(value);
       }));
     });
-  };
+  }
 
   _handleData(data: any) {
     if (data.length) {
       this._filterReady();
     }
-  };
+  }
 
   _addEventListeners() {
     this._handleChange = this._handleChange.bind(this);
-    this.addEventListener('field.iron-select', this._handleChange);
-  };
+    this.addEventListener('field.iron-select', this._handleChange as any);
+  }
 
   _removeEventListeners() {
-    this.removeEventListener('field.iron-select', this._handleChange);
-  };
+    this.removeEventListener('field.iron-select', this._handleChange as any);
+  }
 
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
     this._removeEventListeners();
-  };
+  }
 }
 
 window.customElements.define('dropdown-filter', DropdownFilter);

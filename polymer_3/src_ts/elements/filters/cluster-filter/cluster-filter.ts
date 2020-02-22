@@ -1,17 +1,18 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../dropdown-filter/searchable-dropdown-filter.html';
-import '../../etools-prp-ajax.html";
+import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import LocalizeMixin from '../../../mixins/localize-mixin';
 import Endpoints from '../../../endpoints';
 import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { EtoolsPrpAjaxEl } from '../../etools-prp-ajax';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 
 /**
  * @polymer
@@ -19,8 +20,9 @@ import { EtoolsPrpAjaxEl } from '../../etools-prp-ajax';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  * @appliesMixin FilterMixin
+ * @appliesMixin LocalizeMixin
  */
-class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
+class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
     <style>
@@ -77,28 +79,28 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
 
   _computeClusterNamesUrl(responsePlanID: string) {
     return Endpoints.clusterNames(responsePlanID);
-  };
+  }
 
   _fetchClusterNames() {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-      var self = this;
-      const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
-      (this.$.clusters as EtoolsPrpAjaxEl).abort();
+        var self = this;
+        const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
+        (this.$.clusters as EtoolsPrpAjaxEl).abort();
 
-      thunk()
-        .then(function(res: any) {
-          self.set('data', [{
-            id: '',
-            title: 'All',
-          }].concat(res.data));
-        })
-        .catch(function(err) { // jshint ignore:line
-          // TODO: error handling
-        });
-    });
-  };
+        thunk()
+          .then(function(res: any) {
+            self.set('data', [{
+              id: '',
+              title: 'All',
+            }].concat(res.data));
+          })
+          .catch(function(err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      });
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
@@ -107,7 +109,7 @@ class ClusterFilter extends UtilsMixin(FilterMixin(ReduxConnectedElement)) {
     if (this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
 
 }
 

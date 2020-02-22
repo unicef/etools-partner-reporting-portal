@@ -1,8 +1,11 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-input/paper-input';
 import DisaggregationMixin from '../../mixins/disaggregations-mixin';
+import {fireEvent} from '../../utils/fire-custom-event';
 //<link rel="import" href="../../behaviors/disaggregation-field.html">
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+
 
 /**
  * @polymer
@@ -55,13 +58,13 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
   @property({type: String})
   validator!: string;
 
-  property({type: Number})
+  @property({type: Number})
   min!: number;
 
-  property({type: Number, notify: true})
+  @property({type: Number, notify: true})
   value!: number;
 
-  property({type: Boolean, notify: true})
+  @property({type: Boolean, notify: true})
   invalid!: boolean;
 
 
@@ -71,7 +74,7 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
 
   attached() {
     this.$.field.validate();
-    this.fire('register-field', this);
+    fireEvent(this, 'register-field', this);
   };
 
   detached() {
@@ -96,7 +99,7 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
 
     change[this.key] = e.target.value;
 
-    this.fire('field-value-changed', {
+    fireEvent(this, 'field-value-changed', {
       key: this.coords,
       value: this._toNumericValues(change),
     });

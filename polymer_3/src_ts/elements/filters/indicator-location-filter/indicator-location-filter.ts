@@ -1,11 +1,11 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
+import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer

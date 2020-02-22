@@ -1,6 +1,6 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/dropdown - filter - multi'
+import '../dropdown-filter/dropdown-filter-multi'
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
@@ -56,7 +56,7 @@ class ClusterIndicatorTypeFilter extends LocalizeMixin(UtilsMixin(ReduxConnected
     ];
 
     return options;
-  };
+  }
 
   _computeData(isPartner: boolean, options: any) {
     if (isPartner) {
@@ -66,13 +66,13 @@ class ClusterIndicatorTypeFilter extends LocalizeMixin(UtilsMixin(ReduxConnected
     }
 
     return options;
-  },
+  }
 
   _computeRole(roles: any) {
     return roles.every(function(role: any) {
       return role.role !== 'CLUSTER_IMO';
     });
-  },
+  }
 }
 
 window.customElements.define('cluster-indicator-type-filter', ClusterIndicatorTypeFilter);

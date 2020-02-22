@@ -1,10 +1,10 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
+import '../dropdown-filter/dropdown-filter-multi';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from "../../../endpoints";
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -46,18 +46,17 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
   @property({type: Array})
   data = [];
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterIndicatorLocations(responsePlanID);
-  };
-
   static get observers() {
     return ['_computeValue(data, value)'];
   }
 
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  }
 
   _computeUrl(responsePlanID: string) {
     return Endpoints.plannedActions(responsePlanID);
-  };
+  }
 
   _fetchPartnerProjects() {
     var self = this;
@@ -71,12 +70,13 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
       .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('partner-project-filter-multi', PartnerProjectFilterMulti);

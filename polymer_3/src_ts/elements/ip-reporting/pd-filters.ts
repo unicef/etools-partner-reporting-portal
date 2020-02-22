@@ -9,10 +9,9 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../elements/filter-list';
-
-// <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-// <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
-// <link rel="import" href="../../elements/filters/location-filter-multi/location-filter-multi.html">
+import '../../elements/filters/text-filter/text-filter';
+import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
+import '../../elements/filters/location-filter-multi/location-filter-multi';
 
 
 /**

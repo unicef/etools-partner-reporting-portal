@@ -82,7 +82,7 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       </app-drawer>
 
       <ip-reporting-app-header></ip-reporting-app-header>
-      <!--
+
       <iron-pages
           selected="[[page]]"
           attr-for-selected="name">
@@ -114,7 +114,7 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             </page-ip-progress-reports>
          </template>
        </iron-pages>
-       -->
+
     </app-drawer-layout>
   `;
   }

@@ -1,13 +1,14 @@
-import {html} from '@polymer/polymer';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
-import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import Endpoints from '../../../endpoints';
+import LocalizeMixin from '../../../mixins/localize-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -53,31 +54,32 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Array})
   data = [];
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterIndicatorLocations(responsePlanID);
-  };
+  private _debouncer!: Debouncer;
 
   static get observers() {
     return ['_computeValue(data, value)'];
   }
 
-  private _debouncer!: Debouncer;
+  _computeLocationNamesUrl(responsePlanID: string) {
+    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  }
 
   _computeUrl(responsePlanID: string) {
     return Endpoints.clusterPartnerNames(responsePlanID);
-  };
+  }
 
   _computeValue(data: any, value: string) {
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       function() {
-        var index = data.findIndex(function(item) {
+        var index = data.findIndex(function(item: GenericObject) {
           return value === String(item.id);
         });
 
-        this.set('computedValue', data[index === -1 ? 0 : index].id);
+        self.set('computedValue', data[index === -1 ? 0 : index].id);
       });
-  };
+  }
 
   _fetchPartnerNames() {
     var self = this;
@@ -96,7 +98,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       .catch(function(err: any) { // jshint ignore:line
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
@@ -105,7 +107,8 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     if (this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
+
 }
 
 window.customElements.define('partner-filter', PartnerFilter);

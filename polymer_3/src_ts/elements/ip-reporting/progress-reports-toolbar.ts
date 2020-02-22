@@ -1,11 +1,10 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import Endpoints from "../../endpoints";
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-toolbar';
 import '../download-button';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-// <link rel="import" href="js/progress-reports-toolbar-functions.html">
+import {computePdReportsUrl, canExport} from './js/progress-reports-toolbar-functions';
 
 
 /**
@@ -13,15 +12,15 @@ import {property} from '@polymer/decorators/lib/decorators';
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement){
-  public static get template(){
+class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
       </style>
-      
+
       <etools-prp-toolbar
         query="{{ query }}"
         location-id="{{ locationId }}">
@@ -49,11 +48,11 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement){
   pdfExportUrl!: string;
 
   _computePdReportsUrl(locationId: string) {
-    return ProgressReportsToolbarUtils.computePdReportsUrl(locationId);
+    return computePdReportsUrl(locationId);
   }
 
   _canExport(totalResults: number) {
-    return ProgressReportsToolbarUtils.canExport(totalResults);
+    return canExport(totalResults);
   }
 
 }

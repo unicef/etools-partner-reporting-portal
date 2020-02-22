@@ -1,11 +1,11 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
+import '../dropdown-filter/dropdown-filter-multi';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -54,7 +54,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeProgrammeDocumentsUrl(locationId: string) {
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  };
+  }
 
   _fetchPDs(url: string) {
     var self = this;
@@ -71,12 +71,13 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
       .catch(function(err) { // jshint ignore:line
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();;
-  };
+  }
+
 }
 
 window.customElements.define('pd-dropdown-filter', PDDropdownFilter);

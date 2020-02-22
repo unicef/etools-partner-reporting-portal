@@ -25,8 +25,7 @@ class PartnerDropdownContent extends ReduxConnectedElement {
     <etools-prp-ajax
         id="partnerNames"
         url="[[partnerNamesUrl]]"
-        params="[[params]]"
-        >
+        params="[[params]]">
     </etools-prp-ajax>
 
     <etools-prp-permissions

@@ -1,12 +1,13 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import Settings from '../../../settings';
-import '../dropdown-filter/searchable - dropdown - filter';
+import '../dropdown-filter/dropdown-filter';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+
 
 /**
  * @polymer
@@ -74,11 +75,11 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
         title: 'None',
       },
     ].concat(validData);
-  };
+  }
 
   _computeDisabled(data: any) {
     return data && data.length === 1;
-  };
+  }
 
   _computeFieldValue(value: string, data: any, locType: string, maxLocType: number) {
     switch (true) {
@@ -89,7 +90,8 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
       default:
         return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
     }
-  };
+  }
+
 }
 
 window.customElements.define('narrow-location-type-filter', NarrowLocationTypeFilter);

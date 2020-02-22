@@ -1,14 +1,14 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
 import UtilsMixin from "../../mixins/utils-mixin";
 import LocalizeMixin from "../../mixins/localize-mixin";
 import '../labelled-item';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-import {partnerLoading} from'../../redux/selectors/partner';
+import {partnerLoading} from '../../redux/selectors/partner';
 
 
 /**
@@ -17,33 +17,33 @@ import {partnerLoading} from'../../redux/selectors/partner';
  * @appliesMixin LocalizeMixin
  * @appliesMixin UtilsMixin
  */
-class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       <style include="app-grid-style">
         :host {
           display: block;
-  
+
           --app-grid-columns: 3;
           --app-grid-gutter: 25px;
           --app-grid-item-height: auto;
         }
-  
+
         .app-grid {
           padding: 0;
           margin: 0;
           list-style: none;
         }
-  
+
         .field-value {
           display: block;
           word-wrap: break-word;
         }
       </style>
-      
+
       <etools-content-panel panel-title="[[localize('financial_management')]]">
         <etools-loading active="[[loading]]"></etools-loading>
-  
+
         <ul class="app-grid">
           <li class="item">
             <labelled-item label="[[localize('partner_risk')]]">
@@ -68,7 +68,7 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   @property({type: Object, computed: 'getReduxStateValue(rootState.partner.current)'})
   partner!: GenericObject;
 
-  @property({type: Boolean, computed: 'partnerLoading(state)'})
+  @property({type: Boolean, computed: 'partnerLoading(rootState)'})
   loading!: boolean;
 
 }

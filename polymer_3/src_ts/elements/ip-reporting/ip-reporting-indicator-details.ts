@@ -9,24 +9,18 @@ import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {EtoolsPrpNumberEl} from '../etools-prp-number';
 import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../labelled-item';
 import '../report-status';
 import '../disaggregations/disaggregation-table';
 import '../list-placeholder';
 import {GenericObject} from '../../typings/globals.types';
-import { Indicators } from '../../redux/reducers/indicators';
-
-//<link rel="import" href="js/ip-reporting-indicator-details-functions.html">
-
-// @Lajos
-// behaviors: [
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {
+  computeParams, computeIsClusterApp, computeIndicatorReportsUrl,
+  bucketByLocation, computeHidden
+} from './js/ip-reporting-indicator-details-functions';
+// (dci) ti be checked - it's missing in original ?
+// import {setIndicatorDisaggregations} from '../../redux/actions/indicators';
 
 /**
  * @polymer
@@ -35,7 +29,7 @@ import { Indicators } from '../../redux/reducers/indicators';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -214,8 +208,6 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
 
-
-
   @property({type: String, computed: '_computeIndicatorReportsUrl(indicator)'})
   indicatorDetailUrl!: string;
 
@@ -232,7 +224,7 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
   loading!: boolean;
 
   @property({type: Array})
-  data!: any;
+  data!: any[];
 
   @property({type: Object, computed: 'getReduxStateObject(state.indicators.details)'})
   dataDict!: GenericObject;
@@ -254,24 +246,24 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
   _computeParams(isClusterApp: boolean) {
-    IndicatorDetailsUtils.computeParams(isClusterApp);
+    computeParams(isClusterApp);
   };
 
   _computeIsClusterApp(appName: string) {
-    IndicatorDetailsUtils.computeIsClusterApp(appName);
+    computeIsClusterApp(appName);
   };
 
   _computeIndicatorReportsUrl(indicator: GenericObject) {
-    return IndicatorDetailsUtils.computeIndicatorReportsUrl(indicator);
+    return computeIndicatorReportsUrl(indicator);
   };
 
-  _bucketByLocation(data: GenericObject) {
-    return IndicatorDetailsUtils.bucketByLocation(data);
+  _bucketByLocation(data: any[]) {
+    return bucketByLocation(data);
   };
 
   _updateDisaggregationStore(data: GenericObject) {
     //this.dispatch(App.Actions.setIndicatorDisaggregations(data));
-    this.reduxStore.dispatch(action.setIndicatorDisaggregations(data));
+    //this.reduxStore.dispatch(Actions .setIndicatorDisaggregations(data));
   };
 
   _getDataByKey(dataDict: GenericObject) {
@@ -280,15 +272,15 @@ class IpReportingIndicatorDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
     }
   };
 
-  _computeHidden(data: GenericObject, loading: boolean) {
-    return IndicatorDetailsUtils.computeHidden(data, loading);
+  _computeHidden(data: any[], loading: boolean) {
+    return computeHidden(data, loading);
   };
 
   _openChanged() {
     if (this.isOpen) {
       var thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
       //need to check
-      var action = Indicators;
+      // var action = Indicators;
       this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
         .catch(function(err) { // jshint ignore:line
           // TODO: error handling.

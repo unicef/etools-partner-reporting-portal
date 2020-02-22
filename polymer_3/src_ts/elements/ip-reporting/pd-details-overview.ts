@@ -1,15 +1,15 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-icon/iron-icon';
-import '@polymer/moment-element/moment-import';
 
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 
-import '../pd-details-reporting-requirements';
-import '../pd-details-doc-download';
+import './pd-details-reporting-requirements';
+import './pd-details-doc-download';
 
 import '../page-body';
 import '../list-placeholder';
@@ -19,30 +19,20 @@ import {pdFetch} from '../../redux/actions/pd';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 
-import '../../redux/selectors/programmeDocuments';
+
 import '../../elements/labelled-item';
 import '../../elements/etools-prp-currency';
 import '../../elements/etools-prp-progress-bar';
-
-import { ReduxConnectedElement } from '../../ReduxConnectedElement';
-import { GenericObject } from '../../typings/globals.types';
+import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import { store } from '../../redux/store';
 import Settings from '../../settings';
-//<link rel="import" href="js/pd-details-reports-functions.html">
+declare const moment: any;
+import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 
-// @Lajos
-// behaviors: [
-//   behaviors: [
-  // App.Behaviors.UtilsBehavior,
-  //       App.Behaviors.ReduxBehavior,
-  //       App.Behaviors.LocalizeBehavior,
-  //       Polymer.AppLocalizeBehavior,
-// ],
-// ],
 
 /**
  * @polymer
@@ -52,7 +42,7 @@ import Settings from '../../settings';
  * @appliesMixin LocalizeMixin
  */
 class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-//not sure about data table styles....
+  //not sure about data table styles....
   static get template() {
     return html`
     ${tableStyles}
@@ -307,12 +297,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
- // statePath: App.Selectors.ProgrammeDocuments.current,
-  @property({type: Object, computed: 'ProgrammeDocuments.current'})
+  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
   pd = {};
 
   @property({type: Object})
-  amendmentTypes = {
+  amendmentTypes: GenericObject = {
     dates: 'Dates',
     results: 'Results',
     budget: 'Budget',
@@ -323,17 +312,17 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     no_cost: 'Type 5: No cost extension',
     other: 'Type 6: Other'
   };
-  
+
   @property({type: Boolean, computed: '_computeLoaded(pd)'})
   loaded = false;
-  
+
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
   @property({type: Object, computed: '_computeReportingRequirements(pd.reporting_periods)'})
   reportingRequirements!: GenericObject;
-  
-  @property({type: String, computed:'getReduxStateValue(rootState.programmeDocuments.current)'})
+
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
 
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
@@ -350,67 +339,69 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     } else {
       return num / 100;
     }
-  };
+  }
 
   _computeLoaded(pd: GenericObject) {
-    return PdDetailsOverviewUtils.computeLoaded(pd);
-  };
+    return computeLoaded(pd);
+  }
 
   _formatFocalPoint(items: any) {
     return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
-  };
+  }
 
   _hasAmendments(pd: GenericObject) {
-    return PdDetailsOverviewUtils.hasAmendments(pd);
-  };
+    return hasAmendments(pd);
+  }
 
   _computeReportingRequirements(reportingPeriods: any) {
-    return PdDetailsOverviewUtils.computeReportingRequirements(reportingPeriods, moment, Settings.dateFormat);
-  };
+    return computeReportingRequirements(reportingPeriods, moment, Settings.dateFormat);
+  }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  };
+  }
 
-  _displayFullName(types: any) {
-    var self = this;
+  _displayFullName(types: any[]) {
+    const self = this;
 
     if (!types) {
       return '';
     }
 
     return types
-      .map(function (type) {
+      .map(function(type: string) {
         return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
       })
       .join(', ');
-  };
+  }
 
   _getPdReports() {
     // Status being present prevents Redux / res.data from getting reports,
     // preventing pd-details title from rendering. In that case (which we
     // check by seeing if this.pdReportsCount is present), just get the reports again
     if (this.pdReportsCount[this.pdId] === undefined) {
+      const self = this;
       this._debouncer = Debouncer.debounce(this._debouncer,
         timeOut.after(250),
-        () => { 
-        var pdThunk = this.$.programmeDocuments;
-        pdThunk.params = {
-          page: 1,
-          page_size: 10,
-          programme_document: this.pdId
-        };
+        () => {
+          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
+          pdThunk.params = {
+            page: 1,
+            page_size: 10,
+            programme_document: this.pdId
+          };
 
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-        //@Lajos not sure if connect function
-        store.dispatch(pdFetch(pdThunk.thunk()))
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
-      });
+          // Cancel the pending request, if any
+          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+          //@Lajos not sure if connect function
+          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+            .catch(function(err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        });
     }
   }
+
 }
 
 window.customElements.define('pd-details-overview', PdDetailsOverview);

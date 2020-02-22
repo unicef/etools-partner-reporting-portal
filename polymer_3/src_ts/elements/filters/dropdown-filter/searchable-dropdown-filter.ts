@@ -1,7 +1,6 @@
 import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-//@Lajos needs to be checked
-import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
+import '@unicef-polymer/etools-dropdown/etools-dropdown.js';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {fireEvent} from '../../../utils/fire-custom-event';
@@ -20,20 +19,19 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       }
     </style>
 
-    <etools-single-selection-menu
-        id="field"
-        label="[[label]]"
-        options="[[data]]"
-        option-value="id"
-        option-label="title"
-        selected="[[value]]"
-        selected-item="{{selectedItem}}"
-        disabled="[[disabled]]"
-        trigger-value-change-event>
-    </etools-single-selection-menu>
+    <etools-dropdown
+      id="field"
+      label="[[label]]"
+      options="[[data]]"
+      option-value="id"
+      option-label="title"
+      selected="[[value]]"
+      selected-item="{{selectedItem}}"
+      disabled="[[disabled]]"
+      trigger-value-change-event>
+    </etools-dropdown>
   `;
   }
-
 
   @property({type: Boolean})
   disabled!: boolean;
@@ -48,38 +46,39 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   data = [];
 
   _handleChange() {
-    this.async(function() {
+    setTimeout(() => {
       fireEvent(this, 'filter-changed', {
         name: this.name,
         value: String(this.selectedItem.id),
       });
     });
-  };
+  }
 
   _handleData(data: any) {
     if (data.length) {
       this._filterReady();
     }
-  };
+  }
 
   _addEventListeners() {
     this._handleChange = this._handleChange.bind(this);
     this.addEventListener('field.iron-select', this._handleChange);
-  };
+  }
 
   _removeEventListeners() {
     this.removeEventListener('field.iron-select', this._handleChange);
-  };
+  }
 
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-  };
+  }
+
 }
 
 window.customElements.define('searchble-dropdown-filter', SearchableDropdownFilter);

@@ -16,33 +16,24 @@ import '../etools-prp-number';
 import '../../redux/selectors/programmeDocumentDetails';
 import '../../redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
-
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
+import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
-import { store } from '../../redux/store';
-//<link rel="import" href="js/authorized-officer-modal-functions.html">
-
-// @Lajos
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.ModalBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.RoutingBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {store} from '../../redux/store';
+import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
+ * @appliesMixin UtilsMixin
  * @appliesMixin ModalMixin
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(ReduxConnectedElement))) {
+class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
@@ -151,16 +142,16 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Redux
   postBody!: GenericObject;
 
   _computePostBody(selectedFocalPoint: string) {
-    return AuthorizedOfficerModalUtils.computePostBody(selectedFocalPoint);
+    return computePostBody(selectedFocalPoint);
   };
 
   _computeAuthorizedPartners(pd: string) {
-    return AuthorizedOfficerModalUtils.computeAuthorizedPartners(pd);
+    return computeAuthorizedPartners(pd);
   };
 
   _validate(e: CustomEvent) {
     e.target.validate();
-  };
+  }
 
   _save() {
     if (!this._fieldsAreValid()) {
@@ -175,8 +166,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Redux
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
-        //@Lajos: for bellow: App.Actions.PDReports.updateSingle
-        //which fucntions should be
+
         store.dispatch(pdReportsUpdateSingle(
           self.pdId,
           self.reportId,
@@ -197,7 +187,8 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Redux
 
   _cancel() {
     this.close();
-  };
+  }
+
 }
 
 window.customElements.define('authorized-officer-modal', AuthorizedOfficerModal);

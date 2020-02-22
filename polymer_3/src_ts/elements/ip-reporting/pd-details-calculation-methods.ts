@@ -5,42 +5,33 @@ import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@unicef-polymer/etoolsetools-loading/etools-loading';
+import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-//<link rel="import" href="../../polyfills/es6-shim.html">
 import Constants from '../../constants';
-import {store} from '../../redux/store';
 import '../../redux/actions';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import {currentProgramDocuments} from '../../redux/selectors/programmeDocument';
-import '../../redux/selectors/programmeDocumentIndicators';
+import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';
 import '../page-body';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {pdIndicatorsFetch} from '../../redux/actions/pdIndicators';
-import {pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
+import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import {pdFetch} from '../../redux/actions/pd';
 import '../etools-prp-permissions';
 import '../confirm-box';
+import {ConfirmBoxEl} from '../confirm-box';
 import {tableStyles} from '../../styles/table-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {GenericObject} from '../../typings/globals.types';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
-//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
-// @Lajos
-// behaviors: [
-//   behaviors: [
-  // App.Behaviors.ReduxBehavior,
-  // App.Behaviors.UtilsBehavior,
-  // App.Behaviors.DataTableBehavior,
-  // App.Behaviors.NotificationsBehavior,
-  // App.Behaviors.LocalizeBehavior,
-  // Polymer.AppLocalizeBehavior,
-// ],
-// ],
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
+import Endpoints from '../../endpoints';
+import {
+  computeIndicatorsUrl, computeFormattedData, computeSelected, computeDisabled,
+  onValueChanged, canEdit, canSave
+} from './js/pd-details-calculation-methods-functions';
 
 /**
  * @polymer
@@ -51,7 +42,7 @@ import { timeOut } from '@polymer/polymer/lib/utils/async';
  * @appliesMixin DataTableMixin
  * @appliesMixin NotificationsMixin
  */
-class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixin(NotificationsMixin(ReduxConnectedElement)))) {
+class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
@@ -249,23 +240,19 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
   `;
   }
 
-
-
-
   @property({type: Object})
   localData!: GenericObject;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
-  //@Lajos bellowes needs to be checked for states
-  @property({type: Boolean, computed: 'currentProgramDocuments(state)'})
-  pdId!: boolean;
+  @property({type: String, computed: 'currentProgrammeDocument(rootState)'})
+  pdId!: string;
 
-  @property({type: Boolean, computed: 'pdIndicatorsLoading(state)'})
+  @property({type: Boolean, computed: 'pdIndicatorsLoading(rootState)'})
   loading!: boolean;
 
-  @property({type: Array, computed: 'pdIndicatorsAll(state)', observer: '_initLocalData'})
+  @property({type: Array, computed: 'pdIndicatorsAll(rootState)', observer: '_initLocalData'})
   data!: any;
 
   @property({type: Array, computed: '_computeFormattedData(data)'})
@@ -286,25 +273,25 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
     this.set('localData', this._clone(data));
   };
 
-  _computeIndicatorsUrl(locationId: string, pdId: boolean) {
-    return PdDetailsCalculationMethodsUtils.computeIndicatorsUrl(locationId, pdId);
-  };
+  _computeIndicatorsUrl(locationId: string, pdId: string) {
+    return computeIndicatorsUrl(locationId, pdId);
+  }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  };
+  }
 
   _computeFormattedData(data: any) {
-    return PdDetailsCalculationMethodsUtils.computeFormattedData(data);
-  };
+    return computeFormattedData(data);
+  }
 
   _computeSelected(data: any, scope: any) {
-    return PdDetailsCalculationMethodsUtils.computeSelected(data, scope);
-  };
+    return computeSelected(data, scope);
+  }
 
   _computeDisabled(display_type: any) {
-    return PdDetailsCalculationMethodsUtils.computeDisabled(display_type);
-  };
+    return computeDisabled(display_type);
+  }
 
   _fetchData(url: string) {
     if (!url) {
@@ -314,21 +301,21 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-      var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+        var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
-      (this.$.indicators as EtoolsPrpAjaxEl).abort();
+        (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-      this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
-          .catch(function (err) { // jshint ignore:line
+        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
+          .catch(function(err) { // jshint ignore:line
             // TODO: error handling
           });
-    });
-  };
+      });
+  }
 
   _onValueChanged(e: CustomEvent) {
     var newValue = e.target.selected;
     var data = e.target.dataset;
-    var indices = PdDetailsCalculationMethodsUtils.onValueChanged(data, this.localData);
+    var indices = onValueChanged(data, this.localData);
 
     this.set([
       'localData.ll_outputs_and_indicators',
@@ -337,29 +324,28 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
       indices.indicatorIndex,
       data.scope,
     ], newValue);
-  };
+  }
 
   _save() {
-    var self = this;
+    const self = this;
 
     this._confirmIntent()
-        .then(function () {
-          var updateThunk = self.$.update.thunk();
+      .then(function() {
+        const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
 
-          return store.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
-        })
-        .then(this._notifyChangesSaved.bind(this))
-        .catch(this._noop);
-  };
+        return self.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
+      })
+      .then(this._notifyChangesSaved.bind(this))
+      .catch();
+  }
 
   _confirmIntent() {
-    var deferred = this._deferred();
-    //@lajos: not sure about his bellow
-    this.$.confirm.run({
+    const deferred = this._deferred();
+    (this.$.confirm as ConfirmBoxEl).run({
       body:
-          'Please make sure the calculation methods for your indicators are ' +
-          'properly configured. Changing calculation methods would recalculate ' +
-          'progress reports for your indicators!',
+        'Please make sure the calculation methods for your indicators are ' +
+        'properly configured. Changing calculation methods would recalculate ' +
+        'progress reports for your indicators!',
       result: deferred,
       maxWidth: '500px',
       //where to find it?
@@ -367,23 +353,23 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
     });
 
     return deferred.promise;
-  };
+  }
 
   _canEdit(item: any, permissions: any) {
-    return PdDetailsCalculationMethodsUtils.canEdit(item, permissions);
-  };
+    return canEdit(item, permissions);
+  }
 
   _canSave(permissions: any) {
-    return PdDetailsCalculationMethodsUtils.canSave(permissions);
-  };
+    return canSave(permissions);
+  }
 
   detached() {
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    if(this._debouncer.isActive()){
+    if (this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
 
   _getPdReports() {
     // Status being present prevents Redux / res.data from getting reports,
@@ -393,22 +379,23 @@ class PdDetailsCalculationMethods extends UtilsMixin(LocalizeMixin(DataTableMixi
       this._debouncer = Debouncer.debounce(this._debouncer,
         timeOut.after(250),
         () => {
-        var pdThunk = this.$.programmeDocuments;
-        pdThunk.params = {
-          page: 1,
-          page_size: 10,
-          programme_document: this.pdId
-        };
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+          const pdThunk = this.$.programmeDocuments;
+          pdThunk.params = {
+            page: 1,
+            page_size: 10,
+            programme_document: this.pdId
+          };
+          // Cancel the pending request, if any
+          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
-      });
+          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+            .catch(function(err) { // jshint ignore:line
+              // TODO: error handling
+            });
+        });
     }
   }
+
 }
 
 window.customElements.define('pd-details-calculation-methods', PdDetailsCalculationMethods);
