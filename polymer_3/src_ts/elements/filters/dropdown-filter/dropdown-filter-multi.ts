@@ -17,7 +17,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
         display: block;
       }
 
-      etools-multi-selection-menu {
+      etools-dropdown-multi {
         width: 100%;
       }
     </style>

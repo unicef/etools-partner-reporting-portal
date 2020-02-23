@@ -2,7 +2,6 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import Settings from '../settings';
-
 declare const moment: any;
 
 

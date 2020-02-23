@@ -6,7 +6,6 @@ import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/paper-spinner/paper-spinner';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '../../settings';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import UtilsMixin from '../../mixins/utils-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';

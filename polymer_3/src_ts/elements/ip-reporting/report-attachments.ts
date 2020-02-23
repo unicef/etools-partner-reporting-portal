@@ -15,7 +15,7 @@ import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-// <link rel="import" href="../../../bower_components/etools-file/etools-file.html">
+import 'etools-file/etools-file.js';
 
 /**
  * @polymer

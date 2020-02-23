@@ -10,8 +10,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/polymer/lib/elements/dom-if';
-// <link rel="import" href="../../bower_components/etools-file/etools-file.html">
-
+import 'etools-file/etools-file.js';
 import UtilsMixin from '../mixins/utils-mixin';
 import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
@@ -22,7 +21,6 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 import {fireEvent} from '../utils/fire-custom-event';
-
 
 /**
  * @polymer

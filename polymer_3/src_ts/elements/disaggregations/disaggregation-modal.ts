@@ -130,15 +130,15 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     this.close = this.close.bind(this);
     this.addEventListener('dialog.iron-overlay-closed', this.close);
     this.adjustPosition = this.adjustPosition.bind(this);
-    this.addEventListener('disaggregation-modal-refit', this.adjustPosition);
+    this.addEventListener('disaggregation-modal-refit', this.adjustPosition as any);
     this._confirm = this._confirm.bind(this);
-    this.addEventListener('disaggregation-modal-confirm', this._confirm);
+    this.addEventListener('disaggregation-modal-confirm', this._confirm as any);
   };
 
   _removeEventListeners() {
     this.removeEventListener('dialog.iron-overlay-closed', this.close);
-    this.removeEventListener('disaggregation-modal-refit', this.adjustPosition);
-    this.removeEventListener('disaggregation-modal-confirm', this._confirm);
+    this.removeEventListener('disaggregation-modal-refit', this.adjustPosition as any);
+    this.removeEventListener('disaggregation-modal-confirm', this._confirm as any);
   };
 
   connectedCallback() {

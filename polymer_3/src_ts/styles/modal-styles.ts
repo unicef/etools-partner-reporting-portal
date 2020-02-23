@@ -1,5 +1,4 @@
 import {html} from '@polymer/polymer/polymer-element.js';
-import "@polymer/paper-styles/typography";
 
 export const modalStyles = html`
   <style>

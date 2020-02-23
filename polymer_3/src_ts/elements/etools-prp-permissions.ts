@@ -9,7 +9,7 @@ import {GenericObject} from '../typings/globals.types';
   const checkInResponsePlan = (roles: any[]) => {
     return function(params: GenericObject) {
       return params.prpRoles.filter(function(role: any) {
-        return params.responsePlan && params.responsePlan.clusters.some(function(cluster: any) {
+        return params.responsePlan && params.responsePlan.clusters && params.responsePlan.clusters.some(function(cluster: any) {
           return role.cluster && cluster.id === role.cluster.id;
         });
       }).some(function(item: any) {

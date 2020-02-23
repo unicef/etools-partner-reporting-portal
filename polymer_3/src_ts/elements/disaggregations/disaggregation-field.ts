@@ -69,30 +69,24 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
 
 
   ready() {
+    super.ready();
     (this.$.field as PaperInputElement).validate();
-  };
-
-  attached() {
-    (this.$.field as PaperInputElement).validate();
-    fireEvent(this, 'register-field', this);
-  };
-
-  detached() {
   }
 
-  // Cant deregister fields in lifecycle hooks due to:
-  // https://github.com/Polymer/polymer/issues/1159
-  // :( :( :(
-  //
-  // detached: function () {}
+  connectedCallback() {
+    super.connectedCallback();
+
+    (this.$.field as PaperInputElement).validate();
+    fireEvent(this, 'register-field', this);
+  }
 
   validate() {
     return (this.$.field as PaperInputElement).validate();
-  };
+  }
 
   getField() {
     return this.$.field;
-  };
+  }
 
   _inputValueChanged(e: CustomEvent) {
     let change: GenericObject = {};
@@ -103,7 +97,7 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
       key: this.coords,
       value: this._toNumericValues(change),
     });
-  };
+  }
 
 }
 

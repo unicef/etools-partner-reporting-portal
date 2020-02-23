@@ -19,7 +19,7 @@ import {
   computeParams, computeIsClusterApp, computeIndicatorReportsUrl,
   bucketByLocation, computeHidden
 } from './js/ip-reporting-indicator-details-functions';
-// (dci) ti be checked - it's missing in original ?
+// (dci) to be checked - it's missing in original ?
 // import {setIndicatorDisaggregations} from '../../redux/actions/indicators';
 
 /**

@@ -4,21 +4,17 @@ import {html} from '@polymer/polymer';
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-icon/iron-icon';
-
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-
 import './pd-details-reporting-requirements';
 import './pd-details-doc-download';
-
 import '../page-body';
 import '../list-placeholder';
-import '../../settings';
 import {tableStyles} from '../../styles/table-styles';
 import {pdFetch} from '../../redux/actions/pd';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-
 
 import '../../elements/labelled-item';
 import '../../elements/etools-prp-currency';

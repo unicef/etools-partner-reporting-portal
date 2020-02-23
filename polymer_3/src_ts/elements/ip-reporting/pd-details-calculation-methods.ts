@@ -363,7 +363,9 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
     return canSave(permissions);
   }
 
-  detached() {
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
     if (this._debouncer.isActive()) {

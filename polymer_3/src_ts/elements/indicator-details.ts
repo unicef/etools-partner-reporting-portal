@@ -497,7 +497,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Boolean})
   initialized: boolean = false;
 
-  //DONE  statePath: App.Selectors.ProgrammeDocuments.current
   @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
   currentPD!: GenericObject;
 
@@ -510,7 +509,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Object, computed: '_computeParams(indicatorId, currentPD)'})
   params!: GenericObject;
 
-  //DONE statePath: 'disaggregations.byIndicator'
   @property({type: Object, computed: 'getReduxStateObject(rootState.disaggregations.byIndicator)'})
   data!: GenericObject;
 
@@ -520,7 +518,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Array, computed: '_computeLocationData(disaggregations.indicator_location_data)'})
   locationData!: GenericObject[];
 
-  //DONE statePath: 'programmeDocumentReports.current.mode'
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode: string = '';
 

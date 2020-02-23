@@ -4,8 +4,8 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '@polymer/etools-content-panel/etools-content-panel';
-import '@polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-loading/etools-loading';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import '../labelled-item';
@@ -20,7 +20,7 @@ import {computePartnerType} from './js/partner-details-functions';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class PartnerDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -146,4 +146,4 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
 }
 
-window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);
+window.customElements.define('partner-details', PartnerDetails);
