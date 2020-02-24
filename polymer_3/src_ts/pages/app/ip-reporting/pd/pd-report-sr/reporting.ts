@@ -18,7 +18,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {GenericObject} from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
 
-import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo'
+import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo';
 import {currentProgrammeDocument} from '../../../../../redux/selectors/programmeDocuments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';

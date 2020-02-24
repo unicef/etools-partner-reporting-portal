@@ -1,11 +1,11 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-number';
 import './disaggregation-field';
 import './disaggregation-table-cell';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 

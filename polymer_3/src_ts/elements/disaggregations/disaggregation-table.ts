@@ -465,16 +465,16 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   _addEventListeners() {
     if (this.editableBool) {
       this._registerField = this._registerField.bind(this);
-      this.addEventListener('register-field', this._registerField);
+      this.addEventListener('register-field', this._registerField as any);
       this._fieldValueChanged = this._fieldValueChanged.bind(this);
-      this.addEventListener('field-value-changed', this._fieldValueChanged);
+      this.addEventListener('field-value-changed', this._fieldValueChanged as any);
     }
   }
 
   _removeEventListeners() {
     if (this.editableBool) {
-      this.removeEventListener('register-field', this._registerField);
-      this.removeEventListener('field-value-changed', this._fieldValueChanged);
+      this.removeEventListener('register-field', this._registerField as any);
+      this.removeEventListener('field-value-changed', this._fieldValueChanged as any);
     }
   }
 

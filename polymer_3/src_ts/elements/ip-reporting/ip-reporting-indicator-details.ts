@@ -1,6 +1,7 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';

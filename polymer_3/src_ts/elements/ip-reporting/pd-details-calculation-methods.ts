@@ -8,7 +8,6 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import Constants from '../../constants';
-import '../../redux/actions';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';

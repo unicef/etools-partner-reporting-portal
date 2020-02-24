@@ -1,18 +1,17 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-if';
 import UtilsMixin from '../../mixins/utils-mixin';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
-import '@polymer/polymer/lib/elements/dom-if';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class DisaggregationTableCell extends UtilsMixin(PolymerElement){
-  public static get template(){
+class DisaggregationTableCell extends UtilsMixin(PolymerElement) {
+  public static get template() {
     return html`
         ${disaggregationTableStyles}
       <style>
@@ -20,13 +19,13 @@ class DisaggregationTableCell extends UtilsMixin(PolymerElement){
           display: block;
         }
       </style>
-      
+
       <template
         is="dom-if"
         if="[[editableBool]]">
         <slot select="editable"></slot>
       </template>
-      
+
       <template
         is="dom-if"
         if="[[!editableBool]]">

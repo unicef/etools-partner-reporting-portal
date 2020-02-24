@@ -1,11 +1,11 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-number';
 import './disaggregation-field';
 import './disaggregation-table-cell';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 
@@ -15,44 +15,44 @@ import {fireEvent} from '../../utils/fire-custom-event';
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement){
-  public static get template(){
+class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
+  public static get template() {
     // language=HTML
     return html`
         ${disaggregationTableStyles}
       <style>
         :host {
           display: block;
-  
+
           --app-grid-columns: 2;
           --app-grid-gutter: 0px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
         }
-  
+
         .item,
         .computed-value {
           box-sizing: border-box;
           min-height: 25px;
           line-height: 25px;
         }
-  
+
         .item {
           padding: 0;
           border-bottom: 1px solid white;
         }
-  
+
         .item:not(:first-child) {
           border-left: 1px solid white;
         }
-  
+
         .computed-value {
           @apply --app-grid-expandible-item;
-  
+
           color: var(--theme-secondary-text-color);
         }
       </style>
-      
+
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
         <editable>
           <div class="app-grid">
@@ -90,7 +90,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement){
           </div>
         </non-editable>
       </disaggregation-table-cell>
-    
+
     `;
   }
 
@@ -160,7 +160,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement){
     let validator = {
       validatorName: vName,
       validatorType: 'validator',
-      validate: function (value: string) {
+      validate: function(value: string) {
         return Number(value) !== 0 || Number(this.shadowRoot.querySelector('#v').getField().value) === 0;
       }.bind(this),
     };
