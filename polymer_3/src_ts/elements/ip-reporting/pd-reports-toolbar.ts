@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {property} from '@polymer/decorators';
 import '../etools-prp-toolbar';
 import '../download-button';
 import {GenericObject} from '../../typings/globals.types';

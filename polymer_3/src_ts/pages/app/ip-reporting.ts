@@ -15,7 +15,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-
+import {getDomainByEnv} from '../../config';
 
 /**
  * @polymer
@@ -137,8 +137,9 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   async _pageChanged(page: string) {
-    const resolvedPageUrl = `./ip-reporting/${page}.js`; //getDomainByEnv() + `/src/pages
-
+    //const resolvedPageUrl = `./ip-reporting/${page}.js`;
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
+    console.log('ipReporting loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

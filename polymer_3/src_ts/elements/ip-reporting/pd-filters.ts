@@ -1,9 +1,9 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import {property} from '@polymer/decorators';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import {GenericObject} from '../../typings/globals.types';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';

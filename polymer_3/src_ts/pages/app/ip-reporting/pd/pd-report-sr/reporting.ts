@@ -1,7 +1,7 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/paper-input/paper-input-container';
 import '@polymer/paper-input/paper-input-char-counter';
 import '@polymer/app-layout/app-grid/app-grid-style';

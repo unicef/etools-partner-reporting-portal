@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {disaggregationTableStyles} from '../../../styles/disaggregation-table-styles';
-import {property} from '@polymer/decorators/lib/decorators';
+import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 

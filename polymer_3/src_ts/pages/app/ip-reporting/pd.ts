@@ -5,6 +5,7 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
+import '@polymer/polymer/lib/elements/dom-if';
 import '../../../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
@@ -79,6 +80,12 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   @property({type: Object})
+  query!: GenericObject;
+
+  @property({type: Object})
+  subroute!: GenericObject;
+
+  @property({type: Object})
   queryParams!: GenericObject;
 
   @property({type: String, observer: '_pageChanged'})
@@ -131,11 +138,10 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
 
     // resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-
+    console.log('pd loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
-        console.log(resolvedPageUrl);
         this._notFound();
       });
   }

@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@polymer/iron-location';
+import '@polymer/iron-location/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-query-params';

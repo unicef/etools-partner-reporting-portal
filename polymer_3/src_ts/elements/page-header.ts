@@ -25,7 +25,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
         ${sharedStyles}
       <style include="iron-flex iron-flex-alignment iron-flex-factors">
         :host {
-          --header-gutter: 25px;
+          --header-gutter: 57px;
 
           display: block;
           padding: var(--header-gutter);
@@ -61,7 +61,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
           text-align: right;
         }
 
-        .tabs ::content paper-tabs {
+        .tabs ::slotted(paper-tabs) {
           margin-bottom: -var(--header-gutter);
         }
       </style>
@@ -69,7 +69,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
       <div class="layout horizontal baseline">
         <div class="title flex">
           <div class="above-title">
-            <content select=".above-title"></content>
+            <slot select=".above-title"></slot>
           </div>
           <div class="layout horizontal center">
             <template is="dom-if" if="[[back]]">
@@ -77,21 +77,21 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
                 <paper-icon-button icon="chevron-left"></paper-icon-button>
               </a>
             </template>
-            <h1>[[title]]<content select=".in-title"></content></h1>
+            <h1>[[title]]<slot select=".in-title"></slot></h1>
           </div>
         </div>
 
         <div class="toolbar flex">
-          <content select=".toolbar"></content>
+          <slot select=".toolbar"></slot>
         </div>
       </div>
 
       <div class="header-content">
-        <content select=".header-content"></content>
+        <slot select=".header-content"></slot>
       </div>
 
       <div class="tabs">
-        <content select=".tabs"></content>
+        <slot select=".tabs"></slot>
       </div>`
       ;
   }

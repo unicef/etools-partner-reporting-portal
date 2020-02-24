@@ -1,17 +1,17 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {property} from '@polymer/decorators';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-input/paper-input';
-import '../table-content/three-disaggregations';
-import '../table-content/two-disaggregations';
-import '../table-content/one-disaggregations';
-import '../table-content/zero-disaggregations';
+import './table-content/three-disaggregations';
+import './table-content/two-disaggregations';
+import './table-content/one-disaggregation';
+import './table-content/zero-disaggregations';
 import './disaggregation-switches';
 import '../etools-prp-ajax';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import DisaggregationHelpersMixin from '../../mixins/disaggregation-helpers-mixin';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
 import {fireEvent} from '../../utils/fire-custom-event';
@@ -25,8 +25,8 @@ import {disaggregationsUpdateForLocation} from '../../redux/actions/disaggregati
  * @appliesMixin LocalizeMixin
  * @appliesMixin DisaggregationHelpersMixin
  */
-class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpersMixin(ReduxConnectedElement))){
-  public static get template(){
+class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpersMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       ${disaggregationTableStyles}
       <style>
@@ -35,59 +35,59 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
             padding: 0;
           };
         }
-  
+
         disaggregation-switches {
           margin-bottom: 1em;
         }
-  
+
         .data-key {
           font-size: 12px;
           color: var(--theme-secondary-text-color);
         }
-  
+
         .data-key dt,
         .data-key dd {
           display: inline;
         }
-  
+
         .data-key dd {
           margin: 0;
         }
-  
+
         h4 {
           font-size: 12px;
         }
-  
+
         .percentage-map {
           padding-left: 25px;
         }
-  
+
         .percentage-map ul {
           padding: 0;
           margin: 0;
           list-style: none;
           font-size: 13px;
         }
-  
+
         .percentage-map li {
           margin-bottom: 5px;
         }
-  
+
         .percentage-map paper-input {
           width: 60px;
           padding: 0;
           margin: 0 5px;
           text-align: center;
         }
-  
+
         .percentage-map .entity-name {
           display: inline-block;
           padding: 3px 10px;
           white-space: nowrap;
           background-color: var(--paper-grey-100)
         }
-      </style>  
-      
+      </style>
+
       <etools-prp-ajax
           id="update"
           url="[[updateUrl]]"
@@ -95,7 +95,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
           content-type="application/json"
           method="put">
       </etools-prp-ajax>
-      
+
       <div>
         <disaggregation-switches
             data="[[data]]"
@@ -143,7 +143,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
                 restamp="true">
               <h4>[[localize('progress_against_cluster_target')]]:</h4>
             </template>
-  
+
             <table class="vertical layout">
               <template
                   is="dom-if"
@@ -155,7 +155,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
                     editable="[[editable]]">
                 </zero-disaggregations>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[_equals(formattedMapping.length, 1)]]"
@@ -166,7 +166,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
                     editable="[[editable]]">
                 </one-disaggregation>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[_equals(formattedMapping.length, 2)]]"
@@ -177,7 +177,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
                     editable="[[editable]]">
                 </two-disaggregations>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[_equals(formattedMapping.length, 3)]]"
@@ -192,8 +192,8 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
           </div>
         </div>
       </div>
-      
-      
+
+
     `;
   }
 
@@ -251,7 +251,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   @property({type: Array})
   mapping!: any[];
 
-  static get observers(){
+  static get observers() {
     return ['_resetFields(formattedData.disaggregation_reported_on)',
       '_initPercentageMap(localData, reportingEntityPercentageMap)']
   }
@@ -336,7 +336,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
     if ((String(app) === String('ip-reporting'))
       && (String(indicatorType) === String('number'))) {
       return false;
-    } else { return true; }
+    } else {return true;}
   }
 
   save() {
@@ -349,11 +349,11 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       return Promise.reject();
     }
 
-    this.fields.forEach(function (field) {
+    this.fields.forEach(function(field) {
       field.validate();
     });
 
-    cellsValid = this.fields.every(function (field) {
+    cellsValid = this.fields.every(function(field) {
       return !field.invalid;
     });
 
@@ -374,8 +374,8 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
         this.formattedData.location.id
       )
     )
-      .then(function (value) {
-        fireEvent(this,'locations-updated');
+      .then(function(value) {
+        fireEvent(this, 'locations-updated');
 
         return value;
       });
@@ -388,13 +388,13 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       return;
     }
 
-    fireEvent(this,'disaggregation-modal-refit');
+    fireEvent(this, 'disaggregation-modal-refit');
   }
 
   _computeMapping(editableBool: boolean, formattedData: GenericObject, mapping: any[]) {
     let reportedOn = formattedData.disaggregation_reported_on;
 
-    return editableBool ? mapping.filter(function (disagg) {
+    return editableBool ? mapping.filter(function(disagg) {
       return reportedOn.indexOf(disagg.id) !== -1;
     }) : mapping;
   }
@@ -415,10 +415,10 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
 
   _computeReportingEntityPercentageMap(byEntity: any[]) {
     return byEntity
-      .filter(function (location) {
+      .filter(function(location) {
         return !location.is_master_location_data;
       })
-      .map(function (location) {
+      .map(function(location) {
         return {
           title: location.reporting_entity.title,
           percentage: 1,
@@ -463,7 +463,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _addEventListeners() {
-    if (this.editableBool){
+    if (this.editableBool) {
       this._registerField = this._registerField.bind(this);
       this.addEventListener('register-field', this._registerField);
       this._fieldValueChanged = this._fieldValueChanged.bind(this);
@@ -472,7 +472,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _removeEventListeners() {
-    if (this.editableBool){
+    if (this.editableBool) {
       this.removeEventListener('register-field', this._registerField);
       this.removeEventListener('field-value-changed', this._fieldValueChanged);
     }

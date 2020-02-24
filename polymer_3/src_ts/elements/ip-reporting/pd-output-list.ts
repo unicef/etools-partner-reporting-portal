@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import 'pd-output';
+import './pd-output';
 import '../list-placeholder';
 import '../ip-reporting/pd-output';
 import LocalizeMixin from '../../mixins/localize-mixin';
