@@ -3,7 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable-dropdown-filter';
 import '@polymer/paper-item/paper-item';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import FilterMixin from '../../../mixins/filter-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
