@@ -14,7 +14,6 @@ import '../filters/checkbox-filter/checkbox-filter';
 import '@polymer/paper-styles/typography';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
-import '@polymer/iron-location/iron-location';
 import '../error-modal';
 import {filterStyles} from '../../styles/filter-styles'
 import LocalizeMixin from '../../mixins/localize-mixin';
@@ -33,7 +32,7 @@ class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
   static get template() {
     return html`
     ${filterStyles}
-    <style include="app-grid-style filter-styles">
+    <style include="app-grid-style">
       :host {
         display: block;
         background: white;

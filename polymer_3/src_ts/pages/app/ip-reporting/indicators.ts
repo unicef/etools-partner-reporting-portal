@@ -9,9 +9,9 @@ import '../../../elements/page-header';
 import '../../../elements/page-body';
 import '../../../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
-import '../../elements/ip-reporting/indicators-filters';
-import '../../elements/ip-reporting/indicators-toolbar';
-import '../../elements/list-view-indicators';
+import '../../../elements/ip-reporting/indicators-filters';
+import '../../../elements/ip-reporting/indicators-toolbar';
+import '../../../elements/list-view-indicators';
 import Endpoints from '../../../endpoints';
 
 import SortingMixin from '../../../mixins/sorting-mixin';
