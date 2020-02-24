@@ -1,9 +1,9 @@
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-material/paper-material.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
+// import '@polymer/paper-material/paper-material';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
 
 import '../../../elements/page-header';
 import '../../../elements/page-body';

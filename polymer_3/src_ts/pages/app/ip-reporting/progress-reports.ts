@@ -3,7 +3,6 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-localize-behavior/app-localize-behavior';
 import '../../../elements/page-header';
 import '../../../elements/page-body';
 import '../../../elements/etools-prp-ajax';

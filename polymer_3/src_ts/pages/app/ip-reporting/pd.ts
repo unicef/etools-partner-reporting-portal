@@ -5,7 +5,6 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-localize-behavior/app-localize-behavior';
 import '../../../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
@@ -17,7 +16,8 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdFetch, pdSetCurrent} from '../../../redux/actions/pd';
 import {getDomainByEnv} from '../../../config';
-
+import './pd/pd-index';
+import './pd/pd-router';
 
 /**
  * @polymer
@@ -135,6 +135,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
+        console.log(resolvedPageUrl);
         this._notFound();
       });
   }
