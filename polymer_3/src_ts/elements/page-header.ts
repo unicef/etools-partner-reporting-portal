@@ -25,7 +25,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
         ${sharedStyles}
       <style include="iron-flex iron-flex-alignment iron-flex-factors">
         :host {
-          --header-gutter: 57px;
+          --header-gutter: 25px;
 
           display: block;
           padding: var(--header-gutter);

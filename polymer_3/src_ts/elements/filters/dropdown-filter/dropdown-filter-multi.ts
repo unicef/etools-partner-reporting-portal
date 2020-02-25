@@ -43,14 +43,10 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   hideSearch!: boolean;
 
   @property({type: Array, observer: '_handleData'})
-  data = function() {
-    return [];
-  };
+  data = [];
 
   @property({type: Array})
-  selectedValues = function() {
-    return [];
-  };
+  selectedValues = [];
 
   public static get observers() {
     return [
@@ -89,7 +85,9 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
 
   _setSelectedValues(value: any) {
     setTimeout(() => {
-      this.set('selectedValues', value.split(',').filter(Boolean));
+      if (value) {
+        this.set('selectedValues', value.split(',').filter(Boolean));
+      }
     });
   }
 

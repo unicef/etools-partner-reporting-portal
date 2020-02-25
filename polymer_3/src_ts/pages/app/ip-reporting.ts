@@ -52,6 +52,9 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         @apply --layout-horizontal;
         @apply --layout-center;
       }
+      #page-container {
+        margin-left: -30px;
+      }
     </style>
 
     <page-title title="[[localize('ip_reporting')]]"></page-title>
@@ -81,40 +84,42 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         </ip-reporting-nav>
       </app-drawer>
 
-      <ip-reporting-app-header></ip-reporting-app-header>
+      <main role="main" id="page-container">
 
-      <iron-pages
-          selected="[[page]]"
-          attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
-          <page-ip-reporting-overview
-              name="overview"
-              route="{{subroute}}">
-          </page-ip-reporting-overview>
-        </template>
+          <ip-reporting-app-header></ip-reporting-app-header>
 
-        <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
-          <page-ip-reporting-pd
-              name="pd"
-              route="{{subroute}}">
-          </page-ip-reporting-pd>
-        </template>
+          <iron-pages
+              selected="[[page]]"
+              attr-for-selected="name">
+            <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
+              <page-ip-reporting-overview
+                  name="overview"
+                  route="{{subroute}}">
+              </page-ip-reporting-overview>
+            </template>
 
-        <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
-          <page-ip-reporting-indicators
-              name="indicators"
-              route="{{subroute}}">
-          </page-ip-reporting-indicators>
-        </template>
+            <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
+              <page-ip-reporting-pd
+                  name="pd"
+                  route="{{subroute}}">
+              </page-ip-reporting-pd>
+            </template>
 
-        <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
-            <page-ip-progress-reports
-                name="progress-reports"
-                route="{{subroute}}">
-            </page-ip-progress-reports>
-         </template>
-       </iron-pages>
+            <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
+              <page-ip-reporting-indicators
+                  name="indicators"
+                  route="{{subroute}}">
+              </page-ip-reporting-indicators>
+            </template>
 
+            <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
+                <page-ip-progress-reports
+                    name="progress-reports"
+                    route="{{subroute}}">
+                </page-ip-progress-reports>
+            </template>
+          </iron-pages>
+       </main>
     </app-drawer-layout>
   `;
   }

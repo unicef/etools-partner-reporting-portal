@@ -25,7 +25,7 @@ export function computeIndicatorReportsUrl(indicator: GenericObject) {
 }
 
 export function computeHidden(data: any[], loading: boolean) {
-  return !loading || data.length;
+  return !loading || (data && data.length);
 }
 
 export function bucketByLocation(data: any[]) {
