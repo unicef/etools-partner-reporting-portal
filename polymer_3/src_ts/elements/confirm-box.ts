@@ -100,7 +100,7 @@ class ConfirmBox extends PolymerElement {
   position!: string;
 
   @property({type: Object})
-  config: ConfirmBoxElem = {
+  config = {
     okLabel: 'Continue',
     cancelLabel: 'Cancel',
     maxWidth: '100%',
