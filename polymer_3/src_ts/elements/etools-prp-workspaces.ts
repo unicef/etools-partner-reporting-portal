@@ -11,11 +11,9 @@ class EtoolsPrpWorkspaces extends ReduxConnectedElement {
 
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _current!: string;
-  // statePath: 'workspaces.current'
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   _all!: any[];
-  // statePath: 'workspaces.all'
 
   @property({type: String, notify: true, computed: '_computeCurrent(_current)'})
   current!: string;

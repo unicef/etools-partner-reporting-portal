@@ -12,8 +12,9 @@ class PageBody extends PolymerElement {
             display: block;
             padding: 25px 25px 75px;
           }
-      </style>`
-      ;
+      </style>
+      <slot><slot>
+    `;
   }
 }
 

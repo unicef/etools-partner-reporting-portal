@@ -1,18 +1,18 @@
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../dropdown-filter/searchable-dropdown-filter.html';
-import '../../etools-prp-ajax.html';
+import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import Endpoints from '../../../endpoints';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -21,7 +21,7 @@ import { timeOut } from '@polymer/polymer/lib/utils/async';
  * @appliesMixin FilterMixin
  * @appliesMixin FilterDependenciesMixin
  */
-class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(ReduxConnectedElement))) {
+class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
     <style>
@@ -53,12 +53,6 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
     </searchable-dropdown-filter>
   `;
   }
-
-  // properties: {
-  //   queryParams: Object,
-
-  //   value: String,
-  // },
 
   @property({type: Object})
   queryParams!: GenericObject;
@@ -108,7 +102,9 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
       });
   };
 
-  detached() {
+  disconnectedCallback() {
+    super.connectedCallback();
+
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     if (this._debouncer.isActive()) {
@@ -117,4 +113,4 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(Redu
   };
 }
 
-window.customElements.define('checkbox-filter', CheckboxFilter);
+window.customElements.define('cluster-activity-filter', ClusterActivityFilter);

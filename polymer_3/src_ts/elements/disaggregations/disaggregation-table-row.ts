@@ -1,11 +1,12 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import './disaggregation-table-cell-number';
 import './disaggregation-table-cell-percentage';
 import './disaggregation-table-cell-ratio';
@@ -17,17 +18,17 @@ import './disaggregation-table-cell-ratio';
  * @appliesMixin LocalizeMixin
  * @appliesMixin UtilsMixin
  */
-class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
         ${disaggregationTableStyles}
       <style></style>
-      
+
       <tr class$="[[_computeClass(rowType)]]">
         <td class="cellTitle">
           <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
         </td>
-  
+
         <template is="dom-repeat"
                   items="[[data.data]]">
           <td>
@@ -41,7 +42,7 @@ class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
                   editable="[[editable]]">
               </disaggregation-table-cell-number>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[_equals(indicatorType, 'percentage')]]"
@@ -64,7 +65,7 @@ class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
             </template>
           </td>
         </template>
-  
+
         <template
             is="dom-if"
             if="[[data.total]]">
@@ -79,7 +80,7 @@ class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
                   editable="[[totalEditable]]">
               </disaggregation-table-cell-number>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[_equals(indicatorType, 'percentage')]]"
@@ -103,11 +104,11 @@ class DisaggregationTableRow extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
           </td>
         </template>
       </tr>
-      
+
     `;
   }
 
-  static get observers(){
+  static get observers() {
     return ['_setTotalEditable(data.total.key, levelReported, editable)'];
   }
 

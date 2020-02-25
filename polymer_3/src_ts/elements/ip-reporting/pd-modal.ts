@@ -14,7 +14,6 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
-// (dci) - check above
 
 /**
  * @polymer

@@ -1,9 +1,9 @@
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/dropdown-filter-multi';
+import '../dropdown-filter/searchable-dropdown-filter';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import Endpoints from "../../../endpoints";
 
 
@@ -44,7 +44,7 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computePartnerNamesUrl(responsePlanID: string) {
     return Endpoints.clusterPartnerNames(responsePlanID);
-  };
+  }
 
   _fetchPartnerNames() {
     var self = this;
@@ -61,12 +61,13 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       .catch(function(err: any) { // jshint ignore:line
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('cluster-partner-filter', ClusterPartnerFilter);

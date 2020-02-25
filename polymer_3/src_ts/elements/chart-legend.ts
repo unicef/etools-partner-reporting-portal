@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/polymer/lib/elements/dom-repeat';
@@ -13,14 +14,14 @@ import {property} from '@polymer/decorators/lib/decorators';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class ChartLegend extends LocalizeMixin(PolymerElement){
-  public static get template(){
+class ChartLegend extends LocalizeMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       <style include="iron-flex iron-flex-alignment">
         :host {
           display: block;
         }
-  
+
         .legend {
           padding: 0;
           margin: 0;
@@ -28,16 +29,16 @@ class ChartLegend extends LocalizeMixin(PolymerElement){
           font-size: 12px;
           line-height: 1;
         }
-  
+
         .legend-row {
           padding: 0 .5em .5em;
           border-bottom: 1px solid var(--paper-grey-200);
         }
-  
+
         .legend-row:not(:last-child) {
           margin-bottom: .75em;
         }
-  
+
         .color {
           display: inline-block;
           vertical-align: middle;
@@ -48,7 +49,7 @@ class ChartLegend extends LocalizeMixin(PolymerElement){
           top: -1px;
         }
       </style>
-      
+
       <ul class="legend">
         <template
             is="dom-repeat"
@@ -65,7 +66,7 @@ class ChartLegend extends LocalizeMixin(PolymerElement){
           </li>
         </template>
       </ul>
-    
+
     `;
   }
 
@@ -75,7 +76,7 @@ class ChartLegend extends LocalizeMixin(PolymerElement){
   @property({type: Array})
   colors: string[] = [];
 
-  public _getColor(colors: string[], index: string) {
+  _getColor(colors: string[], index: string) {
     return colors[index];
   }
 

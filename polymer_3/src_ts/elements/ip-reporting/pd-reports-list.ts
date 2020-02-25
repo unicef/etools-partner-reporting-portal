@@ -9,7 +9,7 @@ import '@polymer/iron-location/iron-query-params.js';
 import '../report-status';
 import '../list-placeholder';
 import '../etools-prp-permissions';
-import 'pd-reports-report-title';
+import './pd-reports-report-title';
 import {GenericObject} from '../../typings/globals.types';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import PaginationMixin from '../../mixins/pagination-mixin';

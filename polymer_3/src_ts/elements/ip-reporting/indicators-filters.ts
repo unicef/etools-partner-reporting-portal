@@ -5,33 +5,20 @@ import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../filter-list';
-import '../text-filter/text-filter';
-import '../dropdown-filter/dropdown-filter-multi';
-import '../location-filter/location-filter';
-import '../pd-filter/pd-dropdown-filter';
-import '../checkbox-filter/checkbox-filter';
-
+import '../filters/text-filter/text-filter';
+import '../filters/dropdown-filter/dropdown-filter-multi';
+import '../filters/location-filter/location-filter';
+import '../filters/pd-filter/pd-dropdown-filter';
+import '../filters/checkbox-filter/checkbox-filter';
 
 import '@polymer/paper-styles/typography';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
-import '@polymer/iron-location/iron-location';
 import '../error-modal';
 import {filterStyles} from '../../styles/filter-styles'
 import LocalizeMixin from '../../mixins/localize-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import {GenericObject} from '../../typings/globals.types';
-//<link rel="import" href="js/authorized-officer-modal-functions.html">
-
-// @Lajos
-// behaviors: [
-//   behaviors: [
-// App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-//       ],
-// ],
 
 /**
  * @polymer
@@ -45,7 +32,7 @@ class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
   static get template() {
     return html`
     ${filterStyles}
-    <style include="app-grid-style filter-styles">
+    <style include="app-grid-style">
       :host {
         display: block;
         background: white;

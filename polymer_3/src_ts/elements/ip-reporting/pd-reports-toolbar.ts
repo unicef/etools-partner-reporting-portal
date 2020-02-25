@@ -1,11 +1,12 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import UtilsMixin from '../../mixins/utils-mixin';
+import {property} from '@polymer/decorators';
 import '../etools-prp-toolbar';
 import '../download-button';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-
+import UtilsMixin from '../../mixins/utils-mixin';
+import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
+import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
 
 /**
  * @polymer
@@ -13,14 +14,14 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  */
 class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
-  public static get template(){
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
       </style>
-      
+
       <etools-prp-toolbar
         query="{{ query }}"
         pd-id="{{ pdId }}"
@@ -30,13 +31,12 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
           <download-button url="[[pdfExportUrl]]">PDF</download-button>
         </template>
       </etools-prp-toolbar>
-    
+
     `;
   }
 
-  @property({type: Number})
+  @property({type: Number, computed: 'programmeDocumentReportsCount(rootState)'})
   totalResults!: number;
-    // statePath: App.Selectors.ProgrammeDocumentReports.count,
 
   @property({type: Boolean, computed: '_canExport(totalResults)'})
   canExport!: boolean;
@@ -54,15 +54,15 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
   pdfExportUrl!: string;
 
   _computePdReportsUrl(locationId: string) {
-    return PdReportsToolbarUtils.computePdReportsUrl(locationId);
+    return computePdReportsUrl(locationId);
   }
 
   _canExport(totalResults: number) {
-    return PdReportsToolbarUtils.canExport(totalResults);
+    return canExport(totalResults);
   }
 
   _computePdQuery(pdId: string) {
-    return PdReportsToolbarUtils.computePdQuery(pdId);
+    return computePdQuery(pdId);
   }
 
 }

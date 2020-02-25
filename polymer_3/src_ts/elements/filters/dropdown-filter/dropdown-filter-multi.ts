@@ -1,8 +1,7 @@
 import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu';
+import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import FilterMixin from '../../../mixins/filter-mixin';
-//<link rel="import" href="../../../polyfills/es6-shim.html">
 import {fireEvent} from '../../../utils/fire-custom-event';
 
 /**
@@ -18,21 +17,21 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
         display: block;
       }
 
-      etools-multi-selection-menu {
+      etools-dropdown-multi {
         width: 100%;
       }
     </style>
 
-    <etools-multi-selection-menu
-        label="[[label]]"
-        options="[[data]]"
-        option-value="id"
-        option-label="title"
-        selected-values="{{selectedValues}}"
-        on-selected-values-changed="_handleChange"
-        hide-search="[[hideSearch]]"
-        disabled="[[disabled]]">
-    </etools-multi-selection-menu>
+    <etools-dropdown-multi
+      label="[[label]]"
+      options="[[data]]"
+      option-value="id"
+      option-label="title"
+      selected-values="{{selectedValues}}"
+      on-etools-selected-items-changed="_handleChange"
+      hide-search="[[hideSearch]]"
+      disabled="[[disabled]]">
+    </etools-dropdown-multi>
   `;
   }
 
@@ -44,39 +43,35 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   hideSearch!: boolean;
 
   @property({type: Array, observer: '_handleData'})
-  data = function() {
-    return [];
-  };
+  data = [];
 
   @property({type: Array})
-  selectedValues = function() {
-    return [];
-  };
+  selectedValues = [];
 
   public static get observers() {
     return [
       '_setSelectedValues(value, data)',
     ]
   }
-  _handleChange(e: CustomEvent, change: any) {
+
+  _handleChange(e: CustomEvent, detail: any) {
     var newValue;
 
-    if (change.path === 'selectedValues.splices') {
-      newValue = change.value.indexSplices[0].object;
-    } else if (!change.path) {
-      newValue = change.value;
+    if (detail.path === 'selectedValues.splices') {
+      newValue = detail.value.indexSplices[0].object;
+    } else if (!detail.path) {
+      newValue = detail.value;
     }
 
     if (typeof newValue === 'undefined') {
       return;
     }
 
-    //@Lajos please take a look
     fireEvent(this, 'filter-changed', {
       name: this.name,
       value: String(newValue || ''),
     });
-  };
+  }
 
   _handleData(data: any) {
     if (data.length) {
@@ -86,13 +81,16 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
       // there are no locations - in that case, fire filterReady method to have filters stop loading.
       this._filterReady();
     }
-  };
+  }
 
   _setSelectedValues(value: any) {
-    this.async(function() {
-      this.set('selectedValues', value.split(',').filter(Boolean));
+    setTimeout(() => {
+      if (value) {
+        this.set('selectedValues', value.split(',').filter(Boolean));
+      }
     });
-  };
+  }
+
 }
 
 window.customElements.define('dropdown-filter-multi', DropdownFilterMulti);

@@ -14,7 +14,6 @@ class EtoolsPrpAuth extends (UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String, computed: 'getReduxStateValue(rootState.auth.token)'})
   token!: string;
-  // statePath: 'auth.token'
 
   @property({type: Boolean, notify: true, computed: '_computeAuthenticated(token)'})
   authenticated!: boolean;

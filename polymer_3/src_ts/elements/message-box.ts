@@ -1,5 +1,5 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';

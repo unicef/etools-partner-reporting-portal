@@ -1,15 +1,18 @@
-import {html} from '@polymer/polymer';
-import '@polymer/paper-input/paper-input';
-import DisaggregationMixin from '../../mixins/disaggregations-mixin';
-//<link rel="import" href="../../behaviors/disaggregation-field.html">
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/paper-input/paper-input';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
+import DisaggregationFieldMixin from '../../mixins/disaggregation-field-mixin';
+import {fireEvent} from '../../utils/fire-custom-event';
+import {GenericObject} from '../../typings/globals.types';
 
 /**
  * @polymer
  * @customElement
- * @appliesMixin DisaggregationMixin
+ * @appliesMixin DisaggregationFieldMixin
  */
-class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
+class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement) {
   public static get template() {
     // language=HTML
     return html`
@@ -55,52 +58,46 @@ class DisaggregationField extends DisaggregationMixin(ReduxConnectedElement) {
   @property({type: String})
   validator!: string;
 
-  property({type: Number})
+  @property({type: Number})
   min!: number;
 
-  property({type: Number, notify: true})
+  @property({type: Number, notify: true})
   value!: number;
 
-  property({type: Boolean, notify: true})
+  @property({type: Boolean, notify: true})
   invalid!: boolean;
 
 
   ready() {
-    this.$.field.validate();
-  };
-
-  attached() {
-    this.$.field.validate();
-    this.fire('register-field', this);
-  };
-
-  detached() {
+    super.ready();
+    (this.$.field as PaperInputElement).validate();
   }
 
-  // Cant deregister fields in lifecycle hooks due to:
-  // https://github.com/Polymer/polymer/issues/1159
-  // :( :( :(
-  //
-  // detached: function () {}
+  connectedCallback() {
+    super.connectedCallback();
+
+    (this.$.field as PaperInputElement).validate();
+    fireEvent(this, 'register-field', this);
+  }
 
   validate() {
-    return this.$.field.validate();
-  };
+    return (this.$.field as PaperInputElement).validate();
+  }
 
   getField() {
     return this.$.field;
-  };
+  }
 
   _inputValueChanged(e: CustomEvent) {
-    var change = {};
+    let change: GenericObject = {};
 
     change[this.key] = e.target.value;
 
-    this.fire('field-value-changed', {
+    fireEvent(this, 'field-value-changed', {
       key: this.coords,
       value: this._toNumericValues(change),
     });
-  };
+  }
 
 }
 

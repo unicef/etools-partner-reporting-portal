@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-repeat';
 

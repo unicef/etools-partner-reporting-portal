@@ -1,3 +1,5 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {property} from '@polymer/decorators/lib/decorators';
 import {html} from '@polymer/polymer';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
@@ -17,13 +19,9 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../mixins/sorting-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-// <link rel="import" href="../../redux/actions/localize.html">
-// <link rel="import" href="../../redux/store.html">
 import {tableStyles} from '../../styles/table-styles';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-// <link rel="import" href="js/progress-reports-list-functions.html">
+import {getReportTitle} from './js/progress-reports-list-functions';
 
 
 /**
@@ -37,36 +35,31 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin SortingMixin
  * @appliesMixin LocalizeMixin
  */
-class ProgressReportsList extends
-  UtilsMixin(
-  DataTableMixin(
-  PaginationMixin(
-  RoutingMixin(
-  ProgressReportUtilsMixin(
-  SortingMixin(
-  LocalizeMixin(ReduxConnectedElement))))))){
-  public static get template(){
+class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtilsMixin(
+  RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement))))))) {
+
+  public static get template() {
     return html`
       ${tableStyles}
       <style include="data-table-styles">
         :host {
           display: block;
-  
+
           --ecp-content: {
             padding: 0;
           };
         }
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-      
+
       <etools-content-panel panel-title="[[localize('list_of_reports')]]">
         <etools-data-table-header
             no-collapse
@@ -90,7 +83,7 @@ class ProgressReportsList extends
             <div class="table-column">[[localize('reporting_period')]]</div>
           </etools-data-table-column>
         </etools-data-table-header>
-  
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -99,7 +92,7 @@ class ProgressReportsList extends
             on-page-size-changed="_pageSizeChanged"
             on-page-number-changed="_pageNumberChanged">
         </etools-data-table-footer>
-  
+
         <template
           id="list"
           is="dom-repeat"
@@ -135,12 +128,12 @@ class ProgressReportsList extends
             </div>
           </etools-data-table-row>
         </template>
-  
+
         <list-placeholder
             data="[[data]]"
             loading="[[loading]]">
         </list-placeholder>
-  
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -149,7 +142,7 @@ class ProgressReportsList extends
             on-page-size-changed="_pageSizeChanged"
             on-page-number-changed="_pageNumberChanged">
         </etools-data-table-footer>
-  
+
         <etools-loading active="[[loading]]"></etools-loading>
       </etools-content-panel>
     `;
@@ -164,8 +157,8 @@ class ProgressReportsList extends
   @property({type: Number, computed: 'getReduxStateValue(rootState.progressReports.count)'})
   totalResults!: number;
 
-  _getReportTitle(report) {
-    return ProgressReportsListUtils.getReportTitle(report);
+  _getReportTitle(report: GenericObject) {
+    return getReportTitle(report);
   }
 
 }

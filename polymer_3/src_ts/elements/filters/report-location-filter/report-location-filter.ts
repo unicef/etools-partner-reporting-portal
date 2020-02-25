@@ -1,11 +1,11 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
+import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -53,7 +53,7 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeLocationsUrl(locationId: string, reportId: string) {
     return Endpoints.indicatorDataLocation(locationId, reportId);
-  };
+  }
 
   _fetchLocations() {
     var self = this;
@@ -69,12 +69,13 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
       .catch(function(err: any) { // jshint ignore:line
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('report-location-filter', ReportLocationFilter);

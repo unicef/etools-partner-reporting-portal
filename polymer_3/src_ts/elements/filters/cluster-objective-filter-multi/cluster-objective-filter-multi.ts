@@ -1,3 +1,4 @@
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -6,11 +7,10 @@ import '../dropdown-filter/dropdown-filter-multi';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
 import Endpoints from '../../../endpoints';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -71,12 +71,14 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   @property({type: Boolean})
   pending = false;
 
+  private _debouncer!: Debouncer;
+
   _computeObjectivesUrl(responsePlanId: string) {
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
-  },
+  }
 
   _computeObjectivesParams(params: GenericObject) {
-    var objectivesParams = {
+    var objectivesParams: GenericObject = {
       page_size: 99999,
     };
 
@@ -85,19 +87,17 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
     }
 
     return objectivesParams;
-  };
-
-  private _debouncer!: Debouncer;
+  }
 
   _fetchObjectives() {
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
-     timeOut.after(250),
+      timeOut.after(250),
       function() {
-        var self = this;
-        const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
-        this.set('pending', true);
+        const thunk = (self.$.objectives as EtoolsPrpAjaxEl).thunk();
+        self.set('pending', true);
 
-        (this.$.objectives as EtoolsPrpAjaxEl).abort();
+        (self.$.objectives as EtoolsPrpAjaxEl).abort();
 
         thunk()
           .then(function(res: any) {
@@ -109,14 +109,15 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
           });
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  },
+  }
+
 }
 
 window.customElements.define('cluster-objective-filter-multi', ClusterObjectiveFilterMulti);

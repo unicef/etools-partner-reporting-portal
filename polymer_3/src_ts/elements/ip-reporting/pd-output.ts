@@ -356,6 +356,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
     if (currentReport && indicator) {
       return String(currentReport.report_type) === String('QPR');
     }
+    return false;
   }
 
   _computeShowMeta(report: GenericObject) {

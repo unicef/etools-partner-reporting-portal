@@ -1,27 +1,14 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/paper-spinner/paper-spinner';
-import '@unicef-polymer/etoolsetools-loading/etools-loading';
-import '../../settings';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-data-table/etools-data-table';
+import '../list-placeholder';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {tableStyles} from '../../styles/table-styles';
+import {getReportName} from './js/pd-details-reporting-requirements-functions';
 
-//<link rel="import" href="js/pd-details-doc-download-functions">
-//<link rel="import" href="js/pd-details-calculation-methods-functions.html">
-// @Lajos
-// behaviors: [
-//   behaviors: [
-  // App.Behaviors.UtilsBehavior,
-  //       App.Behaviors.ReduxBehavior,
-  //       App.Behaviors.LocalizeBehavior,
-  //       Polymer.AppLocalizeBehavior,
-// ],
-// ],
 
 /**
  * @polymer
@@ -30,8 +17,8 @@ import {tableStyles} from '../../styles/table-styles';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-//not sure about data table styles....
+class PdDetailsReportingRequirements extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+
   static get template() {
     return html`
     ${tableStyles}
@@ -97,18 +84,18 @@ class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(ReduxConne
   }
 
   @property({type: Array})
-  data!: any;
+  data!: any[];
 
   @property({type: Boolean})
   loading!: boolean;
 
   @property({type: String})
-  title!: String;
-  
+  title!: string;
 
   _getReportName(type: any, index: any, localize: any) {
-    return PdDetailsReportingRequirementsUtils.getReportName(type, index, localize);
-  };
+    return getReportName(type, index, localize);
+  }
+
 }
 
 window.customElements.define('pd-details-reporting-requirements', PdDetailsReportingRequirements);

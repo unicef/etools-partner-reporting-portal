@@ -10,8 +10,7 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../elements/filter-list';
-// <link rel="import" href = "../../elements/filters/dropdown-filter/dropdown-filter.html" >
-// (dci)
+import '../../elements/filters/dropdown-filter/dropdown-filter';
 
 /**
  * @polymer

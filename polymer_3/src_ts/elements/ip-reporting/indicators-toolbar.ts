@@ -3,14 +3,7 @@ import {property} from '@polymer/decorators';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-toolbar';
 import '../download-button';
-//         <link rel="import" href = "js/indicators-toolbar-functions.html" >
-
-// @Lajos
-// behaviors: [
-//   behaviors: [
-// App.Behaviors.UtilsBehavior,
-//       ],
-// ],
+import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
 
 /**
  * @polymer
@@ -30,8 +23,8 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
 
     <etools-prp-toolbar
       query="{{query}}"
-      location-id="{{locationId}}"
-    >
+      location-id="{{locationId}}">
+
       <download-button url="[[xlsExportUrl]]">XLS</download-button>
       <download-button url="[[pdfExportUrl]]">PDF</download-button>
     </etools-prp-toolbar>
@@ -47,7 +40,7 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
   pdfExportUrl!: string;
 
   _computeIndicatorsUrl(locationId: string) {
-    return IndicatorsToolbarUtils.computeIndicatorsUrl(locationId);
+    return computeIndicatorsUrl(locationId);
   };
 }
 

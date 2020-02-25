@@ -1,33 +1,19 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-
 import '../ip-reporting/pd-report-filters';
 import '../ip-reporting/pd-reports-toolbar';
 import '../ip-reporting/pd-reports-list';
-import '../../settings';
 import {tableStyles} from '../../styles/table-styles';
-import { ReduxConnectedElement } from '../../ReduxConnectedElement';
-import { GenericObject } from '../../typings/globals.types';
+import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import { store } from '../../redux/store';
-import { pdReportsFetch } from '../../redux/actions/pdReports';
-//<link rel="import" href="../../polyfills/es6-shim.html">
-//<link rel="import" href="js/pd-details-reports-functions.html">
-
-// @Lajos
-// behaviors: [
-//   behaviors: [
-  // App.Behaviors.UtilsBehavior,
-  //       App.Behaviors.ReduxBehavior,
-  //       App.Behaviors.LocalizeBehavior,
-  //       Polymer.AppLocalizeBehavior,
-// ],
-// ],
+import {pdReportsFetch} from '../../redux/actions/pdReports';
+import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions';
 
 /**
  * @polymer
@@ -35,7 +21,7 @@ import { pdReportsFetch } from '../../redux/actions/pdReports';
  * @mixinFunction
  */
 class PdDetailsReport extends ReduxConnectedElement {
-//not sure about data table styles....
+
   static get template() {
     return html`
     ${tableStyles}
@@ -92,9 +78,9 @@ class PdDetailsReport extends ReduxConnectedElement {
   @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
   pdReportsCount!: GenericObject;
 
-  @property({type: String, computed:'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
   pdReportsId!: string;
- 
+
   private _debouncer!: Debouncer;
 
   public static get observers() {
@@ -104,37 +90,38 @@ class PdDetailsReport extends ReduxConnectedElement {
   }
 
   _computePDReportsUrl(locationId: string) {
-    return PdDetailsReportsUtils.computePDReportsUrl(locationId);
-  };
+    return computePDReportsUrl(locationId);
+  }
 
-  _computePDReportsParams(pdId: string, queryParams: string) {
-    return PdDetailsReportsUtils.computePDReportsParams(pdId, queryParams);
-  };
+  _computePDReportsParams(pdId: string, queryParams: GenericObject) {
+    return computePDReportsParams(pdId, queryParams);
+  }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  };
+  }
 
   _handleInputChange(url: string) {
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-      var pdReportsThunk;
-      if (!url) {
-        return;
-      }
+        if (!url) {
+          return;
+        }
 
-      pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
+        const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
 
-      // Cancel the pending request, if any
-      (this.$.pdReports as EtoolsPrpAjaxEl).abort();
+        // Cancel the pending request, if any
+        (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-      store.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
-          .catch(function (err) { // jshint ignore:line
+        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
+          .catch(function(err) { // jshint ignore:line
             // TODO: error handling
           });
-    });
-  };
+      });
+  }
+
 }
 
 window.customElements.define('pd-details-reports', PdDetailsReport);

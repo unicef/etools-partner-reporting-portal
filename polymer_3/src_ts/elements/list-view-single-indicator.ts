@@ -7,7 +7,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/polymer/lib/elements/dom-if';
 
-// <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
+import './ip-reporting/ip-reporting-indicator-details';
 import './etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
@@ -22,8 +22,8 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
 import {sharedStyles} from '../styles/shared-styles';
-// <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
-// <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
+//(dci) import 'cluster-reporting/indicator-editing-modal';
+//(dci) import 'cluster-reporting/indicator-locations-modal';
 
 
 /**
@@ -37,7 +37,7 @@ import {sharedStyles} from '../styles/shared-styles';
 class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
-        ${tableStyles} ${sharedStyles}
+      ${tableStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles">
         :host {
           display: block;
@@ -291,9 +291,8 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
-  // statePath: 'app.current',
 
   @property({type: String})
   type: string = '';

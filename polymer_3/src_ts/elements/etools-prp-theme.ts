@@ -11,7 +11,6 @@ class EtoolsPrpTheme extends PolymerElement {
 
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   _app!: string;
-  // statePath: 'app.current',
 
   @property({type: String, notify: true, computed: '_computePrimaryColor(_app)'})
   primaryColor!: string;
@@ -20,8 +19,8 @@ class EtoolsPrpTheme extends PolymerElement {
     switch (app) {
       case 'cluster-reporting':
         return Constants.THEME_PRIMARY_COLOR_CLUSTER;
-
       case 'ip-reporting':
+      default:
         return Constants.THEME_PRIMARY_COLOR_IP;
     }
   }

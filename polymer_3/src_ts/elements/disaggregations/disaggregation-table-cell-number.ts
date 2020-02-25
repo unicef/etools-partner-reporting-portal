@@ -1,10 +1,10 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import UtilsMixin from '../../mixins/utils-mixin';
 import './disaggregation-table-cell';
 import './disaggregation-field';
 import '../etools-prp-number';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
 
@@ -13,16 +13,16 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement){
-  public static get template(){
+class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement) {
+  public static get template() {
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style>
         :host {
           display: block;
         }
       </style>
-    
+
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
         <editable>
           <disaggregation-field

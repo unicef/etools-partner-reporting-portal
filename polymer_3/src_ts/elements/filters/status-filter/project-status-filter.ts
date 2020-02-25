@@ -1,17 +1,16 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable - dropdown - filter';
-import '../elements/etools-prp-ajax';
+import '../dropdown-filter/dropdown-filter';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
-import '../../../redux/selectors/llos';
+import UtilsMixin from '../../../mixins/utils-mixin';
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin LocalizeMixin
  */
-class ProjectStatusFilter extends LocalizeMixin(ReduxConnectedElement) {
+class ProjectStatusFilter extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
     <style>

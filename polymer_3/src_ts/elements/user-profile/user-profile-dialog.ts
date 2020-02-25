@@ -14,7 +14,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../labelled-item';
-import '../../styles/modal-styles';
+import {modalStyles} from '../../styles/modal-styles';
 
 /**
  * @polymer
@@ -26,7 +26,8 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse modal-styles">
+    ${modalStyles}
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --app-grid-columns: 3;

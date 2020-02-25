@@ -1,17 +1,12 @@
 import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-//@Lajos Needs to BE CHECKED
-import '@polymer/moment-element/moment-import';
-
 import '@polymer/paper-input/paper-input';
 import '@polymer/iron-icons/iron-icons';
-//<link rel="import" href="../../../../bower_components/etools-datepicker/etools-datepicker.html">
-import '@unicef-polymer/etools-datepicker/etools-datepicker';
-
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
-
+declare const moment: any;
 
 /**
  * @polymer
@@ -27,6 +22,14 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
         display:block;
       };
     </style>
+    <datepicker-lite
+      id="field"
+      selected-date-display-format="D MMM YYYY"
+      label="[[label]]"
+      value="[[prettyDate(value, format)]]">
+    </datepicker-lite>
+
+    <!--
     <paper-input
       id="field"
       type="[[type]]"
@@ -45,6 +48,7 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
         prefix>
       </etools-datepicker-button>
     </paper-input>
+    -->
   `;
   }
 
@@ -54,41 +58,41 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
 
   @property({type: String})
   type = 'text';
-  //@Lajos needs to be investigated
-  @property({type: any, notify: 'true'})
-  jsonValue!: any;
+
+  @property({type: String, notify: true})
+  jsonValue = null;
 
   @property({type: String})
   format = 'DD MMM YYYY';
 
   _handleInput() {
     var newValue = this.$.field.value;
-    //initially this.fire
     fireEvent(this, 'filter-changed', {
       name: this.name,
       value: newValue,
     });
-  };
+  }
 
   _addEventListeners() {
     this._handleInput = this._handleInput.bind(this);
     this.addEventListener('field.value-changed', this._handleInput);
-  };
+  }
 
   _removeEventListeners() {
     this.removeEventListener('field.value-changed', this._handleInput);
-  };
+  }
 
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
     this._filterReady();
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-  };
+  }
+
 }
 
 window.customElements.define('date-filter', DateFilter);

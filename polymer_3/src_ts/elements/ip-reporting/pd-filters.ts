@@ -1,18 +1,17 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import {property} from '@polymer/decorators';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import {GenericObject} from '../../typings/globals.types';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../elements/filter-list';
-
-// <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-// <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
-// <link rel="import" href="../../elements/filters/location-filter-multi/location-filter-multi.html">
+import '../../elements/filters/text-filter/text-filter';
+import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
+import '../../elements/filters/location-filter-multi/location-filter-multi';
 
 
 /**

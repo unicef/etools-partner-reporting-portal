@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@polymer/iron-location';
+import '@polymer/iron-location/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-query-params';
@@ -13,51 +13,48 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpToolbar extends (UtilsMixin(PolymerElement)){
-  public static get template(){
+class EtoolsPrpToolbar extends UtilsMixin(PolymerElement) {
+
+  public static get template() {
     return html`
-        ${buttonsStyles}
+      ${buttonsStyles}
       <style include="iron-flex iron-flex-reverse">
         :host {
           display: block;
           margin: 25px 0;
         }
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{params}}">
       </iron-query-params>
-  
+
       <div class="layout horizontal-reverse">
         <slot></slot>
       </div>
-    
+
     `;
   }
 
   @property({type: String, notify: true})
   properties!: string;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   _responsePlanId!: string;
-  // statePath: 'responsePlans.currentID'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   _locationId!: string;
-  // statePath: 'location.id'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   _pdId!: string;
-  // statePath: 'programmeDocuments.current'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
   _reportId!: string;
-  // statePath: 'programmeDocumentReports.current.id'
 
   @property({type: String, computed: '_identity(_responsePlanId)', notify: true})
   responsePlanId!: string;

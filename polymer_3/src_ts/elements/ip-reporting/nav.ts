@@ -14,16 +14,6 @@ import PageNavMixin from '../../mixins/page-nav-mixin';
 import '../etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
 
-// (dci)
-// behaviors: [
-// App.Behaviors.UtilsBehavior,
-// App.Behaviors.PageNavBehavior,
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.RoutingBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
-// ]
-
 /**
  * @polymer
  * @customElement

@@ -4,10 +4,9 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
 import {property} from '@polymer/decorators';
-import { fireEvent } from '../../../utils/fire-custom-event';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
-// <link rel="import" href="../../../behaviors/filter.html">
-// <link rel="import" href="../../../behaviors/utils.html">
+import {fireEvent} from '../../../utils/fire-custom-event';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
+
 /**
  * @polymer
  * @customElement
@@ -36,11 +35,6 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
     </paper-checkbox>
   `;
   }
-
-  // behaviors: [
-  //   App.Behaviors.FilterBehavior,
-  //   App.Behaviors.UtilsBehavior,
-  // ],
 
   @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
   checked!: boolean;
@@ -95,4 +89,4 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
 
 window.customElements.define('checkbox-filter', CheckboxFilter);
 
-// export {CheckboxFilter as CheckboxFilterEl};
+export {CheckboxFilter as CheckboxFilterEl};

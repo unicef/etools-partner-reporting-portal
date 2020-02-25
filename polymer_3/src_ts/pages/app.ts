@@ -1,9 +1,9 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/paper-toast/paper-toast.js';
+import '@polymer/app-route/app-route';
+import '@polymer/iron-pages/iron-pages';
+import '@polymer/paper-toast/paper-toast';
 
 import '../elements/etools-prp-workspaces';
 import '../elements/etools-prp-ajax';

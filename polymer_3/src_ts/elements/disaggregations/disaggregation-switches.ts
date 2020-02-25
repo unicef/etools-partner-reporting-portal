@@ -1,12 +1,13 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {property} from '@polymer/decorators/lib/decorators';
 import {html} from '@polymer/polymer';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/paper-checkbox';
 import '@polymer/polymer/lib/elements/dom-if';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import DisaggregationMixin from '../../mixins/disaggregations-mixin';
 import '../message-box';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
@@ -20,35 +21,35 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
  * @appliesMixin LocalizeMixin
  * @appliesMixin DisaggregationMixin
  */
-class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixin(ReduxConnectedElement))){
-  public static get template(){
+class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
-  
+
         .container {
           padding: 10px 24px;
           margin: 0 -24px;
           background: var(--paper-grey-100);
         }
-  
+
         .container h4 {
           margin: 0 0 10px;
           font-size: 12px;
           line-height: 1;
         }
-  
+
         paper-checkbox:not(:first-of-type) {
           margin-left: 24px;
         }
-  
+
         message-box {
           margin-top: 10px;
         }
       </style>
-      
+
       <template
           is="dom-if"
           if="[[editableBool]]"
@@ -67,7 +68,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
               [[_formatFieldName(field.name)]]
             </paper-checkbox>
           </template>
-  
+
           <template
               is="dom-if"
               if="[[warning]]"
@@ -105,7 +106,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
 
   fieldValueChanged !: Debouncer | null;
 
-  static get observers(){
+  static get observers() {
     return ['_computeWarning(data.num_disaggregation, reportedOn.length)']
   }
 
@@ -143,9 +144,9 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   _confirmIntent(field: GenericObject) {
     let deferred = this._deferred();
 
-    fireEvent(this,'disaggregation-modal-confirm', deferred);
+    fireEvent(this, 'disaggregation-modal-confirm', deferred);
 
-    return deferred.promise.catch(function () {
+    return deferred.promise.catch(function() {
       return Promise.reject(field);
     });
   }

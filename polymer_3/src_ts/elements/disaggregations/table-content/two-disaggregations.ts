@@ -5,8 +5,7 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 import {disaggregationTableStyles} from '../../../styles/disaggregation-table-styles';
 import {property} from "@polymer/decorators/lib/decorators";
 import {GenericObject} from "../../../typings/globals.types";
-
-// <link rel="import" href="../disaggregation-table-row.html">
+import '../disaggregation-table-row';
 
 
 /**
@@ -16,24 +15,25 @@ import {GenericObject} from "../../../typings/globals.types";
  * @appliesMixin UtilsMixin
  */
 class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement)) {
+
   public static get template() {
     // language=HTML
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style></style>
-      
+
       <tr class='horizontal layout headerRow'>
         <th></th>
-  
+
         <template is="dom-repeat"
                   items="[[columns]]"
                   as="column">
           <th>[[_capitalizeFirstLetter(column.value)]]</th>
         </template>
-  
+
         <th>Total</th>
       </tr>
-      
+
       <template
           is="dom-repeat"
           items="[[rowsForDisplay]]"
@@ -46,14 +46,14 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
             editable="[[editable]]">
         </disaggregation-table-row>
       </template>
-      
+
       <disaggregation-table-row
           data="[[totalsForDisplay]]"
           level-reported="[[data.level_reported]]"
           indicator-type="[[data.display_type]]"
           row-type="totalsRow">
       </disaggregation-table-row>
-    
+
     `;
   }
 
@@ -92,8 +92,9 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
   }
 
   _determineTotals(columns: any[], data: GenericObject) {
-    let columnData = columns.map(function (z) {
-      let formatted = this._formatDisaggregationIds([z.id]);
+    const self = this;
+    let columnData = columns.map(function(z) {
+      let formatted = self._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,

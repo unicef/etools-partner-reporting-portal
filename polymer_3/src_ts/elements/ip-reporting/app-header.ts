@@ -20,12 +20,12 @@ class IpReportingAppHeader extends PolymerElement {
 
   static get template() {
     return html`
-
     <style>
       :host {
         display: block;
         position: relative;
         z-index: 100;
+        height: 65px;
       }
 
       app-header {

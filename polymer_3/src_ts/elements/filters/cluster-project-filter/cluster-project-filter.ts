@@ -1,16 +1,16 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../dropdown-filter/dropdown-filter-multi';
+import '../dropdown-filter/searchable-dropdown-filter';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import Endpoints from "../../../endpoints";
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 
 /**
@@ -78,12 +78,12 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
   };
 
   _fetchProjectNames() {
+    var self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       function() {
-        var self = this;
-        const thunk = (this.$.projectNames as EtoolsPrpAjaxEl).thunk();
-        (this.$.projectNames as EtoolsPrpAjaxEl).abort();
+        const thunk = (self.$.projectNames as EtoolsPrpAjaxEl).thunk();
+        (self.$.projectNames as EtoolsPrpAjaxEl).abort();
 
         thunk()
           .then(function(res: any) {
@@ -96,7 +96,7 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
             // TODO: error handling
           });
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -105,7 +105,8 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
     if (this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
+
 }
 
 window.customElements.define('cluster-project-filter', ClusterProjectFilter);

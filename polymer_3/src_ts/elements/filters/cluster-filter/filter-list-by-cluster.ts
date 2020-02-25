@@ -2,11 +2,9 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../polyfills/es6-shim';
-//<link rel="import" href = "../../../polyfills/es6-shim.html" >
 import UtilsMixin from '../../../mixins/utils-mixin';
 import '../../filters/cluster-filter/cluster-filter';
-//<link rel="import" href = "../../filters/cluster-filter/cluster-filter.html" >
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -22,18 +20,18 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
     }
     </style>
 
-    < iron - location
-      query = "{{query}}" >
+    <iron-location
+      query="{{query}}">
     </iron-location>
 
-    < iron - query - params
-      params - string="{{query}}"
-      params - object="{{queryParams}}" >
+    <iron-query-params
+      params-string="{{query}}"
+      params-object="{{queryParams}}" >
     </iron-query-params>
 
-    < cluster - filter
-      name = "cluster_id"
-      value = "[[_withDefault(queryParams.cluster_id, '')]]" >
+    <cluster-filter
+      name="cluster_id"
+      value="[[_withDefault(queryParams.cluster_id, '')]]">
     </cluster-filter>
   `;
   }
@@ -42,7 +40,7 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
   queryParams!: Object;
 
   _onFilterChanged(e: CustomEvent) {
-    var change = {
+    const change: GenericObject = {
       page: 1,
     };
     const data = e.detail;
@@ -55,11 +53,11 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
 
   _addEventListeners() {
     this._onFilterChanged = this._onFilterChanged.bind(this);
-    this.addEventListener('filter-changed', this._onFilterChanged);
+    this.addEventListener('filter-changed', this._onFilterChanged as any);
   };
 
   _removeEventListeners() {
-    this.removeEventListener('filter-changed', this._onFilterChanged);
+    this.removeEventListener('filter-changed', this._onFilterChanged as any);
   };
 
   connectedCallback() {

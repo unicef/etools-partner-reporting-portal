@@ -2,7 +2,6 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import Settings from '../settings';
-
 declare const moment: any;
 
 
@@ -66,7 +65,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return localize(text).substring(0, text.length - 1);
     }
 
-    _withDefault(value: any, defaultValue: any, localize: any) {
+    _withDefault(value: any, defaultValue?: any, localize?: any) {
       if (typeof defaultValue === 'undefined') {
         defaultValue = '...';
       }
@@ -184,7 +183,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _commaSeparatedDictValues(items: any, key: string) {
-      let newList = (items || []).map(function(item) {
+      let newList = (items || []).map(function(item: any) {
         return item[key];
       });
 

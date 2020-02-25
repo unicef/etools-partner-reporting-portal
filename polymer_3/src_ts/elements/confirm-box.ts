@@ -1,12 +1,11 @@
 import {PolymerElement, html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/polymer/lib/elements/dom-if';
-
 import Constants from '../constants';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {ConfirmBoxElem} from '../typings/entities.types';
 import {buttonsStyles} from '../styles/buttons-styles';
@@ -18,7 +17,7 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class ConfirmBox extends PolymerElement{
+class ConfirmBox extends PolymerElement {
   public static get template() {
     return html`
         ${buttonsStyles}
@@ -26,7 +25,7 @@ class ConfirmBox extends PolymerElement{
         :host {
           display: block;
         }
-  
+
         .overlay {
           left: 0;
           right: 0;
@@ -35,7 +34,7 @@ class ConfirmBox extends PolymerElement{
           z-index: 10;
           background: rgba(0, 0, 0, .3);
         }
-  
+
         .prompt {
           box-sizing: border-box;
           width: calc(100% - 48px);
@@ -44,12 +43,12 @@ class ConfirmBox extends PolymerElement{
           box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
           font-weight: 600;
         }
-  
+
         .info-wrapper {
           display: flex;
           align-items: center;
         }
-  
+
         .info-icon {
           color: #e2d96b;
           display: block;
@@ -58,7 +57,7 @@ class ConfirmBox extends PolymerElement{
           margin-right: 20px;
         }
       </style>
-      
+
       <template
         is="dom-if"
         if="[[active]]">
@@ -80,7 +79,7 @@ class ConfirmBox extends PolymerElement{
                 on-tap="_ok">
                 [[config.okLabel]]
               </paper-button>
-  
+
               <paper-button
                 on-tap="_cancel">
                 [[config.cancelLabel]]
@@ -89,8 +88,8 @@ class ConfirmBox extends PolymerElement{
           </div>
         </div>
       </template>
-    
-    
+
+
     `;
   }
 
@@ -101,10 +100,12 @@ class ConfirmBox extends PolymerElement{
   position!: string;
 
   @property({type: Object})
-  config: ConfirmBoxElem = { okLabel: 'Continue',
-                            cancelLabel: 'Cancel',
-                            maxWidth: '100%',
-                            mode: Constants.CONFIRM_INLINE};
+  config = {
+    okLabel: 'Continue',
+    cancelLabel: 'Cancel',
+    maxWidth: '100%',
+    mode: Constants.CONFIRM_INLINE
+  };
 
   _computePosition(config: GenericObject) {
     switch (config.mode) {
@@ -150,3 +151,5 @@ class ConfirmBox extends PolymerElement{
 }
 
 window.customElements.define('confirm-box', ConfirmBox);
+
+export {ConfirmBox as ConfirmBoxEl};

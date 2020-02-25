@@ -1,27 +1,28 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import '@polymer/paper-input/paper-input-container.js';
-import '@polymer/paper-input/paper-input-char-counter.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@polymer/paper-input/paper-input-container';
+import '@polymer/paper-input/paper-input-char-counter';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import '../labelled-item';
 import '../etools-prp-permissions';
 import './report-attachments';
+import '../../elements/filter-list';
+import '../../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../elements/etools-prp-ajax';
 
 import {GenericObject} from '../../typings/globals.types';
 import UtilsMixin from '../../mixins/utils-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import '../../elements/filter-list';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
 import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
-import '../../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../elements/etools-prp-ajax';
+
 
 /**
  * @polymer
@@ -247,9 +248,9 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
       () => {
         const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
-        (this.$.update as EtoolsPrpAjaxEl).abort();
+        (self.$.update as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(
+        self.reduxStore.dispatch(
           pdReportsUpdate(
             updateThunk,
             this.pdId,
