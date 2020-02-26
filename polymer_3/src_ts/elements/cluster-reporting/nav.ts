@@ -28,6 +28,8 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
+ * @appliesMixin PageNavMixin
+ * @appliesMixin RoutingMixin
  */
 class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnectedElement)))){
     public static get template(){

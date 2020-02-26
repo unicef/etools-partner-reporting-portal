@@ -67,7 +67,7 @@ import {fireEvent} from "../../utils/fire-custom-event";
  * @customElement
  * @appliesMixin IronMenuBehavior
  */
-class PaperRadioGroupCustom extends PolymerElement{
+class PaperRadioGroupCustom extends IronMenuBehavior(PolymerElement){
   public static get template(){
     return html`
       <style>

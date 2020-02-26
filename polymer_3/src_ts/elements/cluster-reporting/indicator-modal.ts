@@ -967,12 +967,15 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
   }
 
 
-  private _debouncer!: Debouncer;
+  private _adjustPositionDebouncer!: Debouncer;
+  private _fetchIndDebouncer! : Debouncer;
+  private _fetchObjectivesDebouncer! : Debouncer;
+  private _fetchSelectedIndDebouncer! : Debouncer;
 
   adjustPosition(e: CustomEvent) {
     e.stopPropagation();
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
       timeOut.after(250),
       () => {
         this.$.dialog.refit();
@@ -1061,7 +1064,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
         otherRadio.disabled = true;
       }
     }
-  },
+  }
 
   _setDefaults(opened: boolean) {
     if (!opened) {
@@ -1179,7 +1182,8 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
     this.set('indicatorsListParams', {object_id: selectedId, page_size: 9999, page: 1});
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+
+    this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer,
       timeOut.after(250), () => {
         let self = this;
 
@@ -1214,7 +1218,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
       this.set('data.partner_project_id', parseInt(this.objectId));
     }
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._fetchObjectivesDebouncer = Debouncer.debounce(this._fetchObjectivesDebouncer,
       timeOut.after(250),
       () => {
         let self = this;
@@ -1241,7 +1245,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     this.set('data.cluster_objective_id', selectedObjectiveId);
     this.set('indicatorsListParams', {object_id: selectedObjectiveId});
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer,
       timeOut.after(250),
       () => {
         let self = this;
@@ -1275,7 +1279,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
       return;
     }
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._fetchSelectedIndDebouncer = Debouncer.debounce(this._fetchSelectedIndDebouncer,
       timeOut.after(250),
       () => {
         let self = this;
