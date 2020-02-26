@@ -19,7 +19,8 @@ import {GenericObject} from "../../typings/globals.types";
 /**
  * @polymer
  * @customElement
- * @appliesMixin ModalMixin
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
  */
 class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   public static get template(){
@@ -223,22 +224,22 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
 
       this.set('value', newSelectedDisaggregations);
     }
-  },
+  }
 
-  _formatChoices: function(selected) {
+  _formatChoices(selected) {
     return selected.choices.map(function (choice) {
       return choice.value;
     }).join(', ');
-  },
+  }
 
-  _validate: function (e) {
-    e.target.validate();
-  },
+  _validate(e: CustomEvent) {
+    e.target!.validate();
+  }
 
-  validate: function () {
+  validate() {
     let self = this;
     this.set('invalid', false);
-    let allMenus = Polymer.dom(this.root).querySelectorAll('.dis-menu');
+    let allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
     allMenus.forEach(function(menu) {
       menu.set('invalid', false);
     });
@@ -266,13 +267,6 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     }
   }
 
-
 }
 
-
-
-
-
-
-
-
+window.customElements.define('disaggregations-dropdown-widget', DisaggregationsDropdownWidget);
