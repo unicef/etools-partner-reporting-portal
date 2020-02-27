@@ -81,7 +81,7 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   disconnectedCallback() {
     super.connectedCallback();
     this._removeEventListeners();
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

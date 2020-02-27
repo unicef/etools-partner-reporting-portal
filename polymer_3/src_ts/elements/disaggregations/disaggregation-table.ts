@@ -392,6 +392,10 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _computeMapping(editableBool: boolean, formattedData: GenericObject, mapping: any[]) {
+    if (!formattedData) {
+      return;
+    }
+
     let reportedOn = formattedData.disaggregation_reported_on;
 
     return editableBool ? mapping.filter(function(disagg) {

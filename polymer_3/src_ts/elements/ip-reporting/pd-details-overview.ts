@@ -28,7 +28,7 @@ import Settings from '../../settings';
 declare const moment: any;
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
-
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -293,7 +293,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   pd = {};
 
   @property({type: Object})
@@ -389,13 +389,18 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-          //@Lajos not sure if connect function
+
           self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
-            .catch(function(err) { // jshint ignore:line
+            // @ts-ignore
+            .catch(function(err) {
               // TODO: error handling
             });
         });
     }
+  }
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
   }
 
 }

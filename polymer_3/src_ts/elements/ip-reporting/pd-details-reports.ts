@@ -14,6 +14,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {pdReportsFetch} from '../../redux/actions/pdReports';
 import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions';
+import {pdFetch} from '../../redux/actions/pd';
 
 /**
  * @polymer
@@ -82,6 +83,7 @@ class PdDetailsReport extends ReduxConnectedElement {
   pdReportsId!: string;
 
   private _debouncer!: Debouncer;
+  private fetchPdsDebouncer!: Debouncer;
 
   public static get observers() {
     return [
@@ -116,11 +118,40 @@ class PdDetailsReport extends ReduxConnectedElement {
         (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
         self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
-          .catch(function(err) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling
           });
       });
   }
+
+  _getPdReports() {
+    // Status being present prevents res.data from getting reports,
+    // preventing pd-details title from rendering. Deleting the status
+    // can resolve this issue, and filter will still work
+    if (this.pdReportsCount[this.pdId] > 0 && this.pdReportsId === '') {
+      const self = this;
+      this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer,
+        timeOut.after(100),
+        () => {
+          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
+          pdThunk.params = {
+            page: 1,
+            page_size: 10,
+            programme_document: this.pdId
+          };
+
+          // Cancel the pending request, if any
+          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+            // @ts-ignore
+            .catch(function(err) {
+              // TODO: error handling
+            });
+        });
+    }
+  }
+
 
 }
 

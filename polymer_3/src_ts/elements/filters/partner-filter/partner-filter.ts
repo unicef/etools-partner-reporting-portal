@@ -95,7 +95,8 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
         self.set('data', data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }
@@ -104,7 +105,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.connectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

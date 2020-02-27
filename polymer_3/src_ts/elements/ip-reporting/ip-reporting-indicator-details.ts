@@ -283,7 +283,8 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
       //need to check
       // var action = Indicators;
       this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        .catch(function(err) { // jshint ignore:line
+        // @ts-ignore
+        .catch(function(err) {
           // TODO: error handling.
         });
     } else {

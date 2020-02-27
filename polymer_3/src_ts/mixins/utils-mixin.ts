@@ -54,7 +54,11 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _toLowerCaseLocalized(text: string, localize: any) {
-      return localize(text).toLowerCase();
+      const localizedText = localize(text);
+      if (localizedText) {
+        return localizedText.toLowerCase();
+      }
+      return text;
     }
 
     _localizeLowerCased(text: string, localize: any) {
@@ -113,23 +117,25 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _clone(val: any) {
-      const typeStr = Object.prototype.toString.call(val);
-      const self = this;
-
-      switch (typeStr) {
-        case '[object Array]':
-          return val.map(self._clone);
-
-        case '[object Object]':
-          return Object.keys(val).reduce(function(prev, curr) {
-            prev[curr] = self._clone(val[curr]);
-
-            return prev;
-          }, {});
-
-        default:
-          return val;
+      if (val) {
+        return JSON.parse(JSON.stringify(val));
       }
+      return val;
+      // (dci) must check this !!!!
+
+      // const typeStr = Object.prototype.toString.call(val);
+      // const self = this;
+
+      // switch (typeStr) {
+      //   case '[object Array]':
+      //     return val.map(self._clone);
+
+      //   case '[object Object]':
+      //     return val.map(x => Object.assign({}, x));
+
+      //   default:
+      //     return val;
+      // }
     }
 
     _deferred() {
@@ -285,7 +291,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _cancelDebouncers(debouncers: Debouncer[]) {
       debouncers.forEach(debouncer => {
-        if (debouncer.isActive()) {
+        if (debouncer && debouncer.isActive()) {
           debouncer.cancel();
         }
       }, this);

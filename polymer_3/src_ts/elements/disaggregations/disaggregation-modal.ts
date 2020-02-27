@@ -99,8 +99,8 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
 
   _save() {
-    var table = this.getContentChildNodes('.table')[0];
-    var self = this;
+    const table = this.shadowRoot!.querySelectorAll('.table')[0];
+    const self = this;
 
     this.set('updatePending', true);
 
@@ -109,9 +109,9 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
         self.set('updatePending', false);
         self.close();
       })
-      .catch(function(err) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling
-
         self.set('updatePending', false);
       });
   }

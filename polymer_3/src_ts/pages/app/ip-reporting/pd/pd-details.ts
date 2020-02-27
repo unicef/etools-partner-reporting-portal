@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
@@ -15,7 +15,8 @@ import UtilsMixin from '../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
 import {GenericObject} from '../../../../typings/globals.types';
 import {sharedStyles} from '../../../../styles/shared-styles';
-import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
+import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments';
+import {RootState} from '../../../../typings/redux.types';
 
 /**
  * @polymer
@@ -37,6 +38,7 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
       .header-content {
         margin: .5em 0;
       }
+
     </style>
 
     <app-route
@@ -45,19 +47,19 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
       data="{{routeData}}">
     </app-route>
 
-    <page-header title="[[ pd.title ]]" back="pd?&status=Sig%2CAct%2CSus">
+    <page-header title="[[pd.title]]" back="pd?&status=Sig%2CAct%2CSus">
       <template
           is="dom-if"
           if="[[_equals(pd.status, 'Suspended')]]"
           restamp="true">
         <message-box
-            class="header-content"
+            slot="header-content"
             type="warning">
           PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
         </message-box>
       </template>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{ routeData.dashTab }}"
             attr-for-selected="name"
@@ -97,7 +99,7 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
   @property({type: Object})
   routeData!: GenericObject;
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   pd: GenericObject = {};
 
   public static get observers() {
@@ -112,6 +114,10 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
 
   _updateUrlTab(dashTab: string) {
     this.set('pdTab', dashTab);
+  }
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
   }
 
 }

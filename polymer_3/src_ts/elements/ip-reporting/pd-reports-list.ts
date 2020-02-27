@@ -20,6 +20,7 @@ import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsAll, programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
 import {getLink} from './js/pd-reports-list-functions';
 import {tableStyles} from '../../styles/table-styles';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -154,16 +155,26 @@ class PdReportsList extends LocalizeMixin(ProgressReportUtilsMixin(RoutingMixin(
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
 
-  @property({type: Array, computed: 'programmeDocumentReportsAll(rootState)'})
+  @property({type: Array, computed: '_programmeDocumentReportsAll(rootState)'})
   data!: any[];
 
-
-  @property({type: Number, computed: 'programmeDocumentReportsCount(rootState)'})
+  @property({type: Number, computed: '_programmeDocumentReportsCount(rootState)'})
   totalResults!: any[];
 
   _getLink(report: GenericObject, permissions: GenericObject) {
     const suffix = this._getMode(report, permissions);
     return getLink(report, suffix, this.buildUrl, this._baseUrl);
+  }
+
+  _programmeDocumentReportsAll(rootState: RootState) {
+    const aa = programmeDocumentReportsAll(rootState);
+    console.log('_programmeDocumentReportsAll...');
+    console.log(aa);
+    return aa;
+  }
+
+  _programmeDocumentReportsCount(rootState: RootState) {
+    return programmeDocumentReportsCount(rootState);
   }
 
 }

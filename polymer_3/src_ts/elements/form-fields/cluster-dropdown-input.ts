@@ -79,7 +79,7 @@ class ClusterDropdownInput extends ReduxConnectedElement {
       .then(function(res: any) {
         self.set('data', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

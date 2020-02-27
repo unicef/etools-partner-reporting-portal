@@ -14,6 +14,7 @@ import Endpoints from '../endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
+import {locationSet} from '../redux/actions/location';
 
 /**
  * @polymer
@@ -172,6 +173,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
   userHasPrpRolesOrAccess!: boolean;
 
+  @property({type: String})
+  locationId!: string;
+
   public static get observers() {
     return [
       '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
@@ -285,7 +289,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return workspace.code === currentWorkspace;
     })[0];
 
-    //this.reduxStore.dispatch(locationSet(currentWorkspaceData.id)); TODO
+    if (this.locationId !== currentWorkspaceData.id) {
+      this.locationId = currentWorkspaceData.id;
+      this.reduxStore.dispatch(locationSet(currentWorkspaceData.id));
+    }
   }
 
   _notify(e: CustomEvent) {

@@ -73,7 +73,8 @@ class PartnerDropdownContent extends ReduxConnectedElement {
       .then(function(res: any) {
         self.set('partners', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

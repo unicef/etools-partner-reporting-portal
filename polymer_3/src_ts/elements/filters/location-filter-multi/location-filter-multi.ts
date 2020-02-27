@@ -41,8 +41,8 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
   @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
   locationsUrl = '';
 
-  @property({type: String, computed: 'getReduxStateArray(rootState.location.id)'})
-  locationId = [];
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  locationId!: string;
 
   @property({type: Array})
   data!: any;
@@ -53,14 +53,13 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
   @property({type: String})
   value!: string;
 
-  //@Lajos not sure about this
   static get observers() {
     return ['_fetchLocations(locationsUrl, params)'];
   }
 
-  _computeActivitiesUrl(locationId: string) {
+  _computeLocationsUrl(locationId: string) {
     return locationId ? Endpoints.locations(locationId) : '';
-  };
+  }
 
   _fetchLocations(url: string) {
     var self = this;
@@ -71,11 +70,12 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
 
     (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-    (this.$.locations as EtoolsPrpAjaxEl).thunk()
+    (this.$.locations as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err: any) {
         // TODO: error handling
       });
   };

@@ -31,16 +31,17 @@ import {GenericObject} from '../typings/globals.types';
 import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
-// @ts-ignore
-import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
 import {disaggregationsFetch} from '../redux/actions/disaggregations';
-
+// (dci) make sure Pd is correct without these...
+// import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
+// import {RootState} from '../typings/redux.types';
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
  * @polymer
  * @customElement
- * @appliesMixin EndpointsMixin
  * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
  */
 class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
@@ -497,16 +498,16 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Boolean})
   initialized: boolean = false;
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
-  currentPD!: GenericObject;
+  @property({type: Object})
+  currentPd!: GenericObject;
 
-  @property({type: Boolean, computed: '_computeHasPD(currentPD)'})
+  @property({type: Boolean, computed: '_computeHasPD(currentPd)'})
   hasPD!: boolean;
 
   @property({type: String, computed: '_computeDisaggregationsUrl(reportableId)'})
   disaggregationsUrl!: string;
 
-  @property({type: Object, computed: '_computeParams(indicatorId, currentPD)'})
+  @property({type: Object, computed: '_computeParams(indicatorId, currentPd)'})
   params!: GenericObject;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.disaggregations.byIndicator)'})
@@ -540,10 +541,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   isHfIndicator!: boolean;
 
   _fetchData() {
-    const disaggregationsThunk = this.$.disaggregations.thunk();
-
+    const disaggregationsThunk = (this.$.disaggregations as EtoolsPrpAjaxEl).thunk();
     // Cancel the pending request, if any
-    this.$.disaggregations.abort();
+    (this.$.disaggregations as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(
       disaggregationsFetch(disaggregationsThunk, String(this.indicatorId))
@@ -551,21 +551,25 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   init() {
-    const self = this;
+    if (this.indicatorId) {
+      const self = this;
 
-    if (this.initialized) {
-      return;
+      if (this.initialized) {
+        return;
+      }
+
+      this.set('initialized', true);
+
+      this._fetchData()
+        // @ts-ignore
+        .then(function() {
+          self.set('loading', false);
+        })
+        // @ts-ignore
+        .catch(function(err) {
+          // TODO: error handling
+        });
     }
-
-    this.set('initialized', true);
-
-    this._fetchData()
-      .then(function() {
-        self.set('loading', false);
-      })
-      .catch(function(err) { // jshint ignore:line
-        // TODO: error handling
-      });
   }
 
   _computeDisaggregationsUrl(reportableId: string) {
@@ -573,6 +577,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeParams(indicatorId: number, currentPD: GenericObject) {
+    if (!currentPD) {
+      return;
+    }
     const params: GenericObject = {
       pks: indicatorId,
       limit: 1,
@@ -586,7 +593,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeDisaggregations(data: GenericObject, key: string) {
-    return this._clone(data[key]);
+    if (data && key) {
+      return this._clone(data[key]);
+    }
   }
 
   _computeIsHfIndicator(disaggregations: GenericObject) {
@@ -637,7 +646,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
     this._fetchData();
 
-    fireEvent(this, 'refresh-report', this.indicatorId);
+    fireEvent(this, 'refresh-report', String(this.indicatorId));
 
     const allComplete = this.disaggregations.indicator_location_data
       .every(function(location: GenericObject) {

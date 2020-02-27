@@ -18,6 +18,7 @@ import '../refresh-report-modal';
 import {RefreshReportModalEl} from '../refresh-report-modal';
 import '../download-button';
 import '../upload-button';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -87,7 +88,7 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   }
 
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   programmeDocument!: GenericObject;
 
   @property({type: Boolean, computed: '_computeShowImportButtons(programmeDocument)'})
@@ -108,7 +109,7 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: String, computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')'})
   xlsExportUrl!: string;
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   currentReport!: GenericObject;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
@@ -124,8 +125,15 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   showRefresh = false;
 
   @property({type: String})
+  reportId!: string;
+
+  @property({type: String})
   refreshUrl = Endpoints.reportProgressReset();
 
+
+  _programmeDocumentReportsCurrent(rootState: RootState) {
+    return programmeDocumentReportsCurrent(rootState);
+  }
 
   _computeImportTemplateUrl(locationId: string, reportId: string) {
     return computeImportTemplateUrl(locationId, reportId);

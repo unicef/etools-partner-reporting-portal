@@ -77,7 +77,10 @@ class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsBehavior(
   }
 
   _getReportTitleFull(report: GenericObject, localize: Function) {
-    return getReportTitleFull(report, localize);
+    if (report) {
+      return getReportTitleFull(report, localize);
+    }
+    return '';
   }
 
   _getReportTitle(report: GenericObject, localize: Function) {

@@ -76,7 +76,7 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     return locationId ? Endpoints.progressReports(locationId) : '';
   }
 
-  _handleInputChange(_, queryParams: GenericObject) { // jshint ignore:line
+  _handleInputChange(_, queryParams: GenericObject) {
     if (!Object.keys(queryParams).length) {
       return;
     }
@@ -86,11 +86,11 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     // Cancel the pending request, if any
     (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(progressReportsFetch(progressReportsThunk));
-    // (dci)
-    // .catch(function(err) { // jshint ignore:line
-    //   // TODO: error handling
-    // }));
+    this.reduxStore.dispatch(progressReportsFetch(progressReportsThunk))
+      // @ts-ignore
+      .catch(function(err) {
+        // TODO: error handling
+      })
   }
 
 }

@@ -66,7 +66,7 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           title: 'All',
         }].concat(res.data));
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

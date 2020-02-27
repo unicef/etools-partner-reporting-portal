@@ -12,6 +12,8 @@ import '../../elements/ip-reporting/app-header';
 import '../../elements/page-title';
 import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
 import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
+import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
@@ -82,9 +84,11 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             selected="{{page}}"
             role="navigation">
         </ip-reporting-nav>
+
       </app-drawer>
 
       <main role="main" id="page-container">
+          <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
 
           <ip-reporting-app-header></ip-reporting-app-header>
 
@@ -153,6 +157,43 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _notFound() {
     window.location.href = '/not-found';
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.loadResources(getDomainByEnv() + '/src/locales.json');
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this.addEventListener('iron-overlay-opened', this._dialogOpening as any);
+    this.addEventListener('iron-overlay-closed', this._dialogClosing as any);
+  }
+
+  _dialogOpening() {
+    const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
+    if (!dialogOverlay) {return;}
+
+    dialogOverlay.classList.remove('opened');
+    dialogOverlay.removeAttribute('opened');
+    const zIndex = (dialogOverlay as any).style.zIndex;
+    this.$.drawer.style.zIndex = '-1';
+    const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
+    pageOverlay.style.zIndex = zIndex;
+    pageOverlay.classList.add('opened');
+  }
+
+  _dialogClosing(event: CustomEvent) {
+    // chrome
+    if (event.path && event.path[0] && event.path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
+    // edge
+    if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
+
+    this.$.drawer.style.zIndex = '1';
+    const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
+    pageOverlay.style.zIndex = '';
+    pageOverlay.classList.remove('opened');
   }
 
 }

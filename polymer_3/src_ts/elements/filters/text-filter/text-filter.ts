@@ -65,7 +65,7 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
 
   disconnectedCallback() {
     super.connectedCallback();
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

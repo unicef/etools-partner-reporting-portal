@@ -20,7 +20,7 @@ function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseCla
         case this._isReadOnlyReport(report):
         case report.programme_document.status === 'Signed':
         case report.programme_document.status === 'Closed':
-        case !permissions.editProgressReport:
+        case (!permissions || !permissions.editProgressReport):
           return 'view';
 
         default:

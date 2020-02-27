@@ -26,7 +26,8 @@ import '../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '../etools-prp-permissions';
 import '../indicator-details';
-
+import {RootState} from '../../typings/redux.types';
+import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 
 /**
  * @polymer
@@ -273,6 +274,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
               reporting-period="[[currentReport.reporting_period]]"
               override-mode="[[computedMode]]"
               report-id="[[reportId]]"
+              current-pd="[[currentPd]]"
               workspace-id="[[workspaceId]]">
           </indicator-details>
         </iron-collapse>
@@ -314,7 +316,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
   @property({type: String, computed: '_computeCalculationMethodUrl(_baseUrl, pdId)'})
   calculationMethodUrl!: string;
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   currentReport!: GenericObject;
 
   @property({type: Boolean, computed: '_computeShowMeta(currentReport)'})
@@ -323,8 +325,15 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
   @property({type: String})
   workspaceId!: string;
 
+  @property({type: Object})
+  currentPd!: GenericObject;
+
   _calculationFormulaAcrossPeriods(indicator: GenericObject, localize: Function) {
     return calculationFormulaAcrossPeriods(indicator, localize);
+  }
+
+  _programmeDocumentReportsCurrent(rootState: RootState) {
+    return programmeDocumentReportsCurrent(rootState);
   }
 
   _toggle(e: CustomEvent) {
@@ -400,17 +409,17 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
         this.data.id
       )
     )
-    // (dci) clarify
-    // .then(function() {
-    //   self._notifyChangesSaved();
-    // })
-    // .catch(function(err) { // jshint ignore:line
-    //   // TODO: error handling
-    // });
+      // @ts-ignore
+      .then(function() {
+        self._notifyChangesSaved();
+      })
+      .catch(function(err) {
+        // TODO: error handling
+      });
   }
 
   _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
-    return permissions.savePdReport ? (overrideMode || mode) : 'view';
+    return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }
 
   _computeReportableData(data: GenericObject) {
@@ -445,9 +454,9 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
     super.disconnectedCallback();
 
     this._removeEventListeners();
-    this._forEach('[id^="collapse-"]', function(section: any) {
+    this.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
       section.opened = false;
-    });
+    })
   }
 
 }

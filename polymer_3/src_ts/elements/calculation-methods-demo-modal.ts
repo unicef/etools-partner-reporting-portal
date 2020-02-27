@@ -27,7 +27,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
 
   static get template() {
     return html`
-    ${buttonsStyles} ${modalStyles} 
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -210,6 +210,10 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   description!: string;
 
   _computeFinalTotal(selectedType: string, totals: GenericObject[]) {
+    if (!totals) {
+      return;
+    }
+
     switch (selectedType) {
       case 'sum':
         return this._totalSum(totals);

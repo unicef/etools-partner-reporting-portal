@@ -110,9 +110,10 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
         (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(fetchIndicators(indicatorsThunk))
-        // .catch(function(err) { // jshint ignore:line
-        //   // TODO: error handling
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            // TODO: error handling
+          })
       });
   }
 
