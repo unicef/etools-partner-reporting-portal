@@ -252,10 +252,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
               <div hidden aria-hidden="true">
                 <template
                     is="dom-if"
-                    if="[[currentPD.title]]">
+                    if="[[currentPd.title]]">
                   <dl class="printme" style="margin: 0;">
                     <dt style="display: inline;">[[_singularLocalized('programme_documents', localize)]]:</dt>
-                    <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+                    <dd style="display: inline; margin: 0;">[[currentPd.title]]</dd>
                   </dl>
                 </template>
 
@@ -397,7 +397,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                       id="modal-[[topLevelLocationIndex]]"
                       reporting-period="[[reportingPeriod]]"
                       on-opened-changed="_updateModals">
-                    <div class="meta layout horizontal justified">
+                    <div slot="meta" class="layout horizontal justified">
                       <div>
                         <h3>[[indicatorName]]</h3>
                         <p class="location">
@@ -409,7 +409,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                             if="[[hasPD]]"
                             restamp="true">
                           <p class="current-pd">
-                            [[currentPD.agreement]] | [[currentPD.title]]
+                            [[currentPd.agreement]] | [[currentPd.title]]
                           </p>
                         </template>
                       </div>
@@ -439,6 +439,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                         if="[[_computeTableVisibility(opened, topLevelLocationIndex)]]"
                         restamp="true">
                       <disaggregation-table
+                          slot="disaggregation-table"
                           data="[[topLevelLocation.byEntity.0]]"
                           by-entity="[[topLevelLocation.byEntity]]"
                           mapping="[[disaggregations.disagg_lookup_map]]"

@@ -211,19 +211,18 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _fieldsAreValid() {
-      let valid;
-      let fields = [].slice.call(
-        this.shadowRoot!.querySelector('.validate')
-      );
+      let valid = true;
+      let fields = this.shadowRoot!.querySelectorAll('.validate');
 
       fields.forEach(function(field: any) {
         field.validate();
       });
 
-      valid = fields.every(function(field: any) {
-        return !field.invalid;
+      fields.forEach(function(field: any) {
+        if (field.invalid) {
+          valid = false;
+        }
       });
-
       return valid;
     }
 

@@ -16,6 +16,7 @@ import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {disaggregationsUpdateForLocation} from '../../redux/actions/disaggregations';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 
 
 /**
@@ -192,8 +193,6 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
           </div>
         </div>
       </div>
-
-
     `;
   }
 
@@ -340,7 +339,6 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   save() {
-    let self = this;
     let updateThunk;
     let cellsValid;
     let percentagesValid;
@@ -363,20 +361,20 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       return Promise.reject();
     }
 
-    updateThunk = this.shadowRoot!.querySelector('update').thunk();
+    const self = this;
+    updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
+    (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).abort();
 
-    this.shadowRoot!.querySelector('update').abort();
-
-    return this.dispatch(
+    return this.reduxStore.dispatch(
       disaggregationsUpdateForLocation(
         updateThunk,
         this.indicatorId,
         this.formattedData.location.id
       )
     )
+      // @ts-ignore
       .then(function(value) {
-        fireEvent(this, 'locations-updated');
-
+        fireEvent(self, 'locations-updated');
         return value;
       });
   }
@@ -490,3 +488,6 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
 }
 
 window.customElements.define('disaggregation-table', DisaggregationTable);
+
+export {DisaggregationTable as DisaggregationTableEl};
+
