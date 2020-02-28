@@ -167,10 +167,7 @@ class PdReportsList extends LocalizeMixin(ProgressReportUtilsMixin(RoutingMixin(
   }
 
   _programmeDocumentReportsAll(rootState: RootState) {
-    const aa = programmeDocumentReportsAll(rootState);
-    console.log('_programmeDocumentReportsAll...');
-    console.log(aa);
-    return aa;
+    return programmeDocumentReportsAll(rootState);
   }
 
   _programmeDocumentReportsCount(rootState: RootState) {

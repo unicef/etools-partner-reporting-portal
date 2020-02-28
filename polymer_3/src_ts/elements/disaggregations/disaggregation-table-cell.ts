@@ -18,12 +18,13 @@ class DisaggregationTableCell extends UtilsMixin(PolymerElement) {
         :host {
           display: block;
         }
+
       </style>
 
       <template
         is="dom-if"
         if="[[editableBool]]">
-        <slot select="editable"></slot>
+        <slot name="editable"></slot>
       </template>
 
       <template
@@ -40,10 +41,11 @@ class DisaggregationTableCell extends UtilsMixin(PolymerElement) {
             is="dom-if"
             if="[[!noValue]]"
             restamp="true">
-            <slot select="non-editable"></slot>
+            <slot name="non-editable"></slot>
           </template>
         </span>
       </template>
+
     `;
   }
 

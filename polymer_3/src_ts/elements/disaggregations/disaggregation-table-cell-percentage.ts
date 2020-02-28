@@ -55,8 +55,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
-        <div slot="editable">
-          <div class="app-grid">
+          <div slot="editable" class="app-grid">
             <div class="item">
               <disaggregation-field
                 id="v"
@@ -78,9 +77,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
             </div>
             <div class="computed-value">[[_toPercentage(localData.c)]]</div>
           </div>
-        </div>
-        <div slot="non-editable">
-          <div class="app-grid">
+          <div slot="non-editable" class="app-grid">
             <div class="item">
               <etools-prp-number value="[[data.v]]"></etools-prp-number>
             </div>
@@ -89,7 +86,6 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
             </div>
             <div class="computed-value">[[_toPercentage(data.c)]]</div>
           </div>
-        </div>
       </disaggregation-table-cell>
 
     `;
