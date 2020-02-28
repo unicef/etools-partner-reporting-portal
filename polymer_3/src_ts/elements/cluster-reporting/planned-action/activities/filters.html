@@ -1,0 +1,90 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
+<link rel="import" href="../../../../styles/filter-styles.html">
+<link rel="import" href="../../../filter-list.html">
+<link rel="import" href="../../../filters/text-filter/text-filter.html">
+<link rel="import" href="../../../filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../../filters/checkbox-filter/checkbox-filter.html">
+<link rel="import" href="../../../filters/date-filter/date-filter.html">
+<link rel="import" href="../../../filters/status-filter/project-status-filter.html">
+<link rel="import" href="../../../filters/cluster-location-filter/cluster-location-filter.html">
+<link rel="import" href="../../../filters/cluster-project-filter/cluster-project-filter.html">
+
+<dom-module id="planned-action-activities-filters">
+  <template>
+    <style include="app-grid-style filter-styles">
+      :host {
+        padding: 0;
+        display: block;
+        --app-grid-columns: 4;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .filter-2-col {
+        @apply --app-grid-expandible-item;
+      }
+
+      .checkbox {
+        padding-left: 30px;
+        padding-top: 30px;
+      }
+    </style>
+
+    <iron-location query="{{query}}">
+    </iron-location>
+
+    <iron-query-params params-string="{{query}}" params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <cluster-project-filter class="item" value="[[_withDefault(queryParams.project, '')]]">
+        </cluster-project-filter>
+
+        <project-status-filter value="[[_withDefault(queryParams.status, '')]]">
+        </project-status-filter>
+
+        <cluster-location-filter class="item filter-2-col" value="[[_withDefault(queryParams.location, '')]]">
+        </cluster-location-filter>
+
+        <text-filter class="item filter-2-col" label="[[localize('search_activity_title')]]" name="activity"
+          value="[[_withDefault(queryParams.activity, '')]]">
+        </text-filter>
+
+        <checkbox-filter class="item filter-2-col checkbox" name="custom"
+          value="[[_withDefault(queryParams.custom, '')]]">
+          <span class="checkbox-label">[[localize('show_only_custom_activities')]]</span>
+        </checkbox-filter>
+      </div>
+    </filter-list>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'planned-action-activities-filters',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
+      properties: {
+        queryParams: Object,
+
+        filters: {
+          type: Object,
+          notify: true,
+        },
+      },
+
+    });
+  </script>
+</dom-module>

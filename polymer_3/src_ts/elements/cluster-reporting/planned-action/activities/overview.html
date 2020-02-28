@@ -1,0 +1,67 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../behaviors/localize.html">
+<link rel="import" href="../../activity-details.html">
+<link rel="import" href="editing-modal.html">
+
+<dom-module id="pa-activity-details-overview">
+  <template>
+    <style include="button-styles">
+      :host {
+        display: block;
+      }
+
+      div#action {
+        margin: 25px 0;
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
+      }
+    </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <page-body>
+
+      <template is="dom-if"
+        if="[[permissions.createPartnerEntities]]"
+        restamp="true">
+        <planned-action-activity-editing-modal id="modal" edit-data="[[activityData]]"></planned-action-activity-editing-modal>
+
+        <div id="action">
+          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+            [[localize('edit_activity')]]
+          </paper-button>
+        </div>
+      </template>
+
+      <activity-details-display activity-data=[[activityData]]></activity-details-display>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pa-activity-details-overview',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
+      properties: {
+        activityData: Object,
+        permissions: Object,
+      },
+
+      _openModal: function () {
+        this.shadowRoot.querySelector('#modal').open();
+      },
+
+    });
+  </script>
+</dom-module>
