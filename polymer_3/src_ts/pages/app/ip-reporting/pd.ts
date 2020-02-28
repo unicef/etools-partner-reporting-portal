@@ -109,7 +109,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   public static get observers() {
     return [
       '_handleInputChange(programmeDocumentsUrl, queryParams)',
-      '_routePdIdChanged(routeData.pd_id)',
+      '_routePdIdChanged(routeData.pd_id, reduxStore)',
       '_routePathChanged(route.path)',
     ]
   }
@@ -119,7 +119,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _routePdIdChanged(pd_id: number) {
-    if (pd_id !== this.pdId) {
+    if (pd_id !== this.pdId && this.reduxStore) {
       this.reduxStore.dispatch(pdSetCurrent(pd_id));
     }
 

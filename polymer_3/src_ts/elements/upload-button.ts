@@ -159,19 +159,20 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
       data.append('file', file.raw, file.file_name);
     }
 
-    const upload = this.shadowRoot!.querySelector('upload') as EtoolsPrpAjaxEl;
+    const upload = this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl;
     upload!.body = data;
 
     this.set('pending', true);
 
     upload!.thunk()
+      // @ts-ignore
       .then(() => {
         self.set('pending', false);
         self.close();
         self._notifyFileUploaded();
         fireEvent(this, 'file-uploaded');
       })
-      .catch(function(res) {
+      .catch(function(res: any) {
         self.set('errors', res.data);
         self.set('pending', false);
       });
@@ -185,13 +186,6 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     this.set('files', []);
     this.set('errors', {});
     this.set('pending', false);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._cancelDebouncers([
-      'set-payload',
-    ]);
   }
 
 }
