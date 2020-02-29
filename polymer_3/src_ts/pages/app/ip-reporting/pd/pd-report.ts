@@ -417,7 +417,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
 
   _canExport(report: GenericObject, mode: string, permissions: GenericObject) {
     switch (true) {
-      case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+      case report.status === 'Sub' && (!permissions || !permissions.exportSubmittedProgressReport):
       case mode === 'edit':
         return false;
 

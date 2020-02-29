@@ -175,17 +175,27 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
     if (!dialogOverlay) {return;}
 
-    dialogOverlay.classList.remove('opened');
-    dialogOverlay.removeAttribute('opened');
+    // dialogOverlay.classList.remove('opened');
+    // dialogOverlay.removeAttribute('opened');
     const zIndex = (dialogOverlay as any).style.zIndex;
+    if (dialogOverlay.parentElement) {
+      dialogOverlay.parentElement.removeChild(dialogOverlay);
+    }
     this.$.drawer.style.zIndex = '-1';
     const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
-    pageOverlay.style.zIndex = zIndex;
-    pageOverlay.classList.add('opened');
+    if (!pageOverlay.classList.contains('opened')) {
+      pageOverlay.style.zIndex = zIndex;
+      pageOverlay.classList.add('opened');
+    }
   }
 
   _dialogClosing(event: CustomEvent) {
     // chrome
+    const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
+    if (dialogOverlay && dialogOverlay.parentElement) {
+      dialogOverlay.parentElement.removeChild(dialogOverlay);
+    }
+
     if (event.path && event.path[0] && event.path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
     // edge
     if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}

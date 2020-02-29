@@ -92,6 +92,9 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
     `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   queryParams!: GenericObject;
 

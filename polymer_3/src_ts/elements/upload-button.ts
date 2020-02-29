@@ -140,7 +140,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
   }
 
   _openModal() {
-    const dialog = this.shadowRoot!.querySelector('dialog');
+    const dialog = this.shadowRoot!.querySelector('#dialog');
     dialog!.open();
   }
 

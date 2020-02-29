@@ -26,7 +26,7 @@ class PdDetailsReport extends ReduxConnectedElement {
   static get template() {
     return html`
     ${tableStyles}
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles">
       :host {
         display: block;
       }
