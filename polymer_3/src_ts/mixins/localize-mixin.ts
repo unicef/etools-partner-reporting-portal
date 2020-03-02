@@ -34,7 +34,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
     @property({type: Boolean})
     useKeyIfMissing = false;
 
-    @property({type: Function, computed: '__computeLocalize(language, resources, formats)'})
+    @property({type: Object, computed: '__computeLocalize(language, resources, formats)'})
     localize!: Function;
 
     @property({type: Boolean})
