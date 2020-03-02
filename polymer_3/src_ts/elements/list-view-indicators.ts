@@ -184,6 +184,12 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   @property({type: Boolean})
   loading!: boolean;
 
+  @property({type: Boolean})
+  isCustom!: boolean;
+
+  @property({type: Boolean})
+  canEdit!: boolean;
+
   @property({type: Number})
   totalResults!: number;
 
@@ -206,7 +212,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   type!: string;
 
   @property({type: Array})
-  openedDetails!: any[];
+  openedDetails = [];
 
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;

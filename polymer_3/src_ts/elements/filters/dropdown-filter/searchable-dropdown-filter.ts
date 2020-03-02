@@ -2,7 +2,6 @@ import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../mixins/filter-mixin';
-import {GenericObject} from '../../../typings/globals.types';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
 /**
@@ -26,9 +25,10 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       option-value="id"
       option-label="title"
       selected="[[value]]"
-      selected-item="{{selectedItem}}"
       disabled="[[disabled]]"
-      trigger-value-change-event>
+      trigger-value-change-event
+      on-etools-selected-item-changed="_handleDropdownChange"
+      >
     </etools-dropdown>
   `;
   }
@@ -36,22 +36,27 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   @property({type: Boolean})
   disabled!: boolean;
 
-  @property({type: Object})
-  selectedItem!: GenericObject;
-
   @property({type: String})
   value = '';
+
+  @property({type: String})
+  name!: string;
+
+  @property({type: String})
+  label!: string;
 
   @property({type: Array, observer: '_handleData'})
   data = [];
 
-  _handleChange() {
-    setTimeout(() => {
-      fireEvent(this, 'filter-changed', {
-        name: this.name,
-        value: String(this.selectedItem.id),
+  _handleDropdownChange(event: CustomEvent) {
+    if (event.detail.selectedItem) {
+      setTimeout(() => {
+        fireEvent(this, 'filter-changed', {
+          name: this.name,
+          value: String(event.detail.selectedItem.id),
+        });
       });
-    });
+    }
   }
 
   _handleData(data: any) {
@@ -60,25 +65,6 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
     }
   }
 
-  _addEventListeners() {
-    this._handleChange = this._handleChange.bind(this);
-    this.addEventListener('field.iron-select', this._handleChange);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('field.iron-select', this._handleChange);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._addEventListeners();
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._removeEventListeners();
-  }
-
 }
 
-window.customElements.define('searchble-dropdown-filter', SearchableDropdownFilter);
+window.customElements.define('searchable-dropdown-filter', SearchableDropdownFilter);

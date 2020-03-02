@@ -26,6 +26,11 @@ class PdListToolbar extends UtilsMixin(PolymerElement) {
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
+  @property({type: String})
+  locationId!: string;
 
   @property({type: String, computed: '_computePdUrl(locationId)'})
   pdUrl!: string;

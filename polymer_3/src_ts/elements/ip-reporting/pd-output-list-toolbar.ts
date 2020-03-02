@@ -53,10 +53,10 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
     </refresh-report-modal>
 
     <etools-prp-toolbar
-      query="{{ query }}"
-      report-id="{{ reportId }}"
-      location-id="{{ locationId }}"
-    >
+      query="{{query}}"
+      report-id="{{reportId}}"
+      location-id="{{locationId}}">
+
       <download-button url="[[pdfExportUrl]]">PDF</download-button>
       <download-button url="[[xlsExportUrl]]">XLS</download-button>
 
@@ -87,6 +87,11 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
+  @property({type: String})
+  locationId!: string;
 
   @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   programmeDocument!: GenericObject;

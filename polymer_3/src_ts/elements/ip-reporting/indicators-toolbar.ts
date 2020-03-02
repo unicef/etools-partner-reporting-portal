@@ -30,6 +30,13 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
     </etools-prp-toolbar>
   `;
   }
+
+  @property({type: String})
+  query!: string;
+
+  @property({type: String})
+  locationId!: string;
+
   @property({type: String, computed: '_computeIndicatorsUrl(locationId)'})
   indicatorsUrl!: string;
 

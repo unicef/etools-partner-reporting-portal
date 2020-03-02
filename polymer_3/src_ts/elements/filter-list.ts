@@ -145,8 +145,7 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
 
   _clearFilters() {
     const self = this;
-
-    this.set('queryParams', Object.keys(this.queryParams)
+    const clearParams = Object.keys(this.queryParams)
       .reduce(function(prev: any, curr) {
         if (self.filters.indexOf(curr) === -1) {
           prev[curr] = self.queryParams[curr];
@@ -155,7 +154,8 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
         }
 
         return prev;
-      }, {}));
+      }, {})
+    this.set('queryParams', clearParams);
 
     this._resetPageNumber();
   }

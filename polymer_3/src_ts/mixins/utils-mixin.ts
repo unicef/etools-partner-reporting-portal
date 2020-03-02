@@ -11,7 +11,7 @@ declare const moment: any;
  */
 function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
-  const pdListStatuses = {
+  const pdListStatuses: GenericObject = {
     Signed: 'signed',
     Active: 'active',
     Suspended: 'suspended',
@@ -265,6 +265,10 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _appendQuery(url: string) {
+      if (url === undefined) {
+        return;
+      }
+
       return url + '?' + buildQuery([].slice.call(arguments, 1));
     }
 

@@ -63,8 +63,8 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
   `;
   }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.indicators.all)'})
-  data!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.indicators.all)'})
+  data!: GenericObject[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.indicators.loading)'})
   loading!: boolean;

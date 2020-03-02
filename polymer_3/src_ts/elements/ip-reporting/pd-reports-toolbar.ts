@@ -24,8 +24,8 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
       </style>
 
       <etools-prp-toolbar
-        query="{{ query }}"
-        pd-id="{{ pdId }}"
+        query="{{query}}"
+        pd-id="{{pdId}}"
         location-id="{{ locationId }}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
           <download-button url="[[xlsExportUrl]]">XLS</download-button>
@@ -35,6 +35,12 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
 
     `;
   }
+
+  @property({type: String})
+  query!: string;
+
+  @property({type: String})
+  pdId!: string;
 
   @property({type: Number, computed: '_programmeDocumentReportsCount(rootState)'})
   totalResults!: number;
