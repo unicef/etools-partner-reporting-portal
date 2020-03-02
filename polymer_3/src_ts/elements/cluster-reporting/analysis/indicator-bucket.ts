@@ -228,9 +228,9 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
     return data.type === 'partneractivityprojectcontext' ? data.activity_name : data.title;
   }
 
-  _computePrefix(data: GenericObject, localize: any) {
+  _computePrefix(data: GenericObject, localize: Function) {
     //@Lajos: needs to be checked
-    var prefix = {
+    const prefix: GenericObject = {
       partneractivity: localize('partner_activity'),
       partnerproject: localize('partner_project'),
       clusterobjective: localize('cluster_objective'),
