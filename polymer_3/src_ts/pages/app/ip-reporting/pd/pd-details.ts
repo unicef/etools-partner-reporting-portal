@@ -61,7 +61,7 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
 
       <div slot="tabs">
         <paper-tabs
-            selected="{{ routeData.dashTab }}"
+            selected="{{routeData.dashTab}}"
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>

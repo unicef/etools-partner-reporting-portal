@@ -26,7 +26,7 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
       <etools-prp-toolbar
         query="{{query}}"
         pd-id="{{pdId}}"
-        location-id="{{ locationId }}">
+        location-id="{{locationId}}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
           <download-button url="[[xlsExportUrl]]">XLS</download-button>
           <download-button url="[[pdfExportUrl]]">PDF</download-button>

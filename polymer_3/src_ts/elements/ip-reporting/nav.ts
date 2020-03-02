@@ -37,7 +37,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
     </style>
 
     <etools-prp-permissions
-      permissions="{{ permissions }}">
+      permissions="{{permissions}}">
     </etools-prp-permissions>
 
     <paper-listbox
