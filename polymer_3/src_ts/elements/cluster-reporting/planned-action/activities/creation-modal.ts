@@ -52,7 +52,7 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
   static get template() {
     return html`
     ${buttonsStyles} ${modalStyles}
-    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
@@ -828,15 +828,14 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    //@Lajos: Bellow returns error
-    this.addEventListener('mode.selected-changed', this.adjustPosition);
-    this.addEventListener('project-details-selection-refit', this.adjustPosition);
+    this.addEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
     //@Lajos: Bellow returns error
-    this.removeEventListener('mode.selected-changed', this.adjustPosition);
-    this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+    this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
 

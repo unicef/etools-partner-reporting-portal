@@ -244,7 +244,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                   </paper-dropdown-menu>
                 </div>
                 <div class="item">
-                  <etools-single-selection-menu
+                  <etools-dropdown
                       class="validate"
                       label="[[localize('activity')]]"
                       options="[[activities]]"
@@ -255,7 +255,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                       disabled="[[_equals(activities.length, 0)]]"
                       trigger-value-change-event
                       required>
-                  </etools-single-selection-menu>
+                  </etools-dropdown>
                 </div>
 
               </div>
@@ -774,14 +774,14 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
     //@Lajos: bellow throws error
-    // this.addEventListener('mode.selected-changed', this.adjustPosition);
-    // this.addEventListener('project-details-selection-refit', this.adjustPosition);
+    this.addEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
     //@Lajos: bellow throws error
-    // this.removeEventListener('mode.selected-changed', this.adjustPosition);
-    // this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+    this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   connectedCallback() {

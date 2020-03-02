@@ -218,7 +218,7 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
             </div>
 
             <div class="item">
-              <etools-single-selection-menu
+              <etools-dropdown
                   class="validate"
                   label="[[localize('cluster_activity')]]"
                   options="[[activities]]"
@@ -229,7 +229,7 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
                   disabled
                   trigger-value-change-event
                   required>
-              </etools-single-selection-menu>
+              </etools-dropdown>
             </div>
 
             <header class="item-wide">
@@ -738,13 +738,11 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    //@Lajos: Bellow returns error
-    this.addEventListener('project-details-selection-refit', this.adjustPosition);
+    this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    //@Lajos: Bellow returns error
-    this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+    this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   connectedCallback() {

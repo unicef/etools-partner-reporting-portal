@@ -468,7 +468,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     thunk()
       .then(function(res: any) {
-        var filteredActivities = res.data.results.filter(function(item) {
+        var filteredActivities = res.data.results.filter(function(item: any) {
           return item.projects.find(function(element: any) {
             return element.project_id === parseInt(self.projectData.id);
           }) === undefined;
@@ -517,7 +517,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.set('updatePending', true);
 
     var clonedData = this._clone(this.data); // make copy of data
-    var selectedPartnerActivity = this.partnerActivities.find(function(item) {
+    var selectedPartnerActivity = this.partnerActivities.find(function(item: any) {
       return item.id === self.data.partner_activity;
     });
     //@Lajos: did not find a wat to give default value before asignation
@@ -567,12 +567,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
     //@Lajos: bellow gives error
-    this.addEventListener('project-details-selection-refit', this.adjustPosition);
+    this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
     //@Lajos: bellow gives error
-    this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+    this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
 
