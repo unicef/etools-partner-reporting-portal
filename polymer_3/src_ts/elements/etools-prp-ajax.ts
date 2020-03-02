@@ -48,6 +48,21 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   `;
   }
 
+  @property({type: String})
+  method!: string;
+
+  @property({type: String})
+  contentType!: string;
+
+  @property({type: String})
+  url!: string;
+
+  @property({type: Object})
+  body!: GenericObject;
+
+  @property({type: Object})
+  params!: GenericObject;
+
   @property({type: String, computed: 'getReduxStateValue(rootState.auth.token)'})
   token!: string;
 

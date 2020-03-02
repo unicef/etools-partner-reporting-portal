@@ -73,7 +73,7 @@ class StatusBadge extends PolymerElement {
       case 'no-status':
         return '#273d48';
     }
-    return;
+    return '#273d48';
   };
 }
 

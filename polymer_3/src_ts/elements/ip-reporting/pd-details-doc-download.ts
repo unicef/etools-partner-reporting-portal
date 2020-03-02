@@ -11,7 +11,7 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
-
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -50,7 +50,7 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
   @property({type: Boolean})
   spinnerActive!: boolean;
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   pd = {};
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
@@ -62,6 +62,9 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
   @property({type: String})
   docUrl!: string;
 
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
 
   _computeDocUrl(locationId: string, pdId: string) {
     return computeDocUrl(locationId, pdId);

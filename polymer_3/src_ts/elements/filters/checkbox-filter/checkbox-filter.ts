@@ -1,11 +1,13 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-checkbox/paper-checkbox';
+import {PaperCheckboxElement} from '@polymer/paper-checkbox/paper-checkbox';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce'
 import {property} from '@polymer/decorators';
 import {fireEvent} from '../../../utils/fire-custom-event';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+
 
 /**
  * @polymer
@@ -30,7 +32,8 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
     <paper-checkbox
         id="field"
         name="[[name]]"
-        checked="{{checked}}">
+        checked="{{checked}}"
+        on-tap="_handleInput">
       <slot></slot>
     </paper-checkbox>
   `;
@@ -44,11 +47,11 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
 
   private _debouncer!: Debouncer;
 
-  _handleInput() {
+  _handleInput(e: CustomEvent) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        var newValue = '' + this._toNumber(this.$.field.checked);
+        const newValue = '' + this._toNumber((this.$.field as PaperCheckboxElement).checked);
 
         if (newValue !== this.lastValue) {
           fireEvent(this, 'filter-changed', {
@@ -57,31 +60,22 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
           });
         }
       });
-  };
+  }
 
   _computeChecked(value: string) {
     return value ? !!this._toNumber(value) : false;
   }
 
-  _addEventListeners() {
-    this._handleInput = this._handleInput.bind(this);
-    this.addEventListener('field.change', this._handleInput);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('field.change', this._handleInput);
-  }
-
   connectedCallback() {
     super.connectedCallback();
-    this._addEventListeners();
+
     this._filterReady();
   }
 
   disconnectedCallback() {
     super.connectedCallback();
-    this._removeEventListeners();
-    if (this._debouncer.isActive()) {
+
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

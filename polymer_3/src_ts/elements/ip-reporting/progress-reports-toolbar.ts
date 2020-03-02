@@ -22,8 +22,8 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
       </style>
 
       <etools-prp-toolbar
-        query="{{ query }}"
-        location-id="{{ locationId }}">
+        query="{{query}}"
+        location-id="{{locationId}}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
           <download-button url="[[pdfExportUrl]]">PDF</download-button>
           <download-button url="[[xlsExportUrl]]">XLS</download-button>
@@ -31,6 +31,12 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
       </etools-prp-toolbar>
     `;
   }
+
+  @property({type: String})
+  query!: string;
+
+  @property({type: String})
+  locationId!: string;
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.progressReports.count)'})
   totalResults!: number;

@@ -118,10 +118,12 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
           is="dom-if"
           if="[[canEditLocations]]"
           restamp="true">
+          <!--  (@dci@)
         <indicator-locations-modal
             id="modal-locations"
             edit-data="[[indicator]]">
         </indicator-locations-modal>
+         -->
       </template>
 
       <etools-data-table-row on-opened-changed="_handleOpenedChanged">
@@ -285,6 +287,9 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   @property({type: Boolean})
   detailsOpened: boolean = false;
 
+  @property({type: Boolean})
+  isCustom!: boolean;
+
   @property({type: String, computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)'})
   indicatorReportsUrl!: string;
 
@@ -307,8 +312,12 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   progressBarType!: string;
 
 
+  _flagIndicator(target, baseline, isCustom: boolean) {
+    return !isCustom && (!target || !baseline);
+  }
+
   _openModal(e: CustomEvent) {
-    this.shadowRoot.querySelector('#modal-' + e.target.dataset.modalType).open();
+    this.shadowRoot!.querySelector('#modal-' + e.target.dataset.modalType)!.open();
   }
 
   _computeIsClusterApp(appName: string) {
@@ -320,6 +329,10 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
+    if (!indicator) {
+      return;
+    }
+
     let query_params = 'results/draft?page_size=10&page=1&indicator_type=';
 
     if (indicator.content_type_key === 'cluster.clusterobjective') {
@@ -342,6 +355,10 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   }
 
   _computeProgressBarType(isClusterApp: boolean, indicator: GenericObject) {
+    if (!indicator) {
+      return;
+    }
+
     switch (true) {
       case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
         return 'cluster';

@@ -199,8 +199,9 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     ]
   }
 
+
   _handleInput(event: CustomEvent) {
-    let field = event.composedPath()[0] as GenericObject;
+    let field = event.target as GenericObject;
     const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment');
 
     if (narrativeTextInput && this.toggle === 'Edit' && field.id === 'toggle-button') {

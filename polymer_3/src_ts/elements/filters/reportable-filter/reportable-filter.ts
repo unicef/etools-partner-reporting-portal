@@ -5,6 +5,7 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../etools-prp-ajax';
 import {llosAll} from '../../../redux/selectors/llos';
 import LocalizeMixin from '../../../mixins/localize-mixin';
+import {RootState} from '../../../typings/redux.types';
 
 /**
  * @polymer
@@ -37,8 +38,12 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   value!: string;
 
-  @property({type: Array, computed: 'llosAll(rootState)'})
+  @property({type: Array, computed: '_llosAll(rootState)'})
   data = [];
+
+  _llosAll(rootState: RootState) {
+    return llosAll(rootState);
+  }
 
   _computeOptions(data: any) {
     var other = data.map(function(item: any) {

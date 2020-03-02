@@ -13,6 +13,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import '../confirm-box';
+import {DisaggregationTableEl} from '../disaggregations/disaggregation-table';
 
 /**
  * @polymer
@@ -39,7 +40,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
         };
       }
 
-      ::content disaggregation-table {
+      ::slotted([slot=disaggregation-table]) {
         margin-bottom: 1em;
       }
     </style>
@@ -63,11 +64,8 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
       </div>
 
       <paper-dialog-scrollable>
-        <slot select=".meta"></slot>
-        <slot
-            select="disaggregation-table"
-            class="table">
-        </slot>
+        <slot name="meta"></slot>
+        <slot name="disaggregation-table" class="table"></slot>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -99,21 +97,31 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
 
   _save() {
-    var table = this.getContentChildNodes('.table')[0];
-    var self = this;
-
-    this.set('updatePending', true);
-
-    table.save()
-      .then(function() {
-        self.set('updatePending', false);
-        self.close();
+    const tableSlot = this.shadowRoot!.querySelectorAll('.table')[0];
+    let tableElem: DisaggregationTableEl | null = null;
+    if (tableSlot && tableSlot.assignedElements) {
+      tableSlot.assignedElements().forEach((el) => {
+        if (!tableElem && String(el.tagName).toUpperCase() === 'DISAGGREGATION-TABLE') {
+          tableElem = el;
+        }
       })
-      .catch(function(err) { // jshint ignore:line
-        // TODO: error handling
+    }
+    if (tableElem) {
+      const self = this;
 
-        self.set('updatePending', false);
-      });
+      this.set('updatePending', true);
+
+      tableElem.save()
+        .then(function() {
+          self.set('updatePending', false);
+          self.close();
+        })
+        // @ts-ignore
+        .catch(function(err) {
+          // TODO: error handling
+          self.set('updatePending', false);
+        });
+    }
   }
 
   _confirm(e: CustomEvent) {

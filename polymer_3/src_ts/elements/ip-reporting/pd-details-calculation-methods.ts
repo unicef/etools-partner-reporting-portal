@@ -10,16 +10,17 @@ import '@unicef-polymer/etools-data-table/etools-data-table';
 import Constants from '../../constants';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';
-import '../page-body';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import {pdFetch} from '../../redux/actions/pd';
+import '../etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import '../page-body';
 import '../etools-prp-permissions';
 import '../confirm-box';
+import '../calculation-methods-info-bar';
 import {ConfirmBoxEl} from '../confirm-box';
 import {tableStyles} from '../../styles/table-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
@@ -31,6 +32,7 @@ import {
   computeIndicatorsUrl, computeFormattedData, computeSelected, computeDisabled,
   onValueChanged, canEdit, canSave
 } from './js/pd-details-calculation-methods-functions';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -245,13 +247,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
-  @property({type: String, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
 
-  @property({type: Boolean, computed: 'pdIndicatorsLoading(rootState)'})
+  @property({type: Boolean, computed: '_pdIndicatorsLoading(rootState)'})
   loading!: boolean;
 
-  @property({type: Array, computed: 'pdIndicatorsAll(rootState)', observer: '_initLocalData'})
+  @property({type: Array, computed: '_pdIndicatorsAll(rootState)', observer: '_initLocalData'})
   data!: any;
 
   @property({type: Array, computed: '_computeFormattedData(data)'})
@@ -267,13 +269,22 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
   pdReportsCount!: GenericObject;
 
   private _debouncer!: Debouncer;
+  private _fetchDataDebouncer!: Debouncer;
 
   _initLocalData(data: any) {
     this.set('localData', this._clone(data));
-  };
+  }
 
   _computeIndicatorsUrl(locationId: string, pdId: string) {
     return computeIndicatorsUrl(locationId, pdId);
+  }
+
+  _pdIndicatorsAll(rootState: RootState) {
+    return pdIndicatorsAll(rootState);
+  }
+
+  _pdIndicatorsLoading(rootState: RootState) {
+    return pdIndicatorsLoading(rootState);
   }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
@@ -293,11 +304,10 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
   }
 
   _fetchData(url: string) {
-    if (!url) {
+    if (!url || !this.pdId) {
       return;
     }
-
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._fetchDataDebouncer = Debouncer.debounce(this._fetchDataDebouncer,
       timeOut.after(250),
       () => {
         var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
@@ -305,16 +315,17 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
         (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
-          .catch(function(err) { // jshint ignore:line
+          //@ts-ignore
+          .catch(function(err) {
             // TODO: error handling
           });
       });
   }
 
   _onValueChanged(e: CustomEvent) {
-    var newValue = e.target.selected;
-    var data = e.target.dataset;
-    var indices = onValueChanged(data, this.localData);
+    const newValue = e.target.selected;
+    const data = e.target.dataset;
+    const indices = onValueChanged(data, this.localData);
 
     this.set([
       'localData.ll_outputs_and_indicators',
@@ -367,7 +378,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }
@@ -380,7 +391,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
       this._debouncer = Debouncer.debounce(this._debouncer,
         timeOut.after(250),
         () => {
-          const pdThunk = this.$.programmeDocuments;
+          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
           pdThunk.params = {
             page: 1,
             page_size: 10,
@@ -390,7 +401,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
           this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
-            .catch(function(err) { // jshint ignore:line
+            // @ts-ignore
+            .catch(function(err) {
               // TODO: error handling
             });
         });

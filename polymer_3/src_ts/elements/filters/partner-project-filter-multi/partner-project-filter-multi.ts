@@ -67,7 +67,7 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
       .then(function(res: any) {
         self.set('data', res.data.results);
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }

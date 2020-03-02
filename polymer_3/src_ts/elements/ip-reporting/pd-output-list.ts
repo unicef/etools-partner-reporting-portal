@@ -10,7 +10,9 @@ import '../ip-reporting/pd-output';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
-
+import {RootState} from '../../typings/redux.types';
+import {GenericObject} from '../../typings/globals.types';
+import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 
 /**
  * @polymer
@@ -64,6 +66,7 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
             items="[[viewData]]">
           <pd-output
               data="[[item]]"
+              current-pd="[[currentPd]]"
               override-mode="[[overrideMode]]"
               workspace-id="[[workspaceId]]">
           </pd-output>
@@ -84,7 +87,7 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.loading)'})
   loading!: boolean;
 
-  @property({type: Array, computed: 'llosAll(rootState)'})
+  @property({type: Array, computed: '_llosAll(rootState)'})
   data!: any[];
 
   @property({type: Array, computed: '_computeViewData(data)'})
@@ -99,9 +102,22 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Number, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: number;
 
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
+  currentPd!: GenericObject;
+
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
+
   _computeViewData(data: any[]) {
     return computeViewData(data);
   }
+
+  _llosAll(rootState: RootState) {
+    return llosAll(rootState);
+  }
+
 }
 
 window.customElements.define('pd-output-list', PdOutputList);

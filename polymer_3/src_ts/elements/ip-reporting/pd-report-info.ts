@@ -22,7 +22,7 @@ import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
-
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -191,7 +191,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
   @property({type: Boolean})
   noHeader!: boolean;
 
-  @property({type: Object, computed: 'reportInfoCurrent(rootState)'})
+  @property({type: Object, computed: '_reportInfoCurrent(rootState)'})
   data!: GenericObject;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
@@ -209,13 +209,13 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
   @property({type: String})
   overrideMode = '';
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode!: string;
 
   @property({type: String, computed: '_computeMode(mode, overrideMode, currentReport, permissions)'})
   computedMode!: string;
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   currentReport!: GenericObject;
 
   updateDebouncer!: Debouncer | null;
@@ -224,6 +224,14 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     return [
       '_updateData(localData.*)',
     ]
+  }
+
+  _reportInfoCurrent(rootState: RootState) {
+    return reportInfoCurrent(rootState);
+  }
+
+  _programmeDocumentReportsCurrent(rootState: RootState) {
+    return programmeDocumentReportsCurrent(rootState);
   }
 
   _handleInput() {
@@ -257,13 +265,13 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
             this.reportId
           )
         )
-        // (dci) clarify then on dispatch
-        // .then(function() {
-        //   self._notifyChangesSaved();
-        // })
-        // .catch(function(err) { // jshint ignore:line
-        //   // TODO: error handling
-        // });
+          // @ts-ignore
+          .then(function() {
+            self._notifyChangesSaved();
+          })
+          .catch(function(err) {
+            // TODO: error handling
+          });
       });
   }
 

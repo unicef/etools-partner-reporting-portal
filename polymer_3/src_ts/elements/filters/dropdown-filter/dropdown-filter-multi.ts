@@ -28,6 +28,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
       option-value="id"
       option-label="title"
       selected-values="{{selectedValues}}"
+      trigger-value-change-event
       on-etools-selected-items-changed="_handleChange"
       hide-search="[[hideSearch]]"
       disabled="[[disabled]]">
@@ -35,6 +36,8 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   `;
   }
 
+  @property({type: String})
+  value!: string;
 
   @property({type: Boolean})
   disabled!: boolean;
@@ -55,22 +58,15 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   }
 
   _handleChange(e: CustomEvent, detail: any) {
-    var newValue;
-
-    if (detail.path === 'selectedValues.splices') {
-      newValue = detail.value.indexSplices[0].object;
-    } else if (!detail.path) {
-      newValue = detail.value;
+    if (detail.selectedItems) {
+      let newValue = detail.selectedItems.map((item: any) => item['id']).join(',');
+      if (newValue !== this.value) {
+        fireEvent(this, 'filter-changed', {
+          name: this.name,
+          value: String(newValue || ''),
+        });
+      }
     }
-
-    if (typeof newValue === 'undefined') {
-      return;
-    }
-
-    fireEvent(this, 'filter-changed', {
-      name: this.name,
-      value: String(newValue || ''),
-    });
   }
 
   _handleData(data: any) {
@@ -84,11 +80,9 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   }
 
   _setSelectedValues(value: any) {
-    setTimeout(() => {
-      if (value) {
-        this.set('selectedValues', value.split(',').filter(Boolean));
-      }
-    });
+    if (typeof value === 'string' && value !== this.selectedValues.join(',')) {
+      this.set('selectedValues', value.split(',').filter(Boolean));
+    }
   }
 
 }

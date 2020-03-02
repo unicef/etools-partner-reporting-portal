@@ -9,7 +9,7 @@ import LocalizeMixin from "../../mixins/localize-mixin";
 import '../labelled-item';
 import {GenericObject} from '../../typings/globals.types';
 import {partnerLoading} from '../../redux/selectors/partner';
-
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -68,8 +68,12 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
-  @property({type: Boolean, computed: 'partnerLoading(rootState)'})
+  @property({type: Boolean, computed: '_partnerLoading(rootState)'})
   loading!: boolean;
+
+  _partnerLoading(rootState: RootState) {
+    return partnerLoading(rootState);
+  }
 
 }
 

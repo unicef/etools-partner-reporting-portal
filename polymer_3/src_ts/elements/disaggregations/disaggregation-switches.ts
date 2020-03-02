@@ -165,7 +165,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
     this._recordField(field);
   }
 
-  _computeWarning(numDisagg: number, reportedOnLength: number) { // jshint ignore:line
+  _computeWarning(numDisagg: number, reportedOnLength: number) {
     this.set('warning', !!numDisagg && reportedOnLength < numDisagg);
   }
 

@@ -49,7 +49,7 @@ class ClusterLocationContent extends ReduxConnectedElement {
       .then(function(res: any) {
         self.set('locations', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

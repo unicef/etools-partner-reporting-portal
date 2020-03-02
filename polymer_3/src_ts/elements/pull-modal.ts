@@ -82,7 +82,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     </style>
 
     <etools-prp-permissions
-      permissions="{{ permissions }}">
+      permissions="{{permissions}}">
     </etools-prp-permissions>
 
     <etools-prp-ajax
@@ -101,7 +101,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     <paper-dialog
       id="dialog"
       with-backdrop
-      opened="{{ opened }}">
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Pull data</h2>
         <div class="layout horizontal">

@@ -1,10 +1,12 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-location/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-query-params';
 import {buttonsStyles} from '../styles/buttons-styles';
+import {GenericObject} from '../typings/globals.types';
 
 
 /**
@@ -13,7 +15,7 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpToolbar extends UtilsMixin(PolymerElement) {
+class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
 
   public static get template() {
     return html`
@@ -68,6 +70,11 @@ class EtoolsPrpToolbar extends UtilsMixin(PolymerElement) {
   @property({type: String, computed: '_identity(_reportId)', notify: true})
   reportId!: string;
 
+  @property({type: String})
+  query!: string;
+
+  @property({type: Object})
+  params!: GenericObject;
 }
 
 window.customElements.define('etools-prp-toolbar', EtoolsPrpToolbar);

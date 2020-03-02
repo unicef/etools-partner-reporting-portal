@@ -86,7 +86,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _localizeErrors(errors: string[], localize: any) {
-    if (errors.length === 0) {
+    if (!errors || errors.length === 0) {
       return;
     }
 

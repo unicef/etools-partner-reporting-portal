@@ -14,6 +14,7 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -197,7 +198,7 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
   `;
   }
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   pd!: GenericObject;
 
   _computeFunds(num: number) {
@@ -206,6 +207,10 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
     } else {
       return num / 100;
     }
+  }
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
   }
 
   _formatFocalPoint(items: any[]) {

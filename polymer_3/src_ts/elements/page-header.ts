@@ -29,6 +29,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
 
           display: block;
           padding: var(--header-gutter);
+
           background: white;
           box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
 
@@ -36,40 +37,34 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
               color: #666;
           };
         }
-
         .title {
           min-width: 0;
           position: relative;
         }
-
         .title h1 {
           @apply --paper-font-title;
           @apply --truncate;
           max-width: 100%;
           margin: 0;
         }
-
-        .above-title {
-          margin-left: 40px;
-        }
-
         .back-button {
           text-decoration: none;
         }
-
-        .toolbar {
+        ::slotted([slot=above-title]) {
+          margin-left: 40px;
+        }
+        ::slotted([slot=toolbar]) {
           text-align: right;
         }
-
-        .tabs ::slotted(paper-tabs) {
-          margin-bottom: -var(--header-gutter);
+        ::slotted([slot=tabs]) {
+          margin-bottom: -25px;
         }
       </style>
 
       <div class="layout horizontal baseline">
         <div class="title flex">
           <div class="above-title">
-            <slot select=".above-title"></slot>
+             <slot name="above-title"></slot>
           </div>
           <div class="layout horizontal center">
             <template is="dom-if" if="[[back]]">
@@ -77,23 +72,23 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
                 <paper-icon-button icon="chevron-left"></paper-icon-button>
               </a>
             </template>
-            <h1>[[title]]<slot select=".in-title"></slot></h1>
+            <h1>[[title]]<slot name="in-title"></slot></h1>
           </div>
         </div>
 
-        <div class="toolbar flex">
-          <slot select=".toolbar"></slot>
+        <div class="toolbar">
+          <slot name="toolbar"></slot>
         </div>
       </div>
 
       <div class="header-content">
-        <slot select=".header-content"></slot>
+          <slot name="header-content"></slot>
       </div>
 
       <div class="tabs">
-        <slot select=".tabs"></slot>
-      </div>`
-      ;
+        <slot name="tabs"></slot>
+      </div>
+      `;
   }
 
   @property({type: String})
@@ -108,7 +103,6 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
-  //@lajos: defined tail as back is defined String
   _computeBackUrl(tail: string, baseUrl: string, app: string) {
     if (app === 'cluster-reporting') {
       return this.buildUrl(this._baseUrlCluster, tail);

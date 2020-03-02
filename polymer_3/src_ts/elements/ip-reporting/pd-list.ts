@@ -1,25 +1,27 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
-import '@polymer/paper-tooltip/paper-tooltip.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons/iron-icons';
+import '@unicef-polymer/etools-data-table/etools-data-table';
+import '@unicef-polymer/etools-data-table/data-table-styles';
+import '@polymer/paper-tooltip/paper-tooltip';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import PaginationMixin from '../../mixins/pagination-mixin';
+import RoutingMixin from '../../mixins/routing-mixin';
 import {tableStyles} from '../../styles/table-styles';
 import '../report-status';
 import '../etools-prp-number';
 import '../etools-prp-currency';
 import '../list-placeholder';
+import {getDomainByEnv} from '../../config';
 
-//(dci) where is  data-table-styles ????
 /**
  * @polymer
  * @customElement
@@ -29,7 +31,7 @@ import '../list-placeholder';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdList extends LocalizeMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement)))) {
+class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement))))) {
 
   public static get template() {
     return html`
@@ -111,7 +113,7 @@ class PdList extends LocalizeMixin(UtilsMixin(PaginationMixin(DataTableMixin(Red
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="[[ pd.id ]]/view/details">
+              <a href="[[getLinkUrl(pd.id, 'details')]]">
                 [[_withDefault(pd.reference_number)]]
                 <paper-tooltip>[[pd.title]]</paper-tooltip>
               </a>
@@ -157,7 +159,7 @@ class PdList extends LocalizeMixin(UtilsMixin(PaginationMixin(DataTableMixin(Red
               ([[_computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)]])
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="[[ pd.id ]]/view/reports">[[localize('reports')]]</a>
+              <a href="[[getLinkUrl(pd.id, 'reports')]]">[[localize('reports')]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -197,6 +199,10 @@ class PdList extends LocalizeMixin(UtilsMixin(PaginationMixin(DataTableMixin(Red
     } else {
       return percentage + '%';
     }
+  }
+
+  getLinkUrl(id: string, page: string) {
+    return this.buildUrl(this._baseUrl, `pd/${id}/view/${page}`);
   }
 
 }

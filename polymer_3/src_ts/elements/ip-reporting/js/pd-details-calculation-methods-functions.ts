@@ -57,10 +57,10 @@ export function onValueChanged(data: GenericObject, localData: GenericObject) {
 }
 
 export function canEdit(item: GenericObject, permissions: GenericObject) {
-  return item.data.editable &&
+  return item.data.editable && permissions &&
     permissions.changeProgrammeDocumentCalculationMethod;
 }
 
 export function canSave(permissions: GenericObject) {
-  return permissions.changeProgrammeDocumentCalculationMethod;
+  return permissions && permissions.changeProgrammeDocumentCalculationMethod;
 }

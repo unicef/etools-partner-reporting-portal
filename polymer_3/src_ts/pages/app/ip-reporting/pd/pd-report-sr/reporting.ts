@@ -23,6 +23,7 @@ import {currentProgrammeDocument} from '../../../../../redux/selectors/programme
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
+import {RootState} from '../../../../../typings/redux.types';
 
 /**
  * @polymer
@@ -121,7 +122,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
   @property({type: Object})
   permissions!: GenericObject;
 
-  @property({type: Object, computed: 'reportInfoCurrent(rootState)'})
+  @property({type: Object, computed: '_reportInfoCurrent(rootState)'})
   data!: GenericObject;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
@@ -154,7 +155,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
   @property({type: String, computed: '_computeMode(mode, overrideMode, currentReport, permissions)'})
   computedMode!: string;
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentReport!: GenericObject;
 
   updateDataDebouncer!: Debouncer | null;
@@ -163,6 +164,14 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     return [
       '_updateData(localData.*)',
     ]
+  }
+
+  _reportInfoCurrent(rootState: RootState) {
+    return reportInfoCurrent(rootState);
+  }
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
   }
 
   _handleInput(event: CustomEvent) {
@@ -230,7 +239,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
   }
 
   _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
-    return permissions.savePdReport ? (overrideMode || mode) : 'view';
+    return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }
 
   connectedCallback() {

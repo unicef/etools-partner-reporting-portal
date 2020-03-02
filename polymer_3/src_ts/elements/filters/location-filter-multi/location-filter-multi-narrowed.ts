@@ -11,6 +11,7 @@ import Endpoints from '../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../typings/globals.types';
 
 
 /**
@@ -57,14 +58,17 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
   @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
   locationsUrl = '';
 
-  @property({type: String, computed: 'getReduxStateArray(rootState.responsePlans.currentID)'})
-  responsePlanId = [];
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
+  responsePlanId!: string;
 
   @property({type: Array})
-  data!: any;
+  data = [];
 
   @property({type: Boolean})
   pending = false;
+
+  @property({type: Object})
+  params!: GenericObject;
 
   @property({type: String})
   value!: string;
@@ -75,16 +79,15 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
 
   private _debouncer!: Debouncer;
 
-  _computeActivitiesUrl(responsePlanId: string) {
+  _computeLocationsUrl(responsePlanId: string) {
     return Endpoints.clusterLocationNames(responsePlanId);
-  };
+  }
 
-  _fetchActivities() {
-
+  _fetchLocations() {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        var self = this;
+        const self = this;
         this.set('pending', true);
 
         (this.$.locations as EtoolsPrpAjaxEl).abort();
@@ -93,7 +96,7 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch(function(err: any) { // jshint ignore:line
+          .catch(function(err: any) {
             // TODO: error handling
             self.set('pending', false);
           });
@@ -112,7 +115,7 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     super.disconnectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   };
