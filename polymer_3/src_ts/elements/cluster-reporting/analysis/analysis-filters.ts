@@ -110,17 +110,15 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
     ];
   }
 
-  private _debouncer!: Debouncer;
+  private _narrowLocTypeDebouncer!: Debouncer;
 
-  private _resetNarrowLocTypeDebouncer!: Debouncer;
+  private _clusterObjectivesTypeDebouncer!: Debouncer;
 
-  private _resetClusterObjectivesTypeDebouncer!: Debouncer;
-
-  private _resetLocationsDebouncer!: Debouncer;
+  private _locationsDebouncer!: Debouncer;
 
   _resetClusterObjectives() {
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._clusterObjectivesTypeDebouncer = Debouncer.debounce(this._clusterObjectivesTypeDebouncer,
       timeOut.after(100), () => {
 
         this.set('queryParams.cluster_objectives', null);
@@ -128,7 +126,7 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _resetLocations() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._locationsDebouncer = Debouncer.debounce(this._locationsDebouncer,
       timeOut.after(100), () => {
 
         this.set('queryParams.locs', null);
@@ -136,7 +134,7 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _resetNarrowLocType(locType: any) {
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this._narrowLocTypeDebouncer = Debouncer.debounce(this._narrowLocTypeDebouncer,
       timeOut.after(100), () => {
         if (locType === String(Settings.cluster.maxLocType)) {
           this.set('queryParams.narrow_loc_type', null);
@@ -163,16 +161,16 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this._resetNarrowLocTypeDebouncer && this._resetNarrowLocTypeDebouncer.isActive()) {
-      this._resetNarrowLocTypeDebouncer.cancel();
+    if (this._narrowLocTypeDebouncer && this._narrowLocTypeDebouncer.isActive()) {
+      this._narrowLocTypeDebouncer.cancel();
     }
 
-    if (this._resetClusterObjectivesTypeDebouncer && this._resetClusterObjectivesTypeDebouncer.isActive()) {
-      this._resetClusterObjectivesTypeDebouncer.cancel();
+    if (this._clusterObjectivesTypeDebouncer && this._clusterObjectivesTypeDebouncer.isActive()) {
+      this._clusterObjectivesTypeDebouncer.cancel();
     }
 
-    if (this._resetLocationsDebouncer && this._resetLocationsDebouncer.isActive()) {
-      this._resetLocationsDebouncer.cancel();
+    if (this._locationsDebouncer && this._locationsDebouncer.isActive()) {
+      this._locationsDebouncer.cancel();
     }
     this._removeEventListeners();
   }
