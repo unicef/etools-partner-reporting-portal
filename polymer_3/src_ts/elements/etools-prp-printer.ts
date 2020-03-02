@@ -11,7 +11,7 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin UtilsMixin
  */
 class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
-  public static get template(){
+  public static get template() {
     return html`
       <slot></slot>
     `;
@@ -23,13 +23,13 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
   @property({type: Object})
   printWindow!: GenericObject;
 
-  _onTap(e) {
-    if (!e.target.classList.contains('print-btn')) {
+  _onTap(e: CustomEvent) {
+    if (!(e.target! as HTMLElement).classList.contains('print-btn')) {
       return;
     }
 
-    let parent = this.shadowRoot.parentNode;
-    let toPrint = this.shadowRoot.querySelectorAll(this.selector);
+    let parent = this.shadowRoot!.parentNode;
+    let toPrint = this.shadowRoot!.querySelectorAll(this.selector);
     let style = document.createElement('style');
 
     style.innerHTML = 'body { color: #212121; font: 14px/1.5 Roboto, Noto, sans-serif; }';
@@ -47,11 +47,11 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
 
     this.printWindow.document.head.appendChild(style);
 
-    toPrint.forEach(function (node) {
+    toPrint.forEach((node) => {
       this.printWindow.document.body.appendChild(this._cloneNode(node));
     }, this);
 
-    setTimeout(function () {
+    setTimeout(() => {
       this.printWindow.print();
       this.printWindow.close();
       this.set('printWindow', null);
