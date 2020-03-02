@@ -8,6 +8,7 @@ import LocalizeMixin from '../../../../mixins/localize-mixin';
 import './creation-modal';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
+import {CreationModalEl} from './creation-modal';
 
 
 /**
@@ -72,7 +73,7 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal')as CreationModalEl)!.open();
   }
 
 }

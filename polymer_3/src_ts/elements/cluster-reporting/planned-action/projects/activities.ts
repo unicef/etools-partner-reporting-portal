@@ -15,6 +15,9 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 // <link rel='import' href='../activities/add-existing-activity-from-project-modal.html'>
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
+import {PlannedActionAddActivityFromProjectModalEl} from '../activities/planned-action-add-activity-from-project-modal';
+import {PlannedActionAddExistingActivityFromProjectModalEl}
+                                          from '../activities/planned-action-add-existing-activity-from-project-modal';
 
 
 /**
@@ -135,11 +138,12 @@ class Activities extends UtilsMixin(ReduxConnectedElement){
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionAddActivityFromProjectModalEl)!.open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal')!.open();
+    (this.shadowRoot!.querySelector('#existing-modal') as
+        PlannedActionAddExistingActivityFromProjectModalEl)!.open();
   }
 
   _addEventListeners() {

@@ -1207,3 +1207,5 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
 }
 
 window.customElements.define('creation-modal', CreationModal);
+
+export {CreationModal as CreationModalEl};
