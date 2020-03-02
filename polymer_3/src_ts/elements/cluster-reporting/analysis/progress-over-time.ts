@@ -12,6 +12,7 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 import './analysis-widget';
 import '../../list-placeholder';
 import {GenericObject} from '../../../typings/globals.types';
+declare const numeral: any;
 
 /**
 * @polymer
@@ -116,10 +117,6 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
   @property({type: Array, computed: '_computeRows(data, actualTarget, actualInNeed)'})
   rows!: any;
 
-  //@Lajos: if defined const gives error: class memeber cannot have the const keyword
-  //initially used bower_components/numeral-js/numeral-import
-  declare const numeral: any;
-
   _computeOptions() {
     return Object.assign({}, this._baseOptions, {
       colors: ['#88c245', '#4069c5', '#f19e3a'],
@@ -157,7 +154,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       '<div class="tooltip-content">',
       '<div>' + tick[0] + '</div>',
       '<div class="number-of-partners">',
-      this.numeral(progress).format(Constants.FORMAT_NUMBER_DEFAULT),
+      numeral(progress).format(Constants.FORMAT_NUMBER_DEFAULT),
       '</div>',
       '<div class="progress">',
       this._toPercentage(progressAgainstTarget) + ' of Target',

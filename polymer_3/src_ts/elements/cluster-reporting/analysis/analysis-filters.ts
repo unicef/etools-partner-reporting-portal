@@ -112,6 +112,12 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
 
   private _debouncer!: Debouncer;
 
+  private _resetNarrowLocTypeDebouncer!: Debouncer;
+
+  private _resetClusterObjectivesTypeDebouncer!: Debouncer;
+
+  private _resetLocationsDebouncer!: Debouncer;
+
   _resetClusterObjectives() {
 
     this._debouncer = Debouncer.debounce(this._debouncer,
@@ -157,11 +163,17 @@ class AnalysisFilter extends UtilsMixin(ReduxConnectedElement) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._cancelDebouncers([
-      'reset-narrow-loc-type',
-      'reset-cluster-objectives',
-      'reset-locations',
-    ]);
+    if (this._resetNarrowLocTypeDebouncer && this._resetNarrowLocTypeDebouncer.isActive()) {
+      this._resetNarrowLocTypeDebouncer.cancel();
+    }
+
+    if (this._resetClusterObjectivesTypeDebouncer && this._resetClusterObjectivesTypeDebouncer.isActive()) {
+      this._resetClusterObjectivesTypeDebouncer.cancel();
+    }
+
+    if (this._resetLocationsDebouncer && this._resetLocationsDebouncer.isActive()) {
+      this._resetLocationsDebouncer.cancel();
+    }
     this._removeEventListeners();
   }
 }

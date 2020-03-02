@@ -13,6 +13,7 @@ import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import Constants from '../../../constants';
 import {GenericObject} from '../../../typings/globals.types';
 //<link rel="import" href = "../../../polyfills/es6-shim.html" >
+declare const numeral: any;
 
 /**
 * @polymer
@@ -94,9 +95,6 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   @property({type: Array, computed: '_computeRows(data)'})
   rows!: any;
 
-  //@Lajos: if defined const gives error: class memeber cannot have the const keyword
-  declare const numeral: any;
-
   _computeOptions(rows: any) {
     return Object.assign({}, this._baseOptions, {
       height: rows.length * 45 + 40,
@@ -139,7 +137,7 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
       '<div class="tooltip-content">',
       '<div>' + title + '</div>',
       '<div class="number-of-partners">',
-      this.numeral(data.progress).format(Constants.FORMAT_NUMBER_DEFAULT),
+      numeral(data.progress).format(Constants.FORMAT_NUMBER_DEFAULT),
       '</div>',
       '<div class="progress">',
       this._toPercentage(progressAgainstTarget) + ' of Target',

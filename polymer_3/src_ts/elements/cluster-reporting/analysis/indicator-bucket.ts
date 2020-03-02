@@ -248,7 +248,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
 
     if (data.value) {
       //@Lajos:PLEASE REVIEW => not sure about this
-      indicatorDetails = Polymer.dom(e.srcElement).querySelector('analysis-indicator-details');
+      indicatorDetails = e.target.querySelector('analysis-indicator-details');
 
       try {
         indicatorDetails.init();

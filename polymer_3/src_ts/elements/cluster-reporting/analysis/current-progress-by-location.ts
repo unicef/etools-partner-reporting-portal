@@ -4,7 +4,7 @@ import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 //@Lajos: IMPORTANT NOTICE: bellow does not exists!!!!!!
 //<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 import '@polymer/google-chart/google-chart';
-import '../../numeral-js';
+import {NumeralJsEl} from '../../numeral-js';
 import './analysis-widget';
 import '../../list-placeholder';
 import UtilsMixin from '../../../mixins/utils-mixin';
@@ -13,6 +13,7 @@ import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import Constants from '../../../constants';
 import {GenericObject} from '../../../typings/globals.types';
 //<link rel="import" href="../../../polyfills/es6-shim.html">
+declare const numeral: any;
 
 /**
  * @polymer
@@ -83,8 +84,6 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
   @property({type: Array, computed: '_computeRows(data)'})
   rows!: any;
 
-  declare const numeral: any;
-
   _computeOptions(rows: any) {
     return Object.assign({}, this._baseOptions, {
       height: rows.length * 45 + 30,
@@ -114,7 +113,7 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
       '<div class="tooltip-content">',
       '<div>' + title + '</div>',
       '<div class="number-of-partners">',
-      this.numeral(data.progress).format(Constants.FORMAT_NUMBER_DEFAULT),
+      numeral(data.progress).format(Constants.FORMAT_NUMBER_DEFAULT),
       '</div>',
       '<div>Contributing Partners:</div>',
       '<div>' + this._commaSeparated(data.partners) + '</div>',
