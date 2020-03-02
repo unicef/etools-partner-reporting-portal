@@ -14,9 +14,10 @@ import {html} from '@polymer/polymer';
 import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior';
 import {IronMenuBehavior} from '@polymer/iron-menu-behavior/iron-menu-behavior';
 import '@polymer/paper-radio-button/paper-radio-button';
-import {PolymerElement} from "@polymer/polymer/polymer-element";
-import {property} from "@polymer/decorators/lib/decorators";
-import {fireEvent} from "../../utils/fire-custom-event";
+import {PolymerElement} from '@polymer/polymer/polymer-element';
+import {property} from '@polymer/decorators/lib/decorators';
+import {fireEvent} from '../../utils/fire-custom-event';
+import {mixinBehaviors} from '@polymer/polymer/lib/legacy/class';
 
 /**
  *
@@ -65,9 +66,9 @@ import {fireEvent} from "../../utils/fire-custom-event";
 /**
  * @polymer
  * @customElement
- * @appliesMixin IronMenuBehavior
+ * @appliesMixin mixinBehaviors
  */
-class PaperRadioGroupCustom extends IronMenuBehavior(PolymerElement){
+class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElement){
   public static get template(){
     return html`
       <style>
