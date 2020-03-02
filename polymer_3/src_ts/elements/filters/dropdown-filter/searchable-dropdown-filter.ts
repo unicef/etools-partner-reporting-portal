@@ -16,6 +16,9 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       :host {
         display: block;
       }
+      #field {
+        width: 100%;
+      }
     </style>
 
     <etools-dropdown
