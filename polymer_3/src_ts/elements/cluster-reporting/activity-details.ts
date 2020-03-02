@@ -1,6 +1,7 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
+import { ReduxConnectedElement } from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import ModalMixin from '../../mixins/modal-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/app-layout/app-grid/app-grid-style';
@@ -16,11 +17,11 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin ModalMixin
  * @appliesMixin UtilsMixin
  */
-class ActivityDetails extends ModalMixin(UtilsMixin(PolymerElement)) {
+class ActivityDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
-     <style>
+     <style include="app-grid-style">
       :host {
         display: block;
         --app-grid-columns:4;

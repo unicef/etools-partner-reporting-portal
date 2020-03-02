@@ -167,8 +167,8 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   `;
   }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
-  activities!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
+  activities!: any[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerActivities.loading)'})
   loading!: boolean;
