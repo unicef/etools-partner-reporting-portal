@@ -82,3 +82,5 @@ export const store = createStore(
   rootReducer,
   devCompose(applyMiddleware(thunk))
 );
+
+export type ReduxDispatch = typeof store.dispatch;
