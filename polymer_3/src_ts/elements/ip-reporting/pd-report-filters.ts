@@ -57,6 +57,9 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   queryParams!: GenericObject;
 

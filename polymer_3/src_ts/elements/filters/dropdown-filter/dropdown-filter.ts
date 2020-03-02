@@ -8,6 +8,8 @@ import '@polymer/paper-listbox/paper-listbox';
 import FilterMixin from '../../../mixins/filter-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
+import '@polymer/polymer/lib/elements/dom-repeat';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
 /**
  * @polymer
@@ -27,7 +29,10 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
         width: 100%;
       }
 
-      paper-item {
+      paper-listbox paper-item {
+        height: 48px;
+        cursor: pointer;
+        padding: 0 16px;
         white-space: nowrap;
       }
     </style>
@@ -40,7 +45,8 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
       <paper-listbox
           slot="dropdown-content"
           class="dropdown-content"
-          selected="[[selected]]">
+          selected="[[selected]]"
+          on-iron-select="_handleFilterChange">
         <template
             id="repeat"
             is="dom-repeat"
@@ -72,8 +78,8 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
     ]
   }
 
-  _handleChange(e: CustomEvent) {
-    var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+  _handleFilterChange(e: CustomEvent) {
+    const newValue = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).id;
 
     fireEvent(this, 'filter-changed', {
       name: this.name,
@@ -83,9 +89,13 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
 
   _updateSelected(value: String, data: any) {
     setTimeout(() => {
-      this.set('selected', data.findIndex(function(item: any) {
-        return String(item.id) === String(value);
-      }));
+      const selectedIndex = data.findIndex(function(item: any) {
+        return String(item.id) === String(value)
+      });
+
+      if (selectedIndex !== this.selected) {
+        this.set('selected', selectedIndex);
+      }
     });
   }
 
@@ -95,24 +105,6 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
     }
   }
 
-  _addEventListeners() {
-    this._handleChange = this._handleChange.bind(this);
-    this.addEventListener('field.iron-select', this._handleChange as any);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('field.iron-select', this._handleChange as any);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._addEventListeners();
-  }
-
-  disconnectedCallback() {
-    super.connectedCallback();
-    this._removeEventListeners();
-  }
 }
 
 window.customElements.define('dropdown-filter', DropdownFilter);
