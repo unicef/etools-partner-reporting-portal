@@ -16,6 +16,7 @@ import './current-progress-by-location';
 import './current-progress-by-partner';
 import './current-progress-by-project';
 import {GenericObject} from '../../../typings/globals.types';
+import {analysis_indicators_fetchSingle} from '../../../redux/actions/analysis';
 
 /**
 * @polymer
@@ -290,11 +291,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     this.set('initialized', true);
     (this.$.indicator as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(
-      //@Lajos: assumption, for bellow
-      //App.Actions.Analysis.Indicators.fetchSingle(indicatorThunk, this.indicatorId)
-      fetchIndicatorDetails(indicatorThunk, this.indicatorId)
-    )
-      .catch(function(err) { // jshint ignore:line
+      analysis_indicators_fetchSingle(indicatorThunk, this.indicatorId))
+      //@ts-ignore
+      .catch(function(_err: any) {
         // TODO: error handling
       });
   }
