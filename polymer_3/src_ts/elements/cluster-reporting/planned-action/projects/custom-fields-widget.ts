@@ -9,6 +9,7 @@ import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {sharedStyles} from '../../../../styles/shared-styles';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
+import {GenericObject} from '../../../../typings/globals.types';
 
 
 /**
@@ -145,14 +146,14 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
 
   _remove(e: CustomEvent) {
     let value = this.get('customFields');
-    let toRemove = value.findIndex(function (field) {
+    let toRemove = value.findIndex( (field: GenericObject) => {
       return String(field.id) === String(e.target.id);
     });
     this.splice('customFields', toRemove, 1);
   }
 
   _updateCustomFieldTitle(e: CustomEvent) {
-    let field = this.customFields.find(function (field) {
+    let field = this.customFields.find( (field) => {
       return Number(field.id) === Number(e.target!.nameid);
     });
     field.name = e.target!.value;

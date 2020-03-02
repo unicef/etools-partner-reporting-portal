@@ -135,11 +135,11 @@ class Activities extends UtilsMixin(ReduxConnectedElement){
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    this.shadowRoot!.querySelector('#modal')!.open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal').open();
+    this.shadowRoot!.querySelector('#existing-modal')!.open();
   }
 
   _addEventListeners() {

@@ -72,7 +72,7 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    this.shadowRoot!.querySelector('#modal')!.open();
   }
 
 }

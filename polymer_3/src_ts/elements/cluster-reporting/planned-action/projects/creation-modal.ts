@@ -997,14 +997,14 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
         const projectThunk = (this.$.projects as EtoolsPrpAjaxEl);
         projectThunk.abort();
         projectThunk.thunk()()
-          .then(function (res) {
+          .then(function (res: GenericObject) {
             self.set('projectsLoading', false);
 
             let filteredPartnerProjects = self.partnerProjects.filter(function (item) {
               return item.is_ocha_imported === true;
             });
 
-            let filteredResData = res.data.filter(function (item) {
+            let filteredResData = res.data.filter( (item: GenericObject) => {
               return filteredPartnerProjects.find(function (element) {
                 return element.title.trim() === item.name.trim();
               }) === undefined;
@@ -1013,7 +1013,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
             self.set('projects', filteredResData);
             fireEvent(self, 'details-loaded');
           })
-          .catch(function (err) { // jshint ignore:line
+          .catch( (err: GenericObject) => { // jshint ignore:line
             if (err.code === 504) {
               fireEvent(self,'notify', {type: 'ocha-timeout'});
             }
@@ -1037,12 +1037,12 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     let self = this;
     (this.$.projectDetails as EtoolsPrpAjaxEl).abort();
     (this.$.projectDetails as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res) {
+      .then(function (res: GenericObject) {
         self.set('projectDetailsLoading', false);
         self.set('projectDetails', res.data);
         fireEvent(self, 'details-loaded');
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function (err: GenericObject) { // jshint ignore:line
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
@@ -1051,7 +1051,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
       });
   }
 
-  _computeFormattedProjects(projects) {
+  _computeFormattedProjects(projects: GenericObject[]) {
     return projects.map( (project) => {
       return {id: project.id, title: project.name};
     });
@@ -1080,7 +1080,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 
   _formatForMultiselect(list) {
-    return list.map(function (item) {
+    return list.map( (item: GenericObject) => {
       return {
         id: item.id,
         value: item.id,
@@ -1123,7 +1123,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     let locationError = false;
     let rawLocations = this.get('data.locations');
 
-    let changedLocations = rawLocations.map( (location) => {
+    let changedLocations = rawLocations.map( (location: GenericObject) => {
       if (location.location !== undefined) {
         return location.location;
       } else {
@@ -1131,7 +1131,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
       }
     });
 
-    changedLocations.forEach(function (location) {
+    changedLocations.forEach( (location: GenericObject) => {
       if (location.title === undefined) {
         self.set('errors', 'No location set - please set a location.');
         locationError = true;
@@ -1163,7 +1163,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     this.updatePending = true;
     let thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function (res) {
+      .then( (res: GenericObject) => {
         self.updatePending = false;
         if (self.edit) {
           fireEvent(self, 'project-edited', res.data);
@@ -1173,7 +1173,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
           self._redirectToDetail(res.data.id);
         }
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch( (err: GenericObject) => { // jshint ignore:line
         self.updatePending = false;
         self.set('errors', err.data);
         self.set('data.locations', rawLocations);   // If there are backend validation errors, reset locations

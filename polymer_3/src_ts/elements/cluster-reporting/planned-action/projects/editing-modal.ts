@@ -311,7 +311,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
   }
 
   _formatForMultiselect(list) {
-    return list.map(function(item) {
+    return list.map((item: GenericObject) => {
       return {
         id: item.id,
         value: item.id,
@@ -341,12 +341,12 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
     this.updatePending = true;
     let thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function (res) {
+      .then( (res: GenericObject) => {
         self.updatePending = false;
         fireEvent(self, 'project-edited', res.data);
         self.close();
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch( (err: GenericObject) => { // jshint ignore:line
         self.updatePending = false;
         // TODO: error handling
       });
