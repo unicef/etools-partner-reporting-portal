@@ -4,7 +4,7 @@ import {printStyles} from "./print-styles";
 
 export const disaggregationTableStyles = html`
   ${printStyles}
-  <style include="iron-flex iron-flex-alignment print-styles">
+  <style include="iron-flex iron-flex-alignment">
     :host {
       display: block;
     }

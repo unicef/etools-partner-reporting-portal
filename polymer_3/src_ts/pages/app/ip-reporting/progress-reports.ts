@@ -68,7 +68,7 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
 
   public static get observers() {
     return [
-      '_handleInputChange(reportsUrl, queryParams)',
+      '_handleInputChange(reportsUrl, queryParams, reduxStore)',
     ]
   }
 
@@ -76,8 +76,8 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     return locationId ? Endpoints.progressReports(locationId) : '';
   }
 
-  _handleInputChange(_, queryParams: GenericObject) { // jshint ignore:line
-    if (!Object.keys(queryParams).length) {
+  _handleInputChange(_, queryParams: GenericObject) {
+    if (!queryParams || !Object.keys(queryParams).length || !this.reduxStore) {
       return;
     }
 
@@ -86,11 +86,11 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     // Cancel the pending request, if any
     (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(progressReportsFetch(progressReportsThunk));
-    // (dci)
-    // .catch(function(err) { // jshint ignore:line
-    //   // TODO: error handling
-    // }));
+    this.reduxStore.dispatch(progressReportsFetch(progressReportsThunk))
+      // @ts-ignore
+      .catch(function(err) {
+        // TODO: error handling
+      })
   }
 
 }

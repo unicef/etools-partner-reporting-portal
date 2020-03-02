@@ -16,6 +16,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import 'etools-file/etools-file.js';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -136,10 +137,10 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   @property({type: Boolean})
   otherTwoLoading!: boolean;
 
-  @property({type: Boolean, computed: 'programmeDocumentReportsAttachmentsPending(rootState)'})
+  @property({type: Boolean, computed: '_programmeDocumentReportsAttachmentsPending(rootState)'})
   pending!: boolean;
 
-  @property({type: Array, computed: 'programmeDocumentReportsAttachmentsCurrent(rootState)', observer: '_setFiles'})
+  @property({type: Array, computed: '_programmeDocumentReportsAttachmentsCurrent(rootState)', observer: '_setFiles'})
   attachments!: GenericObject[];
 
   @property({type: String, computed: '_computeListUrl(locationId, reportId)'})
@@ -162,6 +163,14 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       '_filesChanged(otherOneAttachment.*)',
       '_filesChanged(otherTwoAttachment.*)'
     ];
+  }
+
+  _programmeDocumentReportsAttachmentsPending(rootState: RootState) {
+    return programmeDocumentReportsAttachmentsPending(rootState);
+  }
+
+  _programmeDocumentReportsAttachmentsCurrent(rootState: RootState) {
+    return programmeDocumentReportsAttachmentsCurrent(rootState);
   }
 
   _computeListUrl(locationId: string, reportId: string) {
@@ -222,7 +231,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         self.$.otherTwoAttachmentComponent.set('files', []);
       }
     })
-      .catch(function(err) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -337,7 +347,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
           self.set('attachmentDeleteUrl', undefined);
         })
-        .catch(function(err) { // jshint ignore:line
+        .catch(function(err) {
           console.error(err);
           // TODO: error handling
         });
@@ -369,7 +379,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     this.reduxStore.dispatch(
       pdReportsAttachmentsSync(downloadThunk, this.reportId)
     )
-      .catch(function(err) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling
       });
   }

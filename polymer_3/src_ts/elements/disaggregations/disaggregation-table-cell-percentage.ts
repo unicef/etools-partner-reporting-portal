@@ -8,7 +8,8 @@ import './disaggregation-table-cell';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
-
+import '@polymer/iron-meta/iron-meta';
+import {IronMeta} from '@polymer/iron-meta/iron-meta';
 
 /**
  * @polymer
@@ -54,8 +55,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
-        <editable>
-          <div class="app-grid">
+          <div slot="editable" class="app-grid">
             <div class="item">
               <disaggregation-field
                 id="v"
@@ -77,9 +77,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
             </div>
             <div class="computed-value">[[_toPercentage(localData.c)]]</div>
           </div>
-        </editable>
-        <non-editable>
-          <div class="app-grid">
+          <div slot="non-editable" class="app-grid">
             <div class="item">
               <etools-prp-number value="[[data.v]]"></etools-prp-number>
             </div>
@@ -88,7 +86,6 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
             </div>
             <div class="computed-value">[[_toPercentage(data.c)]]</div>
           </div>
-        </non-editable>
       </disaggregation-table-cell>
 
     `;
@@ -156,16 +153,16 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
 
   _bindValidation(coords: string) {
     let vName = 'v-' + coords;
-
+    const self = this;
     let validator = {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
-        return Number(value) !== 0 || Number(this.shadowRoot.querySelector('#v').getField().value) === 0;
-      }.bind(this),
+        return Number(value) !== 0 || Number(self!.shadowRoot!.querySelector('#v')!.getField().value) === 0;
+      }.bind(self),
     };
 
-    new Polymer.IronMeta({
+    new IronMeta({
       type: validator.validatorType,
       key: validator.validatorName,
       value: validator,
@@ -182,7 +179,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
 
   _addEventListeners() {
     this._handleInput = this._handleInput.bind(this);
-    this.addEventListener('field-value-changed', this._handleInput);
+    this.addEventListener('field-value-changed', this._handleInput as any);
   }
 
   connectedCallback() {
@@ -199,7 +196,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
   }
 
   _removeEventListeners() {
-    this.removeEventListener('field-value-changed', this._handleInput);
+    this.removeEventListener('field-value-changed', this._handleInput as any);
   }
 
   disconnectedCallback() {

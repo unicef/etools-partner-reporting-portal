@@ -12,9 +12,8 @@ import '../error-modal';
 import ModalMixin from '../../mixins/modal-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles'
 import {modalStyles} from '../../styles/modal-styles'
-import '../etools-prp-number';
-import '../../redux/selectors/programmeDocumentDetails';
-import '../../redux/selectors/programmeDocuments';
+import '../etools-prp-ajax';
+import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
@@ -23,7 +22,9 @@ import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
 import {store} from '../../redux/store';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
-
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import {RootState} from '../../typings/redux.types';
+import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 /**
  * @polymer
  * @customElement
@@ -75,7 +76,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       <paper-dialog-scrollable>
 
         <h3>[[localize('could_not_be_submitted')]]</h3>
-
+        <!--
         <paper-dropdown-menu
           id="officerDropdown"
           class="validate"
@@ -94,6 +95,21 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
+        -->
+
+        <etools-dropdown
+          id="officerDropdown"
+          label="[[localize('authorized_officer')]]"
+          placeholder="[[localize('select')]]"
+          options="[[currentAuthorizedPartners]]"
+          option-value="value"
+          option-label="title"
+          required
+          trigger-value-change-event
+          on-etools-selected-item-changed="_validate"
+          selected="{{selectedFocalPoint}}"
+          hide-search>
+        </etools-dropdown>
 
       </paper-dialog-scrollable>
 
@@ -121,7 +137,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   data!: GenericObject;
 
   @property({type: Array})
-  emails!: any;
+  emails!: any[];
 
   @property({type: String})
   userMail!: string;
@@ -132,7 +148,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   @property({type: String})
   selectedFocalPoint!: string;
 
-  @property({type: Object, computed: 'getReducStateObject(state.App.Selectors.ProgrammeDocuments.current)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentPd!: GenericObject;
 
   @property({type: Array, computed: '_computeAuthorizedPartners(currentPd)'})
@@ -141,13 +157,26 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   @property({type: Object, computed: '_computePostBody(selectedFocalPoint)'})
   postBody!: GenericObject;
 
+  @property({type: String})
+  pdId!: string;
+
+  @property({type: String})
+  reportId!: string;
+
+  @property({type: String})
+  submitUrl!: string;
+
   _computePostBody(selectedFocalPoint: string) {
     return computePostBody(selectedFocalPoint);
-  };
+  }
 
-  _computeAuthorizedPartners(pd: string) {
+  _computeAuthorizedPartners(pd: GenericObject) {
     return computeAuthorizedPartners(pd);
-  };
+  }
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
 
   _validate(e: CustomEvent) {
     e.target.validate();
@@ -159,8 +188,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     }
     var self = this;
     this.set('busy', true);
-
-    this.$.submit.thunk()()
+    (this.$.submit as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         var newPath = self.buildUrl(
           self._baseUrl,
@@ -183,7 +211,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       .then(function() {
         self.set('busy', false);
       });
-  };
+  }
 
   _cancel() {
     this.close();

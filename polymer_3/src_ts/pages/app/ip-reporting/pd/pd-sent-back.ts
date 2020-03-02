@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-card/paper-card';
 import '@polymer/paper-styles/typography';
@@ -8,6 +9,7 @@ import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import {GenericObject} from '../../../../typings/globals.types';
+import {RootState} from '../../../../typings/redux.types';
 
 /**
  * @polymer
@@ -15,7 +17,7 @@ import {GenericObject} from '../../../../typings/globals.types';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class PdSentBack extends UtilsMixin(PolymerElement) {
+class PdSentBack extends UtilsMixin(ReduxConnectedElement) {
 
   public static get template() {
     return html`
@@ -126,7 +128,7 @@ class PdSentBack extends UtilsMixin(PolymerElement) {
   `;
   }
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   currentReport!: GenericObject;
 
   @property({type: Boolean, computed: '_hasFeedback(currentReport)'})
@@ -147,6 +149,9 @@ class PdSentBack extends UtilsMixin(PolymerElement) {
   @property({type: String, computed: '_computeButtonText(expanded)'})
   buttonText!: string;
 
+  _programmeDocumentReportsCurrent(rootState: RootState) {
+    return programmeDocumentReportsCurrent(rootState);
+  }
 
   _hasFeedback(currentReport: GenericObject) {
     return !!(this._equals(currentReport.status, 'Sen') && currentReport.sent_back_feedback);
@@ -157,8 +162,11 @@ class PdSentBack extends UtilsMixin(PolymerElement) {
   }
 
   _computeCollapsible(threshold: number, currentReport: GenericObject) {
-    return currentReport.sent_back_feedback &&
-      currentReport.sent_back_feedback.length >= threshold;
+    if (currentReport) {
+      return currentReport.sent_back_feedback &&
+        currentReport.sent_back_feedback.length >= threshold;
+    }
+    return false;
   }
 
   _computeContainerClass(expanded: boolean, collapsible: boolean) {

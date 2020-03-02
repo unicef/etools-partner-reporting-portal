@@ -248,34 +248,34 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
   _computeParams(isClusterApp: boolean) {
     computeParams(isClusterApp);
-  };
+  }
 
   _computeIsClusterApp(appName: string) {
     computeIsClusterApp(appName);
-  };
+  }
 
   _computeIndicatorReportsUrl(indicator: GenericObject) {
     return computeIndicatorReportsUrl(indicator);
-  };
+  }
 
   _bucketByLocation(data: any[]) {
     return bucketByLocation(data);
-  };
+  }
 
   _updateDisaggregationStore(data: GenericObject) {
     //this.dispatch(App.Actions.setIndicatorDisaggregations(data));
     //this.reduxStore.dispatch(Actions .setIndicatorDisaggregations(data));
-  };
+  }
 
   _getDataByKey(dataDict: GenericObject) {
     if (dataDict.details) {
       this.data = dataDict.details[this.indicator.id];
     }
-  };
+  }
 
   _computeHidden(data: any[], loading: boolean) {
     return computeHidden(data, loading);
-  };
+  }
 
   _openChanged() {
     if (this.isOpen) {
@@ -283,13 +283,15 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
       //need to check
       // var action = Indicators;
       this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        .catch(function(err) { // jshint ignore:line
+        // @ts-ignore
+        .catch(function(err) {
           // TODO: error handling.
         });
     } else {
       (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
     }
-  };
+  }
+
 }
 
 window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);

@@ -95,7 +95,8 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
               title: 'All',
             }].concat(res.data.results));
           })
-          .catch(function(err: any) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err: any) {
             // TODO: error handling
           });
 

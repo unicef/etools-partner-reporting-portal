@@ -43,6 +43,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {RootState} from '../../../../typings/redux.types';
 
 /**
  * @polymer
@@ -131,18 +132,19 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         title="[[headingPrefix]]"
         back="[[backLink]]">
       <reporting-period
-          class="above-title"
+          slot="above-title"
           range="[[currentReport.reporting_period]]">
       </reporting-period>
 
       <pd-reports-report-title
-        class="above-title"
+        slot="above-title"
         report="[[currentReport]]">
       </pd-reports-report-title>
 
       <a
           href="#"
-          class="pd-details-link in-title"
+          slot="in-title"
+          class="pd-details-link"
           on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
 
       <template
@@ -150,13 +152,13 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
           if="[[_equals(currentPd.status, 'Suspended')]]"
           restamp="true">
         <message-box
-            class="header-content"
+            slot="header-content"
             type="warning">
           This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting requirement.
         </message-box>
       </template>
 
-      <div class="toolbar">
+      <div slot="toolbar">
         <report-status status="[[currentReport.status]]"></report-status>
 
         <template
@@ -180,7 +182,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         </template>
       </div>
 
-      <div class="toolbar">
+      <div slot="toolbar">
         <template
             is="dom-if"
             if="[[submittedOnBehalf]]"
@@ -191,7 +193,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         </template>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{selectedTab}}"
             attr-for-selected="name"
@@ -277,7 +279,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   @property({type: Object})
   permissions!: GenericObject;
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentPd!: GenericObject;
 
   @property({type: String})
@@ -298,7 +300,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   @property({type: String, computed: '_computeReportUrl(locationId, reportId, pdId)'})
   reportUrl!: string;
 
-  @property({type: Object, computed: 'programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
   currentReport!: GenericObject;
 
   @property({type: String, computed: '_computeHeadingPrefix(mode, localize)'})
@@ -326,14 +328,14 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
 
   static get observers() {
     return [
-      '_fetchReport(reportUrl, queryParams)',
-      '_onReportChanged(routeData.report_id, routeData.mode)',
+      '_fetchReport(reportUrl, queryParams, reduxStore)',
+      '_onReportChanged(routeData.report_id, routeData.mode, reduxStore)',
       '_onReportStatusChanged(currentReport, routeData.mode)',
       '_handlePermissions(permissions, mode, _baseUrl, backLink)',
     ]
   }
 
-  _computeReportUrl(locationId: string, reportId: string, _) { // jshint ignore:line
+  _computeReportUrl(locationId: string, reportId: string, _) {
     return Endpoints.programmeDocumentReport(locationId, reportId);
   }
 
@@ -347,11 +349,25 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     }
   }
 
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState)
+  }
+
+  _programmeDocumentReportsCurrent(rootState: RootState) {
+    return programmeDocumentReportsCurrent(rootState);
+  }
+
   _onReportChanged(reportId: string, mode: any) {
-    this.reduxStore.dispatch(pdReportsSetCurrent(reportId, mode));
+    if (this.reduxStore) {
+      this.reduxStore.dispatch(pdReportsSetCurrent(reportId, mode));
+    }
   }
 
   _onReportStatusChanged(currentReport: GenericObject, mode: any) {
+    if (!currentReport) {
+      return;
+    }
+
     if (currentReport.status === 'Sen') {
       this.set('routeData.mode', 'edit');
     }
@@ -364,16 +380,16 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _fetchReport() {
-    this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer,
-      timeOut.after(300),
-      () => {
-        const reportThunk = (this.$.report as EtoolsPrpAjaxEl).thunk();
-
-        (this.$.report as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId)
-        )
-      });
+    if (this.pdId) {
+      const self = this;
+      this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer,
+        timeOut.after(300),
+        () => {
+          const reportThunk = (self.$.report as EtoolsPrpAjaxEl).thunk();
+          (self.$.report as EtoolsPrpAjaxEl).abort();
+          self.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
+        });
+    }
   }
 
   _computeHeadingPrefix(mode: string, localize: Function) {
@@ -401,7 +417,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
 
   _canExport(report: GenericObject, mode: string, permissions: GenericObject) {
     switch (true) {
-      case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+      case report.status === 'Sub' && (!permissions || !permissions.exportSubmittedProgressReport):
       case mode === 'edit':
         return false;
 
@@ -411,12 +427,16 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _computeCanSubmit(mode: string, report: GenericObject, permissions: GenericObject) {
+    if (!report) {
+      return false;
+    }
+
     switch (true) {
       case mode === 'view':
       case report.programme_document &&
         (report.programme_document.status === 'Sig'
           || report.programme_document.status === 'Clo'):
-      case !permissions.editProgressReport:
+      case (!permissions || !permissions.editProgressReport):
         return false;
 
       default:
@@ -429,9 +449,10 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _handlePermissions(permissions: GenericObject, mode: string, baseUrl: string, tail: string) {
-    if (
-      (!permissions.editProgressReport && mode === 'edit')
-    ) {
+    if (!permissions) {
+      return;
+    }
+    if (!permissions.editProgressReport && mode === 'edit') {
       window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
     }
   }
@@ -442,7 +463,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     this.set('busy', true);
 
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res) {
+      .then(function(res: any) {
         var newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'

@@ -6,5 +6,5 @@ export function computeUpdateUrl(locationId: string, reportId: string) {
 }
 
 export function computeMode(mode: string, overrideMode: string, report: any, permissions: GenericObject) {
-  return permissions.savePdReport ? (overrideMode || mode) : 'view';
+  return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
 }

@@ -63,8 +63,8 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
   `;
   }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.indicators.all)'})
-  data!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.indicators.all)'})
+  data!: GenericObject[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.indicators.loading)'})
   loading!: boolean;
@@ -110,9 +110,10 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
         (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(fetchIndicators(indicatorsThunk))
-        // .catch(function(err) { // jshint ignore:line
-        //   // TODO: error handling
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            // TODO: error handling
+          })
       });
   }
 

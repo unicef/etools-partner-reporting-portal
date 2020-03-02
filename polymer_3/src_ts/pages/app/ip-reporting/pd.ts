@@ -19,6 +19,7 @@ import {pdFetch, pdSetCurrent} from '../../../redux/actions/pd';
 import {getDomainByEnv} from '../../../config';
 import './pd/pd-index';
 import './pd/pd-router';
+import {RootState} from '../../../typings/redux.types';
 
 /**
  * @polymer
@@ -97,7 +98,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
-  @property({type: Object, computed: 'currentProgrammeDocument(rootState)'})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentPD!: GenericObject;
 
   @property({type: Number})
@@ -108,13 +109,17 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   public static get observers() {
     return [
       '_handleInputChange(programmeDocumentsUrl, queryParams)',
-      '_routePdIdChanged(routeData.pd_id)',
+      '_routePdIdChanged(routeData.pd_id, reduxStore)',
       '_routePathChanged(route.path)',
     ]
   }
 
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
+
   _routePdIdChanged(pd_id: number) {
-    if (pd_id !== this.pdId) {
+    if (pd_id !== this.pdId && this.reduxStore) {
       this.reduxStore.dispatch(pdSetCurrent(pd_id));
     }
 
@@ -138,7 +143,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
 
     // resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    console.log('pd loading... :' + resolvedPageUrl);
+    console.log('pd page changed: ' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
@@ -172,9 +177,10 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
         (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(pdFetch(pdThunk))
-        // .catch(function(err) { // jshint ignore:line
-        //   // TODO: error handling
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            // TODO: error handling
+          });
       });
   }
 

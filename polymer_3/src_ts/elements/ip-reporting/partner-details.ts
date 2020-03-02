@@ -12,6 +12,7 @@ import '../labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
 import {GenericObject} from '../../typings/globals.types';
 import {computePartnerType} from './js/partner-details-functions';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -133,11 +134,15 @@ class PartnerDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
-  @property({type: Boolean, computed: 'partnerLoading(rootState)'})
+  @property({type: Boolean, computed: '_partnerLoading(rootState)'})
   loading!: boolean;
 
   static get observers() {
     return ['_getDataByKey(dataDict)'];
+  }
+
+  _partnerLoading(rootState: RootState) {
+    return partnerLoading(rootState);
   }
 
   _computePartnerType(partner: GenericObject) {

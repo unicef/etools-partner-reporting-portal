@@ -27,7 +27,7 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
   public static get template() {
     return html`
       ${filterStyles}
-      <style>
+      <style include="app-grid-style">
         :host {
           display: block;
           background: white;
@@ -91,6 +91,9 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
       </filter-list>
     `;
   }
+
+  @property({type: String})
+  query!: string;
 
   @property({type: Object})
   queryParams!: GenericObject;
