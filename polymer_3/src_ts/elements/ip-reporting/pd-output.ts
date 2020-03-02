@@ -27,13 +27,15 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '../etools-prp-permissions';
 import '../indicator-details';
 import {RootState} from '../../typings/redux.types';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
+ * @appliesMixin NotificationsMixin
+ * @appliesMixin ProgressReportUtilsMixin
+ * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
 class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
