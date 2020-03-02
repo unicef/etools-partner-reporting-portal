@@ -11,7 +11,7 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin UtilsMixin
  */
 class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
-  public static get template(){
+  public static get template() {
     return html`
       <slot></slot>
     `;
@@ -24,7 +24,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
   printWindow!: GenericObject;
 
   _onTap(e: CustomEvent) {
-    if (!e.target!.classList.contains('print-btn')) {
+    if (!(e.target! as HTMLElement).classList.contains('print-btn')) {
       return;
     }
 
@@ -47,11 +47,11 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
 
     this.printWindow.document.head.appendChild(style);
 
-    toPrint.forEach( (node) => {
+    toPrint.forEach((node) => {
       this.printWindow.document.body.appendChild(this._cloneNode(node));
     }, this);
 
-    setTimeout( () => {
+    setTimeout(() => {
       this.printWindow.print();
       this.printWindow.close();
       this.set('printWindow', null);
