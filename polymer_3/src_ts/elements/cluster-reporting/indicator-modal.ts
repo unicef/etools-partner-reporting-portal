@@ -44,7 +44,7 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
  * @appliesMixin LocalizeMixin
  * @appliesMixin ModalMixin
  */
-class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedElement))){
+class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedElement))){
   public static get template(){
     return html`
       ${buttonsStyles} ${modalStyles}
@@ -1056,7 +1056,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     let radioGroup = this.shadowRoot!.querySelector('#mode');
 
     if (radioGroup !== undefined) {
-      let otherRadio = radioGroup!.children.find(function (element) {
+      let otherRadio = radioGroup!.children.find( (element: GenericObject) => {
         return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
       });
 
@@ -1116,7 +1116,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _showCSD(frequency) {
@@ -1139,7 +1139,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     let self = this;
 
     (this.$.disaggregations as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res) {
+      .then((res: GenericObject) => {
         self.set('disaggregations', res.data.results);
       });
   }
@@ -1167,10 +1167,10 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     (this.$.activities as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res) {
+      .then( (res: GenericObject) => {
         self.set('activities', res.data.results);
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch( (err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -1191,10 +1191,10 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
         (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
         (this.$.indicatorsList as EtoolsPrpAjaxEl).thunk()()
-          .then(function (res) {
-            let simpleIndicatorsList = [];
+          .then( (res: GenericObject) => {
+            let simpleIndicatorsList: GenericObject = [];
 
-            res.data.results.forEach(function (indicator) {
+            res.data.results.forEach( (indicator: GenericObject) => {
               let simpleIndicator = indicator;
               simpleIndicator.title = indicator.blueprint.title;
 
@@ -1228,11 +1228,11 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
         (this.$.objectives as EtoolsPrpAjaxEl).abort();
         (this.$.objectives as EtoolsPrpAjaxEl).thunk()()
-          .then(function (res) {
+          .then( (res: GenericObject) => {
             self.set('objectives', res.data.results);
             fireEvent(self, 'details-loaded');
           })
-          .catch(function (err) { // jshint ignore:line
+          .catch( (err: GenericObject) => {
             // TODO: error handling
           });
       });
@@ -1254,11 +1254,11 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
         (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
         (this.$.indicatorsList as EtoolsPrpAjaxEl).thunk()()
-          .then(function (res) {
-            let simpleIndicatorsList = [];
+          .then( (res: GenericObject) => {
+            let simpleIndicatorsList: GenericObject = [];
 
             res.data.results.forEach(function (indicator: GenericObject) {
-              let simpleIndicator = {};
+              let simpleIndicator: GenericObject = {};
               simpleIndicator.id = indicator.id;
               simpleIndicator.title = indicator.blueprint.title;
 
@@ -1268,7 +1268,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
             self.set('indicators', simpleIndicatorsList);
             fireEvent(self, 'details-loaded');
           })
-          .catch(function (err) { // jshint ignore:line
+          .catch( (err: GenericObject) => { // jshint ignore:line
             // TODO: error handling
           });
       });
@@ -1303,10 +1303,10 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
         (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
         (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk()()
-          .then(function (res) {
+          .then( (res: GenericObject) => {
             self.set('selectedIndicatorDetailType', res.data.display_type);
           })
-          .catch(function (err) { // jshint ignore:line
+          .catch( (err: GenericObject) => {
             // TODO: error handling
           });
       });
@@ -1314,7 +1314,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
 
   _processData(rawData: GenericObject) {
     let data = this._clone(rawData);
-    let invalidLocations = [];
+    let invalidLocations: string[] = [];
 
     if (data.frequency !== 'Csd') {
       delete data.cs_dates;
@@ -1567,7 +1567,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     dates = this.get('data.cs_dates');
     startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter(function (d) {
+    this.set('data.cs_dates', dates && dates.filter( (d) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
@@ -1618,8 +1618,8 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
     this.$.indicators.body = data;
 
     this.set('updatePending', true);
-    this.$.indicators.thunk()()
-      .then(function (res) {
+    (this.$.indicators as EtoolsPrpAjaxEl).thunk()()
+      .then( (res: GenericObject) => {
         fireEvent(self, 'indicator-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
@@ -1639,7 +1639,7 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
         }
         self.close();
       })
-      .catch(function (err) {
+      .catch( (err: GenericObject) => {
         self.set('errors', err.data);
         self.set('data.locations', dataCopy.locations);
         self.set('updatePending', false);
@@ -1647,9 +1647,9 @@ class IndicatorModal extends UtilsMixin(LocalizeMixin(ModalMixin(ReduxConnectedE
   }
 
   _close(e: CustomEvent) {
-    if (e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON') {
+    if (e.target!.nodeName === 'PAPER-DIALOG' ||
+      e.target!.nodeName === 'PAPER-BUTTON' ||
+      e.target!.nodeName === 'PAPER-ICON-BUTTON') {
 
       if (this.modalTitle === 'Add Project Indicator' || this.modalTitle === 'Add Activity Indicator') {
         this.set('mode', '');

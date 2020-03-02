@@ -1,5 +1,6 @@
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import "@polymer/iron-flex-layout/iron-flex-layout-classes";
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/paper-button/paper-button';
@@ -8,12 +9,11 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/paper-tooltip/paper-tooltip';
-import UtilsMixin from "../../mixins/utils-mixin";
-import LocalizeMixin from "../../mixins/localize-mixin";
-import {buttonsStyles} from "../../styles/buttons-styles";
-import {ReduxConnectedElement} from "../../ReduxConnectedElement";
-import {property} from "@polymer/decorators/lib/decorators";
-import {GenericObject} from "../../typings/globals.types";
+import UtilsMixin from '../../mixins/utils-mixin';
+import LocalizeMixin from '../../mixins/localize-mixin';
+import {buttonsStyles} from '../../styles/buttons-styles';
+import {property} from '@polymer/decorators/lib/decorators';
+import {GenericObject} from '../../typings/globals.types';
 
 
 /**
@@ -227,7 +227,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _formatChoices(selected) {
-    return selected.choices.map(function (choice) {
+    return selected.choices.map( (choice) => {
       return choice.value;
     }).join(', ');
   }
@@ -240,10 +240,10 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     let self = this;
     this.set('invalid', false);
     let allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
-    allMenus.forEach(function(menu) {
+    allMenus.forEach((menu) => {
       menu.set('invalid', false);
     });
-    allMenus.forEach(function(menu) {
+    allMenus.forEach((menu) => {
       if (!menu.value) {
         menu.set('invalid', true);
         self.set('invalid', true);
@@ -252,7 +252,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (allMenus.length < 2) {
       return;
     }
-    let chosen = allMenus.map(function(choice) {
+    let chosen = allMenus.map((choice) => {
       return choice.value;
     });
 

@@ -439,7 +439,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         id: 'Csd',
         title: 'Custom specific dates',
       },
-    ]
+    ];
 
   @property({type: Array})
   disaggregations: any[] = [];
@@ -462,7 +462,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
       '_updateCSDates(data.start_date_of_reporting_period)'];
   }
 
-  _computeLocalizedFrequencies(frequencies: GenericObject[], localize) {
+  _computeLocalizedFrequencies(frequencies: GenericObject[], localize: Function) {
     let self = this;
 
     return frequencies.map(function (frequency) {
@@ -471,7 +471,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     });
   }
 
-  _computeIndicatorType(data: GenericObject, localize) {
+  _computeIndicatorType(data: GenericObject, localize: Function) {
     switch (data.blueprint.display_type) {
       case 'number':
         return localize('quantity');
@@ -540,7 +540,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let self = this;
 
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    locThunk().then(function (res) {
+    locThunk().then( (res: GenericObject) => {
         self.set('locations', res.data);
       });
   }
@@ -556,7 +556,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     dates = this.get('data.cs_dates');
     startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter(function (d) {
+    this.set('data.cs_dates', dates && dates.filter( (d) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
@@ -601,13 +601,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
     const editIndThunk = (this.$.editIndicator as EtoolsPrpAjaxEl).thunk();
     editIndThunk()
-      .then(function (res) {
+      .then( (res: GenericObject) => {
         fireEvent(self,'indicator-edited', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self.close();
       })
-      .catch(function (err) {
+      .catch( (err: GenericObject) => {
         self.set('errors', err.data);
         self.set('data.locations', rawLocations);
         self.set('updatePending', false);

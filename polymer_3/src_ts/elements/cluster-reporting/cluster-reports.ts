@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import Endpoints from '../../endpoints';
 import UtilsMixin from '../../mixins/utils-mixin';
 import './cluster-report-toolbar';
-// <link rel='import' href='cluster-report-list.html'>
+import './cluster-report-list';
 import '../etools-prp-ajax';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
@@ -108,7 +108,7 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement){
       });
   }
 
-  _onContentsChanged(e: CustomEvent) { // jshint ignore:line
+  _onContentsChanged(e: CustomEvent) {
     e.stopPropagation();
 
     this._fetchData();

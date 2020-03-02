@@ -120,7 +120,7 @@ class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxC
 
 
   _computeIsIMOClusters(profile: GenericObject) {
-    return profile.prp_roles ? profile.prp_roles.some(function (role) {
+    return profile.prp_roles ? profile.prp_roles.some( (role: GenericObject) => {
       return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
     }) : [];
   }

@@ -389,7 +389,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       return;
     }
 
-    event.path.forEach(function (node) {
+    event.path.forEach( (node: GenericObject) => {
       if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
         index = node.dataset.index;  // Grab index of current location widget component
         return;
@@ -413,12 +413,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           title: event.detail.value
         };
 
-        thunk.thunk()()
-          .then(function(res) {
+        thunk.thunk()
+          .then((res: GenericObject) => {
             self._setPending(loc_type, false, index);
             self._setLocations(loc_type, res.data.results, index);
           })
-          .catch(function (err) {
+          .catch( (err: GenericObject) => {
             console.error(err);
             self._setPending(loc_type, false, index);
           });
@@ -542,7 +542,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   _onLocTypeChanged(event: CustomEvent, data: GenericObject) {
     let index = -1;
 
-    event.path.forEach(function (node) {
+    event.path.forEach( (node: GenericObject) => {
       if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
         index = node.dataset.index;
         return;
@@ -575,7 +575,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
 
         const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
-        thunk().then(function (res) {
+        thunk().then( (res: GenericObject) => {
           self.set('url', res.xhr.responseURL);
           self._setPending(loc_type, false, index);
           self._setLocations(loc_type, res.data.results, index);
@@ -586,7 +586,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       }
   }
 
-  _fetchInitialL ocations(lockedItems) {
+  _fetchInitialLocations(lockedItems) {
     this.set('savedLocations', lockedItems);
 
     let newLocations = Object.assign({}, this.get('locations'));

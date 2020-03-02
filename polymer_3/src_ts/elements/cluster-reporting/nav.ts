@@ -224,7 +224,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
   }
 
   _computeClusterQuery(queryParams: GenericObject) {
-    var query = {};
+    let query = {};
 
     if (queryParams.cluster_id) {
       query.cluster_id = queryParams.cluster_id;
@@ -236,4 +236,3 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
 }
 
 window.customElements.define('nav', Nav);
-

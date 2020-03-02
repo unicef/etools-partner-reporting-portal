@@ -170,10 +170,10 @@ class ProjectActivityTable extends DataTableMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    this.shadowRoot!.querySelector('#modal')!.open();
   }
 
-  _computeCurrentActivitiesCount(projectId: string, activitiesCountDict: number) {
+  _computeCurrentActivitiesCount(projectId: number, activitiesCountDict: number) {
     return activitiesCountDict[projectId];
   }
 

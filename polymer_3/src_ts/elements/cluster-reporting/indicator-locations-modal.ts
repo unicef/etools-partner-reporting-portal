@@ -298,8 +298,8 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     return type === 'number';
   }
 
-  _getLocationName(locationId: string, locations: any[]) {
-    let location = locations.results.find(function (loc) {
+  _getLocationName(locationId: string, locations: GenericObject[]) {
+    let location = locations.results.find( (loc: GenericObject) => {
       return String(loc.id) === String(locationId);
     });
 
@@ -322,13 +322,13 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     this.set('pending', true);
 
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    locThunk().then(function (res) {
+    locThunk().then( (res: GenericObject) => {
       self.set('pending', false);
       self.set('locations', res.data);
 
       fireEvent(self, 'indicator-locations-modal-refit');
     })
-    .catch(function () {
+    .catch( () => {
       self.set('pending', false);
     });
 
@@ -348,12 +348,12 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     this.set('pending', true);
 
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
-    updateThunk().then(function () {
+    updateThunk().then( () => {
         self.set('pending', false);
         self.set('editData.locations', self.get('data.locations'));
         self.close();
       })
-      .catch(function (err) {
+      .catch( (err: GenericObject) => {
         self.set('pending', false);
         self.set('errors', err.data);
       });

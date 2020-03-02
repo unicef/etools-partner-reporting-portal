@@ -73,7 +73,7 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
     return this._appendQuery(
       Endpoints.clusterIndicatorReportsImportTemplate(responsePlanId),
       query,
-      {submitted: submitted,}
+      {submitted: submitted}
     );
   }
 

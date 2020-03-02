@@ -225,7 +225,7 @@ class ProjectListTable extends DataTableMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    this.shadowRoot!.querySelector('#modal')!.open();
   }
 
   _detailUrl(project: GenericObject, query: string) {
