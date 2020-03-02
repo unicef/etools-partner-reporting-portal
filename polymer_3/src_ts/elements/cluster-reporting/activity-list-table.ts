@@ -189,7 +189,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   projects = {};
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    this.shadowRoot!.querySelector('#modal')!.open();
   }
 
   _detailUrl(activity: string, query: string) {

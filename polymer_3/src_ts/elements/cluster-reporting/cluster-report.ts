@@ -546,18 +546,17 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       '?',
       query,
     ].join('');
-  },
+  }
 
   _computeIndicatorType(data: GenericObject) {
     return data.reportable.blueprint.display_type;
-  },
+  }
 
   _computeCompleteIndicator(complete: string) {
     return complete ? 'Met' : 'Ove';
-  },
+  }
 
   _toggle() {
-    //@Lajos: please check bellow:
     this.$.collapse.toggle();
   }
 
@@ -569,7 +568,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     if (data.value) {
       //@LAJOS: PLEASE REVIEW.... DID NOT SURE IF CORRECT
 
-      indicatorDetails = e.srcElement!.querySelector('indicator-details');
+      indicatorDetails = e.target!.querySelector('indicator-details');
       try {
         indicatorDetails.init();
       } catch (err) {
@@ -694,12 +693,12 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     this.shadowRoot!.querySelector('#sendBackModal').open();
 
     setTimeout(() => {
-      this.shadowRoot.querySelector('#viewMenu').select(2);
+      this.shadowRoot!.querySelector('#viewMenu').select(2);
     });
   }
 
   _viewFeedback() {
-    this.shadowRoot.querySelector('#feedbackModal').open();
+    this.shadowRoot!.querySelector('#feedbackModal').open();
 
     setTimeout(() => {
       this.shadowRoot!.querySelector('#nonViewMenu').select(1);
@@ -722,16 +721,16 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   _addEventListeners() {
     this._onReportComplete = this._onReportComplete.bind(this);
     //@Lajos: bellow are not found
-    this.addEventListener('report-complete', this._onReportComplete);
+    this.addEventListener('report-complete', this._onReportComplete as any);
     //@Lajos: bellow are not found
     this._updateMeta = this._updateMeta.bind(this);
-    this.addEventListener('reportable-meta-changed', this._updateMeta);
+    this.addEventListener('reportable-meta-changed', this._updateMeta as any);
   },
 
   _removeEventListeners() {
     //@Lajos: bellows are not found
-    this.removeEventListener('report-complete', this._onReportComplete);
-    this.removeEventListener('reportable-meta-changed', this._updateMeta);
+    this.removeEventListener('report-complete', this._onReportComplete as any);
+    this.removeEventListener('reportable-meta-changed', this._updateMeta as any);
   }
 
 

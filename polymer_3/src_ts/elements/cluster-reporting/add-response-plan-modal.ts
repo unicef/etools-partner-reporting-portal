@@ -25,15 +25,16 @@ import {modalStyles} from '../../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '../etools-prp-permissions';
 // import '../etools-prp-date';
-import '../../redux/selectors/config';
-import '../../redux/selectors/workspace';
+import {configClusterTypes} from '../../redux/selectors/config';
+import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
 //bellow original: error-box.html
 import '../error-box-errors';
 import './paper-radio-group-custom';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
-import {fetchConfig, configClusterTypes} from '../../redux/actions/config';
+import {fetchConfig} from '../../redux/actions/config';
+import {addResponsePlan} from "../../redux/actions";
 
 /**
  * @polymer
@@ -154,7 +155,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
               if="[[_equals(mode, 'ocha')]]"
               restamp="true">
               <div>
-                <etools-single-selection-menu
+                <etools-dropdown
                   class="item validate full-width"
                   label="Response Plan"
                   options="[[formattedPlans]]"
@@ -165,7 +166,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   disabled="[[plansLoading]]"
                   trigger-value-change-event
                   required>
-                </etools-single-selection-menu>
+                </etools-dropdown>
                 <response-plan-details
                   id="details"
                   plan-data="[[planDetails]]"
@@ -246,7 +247,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </etools-prp-date-input>
                 </div>
                 <div class="item full-width">
-                  <etools-multi-selection-menu
+                  < etools-dropdown-multi
                     class="validate"
                     label="Clusters"
                     options="[[clusters]]"
@@ -256,7 +257,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     on-selected-values-changed="_validate"
                     trigger-value-change-event
                     required>
-                  </etools-multi-selection-menu>
+                  </etools-dropdown-multi>
                 </div>
               </div>
             </template>
@@ -296,7 +297,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: Boolean, observer: '_onOpenedChanged'})
   opened!: boolean;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.App.Selectors.Workspace.id)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaceId)'})
   workspaceId!: string;
 
   @property({type: String})
@@ -330,7 +331,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: String})
   selectedPlan = '';
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.App.Selectors.Config.clusterTypes)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.configClusterTypes)'})
   clusters!: string;
 
   @property({type: Boolean})
@@ -485,7 +486,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         self.set('updatePending', false);
         self.close();
         self.set('errors', {});
-        this.reduxStore.dispatch(App.Actions.addResponsePlan(res.data));
+        this.reduxStore.dispatch(addResponsePlan(res.data));
         fireEvent('refresh-plan-list');
         fireEvent('fetch-profile');
       })
