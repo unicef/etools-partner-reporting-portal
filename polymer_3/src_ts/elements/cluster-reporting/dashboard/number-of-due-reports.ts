@@ -59,10 +59,10 @@ class NumberOfDueReports extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
   @property({type: String, computed: '_computeReportsUrl(_baseUrlCluster, resultsQuery)'})
   reportsUrl!: string;
 
-  @property({type: Boolean, computed: 'getReduxStateObject(rootState.clusterDashboardData.loading)'})
+  @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterDashboardData.loading)'})
   loading!: boolean;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.partner.current)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
   @property({type: Object, computed: '_computeResultsQueryParams(partner)'})
