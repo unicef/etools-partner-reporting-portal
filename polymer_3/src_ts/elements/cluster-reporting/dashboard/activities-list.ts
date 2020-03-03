@@ -180,7 +180,7 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   @property({type: String, computed: '_computeActivitiesUrl(_baseUrlCluster)'})
   activitiesUrl!: string;
 
-  @property({type: Boolean, computed: 'getReduxStateValue(clusterDashboardData.loading)'})
+  @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterDashboardData.loading)'})
   loading!: boolean;
 
   _collapseAll(){
@@ -190,7 +190,7 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   }
 
   _handleOpenedChanged(e: CustomEvent, data: any[]) {
-    var row = e.srcElement;
+    var row = e.target;
     var openedIndex = this.detailsOpened.indexOf(row);
 
     if (!data.value) {
