@@ -1,6 +1,7 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-if';
 import '../../../planned-action/projects/creation-modal';
 import '../../../../page-body';
 import '../../../project-details';

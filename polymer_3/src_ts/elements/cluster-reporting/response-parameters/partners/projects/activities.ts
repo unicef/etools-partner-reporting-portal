@@ -1,6 +1,7 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 //<link rel="import" href="../../../../../polyfills/es6-shim.html">
@@ -10,12 +11,11 @@ import '../../../../etools-prp-permissions';
 import '../../../../page-body';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import Actions from '../../../../../redux/actions'
 import Endpoints from '../../../../../endpoints';
 import '../../../project-activity-table';
 import '../../../planned-action/activities/add-activity-from-project-modal';
 import '../../../planned-action/activities/add-existing-activity-from-project-modal';
-import {buttonStyles} from '../../../../../styles/buttons-styles';
+import {buttonsStyles} from '../../../../../styles/buttons-styles';
 
 import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerProjects';
 import { GenericObject } from '../../../../../typings/globals.types';
@@ -31,7 +31,7 @@ import { timeOut } from '@polymer/polymer/lib/utils/async';
 class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   public static get template(){
     return html`
-    ${buttonStyles}
+    ${buttonsStyles}
     <style>
       :host {
         display: block;
@@ -151,7 +151,7 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   }
 
   _openExistingModal() {
-    this.shadowRoot.querySelector('#existing-modal').open();
+    this.shadowRoot!.querySelector('#existing-modal').open();
   }
 
   _computeUrl(responsePlanId: string) {

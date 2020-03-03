@@ -1,6 +1,7 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-if';
 import '../../../../cluster-reporting/planned-action/activities/editing-modal';
 import '../../../../page-body';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
