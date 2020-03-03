@@ -21,6 +21,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import { GenericObject } from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
+import { fireEvent } from '../../../../../utils/fire-custom-event';
 
 /**
  * @polymer
@@ -176,6 +177,9 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object})
   editData!: GenericObject;
 
+  @property({type: Object})
+  data!: GenericObject;
+
   @property({type: Boolean})
   refresh = false;
 
@@ -212,7 +216,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.data.choices = newChoices;
     thunk()
       .then(function (res: any) {
-        self.fire('disaggregation-added', res.data);
+        fireEvent(self, 'disaggregation-added', res.data);
         self.updatePending = false;
         self.close();
 
