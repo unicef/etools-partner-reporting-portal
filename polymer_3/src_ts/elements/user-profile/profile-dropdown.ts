@@ -1,13 +1,13 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/paper-styles/element-styles/paper-material-styles';
+import '@polymer/iron-collapse/iron-collapse';
+import '@polymer/iron-icons/social-icons';
 import {property} from '@polymer/decorators';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/paper-styles/element-styles/paper-material-styles';
-import '@polymer/iron-collapse/iron-collapse.js';
-import '@polymer/iron-icons/social-icons.js';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import './user-profile-dialog';
@@ -51,11 +51,11 @@ class ProfileDropdown extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         right: 0px;
       }
       .dropdown-content .item {
+        @apply --layout-horizontal;
+        @apply --layout-center;
         height: 48px;
         font-size: 16px;
         color: rgba(0, 0, 0, 0.87);
-        @apply --layout-horizontal;
-        @apply --layout-center;
         padding: 0 16px 0 8px;
         cursor: pointer;
         white-space: nowrap;
@@ -64,10 +64,11 @@ class ProfileDropdown extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         background: var(--medium-theme-background-color, #EEEEEE);
       }
     </style>
+    
     <user-profile-dialog id="userProfileDialog"></user-profile-dialog>
     <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap" aria-disabled="false"></paper-icon-button>
     <iron-collapse id="userDropdown" opened="[[dropdownOpened]]">
-      <div class="paper-material" elevation="5" class="dropdown-content" id="user-dropdown">
+      <div class="paper-material dropdown-content" elevation="5" id="user-dropdown">
         <div class="item" on-tap="_openModal">
           <paper-icon-button id="accountProfile" icon="account-circle"></paper-icon-button>
           [[localize('profile')]]
