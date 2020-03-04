@@ -84,7 +84,7 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
           self._notifyServerError();
           console.error(res);
         } else {
-          let anchor = document.createElement('a');
+          const anchor = document.createElement('a');
           anchor.setAttribute('href', res.data.signed_pd_document_file);
           anchor.setAttribute('target', '_blank');
           anchor.dispatchEvent(new MouseEvent('click',

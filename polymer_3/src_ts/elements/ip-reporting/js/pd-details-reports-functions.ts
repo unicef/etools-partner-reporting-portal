@@ -7,6 +7,6 @@ export function computePDReportsUrl(locationId: string) {
 
 export function computePDReportsParams(pdId: string, queryParams: GenericObject) {
   return Object.assign({}, queryParams, {
-    programme_document: pdId,
+    programme_document: pdId
   });
 }

@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "gulp serve",
     "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
+    "tsEslint": "npx eslint 'src_ts/**' --fix",
     "test": "gulp specs",
     "test:watch": "gulp watch"
   },

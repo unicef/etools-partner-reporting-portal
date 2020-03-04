@@ -196,7 +196,8 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                     <dt>
                       <b>[[_toLowerCaseLocalized(indicator.reportable.blueprint.calculation_formula_across_locations, localize)]]</b>
                       ([[_toLowerCaseLocalized('across_locations', localize)]]),
-                      <b>[[_calculationFormulaAcrossPeriods(indicator, localize)]]</b> ([[_toLowerCaseLocalized('across_reporting_periods', localize)]])</dt>
+                      <b>[[_calculationFormulaAcrossPeriods(indicator, localize)]]</b> 
+                      ([[_toLowerCaseLocalized('across_reporting_periods', localize)]])</dt>
                   </dl>
                 </div>
               </div>
@@ -239,7 +240,8 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.reportable.achieved.c, 0)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, 
+                                    indicator.reportable.achieved.c, 0)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -382,7 +384,8 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
 
       try {
         indicatorDetails.init();
-      } catch (err) {}
+      }
+      // catch (err) {}
     }
   }
 
@@ -401,8 +404,6 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
 
     (this.$.update as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch
-
     this.reduxStore.dispatch(
       pdReportsUpdateReportable(
         updateThunk,
@@ -414,10 +415,10 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
       // @ts-ignore
       .then(function() {
         self._notifyChangesSaved();
-      })
-      .catch(function(err) {
-        // TODO: error handling
       });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
@@ -429,7 +430,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
 
     return {
       overall_status: first.overall_status,
-      narrative_assessment: first.narrative_assessment,
+      narrative_assessment: first.narrative_assessment
     };
   }
 
@@ -458,7 +459,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
     this._removeEventListeners();
     this.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
       section.opened = false;
-    })
+    });
   }
 
 }

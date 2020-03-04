@@ -9,7 +9,7 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '@polymer/polymer/lib/elements/dom-if';
 import {
   programmeDocumentReportsAttachmentsPending, programmeDocumentReportsAttachmentsCurrent
-} from "../../redux/selectors/programmeDocumentReportsAttachments";
+} from '../../redux/selectors/programmeDocumentReportsAttachments';
 import {GenericObject} from '../../typings/globals.types';
 import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
@@ -177,8 +177,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     return computeListUrl(locationId, reportId);
   }
 
-  _setFiles(attachments: GenericObject[]) {
-    let self = this;
+  _setFiles() {
+    const self = this;
     this.set('faceAttachment', []);
     this.set('otherOneAttachment', []);
     this.set('otherTwoAttachment', []);
@@ -200,54 +200,53 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _onDeleteFile(e: CustomEvent) {
-    let self = this;
-    let deleteThunk;
-    let deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
+    const self = this;
+    const deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
 
     this.set('attachmentDeleteUrl', deleteUrl);
 
     e.stopPropagation();
 
-    deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
+    let deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
 
     (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(
       pdReportsAttachmentsSync(deleteThunk, this.reportId)
-    ).then(function() {
+    ).then(() => {
       self._notifyFileDeleted();
       self.set('attachmentDeleteUrl', undefined);
 
       if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
         self.$.faceAttachmentComponent.fileInput.value = null;
         self.$.faceAttachmentComponent.set('files', []);
-      } else if (self.get('otherOneAttachment').length !== 0
-        && e.detail.file.id === self.get('otherOneAttachment')[0].id) {
+      } else if (self.get('otherOneAttachment').length !== 0 &&
+        e.detail.file.id === self.get('otherOneAttachment')[0].id) {
         self.$.otherOneAttachmentComponent.fileInput.value = null;
         self.$.otherOneAttachmentComponent.set('files', []);
-      } else if (self.get('otherTwoAttachment').length !== 0
-        && e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
+      } else if (self.get('otherTwoAttachment').length !== 0 &&
+        e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
         self.$.otherTwoAttachmentComponent.fileInput.value = null;
         self.$.otherTwoAttachmentComponent.set('files', []);
       }
-    })
+    });
       // @ts-ignore
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _filesChanged(change: GenericObject) {
     let attachmentPropertyName = change.path.replace('.length', '');
-    let isEmpty = change.value === 0 ? true : false;
-    let attachment = isEmpty ? undefined : change.base[0];
-    let self = this;
+    const isEmpty = change.value === 0 ? true : false;
+    const attachment = isEmpty ? undefined : change.base[0];
+    const self = this;
 
     if (attachment === undefined) {
       return;
     }
 
-    let files = isEmpty ? [] : change.base;
+    const files = isEmpty ? [] : change.base;
 
     files.findIndex(function(file: GenericObject) {
       if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
@@ -255,7 +254,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       }
     });
 
-    let attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
+    const attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
     if (isEmpty || (!isEmpty && attachment.path !== null)) {
       return;
@@ -267,7 +266,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         return;
       }
 
-      let data = new FormData();
+      const data = new FormData();
       let thunk;
 
       files.forEach(function(file: GenericObject) {
@@ -277,7 +276,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
       if (attachment.id === null) {
         thunk = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl).thunk();
-        let uplodCtrl = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl);
+        const uplodCtrl = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl);
         uplodCtrl.abort();
         uplodCtrl.body = data;
 
@@ -289,11 +288,11 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           this.set('otherTwoLoading', true);
         }
       } else {
-        let replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
+        const replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
         this.set('attachmentDeleteUrl', replaceUrl);
 
         thunk = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl).thunk();
-        let replaceCtrl = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl)
+        const replaceCtrl = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl);
         replaceCtrl.abort();
         replaceCtrl.body = data;
 
@@ -303,14 +302,14 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       this.reduxStore.dispatch(
         pdReportsAttachmentsSync(thunk, this.reportId)
       )
-        .then(function() {
+        .then(() => {
           self._notifyFileUploaded();
 
           self.set('faceLoading', false);
           self.set('otherOneLoading', false);
           self.set('otherTwoLoading', false);
 
-          let attachments = self.get('attachments');
+          const attachments = self.get('attachments');
 
           attachments.forEach(function(item) {
             if (attachment.id !== null && item.id === attachment.id) {
@@ -320,8 +319,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           });
 
           if (attachment.id === null) {
-            let duplicates = attachments.filter(function(item) {
-              let tokens = attachment.file_name.split('.');
+            const duplicates = attachments.filter(function(item) {
+              const tokens = attachment.file_name.split('.');
               if (tokens.length === 0) {
                 return item.file_name.indexOf(attachment.file_name) !== -1;
               } else {
@@ -347,7 +346,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
           self.set('attachmentDeleteUrl', undefined);
         })
-        .catch(function(err) {
+        .catch((err: GenericObject) => {
           console.error(err);
           // TODO: error handling
         });
@@ -372,17 +371,17 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     super.connectedCallback();
 
     this._addEventListeners();
-    let downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
+    const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
 
     (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
 
     this.reduxStore.dispatch(
       pdReportsAttachmentsSync(downloadThunk, this.reportId)
-    )
+    );
       // @ts-ignore
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   disconnectedCallback() {
@@ -391,7 +390,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     [
       this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl,
-      this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl,
+      this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl
     ].forEach(function(req: EtoolsPrpAjaxEl) {
       req.abort();
     });

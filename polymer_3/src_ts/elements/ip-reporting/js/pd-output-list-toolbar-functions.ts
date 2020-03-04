@@ -25,8 +25,8 @@ export function computeRefreshData(reportId: string) {
 export function computeCanRefresh(report: GenericObject, programmeDocument: GenericObject) {
   switch (true) {
     case programmeDocument &&
-      (programmeDocument.status === 'Sig'
-        || programmeDocument.status === 'Clo'):
+      (programmeDocument.status === 'Sig' ||
+        programmeDocument.status === 'Clo'):
     case programmeDocument && report.report_type === 'SR':
       return false;
 
