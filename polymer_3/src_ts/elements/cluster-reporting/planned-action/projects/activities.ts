@@ -10,9 +10,9 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-// <link rel='import' href='../../project-activity-table.html'>
-// <link rel='import' href='../activities/add-activity-from-project-modal.html'>
-// <link rel='import' href='../activities/add-existing-activity-from-project-modal.html'>
+import '../../project-activity-table';
+import '../activities/add-activity-from-project-modal';
+import '../activities/add-existing-activity-from-project-modal';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
 

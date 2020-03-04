@@ -23,8 +23,8 @@ import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '../../../etools-prp-ajax';
 import '../../../message-box';
-// <link rel='import' href='../../../../elements/cluster-reporting/creation-modal-project-details.html'>
-// <link rel='import' href='../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget.html'>
+import '../../../../elements/cluster-reporting/creation-modal-project-details';
+import '../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget';
 // <link rel='import' href='../../../etools-prp-date-input.html'>
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
@@ -44,8 +44,8 @@ import Endpoints from '../../../../endpoints';
 import Constants from '../../../../constants';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
-// <link rel='import' href='../../indicator-locations-widget.html'>
-// <link rel='import' href='../../paper-radio-group-custom.html'>
+import '../../indicator-locations-widget';
+import '../../paper-radio-group-custom';
 
 
 /**
@@ -1206,4 +1206,6 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 }
 
-window.customElements.define('creation-modal', CreationModal);
+window.customElements.define('planned-action-projects-modal', CreationModal);
+
+export {CreationModal as PlannedActionProjectsModalEl};

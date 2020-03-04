@@ -172,4 +172,6 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   }
 }
 
-window.customElements.define('indicators', Indicators);
+window.customElements.define('pa-project-details-indicators', Indicators);
+
+export {Indicators as PaProjectDetailsIndicatorsEl};

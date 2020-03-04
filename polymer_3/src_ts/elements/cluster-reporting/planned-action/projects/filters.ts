@@ -99,4 +99,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
 }
 
-window.customElements.define('filters', Filters);
+window.customElements.define('planned-action-projects-filters', Filters);
+
+export {Filters as PlannedActionProjectsFilters}
