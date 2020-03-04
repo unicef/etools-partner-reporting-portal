@@ -18,7 +18,8 @@ import '../elements/etools-logo';
 import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
 import '../elements/etools-prp-ajax';
 import '../elements/page-title';
-import '../styles/app-theme-ip-styles';
+import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
+
 
 /**
  * @polymer
@@ -30,7 +31,8 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
   public static get template() {
     return html`
-    <style include="app-theme-ip-styles">
+    ${appThemeIpStyles}
+    <style>
       :host {
         display: block;
         height: 100%;
