@@ -52,7 +52,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
         padding: 0 24px;
         margin: 0;
         color: white;
-        background: var(--theme-primary-color);
+        background: var(--theme-primary-color, #0099ff);
       }
 
       .header h2 {
