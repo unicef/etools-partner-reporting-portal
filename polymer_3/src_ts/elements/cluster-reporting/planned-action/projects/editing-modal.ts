@@ -354,4 +354,6 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
 
 }
 
-window.customElements.define('editing-modal', EditingModal);
+window.customElements.define('planned-action-projects-editing-modal', EditingModal);
+
+export {EditingModal as PlannedActionProjectsEditingModalEl}

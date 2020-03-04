@@ -4,7 +4,7 @@ import '../../../../elements/page-body';
 import '../../../../elements/etools-prp-permissions';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
-// <link rel='import' href='../../project-details.html'>
+import '../../project-details';
 import './creation-modal';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
@@ -77,4 +77,6 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
 
 }
 
-window.customElements.define('overview', Overview);
+window.customElements.define('pa-project-details-overview', Overview);
+
+export {Overview as PaProjectDetailsOverviewEl};
