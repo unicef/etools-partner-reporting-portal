@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
@@ -9,7 +9,7 @@ import '../../../../filters/text-filter';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 
 /**
@@ -61,4 +61,4 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
 window.customElements.define('cluster-objectives-filters', Filters);
 
-export {Filters as FiltersEl};
+export {Filters as ClusterObjectivesFiltersEl};

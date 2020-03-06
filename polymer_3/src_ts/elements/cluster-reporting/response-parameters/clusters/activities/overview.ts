@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
@@ -12,7 +12,7 @@ import '../../../../page-body';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import '../../../../labelled-item';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -122,4 +122,4 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 window.customElements.define('rp-clusters-activity-overview', Overview);
 
-export {Overview as OverviewEl};
+export {Overview as RpClusterActivityOverviewEl};

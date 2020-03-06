@@ -18,9 +18,9 @@ import '../../../planned-action/activities/add-existing-activity-from-project-mo
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 
 import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerProjects';
-import { GenericObject } from '../../../../../typings/globals.types';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -28,8 +28,8 @@ import { timeOut } from '@polymer/polymer/lib/utils/async';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${buttonsStyles}
     <style>
@@ -128,15 +128,15 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   _activitiesByPartnerProjectIdAjax() {
     this.ActivitiesByPartnerDebouncer = Debouncer.debounce(this.ActivitiesByPartnerDebouncer,
       timeOut.after(100),
-      () =>{
+      () => {
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-      this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-        .catch(function (err) { // jshint ignore:line
+        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
+          .catch(function(err) { // jshint ignore:line
             // TODO: error handling.
-        });
+          });
       });
   }
 
@@ -178,9 +178,9 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     if (this.ActivitiesByPartnerDebouncer && this.ActivitiesByPartnerDebouncer.isActive) {
       this.ActivitiesByPartnerDebouncer.cancel();
     }
-  }  
+  }
 }
 
 window.customElements.define('rp-partner-project-details-activities', Activities);
 
-export {Activities as ProjectActivitiesEl};
+export {Activities as RpPartnerProjectDetailsActivitiesEl};

@@ -8,7 +8,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import '../../../activity-details';
 import '../../../../etools-prp-permissions';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -16,7 +16,7 @@ import { GenericObject } from '../../../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  */
 class Overview extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template(){
+  public static get template() {
     return html`
     ${buttonsStyles}
     <style>
@@ -70,4 +70,4 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
 
 window.customElements.define('rp-partner-activity-details-overview', Overview);
 
-export {Overview as OverviewEl};
+export {Overview as RpPartnerActivityDetailsOverviewEl};

@@ -794,6 +794,6 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
     this._removeEventListeners();
   }
 }
-window.customElements.define('calculation-methods-demo-modal', AddActivityFromProjectModal);
+window.customElements.define('planned-action-add-activity-from-project-modal', AddActivityFromProjectModal);
 
-export {AddActivityFromProjectModal as AddActivityFromProjectModalEl};
+export {AddActivityFromProjectModal as PlannedActionAddActivityFromProjectModalEl};

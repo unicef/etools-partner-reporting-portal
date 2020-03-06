@@ -100,4 +100,4 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
 window.customElements.define('planned-action-activities-filters', Filters);
 
-export {Filters as FiltersEl};
+export {Filters as PlannedActionActivitiesFiltersEl};

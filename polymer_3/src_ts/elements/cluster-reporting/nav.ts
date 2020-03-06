@@ -31,9 +31,9 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin PageNavMixin
  * @appliesMixin RoutingMixin
  */
-class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnectedElement)))){
-    public static get template(){
-      return html`
+class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnectedElement)))) {
+  public static get template() {
+    return html`
         ${pageNavStyles}
         <style>
           :host {
@@ -43,29 +43,29 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
             };
           }
         </style>
-        
+
         <etools-prp-permissions
           permissions="{{ permissions }}">
         </etools-prp-permissions>
-    
+
         <app-route route="{{ route }}"></app-route>
-    
+
         <iron-location
           query="{{ query }}">
         </iron-location>
-    
+
         <iron-query-params
           params-string="{{ query }}"
           params-object="{{ queryParams }}">
         </iron-query-params>
-        
+
         <paper-listbox
           id="menu"
           selected="{{ selected }}"
           attr-for-selected="name"
           selectable=".selectable"
           key-event-target="null">
-    
+
           <div class="nav-content">
             <div>
               <paper-item name="dashboard" class="selectable">
@@ -73,7 +73,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
                   <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>[[localize('dashboard')]]</span>
                 </a>
               </paper-item>
-    
+
               <div name="response-parameters" class="selectable">
                 <paper-submenu>
                   <paper-item class="menu-trigger">
@@ -92,7 +92,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
                   </paper-listbox>
                 </paper-submenu>
               </div>
-    
+
               <template
                 is="dom-if"
                 if="[[canViewPlannedAction]]"
@@ -104,23 +104,23 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
                   </a>
                 </paper-item>
               </template>
-    
+
               <paper-item name="results" class="selectable">
                 <a href="[[_appendQuery(resultsUrl, clusterQuery, partnerQuery)]]">
                   <span><iron-icon icon="trending-up"
                                    role="presentation"></iron-icon>[[localize('reporting_results')]]</span>
                 </a>
               </paper-item>
-    
+
               <paper-item name="analysis" class="selectable">
                 <a href="[[_appendQuery(analysisUrl, clusterQuery, analysisQuery, partnerQuery)]]">
                   <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>[[localize('analysis')]]</span>
                 </a>
               </paper-item>
-    
+
               <template is="dom-if" if="[[permissions.accessClusterIdManagement]]" restamp="true">
                 <paper-divider></paper-divider>
-    
+
                 <paper-item name="id-management" id="id-management" on-tap="goToIdManagement">
                   <a href="/id-management/cluster-reporting/">
                     <span><iron-icon icon="social:people"
@@ -129,7 +129,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
                 </paper-item>
               </template>
             </div>
-    
+
             <div>
               <paper-divider></paper-divider>
               <paper-item name="indicators">
@@ -141,7 +141,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
           </div>
         </paper-listbox>
       `;
-    }
+  }
 
   @property({type: String})
   clustersSelected!: string;
@@ -191,7 +191,7 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
   canViewPlannedAction!: boolean;
 
 
-  static get observers(){
+  static get observers() {
     return ['_routeChanged(route)'];
   }
 
@@ -235,4 +235,4 @@ class Nav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnec
 
 }
 
-window.customElements.define('nav', Nav);
+window.customElements.define('cluster-reporting-nav', Nav);

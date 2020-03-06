@@ -23,48 +23,48 @@ import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProje
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class Activities extends UtilsMixin(ReduxConnectedElement){
-  public static get template(){
+class Activities extends UtilsMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       <style include="button-styles">
         :host {
           display: block;
         }
-  
+
         div#action {
           margin: 25px 0;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
       </style>
-      
+
       <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
       <iron-query-params
         params-string="{{query}}"
         params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <etools-prp-ajax
         id="activities"
         url="[[url]]"
         params="[[params]]">
       </etools-prp-ajax>
-      
+
       <page-body>
         <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
         <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
-  
+
         <div id="action">
           <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
             Add New Project Activity
           </paper-button>
-  
+
           <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
             Add Existing Project Activity
           </paper-button>
         </div>
-  
+
         <project-activity-table
           page="planned-action"
           project-id="[[projectId]]">
@@ -97,7 +97,7 @@ class Activities extends UtilsMixin(ReduxConnectedElement){
   private _debouncer!: Debouncer;
 
 
-  static get observers(){
+  static get observers() {
     return ['_activitiesByPartnerProjectIdAjax(url, params)'];
   }
 
@@ -121,14 +121,14 @@ class Activities extends UtilsMixin(ReduxConnectedElement){
 
   _activitiesByPartnerProjectIdAjax() {
     this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(100),() =>{
+      timeOut.after(100), () => {
 
         let thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-          .catch(function (err) { // jshint ignore:line
+          .catch(function(err) { // jshint ignore:line
             // TODO: error handling.
           });
       });
@@ -163,4 +163,4 @@ class Activities extends UtilsMixin(ReduxConnectedElement){
 
 }
 
-window.customElements.define('activities', Activities);
+window.customElements.define('pa-project-details-activities', Activities);

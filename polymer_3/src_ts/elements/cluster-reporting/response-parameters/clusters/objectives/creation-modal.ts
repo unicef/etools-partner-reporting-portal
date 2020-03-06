@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -217,11 +217,11 @@ class CreationModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnected
     const thunk = (this.$.createObjective as EtoolsPrpAjaxEl).thunk();
     let self = this;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         self._redirectToDetail(res.data.id);
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         self.updatePending = false;
         // TODO: error handling
       });
@@ -230,4 +230,4 @@ class CreationModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnected
 
 window.customElements.define('cluster-objectives-modal', CreationModal);
 
-export {CreationModal as CreationModalEl};
+export {CreationModal as ClusterObjectivesModalEl};

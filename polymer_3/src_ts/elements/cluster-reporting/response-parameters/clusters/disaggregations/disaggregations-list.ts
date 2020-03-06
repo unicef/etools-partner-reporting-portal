@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -12,7 +12,7 @@ import '@polymer/iron-location/iron-query-params';
 import '../../../../etools-prp-ajax';
 import '../../../../page-body';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -127,4 +127,4 @@ class DisaggregationList extends LocalizeMixin(UtilsMixin(DataTableMixin(Paginat
 
 window.customElements.define('clusters-disaggregations-list', DisaggregationList);
 
-export {DisaggregationList as DisaggregationListEl};
+export {DisaggregationList as ClustersDisaggregationListEl};

@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -254,10 +254,10 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
       this.objectivesParams = {cluster_id: this.data.cluster};
 
       thunk()
-        .then(function (res: any) {
+        .then(function(res: any) {
           self.set('objectives', res.data.results);
         })
-        .catch(function (err) { // jshint ignore:line
+        .catch(function(err) { // jshint ignore:line
           self.updatePending = false;
           // TODO: error handling
         });
@@ -292,19 +292,19 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
   _save() {
     let self = this;
     const thunk = (this.$.createActivity as EtoolsPrpAjaxEl).thunk();
-    
+
     if (!this._fieldsAreValid()) {
       return;
     }
 
     self.updatePending = true;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         self.set('errors', {});
         self._redirectToDetail(res.data.id);
       })
-      .catch(function (err: any) {
+      .catch(function(err: any) {
         self.set('errors', err.data);
         self.updatePending = false;
       });
@@ -313,4 +313,4 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
 
 window.customElements.define('cluster-activities-modal', CreationModal);
 
-export {CreationModal as CreationModalEl};
+export {CreationModal as ClusterActivitiesModalEl};

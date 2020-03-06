@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
@@ -133,5 +133,5 @@ class ActivityDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   activityData!: GenericObject;
 }
 
-window.customElements.define('activity-details', ActivityDetails);
+window.customElements.define('activity-details-display', ActivityDetails);
 

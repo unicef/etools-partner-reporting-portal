@@ -7,7 +7,7 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
 import '../../../../filter-list';
 import '../../../../filters/cluster-partner-filter/cluster-partner-filter';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -16,7 +16,7 @@ import { GenericObject } from '../../../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  */
 class Filters extends UtilsMixin(PolymerElement) {
-  public static get template(){
+  public static get template() {
     return html`
     ${filterStyles}
     <style include="app-grid-style">
@@ -55,12 +55,12 @@ class Filters extends UtilsMixin(PolymerElement) {
   @property({type: Array})
   locations = [
     {
-      title: 'All', 
+      title: 'All',
       id: ''
     }
   ];
 }
 
-window.customElements.define('partner-activities-filters', Filters);
+window.customElements.define('partner-contacts-filters', Filters);
 
-export {Filters as ContactFiltersEl};
+export {Filters as PartnerContactsFiltersEl};

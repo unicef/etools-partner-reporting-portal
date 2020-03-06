@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -19,9 +19,9 @@ import '../../../../etools-prp-chips';
 import '../../../chip-disagg-value';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
-import { fireEvent } from '../../../../../utils/fire-custom-event';
+import {fireEvent} from '../../../../../utils/fire-custom-event';
 
 /**
  * @polymer
@@ -161,7 +161,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String, notify: true})
   name = '';
-  
+
   @property({type: Boolean})
   opened = false;
 
@@ -193,7 +193,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   open() {
-    //@Lajos: data does not exists on 
+    //@Lajos: data does not exists on
     this.data = {'response_plan': +this.responsePlanID, 'choices': [], 'active': true};
     this.set('opened', true);
     this.set('refresh', true);
@@ -215,13 +215,13 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
     this.data.choices = newChoices;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         fireEvent(self, 'disaggregation-added', res.data);
         self.updatePending = false;
         self.close();
 
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) { // jshint ignore:line
         // TODO: error handling
         self.updatePending = false;
       });
@@ -229,15 +229,15 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _checkMatchingName() {
     let disaggregations = this.disaggregations;
-      for (var i = 0; i < disaggregations.length; i++) {
-        if (disaggregations[i].name === this.data.name.trim()) {
-            return false;
-        }
+    for (var i = 0; i < disaggregations.length; i++) {
+      if (disaggregations[i].name === this.data.name.trim()) {
+        return false;
       }
-      return true;
+    }
+    return true;
   }
 
-  _onInput (e: CustomEvent) {
+  _onInput(e: CustomEvent) {
     let el = e.target;
 
     el.validate();
@@ -253,4 +253,4 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 window.customElements.define('cluster-disaggregations-modal', CreationModal);
 
-export {CreationModal as CreationModalEl};
+export {CreationModal as ClusterDisaggregationsModalEl};

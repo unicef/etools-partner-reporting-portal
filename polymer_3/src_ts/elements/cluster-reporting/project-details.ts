@@ -18,8 +18,8 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style include="app-grid-style">
@@ -30,61 +30,61 @@ class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 3;
         }
-  
+
         .app-grid {
           padding: 0;
           margin: 0;
           list-style: none;
         }
-  
+
         .extended {
           @apply --app-grid-expandible-item;
         }
-  
+
         .location {
           margin: 2px 0px;
         }
-  
+
         .top-row {
           display: flex;
           justify-content: flex-start;
           align-items: flex-start;
           flex-direction: row;
         }
-  
+
         .top-element {
           margin-right: 50px;
           min-width: 200px;
         }
-  
+
         ul {
           padding-left: 0;
         }
-  
+
         li {
           list-style-type: none;
         }
-  
+
         div#action {
           margin: 25px 0;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
-  
+
         #detailsIcon {
           padding-left: 5px;
           color: #9e9e9e;
         }
-  
+
         #detailsIcon iron-icon:hover {
           color: rgba(0, 0, 0, 0.87);
         }
-  
+
         #detailsIcon iron-icon[hidden] {
           display: none !important;
         }
       </style>
-      
+
       <etools-content-panel panel-title="[[localize('project_details')]]">
         <div class="row">
           <ul class="app-grid">
@@ -277,4 +277,4 @@ class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
 }
 
-window.customElements.define('project-details', ProjectDetails);
+window.customElements.define('project-details-display', ProjectDetails);

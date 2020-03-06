@@ -16,7 +16,7 @@ import {tableStyles} from '../../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/partnerActivities';
 
 /**
@@ -25,8 +25,8 @@ import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/par
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${tableStyles} ${buttonsStyles}
     <style include="iron-flex data-table-styles">
@@ -140,8 +140,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
   _computeCanEdit(permissions: GenericObject, activityData: GenericObject) {
     return activityData.cluster ?
-        permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
-        false;
+      permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
+      false;
   }
 
   _onSuccess() {
@@ -159,8 +159,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     //@Lajos: bellow was original
     //this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
     this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, this.activityId))
-      .catch(function (err) { // jshint ignore:line
-          // TODO: error handling.
+      .catch(function(err) { // jshint ignore:line
+        // TODO: error handling.
       });
   }
 
@@ -184,9 +184,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-  
+
 }
 
 window.customElements.define('rp-partner-activity-details-indicators', Indicators);
 
-export {Indicators as IndicatorsEl};
+export {Indicators as RpPartnerActivityDetailsIndicatorsEl};

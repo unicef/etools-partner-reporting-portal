@@ -173,6 +173,7 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     this._removeEventListeners();
   }
 }
+
 window.customElements.define('pa-activity-details-indicators', Filters);
 
-export {Filters as FiltersEl};
+export {Filters as PaActivityDetailsIndicatorsEl};

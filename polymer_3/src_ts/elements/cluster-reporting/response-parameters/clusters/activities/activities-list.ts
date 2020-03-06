@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -14,7 +14,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import '../../../../etools-prp-ajax';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -25,7 +25,7 @@ import { GenericObject } from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ActivityList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
+class ActivitiesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
@@ -157,6 +157,6 @@ class ActivityList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(
   }
 }
 
-window.customElements.define('clusters-activities-list', ActivityList);
+window.customElements.define('clusters-activities-list', ActivitiesList);
 
-export {ActivityList as ActivityListEl};
+export {ActivitiesList as ClustersActivitiesListEl};

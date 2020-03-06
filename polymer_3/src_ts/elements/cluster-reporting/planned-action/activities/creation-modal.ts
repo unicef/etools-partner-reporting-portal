@@ -851,4 +851,4 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
 }
 window.customElements.define('planned-action-activity-modal', CreationModal);
 
-export {CreationModal as CreationModalEl};
+export {CreationModal as PlannedActionCreationModalEl};

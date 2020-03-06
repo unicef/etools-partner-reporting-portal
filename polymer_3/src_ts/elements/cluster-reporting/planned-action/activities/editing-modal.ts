@@ -46,7 +46,7 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
 * @appliesMixin UtilsMixin
 * @appliesMixin LocalizeMixin
 */
-class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))) {
+class EditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -755,6 +755,6 @@ class CreationModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedEl
     this._removeEventListeners();
   }
 }
-window.customElements.define('planned-action-activity-modal', CreationModal);
+window.customElements.define('planned-action-activity-editing-modal', EditingModal);
 
-export {CreationModal as CreationModalEl};
+export {EditingModal as PlannedActionActivityEditingModalEl};

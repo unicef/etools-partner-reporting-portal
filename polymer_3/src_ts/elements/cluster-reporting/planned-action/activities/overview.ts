@@ -67,4 +67,4 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
 
 window.customElements.define('pa-activity-details-overview', Overview);
 
-export {Overview as OverviewEl};
+export {Overview as PaActivityDetailsOverviewEl};
