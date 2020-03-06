@@ -8,7 +8,7 @@ import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import '@polymer/paper-divider/paper-divider.js';
+//import '@polymer/paper-divider/paper-divider.js';
 import '@polymer/paper-listbox/paper-listbox';
 import UtilsMixin from '../../mixins/utils-mixin';
 import PageNavMixin from '../../mixins/page-nav-mixin';
@@ -114,7 +114,7 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
               </paper-item>
 
               <template is="dom-if" if="[[permissions.accessClusterIdManagement]]" restamp="true">
-                <paper-divider></paper-divider>
+               <!-- <paper-divider></paper-divider> -->
 
                 <paper-item name="id-management" id="id-management" on-tap="goToIdManagement">
                   <a href="/id-management/cluster-reporting/">
@@ -126,7 +126,7 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
             </div>
 
             <div>
-              <paper-divider></paper-divider>
+            <!-- <paper-divider></paper-divider> -->
               <paper-item name="indicators">
                 <a href="https://prphelp.zendesk.com/" target="_blank">
                   <span><iron-icon icon="communication:import-contacts" role="presentation"></iron-icon>[[localize('knowledge_base')]]</span>

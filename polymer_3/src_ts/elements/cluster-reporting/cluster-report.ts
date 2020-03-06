@@ -6,7 +6,6 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-button/paper-button';
-import '@polymer/promise-polyfill/promise-polyfill-lite';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/paper-menu-button/paper-menu-button';

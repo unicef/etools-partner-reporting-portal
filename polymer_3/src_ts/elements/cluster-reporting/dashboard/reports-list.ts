@@ -71,7 +71,7 @@ class ReportsList extends ReduxConnectedElement {
   active = false;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterDashboardData.data)'})
-  numberOfProjects!: GenericObject;
+  dashboardData!: GenericObject;
 
   @property({type: Array, computed: '_computeData(dashboardData, collection)', observer: '_refresh'})
   data!: any[];

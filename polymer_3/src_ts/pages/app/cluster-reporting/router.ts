@@ -1,14 +1,14 @@
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/app-layout/iron-pages/iron-pages';
+import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
 import '@polymer/app-layout/app-drawer/app-drawer';
 import '@polymer/app-route/app-route';
 import '@polymer/app-layout/app-header/app-header';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
-import '@polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@unicef-polymer/etools-loading/etools-loading';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
 import '../../../elements/etools-prp-permissions';
 import '../../../elements/cluster-reporting/nav';
@@ -217,6 +217,10 @@ class PageClusterReportingRouter extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _routeCurrentPlanChanged(id: string, allPlans: any[]) {
+    if (!allPlans) {
+      return;
+    }
+
     const current = allPlans.find(function(plan) {
       return Number(id) === plan.id;
     });
