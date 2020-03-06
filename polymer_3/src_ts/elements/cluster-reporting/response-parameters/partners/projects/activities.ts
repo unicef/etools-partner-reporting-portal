@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-//<link rel="import" href="../../../../../polyfills/es6-shim.html">
 import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
@@ -18,9 +17,9 @@ import '../../../planned-action/activities/add-existing-activity-from-project-mo
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 
 import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerProjects';
-import { GenericObject } from '../../../../../typings/globals.types';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -28,8 +27,8 @@ import { timeOut } from '@polymer/polymer/lib/utils/async';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${buttonsStyles}
     <style>
@@ -128,15 +127,16 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   _activitiesByPartnerProjectIdAjax() {
     this.ActivitiesByPartnerDebouncer = Debouncer.debounce(this.ActivitiesByPartnerDebouncer,
       timeOut.after(100),
-      () =>{
+      () => {
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-      this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-        .catch(function (err) { // jshint ignore:line
+        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
-        });
+          });
       });
   }
 
@@ -178,7 +178,7 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     if (this.ActivitiesByPartnerDebouncer && this.ActivitiesByPartnerDebouncer.isActive) {
       this.ActivitiesByPartnerDebouncer.cancel();
     }
-  }  
+  }
 }
 
 window.customElements.define('rp-partner-project-details-activities', Activities);

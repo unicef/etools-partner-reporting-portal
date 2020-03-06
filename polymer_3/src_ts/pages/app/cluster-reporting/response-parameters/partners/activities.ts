@@ -142,11 +142,11 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
         }
         (this.$.partnerActivities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchPartnerActivitiesList(thunk));
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+        this.reduxStore.dispatch(fetchPartnerActivitiesList(thunk))
+          // @ts-ignore
+          .catch(function(err) {
+            //   // TODO: error handling.
+          });
       });
   }
 

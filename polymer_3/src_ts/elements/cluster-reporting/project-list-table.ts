@@ -23,7 +23,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
 
-
 /**
  * @polymer
  * @customElement
@@ -33,63 +32,60 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectListTable extends DataTableMixin(
-                              PaginationMixin(
-                              RoutingMixin(
-                              UtilsMixin(
-                              LocalizeMixin(ReduxConnectedElement))))){
+class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
+  UtilsMixin(LocalizeMixin(ReduxConnectedElement))))) {
 
-  public static get template(){
+  public static get template() {
     return html`
       ${tableStyles}
       <style include="data-table-styles iron-flex">
         :host {
           display: block;
         }
-  
+
         div[slot='row-data-details'] .table-cell--text {
           font-size: 12px;
         }
-  
+
         .label {
           display: block;
           padding-top: 10px;
           color: var(--paper-grey-600);
         }
-  
+
         div#action {
           margin-bottom: 25px;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
-  
+
         a {
           color: var(--theme-primary-color);
         }
-  
+
         .wrapper {
           position: relative;
         }
-  
+
         etools-data-table-column {
           display: flex;
         }
       </style>
-      
+
       <iron-location
         query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <iron-query-params
           params-string="{{anchorQuery}}"
           params-object="{{anchorQueryParams}}">
       </iron-query-params>
-      
+
       <div class="wrapper">
         <etools-content-panel no-header>
           <etools-data-table-header
@@ -115,7 +111,7 @@ class ProjectListTable extends DataTableMixin(
               <div class="table-column">[[localize('from_ocha')]]</div>
             </etools-data-table-column>
           </etools-data-table-header>
-  
+
           <etools-data-table-footer
               page-size="[[pageSize]]"
               page-number="[[pageNumber]]"
@@ -124,7 +120,7 @@ class ProjectListTable extends DataTableMixin(
               on-page-size-changed="_pageSizeChanged"
               on-page-number-changed="_pageNumberChanged">
           </etools-data-table-footer>
-  
+
           <template
               id="list"
               is="dom-repeat"
@@ -181,12 +177,12 @@ class ProjectListTable extends DataTableMixin(
               </div>
             </etools-data-table-row>
           </template>
-  
+
           <list-placeholder
               data="[[projects]]"
               loading="[[loading]]">
           </list-placeholder>
-  
+
           <etools-data-table-footer
               page-size="[[pageSize]]"
               page-number="[[pageNumber]]"
@@ -195,12 +191,18 @@ class ProjectListTable extends DataTableMixin(
               on-page-size-changed="_pageSizeChanged"
               on-page-number-changed="_pageNumberChanged">
           </etools-data-table-footer>
-  
+
           <etools-loading active="[[loading]]"></etools-loading>
         </etools-content-panel>
       </div>
     `;
   }
+
+  @property({type: String})
+  page!: string;
+
+  @property({type: String})
+  query!: string;
 
   @property({type: Object})
   queryParams!: GenericObject;
@@ -219,6 +221,9 @@ class ProjectListTable extends DataTableMixin(
 
   @property({type: Array})
   openedDetails: any[] = [];
+
+  @property({type: String})
+  anchorQuery!: string;
 
   @property({type: Object, computed: '_withDefaultParams(queryParams)'})
   anchorQueryParams!: GenericObject;
@@ -241,12 +246,12 @@ class ProjectListTable extends DataTableMixin(
     this._tableContentChanged = this._tableContentChanged.bind(this);
     this.addEventListener('page-number-changed', this._tableContentChanged);
     this._detailsChange = this._detailsChange.bind(this);
-    this.addEventListener('details-opened-changed', this._detailsChange);
+    this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('page-number-changed', this._tableContentChanged);
-    this.removeEventListener('details-opened-changed', this._detailsChange);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   connectedCallback() {

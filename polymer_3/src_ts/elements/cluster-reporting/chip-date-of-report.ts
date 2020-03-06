@@ -4,15 +4,13 @@ import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-date-picker/paper-date-picker';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-//@Lajos: do nto remember what to do with this
-// import '@polymer/moment-element/moment-import';
 import ChipMixin from '../../mixins/chip-mixin';
 import dateFormat from '../../settings';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
-
-
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
+declare const moment: any;
 
 /**
 * @polymer
@@ -96,7 +94,6 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
 
 
   _add() {
-    //@Lajos: moment is from ChipMixin, but is not recognized
     var formatted = moment(this._date).format(dateFormat);
 
     fireEvent('chip-add', formatted);
@@ -117,9 +114,10 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    //@Lajos: check bellow
-    this.$.dialog.positionTarget = this.$.add;
+
+    (this.$.dialog as PaperDialogElement).positionTarget = this.$.add;
   }
+
 }
 
 window.customElements.define('chip-date-of-report', ChipDateOfReport);

@@ -41,6 +41,7 @@ class NumberOfNonClusterActivities extends LocalizeMixin(ReduxConnectedElement) 
     </paper-card>
     `;
   }
+
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_non_cluster_activities)'})
   numberOfActivities!: number;
 

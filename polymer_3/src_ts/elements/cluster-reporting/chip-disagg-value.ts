@@ -5,15 +5,12 @@ import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-input/paper-input';
 import '@polymer/paper-button/paper-button';
-
-//@Lajos: do not remember what to do with this
-// import '@polymer/moment-element/moment-import';
 import ChipMixin from '../../mixins/chip-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {fireEvent} from '../../utils/fire-custom-event';
-
-
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
 * @polymer
@@ -120,14 +117,14 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _add() {
-    this.$.field!.validate();
+    (this.$.field as PaperInputElement)!.validate();
 
-    if (this.$.field.invalid) {
+    if ((this.$.field as PaperInputElement).invalid) {
       return;
     }
 
     if (!this._formattedValue.length) {
-      this.$.field.invalid = true;
+      (this.$.field as PaperInputElement).invalid = true;
 
       return;
     }
@@ -138,7 +135,7 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   _computeFormattedValue(value: string) {
     return value.trim();
-  },
+  }
 
   _handleKeyup(e: CustomEvent) {
     var key = e.which;
@@ -150,9 +147,9 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   connectedCallback() {
     super.connectedCallback();
-    //@Lajos: check bellow
-    this.$.dialog.positionTarget = this.$.add;
+    (this.$.dialog as PaperDialogElement).positionTarget = this.$.add;
   }
+
 }
 
 window.customElements.define('chip-disagg-value', ChipDisaggValue);

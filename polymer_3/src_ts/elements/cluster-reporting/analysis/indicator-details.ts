@@ -2,11 +2,12 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import Endpoints from '../../../endpoints';
-//App.Actions.Analysis.Indicators
-import {fetchIndicatorDetails} from '../../../redux/actions/indicators';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import '../../etools-prp-number';
 import '../../frequency-of-reporting';

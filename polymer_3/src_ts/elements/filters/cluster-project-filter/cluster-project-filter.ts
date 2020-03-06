@@ -92,7 +92,7 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
               title: 'All',
             }].concat(res.data));
           })
-          .catch(function(err: any) { // jshint ignore:line
+          .catch(function(err: any) {
             // TODO: error handling
           });
       });

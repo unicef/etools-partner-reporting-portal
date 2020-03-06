@@ -2,7 +2,6 @@ import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
-//<link rel="import" href="../../../polyfills/es6-shim.html">
 import './indicator-bucket';
 
 /**

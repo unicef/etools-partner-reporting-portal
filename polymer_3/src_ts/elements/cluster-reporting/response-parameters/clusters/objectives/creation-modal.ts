@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -22,6 +22,7 @@ import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import Endpoints from '../../../../../endpoints';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 
 /**
@@ -31,7 +32,7 @@ import Endpoints from '../../../../../endpoints';
  * @appliesMixin UtilsMixin
  * @appliesMixin RoutingMixin
  */
-class CreationModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
+class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
   public static get template() {
     // language=HTML
     return html`
@@ -185,6 +186,9 @@ class CreationModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnected
   @property({type: Boolean})
   refresh = false;
 
+  @property({type: Object})
+  data!: GenericObject;
+
   _computeUrl(responsePlanID: string) {
     return Endpoints.responseParametersClusterObjectives(responsePlanID);
   }
@@ -217,17 +221,17 @@ class CreationModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnected
     const thunk = (this.$.createObjective as EtoolsPrpAjaxEl).thunk();
     let self = this;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         self._redirectToDetail(res.data.id);
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) {
         self.updatePending = false;
         // TODO: error handling
       });
   }
 }
 
-window.customElements.define('cluster-objectives-modal', CreationModal);
+window.customElements.define('cluster-objectives-modal', ClusterObjectivesModal);
 
-export {CreationModal as CreationModalEl};
+export {ClusterObjectivesModal as ClusterObjectivesModalEl};

@@ -1,8 +1,7 @@
 import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
-// <link rel="import" href = "../../../../bower_components/google-chart/google-chart.html" >
-//<link rel="import" href="../../../polyfills/es6-shim.html">
+import '@google-web-components/google-chart';
 import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
@@ -69,7 +68,7 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     },
   ];
 
-  @property({type: Array, computed: '_computeRows(data, localize)'})
+  @property({type: Array, computed: '_computeRowsLocal(data, localize)'})
   rows!: any;
 
   _computeOptions(rows: any) {
@@ -90,8 +89,7 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     });
   }
 
-  //@Lajos: bellow has some error...it is not assignable to the same property in base as in MIXINS
-  _computeRows(data: GenericObject, localize: string) {
+  _computeRowsLocal(data: GenericObject, localize: string) {
     var self = this;
     return Object.keys(data || {}).map(function(key) {
       return [
@@ -100,6 +98,7 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       ];
     });
   }
+
 }
 
 window.customElements.define('partners-by-status', PartnersByStatus);

@@ -119,3 +119,5 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 }
 
 window.customElements.define('error-modal', ErrorModal);
+
+export {ErrorModal as ErrorModalEl};

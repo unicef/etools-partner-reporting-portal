@@ -1,15 +1,14 @@
-import {PolymerElement,html} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-// <link rel='import' href='cluster-report.html'>
-
+import './cluster-report';
 
 /**
  * @polymer
  * @customElement
  */
-class ClusterReportProxy extends PolymerElement{
-  public static get template(){
+class ClusterReportProxy extends PolymerElement {
+  public static get template() {
     return html`
       <style>
         :host {
@@ -17,7 +16,7 @@ class ClusterReportProxy extends PolymerElement{
           margin: 0 -24px;
         }
       </style>
-      
+
       <template
           is="dom-if"
           if="[[active]]"
@@ -43,7 +42,7 @@ class ClusterReportProxy extends PolymerElement{
   active: boolean = false;
 
 
-  static get observers(){
+  static get observers() {
     return ['_render(data.id)'];
   }
 
@@ -60,14 +59,14 @@ class ClusterReportProxy extends PolymerElement{
       return;
     }
 
-    setTimeout( () => {
+    setTimeout(() => {
       this.set('currentId', id);
     });
 
     // Force re-render:
     this.set('active', false);
 
-    setTimeout( () => {
+    setTimeout(() => {
       this.set('active', true);
     });
   }

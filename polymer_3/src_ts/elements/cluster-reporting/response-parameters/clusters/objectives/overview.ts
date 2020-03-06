@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
@@ -12,7 +12,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import '../../../../labelled-item';
 import Endpoints from '../../../../../endpoints';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -106,8 +106,6 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 
   _openModal() {
-    //@Lajos: imported is the edit modal, original:
-    //this.shadowRoot.querySelector('#modal').open();
     (this.shadowRoot!.querySelector('#modal') as EditingModalEl).open();
   }
 

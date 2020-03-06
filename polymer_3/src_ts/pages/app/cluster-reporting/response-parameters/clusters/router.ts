@@ -93,27 +93,23 @@ class Router extends UtilsMixin(PolymerElement) {
     this.set('id', id);
   }
 
-  //@Lajos: needs review
-  _pageChanged(page: string) {
+  async _pageChanged(page: string) {
     if (!page) {
       return;
     }
 
-    setTimeout(async () => {
-      if (!this.visible) {
-        return;
-      }
 
-      //@Lajos: derrived from src_/pages/app/ip-reporting/pd.ts
-      // resolvedPageUrl = this.resolveUrl(page + '.html');
-      const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
+    if (!this.visible) {
+      return;
+    }
 
-      //this.importHref(resolvedPageUrl, null, this._notFound, true);
-      await import(resolvedPageUrl)
-        .catch((err: any) => {
-          this._notFound();
-        });
-    });
+    // resolvedPageUrl = this.resolveUrl(page + '.html');
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/${page}.js`;
+    console.log('cluster Reporting - response-parameters loading... :' + resolvedPageUrl);
+    await import(resolvedPageUrl)
+      .catch((err: any) => {
+        this._notFound();
+      });
   }
 
   connectedCallback() {

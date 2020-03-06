@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -22,8 +22,8 @@ import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import Endpoints from '../../../../../endpoints';
-import { GenericObject } from '../../../../../typings/globals.types';
-import { fireEvent } from '../../../../../utils/fire-custom-event';
+import {GenericObject} from '../../../../../typings/globals.types';
+import {fireEvent} from '../../../../../utils/fire-custom-event';
 
 
 /**
@@ -191,16 +191,16 @@ class EditingModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedE
     if (!this._fieldsAreValid()) {
       return;
     }
-    
+
     let self = this;
     const thunk = (this.$.editObjective as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         fireEvent(self, 'objective-edited', res.data);
         self.close();
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) {
         self.updatePending = false;
         // TODO: error handling
       });

@@ -130,10 +130,10 @@ class Objectives extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
         (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(fetchClusterObjectivesList(thunk))
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            //   // TODO: error handling.
+          });
       });
   }
 

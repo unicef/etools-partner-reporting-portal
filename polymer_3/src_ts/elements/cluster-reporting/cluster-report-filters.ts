@@ -5,8 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../mixins/utils-mixin';
 import {filterStyles} from '../../styles/filter-styles';
-//@Lajos: bellow have not been merged yet
-import '../filters/filter-list';
+import '../filter-list';
 import '../filters/cluster-indicator-filter/cluster-indicator-filter';
 import '../filters/cluster-project-filter/cluster-project-filter';
 import '../filters/cluster-partner-filter/cluster-partner-filter';
@@ -15,8 +14,6 @@ import '../filters/cluster-filter/cluster-filter';
 import '../filters/cluster-indicator-type-filter/cluster-indicator-type-filter';
 import '../filters/cluster-indicator-filter/cluster-indicator-filter';
 import {GenericObject} from '../../typings/globals.types';
-
-
 
 /**
 * @polymer

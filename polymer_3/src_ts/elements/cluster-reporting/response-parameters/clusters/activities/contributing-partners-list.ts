@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -16,7 +16,6 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-//<link rel="import" href="../../../../../polyfills/es6-shim.html">
 import '../../../../etools-prp-ajax';
 import '../../../../labelled-item';
 import '../../../../list-placeholder';
@@ -24,7 +23,7 @@ import '../../../../project-status';
 import '../../../../page-body';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -259,8 +258,8 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
     return allPartnersCount[activityId];
   }
 
-  _getActivityUrl (_baseUrlCluster: string, activityId: number, partner_activities: GenericObject) {
-    const id = (partner_activities.filter(function (activity: GenericObject) {
+  _getActivityUrl(_baseUrlCluster: string, activityId: number, partner_activities: GenericObject) {
+    const id = (partner_activities.filter(function(activity: GenericObject) {
       return Number(activity.cluster_activity) === Number(activityId);
     })[0] || {}).id;
 
@@ -285,8 +284,8 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
   }
 
   _removeEventListeners() {
-    this.removeEventListener('page-number-changed', this._tableContentChanged  as any);
-    this.removeEventListener('details-opened-changed', this._detailsChange  as any);
+    this.removeEventListener('page-number-changed', this._tableContentChanged as any);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   connectedCallback() {

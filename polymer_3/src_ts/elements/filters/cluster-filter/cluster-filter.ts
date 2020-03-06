@@ -96,7 +96,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
               title: 'All',
             }].concat(res.data));
           })
-          .catch(function(err) { // jshint ignore:line
+          .catch(function(err) {
             // TODO: error handling
           });
       });

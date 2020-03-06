@@ -1,5 +1,6 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
@@ -9,11 +10,12 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import Settings from '../../settings';
-// <link rel='import' href='../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html'>
-// <link rel='import' href='disaggregations-dropdown-widget.html'>
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import './disaggregations-dropdown-widget';
 import './indicator-locations-widget';
-// <link rel='import' href='chip-date-of-report.html'>
+import './chip-date-of-report';
 import '../labelled-item';
 import '../etools-prp-chips';
 import '../etools-prp-ajax';
@@ -27,7 +29,6 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import '../error-box';
 import '../etools-prp-permissions';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from '../../utils/fire-custom-event';
@@ -40,67 +41,67 @@ import {fireEvent} from '../../utils/fire-custom-event';
  * @appliesMixin NotificationsMixin
  * @appliesMixin LocalizeMixin
  */
-class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))){
-  public static get template(){
+class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${modalStyles}
       <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-  
+
           --app-grid-columns: 3;
           --app-grid-gutter: 24px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 3;
-  
+
           --paper-dialog: {
             width: 800px;
-  
+
             & > * {
               margin: 0;
             }
           };
         }
-  
+
         .row {
           margin: 16px 0;
         }
-  
+
         .full-width {
           @apply --app-grid-expandible-item;
         }
-  
+
         .app-grid {
            padding-top: 0;
            margin: 0 -var(--app-grid-gutter);
         }
-  
+
         .item {
           margin-bottom: 0;
         }
-  
+
         .indicator-type {
           color: var(--theme-secondary-text-color);
         }
-  
+
         .calculation-method:not(:first-child) {
           margin-left: 50px;
         }
-  
+
         indicator-locations-widget {
           margin: 2em 0;
         }
       </style>
-      
+
       <etools-prp-permissions
           permissions="{{permissions}}">
       </etools-prp-permissions>
-  
+
       <etools-prp-ajax
           id="locations"
           url="[[locationsUrl]]">
       </etools-prp-ajax>
-  
+
       <etools-prp-ajax
           id="editIndicator"
           url="[[indicatorsUrl]]"
@@ -108,29 +109,29 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
           body="[[data]]"
           content-type="application/json">
       </etools-prp-ajax>
-      
+
       <paper-dialog
           id="dialog"
           with-backdrop
           opened="{{opened}}">
-  
+
         <div class="header layout horizontal justified">
           <h2>[[localize('edit_indicator')]]</h2>
-  
+
           <paper-icon-button
               class="self-center"
               on-tap="close"
               icon="icons:close">
           </paper-icon-button>
         </div>
-  
+
         <paper-dialog-scrollable>
           <template
               is="dom-if"
               if="[[opened]]"
               restamp="true">
             <error-box errors="[[errors]]"></error-box>
-  
+
             <div class="row">
               <paper-input
                   class="validate"
@@ -142,13 +143,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   required>
               </paper-input>
             </div>
-  
+
             <div class="row">
               <labelled-item label="[[localize('type')]]">
                 <span class="indicator-type">[[indicatorType]]</span>
               </labelled-item>
             </div>
-  
+
             <div class="row">
               <div class="layout horizontal">
                 <labelled-item
@@ -159,7 +160,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                       readonly>
                   </calculation-method>
                 </labelled-item>
-  
+
                 <labelled-item
                     class="calculation-method"
                     label="[[localize('calculation_method_across_reporting')]]">
@@ -170,7 +171,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                 </labelled-item>
               </div>
             </div>
-  
+
             <div class="row">
               <paper-input
                   class="validate"
@@ -181,7 +182,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   always-float-label>
               </paper-input>
             </div>
-  
+
             <div class="row">
               <paper-input
                   class="validate"
@@ -192,13 +193,14 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   always-float-label>
               </paper-input>
             </div>
-  
-  
+
+
             <template
                 is="dom-if"
                 if="[[isPAI]]"
                 restamp="true">
               <div class="row">
+                <!--
                 <etools-single-selection-menu
                   class="item validate pair"
                   label="[[localize('project_context')]]"
@@ -212,11 +214,25 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   disabled
                   required>
                 </etools-single-selection-menu>
+                -->
+                <etools-dropdown
+                  class="item validate pair"
+                  label="[[localize('project_context')]]"
+                  options="[[projects]]"
+                  option-value="context_id"
+                  option-label="project_name"
+                  selected="{{data.project_context_id}}"
+                  disabled
+                  hide-search
+                  auto-validate
+                  required>
+                </etools-dropdown>
               </div>
             </template>
-  
+
             <div class="row">
               <div class="app-grid">
+                <!--
                 <etools-single-selection-menu
                     class="item validate"
                     label="[[localize('frequency_of_reporting')]]"
@@ -230,7 +246,19 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     hide-search
                     required>
                 </etools-single-selection-menu>
-  
+                -->
+                <etools-dropdown
+                    class="item validate"
+                    label="[[localize('frequency_of_reporting')]]"
+                    options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.frequency}}"
+                    disabled="[[!canEditDetails]]"
+                    hide-search
+                    auto-validate
+                    required>
+                </etools-dropdown>
                 <template
                     is="dom-if"
                     if="[[_showCSD(data.frequency)]]"
@@ -250,7 +278,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     </template>
                   </etools-prp-chips>
                 </template>
-  
+                <!--
                 <etools-prp-date-input
                     class="item validate"
                     label="[[localize('start_date_reporting')]]"
@@ -260,9 +288,18 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     error-message=""
                     no-init>
                 </etools-prp-date-input>
+                -->
+                <datepicker-lite
+                  class="item validate"
+                  label="[[localize('start_date_reporting')]]"
+                  value="{{data.start_date_of_reporting_period}}"
+                  disabled="[[!canEditDetails]]"
+                  error-message=""
+                  selected-date-display-format="[[dateFormat]]">
+                </datepicker-lite>
               </div>
             </div>
-  
+
             <div class="row">
               <template
                   is="dom-if"
@@ -277,7 +314,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     always-float-label>
                 </paper-input>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[!isNumber]]"
@@ -291,7 +328,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                       disabled="[[!canEditDetails]]"
                       always-float-label>
                   </paper-input>
-  
+
                   <paper-input
                       class="item validate"
                       label="[[localize('denominator_label')]]"
@@ -303,7 +340,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                 </div>
               </template>
             </div>
-  
+
             <div class="row">
               <div class="app-grid">
                 <json-field
@@ -315,7 +352,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     allowed-pattern="[+\\-\\d]"
                     disabled="[[!canEditDetails]]">
                 </json-field>
-  
+
                 <template
                     is="dom-if"
                     if="[[isNumber]]"
@@ -330,7 +367,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                       disabled="[[!canEditDetails]]">
                   </json-field>
                 </template>
-  
+
                 <json-field
                     class="item validate"
                     type="[[data.blueprint.display_type]]"
@@ -344,7 +381,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                 </json-field>
               </div>
             </div>
-  
+
             <div class="row">
               <div class="row">
                 <indicator-locations-widget
@@ -359,7 +396,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                 </indicator-locations-widget>
               </div>
             </div>
-  
+
             <div class="row">
               <disaggregations-dropdown-widget
                   value="{{data.disaggregations}}"
@@ -368,7 +405,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
             </div>
           </template>
         </paper-dialog-scrollable>
-  
+
         <div class="buttons layout horizontal-reverse">
           <paper-button
               on-tap="_save"
@@ -376,13 +413,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
               raised>
             [[localize('save')]]
           </paper-button>
-  
+
           <paper-button
               on-tap="close">
             [[localize('cancel')]]
           </paper-button>
         </div>
-  
+
         <etools-loading active="[[updatePending]]"></etools-loading>
       </paper-dialog>
     `;
@@ -423,23 +460,23 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
   @property({type: Array})
   frequencies: GenericObject[] = [
-      {
-        id: 'Wee',
-        title: 'Weekly',
-      },
-      {
-        id: 'Mon',
-        title: 'Monthly',
-      },
-      {
-        id: 'Qua',
-        title: 'Quarterly',
-      },
-      {
-        id: 'Csd',
-        title: 'Custom specific dates',
-      },
-    ];
+    {
+      id: 'Wee',
+      title: 'Weekly',
+    },
+    {
+      id: 'Mon',
+      title: 'Monthly',
+    },
+    {
+      id: 'Qua',
+      title: 'Quarterly',
+    },
+    {
+      id: 'Csd',
+      title: 'Custom specific dates',
+    },
+  ];
 
   @property({type: Array})
   disaggregations: any[] = [];
@@ -457,7 +494,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   _minDate!: GenericObject;
 
 
-  static get observers(){
+  static get observers() {
     return ['_setDefaults(opened)',
       '_updateCSDates(data.start_date_of_reporting_period)'];
   }
@@ -465,7 +502,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   _computeLocalizedFrequencies(frequencies: GenericObject[], localize: Function) {
     let self = this;
 
-    return frequencies.map(function (frequency) {
+    return frequencies.map(function(frequency) {
       frequency.title = self._localizeLowerCased(frequency.title, localize);
       return frequency;
     });
@@ -506,7 +543,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivityprojectcontext';
   }
 
-  _computeMinDate(date) {
+  _computeMinDate(date?: Date) {
     return date ? this._normalizeDate(date) : null;
   }
 
@@ -540,23 +577,20 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let self = this;
 
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    locThunk().then( (res: GenericObject) => {
-        self.set('locations', res.data);
-      });
+    locThunk().then((res: GenericObject) => {
+      self.set('locations', res.data);
+    });
   }
 
   _updateCSDates(startDateStr: string) {
-    let dates;
-    let startDate;
-
     if (!startDateStr) {
       return;
     }
 
-    dates = this.get('data.cs_dates');
-    startDate = this._normalizeDate(startDateStr);
+    let dates = this.get('data.cs_dates');
+    let startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter( (d) => {
+    this.set('data.cs_dates', dates && dates.filter((d) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
@@ -567,7 +601,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let noLocationSet = false;
     let rawLocations = this.get('data.locations');
 
-    let changedLocations = rawLocations.map(function (location: GenericObject) {
+    let changedLocations = rawLocations.map(function(location: GenericObject) {
       if (location.location !== undefined && location.location.id !== undefined) {
         let id = location.location.id;
         location.location = id;
@@ -581,7 +615,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
       }
     });
 
-    if (noLocationSet === true) {
+    if (noLocationSet) {
       return;
     }
 
@@ -601,13 +635,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
     const editIndThunk = (this.$.editIndicator as EtoolsPrpAjaxEl).thunk();
     editIndThunk()
-      .then( (res: GenericObject) => {
-        fireEvent(self,'indicator-edited', res.data);
+      .then((res: GenericObject) => {
+        fireEvent(self, 'indicator-edited', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self.close();
       })
-      .catch( (err: GenericObject) => {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('data.locations', rawLocations);
         self.set('updatePending', false);

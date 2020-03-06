@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
@@ -8,11 +8,11 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import '../../../../page-body';
 import '../../../response-parameters/clusters/activities/activities-list';
 import '../../../response-parameters/clusters/activities/filters';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {fetchClusterActivitiesList} from '../../../../../redux/actions/clusterActivities';
 import Endpoints from '../../../../../endpoints';
 
@@ -77,19 +77,20 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
   _clusterActivitiesAjax(queryParams: GenericObject) {
     this._clusterActivityDebouncer = Debouncer.debounce(this._clusterActivityDebouncer,
       timeOut.after(100),
-      () =>{
+      () => {
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
-      if (typeof queryParams.cluster_objective_id === 'undefined') {
-        return;
-      }
+        if (typeof queryParams.cluster_objective_id === 'undefined') {
+          return;
+        }
 
-      (this.$.activities as EtoolsPrpAjaxEl).abort();
-      //App.Actions.ClusterActivities.fetchClusterActivitiesList
-      this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
-        .catch(function (err) { // jshint ignore:line
+        (this.$.activities as EtoolsPrpAjaxEl).abort();
+
+        this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
-        });
-    });
+          });
+      });
   }
 
   _computeActivitiesUrl() {

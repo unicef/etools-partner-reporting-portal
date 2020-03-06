@@ -2,7 +2,6 @@ import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 // <link rel="import" href = "../../../../bower_components/leaflet-map/leaflet-map.html" >
-//<link rel="import" href="../../../polyfills/es6-shim.html">
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import './analysis-widget';
@@ -474,8 +473,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
         var style = document.createElement('style');
 
         style.innerHTML = this.mapStyles;
-        //@Lajos: not sure about these types
-        this.shadowRoot.querySelector('leaflet-map').appendChild(style);
+        (this.shadowRoot!.querySelector('leaflet-map') as Element).appendChild(style);
       });
     });
   }

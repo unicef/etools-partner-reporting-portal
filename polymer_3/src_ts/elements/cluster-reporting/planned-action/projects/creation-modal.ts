@@ -12,10 +12,8 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
-// <link rel='import'
-// href='../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html'>
-// <link rel='import'
-// href='../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html'>
+import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
@@ -25,7 +23,7 @@ import '../../../etools-prp-ajax';
 import '../../../message-box';
 import '../../../../elements/cluster-reporting/creation-modal-project-details';
 import '../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget';
-// <link rel='import' href='../../../etools-prp-date-input.html'>
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
 import '../../../form-fields/partner-dropdown-content';
@@ -57,30 +55,30 @@ import '../../paper-radio-group-custom';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement)))){
-  public static get template(){
+class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement)))) {
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-  
+
           --app-grid-columns: 2;
           --app-grid-gutter: 15px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
-  
+
           --paper-dialog: {
             width: 700px; & > *{
           margin: 0;
         }
         };
         }
-  
+
         .full-width {
           @apply --app-grid-expandible-item;
         }
-  
+
         .header {
           height: 48px;
           padding: 0 24px;
@@ -88,7 +86,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
           color: white;
           background: var(--theme-primary-color);
         }
-  
+
         .infobox {
           display: block;
           --app-grid-columns: 2;
@@ -97,119 +95,119 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
           padding: 15px;
           background: var(--paper-grey-300);
         }
-  
+
         .infobox h4 {
           display: inline;
           color: #737373;
           font-weight: 400;
           font-size: 12px
         }
-  
+
         .red {
           color: red;
           display: inline;
         }
-  
+
         .justify-right {
           float: right;
         }
-  
+
         .show-more-details {
           display: block;
           padding: 15px;
           background: var(--paper-grey-300);
         }
-  
+
         .show-more-details .justify-right {
           float: right;
         }
-  
+
         .header h2 {
           @apply --paper-font-title;
           margin: 0;
           line-height: 48px;
         }
-  
+
         .header paper-icon-button {
           margin: 0 -13px 0 20px;
           color: white;
         }
-  
+
         .buttons {
           padding: 24px;
         }
-  
+
         .details-section {
           padding: 15px;
           background: var(--paper-grey-200);
         }
-  
+
         .details-text {
           font-size: 12px;
           color: #757575;
         }
-  
+
         #detailsIcon {
           padding-left: 5px;
           color: #9e9e9e;
         }
-  
+
         #detailsIcon iron-icon:hover {
           color: rgba(0, 0, 0, 0.87);
         }
-  
+
         #detailsIcon iron-icon[hidden] {
           display: none !important;
         }
-  
+
         paper-radio-group-custom {
           display: block;
           padding-top: 16px;
         }
-  
+
         paper-radio-group-custom > .fields {
           padding: calc(var(--app-grid-gutter) / 2) 0;
         }
-  
+
         paper-radio-group-custom > .fields[empty] {
           padding: 0;
         }
-  
+
         paper-radio-group-custom .app-grid {
           margin: -var(--app-grid-gutter);
         }
-  
+
         paper-radio-button {
           margin-left: -12px;
         }
-  
+
         paper-dropdown-menu {
           width: 100%;
         }
-  
+
         iron-icon {
           color: var(--list-icon-color, #2b2b2b);
           height: 40px;
           width: 40px;
         }
-  
+
         iron-icon:hover {
           color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
         }
-  
+
         message-box {
           margin-bottom: 1em;
         }
       </style>
-      
+
       <etools-prp-permissions
         permissions="{{ permissions }}">
       </etools-prp-permissions>
-  
+
       <iron-location path="{{ path }}"></iron-location>
-  
+
       <cluster-dropdown-content clusters="{{ clusters }}" partner="{{ partnerForClusters }}"></cluster-dropdown-content>
-      
+
       <template
         is="dom-if"
         if="[[permissions.addPartnerToProject]]"
@@ -219,7 +217,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
           clusters="[[imoClusters]]">
         </partner-dropdown-content>
       </template>
-  
+
       <etools-prp-ajax
         id="projectAjax"
         url="[[url]]"
@@ -227,14 +225,14 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
         content-type="application/json"
         method="[[_computeAjaxMethod(edit)]]">
       </etools-prp-ajax>
-  
+
       <etools-prp-ajax
         id="projects"
         timeout="100000"
         url="[[ochaProjectsUrl]]"
         params="[[ochaProjectsParams]]">
       </etools-prp-ajax>
-  
+
       <etools-prp-ajax
         id="projectDetails"
         url="[[ochaProjectDetailsUrl]]"
@@ -242,7 +240,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
         content-type="application/json"
         timeout="100000">
       </etools-prp-ajax>
-      
+
       <paper-dialog
         id="dialog"
         with-backdrop
@@ -256,7 +254,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
             icon="icons:close">
           </paper-icon-button>
         </div>
-  
+
         <paper-dialog-scrollable>
           <error-box errors="[[errors]]"></error-box>
           <template
@@ -271,6 +269,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                 is="dom-if"
                 if="[[!edit]]"
                 restamp="true">
+                <!--
                 <etools-single-selection-menu
                   class="item validate full-width"
                   label="[[localize('partner')]]"
@@ -283,6 +282,18 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                   trigger-value-change-event
                   required>
                 </etools-single-selection-menu>
+                -->
+                <etools-dropdown
+                    class="item validate full-width"
+                    label="[[localize('partner')]]"
+                    options="[[partners]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.partner_id}}"
+                    selected-item="{{selectedPartner}}"
+                    auto-validate
+                    required>
+               </etools-dropdown>
               </template>
             </template>
             <paper-radio-group-custom
@@ -312,6 +323,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                   if="[[_equals(mode, 'ocha')]]"
                   restamp="true">
                   <div>
+                    <!--
                     <etools-single-selection-menu
                       class="item validate full-width"
                       label="[[localize('project')]]"
@@ -324,7 +336,18 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       trigger-value-change-event
                       required>
                     </etools-single-selection-menu>
-  
+                    -->
+                    <etools-dropdown
+                        class="item validate full-width"
+                        label="[[localize('project')]]"
+                        options="[[formattedProjects]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{ selectedProject }}"
+                        disabled="[[projectsLoading]]"
+                        auto-validate
+                        required>
+                    </etools-dropdown>
                     <template
                       is="dom-if"
                       if="[[_equals(formattedProjects.length, 0)]]"
@@ -334,7 +357,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                         [[localize('there_are_no_ocha_projects')]].
                       </message-box>
                     </template>
-  
+
                     <creation-modal-project-details
                       id="details"
                       project-data="[[projectDetails]]"
@@ -384,8 +407,9 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       required
                       on-input="_validate">
                     </paper-input>
-  
+
                     <div class="item full-width">
+                      <!--
                       <etools-multi-selection-menu
                         class="validate"
                         label="[[localize('clusters')]] *"
@@ -395,9 +419,19 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                         trigger-value-change-event
                         required>
                       </etools-multi-selection-menu>
+                      -->
+                      <etools-dropdown-multi
+                        class="validate"
+                        label="[[localize('clusters')]] *"
+                        options="[[formattedClusters]]"
+                        selected-values="{{selectedClusters}}"
+                        auto-validate
+                        required>
+                      </etools-dropdown-multi>
                     </div>
-  
+
                     <div class="item">
+                      <!--
                       <etools-prp-date-input
                         class="start-date"
                         label="[[localize('start_date')]] *"
@@ -406,9 +440,18 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                         required
                         no-init>
                       </etools-prp-date-input>
+                      -->
+                      <datepicker-lite
+                        class="start-date"
+                        label="[[localize('start_date')]] *"
+                        value="{{data.start_date}}"
+                        error-message=""
+                        required>
+                      </datepicker-lite>
                     </div>
-  
+
                     <div class="item">
+                      <!--
                       <etools-prp-date-input
                         class="end-date"
                         label="[[localize('end_date')]] *"
@@ -417,6 +460,14 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                         required
                         no-init>
                       </etools-prp-date-input>
+                      -->
+                      <datepicker-lite
+                        class="end-date"
+                        label="[[localize('end_date')]] *"
+                        value="{{data.end_date}}"
+                        error-message=""
+                        required>
+                      </datepicker-lite>
                     </div>
                     <div class="row">
                       <paper-dropdown-menu
@@ -438,14 +489,14 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                         </paper-listbox>
                       </paper-dropdown-menu>
                     </div>
-  
+
                     <div class="item full-width">
                       <indicator-locations-widget
                         class="validate"
                         value="{{data.locations}}">
                       </indicator-locations-widget>
                     </div>
-  
+
                     <paper-input
                       class="item validate full-width"
                       id="description"
@@ -455,7 +506,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       required
                       on-input="_validate">
                     </paper-input>
-  
+
                     <paper-input
                       class="item validate"
                       id="total_budget"
@@ -466,7 +517,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       step="0.01"
                       on-input="_validate">
                     </paper-input>
-  
+
                     <paper-input
                       class="item validate full-width"
                       id="funding_source"
@@ -475,7 +526,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       type="string"
                       on-input="_validate">
                     </paper-input>
-  
+
                     <paper-input
                       class="item validate full-width"
                       id="additional_information"
@@ -484,7 +535,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                       type="string"
                       on-input="_validate">
                     </paper-input>
-  
+
                     <div class="details-section item full-width">
                       <div class="layout horizontal center justified">
                         <span class="details-text">[[localize('want_to_add')]]</span>
@@ -517,7 +568,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+                          <!--
                           <etools-single-selection-menu
                             class="item validate"
                             label="[[localize('type_of_agency')]]"
@@ -529,7 +580,16 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             trigger-value-change-event
                             always-float-label>
                           </etools-single-selection-menu>
-  
+                          -->
+                          <etools-dropdown
+                              class="item validate"
+                              label="[[localize('type_of_agency')]]"
+                              options="[[agencyTypes]]"
+                              option-value="title"
+                              option-label="title"
+                              selected="{{data.agency_type}}"
+                              auto-validate>
+                          </etools-dropdown>
                           <paper-input
                             class="item validate full-width"
                             id="additional_implementing_partners"
@@ -539,7 +599,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <div class="full-width">
                             <labelled-item label="[[localize('is_this_project_hrp_fa')]]">
                               <paper-radio-group-custom
@@ -550,7 +610,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                               </paper-radio-group-custom>
                             </labelled-item>
                           </div>
-  
+                          <!--
                           <etools-single-selection-menu
                             class="item validate"
                             label="[[localize('prioritization_classification')]]"
@@ -562,7 +622,16 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             trigger-value-change-event
                             always-float-label>
                           </etools-single-selection-menu>
-  
+                          -->
+                          <etools-dropdown
+                              class="item validate"
+                              label="[[localize('prioritization_classification')]]"
+                              options="[[classifications]]"
+                              option-value="title"
+                              option-label="title"
+                              selected="{{data.prioritization}}"
+                              auto-validate>
+                          </etools-dropdown>
                           <paper-input
                             class="item validate"
                             id="project_code"
@@ -572,7 +641,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="funding_requirements"
@@ -584,7 +653,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="own_funding"
@@ -596,7 +665,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="cerf_funding"
@@ -608,7 +677,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="cbpf_funding"
@@ -620,7 +689,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="bilateral_funding"
@@ -632,7 +701,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="unicef_funding"
@@ -644,7 +713,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="wfp_funding"
@@ -656,7 +725,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <paper-input
                             class="item validate full-width"
                             id="funding_gap"
@@ -668,30 +737,30 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-  
+
                           <custom-fields-widget
                             class="item full-width"
                             custom-fields="{{ data.custom_fields }}"
                             edit="[[edit]]">
                           </custom-fields-widget>
-  
+
                           <div>
                       </iron-collapse>
                     </div>
                 </template>
-  
+
                 <div class="buttons layout horizontal-reverse">
                   <paper-button class="btn-primary" on-tap="_save" raised>
                     [[localize('save')]]
                   </paper-button>
-  
+
                   <paper-button on-tap="_close">
                     [[localize('cancel')]]
                   </paper-button>
                 </div>
-  
+
                 <etools-loading active="[[updatePending]]"></etools-loading>
-  
+
               </div>
             </paper-radio-group-custom>
           </template>
@@ -767,11 +836,11 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   statuses!: any[];
 
   @property({type: Array})
-  frequencies: GenericObject [] = [
-      {title: 'Weekly', id: 'Wee'},
-      {title: 'Monthly', id: 'Mon'},
-      {title: 'Quarterly', id: 'Qua'},
-    ];
+  frequencies: GenericObject[] = [
+    {title: 'Weekly', id: 'Wee'},
+    {title: 'Monthly', id: 'Mon'},
+    {title: 'Quarterly', id: 'Qua'},
+  ];
 
   @property({type: Array})
   projects: any[] = [];
@@ -813,7 +882,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   private _fetchOchaProjectDebouncer!: Debouncer;
 
 
-  static get observers(){
+  static get observers() {
     return ['_resetOchaProjects(selectedPartner)',
       '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
       '_computeOchaProjectDetailsUrl(selectedProject)',
@@ -867,7 +936,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
         if (fromOchaDisabled && !customDisabled) {
           this.set('mode', 'custom');
         }
-    });
+      });
   }
 
   _updatePartnerForClusters(partner: string) {
@@ -922,7 +991,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   open() {
     if (this.edit && this.editData) {
       this.set('data', Object.assign({}, this.editData));
-      this.selectedClusters = this.editData.clusters.map(function (cluster) {
+      this.selectedClusters = this.editData.clusters.map(function(cluster) {
         return cluster.id;
       });
       this.set('mode', 'custom');
@@ -972,7 +1041,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     if (partner && partner.id) {
       this.set('selectedProject', '');
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.set('projectDetails', {});
         fireEvent(this, 'details-loaded');
       });
@@ -997,15 +1066,15 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
         const projectThunk = (this.$.projects as EtoolsPrpAjaxEl);
         projectThunk.abort();
         projectThunk.thunk()()
-          .then(function (res: GenericObject) {
+          .then(function(res: GenericObject) {
             self.set('projectsLoading', false);
 
-            let filteredPartnerProjects = self.partnerProjects.filter(function (item) {
+            let filteredPartnerProjects = self.partnerProjects.filter(function(item) {
               return item.is_ocha_imported === true;
             });
 
-            let filteredResData = res.data.filter( (item: GenericObject) => {
-              return filteredPartnerProjects.find(function (element) {
+            let filteredResData = res.data.filter((item: GenericObject) => {
+              return filteredPartnerProjects.find(function(element) {
                 return element.title.trim() === item.name.trim();
               }) === undefined;
             });
@@ -1013,9 +1082,9 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
             self.set('projects', filteredResData);
             fireEvent(self, 'details-loaded');
           })
-          .catch( (err: GenericObject) => { // jshint ignore:line
+          .catch((err: GenericObject) => {
             if (err.code === 504) {
-              fireEvent(self,'notify', {type: 'ocha-timeout'});
+              fireEvent(self, 'notify', {type: 'ocha-timeout'});
             }
             self.set('projectsLoading', false);
             self.set('errors', err.data);
@@ -1029,7 +1098,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     return obb;
   }
 
-  _fetchOchaProjectDetails(project) {
+  _fetchOchaProjectDetails(project: string) {
     if (!project) {
       return;
     }
@@ -1037,12 +1106,12 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     let self = this;
     (this.$.projectDetails as EtoolsPrpAjaxEl).abort();
     (this.$.projectDetails as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res: GenericObject) {
+      .then(function(res: GenericObject) {
         self.set('projectDetailsLoading', false);
         self.set('projectDetails', res.data);
         fireEvent(self, 'details-loaded');
       })
-      .catch(function (err: GenericObject) { // jshint ignore:line
+      .catch(function(err: GenericObject) {
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
@@ -1052,13 +1121,13 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 
   _computeFormattedProjects(projects: GenericObject[]) {
-    return projects.map( (project) => {
+    return projects.map((project) => {
       return {id: project.id, title: project.name};
     });
   }
 
   _saveClusters() {
-    this.set('data.clusters', this.selectedClusters.map(function (cluster) {
+    this.set('data.clusters', this.selectedClusters.map(function(cluster) {
       return {'id': cluster};
     }));
   }
@@ -1079,8 +1148,8 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     this.set('path', url);
   }
 
-  _formatForMultiselect(list) {
-    return list.map( (item: GenericObject) => {
+  _formatForMultiselect(list: GenericObject[]) {
+    return list.map((item: GenericObject) => {
       return {
         id: item.id,
         value: item.id,
@@ -1123,7 +1192,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     let locationError = false;
     let rawLocations = this.get('data.locations');
 
-    let changedLocations = rawLocations.map( (location: GenericObject) => {
+    let changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location !== undefined) {
         return location.location;
       } else {
@@ -1131,7 +1200,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
       }
     });
 
-    changedLocations.forEach( (location: GenericObject) => {
+    changedLocations.forEach((location: GenericObject) => {
       if (location.title === undefined) {
         self.set('errors', 'No location set - please set a location.');
         locationError = true;
@@ -1141,7 +1210,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
       }
     });
 
-    if (locationError === true) {
+    if (locationError) {
       return;
     }
 
@@ -1156,14 +1225,14 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
     }
 
     if (this.mode === 'ocha') {
-      this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
+      (this.$.projectAjax as EtoolsPrpAjaxEl).body = Object.assign({}, this.ochaProjectRequestId);
     } else {
-      this.$.projectAjax.body = Object.assign({}, this.data);
+      (this.$.projectAjax as EtoolsPrpAjaxEl).body = Object.assign({}, this.data);
     }
     this.updatePending = true;
     let thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then( (res: GenericObject) => {
+      .then((res: GenericObject) => {
         self.updatePending = false;
         if (self.edit) {
           fireEvent(self, 'project-edited', res.data);
@@ -1173,7 +1242,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
           self._redirectToDetail(res.data.id);
         }
       })
-      .catch( (err: GenericObject) => { // jshint ignore:line
+      .catch((err: GenericObject) => {
         self.updatePending = false;
         self.set('errors', err.data);
         self.set('data.locations', rawLocations);   // If there are backend validation errors, reset locations
@@ -1182,11 +1251,11 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    this.addEventListener('details-loaded', this.adjustPosition);
+    this.addEventListener('details-loaded', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('details-loaded', this.adjustPosition);
+    this.removeEventListener('details-loaded', this.adjustPosition as any);
   }
 
   connectedCallback() {

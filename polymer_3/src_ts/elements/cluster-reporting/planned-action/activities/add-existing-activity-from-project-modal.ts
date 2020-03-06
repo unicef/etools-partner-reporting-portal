@@ -14,13 +14,9 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
-//<link rel="import" href = "../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html" >
-//<link rel="import"href = "../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html" >
-//<link rel="import" href = "../../../../polyfills/es6-shim.html" >
+import '@unicef-polymer/etools-date-time/datepicker-lite';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import Endpoints from '../../../../endpoints';
-
-import '@polymer/paper-input/paper-input';
-import '@polymer/paper-input/paper-input';
 import ModalMixin from '../../../../mixins/modal-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
@@ -28,19 +24,12 @@ import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {modalStyles} from '../../../../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-ajax';
 import '../../../etools-prp-permissions';
-//@Lajos: bellow was not found!!!!!!!!!!
-import '../../../etools-prp-date-input';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
-//@Lajos: bellow was originally
-// <link rel="import" href = "../../../error-box.html" > but assumed bellow:
 import '../../../error-box-errors';
-//@Lajos: unable to find bellow
 import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
-
-
 
 
 /**
@@ -220,6 +209,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
             </paper-dropdown-menu>
           </div>
           <div class="item">
+            <!--
             <etools-single-selection-menu
                 class="validate"
                 label="[[localize('partner_activity')]]"
@@ -232,6 +222,18 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                 trigger-value-change-event
                 required>
             </etools-single-selection-menu>
+            -->
+            <etools-dropdown
+                class="validate"
+                label="[[localize('partner_activity')]]"
+                options="[[partnerActivities]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.partner_activity}}"
+                disabled="[[_equals(partnerActivities.length, 0)]]"
+                auto-validate
+                required>
+            </etools-dropdown>
           </div>
 
           <header class="item-wide">
@@ -246,6 +248,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
               <div class="flex">
                 <div class="app-grid">
                   <div class="item">
+                    <!--
                     <etools-single-selection-menu
                         disabled
                         class="validate"
@@ -259,6 +262,18 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                         trigger-value-change-event
                         required>
                     </etools-single-selection-menu>
+                    -->
+                    <etools-dropdown
+                      class="validate"
+                      label="[[localize('partner_project')]]"
+                      options="[[data.projects]]"
+                      option-value="project_id"
+                      option-label="title"
+                      selected="[[item.project_id]]"
+                      auto-validate
+                      disabled
+                      required>
+                    </etools-dropdown>
                   </div>
 
                   <div class="item">
@@ -284,6 +299,8 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                   </div>
 
                   <div class="item">
+
+                  <!--
                     <etools-prp-date-input
                         class="start-date"
                         label="[[localize('start_date')]]"
@@ -293,9 +310,18 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                         no-init>
                     </etools-prp-date-input>
                     </etools-date-input>
+                    -->
+                    <datepicker-lite
+                      class="start-date"
+                      label="[[localize('start_date')]]"
+                      value="{{item.start_date}}"
+                      error-message=""
+                      required>
+                    </datepicker-lite>
                   </div>
 
                   <div class="item">
+                    <!--
                     <etools-prp-date-input
                         class="end-date"
                         label="[[localize('end_date')]]"
@@ -304,6 +330,14 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                         required
                         no-init>
                     </etools-prp-date-input>
+                    -->
+                    <datepicker-lite
+                      class="end-date"
+                      label="[[localize('end_date')]]"
+                      value="{{item.end_date}}"
+                      error-message=""
+                      required>
+                    </datepicker-lite>
                   </div>
                 </div>
               </div>
@@ -373,7 +407,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   activities = [];
 
   @property({type: Array})
-  partnerActivities = [];
+  partnerActivities: GenericObject[] = [];
 
   @property({type: Array})
   objectives = [];
@@ -414,7 +448,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _setDefaults() {
-    var simpleProjectData = {};
+    let simpleProjectData: GenericObject = {};
 
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
@@ -475,7 +509,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         });
         self.set('partnerActivities', filteredActivities);
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -497,15 +531,15 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }
 
   _save() {
-    var self = this;
-    var thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    var valid = [
+    const self = this;
+    const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
+    const valid = [
       this._fieldsAreValid(),
       this._dateRangeValid('.start-date', '.end-date'),
     ].every(Boolean);
@@ -516,19 +550,17 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     this.set('updatePending', true);
 
-    var clonedData = this._clone(this.data); // make copy of data
-    var selectedPartnerActivity = this.partnerActivities.find(function(item: any) {
+    const clonedData = this._clone(this.data); // make copy of data
+    const selectedPartnerActivity: GenericObject | undefined = this.partnerActivities.find(function(item: any) {
       return item.id === self.data.partner_activity;
     });
-    //@Lajos: did not find a wat to give default value before asignation
-    var combinedProjects = selectedPartnerActivity.projects.concat(this.data.projects);
-
-    // assign combined projects to cloned data instead of data directly to fix visual glitch
-    clonedData.projects = combinedProjects;
+    if (selectedPartnerActivity && selectedPartnerActivity.projects) {
+      // assign combined projects to cloned data instead of data directly to fix visual glitch
+      clonedData.projects = selectedPartnerActivity.projects.concat(this.data.projects);
+    }
 
     // save cloned data and not regular data, since cloned data has the combined projects
-    //@Lajos not sure if bellow is correct
-    this.$.activity.body = Object.assign({
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.partner,
     }, clonedData);
 
@@ -566,12 +598,10 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    //@Lajos: bellow gives error
     this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    //@Lajos: bellow gives error
     this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 

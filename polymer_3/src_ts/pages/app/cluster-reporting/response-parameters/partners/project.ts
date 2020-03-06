@@ -119,8 +119,6 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
-
-  //Lajos: this was not defined
   @property({type: Boolean})
   updatePending = false;
 
@@ -169,10 +167,10 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             self.updatePending = false;
             self.projectData = res.data;
           })
-        // .catch(function(err: any) { // jshint ignore:line
-        //   self.updatePending = false;
-        //   // TODO: error handling
-        // });
+          .catch(function(err: any) {
+            self.updatePending = false;
+            //   // TODO: error handling
+          });
       });
   }
 

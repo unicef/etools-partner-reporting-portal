@@ -49,6 +49,7 @@ class NumberOfPartners extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)
   _computePartnersUrl(baseUrl: string) {
     return this.buildUrl(baseUrl, '/response-parameters/partners');
   }
+
 }
 
 window.customElements.define('number-of-partners', NumberOfPartners);

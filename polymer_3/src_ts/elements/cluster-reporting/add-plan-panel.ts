@@ -2,9 +2,9 @@ import {html, PolymerElement} from '@polymer/polymer';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
-//<link rel="import" href="../../polyfills/es6-shim.html">
 import {buttonsStyles} from '../../styles/buttons-styles';
 import './add-response-plan-modal';
+import {AddResponsePlanModalEl} from './add-response-plan-modal';
 
 /**
  * @polymer
@@ -43,11 +43,10 @@ class AddPlanPanel extends PolymerElement {
     `;
   }
 
-  //@Lajos: not sure about bellow
-  //did not find anything similar yet :(
   _openModal() {
-    this.$.modal.open();
+    (this.$.modal as AddResponsePlanModalEl).open();
   }
+
 }
 
 window.customElements.define('add-plan-panel', AddPlanPanel);

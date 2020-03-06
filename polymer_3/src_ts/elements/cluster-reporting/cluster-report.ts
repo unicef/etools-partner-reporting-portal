@@ -13,7 +13,6 @@ import '@polymer/paper-menu-button/paper-menu-button';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-item/paper-icon-item';
 import '@polymer/paper-listbox/paper-listbox';
-//<link rel="import" href="../../polyfills/es6-shim.html">
 import Endpoints from '../../endpoints';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
@@ -22,11 +21,13 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import './send-back-modal';
 import './feedback-modal';
 import '../error-modal';
+import {ErrorModalEl} from '../error-modal';
 import '../report-status';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '../etools-prp-number';
 import '../etools-prp-permissions';
 import '../indicator-details';
+import {IndicatorDetailsEl} from '../indicator-details';
 import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
@@ -561,16 +562,14 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _handleOpenedChanged(e: CustomEvent, data: GenericObject) {
-    var indicatorDetails;
-
     e.stopPropagation();
 
     if (data.value) {
-      //@LAJOS: PLEASE REVIEW.... DID NOT SURE IF CORRECT
-
-      indicatorDetails = e.target!.querySelector('indicator-details');
+      const indicatorDetails = (e.target as HTMLElement)!.querySelector('indicator-details') as IndicatorDetailsEl;
       try {
-        indicatorDetails.init();
+        if (indicatorDetails) {
+          indicatorDetails.init();
+        }
       } catch (err) {
       }
     }
@@ -585,20 +584,20 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _confirmIntent() {
-    var deferred = this._deferred();
-
-    fireEvent('report-submit-confirm', deferred);
+    const deferred = this._deferred();
+    fireEvent(this, 'report-submit-confirm', deferred);
 
     return deferred.promise;
   }
 
   _commit() {
     const submitThunk = (this.$.submit as EtoolsPrpAjaxEl).thunk();
-    var self = this;
+    const self = this;
 
     return this.reduxStore.dispatch(
       clusterIndicatorReportsSubmit(submitThunk)
     )
+      // @ts-ignore
       .then(function() {
         self.set('busy', false);
         fireEvent('report-submitted', self.data.id);
@@ -630,8 +629,8 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _updateMeta(e: CustomEvent) {
-    var self = this;
-    var updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
+    const self = this;
+    const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
     e.stopPropagation();
     const data = e.detail;
@@ -641,10 +640,11 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     this.reduxStore.dispatch(
       ClusterIndicatorReportsUpdate(updateThunk, this.data.id)
     )
+      // @ts-ignore
       .then(function() {
         self._notifyChangesSaved();
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -720,19 +720,16 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _addEventListeners() {
     this._onReportComplete = this._onReportComplete.bind(this);
-    //@Lajos: bellow are not found
+
     this.addEventListener('report-complete', this._onReportComplete as any);
-    //@Lajos: bellow are not found
     this._updateMeta = this._updateMeta.bind(this);
     this.addEventListener('reportable-meta-changed', this._updateMeta as any);
-  },
+  }
 
   _removeEventListeners() {
-    //@Lajos: bellows are not found
     this.removeEventListener('report-complete', this._onReportComplete as any);
     this.removeEventListener('reportable-meta-changed', this._updateMeta as any);
   }
-
 
   connectedCallback() {
     super.connectedCallback();
@@ -742,9 +739,8 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.submit as EtoolsPrpAjaxEl).abort();
-    //@Lajos: belows shows taht it does not exists from original: this.$.error.close();
-    //not sure of what type this is.....
-    (this.$.error as EtoolsPrpAjaxEl).close();
+
+    (this.$.error as ErrorModalEl).close();
     (this.$.update as EtoolsPrpAjaxEl).abort();
     this._removeEventListeners();
   }

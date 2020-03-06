@@ -25,7 +25,6 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from "../../utils/fire-custom-event";
 
 
-
 /**
  * @polymer
  * @customElement
@@ -33,88 +32,88 @@ import {fireEvent} from "../../utils/fire-custom-event";
  * @appliesMixin NotificationsMixin
  * @appliesMixin LocalizeMixin
  */
-class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement))){
-  public static get template(){
+class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${modalStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-  
+
           --paper-dialog: {
             width: 800px;
-  
+
             & > * {
               margin: 0;
             }
           };
-  
+
           --json-field-label: {
             display: none;
           };
         }
-  
+
         .row {
           margin: 16px 0;
         }
-  
+
         table {
           width: 100%;
           table-layout: fixed;
         }
-  
+
         th {
           padding: 5px 10px;
           background: var(--paper-grey-200);
         }
-  
+
         td {
           padding: 0 10px;
         }
-  
+
         th:first-of-type {
           text-align: left;
         }
-  
+
         td:nth-of-type(1),
         td:nth-of-type(2) {
           background: var(--paper-grey-100);
         }
-  
+
         th:nth-of-type(1),
         td:nth-of-type(1) {
           width: 150px;
         }
-  
+
         .text {
           @apply --truncate;
         }
-  
+
         json-field {
           text-align: center;
         }
-  
+
         .data-key {
           margin: 0;
           font-size: 12px;
           color: var(--theme-secondary-text-color);
         }
-  
+
         .data-key dt,
         .data-key dd {
           display: inline;
         }
-  
+
         .data-key dd {
           margin: 0;
         }
       </style>
-      
+
       <etools-prp-ajax
           id="locations"
           url="[[locationsUrl]]">
       </etools-prp-ajax>
-  
+
       <etools-prp-ajax
           id="update"
           url="[[updateUrl]]"
@@ -122,34 +121,34 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
           method="patch"
           content-type="application/json">
       </etools-prp-ajax>
-      
+
       <paper-dialog
           id="dialog"
           with-backdrop
           opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>[[localize('location_settings_for_indicator')]]</h2>
-  
+
           <paper-icon-button
               class="self-center"
               on-tap="close"
               icon="icons:close">
           </paper-icon-button>
         </div>
-  
+
         <paper-dialog-scrollable>
           <template
               is="dom-if"
               if="[[opened]]"
               restamp="true">
             <error-box errors="[[errors]]"></error-box>
-  
+
             <div class="row">
               <div class="layout horizontal justified">
                 <labelled-item label="[[localize('title')]]">
                   [[data.blueprint.title]]
                 </labelled-item>
-  
+
                 <dl class="data-key">
                   <dt>[[localize('label')]] -</dt>
                   <template
@@ -171,7 +170,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
                 </dl>
               </div>
             </div>
-  
+
             <div class="row">
               <table>
                 <thead>
@@ -187,7 +186,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
                     </template>
                   </tr>
                 </thead>
-  
+
                 <tbody>
                   <template
                       is="dom-repeat"
@@ -230,7 +229,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
             </div>
           </template>
         </paper-dialog-scrollable>
-  
+
         <div class="buttons layout horizontal-reverse">
           <paper-button
               on-tap="_save"
@@ -238,16 +237,16 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
               raised>
             [[localize('save')]]
           </paper-button>
-  
+
           <paper-button
               on-tap="close">
             [[localize('cancel')]]
           </paper-button>
         </div>
-  
+
         <etools-loading active="[[pending]]"></etools-loading>
       </paper-dialog>
-    
+
     `;
   }
 
@@ -266,7 +265,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   @property({type: Boolean})
   pending: boolean = false;
 
-  @property({type: String, computed:'getReduxStateValue(rootState.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
@@ -278,11 +277,11 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   @property({type: Boolean, computed: '_computeIsNumber(data.blueprint.display_type)'})
   isNumber!: boolean;
 
-  @property({type: String, computed:'getReduxStateValue(rootState.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
 
-  static get observers(){
+  static get observers() {
     return ['_setDefaults(opened)'];
   }
 
@@ -299,7 +298,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _getLocationName(locationId: string, locations: GenericObject[]) {
-    let location = locations.results.find( (loc: GenericObject) => {
+    let location = locations.results.find((loc: GenericObject) => {
       return String(loc.id) === String(locationId);
     });
 
@@ -322,16 +321,15 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     this.set('pending', true);
 
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    locThunk().then( (res: GenericObject) => {
+    locThunk().then((res: GenericObject) => {
       self.set('pending', false);
       self.set('locations', res.data);
 
       fireEvent(self, 'indicator-locations-modal-refit');
     })
-    .catch( () => {
-      self.set('pending', false);
-    });
-
+      .catch(() => {
+        self.set('pending', false);
+      });
   }
 
   _validate(e: CustomEvent) {
@@ -348,12 +346,12 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     this.set('pending', true);
 
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
-    updateThunk().then( () => {
-        self.set('pending', false);
-        self.set('editData.locations', self.get('data.locations'));
-        self.close();
-      })
-      .catch( (err: GenericObject) => {
+    updateThunk().then(() => {
+      self.set('pending', false);
+      self.set('editData.locations', self.get('data.locations'));
+      self.close();
+    })
+      .catch((err: GenericObject) => {
         self.set('pending', false);
         self.set('errors', err.data);
       });
@@ -361,11 +359,11 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    this.addEventListener('indicator-locations-modal-refit', this.adjustPosition);
+    this.addEventListener('indicator-locations-modal-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('indicator-locations-modal-refit', this.adjustPosition);
+    this.removeEventListener('indicator-locations-modal-refit', this.adjustPosition as any);
   }
 
   connectedCallback() {
