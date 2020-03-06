@@ -8,8 +8,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters';
-//@Lajos: has no exported element => needs export modal and refactoring names
-import {CreationModalEl} from '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
+import {PlannedActionProjectsModalEl} from '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../../elements/cluster-reporting/project-list-table';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -105,10 +104,7 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
   private _projectsAjaxDebouncer!: Debouncer;
 
   _openModal() {
-    //CreationModalEl is imported
-    //TO DO: if not refactored yet, refactor export line of CreationModal => change name
-    // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as CreationModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
 
   _computeUrl(responsePlanID: string) {

@@ -9,9 +9,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/filters';
-//CreationModalEl is imported
-//TO DO: if not refactored yet, refactor export line of CreationModal => change name
-import {CreationModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
+import {ClusterActivitiesModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/activities-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -124,10 +122,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   private _clusterActivitiesAjaxDebouncer!: Debouncer;
 
   _openModal() {
-    //CreationModalEl is imported
-    //TO DO: if not refactored yet, refactor export line of CreationModal => change name
-    // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as CreationModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as ClusterActivitiesModalEl).open();
   }
 
   _clusterActivitiesAjax() {

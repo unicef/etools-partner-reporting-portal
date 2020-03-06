@@ -7,9 +7,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
-//CreationModalEl is imported
-//TO DO: if not refactored yet, refactor export line of CreationModal => change name
-import {CreationModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
+import {ClusterDisaggregationsModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -115,7 +113,7 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
     //CreationModalEl is imported
     //TO DO: if not refactored yet, refactor export line of CreationModal => change name
     // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as CreationModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as ClusterDisaggregationsModalEl).open();
   }
 
   _computeUrl(responsePlanID: string) {

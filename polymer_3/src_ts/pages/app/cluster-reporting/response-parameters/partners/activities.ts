@@ -9,9 +9,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/filters';
-//CreationModalEl is imported
-//TO DO: if not refactored yet, refactor export line of CreationModal => change name
-import {CreationModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
+import {PlannedActionCreationModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/activities-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -115,7 +113,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
     //CreationModalEl is imported
     //TO DO: if not refactored yet, refactor export line of CreationModal => change name
     // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as CreationModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionCreationModalEl).open();
   }
 
   _computeUrl(responsePlanID: string) {
@@ -158,7 +156,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   }
 
   _removeEventListeners() {
-    this.removeEventListener('activity-added', this._onSuccess: as any);
+    this.removeEventListener('activity-added', this._onSuccess as any);
   }
 
   connectedCallback() {
