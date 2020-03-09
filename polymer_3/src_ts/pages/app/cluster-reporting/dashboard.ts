@@ -25,6 +25,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
 import {clusterDashboardDataFetch} from '../../../redux/actions/clusterDashboardData';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -70,7 +71,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </style>
 
     <etools-prp-auth
-      account-type="{{ accountType }}">
+      account-type="{{accountType}}">
     </etools-prp-auth>
 
     <iron-location
@@ -78,8 +79,8 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </iron-location>
 
     <iron-query-params
-      params-string="{{ query }}"
-      params-object="{{ queryParams }}">
+      params-string="{{query}}"
+      params-object="{{queryParams}}">
     </iron-query-params>
 
     <etools-prp-ajax
@@ -88,7 +89,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
       params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <page-header title="{{ page_title }}">
+    <page-header title="{{page_title}}">
       <div class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
       </div>
@@ -152,6 +153,11 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   `;
   }
 
+  @property({type: Object})
+  queryParams!: GenericObject;
+
+  @property({type: String})
+  query!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
@@ -177,6 +183,10 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   }
 
   _computeMode(accountType: string) {
+    if (!accountType) {
+      return undefined;
+    }
+
     switch (accountType) {
       case Constants.ACCOUNT_TYPE_PARTNER:
         return 'partner';
@@ -184,10 +194,13 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
       case Constants.ACCOUNT_TYPE_CLUSTER:
         return 'cluster';
     }
-    return '';
   }
 
   _computePageTitle(mode: string, localize: Function) {
+    if (!mode) {
+      return undefined;
+    }
+
     switch (mode) {
       case 'partner':
         return localize('partner_dashboard');
@@ -198,10 +211,16 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   }
 
   _computeDataUrl(responsePlanId: string, mode: string) {
+    if (!responsePlanId || !mode) {
+      return undefined;
+    }
     return Endpoints.clusterDashboard(responsePlanId, mode);
   }
 
-  _fetchData() {
+  _fetchData(dataUrl: string, queryParams: GenericObject) {
+    if (!dataUrl || !queryParams) {
+      return;
+    }
     const self = this;
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer,
       timeOut.after(300),
@@ -215,11 +234,11 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   _addEventListeners() {
     this._fetchData = this._fetchData.bind(this);
-    this.addEventListener('report-submitted', this._fetchData);
+    this.addEventListener('report-submitted', this._fetchData as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('report-submitted', this._fetchData);
+    this.removeEventListener('report-submitted', this._fetchData as any);
   }
 
   connectedCallback() {

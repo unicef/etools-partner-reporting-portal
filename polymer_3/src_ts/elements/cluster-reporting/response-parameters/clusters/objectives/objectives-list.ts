@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -17,7 +17,7 @@ import '../../../../etools-prp-ajax';
 import '../../../../page-body';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -33,7 +33,7 @@ class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixi
     // language=HTML
     return html`
     ${sharedStyles} ${tableStyles}
-    style include="data-table-styles table-styles iron-flex">
+    style include="data-table-styles iron-flex">
       :host {
         display: block;
       }
@@ -136,7 +136,7 @@ class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixi
 
   @property({type: Object, computed: '_withDefaultParams(queryParams)'})
   anchorQueryParams!: GenericObject;
-  
+
   _openModal() {
     this.shadowRoot!.querySelector('#modal').open();
   }

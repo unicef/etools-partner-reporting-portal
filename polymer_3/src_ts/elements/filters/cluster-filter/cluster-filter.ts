@@ -55,13 +55,16 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   queryParams!: GenericObject;
 
   @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)'})
   clusterNamesUrl = '';
 
-  @property({type: String, computed: 'getReduxStatevalue(rootState.responsePlans.currentID)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanID = [];
 
   @property({type: Array})
@@ -75,19 +78,19 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
     return ['_fetchClusterNames(clusterNamesUrl, params)'];
   };
 
-  private _debouncer!: Debouncer;
+  private clusterNamesDebouncer!: Debouncer;
 
   _computeClusterNamesUrl(responsePlanID: string) {
     return Endpoints.clusterNames(responsePlanID);
   }
 
   _fetchClusterNames() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
         var self = this;
-        const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
-        (this.$.clusters as EtoolsPrpAjaxEl).abort();
+        const thunk = (this.$.clusterNames as EtoolsPrpAjaxEl).thunk();
+        (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
         thunk()
           .then(function(res: any) {
@@ -104,10 +107,10 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
 
   disconnectedCallback() {
     super.connectedCallback();
-    (this.$.clusters as EtoolsPrpAjaxEl).abort();
+    (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
-      this._debouncer.cancel();
+    if (this.clusterNamesDebouncer.isActive()) {
+      this.clusterNamesDebouncer.cancel();
     }
   }
 

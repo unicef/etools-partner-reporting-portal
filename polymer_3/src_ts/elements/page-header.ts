@@ -104,6 +104,10 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   app!: string;
 
   _computeBackUrl(tail: string, baseUrl: string, app: string) {
+    if (tail === undefined) {
+      return;
+    }
+
     if (app === 'cluster-reporting') {
       return this.buildUrl(this._baseUrlCluster, tail);
     }

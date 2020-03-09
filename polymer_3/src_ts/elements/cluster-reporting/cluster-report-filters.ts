@@ -25,7 +25,7 @@ class ClusterReportFilters extends UtilsMixin(PolymerElement) {
     // language=HTML
     return html`
     ${filterStyles}
-    <style include="app-grid-style filter-styles">
+    <style include="app-grid-style">
       :host {
         display: block;
         background: white;

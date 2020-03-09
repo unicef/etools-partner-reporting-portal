@@ -173,7 +173,7 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
     this.addEventListener('pa-activity-edited', this._onSuccess);
-  },
+  }
 
   _removeEventListeners() {
     this.removeEventListener('pa-activity-edited', this._onSuccess);

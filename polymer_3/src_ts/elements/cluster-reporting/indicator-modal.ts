@@ -1430,7 +1430,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         data.in_need.d = 1;
       }
 
-      data.locations.forEach(function(location: GenericObject, idx: number, arr:) {
+      data.locations.forEach(function(location: GenericObject, idx: number, arr: any[]) {
         location.baseline.d = 1;
         location.target.d = 1;
         location.baseline.v = parseInt(location.baseline.v);

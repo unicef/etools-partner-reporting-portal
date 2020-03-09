@@ -63,7 +63,7 @@ export const setUserProfile = function(data: any) {
   };
 };
 
-export const setAccountType = function(data: string) {
+export const setAccountType = function(data: Object) {
   return {
     type: Constants.SET_ACCOUNT_TYPE,
     data: data,

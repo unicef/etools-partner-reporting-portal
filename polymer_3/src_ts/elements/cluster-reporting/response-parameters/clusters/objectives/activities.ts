@@ -26,7 +26,7 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
     // language=HTML
     return html`
     ${tableStyles}
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles">
       :host {
         display: block;
       }
@@ -94,7 +94,10 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _computeActivitiesUrl() {
-    return Endpoints.responseParametersClusterActivities(this.responsePlanID);
+    if (this.responsePlanID) {
+      return Endpoints.responseParametersClusterActivities(this.responsePlanID);
+    }
+    return '';
   }
 
   disconnectedCallback() {

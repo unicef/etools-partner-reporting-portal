@@ -1,40 +1,23 @@
-// <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-// <link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
-// <link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
-// <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
-// <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
-// <link rel="import" href="../../../../bower_components/paper-radio-button/paper-radio-button.html">
-// <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
-// <link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
-// <link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
-
-// <link rel="import" href="../../../behaviors/utils.html">
-// <link rel="import" href="../../../behaviors/routing.html">
-// <link rel="import" href="../../../behaviors/data-table.html">
-// <link rel="import" href="../../../redux/store.html">
-// <link rel="import" href="../../../elements/etools-prp-permissions.html">
-// <link rel="import" href="../../../styles/table-styles.html">
-// <link rel="import" href="../../../styles/app-theme-cluster.html">
-// <link rel="import" href="../../../elements/cluster-reporting/add-plan-panel.html">
-
-// <link rel="import" href="../../../elements/workspace-dropdown.html">
-// <link rel="import" href="../../../elements/etools-prp-workspaces.html">
-
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-tabs/paper-tab';
-import '@polymer/paper-tabs/paper-tabs';
-import '@polymer/app-route/app-route';
-import '@polymer/iron-pages/iron-pages';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/paper-button/paper-button';
+import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-card/paper-card';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../elements/page-header';
-import '../../../elements/page-body';
-import '../../../elements/cluster-reporting/cluster-report-filters';
-import '../../../elements/cluster-reporting/cluster-reports';
+import '@unicef-polymer/etools-data-table/etools-data-table';
+
+import '../../../elements/etools-prp-permissions';
+import '../../../elements/workspace-dropdown';
+import '../../../elements/etools-prp-workspaces';
+import '../../../elements/cluster-reporting/add-plan-panel';
 import RoutingMixin from '../../../mixins/routing-mixin';
 import {GenericObject} from '../../../typings/globals.types';
+import {tableStyles} from '../../../styles/table-styles';
+import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
 
 /**
  * @polymer
@@ -45,7 +28,8 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
 
   public static get template() {
     return html`
-    <style include="data-table-styles table-styles app-theme-cluster-styles">
+    ${tableStyles} ${appThemeClusterStyles}
+    <style include="data-table-styles">
       :host {
         display: block;
         position: absolute;

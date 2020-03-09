@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params.html';
+import '@polymer/iron-location/iron-query-params';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import '../../../../elements/etools-prp-ajax';
 import '../../../../elements/cluster-reporting/analysis/indicators-filters';

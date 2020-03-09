@@ -87,10 +87,10 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
     return Endpoints.clusterIndicatorReports(responsePlanId);
   }
 
-  _fetchData(reset) {
+  _fetchData(reset?: boolean) {
     const reportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
 
-    reportsThunk().abort();
+    (this.$.reports as EtoolsPrpAjaxE).abort();
 
     this.reduxStore.dispatch(
       clusterIndicatorReportsFetch(reportsThunk, reset)
@@ -102,10 +102,11 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _onParamsChanged() {
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(100),
       () => {
-        this._fetchData();
+        self._fetchData();
       });
   }
 

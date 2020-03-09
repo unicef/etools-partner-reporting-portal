@@ -95,7 +95,9 @@ class ReportsList extends ReduxConnectedElement {
   }
 
   _computeData(dashboardData: any, collection: any) {
-    return dashboardData[collection];
+    if (dashboardData) {
+      return dashboardData[collection];
+    }
   }
 
   _computeIsIMOClusters(profile: GenericObject) {

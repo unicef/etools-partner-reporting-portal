@@ -7,6 +7,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
+import {GenericObject} from '../../../typings/globals.types';
 
 
 /**
@@ -43,6 +44,8 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
   `;
   }
 
+  @property({type: Object})
+  params!: GenericObject;
 
   @property({type: Number})
   maxLocType = Settings.cluster.maxLocType;
@@ -60,7 +63,11 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
   value = '';
 
   _computeData(params: any, maxLocType: number) {
-    var validData = Array.apply(null, Array(maxLocType + 1))
+    if (!params) {
+      return;
+    }
+
+    const validData = Array.apply(null, Array(maxLocType + 1))
       .map(function(_, index) {
         return {
           id: String(index),
@@ -82,6 +89,10 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
   }
 
   _computeFieldValue(value: string, data: any, locType: string, maxLocType: number) {
+    if (data === undefined || locType === undefined) {
+      return;
+    }
+
     switch (true) {
       case !value:
       case data.length === 1:

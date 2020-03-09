@@ -115,7 +115,7 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
   @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDashboardData.data.constrained_indicator_reports)'})
   data!: any[];
 
-  @property({type: String, computed: '_computeActivitiesUrl(_baseUrlCluster, resultsQuery)'})
+  @property({type: String, computed: '_computeReportsUrl(_baseUrlCluster, resultsQuery)'})
   reportsUrl!: string;
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterDashboardData.loading)'})
