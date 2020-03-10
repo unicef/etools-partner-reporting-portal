@@ -945,6 +945,10 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
+    if (!responsePlanID) {
+      return;
+    }
+
     if (edit) {
       return Endpoints.plannedActionsProjectOverview(data.id);
     } else if (mode === 'custom') {
@@ -955,6 +959,10 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 
   _computeOchaProjectsUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
+
     return Endpoints.ochaProjectsList(responsePlanID);
   }
 

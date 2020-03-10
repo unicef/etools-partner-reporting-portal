@@ -12,7 +12,7 @@ import {getDomainByEnv} from '../../../../../config';
 * @customElement
 * @appliesMixin UtilsMixin
 */
-class Router extends UtilsMixin(PolymerElement) {
+class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
@@ -98,7 +98,6 @@ class Router extends UtilsMixin(PolymerElement) {
       return;
     }
 
-
     if (!this.visible) {
       return;
     }
@@ -124,6 +123,6 @@ class Router extends UtilsMixin(PolymerElement) {
   }
 }
 
-window.customElements.define('response-parameters-clusters-router', Router);
+window.customElements.define('response-parameters-clusters-router', ResponseParametersClustersRouter);
 
-export {Router as ResponseParametersClustersRouterEl};
+export {ResponseParametersClustersRouter as ResponseParametersClustersRouterEl};

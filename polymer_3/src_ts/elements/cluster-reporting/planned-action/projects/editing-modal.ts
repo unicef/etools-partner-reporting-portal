@@ -49,11 +49,9 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
           --paper-dialog: {
             width: 700px;
-
-            & > * {
-              margin: 0;
+            margin: 0;
             }
-          };
+
         }
 
         .full-width {

@@ -116,6 +116,9 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
 
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.plannedActions(responsePlanID);
   }
 
@@ -127,6 +130,10 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
   }
 
   _projectsAjax(queryParams: GenericObject) {
+    if (!this.url) {
+      return;
+    }
+
     this.projectsDebouncer = Debouncer.debounce(this.projectsDebouncer,
       timeOut.after(300),
       () => {

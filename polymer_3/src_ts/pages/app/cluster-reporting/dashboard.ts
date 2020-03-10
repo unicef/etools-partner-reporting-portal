@@ -184,7 +184,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   _computeMode(accountType: string) {
     if (!accountType) {
-      return undefined;
+      return;
     }
 
     switch (accountType) {

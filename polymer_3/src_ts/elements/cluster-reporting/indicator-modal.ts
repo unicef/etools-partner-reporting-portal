@@ -61,11 +61,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
           --paper-dialog: {
             width: 800px;
-
-            & > * {
-              margin: 0;
-            }
-          };
+          }
         }
 
         .row {
@@ -1227,6 +1223,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 

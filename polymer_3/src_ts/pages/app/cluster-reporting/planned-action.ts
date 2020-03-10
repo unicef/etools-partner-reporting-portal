@@ -67,7 +67,7 @@ class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxCo
           <div class="toolbar horizontal end-justified layout">
             <filter-list-by-cluster></filter-list-by-cluster>
           </div>
-          <div class="tabs">
+          <div slot="tabs">
             <paper-tabs
               selected="{{routeData.subpage}}"
               attr-for-selected="name"

@@ -25,19 +25,14 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
-    ${modalStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
-          }
-        };
+        }
       }
 
       ::slotted([slot=disaggregation-table]) {

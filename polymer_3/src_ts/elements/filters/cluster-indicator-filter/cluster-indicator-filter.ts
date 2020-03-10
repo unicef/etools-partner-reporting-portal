@@ -37,7 +37,7 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
   `;
   }
 
-  @property({type: String, computed: '_computeIndicatorNamesUrl(responsePlanID)', observer: '_fetchIndicatorNames'})
+  @property({type: String, computed: '_computeIndicatorNamesUrl(responsePlanId)', observer: '_fetchIndicatorNames'})
   indicatorNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
@@ -50,11 +50,18 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
   value!: string;
 
   _computeIndicatorNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterNames(responsePlanId);
-  };
+  }
 
   _fetchIndicatorNames() {
-    var self = this;
+    if (!this.indicatorNamesUrl) {
+      return;
+    }
+
+    const self = this;
     const thunk = (this.$.indicatorNames as EtoolsPrpAjaxEl).thunk();
     (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
 
@@ -63,17 +70,18 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
         self.set('data', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
       .catch(function(err) {
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('cluster-indicator-filter', ClusterIndicatorFilter);

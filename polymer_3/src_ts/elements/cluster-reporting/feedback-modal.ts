@@ -20,17 +20,14 @@ class FeedbackModal extends ModalMixin(PolymerElement) {
   public static get template() {
     return html`
         ${buttonsStyles} ${modalStyles}
-        <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+        <style include="iron-flex iron-flex-alignment iron-flex-reverse">
           :host {
             display: block;
 
             --paper-dialog: {
               width: 600px;
+            }
 
-              & > * {
-                margin: 0;
-              }
-            };
           }
 
           h3 {

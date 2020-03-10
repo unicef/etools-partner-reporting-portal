@@ -9,7 +9,9 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/filters';
-import {ClusterActivitiesModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
+import {CreationModalActivitiesEl} from
+  '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
+import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/activities-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -116,16 +118,23 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
+
     return Endpoints.responseParametersClusterActivities(responsePlanID);
   }
 
   private _clusterActivitiesAjaxDebouncer!: Debouncer;
 
   _openModal() {
-    (this.shadowRoot!.querySelector('#modal') as ClusterActivitiesModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as CreationModalActivitiesEl).open();
   }
 
   _clusterActivitiesAjax() {
+    if (!this.activitiesUrl) {
+      return;
+    }
 
     this._clusterActivitiesAjaxDebouncer = Debouncer.debounce(this._clusterActivitiesAjaxDebouncer,
       timeOut.after(300),
@@ -133,11 +142,11 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchClusterActivitiesList(thunk));
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+        this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
+          // @ts-ignore
+          .catch(function(err) {
+            // TODO: error handling.
+          });
       });
   }
 

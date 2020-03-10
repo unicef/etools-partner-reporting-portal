@@ -55,11 +55,8 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
         --paper-dialog: {
           width: 600px;
-
-          & > * {
-            margin: 0;
+          margin: 0;
           }
-        };
       }
 
       .app-grid {
@@ -483,6 +480,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 

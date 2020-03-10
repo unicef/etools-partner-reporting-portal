@@ -84,6 +84,10 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
   }
 
   _fetchLocations() {
+    if (!this.locationsUrl || !this.params) {
+      return;
+    }
+
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {

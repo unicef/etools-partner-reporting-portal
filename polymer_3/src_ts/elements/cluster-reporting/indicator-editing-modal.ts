@@ -56,11 +56,8 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
           --paper-dialog: {
             width: 800px;
+          }
 
-            & > * {
-              margin: 0;
-            }
-          };
         }
 
         .row {
@@ -570,6 +567,9 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _computeLocationsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanId);
   }
 
@@ -649,4 +649,4 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 }
 
-window.customElements.define('indicator-editing-modal', IndicatorEditingModal);
+window.customElements.define('indicator-edit-modal', IndicatorEditingModal);

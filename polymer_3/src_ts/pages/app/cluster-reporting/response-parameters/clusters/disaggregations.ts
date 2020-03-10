@@ -7,7 +7,9 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
-import {ClusterDisaggregationsModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
+import {CreationModalDisaggregationEl} from
+  '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
+import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
@@ -18,8 +20,6 @@ import {GenericObject} from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-//Originally the files was imported but was not included in style tag
-// import {sharedStyles} from '../../../../../styles/shared-styles';
 import {fetchClusterDisaggregationsList} from '../../../../../redux/actions/clusterDisaggregations';
 
 /**
@@ -110,17 +110,22 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
   }
 
   _openModal() {
-    //CreationModalEl is imported
-    //TO DO: if not refactored yet, refactor export line of CreationModal => change name
-    // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as ClusterDisaggregationsModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as CreationModalDisaggregationEl).open();
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
+
     return Endpoints.responseParametersClusterDisaggregations(responsePlanID);
   }
 
   _clusterDisaggregationsAjax(queryParams: GenericObject) {
+    if (!this.disaggregationsUrl) {
+      return;
+    }
+
     this._clusterDisaggregationsAjaxDebouncer = Debouncer.debounce(this._clusterDisaggregationsAjaxDebouncer,
       timeOut.after(300),
       () => {
@@ -130,10 +135,10 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
         }
         (this.$.disaggregations as EtoolsPrpAjaxEl).abort();
         this.reduxStore.dispatch(fetchClusterDisaggregationsList(thunk))
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            //   // TODO: error handling.
+          });
       });
   }
 

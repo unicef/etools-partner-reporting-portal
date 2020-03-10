@@ -32,11 +32,9 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
           width: auto;
           max-width: none !important; /* :( */
           max-height: none !important; /* :( */
+          margin: 0;
+        }
 
-          & > * {
-            margin: 0;
-          }
-        };
       }
 
       .add-chip {
@@ -96,7 +94,7 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
   _add() {
     var formatted = moment(this._date).format(dateFormat);
 
-    fireEvent('chip-add', formatted);
+    fireEvent(this, 'chip-add', formatted);
     this._close();
   }
 

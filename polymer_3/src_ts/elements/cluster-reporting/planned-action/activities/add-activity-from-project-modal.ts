@@ -55,11 +55,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
         --paper-dialog: {
           width: 600px;
-
-          & > * {
-            margin: 0;
-          }
-        };
+        }
       }
 
       .app-grid {
@@ -716,10 +712,13 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 
-  _fetchActivities(clusterId: strign) {
+  _fetchActivities(clusterId: string) {
     var self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     this.set('partnerActivitiesUrl', Endpoints.partnerActivityList(this.responsePlanId)

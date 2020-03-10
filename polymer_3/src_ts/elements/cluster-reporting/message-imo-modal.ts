@@ -37,11 +37,9 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
 
           --paper-dialog: {
             width: 600px;
-
-            & > * {
-              margin: 0;
+            margin: 0;
             }
-          };
+
         }
 
         .row {

@@ -37,7 +37,7 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   `;
   }
 
-  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanID)', observer: '_fetchLocationNames'})
+  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanId)', observer: '_fetchLocationNames'})
   locationNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
@@ -49,9 +49,12 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   value!: string;
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterLocationNames(responsePlanID);
-  };
+  _computeLocationNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterLocationNames(responsePlanId);
+  }
 
   _fetchLocationNames() {
     var self = this;
@@ -63,17 +66,18 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
         self.set('data', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
       .catch(function(err: any) {
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('cluster-location-filter', ClusterLocationFilter);

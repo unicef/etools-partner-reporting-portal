@@ -467,6 +467,9 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeLocationsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanId);
   }
 

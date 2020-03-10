@@ -28,12 +28,12 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
+class ObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
     ${sharedStyles} ${tableStyles}
-    style include="data-table-styles iron-flex">
+      <style include="data-table-styles iron-flex">
       :host {
         display: block;
       }

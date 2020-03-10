@@ -3,6 +3,7 @@ import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -29,12 +30,15 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       option-label="title"
       selected="[[value]]"
       disabled="[[disabled]]"
+      selected-item="{{selectedItem}}"
       trigger-value-change-event
-      on-etools-selected-item-changed="_handleDropdownChange"
-      >
+      on-etools-selected-item-changed="_handleDropdownChange">
     </etools-dropdown>
   `;
   }
+
+  @property({type: Object})
+  selectedItem!: GenericObject;
 
   @property({type: Boolean})
   disabled!: boolean;

@@ -38,19 +38,13 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 
   static get template() {
     return html`
-    ${buttonsStyles}
-    ${modalStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {
           width: 750px;
-
-          &>* {
-            margin: 0;
-          }
         }
-        ;
       }
     </style>
 
@@ -66,7 +60,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog with-backdrop opened=[[opened]]>
+    <paper-dialog opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 

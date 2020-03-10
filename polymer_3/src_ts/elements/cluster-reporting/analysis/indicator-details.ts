@@ -279,6 +279,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   loading!: boolean;
 
   _computeIndicatorUrl(responsePlanId: string, indicatorId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.analysisIndicator(responsePlanId, indicatorId);
   }
 

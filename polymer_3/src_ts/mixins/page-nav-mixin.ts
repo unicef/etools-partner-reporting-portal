@@ -40,7 +40,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       // Don't toggle submenus
       this.shadowRoot!.querySelectorAll('.menu-trigger').forEach((trigger: any) => {
         trigger.addEventListener('tap', function(e: CustomEvent) {
-          if (trigger.parentNode.opened) {
+          if (trigger.opened) {
             e.stopPropagation();
           }
         });

@@ -72,7 +72,7 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         <project-status status="[[activityData.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{routeData.tab}}"
             attr-for-selected="name"
@@ -135,6 +135,9 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeOverviewUrl(responsePlanID: string, activityId: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.plannedActionsActivityOverview(responsePlanID, activityId);
   }
 
@@ -152,6 +155,9 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _getActivityAjax() {
+    if (!this.overviewUrl) {
+      return;
+    }
     this._activityAjaxDebouncer = Debouncer.debounce(this._activityAjaxDebouncer,
       timeOut.after(100),
       () => {

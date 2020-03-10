@@ -120,10 +120,17 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!this.responsePlanID) {
+      return;
+    }
     return Endpoints.partnerActivityList(responsePlanID);
   }
 
   _activitiesAjax(queryParams: GenericObject) {
+    if (!this.url) {
+      return;
+    }
+
     const self = this;
     this.activitiesDebouncer = Debouncer.debounce(this.activitiesDebouncer,
       timeOut.after(300),

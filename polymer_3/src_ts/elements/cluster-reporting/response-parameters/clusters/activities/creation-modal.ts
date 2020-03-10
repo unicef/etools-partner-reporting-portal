@@ -17,6 +17,8 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-dialog/paper-dialog';
 import '../../../../form-fields/dropdown-form-input';
 import '../../../../form-fields/cluster-dropdown-content';
@@ -24,6 +26,7 @@ import '../../../../error-box';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../../styles/modal-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
@@ -33,11 +36,11 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin DateMixin
  */
-class CreationModal extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedElement))) {
+class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -48,40 +51,8 @@ class CreationModal extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedEle
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 700px;
-
-          & > * {
-            margin: 0;
-          }
-        };
-      }
-
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
-
-      .header {
-        height: 48px;
-        padding: 0 24px;
-        margin: 0;
-        color: white;
-        background: var(--theme-primary-color);
-      }
-
-      .header h2 {
-        @apply --paper-font-title;
-
-        margin: 0;
-        line-height: 48px;
-      }
-
-      .header paper-icon-button {
-        margin: 0 -13px 0 20px;
-        color: white;
-      }
-
-      .buttons {
-        padding: 24px;
+            width: 700px;
+        }
       }
     </style>
 
@@ -107,7 +78,7 @@ class CreationModal extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedEle
         id="dialog"
         with-backdrop
         opened="{{opened}}">
-      <div class="header layout horizontal justified">
+      <div id="header" class="header layout horizontal justified">
         <h2>[[localize('add_cluster_activity')]]</h2>
           <paper-icon-button
               class="self-center"
@@ -311,6 +282,6 @@ class CreationModal extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedEle
   }
 }
 
-window.customElements.define('cluster-activities-modal', CreationModal);
+window.customElements.define('cluster-activities-modal', CreationModalActivities);
 
-export {CreationModal as CreationModalEl};
+export {CreationModalActivities as CreationModalActivitiesEl};

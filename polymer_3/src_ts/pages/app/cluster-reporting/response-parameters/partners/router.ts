@@ -14,7 +14,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 * @customElement
 * @appliesMixin UtilsMixin
 */
-class Router extends UtilsMixin(PolymerElement) {
+class ResponseParametersPartnersRouter extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
@@ -98,6 +98,6 @@ class Router extends UtilsMixin(PolymerElement) {
   }
 }
 
-window.customElements.define('response-parameters-clusters-router', Router);
+window.customElements.define('response-parameters-partners-router', ResponseParametersPartnersRouter);
 
-export {Router as ResponseParametersClustersRouterEl};
+export {ResponseParametersPartnersRouter as ResponseParametersPartnersRouterEl};

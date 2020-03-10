@@ -53,11 +53,8 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
         --paper-dialog: {
           width: 600px;
-
-          & > * {
-            margin: 0;
           }
-        };
+
       }
 
       .app-grid {
@@ -698,10 +695,16 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 
   _computeProjectsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.plannedActions(responsePlanId);
   }
 

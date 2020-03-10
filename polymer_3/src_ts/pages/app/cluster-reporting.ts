@@ -16,6 +16,8 @@ import {RootState} from '../../typings/redux.types';
 import {EtoolsPrpAjaxEl} from '../../elements/etools-prp-ajax';
 import {getDomainByEnv} from '../../config';
 import {fetchResponsePlans} from '../../redux/actions';
+import '../../pages/app/cluster-reporting/select-plan';
+import '../../pages/app/cluster-reporting/router';
 
 /**
  * @polymer

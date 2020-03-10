@@ -96,14 +96,14 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   responsePlanID!: string;
 
   @property({type: String, computed: '_computeUrl(responsePlanID)'})
-  url!: string;
+  activitiesUrl!: string;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.responsePlans.current)'})
   responsePlanCurrent!: GenericObject;
 
   static get observers() {
     return [
-      '_activitiesAjax(queryParams, url)'
+      '_activitiesAjax(queryParams, activitiesUrl)'
     ]
   }
 
@@ -117,6 +117,9 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.partnerActivityList(responsePlanID);
   }
 
@@ -133,6 +136,10 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   }
 
   _activitiesAjax(queryParams: GenericObject) {
+    if (!this.activitiesUrl || !queryParams) {
+      return;
+    }
+
     this._activitiesAjaxDebouncer = Debouncer.debounce(this._activitiesAjaxDebouncer,
       timeOut.after(300),
       () => {

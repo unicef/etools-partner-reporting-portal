@@ -86,7 +86,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         <project-status status="[[data.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{routeData.tab}}"
             attr-for-selected="name"

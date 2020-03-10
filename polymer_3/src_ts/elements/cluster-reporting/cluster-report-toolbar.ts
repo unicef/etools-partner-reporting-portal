@@ -32,7 +32,7 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
 
       <etools-prp-toolbar
         query="{{ query }}"
-        response-plan-id="{{ responsePlanId }}">
+        response-plan-id="{{responsePlanId}}">
         <download-button url="[[exportUrl]]">[[localize('export')]]</download-button>
 
         <template
@@ -58,6 +58,9 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
 
   @property({type: Number})
   submitted!: number;
+
+  @property({type: String})
+  responsePlanId!: string;
 
   @property({type: String, computed: '_computeImportTemplateUrl(responsePlanId, query, submitted)'})
   exportTemplateUrl!: string;

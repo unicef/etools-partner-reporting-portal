@@ -9,14 +9,17 @@ import '@polymer/app-layout/app-header/app-header';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
 import '../../../elements/etools-prp-permissions';
 import '../../../elements/cluster-reporting/nav';
 import '../../../elements/cluster-reporting/app-header';
 import UtilsMixin from '../../../mixins/utils-mixin';
+import OverlayHelperMixin from '../../../mixins/overlay-helper-mixin';
 import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../redux/actions';
 import {GenericObject} from '../../../typings/globals.types';
 import {getDomainByEnv} from '../../../config';
+
 
 /**
  * @polymer
@@ -24,7 +27,7 @@ import {getDomainByEnv} from '../../../config';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PageClusterReportingRouter extends UtilsMixin(ReduxConnectedElement) {
+class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConnectedElement)) {
 
   public static get template() {
     return html`
@@ -88,6 +91,7 @@ class PageClusterReportingRouter extends UtilsMixin(ReduxConnectedElement) {
       </app-drawer>
 
       <main role="main" id="page-container">
+          <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
           <cluster-reporting-app-header></cluster-reporting-app-header>
 
           <template
@@ -206,7 +210,9 @@ class PageClusterReportingRouter extends UtilsMixin(ReduxConnectedElement) {
 
 
   _planChanged(plan: string) {
-    this.reduxStore.dispatch(setCurrentResponsePlanID(plan));
+    if (this.reduxStore) {
+      this.reduxStore.dispatch(setCurrentResponsePlanID(plan));
+    }
   }
 
   _routePlanChanged(plan: string) {

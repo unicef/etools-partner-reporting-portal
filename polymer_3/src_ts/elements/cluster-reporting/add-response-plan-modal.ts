@@ -55,10 +55,8 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px; & > *{
-        margin: 0;
-      }
-      };
+          width: 600px;
+        }
       }
 
       .full-width {

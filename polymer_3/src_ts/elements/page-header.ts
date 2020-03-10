@@ -58,6 +58,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
         }
         ::slotted([slot=tabs]) {
           margin-bottom: -25px;
+          text-transform: uppercase;
         }
       </style>
 

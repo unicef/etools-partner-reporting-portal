@@ -270,6 +270,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _pageChanged(page: string) {
+    if (page === 'pages') {
+      return;
+    }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
     console.log('app.ts loading...' + resolvedPageUrl);
     import(resolvedPageUrl).catch((err: any) => {

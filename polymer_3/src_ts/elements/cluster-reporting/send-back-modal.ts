@@ -37,11 +37,7 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
 
         --paper-dialog: {
           width: 600px;
-
-          & > * {
-            margin: 0;
-          }
-        };
+        }
       }
 
       h3 {

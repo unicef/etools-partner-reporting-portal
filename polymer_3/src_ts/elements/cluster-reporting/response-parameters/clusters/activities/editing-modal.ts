@@ -48,11 +48,8 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
+          margin: 0;
           }
-        };
       }
 
       .full-width {

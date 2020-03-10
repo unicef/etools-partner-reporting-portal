@@ -42,11 +42,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
 
           --paper-dialog: {
             width: 800px;
-
-            & > * {
-              margin: 0;
-            }
-          };
+          }
 
           --json-field-label: {
             display: none;
@@ -290,6 +286,9 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _computeLocationsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanId);
   }
 

@@ -29,14 +29,10 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
 
         --paper-dialog: {
           width: 175px;
-          max-width: none !important; /* :( */
+          max-width: none !important;
           padding: 10px;
           margin: 0;
-
-          & > * {
-            margin: 0;
-          }
-        };
+        }
 
         --paper-input-container: {
           padding: 0;
@@ -129,7 +125,7 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
       return;
     }
 
-    fireEvent('chip-add', this._formattedValue);
+    fireEvent(this, 'chip-add', this._formattedValue);
     this._close();
   }
 

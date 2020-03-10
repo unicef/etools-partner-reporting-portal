@@ -207,10 +207,16 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
   }
 
   _computeApiUrl(responsePlanId: string, type: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.analysisOperationalPresence(responsePlanId, type);
   }
 
   _fetchData() {
+    if (!this.dataUrl) {
+      return;
+    }
     const self = this;
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer,
       timeOut.after(300),
@@ -228,6 +234,10 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
   }
 
   _fetchMap() {
+    if (!this.mapUrl) {
+      return;
+    }
+
     const self = this;
     this.fetchMapDebouncer = Debouncer.debounce(this.fetchMapDebouncer,
       timeOut.after(300),

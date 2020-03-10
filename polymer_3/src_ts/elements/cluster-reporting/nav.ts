@@ -8,6 +8,7 @@ import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import LocalizeMixin from '../../mixins/localize-mixin';
+import '@polymer/iron-collapse/iron-collapse';
 //import '@polymer/paper-divider/paper-divider.js';
 import '@polymer/paper-listbox/paper-listbox';
 import UtilsMixin from '../../mixins/utils-mixin';
@@ -35,7 +36,11 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
             --paper-item-selected: {
               color: var(--theme-primary-color);
               background: var(--theme-selected-item-background-color);
-            };
+            }
+          }
+          .nav-content paper-item{
+            min-height: 48px;
+            padding: 0px 16px;
           }
         </style>
 
@@ -56,26 +61,29 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
 
         <paper-listbox
           id="menu"
-          selected="{{ selected }}"
+          selected="{{selected}}"
           attr-for-selected="name"
-          selectable=".selectable"
+          slot="dropdown-content"
+          class="dropdown-content"
+
           key-event-target="null">
 
           <div class="nav-content">
             <div>
+
               <paper-item name="dashboard" class="selectable">
                 <a href="[[_appendQuery(dashboardUrl, clusterQuery)]]">
                   <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>[[localize('dashboard')]]</span>
                 </a>
               </paper-item>
 
-              <div name="response-parameters" class="selectable">
-                <paper-listbox>
-                  <paper-item class="menu-trigger">
-                    <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
-                      <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
-                    </a>
-                  </paper-item>
+              <paper-item class="menu-trigger" opened="{{detailsOpened}}" on-tab="toggleCollapse">
+                <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
+                  <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
+                </a>
+             </paper-item>
+
+              <iron-collapse id="details" opened="{{detailsOpened}}">
                   <paper-listbox class="menu-content">
                     <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
                       <a href="[[_appendQuery(clustersUrl, clusterQuery)]]">[[localize('clusters')]]</a>
@@ -85,8 +93,7 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
                       </a>
                     </paper-item>
                   </paper-listbox>
-                </paper-listbox>
-              </div>
+              </iron-collapse>
 
               <template
                 is="dom-if"
@@ -137,6 +144,12 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
         </paper-listbox>
       `;
   }
+
+  @property({type: Boolean})
+  detailsOpened = false;
+
+  @property({type: String})
+  selected!: string;
 
   @property({type: Object})
   route!: Route;
@@ -197,6 +210,10 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
 
   static get observers() {
     return ['_routeChanged(route)'];
+  }
+
+  toggleCollapse() {
+    this.detailsOpened = !this.detailsOpened;
   }
 
   goToIdManagement(e: CustomEvent) {

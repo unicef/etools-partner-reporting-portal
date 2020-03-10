@@ -65,10 +65,17 @@ class PageAnalysisIndicators extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _computeDataUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.analysisIndicators(responsePlanId);
   }
 
   _fetchData() {
+    if (!this.dataUrl) {
+      return;
+    }
+
     const self = this;
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer,
       timeOut.after(300),

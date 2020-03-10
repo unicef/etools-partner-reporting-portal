@@ -541,6 +541,10 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _computeExportUrl(responsePlanId: string, query: any) {
+    if (!responsePlanId) {
+      return;
+    }
+
     return [
       Endpoints.clusterIndicatorReportsExport(responsePlanId),
       '?',
@@ -599,7 +603,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       // @ts-ignore
       .then(function() {
         self.set('busy', false);
-        fireEvent('report-submitted', self.data.id);
+        fireEvent(self, 'report-submitted', self.data.id);
       })
       .catch(function(res: any) {
         var errors = res.data.non_field_errors;

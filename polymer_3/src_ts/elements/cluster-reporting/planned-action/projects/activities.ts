@@ -108,6 +108,9 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _computeUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.partnerActivityList(responsePlanId);
   }
 

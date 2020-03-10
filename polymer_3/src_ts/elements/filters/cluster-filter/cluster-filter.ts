@@ -61,11 +61,11 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)'})
+  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanId)'})
   clusterNamesUrl = '';
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
-  responsePlanID = [];
+  responsePlanId!: string;
 
   @property({type: Array})
   data = [];
@@ -80,11 +80,14 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
 
   private clusterNamesDebouncer!: Debouncer;
 
-  _computeClusterNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterNames(responsePlanID);
+  _computeClusterNamesUrl(responsePlanId: string) {
+    return Endpoints.clusterNames(responsePlanId);
   }
 
   _fetchClusterNames() {
+    if (!this.clusterNamesUrl) {
+      return;
+    }
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
@@ -97,7 +100,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
             self.set('data', [{
               id: '',
               title: 'All',
-            }].concat(res.data));
+            }].concat(res.data || []));
           })
           .catch(function(err) {
             // TODO: error handling

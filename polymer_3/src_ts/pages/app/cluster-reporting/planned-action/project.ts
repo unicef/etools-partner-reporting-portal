@@ -93,7 +93,7 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
         <project-status status="[[projectData.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{ routeData.tab }}"
             attr-for-selected="name"

@@ -18,9 +18,11 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
 import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../../styles/modal-styles';
 import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 
@@ -36,7 +38,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -48,39 +50,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
-          }
-        };
-      }
-
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
-
-      .header {
-        height: 48px;
-        padding: 0 24px;
-        margin: 0;
-        color: white;
-        background: var(--theme-primary-color);
-      }
-
-      .header h2 {
-        @apply --paper-font-title;
-
-        margin: 0;
-        line-height: 48px;
-      }
-
-      .header paper-icon-button {
-        margin: 0 -13px 0 20px;
-        color: white;
-      }
-
-      .buttons {
-        padding: 24px;
+        }
       }
     </style>
 

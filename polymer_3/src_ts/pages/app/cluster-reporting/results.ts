@@ -1,4 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
@@ -11,7 +12,7 @@ import '../../../elements/page-body';
 import '../../../elements/cluster-reporting/cluster-report-filters';
 import '../../../elements/cluster-reporting/cluster-reports';
 import UtilsMixin from '../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../mixins/localize-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 
 /**
@@ -20,7 +21,7 @@ import {GenericObject} from '../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(PolymerElement)) {
+class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   public static get template() {
     return html`
@@ -33,10 +34,6 @@ class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(PolymerElemen
           border-style: solid;
           border-color: var(--paper-grey-300);
         };
-      }
-
-      .tabs paper-tab {
-        text-transform: uppercase;
       }
     </style>
 
@@ -56,9 +53,10 @@ class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(PolymerElemen
     </app-route>
 
     <page-header title="[[localize('reporting_results')]]">
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{tab}}"
+            selectable="paper-tab"
             attr-for-selected="name"
             on-iron-activate="_resetPage"
             scrollable
@@ -72,9 +70,7 @@ class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(PolymerElemen
     <page-body>
       <cluster-report-filters></cluster-report-filters>
 
-      <iron-pages
-          selected="[[tab]]"
-          attr-for-selected="name">
+      <iron-pages selected="[[tab]]" attr-for-selected="name">
         <template
             is="dom-if"
             if="[[_equals(tab, 'draft')]]"
@@ -104,8 +100,14 @@ class PageClusterReportingResults extends LocalizeMixin(UtilsMixin(PolymerElemen
   @property({type: Object})
   routeData!: GenericObject;
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   queryParams!: GenericObject;
+
+  @property({type: Object})
+  route!: GenericObject;
 
   @property({type: String, observer: '_tabChanged'})
   tab!: string;

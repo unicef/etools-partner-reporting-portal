@@ -60,7 +60,7 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
   fieldValue!: string;
 
   @property({type: String})
-  value = '';
+  value!: string;
 
   _computeData(params: any, maxLocType: number) {
     if (!params) {

@@ -56,9 +56,11 @@ class Contacts extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   //Whole file commented
+  @property({type: String})
+  query!: string;
 
-  // @property({type: Object})
-  // queryParams!: GenericObject;
+  @property({type: Object})
+  queryParams!: GenericObject;
 
   // @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   // responsePlanID!: string;

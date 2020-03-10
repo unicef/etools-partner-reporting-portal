@@ -98,7 +98,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
         <project-status status="[[activityData.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{ routeData.tab }}"
             attr-for-selected="name"
@@ -151,7 +151,6 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanID!: string;
 
-
   @property({type: String, computed: '_computeOverviewUrl(responsePlanID, activityId)'})
   overviewUrl!: string;
 
@@ -191,6 +190,9 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
   }
 
   _computeOverviewUrl(responsePlanId: string, activityId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
   }
 

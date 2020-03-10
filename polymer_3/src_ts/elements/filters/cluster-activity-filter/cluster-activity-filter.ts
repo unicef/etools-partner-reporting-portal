@@ -96,7 +96,7 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
             self.set('data', [{
               id: '',
               title: 'All',
-            }].concat(res.data.results));
+            }].concat(res.data.results || []));
           })
           // @ts-ignore
           .catch(function(err: any) {

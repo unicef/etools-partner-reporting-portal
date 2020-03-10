@@ -85,6 +85,8 @@ class ClusterReportFilters extends UtilsMixin(PolymerElement) {
     </filter-list>
   `;
   }
+  @property({type: Object})
+  queryParams!: GenericObject;
 
   @property({type: Object})
   properties!: GenericObject;

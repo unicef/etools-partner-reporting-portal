@@ -84,6 +84,10 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _computeReportsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+
     return Endpoints.clusterIndicatorReports(responsePlanId);
   }
 
