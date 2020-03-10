@@ -160,6 +160,9 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
   data!: GenericObject;
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanID);
   }
 

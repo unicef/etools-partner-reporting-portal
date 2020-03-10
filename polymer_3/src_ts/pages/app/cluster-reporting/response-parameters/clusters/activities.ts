@@ -105,8 +105,8 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterActivities.loading)'})
   loading!: boolean;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterActivities.all)'})
-  activities!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterActivities.all)'})
+  activities!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterActivities.count)'})
   totalResults!: number;

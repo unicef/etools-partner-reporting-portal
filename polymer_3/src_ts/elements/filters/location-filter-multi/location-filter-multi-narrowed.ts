@@ -80,6 +80,9 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
   private _debouncer!: Debouncer;
 
   _computeLocationsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanId);
   }
 

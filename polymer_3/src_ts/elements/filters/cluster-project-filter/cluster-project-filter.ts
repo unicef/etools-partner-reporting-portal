@@ -78,6 +78,9 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
   private _debouncer!: Debouncer;
 
   _computeProjectNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterProjectNames(responsePlanId);
   }
 
@@ -110,7 +113,7 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
     super.disconnectedCallback();
     (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

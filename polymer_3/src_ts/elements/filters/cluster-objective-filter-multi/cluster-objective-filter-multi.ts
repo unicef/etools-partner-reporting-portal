@@ -79,6 +79,9 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 
@@ -122,7 +125,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

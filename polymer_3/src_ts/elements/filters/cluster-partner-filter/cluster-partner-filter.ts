@@ -43,6 +43,9 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   value!: string;
 
   _computePartnerNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterPartnerNames(responsePlanId);
   }
 

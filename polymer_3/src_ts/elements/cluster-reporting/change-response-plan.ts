@@ -49,7 +49,7 @@ class ChangeResponsePlan extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
   }
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.all)'})
-  responsePlans!: any;
+  responsePlans!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanID!: string;

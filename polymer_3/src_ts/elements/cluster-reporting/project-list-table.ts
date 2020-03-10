@@ -207,8 +207,8 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
   @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: Object, observer: '_tableContentChanged', computed: 'getReduxStateObject(rootState.partnerProjects.all)'})
-  projects!: GenericObject;
+  @property({type: Array, observer: '_tableContentChanged', computed: 'getReduxStateArray(rootState.partnerProjects.all)'})
+  projects!: GenericObject[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerProjects.loading)'})
   loading!: boolean;

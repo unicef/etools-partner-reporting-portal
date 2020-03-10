@@ -202,15 +202,21 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
 
   static get observers() {
     return [
-      '_getObjectivesByClusterID(data.cluster)',
+      '_getObjectivesByClusterID(data.cluster, objectivesUrl)',
     ];
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterActivities(responsePlanID);
   }
 
   _computeObjectivesUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanID);
   }
 
@@ -218,9 +224,9 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
     return !clusterID;
   }
 
-  _getObjectivesByClusterID(clusterID: number) {
+  _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
     let self = this;
-    if (clusterID) {
+    if (clusterID && objectivesUrl) {
       const thunk = (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk();
       this.objectivesParams = {cluster_id: this.data.cluster};
 

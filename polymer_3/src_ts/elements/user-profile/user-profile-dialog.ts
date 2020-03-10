@@ -14,7 +14,6 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../labelled-item';
-import {modalStyles} from '../../styles/modal-styles';
 
 /**
  * @polymer
@@ -26,7 +25,6 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -37,9 +35,31 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
         --paper-dialog: {
           width: 700px;
-          margin: 0;
         }
 
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 24px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color, #0099ff);
+      }
+
+      .header h2 {
+        @apply --paper-font-title;
+        margin: 0;
+        line-height: 48px;
+      }
+
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
       }
 
       .clusters {
@@ -106,7 +126,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
                   [[ role ]]
                 </div>
               </template>
-            <paper-divider class="p-divider" colored="black"/>
+            <!-- <paper-divider class="p-divider" colored="black"/> -->
           </div>
 
           <template is="dom-if" if="{{profile.partner}}">

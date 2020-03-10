@@ -48,6 +48,9 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   data = [];
 
   _computeLocationNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterIndicatorLocations(responsePlanId);
   }
 

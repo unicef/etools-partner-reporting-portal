@@ -128,8 +128,8 @@ class ObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(Paginatio
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterObjectives.loading)'})
   loading!: boolean;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.all)'})
-  objectives!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterObjectives.all)'})
+  objectives!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterObjectives.count)'})
   totalResults!: number;

@@ -111,7 +111,7 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
 
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

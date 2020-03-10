@@ -62,7 +62,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   queryParams!: GenericObject;
 
   @property({type: String, computed: '_computeClusterNamesUrl(responsePlanId)'})
-  clusterNamesUrl = '';
+  clusterNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
@@ -81,11 +81,14 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   private clusterNamesDebouncer!: Debouncer;
 
   _computeClusterNamesUrl(responsePlanId: string) {
+    if (responsePlanId) {
+      return;
+    }
     return Endpoints.clusterNames(responsePlanId);
   }
 
   _fetchClusterNames() {
-    if (!this.clusterNamesUrl) {
+    if (!this.clusterNamesUrl || !this.params) {
       return;
     }
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
@@ -112,7 +115,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
     super.connectedCallback();
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
-    if (this.clusterNamesDebouncer.isActive()) {
+    if (this.clusterNamesDebouncer && this.clusterNamesDebouncer.isActive()) {
       this.clusterNamesDebouncer.cancel();
     }
   }

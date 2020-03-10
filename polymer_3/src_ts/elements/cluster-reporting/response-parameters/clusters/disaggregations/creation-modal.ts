@@ -141,8 +141,8 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
   @property({type: String, computed: '_computeUrl(responsePlanID)'})
   url!: string;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterDisaggregations.all)'})
-  disaggregations!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDisaggregations.all)'})
+  disaggregations!: any[];
 
   @property({type: Object})
   editData!: GenericObject;
