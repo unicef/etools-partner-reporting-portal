@@ -180,16 +180,16 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     if (!this._fieldsAreValid()) {
       return;
     }
-    var self = this;
+    const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
-        var newPath = self.buildUrl(
+        const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
 
-        store.dispatch(pdReportsUpdateSingle(
+        self.reduxStore.dispatch(pdReportsUpdateSingle(
           self.pdId,
           self.reportId,
           res.data
@@ -198,7 +198,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         self.set('path', newPath);
       })
       .catch(function(res: any) {
-        var errors = res.data.non_field_errors;
+        const errors = res.data.non_field_errors;
         self.close();
         return self.$.error.open(errors);
       })

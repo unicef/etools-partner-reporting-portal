@@ -28,7 +28,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
+class ClustersObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
@@ -142,11 +142,11 @@ class ObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(Paginatio
   }
 
   _detailUrl(id: number, query: string) {
-    var path = '/response-parameters/clusters/objective/' + id;
+    const path = '/response-parameters/clusters/objective/' + id;
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 }
 
-window.customElements.define('clusters-objectives-list', ObjectivesList);
+window.customElements.define('clusters-objectives-list', ClustersObjectivesList);
 
-export {ObjectivesList as ObjectivesListEl};
+export {ClustersObjectivesList as ClustersObjectivesListEl};
