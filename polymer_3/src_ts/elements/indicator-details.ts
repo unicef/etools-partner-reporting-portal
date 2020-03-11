@@ -125,7 +125,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }
 
       .table-container dd::after {
-        content: '\A';
+        content: '\\A';
 	      white-space: pre;
       }
 

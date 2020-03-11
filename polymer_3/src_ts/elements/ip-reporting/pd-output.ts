@@ -254,7 +254,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                     is="dom-if"
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.total.c, 0)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type, indicator.total.c, 1)]]</dd>
                 </template>
               </dl>
             </div>
