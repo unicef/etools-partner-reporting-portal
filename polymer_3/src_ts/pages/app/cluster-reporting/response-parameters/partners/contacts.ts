@@ -7,13 +7,14 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/contacts/filters';
 import '../../../../../elements/cluster-reporting/contacts-table';
-import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
-import Endpoints from '../../../../../endpoints';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
+import '../../../../../elements/etools-prp-ajax';
+// import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
+// import Endpoints from '../../../../../endpoints';
+// import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+// import {timeOut} from '@polymer/polymer/lib/utils/async';
+// import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
 
 /**
 * @polymer
@@ -56,9 +57,11 @@ class Contacts extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   //Whole file commented
+  @property({type: String})
+  query!: string;
 
-  // @property({type: Object})
-  // queryParams!: GenericObject;
+  @property({type: Object})
+  queryParams!: GenericObject;
 
   // @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   // responsePlanID!: string;

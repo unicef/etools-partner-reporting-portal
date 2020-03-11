@@ -138,7 +138,6 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
-  //Lajos: this was not defined
   @property({type: Boolean})
   updatePending = false;
 
@@ -181,10 +180,10 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
         self.updatePending = false;
         self.data = res.data;
       })
-    // .catch(function(err) { // jshint ignore:line
-    //   self.updatePending = false;
-    //   // TODO: error handling
-    // });
+      .catch(function(err) {
+        self.updatePending = false;
+        // TODO: error handling
+      });
   }
 
   _addEventListeners() {

@@ -22,8 +22,8 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
 import {sharedStyles} from '../styles/shared-styles';
-//(dci) import 'cluster-reporting/indicator-editing-modal';
-//(dci) import 'cluster-reporting/indicator-locations-modal';
+import './cluster-reporting/indicator-editing-modal';
+import './cluster-reporting/indicator-locations-modal';
 
 
 /**
@@ -118,12 +118,10 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
           is="dom-if"
           if="[[canEditLocations]]"
           restamp="true">
-          <!--  (@dci@)
         <indicator-locations-modal
             id="modal-locations"
             edit-data="[[indicator]]">
         </indicator-locations-modal>
-         -->
       </template>
 
       <etools-data-table-row on-opened-changed="_handleOpenedChanged">

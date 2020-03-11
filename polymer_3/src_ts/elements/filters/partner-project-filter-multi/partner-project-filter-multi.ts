@@ -50,18 +50,19 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
     return ['_computeValue(data, value)'];
   }
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterIndicatorLocations(responsePlanID);
-  }
-
-  _computeUrl(responsePlanID: string) {
-    return Endpoints.plannedActions(responsePlanID);
+  _computePartnerProjectsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.plannedActions(responsePlanId);
   }
 
   _fetchPartnerProjects() {
-    var self = this;
+    if (!this.partnerProjectsUrl) {
+      return;
+    }
 
-    // this.$.partnerProjects.abort();
+    const self = this;
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
     (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {

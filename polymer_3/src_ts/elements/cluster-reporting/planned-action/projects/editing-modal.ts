@@ -12,9 +12,9 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
-// <link rel='import' href='../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html'>
+import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '../../../etools-prp-ajax';
-// <link rel='import' href='../../../etools-prp-date-input.html'>
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
 import RoutingMixin from '../../../../mixins/routing-mixin';
@@ -34,32 +34,30 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
  * @appliesMixin RoutingMixin
  * @appliesMixin UtilsMixin
  */
-class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
-  public static get template(){
+class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-  
+
           --app-grid-columns: 2;
           --app-grid-gutter: 15px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
-  
+
           --paper-dialog: {
             width: 700px;
-  
-            & > * {
-              margin: 0;
+            margin: 0;
             }
-          };
+
         }
-  
+
         .full-width {
           @apply --app-grid-expandible-item;
         }
-  
+
         .header {
           height: 48px;
           padding: 0 24px;
@@ -67,28 +65,28 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
           color: white;
           background: var(--theme-primary-color);
         }
-  
+
         .header h2 {
           @apply --paper-font-title;
-  
+
           margin: 0;
           line-height: 48px;
         }
-  
+
         .header paper-icon-button {
           margin: 0 -13px 0 20px;
           color: white;
         }
-  
+
         .buttons {
           padding: 24px;
         }
       </style>
-      
+
       <iron-location path="{{path}}"></iron-location>
 
       <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-  
+
       <etools-prp-ajax
           id="editProject"
           url="[[url]]"
@@ -96,7 +94,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
           content-type="application/json"
           method="patch">
       </etools-prp-ajax>
-      
+
       <paper-dialog
           id="dialog"
           with-backdrop
@@ -110,7 +108,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
             </paper-icon-button>
           </div>
         </div>
-  
+
         <paper-dialog-scrollable>
           <template
               is="dom-if"
@@ -126,8 +124,9 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                 required
                 on-input="_validate">
               </paper-input>
-  
+
               <div class="row">
+                <!--
                 <etools-multi-selection-menu
                     class="validate"
                     label="Clusters"
@@ -137,9 +136,19 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                     trigger-value-change-event
                     required>
                 </etools-multi-selection-menu>
+                -->
+                <etools-dropdown-multi
+                  class="validate"
+                  label="Clusters"
+                  options="[[formattedClusters]]"
+                  selected-values="{{selectedClusters}}"
+                  auto-validate
+                  required>
+                </etools-dropdown-multi>
               </div>
-  
+
               <div class="item">
+                 <!--
                  <etools-prp-date-input
                     class="start-date"
                     label="Start date"
@@ -148,9 +157,18 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                     required
                     no-init>
                  </etools-prp-date-input>
+                 -->
+                 <datepicker-lite
+                    class="start-date"
+                    label="Start date"
+                    value="{{data.start_date}}"
+                    error-message=""
+                    required>
+                </datepicker-lite>
               </div>
-  
+
               <div class="item">
+                <!--
                 <etools-prp-date-input
                     class="end-date"
                     label="End date"
@@ -159,8 +177,16 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                     required
                     no-init>
                 </etools-prp-date-input>
+                -->
+                <datepicker-lite
+                    class="end-date"
+                    label="End date"
+                    value="{{data.end_date}}"
+                    error-message=""
+                    required>
+                </datepicker-lite>
               </div>
-  
+
               <paper-dropdown-menu
                   class="item validate"
                   label="Status"
@@ -179,7 +205,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                   </template>
                 </paper-listbox>
               </paper-dropdown-menu>
-  
+
               <paper-input
                 class="item validate"
                 id="total_budget"
@@ -190,7 +216,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                 step="0.01"
                 on-input="_validate">
               </paper-input>
-  
+
               <paper-input
                 class="item validate full-width"
                 id="funding_source"
@@ -199,7 +225,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                 type="string"
                 on-input="_validate">
               </paper-input>
-  
+
               <paper-input
                 class="item validate full-width"
                 id="description"
@@ -208,7 +234,7 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
                 type="string"
                 on-input="_validate">
               </paper-input>
-  
+
               <paper-input
                 class="item validate full-width"
                 id="additional_information"
@@ -220,17 +246,17 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
             </iron-form>
           </template>
         </paper-dialog-scrollable>
-  
+
         <div class="buttons layout horizontal-reverse">
           <paper-button class="btn-primary" on-tap="_save" raised>
             Save
           </paper-button>
-  
+
           <paper-button  on-tap="close">
             Cancel
           </paper-button>
         </div>
-  
+
         <etools-loading active="[[updatePending]]"></etools-loading>
       </paper-dialog>
     `;
@@ -271,17 +297,17 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
 
   @property({type: Array})
   statuses: GenericObject[] = [
-      {title: 'Ongoing', id: 'Ong'},
-      {title: 'Planned', id: 'Pla'},
-      {title: 'Completed', id: 'Com'},
-    ];
+    {title: 'Ongoing', id: 'Ong'},
+    {title: 'Planned', id: 'Pla'},
+    {title: 'Completed', id: 'Com'},
+  ];
 
   @property({type: Array})
-  frequencies: GenericObject =  [
-      {title: 'Weekly', id: 'Wee'},
-      {title: 'Monthly', id: 'Mon'},
-      {title: 'Quarterly', id: 'Qua'},
-    ];
+  frequencies: GenericObject = [
+    {title: 'Weekly', id: 'Wee'},
+    {title: 'Monthly', id: 'Mon'},
+    {title: 'Quarterly', id: 'Qua'},
+  ];
 
   @property({type: Array})
   selectedClusters!: any[];
@@ -341,12 +367,12 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)){
     this.updatePending = true;
     let thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then( (res: GenericObject) => {
+      .then((res: GenericObject) => {
         self.updatePending = false;
         fireEvent(self, 'project-edited', res.data);
         self.close();
       })
-      .catch( (err: GenericObject) => { // jshint ignore:line
+      .catch((err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });

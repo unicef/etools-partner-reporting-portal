@@ -38,10 +38,13 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       super.connectedCallback();
 
       // Don't toggle submenus
+      const self = this;
       this.shadowRoot!.querySelectorAll('.menu-trigger').forEach((trigger: any) => {
         trigger.addEventListener('tap', function(e: CustomEvent) {
-          if (trigger.parentNode.opened) {
+          if (self.subMenuOpened) {
             e.stopPropagation();
+          } else {
+            self.subMenuOpened = true;
           }
         });
       });

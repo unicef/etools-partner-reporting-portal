@@ -1,10 +1,7 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
-//@Lajos: IMPORTANT NOTICE: bellow does not exists!!!!!!
-//<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
-import '@polymer/google-chart/google-chart';
-import {NumeralJsEl} from '../../numeral-js';
+import '@google-web-components/google-chart';
 import './analysis-widget';
 import '../../list-placeholder';
 import UtilsMixin from '../../../mixins/utils-mixin';
@@ -12,7 +9,6 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import Constants from '../../../constants';
 import {GenericObject} from '../../../typings/globals.types';
-//<link rel="import" href="../../../polyfills/es6-shim.html">
 declare const numeral: any;
 
 /**
@@ -55,7 +51,7 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
     </analysis-widget>
   `;
   }
-  //
+
   @property({type: Object})
   data!: GenericObject;
 
@@ -99,14 +95,15 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
   }
 
   _computeRows(data: GenericObject) {
+    const self = this;
     return Object.keys(data || {}).map(function(key) {
       return [
         key,
         data[key].progress,
-        this._buildTooltipContent(key, data[key]),
+        self._buildTooltipContent(key, data[key]),
       ];
     }, this);
-  },
+  }
 
   _buildTooltipContent(title: string, data: GenericObject) {
     return [
@@ -120,6 +117,7 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
       '</div>',
     ].join('\n');
   }
+
 }
 
 window.customElements.define('current-progress-by-location', CurrentProgressByLocation);

@@ -18,6 +18,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
 * @polymer
@@ -72,7 +73,7 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         <project-status status="[[projectData.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{routeData.tab}}"
             attr-for-selected="name"
@@ -107,6 +108,9 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     `;
   }
 
+  @property({type: Object})
+  parentRouteData!: GenericObject;
+
   @property({type: String})
   tab!: string;
 
@@ -119,8 +123,6 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
-
-  //Lajos: this was not defined
   @property({type: Boolean})
   updatePending = false;
 
@@ -158,6 +160,10 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _getProjectAjax() {
+    if (!this.overviewUrl) {
+      return;
+    }
+
     this._projectAjaxDebouncer = Debouncer.debounce(this._projectAjaxDebouncer,
       timeOut.after(100),
       () => {
@@ -169,10 +175,10 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             self.updatePending = false;
             self.projectData = res.data;
           })
-        // .catch(function(err: any) { // jshint ignore:line
-        //   self.updatePending = false;
-        //   // TODO: error handling
-        // });
+          .catch(function(err: any) {
+            self.updatePending = false;
+            //   // TODO: error handling
+          });
       });
   }
 

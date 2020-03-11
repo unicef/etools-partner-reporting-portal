@@ -12,7 +12,7 @@ import {getDomainByEnv} from '../../../../../config';
 * @customElement
 * @appliesMixin UtilsMixin
 */
-class Router extends UtilsMixin(PolymerElement) {
+class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
@@ -93,27 +93,23 @@ class Router extends UtilsMixin(PolymerElement) {
     this.set('id', id);
   }
 
-  //@Lajos: needs review
-  _pageChanged(page: string) {
+  async _pageChanged(page: string) {
     if (!page) {
       return;
     }
 
-    setTimeout(async () => {
-      if (!this.visible) {
-        return;
-      }
+    if (!this.visible) {
+      return;
+    }
 
-      //@Lajos: derrived from src_/pages/app/ip-reporting/pd.ts
-      // resolvedPageUrl = this.resolveUrl(page + '.html');
-      const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
-
-      //this.importHref(resolvedPageUrl, null, this._notFound, true);
-      await import(resolvedPageUrl)
-        .catch((err: any) => {
-          this._notFound();
-        });
-    });
+    // resolvedPageUrl = this.resolveUrl(page + '.html');
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/clusters/${page}.js`;
+    console.log('cluster response-parameters clusters router loading... :' + resolvedPageUrl);
+    await import(resolvedPageUrl)
+      .catch((err: any) => {
+        console.log(err);
+        this._notFound();
+      });
   }
 
   connectedCallback() {
@@ -127,6 +123,6 @@ class Router extends UtilsMixin(PolymerElement) {
   }
 }
 
-window.customElements.define('response-parameters-clusters-router', Router);
+window.customElements.define('response-parameters-clusters-router', ResponseParametersClustersRouter);
 
-export {Router as ResponseParametersClustersRouterEl};
+export {ResponseParametersClustersRouter as ResponseParametersClustersRouterEl};

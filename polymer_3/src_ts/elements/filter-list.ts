@@ -96,24 +96,28 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
      * here's the place to put the logic for it.
      */
 
-    setTimeout(() => {
-      const newParams = Object.assign({}, this.queryParams);
+    //setTimeout(() => {
+    const newParams = Object.assign({}, this.queryParams);
 
-      if (change.value && change.value.length) {
-        newParams[change.name] = change.value;
-      } else {
-        delete newParams[change.name];
-      }
+    if (change.value && change.value.length) {
+      newParams[change.name] = change.value;
+    } else {
+      delete newParams[change.name];
+    }
 
-      this.set('queryParams', newParams);
+    this.set('queryParams', newParams);
 
-      this._resetPageNumber();
-    });
+    this._resetPageNumber();
+    //});
   }
 
   _registerFilter(e: CustomEvent) {
     e.stopPropagation();
     const name = e.detail;
+    if (!name) {
+      return;
+    }
+
     if (this.ignoredFilters.indexOf(name) !== -1) {
       return;
     }
@@ -136,6 +140,10 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
   _filterReady(e: CustomEvent) {
     e.stopPropagation();
     const name = e.detail;
+    if (!name) {
+      return;
+    }
+
     if (this.ignoredFilters.indexOf(name) !== -1) {
       return;
     }
@@ -175,7 +183,6 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
     setTimeout(() => {
       const filtersCount = this.filters.length - this.ignoredFilters.length;
       const readyCount = Object.keys(this.filtersReady).length;
-
       this.set('loading', readyCount < filtersCount);
     });
   }

@@ -7,13 +7,14 @@ import '@polymer/iron-pages/iron-pages';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import {getDomainByEnv} from '../../../../../config';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
 /**
 * @polymer
 * @customElement
 * @appliesMixin UtilsMixin
 */
-class Router extends UtilsMixin(PolymerElement) {
+class ResponseParametersPartnersRouter extends UtilsMixin(PolymerElement) {
 
   static get template() {
     return html`
@@ -85,14 +86,18 @@ class Router extends UtilsMixin(PolymerElement) {
 
         this.set('page', page);
         // resolvedPageUrl = this.resolveUrl(page + '.html');
-        const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
+        const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/partners/${page}.js`;
 
-        //this.importHref(resolvedPageUrl, null, this._notFound, true);
+        console.log('cluster response-parameters partners router loading... :' + resolvedPageUrl);
         await import(resolvedPageUrl)
+          .catch((err: any) => {
+            console.log(err);
+            this._notFound();
+          });
       });
   }
 }
 
-window.customElements.define('response-parameters-clusters-router', Router);
+window.customElements.define('response-parameters-partners-router', ResponseParametersPartnersRouter);
 
-export {Router as ResponseParametersClustersRouterEl};
+export {ResponseParametersPartnersRouter as ResponseParametersPartnersRouterEl};

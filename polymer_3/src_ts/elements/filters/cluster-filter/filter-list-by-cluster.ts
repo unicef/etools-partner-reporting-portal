@@ -15,6 +15,7 @@ import {GenericObject} from '../../../typings/globals.types';
 class FilterListByCluster extends UtilsMixin(PolymerElement) {
   static get template() {
     return html`
+    <style>
     : host {
       display: block;
     }
@@ -36,8 +37,11 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
-  queryParams!: Object;
+  queryParams!: GenericObject;
 
   _onFilterChanged(e: CustomEvent) {
     const change: GenericObject = {
@@ -49,26 +53,26 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
     e.stopPropagation();
 
     this.set('queryParams', Object.assign({}, this.queryParams, change));
-  };
+  }
 
   _addEventListeners() {
     this._onFilterChanged = this._onFilterChanged.bind(this);
     this.addEventListener('filter-changed', this._onFilterChanged as any);
-  };
+  }
 
   _removeEventListeners() {
     this.removeEventListener('filter-changed', this._onFilterChanged as any);
-  };
+  }
 
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
     this._removeEventListeners();
-  };
+  }
 }
 
 window.customElements.define('filter-list-by-cluster', FilterListByCluster);

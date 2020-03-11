@@ -17,24 +17,24 @@ import {fireEvent} from '../../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
       </style>
-      
+
       <etools-prp-permissions
         permissions="{{ permissions }}">
       </etools-prp-permissions>
-      
+
       <etools-prp-toolbar
         query="{{ query }}"
-        response-plan-id="{{ responsePlanId }}">
+        response-plan-id="{{responsePlanId}}">
         <download-button url="[[exportUrl]]">[[localize('export')]]</download-button>
-  
+
         <template
           is="dom-if"
           if="[[_equals(submitted, 0)]]"
@@ -52,12 +52,15 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
           <download-button url="[[exportTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
         </template>
       </etools-prp-toolbar>
-    
+
     `;
   }
 
   @property({type: Number})
   submitted!: number;
+
+  @property({type: String})
+  responsePlanId!: string;
 
   @property({type: String, computed: '_computeImportTemplateUrl(responsePlanId, query, submitted)'})
   exportTemplateUrl!: string;
@@ -97,11 +100,11 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
 
   _addEventListeners() {
     this._onFileUploaded = this._onFileUploaded.bind(this);
-    this.addEventListener('file-uploaded', this._onFileUploaded);
+    this.addEventListener('file-uploaded', this._onFileUploaded as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('file-uploaded', this._onFileUploaded);
+    this.removeEventListener('file-uploaded', this._onFileUploaded as any);
   }
 
   connectedCallback() {

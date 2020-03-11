@@ -37,14 +37,19 @@ class ClusterLocationContent extends ReduxConnectedElement {
   responsePlanID!: string;
 
   _computeLocationNamesUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanID);
   }
 
   _fetchLocationNames() {
+    if (!this.locationNamesUrl) {
+      return;
+    }
+
     const self = this;
-
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
-
     (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('locations', res.data);

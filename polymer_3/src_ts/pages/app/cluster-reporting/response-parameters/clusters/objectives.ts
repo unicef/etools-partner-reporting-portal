@@ -10,12 +10,12 @@ import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/filters';
 import {ClusterObjectivesModalEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/creation-modal';
+import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/objectives-list';
+import '../../../../../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
 import '../../../../../elements/page-body';
-//@Lajos: originally included but not included in style tag
-// import {sharedStyles} from '../../../../../styles/shared-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
@@ -32,11 +32,11 @@ import {fetchClusterObjectivesList} from '../../../../../redux/actions/clusterOb
 * @appliesMixin RoutingMixin
 * @appliesMixin SortingMixin
 */
-class Objectives extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
+class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
-    ${buttonsStyles} ${tableStyles}
+    ${tableStyles} ${buttonsStyles}
     <style include="iron-flex data-table-styles">
       :host {
         display: block;
@@ -114,6 +114,9 @@ class Objectives extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanID);
   }
 
@@ -130,10 +133,10 @@ class Objectives extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
         (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(fetchClusterObjectivesList(thunk))
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+          // @ts-ignore
+          .catch(function(err) {
+            //   // TODO: error handling.
+          });
       });
   }
 

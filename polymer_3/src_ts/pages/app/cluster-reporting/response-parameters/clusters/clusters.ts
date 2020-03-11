@@ -7,7 +7,6 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-//<link rel="import" href="../../../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
@@ -62,10 +61,12 @@ class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
         <page-header title="[[localize('clusters')]]">
-          <div class="toolbar horizontal end-justified layout">
+
+          <div slot="toolbar" class="toolbar horizontal end-justified layout">
             <filter-list-by-cluster></filter-list-by-cluster>
           </div>
-          <div class="tabs">
+
+          <div slot="tabs">
             <paper-tabs
               selected="{{routeData.subpage}}"
               attr-for-selected="name"
@@ -99,6 +100,9 @@ class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
 
   @property({type: Object})
   queryParams!: GenericObject;
+
+  @property({type: String})
+  subroute!: string;
 
   @property({type: String})
   subpage!: string;

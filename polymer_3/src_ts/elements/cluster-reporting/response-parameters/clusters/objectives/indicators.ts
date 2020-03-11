@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -17,7 +17,7 @@ import {clusterObjectivesIndicatorsFetch} from '../../../../../redux/actions/clu
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -31,61 +31,60 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return html`
     ${buttonsStyles} ${tableStyles}
     <style include="iron-flex data-table-styles">
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+    div#action {
+      margin: 25px 0;
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+    }
+  </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+  <etools-prp-permissions
+      permissions="{{permissions}}">
+  </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+  <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+  <iron-query-params
+      params-string="{{query}}"
+      params-object="{{queryParams}}">
+  </iron-query-params>
 
-    <etools-prp-ajax
-        id="indicators"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+  <etools-prp-ajax
+      id="indicators"
+      url="[[url]]"
+      params="[[queryParams]]">
+  </etools-prp-ajax>
 
-    <page-body>
-      <template
-          is="dom-if"
-          if="[[canAddIndicator]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_cluster_activity_indicator')]]
-          </paper-button>
-        </div>
-      </template>
+  <page-body>
+    <template
+        is="dom-if"
+        if="[[canAddIndicator]]"
+        restamp="true">
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+          [[localize('add_cluster_objective_indicator')]]
+        </paper-button>
+      </div>
+    </template>
 
-      <indicator-modal
-        id="indicatorModal"
-        object="[[activityData]]"
-        object-id="[[activityId]]"
-        object-type="cluster.clusteractivity"
-        modal-title="Add Cluster Activity Indicator">
-      </indicator-modal>
+    <indicator-modal
+      id="indicatorModal"
+      object-id=[[objectiveId]]
+      activity-data=[[activityData]]
+      object-type="cluster.clusterobjective"
+      modal-title="Add Cluster Objective Indicator">
+    </indicator-modal>
 
-      <list-view-indicators
-          data="[[data]]"
-          total-results="[[totalResults]]"
-          type="ca"
-          can-edit="[[canAddIndicator]]">
-      </list-view-indicators>
-    </page-body>
+    <list-view-indicators
+        data="[[data]]"
+        total-results="[[totalResults]]"
+        can-edit="[[canAddIndicator]]">
+    </list-view-indicators>
+  </page-body>
     `;
   }
 
@@ -96,7 +95,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   queryParams!: GenericObject;
 
   @property({type: Number})
-  activityId!: number;
+  objectiveId!: number;
 
   @property({type: Number})
   clusterId!: number;
@@ -149,19 +148,19 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _clusterObjectiveIndicatorsAjax() {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
-    
+
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
     this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
-      .catch(function (err) { // jshint ignore:line
-          // TODO: error handling.
+      .catch(function(err) {
+        // TODO: error handling.
       });
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
     return permissions.createClusterEntities &&
-        permissions.createClusterEntitiesForCluster(clusterId);
+      permissions.createClusterEntitiesForCluster(clusterId);
   }
 
   _addEventListeners() {

@@ -59,7 +59,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
             <filter-list-by-cluster></filter-list-by-cluster>
           </div>
 
-          <div class="tabs">
+          <div slot="tabs">
             <paper-tabs selected="{{routeData.subpage}}" attr-for-selected="name" on-iron-activate="_resetPage"
               scrollable hide-scroll-buttons>
 

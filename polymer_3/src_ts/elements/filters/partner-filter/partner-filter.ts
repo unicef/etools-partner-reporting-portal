@@ -39,7 +39,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
 
-  @property({type: String, computed: '_computeUrl(responsePlanID)', observer: '_fetchPartnerNames'})
+  @property({type: String, computed: '_computeUrl(responsePlanId)', observer: '_fetchPartnerNames'})
   partnerNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
@@ -60,12 +60,18 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     return ['_computeValue(data, value)'];
   }
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterIndicatorLocations(responsePlanID);
+  _computeLocationNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterIndicatorLocations(responsePlanId);
   }
 
-  _computeUrl(responsePlanID: string) {
-    return Endpoints.clusterPartnerNames(responsePlanID);
+  _computeUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterPartnerNames(responsePlanId);
   }
 
   _computeValue(data: any, value: string) {
@@ -82,16 +88,16 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchPartnerNames() {
-    var self = this;
+    const self = this;
 
     // this.$.partnerNames.abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.activities as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
-        var data = (self.required ? [] : [{
+        const data = (self.required ? [] : [{
           id: '',
           title: 'All',
-        }]).concat(res.data);
+        }]).concat(res.data || []);
 
         self.set('data', data);
       })

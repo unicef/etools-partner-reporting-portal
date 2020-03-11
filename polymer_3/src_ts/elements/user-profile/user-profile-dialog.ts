@@ -37,10 +37,8 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
         --paper-dialog: {
           width: 700px;
-          & > *{
-            margin: 0;
-          }
-        };
+        }
+
       }
 
       .full-width {
@@ -57,7 +55,6 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
       .header h2 {
         @apply --paper-font-title;
-
         margin: 0;
         line-height: 48px;
       }
@@ -131,7 +128,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
                   [[ role ]]
                 </div>
               </template>
-            <paper-divider class="p-divider" colored="black"/>
+            <!-- <paper-divider class="p-divider" colored="black"/> -->
           </div>
 
           <template is="dom-if" if="{{profile.partner}}">

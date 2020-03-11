@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -22,8 +22,8 @@ import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
-import { fireEvent } from '../../../../../utils/fire-custom-event';
+import {GenericObject} from '../../../../../typings/globals.types';
+import {fireEvent} from '../../../../../utils/fire-custom-event';
 
 /**
  * @polymer
@@ -48,11 +48,8 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
+          margin: 0;
           }
-        };
       }
 
       .full-width {
@@ -191,15 +188,15 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
 
     let self = this;
     const thunk = (this.$.editActivity as EtoolsPrpAjaxEl).thunk();
-    
+
     self.updatePending = true;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         fireEvent(self, 'activity-edited', res.data);
         self.close();
       })
-      .catch(function (err) { // jshint ignore:line
+      .catch(function(err) {
         self.updatePending = false;
         // TODO: error handling
       });

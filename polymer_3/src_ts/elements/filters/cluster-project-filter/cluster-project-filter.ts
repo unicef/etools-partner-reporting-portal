@@ -4,6 +4,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/searchable-dropdown-filter';
+import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import Endpoints from "../../../endpoints";
@@ -53,10 +54,13 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
   }
 
   @property({type: Object})
+  params!: GenericObject;
+
+  @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: String, computed: '_computeProjectNamesUrl(responsePlanID)'})
-  projectNamesUrl = '';
+  @property({type: String, computed: '_computeProjectNamesUrl(responsePlanId)'})
+  projectNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
@@ -73,12 +77,19 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
 
   private _debouncer!: Debouncer;
 
-  _computeProjectNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterProjectNames(responsePlanID);
-  };
+  _computeProjectNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterProjectNames(responsePlanId);
+  }
 
   _fetchProjectNames() {
-    var self = this;
+    if (!this.projectNamesUrl) {
+      return;
+    }
+
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       function() {
@@ -90,9 +101,9 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
             self.set('data', [{
               id: '',
               title: 'All',
-            }].concat(res.data));
+            }].concat(res.data || []));
           })
-          .catch(function(err: any) { // jshint ignore:line
+          .catch(function(err: any) {
             // TODO: error handling
           });
       });
@@ -102,7 +113,7 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
     super.disconnectedCallback();
     (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

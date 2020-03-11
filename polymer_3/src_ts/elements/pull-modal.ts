@@ -52,10 +52,8 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         display: block;
 
         --paper-dialog: {
-          width: 800px; & > *{
-        margin: 0;
-      }
-      };
+          width: 800px;
+        }
       }
 
       .qpr-header {

@@ -23,9 +23,10 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
           case 403: // FIXME: 401?
             // (dci)
             this.reduxStore.dispatch(userLogout())
-            //.then(function() {
-            location.pathname = '/landing';
-            //});
+              // @ts-ignore
+              .then(function() {
+                location.pathname = '/landing';
+              });
             break;
 
           default:

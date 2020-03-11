@@ -1,8 +1,7 @@
 import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
-//<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
-//<link rel="import" href="../../../polyfills/es6-shim.html">
+import '@google-web-components/google-chart';
 import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
@@ -97,6 +96,7 @@ class PartnersPerClusterObjective extends LocalizeMixin(UtilsMixin(AnalysisChart
       }),
     });
   }
+
 }
 
 window.customElements.define('partners-per-cluster-objective', PartnersPerClusterObjective);
