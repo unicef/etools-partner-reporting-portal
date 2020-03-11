@@ -1,0 +1,234 @@
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../constants.html">
+<link rel="import" href="actions/location.html">
+<link rel="import" href="actions/localize.html">
+<link rel="import" href="actions/pd.html">
+<link rel="import" href="actions/pdIndicators.html">
+<link rel="import" href="actions/pdReports.html">
+<link rel="import" href="actions/indicators.html">
+<link rel="import" href="actions/progressReports.html">
+<link rel="import" href="actions/disaggregations.html">
+<link rel="import" href="actions/partnerProjects.html">
+<link rel="import" href="actions/partnerActivities.html">
+<link rel="import" href="actions/clusterIndicatorReports.html">
+<link rel="import" href="actions/clusterActivities.html">
+<link rel="import" href="actions/clusterObjectives.html">
+<link rel="import" href="actions/clusterDisaggregations.html">
+<link rel="import" href="actions/clusterDashboardData.html">
+<link rel="import" href="actions/config.html">
+<link rel="import" href="actions/analysis.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    Object.assign(App.Actions, {
+
+      // L11N
+      setL11NResources: function (resources) {
+        return {
+          type: App.Constants.SET_L11N_RESOURCES,
+          resources: resources,
+        };
+      },
+
+      // Localization
+      setLanguage: function (language) {
+        return {
+          type: App.Constants.SET_LANGUAGE,
+          language: language
+        };
+      },
+
+      // Auth
+      setToken: function (token) {
+        return {
+          type: App.Constants.SET_TOKEN,
+          token: token,
+        };
+      },
+
+      resetToken: function () {
+        return {
+          type: App.Constants.RESET_TOKEN,
+        };
+      },
+
+      userLogin: function () {
+        return {
+          type: App.Constants.USER_LOGIN,
+        };
+      },
+
+      userLogout: function (logoutThunk) {
+        return function (dispatch) {
+          return logoutThunk()
+            .then(function () {
+              dispatch(App.Actions.resetToken());
+            });
+        };
+      },
+
+      fetchUserProfile: function (profileThunk) {
+        return function (dispatch) {
+          return profileThunk()
+            .then(function (res) {
+              dispatch(App.Actions.setUserProfile(res.data));
+              dispatch(App.Actions.setAccountType(res.data));
+              dispatch(App.Actions.setPartner(res.data.partner));
+            });
+        };
+      },
+
+      setUserProfile: function (data) {
+        return {
+          type: App.Constants.SET_USER_PROFILE,
+          data: data,
+        };
+      },
+
+      setAccountType: function (data) {
+        return {
+          type: App.Constants.SET_ACCOUNT_TYPE,
+          data: data,
+        };
+      },
+
+      // Workspaces
+      fetchWorkspaces: function (interventionsThunk) {
+        return function (dispatch) {
+          return interventionsThunk()
+            .then(function (res) {
+              var workspaces = (res.data || [])
+                .map(function (workspace) {
+                  return {
+                    id: workspace.id,
+                    code: workspace.workspace_code,
+                    name: workspace.title,
+                    latitude: workspace.latitude,
+                    longitude: workspace.longitude
+                  };
+                });
+
+              dispatch(App.Actions.setWorkspaces(workspaces));
+            });
+        };
+      },
+
+      setWorkspace: function (newWorkspace) {
+        return {
+          type: App.Constants.SET_WORKSPACE,
+          workspace: newWorkspace,
+        };
+      },
+
+      setWorkspaces: function (workspaces) {
+        return {
+          type: App.Constants.SET_WORKSPACES,
+          workspaces: workspaces,
+        };
+      },
+
+      // Gets a list of all response plans for the currently selected location ID.
+      fetchResponsePlans: function (responsePlansThunk) {
+        return function (dispatch) {
+          return responsePlansThunk()
+            .then(function (res) {
+              dispatch(App.Actions.setResponsePlans(res.data));
+            });
+        };
+      },
+
+      setResponsePlans: function (plans) {
+        return {
+          type: App.Constants.SET_RESPONSE_PLANS,
+          plans: plans
+        };
+      },
+
+      setCurrentResponsePlanID: function (newPlanID) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
+          planID: newPlanID,
+        };
+      },
+
+      setCurrentResponsePlan: function (newPlan) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
+          plan: newPlan,
+        };
+      },
+
+      addResponsePlan: function (newPlan) {
+        return {
+          type: App.Constants.ADD_RESPONSE_PLAN,
+          plan: newPlan,
+        };
+      },
+
+      setApp: function (app) {
+        return {
+          type: App.Constants.SET_APP,
+          app: app,
+        };
+      },
+
+      // Partner data
+      setPartner: function (partnerData) {
+        return {
+          type: App.Constants.SET_PARTNER,
+          partnerData: partnerData,
+        };
+      },
+
+      // Programme documents
+      fetchProgrammeDocuments: function (pdThunk) {
+        return function (dispatch) {
+          return pdThunk()
+            .then(function (res) {
+              var pdData = res.data;
+
+              dispatch(App.Actions.setProgrammeDocuments(pdData));
+            });
+        };
+      },
+
+      setProgrammeDocuments: function (data) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENTS,
+          data: data,
+        };
+      },
+
+      fetchProgrammeDocumentDetails: function (pdDetailsThunk) {
+        return function (dispatch) {
+          return pdDetailsThunk()
+            .then(function (res) {
+              var pdDetailsData = res.data;
+              dispatch(App.Actions.setProgrammeDocumentDetails(pdDetailsData));
+            });
+        };
+      },
+
+      setProgrammeDocumentDetails: function (pdDetailsData) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
+          pdDetailsData: pdDetailsData,
+        };
+      },
+
+      // Master reset
+      reset: function () {
+        return {
+          type: App.Constants.RESET,
+        };
+      },
+
+    });
+  }());
+</script>
