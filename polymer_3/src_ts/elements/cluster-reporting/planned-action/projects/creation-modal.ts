@@ -19,11 +19,13 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
+
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../etools-prp-ajax';
+import '../../../../elements/etools-prp-permissions';
 import '../../../message-box';
 import '../../../../elements/cluster-reporting/creation-modal-project-details';
 import '../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget';
-import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
 import '../../../form-fields/partner-dropdown-content';
@@ -55,7 +57,7 @@ import '../../paper-radio-group-custom';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement)))) {
+class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
       ${buttonsStyles}
@@ -823,7 +825,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   @property({type: String, computed: 'getReduxStateValue(rootState.partner.current.id)'})
   partnerID!: string;
 
-  @property({type: Array, computed: 'getReduxStateValue(rootState.partnerProjects.all)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.partnerProjects.all)'})
   partnerProjects!: any[];
 
   @property({type: Array, computed: '_formatForMultiselect(clusters)'})
@@ -967,7 +969,7 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 
   _computeOchaProjectsParams(partner: GenericObject, selectedPartner: GenericObject) {
-    var ocha_external_id = (partner && partner.ocha_external_id) ||
+    const ocha_external_id = (partner && partner.ocha_external_id) ||
       (selectedPartner && selectedPartner.ocha_external_id);
 
     return ocha_external_id ? {
@@ -1283,6 +1285,6 @@ class CreationModal extends ModalMixin(RoutingMixin(UtilsMixin(LocalizeMixin(Red
   }
 }
 
-window.customElements.define('planned-action-projects-modal', CreationModal);
+window.customElements.define('planned-action-projects-modal', PlannedActionProjectsModal);
 
-export {CreationModal as PlannedActionProjectsModalEl};
+export {PlannedActionProjectsModal as PlannedActionProjectsModalEl};

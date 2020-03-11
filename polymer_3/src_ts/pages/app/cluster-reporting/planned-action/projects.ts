@@ -11,7 +11,8 @@ import '../../../../elements/etools-prp-ajax';
 import '../../../../elements/etools-prp-permissions';
 import Endpoints from '../../../../endpoints';
 import '../../../../elements/cluster-reporting/planned-action/projects/filters';
-import '../../../../cluster-reporting/planned-action/projects/creation-modal';
+import '../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
+import {PlannedActionProjectsModalEl} from '../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../elements/cluster-reporting/project-list-table';
 import {sharedStyles} from '../../../../styles/shared-styles';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
@@ -111,9 +112,8 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
   projectsDebouncer!: Debouncer;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
-
 
   _computeUrl(responsePlanID: string) {
     if (!responsePlanID) {

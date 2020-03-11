@@ -163,6 +163,9 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   }
 
   _computeObjectiveUrl(objectiveId: string) {
+    if (!objectiveId) {
+      return
+    }
     return Endpoints.responseParametersClustersObjectiveDetail(objectiveId);
   }
 

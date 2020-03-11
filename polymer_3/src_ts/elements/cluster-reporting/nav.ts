@@ -27,7 +27,7 @@ import {GenericObject, Route} from '../../typings/globals.types';
  * @appliesMixin PageNavMixin
  * @appliesMixin RoutingMixin
  */
-class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingMixin(ReduxConnectedElement)))) {
+class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
         ${pageNavStyles}
@@ -41,6 +41,12 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
           .nav-content paper-item{
             min-height: 48px;
             padding: 0px 16px;
+          }
+          iron-collapse paper-item {
+            min-height: 32px !important;
+          }
+          iron-collapse paper-item a {
+            font-size: 12px;
           }
         </style>
 
@@ -77,13 +83,13 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
                 </a>
               </paper-item>
 
-              <paper-item class="menu-trigger" opened="{{detailsOpened}}" on-tab="toggleCollapse">
+              <paper-item class="menu-trigger" opened="{{subMenuOpened}}">
                 <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
                   <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
                 </a>
              </paper-item>
 
-              <iron-collapse id="details" opened="{{detailsOpened}}">
+              <iron-collapse id="details" opened="{{subMenuOpened}}">
                   <paper-listbox class="menu-content">
                     <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
                       <a href="[[_appendQuery(clustersUrl, clusterQuery)]]">[[localize('clusters')]]</a>
@@ -146,7 +152,7 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
   }
 
   @property({type: Boolean})
-  detailsOpened = false;
+  subMenuOpened = false;
 
   @property({type: String})
   selected!: string;
@@ -210,10 +216,6 @@ class ClusterReportingNav extends LocalizeMixin(UtilsMixin(PageNavMixin(RoutingM
 
   static get observers() {
     return ['_routeChanged(route)'];
-  }
-
-  toggleCollapse() {
-    this.detailsOpened = !this.detailsOpened;
   }
 
   goToIdManagement(e: CustomEvent) {

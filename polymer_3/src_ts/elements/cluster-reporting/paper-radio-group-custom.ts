@@ -10,11 +10,10 @@
  *
  */
 
-import {html} from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior';
 import {IronMenuBehavior} from '@polymer/iron-menu-behavior/iron-menu-behavior';
 import '@polymer/paper-radio-button/paper-radio-button';
-import {PolymerElement} from '@polymer/polymer/polymer-element';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {mixinBehaviors} from '@polymer/polymer/lib/legacy/class';
@@ -68,14 +67,14 @@ import {mixinBehaviors} from '@polymer/polymer/lib/legacy/class';
  * @customElement
  * @appliesMixin mixinBehaviors
  */
-class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElement){
-  public static get template(){
+class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElement) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: inline-block;
         }
-  
+
         :host ::slotted(*) {
           padding: var(--paper-radio-group-item-padding, 12px);
         }
@@ -147,7 +146,7 @@ class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElem
     }
 
     this.IronSelectableBehavior.select.apply(this, [value]);
-    fireEvent(this,'paper-radio-group-changed');
+    fireEvent(this, 'paper-radio-group-changed');
   }
 
   _activateFocusedItem() {

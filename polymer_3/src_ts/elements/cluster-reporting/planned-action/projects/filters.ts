@@ -24,8 +24,8 @@ import {GenericObject} from '../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${filterStyles}
       <style include="app-grid-style">
@@ -36,22 +36,22 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
         }
-  
+
         .filter-2-col {
           @apply --app-grid-expandible-item;
         }
-  
+
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-      
+
       <filter-list filters="{{filters}}">
         <div class="app-grid">
           <text-filter
@@ -60,17 +60,17 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
             name="title"
             value="[[queryParams.title]]">
           </text-filter>
-  
+
           <!-- FIXME: Bug #209 -->
           <!-- <cluster-location-filter
             class="item filter-2-col"
             value="[[_withDefault(queryParams.location, '')]]">
           </cluster-location-filter> -->
-  
+
           <!-- <project-status-filter
             value="[[_withDefault(queryParams.status, '')]]">
           </project-status-filter> -->
-  
+
           <date-filter
             format="YYYY-MM-DD"
             class="item"
@@ -78,7 +78,7 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
             name="start_date"
             value="[[_withDefault(queryParams.start_date, '')]]">
           </date-filter>
-  
+
           <date-filter
             format="YYYY-MM-DD"
             class="item"
@@ -99,6 +99,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
 }
 
-window.customElements.define('planned-action-projects-filters', Filters);
+window.customElements.define('planned-action-projects-filters', PlannedActionProjectsFilters);
 
-export {Filters as PlannedActionProjectsFilters}
+export {PlannedActionProjectsFilters as PlannedActionProjectsFiltersEl}

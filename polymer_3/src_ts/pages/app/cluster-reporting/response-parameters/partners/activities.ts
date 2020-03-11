@@ -8,14 +8,16 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
+
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/filters';
-import {PlannedActionCreationModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
-import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/activities-list';
+import '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
+import '../../../../../elements/cluster-reporting/activity-list-table';
+import {PlannedActionActivityModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
+
 import {tableStyles} from '../../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-//<link rel="import" href="../../../../../styles/shared-styles.html">
 import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
 import {GenericObject} from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
@@ -30,7 +32,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 * @appliesMixin RoutingMixin
 * @appliesMixin SortingMixin
 */
-class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
+class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
@@ -113,7 +115,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
     //CreationModalEl is imported
     //TO DO: if not refactored yet, refactor export line of CreationModal => change name
     // this.shadowRoot.querySelector('#modal').open();
-    (this.shadowRoot!.querySelector('#modal') as PlannedActionCreationModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionActivityModalEl).open();
   }
 
   _computeUrl(responsePlanID: string) {
@@ -169,8 +171,8 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    //@Lajos bellow does not exists should it be _activitisAjax?
-    this._getObjectiveAjax();
+    // (dci) need to check if it's working on original
+    // this._getObjectiveAjax();
   }
 
   disconnectedCallback() {
@@ -183,6 +185,6 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
 
 }
 
-window.customElements.define('rp-partners-activities', Activities);
+window.customElements.define('rp-partners-activities', RpPartnersActivities);
 
-export {Activities as RpPartnersActivitiesEl};
+export {RpPartnersActivities as RpPartnersActivitiesEl};

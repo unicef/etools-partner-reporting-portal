@@ -8,6 +8,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters';
+import '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import {PlannedActionProjectsModalEl} from '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../../elements/cluster-reporting/project-list-table';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
