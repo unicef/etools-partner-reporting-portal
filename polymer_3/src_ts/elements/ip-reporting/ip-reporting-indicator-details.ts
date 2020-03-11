@@ -262,10 +262,11 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
     return bucketByLocation(data);
   }
 
-  _updateDisaggregationStore(data: GenericObject) {
-    //this.dispatch(App.Actions.setIndicatorDisaggregations(data));
-    //this.reduxStore.dispatch(Actions .setIndicatorDisaggregations(data));
-  }
+  // (dci) - NOT used, check if can be removed
+  //_updateDisaggregationStore(data: GenericObject) {
+  //this.dispatch(App.Actions.setIndicatorDisaggregations(data));
+  //this.reduxStore.dispatch(Actions .setIndicatorDisaggregations(data));
+  //}
 
   _getDataByKey(dataDict: GenericObject) {
     if (dataDict.details) {
