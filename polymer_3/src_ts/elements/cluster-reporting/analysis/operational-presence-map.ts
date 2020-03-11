@@ -70,6 +70,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           is="dom-if"
           if="[[showMap]]"
           restamp="true">
+        <!--
         <leaflet-map
             longitude="[[center.0]]"
             latitude="[[center.1]]"
@@ -137,6 +138,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
             </template>
           </template>
         </leaflet-map>
+        -->
       </template>
 
       <div class="legend">
@@ -205,6 +207,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           is="dom-if"
           if="[[showMap]]"
           restamp="true">
+        <!--
         <leaflet-map
             longitude="[[center.0]]"
             latitude="[[center.1]]"
@@ -272,6 +275,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
             </template>
           </template>
         </leaflet-map>
+        -->
       </template>
 
       <div class="legend">
@@ -469,12 +473,12 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     setTimeout(() => {
       this.set('showMap', true);
 
-      setTimeout(() => {
-        var style = document.createElement('style');
+      // setTimeout(() => {
+      //   var style = document.createElement('style');
 
-        style.innerHTML = this.mapStyles;
-        (this.shadowRoot!.querySelector('leaflet-map') as Element).appendChild(style);
-      });
+      //   style.innerHTML = this.mapStyles;
+      //   (this.shadowRoot!.querySelector('leaflet-map') as Element).appendChild(style);
+      // });
     });
   }
 }
