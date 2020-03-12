@@ -84,8 +84,8 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
         color: var(--secondary-text-color);
       }
 
-      paper-divider.p-divider {
-        --paper-divider-color: #737373;
+      hr {
+        color: #737373;
         margin-top: 5px;
         opacity: 1;
       }
@@ -128,7 +128,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
                   [[ role ]]
                 </div>
               </template>
-            <!-- <paper-divider class="p-divider" colored="black"/> -->
+            <hr>
           </div>
 
           <template is="dom-if" if="{{profile.partner}}">
