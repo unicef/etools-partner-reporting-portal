@@ -16,7 +16,7 @@ import '../../../../filters/status-filter/project-status-filter';
 import '../../../../filters/cluster-location-filter/cluster-location-filter';
 import '../../../../filters/cluster-partner-filter/cluster-partner-filter';
 import '../../../../filters/cluster-project-filter/cluster-project-filter';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -24,8 +24,8 @@ import { GenericObject } from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class PartnerProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${filterStyles}
     <style include="app-grid-style">
@@ -81,12 +81,12 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   @property({type: Array})
   locations = [
     {
-      title: 'All', 
+      title: 'All',
       id: ''
     }
   ];
 }
 
-window.customElements.define('partner-projects-filters', Filters);
+window.customElements.define('partner-projects-filters', PartnerProjectsFilters);
 
-export {Filters as ProjectsFiltersEl};
+export {PartnerProjectsFilters as PartnerProjectsFiltersEl};

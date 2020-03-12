@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../elements/etools-prp-ajax';
+import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
