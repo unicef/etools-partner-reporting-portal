@@ -247,7 +247,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
-        console.log('localstorage', app);
+        console.log('localstorage defaultApp:', app);
         localStorage.setItem('defaultApp', app);
 
         // Render

@@ -15,8 +15,12 @@ export const isDemoServer = () => {
   return window.location.href.indexOf(DEMO_DOMAIN) > -1;
 };
 
+export const isLocal = () => {
+  return window.location.port === '8081';
+};
+
 export const getDomainByEnv = () => {
-  if (window.location.port === '8081') {
+  if (isLocal()) {
     return 'http://127.0.0.1:8081/app_poly3';
   }
   if (isStagingServer()) {
