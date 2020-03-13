@@ -69,16 +69,9 @@
       "html": {
         "minify": true
       },
+	  "bundle": true,
       "addServiceWorker": true
-    },
-    {
-      "name": "es6-bundled",
-      "addServiceWorker": true
-    },
-    {
-      "name": "es5-bundled",
-      "addServiceWorker": true
-    }
+    }    
   ],
   "moduleResolution": "node",
   "npm": true
