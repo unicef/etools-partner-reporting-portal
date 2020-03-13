@@ -19,7 +19,7 @@ import './pages/unauthorized';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
 import {reset, userLogout} from './redux/actions';
-import {getDomainByEnv, isLocal} from './config';
+import {getDomainByEnv} from './config';
 import {locales} from './locales';
 
 /**
@@ -130,11 +130,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
+    const validPages = ['app', 'app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      location.pathname = isLocal() ? '/app_poly3' : '/app';
+      location.pathname = '/app_poly3';
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
     } else {

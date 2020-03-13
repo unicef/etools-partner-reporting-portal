@@ -16,18 +16,18 @@ export const isDemoServer = () => {
 };
 
 export const isLocal = () => {
-  return window.location.port === '8081';
+  return window.location.port === '9000';
 };
 
 export const getDomainByEnv = () => {
   if (isLocal()) {
-    return 'http://127.0.0.1:8081/app_poly3';
+    return 'http://127.0.0.1:9000/app_poly3'
   }
   if (isStagingServer()) {
-    return 'https://staging.partnerreportingportal.org/app';
+    return 'https://staging.partnerreportingportal.org/app_poly3';
   }
   if (isDemoServer()) {
-    return 'https://demo.partnerreportingportal.org/app';
+    return 'https://demo.partnerreportingportal.org/app_poly3';
   }
-  return 'https://dev.partnerreportingportal.org/app';
+  return 'https://dev.partnerreportingportal.org/app_poly3';
 };
