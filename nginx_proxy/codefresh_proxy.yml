@@ -8,19 +8,20 @@ steps:
         dockerfile: Dockerfile
         working_directory: ${{main_clone}}/nginx_proxy
         tag: ${{CF_BRANCH}}
-            
+
     push_to_hub:
         type: push
         title: Pushing proxy image to docker hub
         candidate: ${{build_proxy}}
-        tags: 
+        tags:
             - ${{CF_BRANCH}}
             - ${{CF_SHORT_REVISION}}
             - latest
         when:
             branch:
-                only: 
+                only:
                     - develop
+                    - polymer3-migration
     # deploy_nginx:
     #     image: codefresh/cf-deploy-kubernetes
     #     tag: ${{CF_SHORT_REVISION}}

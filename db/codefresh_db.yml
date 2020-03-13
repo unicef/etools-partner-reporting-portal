@@ -8,15 +8,16 @@ steps:
         dockerfile: Dockerfile
         working_directory: ${{main_clone}}/db
         tag: ${{CF_BRANCH}}
-            
+
     push_to_hub:
         type: push
         title: Pushing db image to docker hub
         candidate: ${{build_db}}
-        tags: 
+        tags:
             - ${{CF_BRANCH}}
             - latest
         when:
             branch:
-                only: 
+                only:
                     - develop
+                    - polymer3-migration
