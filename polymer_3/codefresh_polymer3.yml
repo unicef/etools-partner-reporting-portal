@@ -2,25 +2,25 @@ version: '1.0'
 
 steps:
 
-    build_polymer:
+    build_polymer_3:
         type: build
-        image_name: unicef/etools-prp-polymer-3
+        image_name: unicef/etools-prp-polymer_3
         dockerfile: Dockerfile-bundle
-        working_directory: ${{main_clone}}/polymer
+        working_directory: ${{main_clone}}/polymer_3
         tag: ${{CF_BRANCH}}
 
-    composition_step:
-       type: composition
-       composition: 'unicef-prp-unit-tests'
-       composition_candidates:
-           test:
-               image: ${{build_polymer}}
-               command: ash -c "npm run test"
+    # composition_step:
+    #    type: composition
+    #    composition: 'unicef-prp-unit-tests'
+    #    composition_candidates:
+    #        test:
+    #            image: ${{build_polymer_3}}
+    #            command: ash -c "npm run test"
 
     push_to_hub:
         type: push
         title: Pushing polymer image to docker hub
-        candidate: ${{build_polymer}}
+        candidate: ${{build_polymer_3}}
         registry: unicef-dockerhub
         tags:
             - ${{CF_BRANCH}}
@@ -31,6 +31,7 @@ steps:
                 only:
                     - develop
                     - master
+                    - polymer3-migration
 
     # deploy_frontend:
     #     image: codefresh/cf-deploy-kubernetes

@@ -16,12 +16,12 @@ export const isDemoServer = () => {
 };
 
 export const isLocal = () => {
-  return window.location.port === '9000';
+  return ['9000', '8081'].includes(window.location.port);
 };
 
 export const getDomainByEnv = () => {
   if (isLocal()) {
-    return 'http://127.0.0.1:9000/app_poly3'
+    return 'http://127.0.0.1:' + window.location.port + '/app_poly3'
   }
   if (isStagingServer()) {
     return 'https://staging.partnerreportingportal.org/app_poly3';

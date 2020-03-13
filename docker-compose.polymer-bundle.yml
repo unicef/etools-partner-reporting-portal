@@ -32,7 +32,7 @@ services:
     restart: always
     volumes:
       - './django_api:/code/'
-      
+
   proxy:
     image: unicef/etools-prp-nginx-proxy
     environment:
@@ -47,6 +47,7 @@ services:
     depends_on:
       - django_api
       - polymer
+      - polymer_3
 
   django_api:
     image: unicef/etools-prp
@@ -81,7 +82,7 @@ services:
     build:
       context: ./redis
       dockerfile: ./Dockerfile
-  
+
   id-management-frontend:
     image: unicef/etools-prp-id-management-frontend
     build:
@@ -93,7 +94,7 @@ services:
     command: bash -c "npm start"
 
   polymer:
-    image: unicef/etools-prp-polymer
+    image: unicef/etools-prp-polymer_built
     build:
       context: ./polymer
       dockerfile: ./Dockerfile-bundle
@@ -101,4 +102,14 @@ services:
         - ./polymer/:/code
         - /code/node_modules
         - /code/bower_components
+    command: ash -c "node express.js"
+
+  polymer_3:
+    image: unicef/etools-prp-polymer_3_built
+    build:
+      context: ./polymer_3
+      dockerfile: ./Dockerfile-bundle
+    volumes:
+        - ./polymer_3/:/code
+        - /code/node_modules
     command: ash -c "node express.js"
