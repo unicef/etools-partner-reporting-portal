@@ -1,5 +1,5 @@
-import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@unicef-polymer/etools-data-table/etools-data-table';
@@ -156,4 +156,4 @@ class OperationalPresenceTable extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
   }
 }
 
-window.customElements.define('operational-presence-map', OperationalPresenceTable);
+window.customElements.define('operational-presence-table', OperationalPresenceTable);

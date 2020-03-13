@@ -13,11 +13,12 @@ import '../../elements/page-title';
 import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
-import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
+import OverlayHelperMixin from '../../mixins/overlay-helper-mixin';
 import {getDomainByEnv} from '../../config';
+import {locales} from '../../locales';
 
 /**
  * @polymer
@@ -25,7 +26,7 @@ import {getDomainByEnv} from '../../config';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -161,50 +162,9 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.loadResources(getDomainByEnv() + '/src/locales.json');
-    this._addEventListeners();
+    this.dispatchResources(locales);
   }
 
-  _addEventListeners() {
-    this.addEventListener('iron-overlay-opened', this._dialogOpening as any);
-    this.addEventListener('iron-overlay-closed', this._dialogClosing as any);
-  }
-
-  _dialogOpening() {
-    const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
-    if (!dialogOverlay) {return;}
-
-    // dialogOverlay.classList.remove('opened');
-    // dialogOverlay.removeAttribute('opened');
-    const zIndex = (dialogOverlay as any).style.zIndex;
-    if (dialogOverlay.parentElement) {
-      dialogOverlay.parentElement.removeChild(dialogOverlay);
-    }
-    this.$.drawer.style.zIndex = '-1';
-    const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
-    if (!pageOverlay.classList.contains('opened')) {
-      pageOverlay.style.zIndex = zIndex;
-      pageOverlay.classList.add('opened');
-    }
-  }
-
-  _dialogClosing(event: CustomEvent) {
-    // chrome
-    const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
-    if (dialogOverlay && dialogOverlay.parentElement) {
-      dialogOverlay.parentElement.removeChild(dialogOverlay);
-    }
-
-    if (event.path && event.path[0] && event.path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
-    // edge
-    if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
-
-    this.$.drawer.style.zIndex = '1';
-    const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
-    pageOverlay.style.zIndex = '';
-    pageOverlay.classList.remove('opened');
-  }
 
 }
 window.customElements.define('page-ip-reporting', PageIpReporting);

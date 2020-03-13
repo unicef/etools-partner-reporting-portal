@@ -1,4 +1,5 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
@@ -8,16 +9,14 @@ import Constants from '../../../constants'
 import {ConfirmBoxEl} from '../../confirm-box';
 import '../../list-placeholder';
 import '../../cluster-reporting/cluster-report';
-import { GenericObject } from '../../../typings/globals.types';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
- * @appliesMixin LocalizeMixin
- * @appliesMixin RoutingMixin
  */
-class ReportsList extends PolymerElement {
+class ReportsList extends ReduxConnectedElement {
   public static get template() {
     return html`
     <style>
@@ -72,7 +71,7 @@ class ReportsList extends PolymerElement {
   active = false;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterDashboardData.data)'})
-  numberOfProjects!: GenericObject;
+  dashboardData!: GenericObject;
 
   @property({type: Array, computed: '_computeData(dashboardData, collection)', observer: '_refresh'})
   data!: any[];
@@ -86,7 +85,7 @@ class ReportsList extends PolymerElement {
   @property({type: Boolean, computed: '_computeIsIMOClusters(profile)'})
   isIMO!: boolean;
 
-  _refresh () {
+  _refresh() {
     // Force re-render:
     this.set('active', false);
 
@@ -96,11 +95,13 @@ class ReportsList extends PolymerElement {
   }
 
   _computeData(dashboardData: any, collection: any) {
-    return dashboardData[collection];
+    if (dashboardData) {
+      return dashboardData[collection];
+    }
   }
 
   _computeIsIMOClusters(profile: GenericObject) {
-    return profile.prp_roles ? profile.prp_roles.some(function (role: any) {
+    return profile.prp_roles ? profile.prp_roles.some(function(role: any) {
       return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
     }) : false;
   }

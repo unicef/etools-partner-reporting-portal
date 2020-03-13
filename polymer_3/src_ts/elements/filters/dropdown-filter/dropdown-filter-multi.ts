@@ -72,7 +72,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   _handleData(data: any) {
     if (data.length) {
       this._filterReady();
-    } else if (this.name === 'location') {
+    } else if (this.name === 'location' || this.name === 'locs') {
       // Locations get populated by PDs so user can filter by location, so if there are no PDs,
       // there are no locations - in that case, fire filterReady method to have filters stop loading.
       this._filterReady();

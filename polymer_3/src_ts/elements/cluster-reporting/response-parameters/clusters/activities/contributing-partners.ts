@@ -8,10 +8,10 @@ import Endpoints from '../../../../../endpoints';
 import './contributing-partners-filters';
 import './contributing-partners-list';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
-import { GenericObject } from '../../../../../typings/globals.types';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
-import { timeOut } from '@polymer/polymer/lib/utils/async';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {GenericObject} from '../../../../../typings/globals.types';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
+import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {clusterActivitiesPartnersFetch} from '../../../../../redux/actions/clusterActivities';
 
 
@@ -65,7 +65,7 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computePartnersUrl(activityId)'})
   partnersUrl!: string;
 
-  private _fetchPartnersDebouncer! : Debouncer;
+  private _fetchPartnersDebouncer!: Debouncer;
 
   _computePartnersUrl(activityId: string) {
     return Endpoints.partnersByClusterActivityId(activityId);
@@ -80,10 +80,11 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
         (this.$.partners as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(clusterActivitiesPartnersFetch(thunk, this.activityId))
-            .catch(function (err) { // jshint ignore:line
-                // TODO: error handling.
-            });
-    });
+          // @ts-ignore
+          .catch(function(err) {
+            // TODO: error handling.
+          });
+      });
   }
 
   disconnectedCallback() {

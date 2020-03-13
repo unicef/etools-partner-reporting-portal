@@ -30,24 +30,31 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
 
-  @property({type: String, computed: '_computePartnerNamesUrl(responsePlanID)', observer: '_fetchPartnerNames'})
+  @property({type: String, computed: '_computePartnerNamesUrl(responsePlanId)', observer: '_fetchPartnerNames'})
   partnerNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.app.current)'})
+  @property({type: Array})
   data = [];
 
   @property({type: String})
   value!: string;
 
-  _computePartnerNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterPartnerNames(responsePlanID);
+  _computePartnerNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterPartnerNames(responsePlanId);
   }
 
   _fetchPartnerNames() {
-    var self = this;
+    if (!this.partnerNamesUrl) {
+      return;
+    }
+
+    const self = this;
     const thunk = (this.$.partnerNames as EtoolsPrpAjaxEl).thunk();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
@@ -56,9 +63,9 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
         self.set('data', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

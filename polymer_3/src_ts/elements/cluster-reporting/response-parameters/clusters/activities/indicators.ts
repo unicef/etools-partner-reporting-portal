@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -17,7 +17,7 @@ import {clusterActivitiesIndicatorsFetch} from '../../../../../redux/actions/clu
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -152,18 +152,19 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterActivityIndicatorsAjax() {
-    const  thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterActivitiesIndicatorsFetch(thunk, this.activityId))
-      .catch(function (err) { // jshint ignore:line
-          // TODO: error handling.
+    this.reduxStore.dispatch(clusterActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+      // @ts-ignore
+      .catch(function(err) {
+        // TODO: error handling.
       });
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
     return permissions.createClusterEntities &&
-        permissions.createClusterEntitiesForCluster(clusterId);
+      permissions.createClusterEntitiesForCluster(clusterId);
   }
 
 

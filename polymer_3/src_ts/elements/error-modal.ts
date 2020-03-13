@@ -23,10 +23,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
           --paper-dialog: {
             width: 500px;
             padding: 24px;
-
-            & > * {
-              margin: 0;
-            }
+            margin: 0;
           }
         }
       </style>
@@ -119,3 +116,5 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 }
 
 window.customElements.define('error-modal', ErrorModal);
+
+export {ErrorModal as ErrorModalEl};

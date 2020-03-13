@@ -5,7 +5,6 @@ import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-//<link rel="import" href="../../../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/overview';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/indicators';
@@ -87,7 +86,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         <project-status status="[[data.status]]"></project-status>
       </div>
 
-      <div class="tabs">
+      <div slot="tabs">
         <paper-tabs
             selected="{{routeData.tab}}"
             attr-for-selected="name"
@@ -138,7 +137,6 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   @property({type: String, observer: '_computeBackLink(query)'})
   backLink!: string;
 
-  //Lajos: this was not defined
   @property({type: Boolean})
   updatePending = false;
 
@@ -165,6 +163,9 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   }
 
   _computeObjectiveUrl(objectiveId: string) {
+    if (!objectiveId) {
+      return
+    }
     return Endpoints.responseParametersClustersObjectiveDetail(objectiveId);
   }
 
@@ -180,10 +181,10 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         self.updatePending = false;
         self.data = res.data;
       })
-    // .catch(function(err) { // jshint ignore:line
-    //   self.updatePending = false;
-    //   // TODO: error handling
-    // });
+      .catch(function(err) {
+        self.updatePending = false;
+        //   // TODO: error handling
+      });
   }
 
   _addEventListeners() {

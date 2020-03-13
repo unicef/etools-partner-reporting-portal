@@ -65,7 +65,7 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
         self.set('data', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
       // @ts-ignore
       .catch(function(err) {

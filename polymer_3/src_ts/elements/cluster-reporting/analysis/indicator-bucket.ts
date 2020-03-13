@@ -12,6 +12,7 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import './indicator-details';
 import {sharedStyles} from '../../../styles/shared-styles';
 import {GenericObject} from '../../../typings/globals.types';
+import '../../cluster-reporting/analysis/indicator-details';
 
 /**
 * @polymer
@@ -222,36 +223,33 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
     } else {
       return undefined;
     }
-  },
+  }
 
   _computeIndicatorTitle(data: GenericObject) {
     return data.type === 'partneractivityprojectcontext' ? data.activity_name : data.title;
   }
 
   _computePrefix(data: GenericObject, localize: Function) {
-    //@Lajos: needs to be checked
-    const prefix: GenericObject = {
+    const localizations: GenericObject = {
       partneractivity: localize('partner_activity'),
       partnerproject: localize('partner_project'),
       clusterobjective: localize('cluster_objective'),
       clusteractivity: localize('cluster_activity'),
       partneractivityprojectcontext: localize('partner_activity_project_context'),
-    }[data.type];
+    };
 
-    return prefix ? prefix + ':' : '';
+    return localizations[data.type] ? localizations[data.type] + ':' : '';
   }
 
   _handleOpenedChanged(e: CustomEvent, data: GenericObject) {
-    var indicatorDetails;
-
     e.stopPropagation();
 
     if (data.value) {
-      //@Lajos:PLEASE REVIEW => not sure about this
-      indicatorDetails = e.target.querySelector('analysis-indicator-details');
-
+      const indicatorDetails = (e.target as HTMLElement)!.querySelector('analysis-indicator-details');
       try {
-        indicatorDetails.init();
+        if (indicatorDetails) {
+          indicatorDetails.init();
+        }
       } catch (err) {}
     }
   }

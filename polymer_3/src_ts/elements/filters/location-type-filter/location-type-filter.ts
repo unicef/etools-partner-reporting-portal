@@ -36,7 +36,7 @@ class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
   data!: any;
 
   @property({type: String})
-  value = '';
+  value!: string;
 
   _computeData(maxLocType: number) {
     return Array.apply(null, Array(maxLocType + 1))

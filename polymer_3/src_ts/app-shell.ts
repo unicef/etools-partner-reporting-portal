@@ -20,13 +20,7 @@ import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
 import {reset, userLogout, setL11NResources} from './redux/actions';
 import {getDomainByEnv} from './config';
-
-// behaviors: [
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ErrorHandlerBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {locales} from './locales';
 
 /**
  * @polymer
@@ -164,6 +158,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
     //`./pages/${page}.js`;
+    console.log('app-shell loading' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
@@ -210,8 +205,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.loadResources(getDomainByEnv() + '/src/locales.json');
+    this.dispatchResources(locales);
     this._addEventListeners();
   }
 

@@ -55,11 +55,12 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
         <page-header title="[[localize('partners')]]">
-          <div class="toolbar horizontal end-justified layout">
+
+          <div slot="toolbar" class="toolbar horizontal end-justified layout">
             <filter-list-by-cluster></filter-list-by-cluster>
           </div>
 
-          <div class="tabs">
+          <div slot="tabs">
             <paper-tabs selected="{{routeData.subpage}}" attr-for-selected="name" on-iron-activate="_resetPage"
               scrollable hide-scroll-buttons>
 

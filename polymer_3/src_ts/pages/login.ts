@@ -2,14 +2,14 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer/polymer-element.js';
 import {property} from '@polymer/decorators';
 
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/iron-media-query/iron-media-query.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/iron-form/iron-form.js';
+import '@polymer/paper-card/paper-card';
+import '@polymer/iron-media-query/iron-media-query';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior';
+import '@polymer/paper-button/paper-button';
+import '@polymer/paper-styles/typography';
+import '@polymer/paper-input/paper-input';
+import '@polymer/iron-form/iron-form';
 
 import Endpoints from '../endpoints';
 import ResponsiveMixin from '../mixins/responsive-mixin'
@@ -234,10 +234,7 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
   @property({type: Object})
   keyEventTarget = () => document.body;
 
-  // (dci)
-  // keyBindings: {
-  //   'enter': 'submit',
-  // },
+  keyBindings = {'enter': 'submit'}
 
   _computeLogoSize(isDesktop: boolean) {
     return isDesktop ? 180 : 120;
@@ -257,15 +254,15 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
           window.location.href = '/app_poly3/';
         }
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }
 
   submit() {
     const self = this;
-    this.shadowRoot!.querySelector('#email').validate();
-    if (this.shadowRoot!.querySelector('#email').invalid) {
+    (this.shadowRoot!.querySelector('#email') as any).validate();
+    if ((this.shadowRoot!.querySelector('#email') as any).invalid) {
       return;
     }
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();

@@ -9,7 +9,7 @@ import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles'
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
 import '../../etools-prp-number';
-import { GenericObject } from '../../../typings/globals.types';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer

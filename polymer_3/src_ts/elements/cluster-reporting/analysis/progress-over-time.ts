@@ -2,9 +2,7 @@ import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import Constants from '../../../constants';
-//<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
-//<link rel="import" href="../../../polyfills/es6-shim.html">
-//For bellow derived from:  <link rel="import" href="../../../../bower_components/numeral-js/numeral-import.html">
+import '@google-web-components/google-chart';
 import '../../numeral-js';
 import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
@@ -114,7 +112,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     },
   ];
 
-  @property({type: Array, computed: '_computeRows(data, actualTarget, actualInNeed)'})
+  @property({type: Array, computed: '_computeRowsLocal(data, actualTarget, actualInNeed)'})
   rows!: any;
 
   _computeOptions() {
@@ -129,23 +127,22 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     });
   }
 
-  //@Lajos: error again as it does not match the definition in AnalysisChart
-  _computeRows(data: any, target: GenericObject, inNeed: GenericObject) {
+  _computeRowsLocal(data: any, target: number, inNeed: number) {
+    const self = this;
     return data.map(function(tick: any) {
       return [
         tick[0],
-        this._fromJSON(tick[1]),
-        this._buildProgressTooltipContent(tick, target, inNeed),
+        self._fromJSON(tick[1]),
+        self._buildProgressTooltipContent(tick, target, inNeed),
         target,
-        this._buildDefaultTooltipContent('Target', target),
+        self._buildDefaultTooltipContent('Target', target),
         inNeed,
-        this._buildDefaultTooltipContent('In Need', inNeed),
+        self._buildDefaultTooltipContent('In Need', inNeed),
       ];
     }, this);
   }
 
-  //@Lajos:target and inNeed are defined as Generic Objects but used as numbers....
-  _buildProgressTooltipContent(tick: any, target: any, inNeed: any) {
+  _buildProgressTooltipContent(tick: any, target: number, inNeed: number) {
     var progress = this._fromJSON(tick[1]);
     var progressAgainstTarget = progress / target;
     var progressAgainstInNeed = progress / inNeed;
@@ -171,7 +168,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       '<div class="tooltip-content">',
       '<div>' + title + '</div>',
       '<div class="number-of-partners">',
-      this.numeral(value).format(Constants.FORMAT_NUMBER_DEFAULT),
+      numeral(value).format(Constants.FORMAT_NUMBER_DEFAULT),
       '</div>',
       '</div>',
     ].join('\n');

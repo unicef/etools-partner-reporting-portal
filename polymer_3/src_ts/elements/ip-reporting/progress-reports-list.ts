@@ -151,7 +151,7 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.progressReports.loading)'})
   loading!: boolean;
 
-  @property({type: Array, computed: 'getReduxStateValue(rootState.progressReports.all)'})
+  @property({type: Array, computed: 'getReduxStateArray(rootState.progressReports.all)'})
   data!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.progressReports.count)'})

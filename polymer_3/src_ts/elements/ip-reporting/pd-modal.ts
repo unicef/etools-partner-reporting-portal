@@ -40,11 +40,8 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
 
         --paper-dialog: {
           width: 900px;
+        }
 
-          & > * {
-            margin: 0;
-          }
-        };
       }
 
       .app-grid {

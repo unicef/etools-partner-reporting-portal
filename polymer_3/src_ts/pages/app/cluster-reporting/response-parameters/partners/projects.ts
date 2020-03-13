@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {property, query} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -8,6 +8,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters';
+import '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import {PlannedActionProjectsModalEl} from '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../../elements/cluster-reporting/project-list-table';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
@@ -108,6 +109,9 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.plannedActions(responsePlanID);
   }
 
@@ -118,7 +122,10 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
     return false;
   }
 
-  _projectsAjax(queryParams: string) {
+  _projectsAjax(queryParams: GenericObject) {
+    if (!this.url || !queryParams) {
+      return;
+    }
     this._projectsAjaxDebouncer = Debouncer.debounce(this._projectsAjaxDebouncer,
       timeOut.after(300),
       () => {
@@ -128,11 +135,11 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
         }
         (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchPartnerProjectsList(thunk));
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+        this.reduxStore.dispatch(fetchPartnerProjectsList(thunk))
+          // @ts-ignore
+          .catch(function(err) {
+            //   // TODO: error handling.
+          });
       });
   }
 
