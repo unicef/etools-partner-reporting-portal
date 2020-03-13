@@ -59,6 +59,13 @@ server {
       proxy_pass http://id-management-frontend:3000/;
     }
 
+    location /app_poly3/ {
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_pass http://polymer_3:8084/;
+    }
+
     location /app/ {
       proxy_set_header Host $host:$server_port;
       proxy_set_header X-Real-IP $remote_addr;
