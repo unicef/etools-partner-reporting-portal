@@ -22,7 +22,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin UtilsBehavior
 */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -171,6 +171,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     this._removeEventListeners();
   }
 }
-window.customElements.define('pa-activity-details-indicators', Filters);
+window.customElements.define('pa-activity-details-indicators', PaActivityDetailsIndicators);
 
-export {Filters as FiltersEl};
+export {PaActivityDetailsIndicators as PaActivityDetailsIndicatorsEl};

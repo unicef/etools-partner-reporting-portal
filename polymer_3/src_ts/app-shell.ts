@@ -18,7 +18,7 @@ import './pages/not-found';
 import './pages/unauthorized';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
-import {reset, userLogout, setL11NResources} from './redux/actions';
+import {reset, userLogout} from './redux/actions';
 import {getDomainByEnv} from './config';
 import {locales} from './locales';
 
@@ -130,11 +130,10 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
+    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      //page = 'app_poly3'
       location.pathname = '/app_poly3';
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
@@ -157,7 +156,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
       componentName = page;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
-    //`./pages/${page}.js`;
     console.log('app-shell loading' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
@@ -169,15 +167,15 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   _onSignOut() {
     const self = this;
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
-    this.reduxStore.dispatch(userLogout(thunk));
-    //(dci) it was a then before
-    setTimeout(() => {
-      self._goToLanding();
-      this.reduxStore.dispatch(reset());
-    });
-    //     .catch(function(err: any) { //jshint ignore:line
-    //   // TODO: error handling
-    // });
+    this.reduxStore.dispatch(userLogout(thunk))
+      // @ts-ignore
+      .then(function() {
+        self._goToLanding();
+        self.reduxStore.dispatch(reset())
+      })
+      .catch(function(err: any) {
+        // TODO: error handling
+      });
   }
 
   _notFound() {

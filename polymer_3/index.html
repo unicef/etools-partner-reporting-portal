@@ -63,8 +63,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
     window.App = {};
-    var serverBackend = (window.location.port !== '8081');
-    var baseUrl = serverBackend ? '/app_poly3/' : '/';
 
     // Load pre-caching Service Worker
     if ('serviceWorker' in navigator) {
@@ -72,7 +70,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         navigator.serviceWorker.register('/service-worker.js');
       });
     }
-
     window.process = {env: {NODE_ENV: 'production'}};
   </script>
 

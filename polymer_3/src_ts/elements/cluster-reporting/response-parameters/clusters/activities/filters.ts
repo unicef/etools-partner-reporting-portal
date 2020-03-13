@@ -18,7 +18,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class ClusterActivitiesFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
@@ -59,6 +59,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   queryParams!: GenericObject;
 }
 
-window.customElements.define('cluster-activities-filters', Filters);
+window.customElements.define('cluster-activities-filters', ClusterActivitiesFilters);
 
-export {Filters as FiltersEl};
+export {ClusterActivitiesFilters as ClusterActivitiesFiltersEl};

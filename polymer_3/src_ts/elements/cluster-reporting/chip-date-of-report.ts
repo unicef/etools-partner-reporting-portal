@@ -2,7 +2,7 @@ import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-button/paper-button';
-import '@polymer/paper-date-picker/paper-date-picker';
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import ChipMixin from '../../mixins/chip-mixin';
 import dateFormat from '../../settings';
@@ -61,12 +61,21 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
         opened="{{_adding}}"
         horizontal-align="right"
         vertical-align="bottom">
+
+      <datepicker-lite
+        id="picker"
+        value="{{_date}}"
+        min-date="[[minDate]]">
+      </datepicker-lite>
+
+      <!--
       <paper-date-picker
           id="picker"
           date="{{_date}}"
           min-date="[[minDate]]"
           force-narrow>
       </paper-date-picker>
+      -->
 
       <div class="buttons layout horizontal-reverse">
         <paper-button
