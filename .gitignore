@@ -20,7 +20,6 @@ celerybeat.pid
 
 # Frontend
 node_modules/
-package-lock.json
 
 data/
 
