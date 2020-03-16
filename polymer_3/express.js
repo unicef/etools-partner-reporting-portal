@@ -18,11 +18,11 @@ function getSourcesPath(request) {
   }
 }
 
-app.use('/app_poly3/', (req, res, next) => {
+app.use('/app/', (req, res, next) => {
   express.static(getSourcesPath(req))(req, res, next);
 });
 
-app.get(/.*service-worker\.js/, function(req, res) {
+app.get(/.*service-worker\.js/, function (req, res) {
   res.sendFile(getSourcesPath(req) + 'service-worker.js');
 });
 
@@ -31,4 +31,4 @@ app.use((req, res) => {
   res.sendFile(getSourcesPath(req) + 'index.html');
 });
 
-app.listen(8082);
+app.listen(8084);
