@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 
 export const filterStyles = html`
   <style>

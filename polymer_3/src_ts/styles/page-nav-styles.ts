@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import "@polymer/iron-flex-layout/iron-flex-layout";
 
 export const pageNavStyles = html`

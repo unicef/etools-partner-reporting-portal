@@ -1,5 +1,5 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
 import '@polymer/paper-card/paper-card';
