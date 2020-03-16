@@ -28,12 +28,12 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
+class ClustersObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
     ${sharedStyles} ${tableStyles}
-    style include="data-table-styles table-styles iron-flex">
+      <style include="data-table-styles iron-flex">
       :host {
         display: block;
       }
@@ -128,8 +128,8 @@ class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixi
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterObjectives.loading)'})
   loading!: boolean;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.all)'})
-  objectives!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterObjectives.all)'})
+  objectives!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterObjectives.count)'})
   totalResults!: number;
@@ -142,11 +142,11 @@ class ObjectivesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixi
   }
 
   _detailUrl(id: number, query: string) {
-    var path = '/response-parameters/clusters/objective/' + id;
+    const path = '/response-parameters/clusters/objective/' + id;
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 }
 
-window.customElements.define('clusters-objectives-list', ObjectivesList);
+window.customElements.define('clusters-objectives-list', ClustersObjectivesList);
 
-export {ObjectivesList as ClusterObjectivesListEl};
+export {ClustersObjectivesList as ClustersObjectivesListEl};

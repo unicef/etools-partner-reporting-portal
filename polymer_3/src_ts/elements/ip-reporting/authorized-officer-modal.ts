@@ -9,9 +9,10 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/iron-location/iron-location';
 import '../error-modal';
+import {ErrorModalEl} from '../error-modal';
 import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles'
-import {modalStyles} from '../../styles/modal-styles'
+import {buttonsStyles} from '../../styles/buttons-styles';
+import {modalStyles} from '../../styles/modal-styles';
 import '../etools-prp-ajax';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
@@ -38,19 +39,13 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 
   static get template() {
     return html`
-    ${buttonsStyles}
-    ${modalStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {
           width: 750px;
-
-          &>* {
-            margin: 0;
-          }
         }
-        ;
       }
     </style>
 
@@ -66,7 +61,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog with-backdrop opened=[[opened]]>
+    <paper-dialog opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 
@@ -179,23 +174,24 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _save() {
     if (!this._fieldsAreValid()) {
       return;
     }
-    var self = this;
+
+    const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
-        var newPath = self.buildUrl(
+        const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
 
-        store.dispatch(pdReportsUpdateSingle(
+        self.reduxStore.dispatch(pdReportsUpdateSingle(
           self.pdId,
           self.reportId,
           res.data
@@ -203,12 +199,12 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch(function(res: any) {
-        var errors = res.data.non_field_errors;
+      .catch((res: any) {
+        const errors = res.data.non_field_errors;
         self.close();
-        return self.$.error.open(errors);
+        return (self.$.error as ErrorModalEl).open(errors);
       })
-      .then(function() {
+      .then(() => {
         self.set('busy', false);
       });
   }
@@ -220,3 +216,5 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 }
 
 window.customElements.define('authorized-officer-modal', AuthorizedOfficerModal);
+
+export {AuthorizedOfficerModal as AuthorizedOfficerModalEl}

@@ -24,7 +24,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class PartnerProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
     ${filterStyles}
@@ -87,6 +87,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   ];
 }
 
-window.customElements.define('partner-projects-filters', Filters);
+window.customElements.define('partner-projects-filters', PartnerProjectsFilters);
 
-export {Filters as PartnerProjectsFiltersEl};
+export {PartnerProjectsFilters as PartnerProjectsFiltersEl};

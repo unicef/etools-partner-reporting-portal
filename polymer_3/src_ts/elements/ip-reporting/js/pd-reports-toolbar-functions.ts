@@ -10,6 +10,6 @@ export function canExport(totalResults: number) {
 
 export function computePdQuery(pdId: string) {
   return {
-    programme_document: pdId,
+    programme_document: pdId
   };
 }

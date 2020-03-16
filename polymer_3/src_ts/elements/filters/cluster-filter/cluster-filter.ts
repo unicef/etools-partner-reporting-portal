@@ -55,14 +55,17 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)'})
-  clusterNamesUrl = '';
+  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanId)'})
+  clusterNamesUrl!: string;
 
-  @property({type: String, computed: 'getReduxStatevalue(rootState.responsePlans.currentID)'})
-  responsePlanID = [];
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
+  responsePlanId!: string;
 
   @property({type: Array})
   data = [];
@@ -75,28 +78,34 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
     return ['_fetchClusterNames(clusterNamesUrl, params)'];
   };
 
-  private _debouncer!: Debouncer;
+  private clusterNamesDebouncer!: Debouncer;
 
-  _computeClusterNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterNames(responsePlanID);
+  _computeClusterNamesUrl(responsePlanId: string) {
+    if (responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterNames(responsePlanId);
   }
 
   _fetchClusterNames() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
+    if (!this.clusterNamesUrl || !this.params) {
+      return;
+    }
+    this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
         var self = this;
-        const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
-        (this.$.clusters as EtoolsPrpAjaxEl).abort();
+        const thunk = (this.$.clusterNames as EtoolsPrpAjaxEl).thunk();
+        (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
         thunk()
           .then(function(res: any) {
             self.set('data', [{
               id: '',
               title: 'All',
-            }].concat(res.data));
+            }].concat(res.data || []));
           })
-          .catch(function(err) { // jshint ignore:line
+          .catch(function(err) {
             // TODO: error handling
           });
       });
@@ -104,10 +113,10 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
 
   disconnectedCallback() {
     super.connectedCallback();
-    (this.$.clusters as EtoolsPrpAjaxEl).abort();
+    (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
-      this._debouncer.cancel();
+    if (this.clusterNamesDebouncer && this.clusterNamesDebouncer.isActive()) {
+      this.clusterNamesDebouncer.cancel();
     }
   }
 

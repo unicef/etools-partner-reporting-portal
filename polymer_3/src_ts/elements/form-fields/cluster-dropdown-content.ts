@@ -35,11 +35,11 @@ class ClusterDropdownContent extends ReduxConnectedElement {
   @property({type: Object, computed: '_computeParams(partner)'})
   params!: GenericObject;
 
-  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)', observer: '_fetchClusterNames'})
+  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanId)', observer: '_fetchClusterNames'})
   clusterNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
-  responsePlanID!: string;
+  responsePlanId!: string;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.responsePlans.current)'})
   responsePlanCurrent!: GenericObject;
@@ -53,8 +53,11 @@ class ClusterDropdownContent extends ReduxConnectedElement {
     ]
   }
 
-  _computeClusterNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterNames(responsePlanID);
+  _computeClusterNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterNames(responsePlanId);
   }
 
   _computeParams(partner: string) {
@@ -65,8 +68,11 @@ class ClusterDropdownContent extends ReduxConnectedElement {
   }
 
   _fetchClusterNames() {
-    const self = this;
+    if (!this.clusterNamesUrl) {
+      return;
+    }
 
+    const self = this;
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()

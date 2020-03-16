@@ -28,30 +28,30 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin UtilsMixin
  */
-class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))){
-  public static get template(){
+class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
+  public static get template() {
     return html`
       ${tableStyles}
       <style include="data-table-styles iron-flex">
         :host {
           display: block;
         }
-  
+
         div#action {
           margin-bottom: 25px;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
-  
+
         a {
           color: var(--theme-primary-color);
         }
-  
+
         .wrapper {
           position: relative;
         }
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
@@ -60,7 +60,7 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-      
+
       <div class="wrapper">
           <etools-content-panel no-header>
         <etools-data-table-header
@@ -87,7 +87,7 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
             <div class="table-column">&nbsp;</div>
           </etools-data-table-column>
         </etools-data-table-header>
-  
+
         <template
             id="list"
             is="dom-repeat"
@@ -130,7 +130,7 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
           </div>
           </etools-data-table-row>
         </template>
-  
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -139,18 +139,18 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
             on-page-size-changed="_pageSizeChanged"
             on-page-number-changed="_pageNumberChanged">
         </etools-data-table-footer>
-  
+
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
-    
+
     `;
   }
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.contacts.loading)'})
   loading!: boolean;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.contacts.all)'})
-  disaggregations!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.contacts.all)'})
+  disaggregations!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.contacts.count)'})
   totalResults!: number;

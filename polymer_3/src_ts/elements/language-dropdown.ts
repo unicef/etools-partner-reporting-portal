@@ -8,6 +8,7 @@ import '@polymer/polymer/lib/elements/dom-repeat';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {localizeSet} from '../redux/actions/localize';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
 /**
  * @polymer

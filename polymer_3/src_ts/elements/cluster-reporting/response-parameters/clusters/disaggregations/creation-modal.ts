@@ -19,9 +19,11 @@ import '../../../../etools-prp-chips';
 import '../../../chip-disagg-value';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../../styles/modal-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
 import Endpoints from '../../../../../endpoints';
 import {fireEvent} from '../../../../../utils/fire-custom-event';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -29,12 +31,12 @@ import {fireEvent} from '../../../../../utils/fire-custom-event';
  * @appliesMixin ModalMixin
  * @appliesMixin UtilsMixin
  */
-class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
-    <style include="app-grid-style button-styles iron-flex iron-flex-alignment iron-flex-reverse">
+    ${buttonsStyles} ${modalStyles}
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
@@ -45,39 +47,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
-          }
-        };
-      }
-
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
-
-      .header {
-        height: 48px;
-        padding: 0 24px;
-        margin: 0;
-        color: white;
-        background: var(--theme-primary-color);
-      }
-
-      .header h2 {
-        @apply --paper-font-title;
-
-        margin: 0;
-        line-height: 48px;
-      }
-
-      .header paper-icon-button {
-        margin: 0 -13px 0 20px;
-        color: white;
-      }
-
-      .buttons {
-        padding: 24px;
+        }
       }
     </style>
 
@@ -171,8 +141,8 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeUrl(responsePlanID)'})
   url!: string;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterDisaggregations.all)'})
-  disaggregations!: GenericObject;
+  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDisaggregations.all)'})
+  disaggregations!: any[];
 
   @property({type: Object})
   editData!: GenericObject;
@@ -184,6 +154,9 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   refresh = false;
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterDisaggregations(responsePlanID);
   }
 
@@ -193,7 +166,6 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   open() {
-    //@Lajos: data does not exists on
     this.data = {'response_plan': +this.responsePlanID, 'choices': [], 'active': true};
     this.set('opened', true);
     this.set('refresh', true);
@@ -204,7 +176,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
     if (!this._checkMatchingName()) {
-      this.shadowRoot!.querySelector('#name').set('invalid', true);
+      (this.shadowRoot!.querySelector('#name') as PaperInputElement).set('invalid', true);
       return;
     }
     let self = this;
@@ -221,7 +193,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         self.close();
 
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
         self.updatePending = false;
       });
@@ -240,17 +212,17 @@ class CreationModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _onInput(e: CustomEvent) {
     let el = e.target;
 
-    el.validate();
+    (el as any).validate();
   }
 
   _formatName(e: CustomEvent) {
-    let el = e.target;
+    let el = e.target as any;
 
     el.value = el.value.trim();
     el.validate();
   }
 }
 
-window.customElements.define('cluster-disaggregations-modal', CreationModal);
+window.customElements.define('cluster-disaggregations-modal', CreationModalDisaggregation);
 
-export {CreationModal as ClusterDisaggregationsModalEl};
+export {CreationModalDisaggregation as CreationModalDisaggregationEl};

@@ -155,8 +155,9 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterActivitiesIndicatorsFetch(thunk, this.activityId))
-      .catch(function(err) { // jshint ignore:line
+    this.reduxStore.dispatch(clusterActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling.
       });
   }

@@ -12,11 +12,9 @@ import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
-// did not find bellow
-//import '@unicef-polymer/etools-searchable-multiselection-menu/etools-multi-selection-menu';
-//import '@unicef-polymer/etools-searchable-multiselection-menu/etools-single-selection-menu';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-loading/etools-loading';
-// <link rel="import" href = "../../polyfills/es6-shim.html" >
 import Endpoints from '../../endpoints'
 import UtilsMixin from '../../mixins/utils-mixin';
 import ModalMixin from '../../mixins/modal-mixin';
@@ -24,17 +22,17 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '../etools-prp-permissions';
-// import '../etools-prp-date';
+import '@unicef-polymer/etools-date-time/datepicker-lite';
 import {configClusterTypes} from '../../redux/selectors/config';
 import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
-//bellow original: error-box.html
 import '../error-box-errors';
 import './paper-radio-group-custom';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {fetchConfig} from '../../redux/actions/config';
-import {addResponsePlan} from "../../redux/actions";
+import {addResponsePlan} from '../../redux/actions';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -57,10 +55,8 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px; & > *{
-        margin: 0;
-      }
-      };
+          width: 600px;
+        }
       }
 
       .full-width {
@@ -161,9 +157,9 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   options="[[formattedPlans]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{ selectedPlan }}"
-                  on-iron-activate="_validate"
+                  selected="{{selectedPlan}}"
                   disabled="[[plansLoading]]"
+                  on-selected-values-changed="_validate"
                   trigger-value-change-event
                   required>
                 </etools-dropdown>
@@ -200,6 +196,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </paper-input>
                 </div>
                 <div class="item">
+                  <!--
                   <etools-single-selection-menu
                     class="validate"
                     label="Plan Type"
@@ -212,6 +209,18 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     hide-search
                     required>
                   </etools-single-selection-menu>
+                  -->
+                  <etools-dropdown
+                      class="validate"
+                      label="Plan Type"
+                      options="[[types]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{ data.plan_type }}"
+                      auto-validate
+                      hide-search
+                      required>
+                  </etools-dropdown>
                 </div>
                 <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
                   <div class="item">
@@ -227,6 +236,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </div>
                 </template>
                 <div class="item">
+                  <!--
                   <etools-prp-date-input
                     class="start-date"
                     label="Start date"
@@ -235,8 +245,17 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     required
                     no-init>
                   </etools-prp-date-input>
+                  -->
+                  <datepicker-lite
+                    class="start-date"
+                    label="Start date"
+                    value="{{ data.start }}"
+                    error-message=""
+                    required>
+                  </datepicker-lite>
                 </div>
                 <div class="item">
+                  <!--
                   <etools-prp-date-input
                     class="end-date"
                     label="End date"
@@ -245,15 +264,23 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     required
                     no-init>
                   </etools-prp-date-input>
+                  -->
+                  <datepicker-lite
+                    class="end-date"
+                    label="End date"
+                    value="{{ data.end }}"
+                    error-message=""
+                    required>
+                  </datepicker-lite>
                 </div>
                 <div class="item full-width">
-                  < etools-dropdown-multi
+                  <etools-dropdown-multi
                     class="validate"
                     label="Clusters"
                     options="[[clusters]]"
                     option-value="value"
                     option-label="label"
-                    selected-values="{{ data.clusters }}"
+                    selected-values="{{data.clusters}}"
                     on-selected-values-changed="_validate"
                     trigger-value-change-event
                     required>
@@ -297,7 +324,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: Boolean, observer: '_onOpenedChanged'})
   opened!: boolean;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaceId)'})
+  @property({type: String, computed: '_workspaceId(rootState)'})
   workspaceId!: string;
 
   @property({type: String})
@@ -337,6 +364,16 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: Boolean})
   emptyClustersError!: boolean;
 
+  @property({type: Boolean})
+  plansLoading!: boolean;
+
+  @property({type: Object})
+  planDetails!: GenericObject;
+
+  @property({type: Object})
+  errors!: GenericObject;
+
+
   static get observers() {
     return [
       '_fetchPlans(mode, ochaPlansUrl)',
@@ -344,6 +381,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       '_fetchPlanDetails(planDetailsUrl)',
       '_setEmptyClustersError(planDetails, mode)',
     ];
+  }
+
+  _workspaceId(rootState: RootState) {
+    return workspaceId(rootState);
   }
 
   _computeCreatePlanUrl(workspaceId: string, mode: string) {
@@ -361,8 +402,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     if (planId !== '') {
       return Endpoints.ochaResponsePlanDetails(planId);
     }
-    //@Lajos: it had no default return
-    return;
+    return '';
   }
 
   _setDefaults() {
@@ -383,19 +423,19 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     e.target!.validate();
   }
 
-  _computeFormattedPlans(plans: GenericObject) {
+  _computeFormattedPlans(plans: GenericObject[]) {
     return plans.map(function(plan) {
       return {id: plan.id, title: plan.name};
     });
-  },
+  }
 
-  _computeCurrentPlan(plans: GenericObject, selectedPlan: string) {
+  _computeCurrentPlan(plans: GenericObject[], selectedPlan: string) {
     return plans.filter(function(plan) {
       return plan.id === selectedPlan;
     })[0];
-  },
+  }
 
-  _setEmptyClustersError(planDetails: string, mode: string) {
+  _setEmptyClustersError(planDetails: GenericObject, mode: string) {
     setTimeout(() => {
       this.set(
         'emptyClustersError',
@@ -412,8 +452,8 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       return;
     }
     this.set('plansLoading', true);
-    var self = this;
-    var thunk = (this.$.plans as EtoolsPrpAjaxEl).thunk();
+    const self = this;
+    const thunk = (this.$.plans as EtoolsPrpAjaxEl).thunk();
     (this.$.plans as EtoolsPrpAjaxEl).abort();
 
     thunk()
@@ -421,10 +461,9 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         self.set('plansLoading', false);
         self.set('plans', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         if (err.code === 504) {
-          //@Lajos: please check bellow
-          fireEvent('notify', {type: 'ocha-timeout'});
+          fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
         self.set('plansLoading', false);
         self.set('errors', err.data);
@@ -436,18 +475,18 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       return;
     }
     this.set('planDetailsLoading', true);
-    var self = this;
-    var thunk = (this.$.planDetails as EtoolsPrpAjaxEl).thunk();
+    const self = this;
+    const thunk = (this.$.planDetails as EtoolsPrpAjaxEl).thunk();
     (this.$.planDetails as EtoolsPrpAjaxEl).abort();
     thunk()
       .then(function(res: any) {
         self.set('planDetailsLoading', false);
         self.set('planDetails', res.data);
-        fireEvent('details-loaded');
+        fireEvent(self, 'details-loaded');
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         if (err.code === 504) {
-          fireEvent('notify', {type: 'ocha-timeout'});
+          fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
         self.set('planDetailsLoading', false);
         self.set('errors', err.data);
@@ -465,34 +504,34 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     this.reduxStore.dispatch(
       fetchConfig(configThunk, configClusterTypes)
     )
-      .catch(function(err: any) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err: any) {
         self.set('errors', err.data);
       });
   }
 
   _savePlan() {
-    var self = this;
+    const self = this;
     this.set('updatePending', true);
 
-    var bodyThunk = (this.$.plan as EtoolsPrpAjaxEl).thunk();
-    //@Lajos: please check bellow, not sure about this.$.plan.body
+    const bodyThunk = (this.$.plan as EtoolsPrpAjaxEl).thunk();
     if (this.mode === 'ocha') {
-      this.$.plan.body = {plan: this.selectedPlan};
+      (this.$.plan as EtoolsPrpAjaxEl).body = {plan: this.selectedPlan};
     } else {
-      this.$.plan.body = Object.assign({}, this.data);
+      (this.$.plan as EtoolsPrpAjaxEl).body = Object.assign({}, this.data);
     }
     bodyThunk()
       .then(function(res: any) {
         self.set('updatePending', false);
         self.close();
         self.set('errors', {});
-        this.reduxStore.dispatch(addResponsePlan(res.data));
-        fireEvent('refresh-plan-list');
-        fireEvent('fetch-profile');
+        self.reduxStore.dispatch(addResponsePlan(res.data));
+        fireEvent(self, 'refresh-plan-list');
+        fireEvent(self, 'fetch-profile');
       })
       .catch(function(err: any) {
         if (err.code === 504) {
-          fireEvent('notify', {type: 'ocha-timeout'});
+          fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
         self.set('errors', err.data);
         self.set('updatePending', false);
@@ -501,15 +540,14 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    //@Lajos: bellow show error
-    // this.addEventListener('details-loaded', this.adjustPosition);
-    // this.addEventListener('mode.selected-changed', this.adjustPosition);
+
+    this.addEventListener('details-loaded', this.adjustPosition as any);
+    this.addEventListener('mode.selected-changed', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    //@Lajos: bellow show error
-    // this.removeEventListener('details-loaded', this.adjustPosition);
-    // this.removeEventListener('mode.selected-changed', this.adjustPosition);
+    this.removeEventListener('details-loaded', this.adjustPosition as any);
+    this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
   }
 
   connectedCallback() {
@@ -526,3 +564,4 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
 window.customElements.define('add-response-plan-modal', AddResponsePlanModal);
 
+export {AddResponsePlanModal as AddResponsePlanModalEl};

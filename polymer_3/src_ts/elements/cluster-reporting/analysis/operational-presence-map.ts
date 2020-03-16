@@ -2,7 +2,6 @@ import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 // <link rel="import" href = "../../../../bower_components/leaflet-map/leaflet-map.html" >
-//<link rel="import" href="../../../polyfills/es6-shim.html">
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import './analysis-widget';
@@ -71,6 +70,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           is="dom-if"
           if="[[showMap]]"
           restamp="true">
+        <!--
         <leaflet-map
             longitude="[[center.0]]"
             latitude="[[center.1]]"
@@ -138,6 +138,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
             </template>
           </template>
         </leaflet-map>
+        -->
       </template>
 
       <div class="legend">
@@ -206,6 +207,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           is="dom-if"
           if="[[showMap]]"
           restamp="true">
+        <!--
         <leaflet-map
             longitude="[[center.0]]"
             latitude="[[center.1]]"
@@ -273,6 +275,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
             </template>
           </template>
         </leaflet-map>
+        -->
       </template>
 
       <div class="legend">
@@ -470,13 +473,12 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     setTimeout(() => {
       this.set('showMap', true);
 
-      setTimeout(() => {
-        var style = document.createElement('style');
+      // setTimeout(() => {
+      //   var style = document.createElement('style');
 
-        style.innerHTML = this.mapStyles;
-        //@Lajos: not sure about these types
-        this.shadowRoot.querySelector('leaflet-map').appendChild(style);
-      });
+      //   style.innerHTML = this.mapStyles;
+      //   (this.shadowRoot!.querySelector('leaflet-map') as Element).appendChild(style);
+      // });
     });
   }
 }

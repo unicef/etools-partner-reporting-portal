@@ -5,9 +5,9 @@ import '../../../page-body';
 import '../../../etools-prp-permissions';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
-//@Lajos: not merged yet
 import '../../activity-details';
 import './editing-modal';
+import {PlannedActionActivityEditingModalEl} from './editing-modal';
 import {GenericObject} from '../../../../typings/globals.types';
 
 /**
@@ -61,7 +61,7 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
   permissions!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionActivityEditingModalEl).open();
   }
 }
 

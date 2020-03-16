@@ -35,44 +35,49 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   `;
   }
 
-
-  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanID)', observer: '_fetchLocationNames'})
+  @property({type: String, computed: '_computeLocationNamesUrl(responsePlanId)', observer: '_fetchLocationNames'})
   locationNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
   @property({type: String})
-  value = '';
+  value!: string;
 
   @property({type: Array})
   data = [];
 
-  _computeLocationNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterIndicatorLocations(responsePlanID);
-  };
+  _computeLocationNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterIndicatorLocations(responsePlanId);
+  }
 
   _fetchLocationNames() {
-    var self = this;
-
+    if (!this.locationNamesUrl) {
+      return;
+    }
+    const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
     (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
       // @ts-ignore
       .catch(function(err) {
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('indicator-location-filter', IndicatorLocationFilter);

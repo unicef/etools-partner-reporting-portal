@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-//<link rel="import" href="../../../../../polyfills/es6-shim.html">
 import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
@@ -134,7 +133,8 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-          .catch(function(err) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
           });
       });

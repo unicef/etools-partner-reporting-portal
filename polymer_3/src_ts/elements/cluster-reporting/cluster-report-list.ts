@@ -1,5 +1,6 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
@@ -11,9 +12,9 @@ import DataTableMixin from '../../mixins/data-table-mixin';
 import '../confirm-box';
 import '../list-placeholder';
 import './cluster-report-proxy';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-
+import {clusterIndicatorsReportsAll} from '../../redux/selectors/clusterIndicatorReports';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -22,40 +23,40 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin PaginationMixin
  * @appliesMixin DataTableMixin
  */
-class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement))){
-  public static get template(){
+class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
-  
+
           --list-bg-color: transparent;
           --list-divider-color: transparent;
         }
-  
+
         .wrapper {
           min-height: 120px;
           position: relative;
         }
-  
+
         etools-data-table-row {
           display: block;
         }
-  
+
         etools-data-table-row:not(:last-of-type) {
           margin-bottom: 2px;
         }
-      </style>  
-      
+      </style>
+
       <iron-location
-        query="{{ query }}">
+        query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
-        params-string="{{ query }}"
-        params-object="{{ queryParams }}">
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <etools-data-table-footer
         page-size="[[pageSize]]"
         page-number="[[pageNumber]]"
@@ -63,7 +64,7 @@ class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxC
         on-page-size-changed="_pageSizeChanged"
         on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
-      
+
       <div class="wrapper">
         <template
           is="dom-repeat"
@@ -78,15 +79,15 @@ class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxC
             </div>
           </etools-data-table-row>
         </template>
-  
+
         <list-placeholder
           data="[[data]]"
           loading="[[loading]]">
         </list-placeholder>
-  
+
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
-  
+
       <etools-data-table-footer
         page-size="[[pageSize]]"
         page-number="[[pageNumber]]"
@@ -94,33 +95,40 @@ class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxC
         on-page-size-changed="_pageSizeChanged"
         on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
-  
+
       <confirm-box id="confirm"></confirm-box>
     `;
   }
+  @property({type: String})
+  query!: string;
 
   @property({type: String})
   mode!: string;
 
-  @property({type: Boolean, computed: 'getReducStateValue(rootState.clusterIndicatorReports.loading)'})
+  @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterIndicatorReports.loading)'})
   loading!: boolean;
 
-  @property({type: Array })
+  @property({type: Array, computed: '_clusterIndicatorsReportsAll(rootState)'})
   data!: GenericObject[];
-    // statePath: Selectors.ClusterIndicatorReports.all,
 
-  @property({type: Number, computed: 'getReducStateValue(rootState.clusterIndicatorReports.count)'})
+  @property({type: Number, computed: 'getReduxStateValue(rootState.clusterIndicatorReports.count)'})
   totalResults!: number;
 
-  @property({type: Object, computed: 'getReducStateValue(rootState.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
   @property({type: Boolean, computed: '_computeIsIMOClusters(profile)'})
   isIMO!: boolean;
 
 
+  _clusterIndicatorsReportsAll(rootState: RootState) {
+    if (rootState) {
+      return clusterIndicatorsReportsAll(rootState);
+    }
+  }
+
   _computeIsIMOClusters(profile: GenericObject) {
-    return profile.prp_roles ? profile.prp_roles.some( (role: GenericObject) => {
+    return profile.prp_roles ? profile.prp_roles.some((role: GenericObject) => {
       return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
     }) : [];
   }
@@ -163,16 +171,16 @@ class ClusterReportList extends UtilsMixin(PaginationMixin(DataTableMixin(ReduxC
 
   _addEventListeners() {
     this._onConfirm = this._onConfirm.bind(this);
-    this.addEventListener('report-submit-confirm', this._onConfirm);
+    this.addEventListener('report-submit-confirm', this._onConfirm as any);
     this._onContentsChanged = this._onContentsChanged.bind(this);
-    this.addEventListener('report-submitted', this._onContentsChanged);
-    this.addEventListener('report-reviewed', this._onContentsChanged);
+    this.addEventListener('report-submitted', this._onContentsChanged as any);
+    this.addEventListener('report-reviewed', this._onContentsChanged as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('report-submit-confirm', this._onConfirm);
-    this.removeEventListener('report-submitted', this._onContentsChanged);
-    this.removeEventListener('report-reviewed', this._onContentsChanged);
+    this.removeEventListener('report-submit-confirm', this._onConfirm as any);
+    this.removeEventListener('report-submitted', this._onContentsChanged as any);
+    this.removeEventListener('report-reviewed', this._onContentsChanged as any);
   }
 
   connectedCallback() {

@@ -48,11 +48,8 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
 
         --paper-dialog: {
           width: 700px;
-
-          & > * {
-            margin: 0;
+          margin: 0;
           }
-        };
       }
 
       .full-width {
@@ -199,7 +196,7 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
         fireEvent(self, 'activity-edited', res.data);
         self.close();
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         self.updatePending = false;
         // TODO: error handling
       });

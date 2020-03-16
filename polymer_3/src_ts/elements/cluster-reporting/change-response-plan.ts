@@ -4,10 +4,7 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import '@polymer/paper-tooltip/paper-tooltip';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
-// <link rel='import' href='../../../bower_components/app-localize-behavior/app-localize-behavior.html'>
 import {sharedStyles} from '../../styles/shared-styles';
-
-
 
 /**
 * @polymer
@@ -52,7 +49,7 @@ class ChangeResponsePlan extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
   }
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.all)'})
-  responsePlans!: any;
+  responsePlans!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanID!: string;

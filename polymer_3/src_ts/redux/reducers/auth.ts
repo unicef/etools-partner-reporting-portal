@@ -2,7 +2,7 @@ import Constants from '../../constants';
 
 export class AuthState {
   token: string = '';
-  acountType: string = '';
+  accountType: string = '';
 }
 
 const INITIAL_STATE = new AuthState();
@@ -10,7 +10,10 @@ const INITIAL_STATE = new AuthState();
 export const Auth = (state = INITIAL_STATE, action: any) => {
   switch (action.type) {
     case Constants.SET_TOKEN:
-      return action.token;
+      return {
+        ...state,
+        token: action.token
+      };
 
     case Constants.RESET_TOKEN:
       return {
@@ -19,19 +22,22 @@ export const Auth = (state = INITIAL_STATE, action: any) => {
       };
 
     case Constants.SET_ACCOUNT_TYPE:
-      return (function () {
+      return (function() {
         let isPartner = !!action.data.partner;
 
-        return isPartner ?
-          Constants.ACCOUNT_TYPE_PARTNER :
-          Constants.ACCOUNT_TYPE_CLUSTER;
+        return {
+          ...state,
+          accountType: (isPartner ?
+            Constants.ACCOUNT_TYPE_PARTNER :
+            Constants.ACCOUNT_TYPE_CLUSTER)
+        }
       }());
 
     case Constants.RESET:
       return {
         ...state,
-        acountType: ''
-      };;
+        accountType: ''
+      };
 
 
     default:

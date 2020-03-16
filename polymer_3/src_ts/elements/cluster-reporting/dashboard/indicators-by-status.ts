@@ -1,7 +1,7 @@
 import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-//<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+import '@google-web-components/google-chart';
 import '@polymer/paper-card/paper-card';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/app-layout/app-grid/app-grid-style';
@@ -9,7 +9,7 @@ import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles'
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import '../../etools-prp-number';
 import '../../chart-legend';
-import { GenericObject } from '../../../typings/globals.types';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -78,13 +78,13 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   chartOptions!: GenericObject;
 
   @property({type: Array})
-  chartCols =  [
+  chartCols = [
     {label: 'Status', type: 'string'},
     {label: 'Count', type: 'number'},
   ];
 
   @property({type: Array})
-  colors =  [
+  colors = [
     '#029a53',
     '#2bb0f2',
     '#d8d8d8',
@@ -93,12 +93,12 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   ];
 
   @property({type: Array})
-  labels =  [
+  labels = [
     'Met',
-            'On Track',
-            'No Progress',
-            'Constrained',
-            'No Status',
+    'On Track',
+    'No Progress',
+    'Constrained',
+    'No Status',
   ];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_met_indicator_reports)'})
@@ -117,16 +117,16 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   no_status_count!: number;
 
   @property({
-    type: Array, 
-    computed:'_computeChartRows(labels, ' +
-    [
-      'met_count',
-      'on_track_count',
-      'no_progress_count',
-      'constrained_count',
-      'no_status_count',
-    ].join(', ') +
-    ')',
+    type: Array,
+    computed: '_computeChartRows(labels, ' +
+      [
+        'met_count',
+        'on_track_count',
+        'no_progress_count',
+        'constrained_count',
+        'no_status_count',
+      ].join(', ') +
+      ')',
   })
   chartRows!: any[];
 
@@ -155,11 +155,11 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   _computeChartRows(labels: any[]) {
     var data = [].slice.call(arguments, 1);
 
-    var localizedLabels = labels.map(function (label: any) { // convert labels to localized label keys
+    var localizedLabels = labels.map(function(label: any) { // convert labels to localized label keys
       return label.split(' ').join('_').toLowerCase();
     });
 
-    return data.map(function (count, index) {
+    return data.map(function(count, index) {
       return [
         localizedLabels[index],
         count,

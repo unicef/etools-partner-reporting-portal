@@ -50,11 +50,17 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
   value!: string;
 
   _computeClustersUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterNames(responsePlanId);
-  };
+  }
 
   _fetchClusters() {
-    var self = this;
+    if (!this.clustersUrl) {
+      return;
+    }
+    const self = this;
     const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
     (this.$.clusters as EtoolsPrpAjaxEl).abort();
 
@@ -62,15 +68,16 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
       .then(function(res: any) {
         self.set('data', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.clusters as EtoolsPrpAjaxEl).abort();
-  };
+  }
+
 }
 
 window.customElements.define('cluster-filter-multi', ClusterFilterMulti);

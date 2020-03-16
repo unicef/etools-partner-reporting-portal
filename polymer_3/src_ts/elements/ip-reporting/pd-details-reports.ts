@@ -19,7 +19,6 @@ import {pdFetch} from '../../redux/actions/pd';
 /**
  * @polymer
  * @customElement
- * @mixinFunction
  */
 class PdDetailsReport extends ReduxConnectedElement {
 
@@ -87,8 +86,8 @@ class PdDetailsReport extends ReduxConnectedElement {
 
   public static get observers() {
     return [
-      '_handleInputChange(pdReportsUrl, pdReportsParams)',
-    ]
+      '_handleInputChange(pdReportsUrl, pdReportsParams)'
+    ];
   }
 
   _computePDReportsUrl(locationId: string) {
@@ -117,11 +116,11 @@ class PdDetailsReport extends ReduxConnectedElement {
         // Cancel the pending request, if any
         (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
+        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId));
           // @ts-ignore
-          .catch(function(err) {
-            // TODO: error handling
-          });
+          // .catch(function(err) {
+          //   // TODO: error handling
+          // });
       });
   }
 
@@ -143,11 +142,11 @@ class PdDetailsReport extends ReduxConnectedElement {
 
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
             // @ts-ignore
-            .catch(function(err) {
-              // TODO: error handling
-            });
+            // .catch(function(err) {
+            //   // TODO: error handling
+            // });
         });
     }
   }

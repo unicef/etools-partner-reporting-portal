@@ -1,0 +1,49 @@
+{
+  "extends": [
+    "eslint:recommended", "google",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "plugins": [
+    "html"
+  ],
+  "rules": {
+    "linebreak-style": "off",
+    "padded-blocks": "off",
+    "brace-style": "off",
+    "new-cap": ["error", { "capIsNewExceptions": ["Polymer"], "capIsNewExceptionPattern": "^Etools..|..Mixin$" }],
+    "no-var": "off",
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+    "comma-dangle": ["error", "never"],
+    "max-len": ["error", { "code": 140 }],
+    "camelcase": "off",
+    "arrow-parens": [2, "as-needed", { "requireForBlockBody": true }],
+    "indent": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-use-before-define": ["error", { "functions": false, "classes": true, "variables": true }],
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  },
+  "globals": {
+    "moment": true,
+    "Promise": true,
+    "Polymer": true,
+    "EtoolsRequestCacheDb": true,
+    "ShadyCSS": true,
+    "Set": true
+  }
+}

@@ -222,8 +222,8 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
 
   public static get observers() {
     return [
-      '_updateData(localData.*)',
-    ]
+      '_updateData(localData.*)'
+    ];
   }
 
   _reportInfoCurrent(rootState: RootState) {
@@ -268,10 +268,10 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
           // @ts-ignore
           .then(function() {
             self._notifyChangesSaved();
-          })
-          .catch(function(err) {
-            // TODO: error handling
           });
+          // .catch(function(err) {
+          //   // TODO: error handling
+          // });
       });
   }
 

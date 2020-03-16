@@ -20,34 +20,34 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
  * @customElement
  * @appliesMixin UtilsMixin
  */
-class ClusterReports extends UtilsMixin(ReduxConnectedElement){
-  public static get template(){
+class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
-      </style>  
-      
+      </style>
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <etools-prp-ajax
           id="reports"
           url="[[reportsUrl]]"
           params="[[params]]">
       </etools-prp-ajax>
-      
+
       <cluster-report-toolbar
           submitted="[[submitted]]">
       </cluster-report-toolbar>
-  
+
       <cluster-report-list mode="[[mode]]"></cluster-report-list>
     `;
   }
@@ -73,7 +73,7 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement){
   private _debouncer!: Debouncer;
 
 
-  static get observers(){
+  static get observers() {
     return ['_onParamsChanged(reportsUrl, params)'];
   }
 
@@ -84,27 +84,33 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement){
   }
 
   _computeReportsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+
     return Endpoints.clusterIndicatorReports(responsePlanId);
   }
 
-  _fetchData(reset) {
+  _fetchData(reset?: boolean) {
     const reportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
 
-    reportsThunk().abort();
+    (this.$.reports as EtoolsPrpAjaxE).abort();
 
     this.reduxStore.dispatch(
       clusterIndicatorReportsFetch(reportsThunk, reset)
     )
-      .catch(function (err) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling
       });
   }
 
   _onParamsChanged() {
+    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(100),
-      () =>{
-        this._fetchData();
+      () => {
+        self._fetchData();
       });
   }
 
@@ -117,14 +123,15 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement){
   _onRefreshReport(e: CustomEvent) {
     e.stopPropagation();
     const reportId = e.detail;
-    let ajax = document.createElement('etools-prp-ajax');
+    let ajax = document.createElement('etools-prp-ajax') as EtoolsPrpAjaxEl;
 
     ajax.url = Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
 
     this.reduxStore.dispatch(
       clusterIndicatorReportsFetchSingle(ajax.thunk(), reportId)
     )
-      .catch(function (err) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -137,19 +144,19 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement){
 
   _addEventListeners() {
     this._onContentsChanged = this._onContentsChanged.bind(this);
-    this.addEventListener('report-submitted', this._onContentsChanged);
-    this.addEventListener('report-reviewed', this._onContentsChanged);
+    this.addEventListener('report-submitted', this._onContentsChanged as any);
+    this.addEventListener('report-reviewed', this._onContentsChanged as any);
     this._onTemplateFileUploaded = this._onTemplateFileUploaded.bind(this);
-    this.addEventListener('template-file-uploaded', this._onTemplateFileUploaded);
+    this.addEventListener('template-file-uploaded', this._onTemplateFileUploaded as any);
     this._onRefreshReport = this._onRefreshReport.bind(this);
-    this.addEventListener('refresh-report', this._onRefreshReport);
+    this.addEventListener('refresh-report', this._onRefreshReport as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('report-submitted', this._onContentsChanged);
-    this.removeEventListener('report-reviewed', this._onContentsChanged);
-    this.removeEventListener('template-file-uploaded', this._onTemplateFileUploaded);
-    this.removeEventListener('refresh-report', this._onRefreshReport);
+    this.removeEventListener('report-submitted', this._onContentsChanged as any);
+    this.removeEventListener('report-reviewed', this._onContentsChanged as any);
+    this.removeEventListener('template-file-uploaded', this._onTemplateFileUploaded as any);
+    this.removeEventListener('refresh-report', this._onRefreshReport as any);
   }
 
   connectedCallback() {

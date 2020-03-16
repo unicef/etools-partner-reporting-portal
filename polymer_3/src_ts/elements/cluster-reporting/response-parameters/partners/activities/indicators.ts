@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../elements/etools-prp-ajax';
+import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
@@ -156,10 +156,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    //@Lajos: bellow was original
-    //this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
-    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, this.activityId))
-      .catch(function(err) { // jshint ignore:line
+    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling.
       });
   }

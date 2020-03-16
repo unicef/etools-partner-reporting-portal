@@ -1,7 +1,8 @@
 import Constants from '../constants';
+import {GenericObject} from '../typings/globals.types';
 
 // L11N
-export const setL11NResources = function(resources: []) {
+export const setL11NResources = function(resources: GenericObject) {
   return {
     type: Constants.SET_L11N_RESOURCES,
     resources: resources,
@@ -63,7 +64,7 @@ export const setUserProfile = function(data: any) {
   };
 };
 
-export const setAccountType = function(data: string) {
+export const setAccountType = function(data: Object) {
   return {
     type: Constants.SET_ACCOUNT_TYPE,
     data: data,

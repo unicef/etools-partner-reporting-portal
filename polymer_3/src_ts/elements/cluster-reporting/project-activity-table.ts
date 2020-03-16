@@ -30,46 +30,44 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectActivityTable extends DataTableMixin(
-                                  PaginationMixin(
-                                  RoutingMixin(
-                                  UtilsMixin(
-                                  LocalizeMixin(ReduxConnectedElement))))){
-  public static get template(){
+class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
+  UtilsMixin(LocalizeMixin(ReduxConnectedElement))))) {
+
+  public static get template() {
     return html`
       ${tableStyles}
       <style include="data-table-styles iron-flex">
         :host {
           display: block;
         }
-  
+
         iron-icon {
           color: var(--paper-grey-600);
         }
-  
+
         a {
           color: var(--theme-primary-color);
         }
-  
+
         .wrapper {
           position: relative;
         }
       </style>
-      
+
       <iron-location
         query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
         params-string="{{query}}"
         params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <iron-query-params
           params-string="{{anchorQuery}}"
           params-object="{{anchorQueryParams}}">
       </iron-query-params>
-      
+
       <div class="wrapper">
         <etools-content-panel no-header>
           <etools-data-table-header
@@ -88,7 +86,7 @@ class ProjectActivityTable extends DataTableMixin(
               <div class="table-column">[[localize('cluster_activity')]]</div>
             </etools-data-table-column>
           </etools-data-table-header>
-  
+
           <etools-data-table-footer
               page-size="[[pageSize]]"
               page-number="[[pageNumber]]"
@@ -97,7 +95,7 @@ class ProjectActivityTable extends DataTableMixin(
               on-page-size-changed="_pageSizeChanged"
               on-page-number-changed="_pageNumberChanged">
           </etools-data-table-footer>
-  
+
           <template id="list" is="dom-repeat" items="[[data]]" initial-count="[[pageSize]]">
             <etools-data-table-row no-collapse>
               <div slot="row-data">
@@ -121,7 +119,7 @@ class ProjectActivityTable extends DataTableMixin(
               </div>
             </etools-data-table-row>
           </template>
-  
+
           <etools-data-table-footer
               page-size="[[pageSize]]"
               page-number="[[pageNumber]]"
@@ -130,11 +128,11 @@ class ProjectActivityTable extends DataTableMixin(
               on-page-size-changed="_pageSizeChanged"
               on-page-number-changed="_pageNumberChanged">
           </etools-data-table-footer>
-  
+
           <etools-loading active="[[loading]]"></etools-loading>
         </etools-content-panel>
       </div>
-    
+
     `;
   }
 
@@ -194,12 +192,12 @@ class ProjectActivityTable extends DataTableMixin(
     this._tableContentChanged = this._tableContentChanged.bind(this);
     this.addEventListener('page-number-changed', this._tableContentChanged);
     this._detailsChange = this._detailsChange.bind(this);
-    this.addEventListener('details-opened-changed', this._detailsChange);
+    this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('page-number-changed', this._tableContentChanged);
-    this.removeEventListener('details-opened-changed', this._detailsChange);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   connectedCallback() {

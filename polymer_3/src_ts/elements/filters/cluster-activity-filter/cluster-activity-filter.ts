@@ -60,7 +60,10 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
   @property({type: String, computed: '_computeActivitiesUrl(responsePlanId)'})
   activitiesUrl = '';
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
+  responsePlanId!: string;
+
+  @property({type: Array})
   data = [];
 
   @property({type: Object})
@@ -77,7 +80,7 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
 
   _computeActivitiesUrl(responsePlanId: string) {
     return Endpoints.partnerActivityList(responsePlanId);
-  };
+  }
 
   _fetchActivities() {
 
@@ -93,7 +96,7 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
             self.set('data', [{
               id: '',
               title: 'All',
-            }].concat(res.data.results));
+            }].concat(res.data.results || []));
           })
           // @ts-ignore
           .catch(function(err: any) {
@@ -101,17 +104,18 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
           });
 
       });
-  };
+  }
 
   disconnectedCallback() {
     super.connectedCallback();
 
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
+
 }
 
 window.customElements.define('cluster-activity-filter', ClusterActivityFilter);

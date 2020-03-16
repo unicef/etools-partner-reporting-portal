@@ -19,7 +19,7 @@ class NumberOfNonClusterActivities extends LocalizeMixin(ReduxConnectedElement) 
   public static get template() {
     return html`
     ${dashboardWidgetStyles}
-    <style include="dashboard-widget-styles iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
@@ -41,6 +41,7 @@ class NumberOfNonClusterActivities extends LocalizeMixin(ReduxConnectedElement) 
     </paper-card>
     `;
   }
+
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_non_cluster_activities)'})
   numberOfActivities!: number;
 

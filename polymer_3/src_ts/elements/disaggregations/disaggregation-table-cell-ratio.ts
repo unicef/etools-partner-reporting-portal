@@ -21,7 +21,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
     // language=HTML
     return html`
         ${disaggregationTableStyles}
-      <style>
+      <style include="app-grid-style">
 
         :host {
           display: block;

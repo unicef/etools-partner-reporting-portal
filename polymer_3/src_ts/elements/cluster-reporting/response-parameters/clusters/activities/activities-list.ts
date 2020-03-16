@@ -25,7 +25,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ActivitiesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
+class ActivityList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
@@ -157,6 +157,6 @@ class ActivitiesList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixi
   }
 }
 
-window.customElements.define('clusters-activities-list', ActivitiesList);
+window.customElements.define('clusters-activities-list', ActivityList);
 
-export {ActivitiesList as ClustersActivitiesListEl};
+export {ActivityList as ClustersActivitiesListEl};

@@ -93,7 +93,7 @@ class PdFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: localize('suspended'), id: 'Sus'},
       {title: localize('ended'), id: 'End'},
       {title: localize('closed'), id: 'Clo'},
-      {title: localize('terminated'), id: 'Ter'},
+      {title: localize('terminated'), id: 'Ter'}
     ];
 
     return statuses;

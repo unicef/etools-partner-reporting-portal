@@ -113,7 +113,7 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
       {title: localize('sent_back'), id: 'Sen'},
       {title: localize('due'), id: 'Due'},
       {title: localize('submitted'), id: 'Sub'},
-      {title: localize('accepted'), id: 'Acc'},
+      {title: localize('accepted'), id: 'Acc'}
     ];
   }
 
@@ -121,7 +121,7 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
     return [
       {title: localize('qpr'), id: 'QPR'},
       {title: localize('hr'), id: 'HR'},
-      {title: localize('sr'), id: 'SR'},
+      {title: localize('sr'), id: 'SR'}
     ];
   }
 

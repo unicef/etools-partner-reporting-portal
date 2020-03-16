@@ -1,9 +1,7 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
-//@Lajos: IMPORTANT NOTICE: bellow does not exists!!!!!!
-// <link rel="import" href = "../../../../bower_components/google-chart/google-chart.html" >
-import '@polymer/google-chart/google-chart';
+import '@google-web-components/google-chart';
 import '../../numeral-js';
 import './analysis-widget';
 import '../../list-placeholder';
@@ -12,7 +10,6 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
 import Constants from '../../../constants';
 import {GenericObject} from '../../../typings/globals.types';
-//<link rel="import" href = "../../../polyfills/es6-shim.html" >
 declare const numeral: any;
 
 /**

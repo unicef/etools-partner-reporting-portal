@@ -1,4 +1,4 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
@@ -80,7 +80,8 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
         (this.$.partners as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(clusterActivitiesPartnersFetch(thunk, this.activityId))
-          .catch(function(err) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
           });
       });

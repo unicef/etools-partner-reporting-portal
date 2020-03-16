@@ -106,8 +106,6 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 
   _openModal() {
-    //@Lajos: imported is the edit modal, original:
-    //this.shadowRoot.querySelector('#modal').open();
     (this.shadowRoot!.querySelector('#modal') as EditingModalEl).open();
   }
 

@@ -18,7 +18,7 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class ProjectDetailsDisplay extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       ${buttonsStyles}
@@ -277,4 +277,4 @@ class ProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
 }
 
-window.customElements.define('project-details-display', ProjectDetails);
+window.customElements.define('project-details-display', ProjectDetailsDisplay);

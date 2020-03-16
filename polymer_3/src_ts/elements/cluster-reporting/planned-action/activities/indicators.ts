@@ -4,17 +4,14 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-
 import LocalizeMixin from '../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-ajax';
 import Endpoints from '../../../../endpoints';
-//Actions.PartnerActivities.indicators.fetch
-import {fetchIndicatorDetails} from '../../../../redux/actions/indicators';
+import {partnerActivitiesIndicatorsFetch} from '../../../../redux/actions/partnerActivities';
 import '../../../etools-prp-permissions';
 import '../../../page-body';
 import '../../../list-view-indicators';
-//@Lajos: bellow not merged yet
 import '../../indicator-modal';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../styles/table-styles';
@@ -25,7 +22,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin UtilsBehavior
 */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -131,7 +128,7 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: any) {
-    //@Lajos: defined as number ....
+
     return allIndicatorsCount[activityId];
   }
 
@@ -146,8 +143,9 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.activityId.toString()))
-      .catch(function(err) { // jshint ignore:line
+    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, this.activityId.toString()))
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling.
       });
   }
@@ -173,7 +171,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     this._removeEventListeners();
   }
 }
+window.customElements.define('pa-activity-details-indicators', PaActivityDetailsIndicators);
 
-window.customElements.define('pa-activity-details-indicators', Filters);
-
-export {Filters as PaActivityDetailsIndicatorsEl};
+export {PaActivityDetailsIndicators as PaActivityDetailsIndicatorsEl};

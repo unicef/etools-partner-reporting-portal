@@ -16,6 +16,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
 import {buttonsStyles} from '../styles/buttons-styles';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -202,7 +203,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _handleInput(event: CustomEvent) {
     let field = event.target as GenericObject;
-    const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment');
+    const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment') as PaperInputElement;
 
     if (narrativeTextInput && this.toggle === 'Edit' && field.id === 'toggle-button') {
       narrativeTextInput.disabled = false;
@@ -294,10 +295,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (paperButton && paperButton.textContent.trim() === 'Save') {
         this.set(['localData', 'narrative_assessment'], labelledItem[1].querySelector('paper-input').value);
       }
-      // (dci) need to get the Debouncer here
-      // if (this.isDebouncerActive('local-data-changed')) {
-      //   this.cancelDebouncer('local-data-changed');
-      // }
+
       (this.$.refresh as RefreshReportModalEl).close();
     }
   }

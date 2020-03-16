@@ -20,7 +20,7 @@ import '../report-status';
 import '../etools-prp-number';
 import '../etools-prp-currency';
 import '../list-placeholder';
-import {getDomainByEnv} from '../../config';
+
 
 /**
  * @polymer

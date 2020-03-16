@@ -1,3 +1,4 @@
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
@@ -17,9 +18,9 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 
 import Settings from '../../../settings';
 import {GenericObject} from '../../../typings/globals.types';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+
 /**
  * @polymer
  * @customElement

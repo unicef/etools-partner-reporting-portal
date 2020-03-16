@@ -31,61 +31,60 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return html`
     ${buttonsStyles} ${tableStyles}
     <style include="iron-flex data-table-styles">
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+    div#action {
+      margin: 25px 0;
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+    }
+  </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+  <etools-prp-permissions
+      permissions="{{permissions}}">
+  </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+  <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+  <iron-query-params
+      params-string="{{query}}"
+      params-object="{{queryParams}}">
+  </iron-query-params>
 
-    <etools-prp-ajax
-        id="indicators"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+  <etools-prp-ajax
+      id="indicators"
+      url="[[url]]"
+      params="[[queryParams]]">
+  </etools-prp-ajax>
 
-    <page-body>
-      <template
-          is="dom-if"
-          if="[[canAddIndicator]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_cluster_activity_indicator')]]
-          </paper-button>
-        </div>
-      </template>
+  <page-body>
+    <template
+        is="dom-if"
+        if="[[canAddIndicator]]"
+        restamp="true">
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+          [[localize('add_cluster_objective_indicator')]]
+        </paper-button>
+      </div>
+    </template>
 
-      <indicator-modal
-        id="indicatorModal"
-        object="[[activityData]]"
-        object-id="[[activityId]]"
-        object-type="cluster.clusteractivity"
-        modal-title="Add Cluster Activity Indicator">
-      </indicator-modal>
+    <indicator-modal
+      id="indicatorModal"
+      object-id=[[objectiveId]]
+      activity-data=[[activityData]]
+      object-type="cluster.clusterobjective"
+      modal-title="Add Cluster Objective Indicator">
+    </indicator-modal>
 
-      <list-view-indicators
-          data="[[data]]"
-          total-results="[[totalResults]]"
-          type="ca"
-          can-edit="[[canAddIndicator]]">
-      </list-view-indicators>
-    </page-body>
+    <list-view-indicators
+        data="[[data]]"
+        total-results="[[totalResults]]"
+        can-edit="[[canAddIndicator]]">
+    </list-view-indicators>
+  </page-body>
     `;
   }
 
@@ -96,7 +95,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   queryParams!: GenericObject;
 
   @property({type: Number})
-  activityId!: number;
+  objectiveId!: number;
 
   @property({type: Number})
   clusterId!: number;
@@ -154,7 +153,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
     this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling.
       });
   }

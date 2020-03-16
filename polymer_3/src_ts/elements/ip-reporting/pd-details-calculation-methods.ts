@@ -43,7 +43,10 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin DataTableMixin
  * @appliesMixin NotificationsMixin
  */
-class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))) {
+class PdDetailsCalculationMethods extends LocalizeMixin(
+                                          NotificationsMixin(
+                                          DataTableMixin(
+                                          UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
@@ -265,7 +268,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
   programmeDocumentsUrl!: string;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
+  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
+                          observer: '_getPdReports'})
   pdReportsCount!: GenericObject;
 
   private _debouncer!: Debouncer;
@@ -314,17 +318,17 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
 
         (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
-          //@ts-ignore
-          .catch(function(err) {
-            // TODO: error handling
-          });
+        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId));
+          // @ts-ignore
+          // .catch(function(err) {
+          //   // TODO: error handling
+          // });
       });
   }
 
   _onValueChanged(e: CustomEvent) {
-    const newValue = e.target.selected;
-    const data = e.target.dataset;
+    const newValue = e.target!.selected;
+    const data = e.target!.dataset;
     const indices = onValueChanged(data, this.localData);
 
     this.set([
@@ -332,7 +336,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
       indices.lloIndex,
       'indicators',
       indices.indicatorIndex,
-      data.scope,
+      data.scope
     ], newValue);
   }
 
@@ -358,8 +362,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
         'progress reports for your indicators!',
       result: deferred,
       maxWidth: '500px',
-      //where to find it?
-      mode: Constants.CONFIRM_MODAL,
+      // where to find it?
+      mode: Constants.CONFIRM_MODAL
     });
 
     return deferred.promise;
@@ -400,11 +404,11 @@ class PdDetailsCalculationMethods extends LocalizeMixin(NotificationsMixin(DataT
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
             // @ts-ignore
-            .catch(function(err) {
-              // TODO: error handling
-            });
+            // .catch(function(err) {
+            //   // TODO: error handling
+            // });
         });
     }
   }

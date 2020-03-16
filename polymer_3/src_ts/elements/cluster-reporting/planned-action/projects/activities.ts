@@ -108,6 +108,9 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _computeUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.partnerActivityList(responsePlanId);
   }
 
@@ -128,7 +131,8 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-          .catch(function(err) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
           });
       });
@@ -144,11 +148,11 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('modal.activity-added', this._onSuccess);
+    this.addEventListener('modal.activity-added', this._onSuccess as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('modal.activity-added', this._onSuccess);
+    this.removeEventListener('modal.activity-added', this._onSuccess as any);
   }
 
   connectedCallback() {

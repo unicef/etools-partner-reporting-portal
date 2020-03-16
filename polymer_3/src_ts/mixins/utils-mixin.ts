@@ -45,7 +45,6 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _forEach(selector: any, fn: any) {
-      // (dci) TO BE CHANGED...
       [].forEach.call(
         this.shadowRoot!.querySelector(selector),
         fn,
@@ -294,7 +293,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _cancelDebouncers(debouncers: Debouncer[]) {
       debouncers.forEach(debouncer => {
-        if (debouncer && debouncer.isActive()) {
+        if (debouncer && debouncer.isActive && debouncer.isActive()) {
           debouncer.cancel();
         }
       }, this);

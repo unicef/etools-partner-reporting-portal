@@ -52,7 +52,6 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   `;
   }
 
-
   @property({type: String, computed: '_computeObjectivesUrl(responsePlanId)'})
   objectivesUrl!: string;
 
@@ -62,7 +61,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   @property({type: Array})
   data = [];
 
-  @property({type: Object, computed: '_computeObjectivesParams(params)', observer: '_fetchObjectives'})
+  @property({type: Object, computed: '_computeObjectivesParams(params)'})
   objectivesParams!: GenericObject;
 
   @property({type: String})
@@ -73,12 +72,21 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   private _debouncer!: Debouncer;
 
+  static get observers() {
+    return [
+      '_fetchObjectives(objectivesParams, objectivesUrl)'
+    ];
+  }
+
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 
   _computeObjectivesParams(params: GenericObject) {
-    var objectivesParams: GenericObject = {
+    const objectivesParams: GenericObject = {
       page_size: 99999,
     };
 
@@ -90,6 +98,10 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   }
 
   _fetchObjectives() {
+    if (!this.objectivesParams || !this.objectivesUrl) {
+      return;
+    }
+
     const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
@@ -104,7 +116,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch(function(err: any) { // jshint ignore:line
+          .catch(function(err: any) {
             // TODO: error handling
             self.set('pending', false);
           });
@@ -113,7 +125,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this._debouncer.isActive()) {
+    if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
   }

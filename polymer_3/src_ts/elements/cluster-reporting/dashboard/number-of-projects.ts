@@ -54,6 +54,7 @@ class NumberOfProjects extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)
   _computePartnersUrl(baseUrl: string) {
     return this.buildUrl(baseUrl, '/planned-action/projects');
   }
+
 }
 
 window.customElements.define('number-of-projects', NumberOfProjects);

@@ -24,5 +24,9 @@ export const modalStyles = html`
     .buttons {
       padding: 24px;
     }
+
+    // .full-width {
+    //   @apply --app-grid-expandible-item;
+    // }
   </style>`
   ;

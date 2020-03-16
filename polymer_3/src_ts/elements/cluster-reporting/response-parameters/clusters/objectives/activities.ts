@@ -26,7 +26,7 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
     // language=HTML
     return html`
     ${tableStyles}
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles">
       :host {
         display: block;
       }
@@ -84,16 +84,20 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
         }
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
-        //App.Actions.ClusterActivities.fetchClusterActivitiesList
+
         this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
-          .catch(function(err) { // jshint ignore:line
+          // @ts-ignore
+          .catch(function(err) {
             // TODO: error handling.
           });
       });
   }
 
   _computeActivitiesUrl() {
-    return Endpoints.responseParametersClusterActivities(this.responsePlanID);
+    if (this.responsePlanID) {
+      return Endpoints.responseParametersClusterActivities(this.responsePlanID);
+    }
+    return '';
   }
 
   disconnectedCallback() {

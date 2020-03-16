@@ -15,7 +15,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(PolymerElement) {
+class PartnerActivitiesFilters extends UtilsMixin(PolymerElement) {
   public static get template() {
     return html`
     ${filterStyles}
@@ -61,6 +61,6 @@ class Filters extends UtilsMixin(PolymerElement) {
   ];
 }
 
-window.customElements.define('partner-contacts-filters', Filters);
+window.customElements.define('partner-activities-filters', PartnerActivitiesFilters);
 
-export {Filters as PartnerContactsFiltersEl};
+export {PartnerActivitiesFilters as PartnerActivitiesFiltersEl};
