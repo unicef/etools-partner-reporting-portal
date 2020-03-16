@@ -108,7 +108,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then(function (res: any) {
         if (res.data.access.length) {
-          window.location.href = '/app_poly3/';
+          window.location.href = '/';
         } else {
           self.set('loading', false);
         }
