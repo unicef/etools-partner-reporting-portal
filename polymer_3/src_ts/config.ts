@@ -20,14 +20,5 @@ export const isLocal = () => {
 };
 
 export const getDomainByEnv = () => {
-  if (isLocal()) {
-    return 'http://127.0.0.1:' + window.location.port + '/app_poly3'
-  }
-  if (isStagingServer()) {
-    return 'https://staging.partnerreportingportal.org/app';
-  }
-  if (isDemoServer()) {
-    return 'https://demo.partnerreportingportal.org/app';
-  }
-  return 'https://dev.partnerreportingportal.org/app';
+  return window.location.origin;
 };
