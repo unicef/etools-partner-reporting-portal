@@ -28,7 +28,7 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
 
 
     public _$computeBaseUrl(workspace: string, app: string) {
-      return '/app_poly3/' + workspace + '/' + app;
+      return '/app/' + workspace + '/' + app;
     }
 
     public _$computeBaseUrlCluster(workspace: string, app: string, planId: string) {

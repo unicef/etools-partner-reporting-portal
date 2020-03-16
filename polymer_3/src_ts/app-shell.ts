@@ -68,9 +68,9 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         selected="[[page]]"
         attr-for-selected="name"
         role="main">
-      <template is="dom-if" if="[[_equals(page, 'app_poly3')]]" restamp="true">
+      <template is="dom-if" if="[[_equals(page, 'app')]]" restamp="true">
         <page-app
-            name="app_poly3"
+            name="app"
             route="{{subroute}}">
         </page-app>
       </template>
@@ -130,11 +130,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
+    const validPages = ['app', 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      location.pathname = '/app_poly3';
+      location.pathname = '/app';
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
     } else {
@@ -150,7 +150,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   async _pageChanged(page: string) {
     // TODO : remove after migration is finished and we no longer use app_poly3
     let componentName = '';
-    if (page === 'app_poly3') {
+    if (page === 'app') {
       componentName = 'app';
     } else {
       componentName = page;
@@ -169,11 +169,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
     this.reduxStore.dispatch(userLogout(thunk))
       // @ts-ignore
-      .then(function() {
+      .then(function () {
         self._goToLanding();
         self.reduxStore.dispatch(reset())
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         // TODO: error handling
       });
   }
@@ -183,7 +183,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _computeRedirectPath(authenticated: boolean) {
-    return authenticated ? '/app_poly3' : '/landing';
+    return authenticated ? '/app' : '/landing';
   }
 
   _addEventListeners() {

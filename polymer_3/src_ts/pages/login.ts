@@ -249,12 +249,12 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
     const thunk = (this.$.getProfile as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.status === 200) {
-          window.location.href = '/app_poly3/';
+          window.location.href = '/app/';
         }
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         // TODO: error handling
       });
   }
@@ -267,11 +267,11 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
     }
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function() {
+      .then(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       })
-      .catch(function() {
+      .catch(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       });

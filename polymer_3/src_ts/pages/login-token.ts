@@ -59,12 +59,12 @@ class PageLoginToken extends PolymerElement {
     const self = this;
     const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.data.success) {
-          window.location.href = '/app_poly3/';
+          window.location.href = '/app/';
         }
       })
-      .catch(function() {
+      .catch(function () {
         fireEvent(self, 'token-error');
       });
   }

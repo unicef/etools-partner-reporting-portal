@@ -24,10 +24,10 @@ export const getDomainByEnv = () => {
     return 'http://127.0.0.1:' + window.location.port + '/app_poly3'
   }
   if (isStagingServer()) {
-    return 'https://staging.partnerreportingportal.org/app_poly3';
+    return 'https://staging.partnerreportingportal.org/app';
   }
   if (isDemoServer()) {
-    return 'https://demo.partnerreportingportal.org/app_poly3';
+    return 'https://demo.partnerreportingportal.org/app';
   }
-  return 'https://dev.partnerreportingportal.org/app_poly3';
+  return 'https://dev.partnerreportingportal.org/app';
 };
