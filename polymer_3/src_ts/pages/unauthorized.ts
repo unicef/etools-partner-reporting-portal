@@ -1,8 +1,8 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/paper-styles/typography.js';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/paper-styles/typography';
 import Endpoints from '../endpoints';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '../elements/etools-prp-ajax';
@@ -103,12 +103,12 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    const self = this;
 
+    const self = this;
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.data.access.length) {
-          location.href = '/';
+          window.location.href = '/app_poly3/';
         } else {
           self.set('loading', false);
         }

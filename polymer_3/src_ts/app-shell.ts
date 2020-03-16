@@ -12,10 +12,6 @@ import Endpoints from './endpoints';
 import './elements/app-redirect';
 import './elements/etools-prp-ajax';
 import './elements/etools-prp-auth';
-import './pages/login';
-import './pages/login-token';
-import './pages/not-found';
-import './pages/unauthorized';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
 import {reset, userLogout} from './redux/actions';
@@ -63,6 +59,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+
 
     <iron-pages
         selected="[[page]]"

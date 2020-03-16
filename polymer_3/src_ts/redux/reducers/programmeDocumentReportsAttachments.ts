@@ -14,7 +14,7 @@ export const ProgrammeDocumentReportsAttachments = combineReducers({
 });
 
 function updateForReport(state: any, reportId: any, newValue: any) {
-  let change = {};
+  let change: GenericObject = {};
   let isNew = true;
 
   if (newValue instanceof Array === true
