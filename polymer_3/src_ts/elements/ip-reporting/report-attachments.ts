@@ -143,7 +143,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   @property({type: Array, computed: '_programmeDocumentReportsAttachmentsCurrent(rootState)', observer: '_setFiles'})
   attachments!: GenericObject[];
 
-  @property({type: String, computed: '_computeListUrl(locationId, reportId)'})
+  @property({type: String, computed: '_computeListUrl(locationId, reportId)', observer: '_getReportAttachments'})
   attachmentsListUrl!: string;
 
   @property({type: String})
@@ -174,6 +174,9 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _computeListUrl(locationId: string, reportId: string) {
+    if (!locationId || !reportId) {
+      return;
+    }
     return computeListUrl(locationId, reportId);
   }
 
@@ -184,7 +187,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     this.set('otherTwoAttachment', []);
 
     setFiles(this.attachments)
-      .forEach(function(attachment: GenericObject) {
+      .forEach(function (attachment: GenericObject) {
         if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
           self.set('otherTwoAttachment', [attachment]);
         } else if (attachment.type === 'Other') {
@@ -230,10 +233,10 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         self.$.otherTwoAttachmentComponent.set('files', []);
       }
     });
-      // @ts-ignore
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+    // @ts-ignore
+    // .catch(function(err) {
+    //   // TODO: error handling
+    // });
   }
 
   _filesChanged(change: GenericObject) {
@@ -248,7 +251,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     const files = isEmpty ? [] : change.base;
 
-    files.findIndex(function(file: GenericObject) {
+    files.findIndex(function (file: GenericObject) {
       if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
         file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
       }
@@ -269,7 +272,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       const data = new FormData();
       let thunk;
 
-      files.forEach(function(file: GenericObject) {
+      files.forEach(function (file: GenericObject) {
         data.append('path', file.raw, file.file_name);
         data.append('type', attachmentType);
       });
@@ -311,7 +314,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
           const attachments = self.get('attachments');
 
-          attachments.forEach(function(item) {
+          attachments.forEach(function (item) {
             if (attachment.id !== null && item.id === attachment.id) {
               self.set(attachmentPropertyName, [item]);
               return;
@@ -319,7 +322,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           });
 
           if (attachment.id === null) {
-            const duplicates = attachments.filter(function(item) {
+            const duplicates = attachments.filter(function (item) {
               const tokens = attachment.file_name.split('.');
               if (tokens.length === 0) {
                 return item.file_name.indexOf(attachment.file_name) !== -1;
@@ -333,7 +336,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
             } else {
               let correctedItem;
 
-              duplicates.forEach(function(item) {
+              duplicates.forEach(function (item) {
                 if (item.file_name !== attachment.file_name) {
                   correctedItem = item;
                   return;
@@ -371,17 +374,21 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     super.connectedCallback();
 
     this._addEventListeners();
-    const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
+  }
 
+  _getReportAttachments() {
+    if (!this.attachmentsListUrl) {
+      return;
+    }
+    let downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
-
     this.reduxStore.dispatch(
       pdReportsAttachmentsSync(downloadThunk, this.reportId)
-    );
+    )
       // @ts-ignore
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch(function (err) {
+        // TODO: error handling
+      });
   }
 
   disconnectedCallback() {
@@ -391,7 +398,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl
-    ].forEach(function(req: EtoolsPrpAjaxEl) {
+    ].forEach(function (req: EtoolsPrpAjaxEl) {
       req.abort();
     });
 
