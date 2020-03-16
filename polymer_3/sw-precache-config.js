@@ -19,7 +19,7 @@ module.exports = {
       handler: 'fastest'
     }
   ],
-  replacePrefix: '/app/',
+  //replacePrefix: '/app/',
   navigateFallback: '/index.html',
   navigateFallbackWhitelist: [
     /^\/api\//,
