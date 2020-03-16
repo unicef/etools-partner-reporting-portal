@@ -18,7 +18,7 @@ function getSourcesPath(request) {
   }
 }
 
-app.use('/app/', (req, res, next) => {
+app.use('/', (req, res, next) => {
   express.static(getSourcesPath(req))(req, res, next);
 });
 
@@ -32,3 +32,5 @@ app.use((req, res) => {
 });
 
 app.listen(8082);
+
+
