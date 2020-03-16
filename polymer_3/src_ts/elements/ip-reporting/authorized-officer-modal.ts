@@ -185,7 +185,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then(function (res: any) {
         const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
@@ -199,7 +199,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch((res: any) {
+      .catch((res: any) => {
         const errors = res.data.non_field_errors;
         self.close();
         return (self.$.error as ErrorModalEl).open(errors);
