@@ -15,7 +15,7 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '../error-modal';
-import {filterStyles} from '../../styles/filter-styles'
+import {filterStyles} from '../../styles/filter-styles';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import {GenericObject} from '../../typings/globals.types';
@@ -108,11 +108,11 @@ class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
       {title: localize('suspended'), id: 'Sus'},
       {title: localize('ended'), id: 'End'},
       {title: localize('closed'), id: 'Clo'},
-      {title: localize('terminated'), id: 'Ter'},
+      {title: localize('terminated'), id: 'Ter'}
     ];
 
     return statuses;
-  };
+  }
 }
 
 window.customElements.define('indicators-filters', IndicatorsFilters);

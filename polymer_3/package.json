@@ -12,9 +12,10 @@
   },
   "scripts": {
     "dev": "gulp serve",
-    "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
+    "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",    
     "build": "export NODE_OPTIONS=--max_old_space_size=4096 && npm run tsToJs && polymer build",
     "tsToJs": "tsc --skipLibCheck || true",
+    "tsEslint": "npx eslint 'src_ts/**' --fix",
     "test": "gulp specs",
     "test:watch": "gulp watch"
   },

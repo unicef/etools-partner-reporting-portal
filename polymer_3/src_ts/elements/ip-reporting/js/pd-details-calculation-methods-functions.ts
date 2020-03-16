@@ -3,28 +3,27 @@ import {GenericObject} from '../../../typings/globals.types';
 
 export function computeIndicatorsUrl(locationId: string, pdId: string) {
   return locationId ? Endpoints.calculationMethods(locationId, pdId) : '';
-};
+}
 
 export function computeFormattedData(data: GenericObject) {
-  return data.ll_outputs_and_indicators.reduce(function(acc: GenericObject, curr: GenericObject) {
-    let items;
+  return data.ll_outputs_and_indicators.reduce((acc: GenericObject, curr: GenericObject) => {
 
     acc.push({
       type: 'label',
-      text: curr.ll_output.title,
+      text: curr.ll_output.title
     });
 
-    items = curr.indicators.map(function(indicator: GenericObject) {
+    let items = curr.indicators.map(function(indicator: GenericObject) {
       return {
         type: 'data',
         data: Object.assign({}, indicator, {
-          editable: true,
+          editable: true
         }),
-        llo_id: curr.ll_output.id,
+        llo_id: curr.ll_output.id
       };
     });
 
-    acc.push.apply(acc, items);
+    acc.push(...items);
 
     return acc;
   }, []);
@@ -39,7 +38,7 @@ export function computeDisabled(display_type: string) {
 }
 
 export function onValueChanged(data: GenericObject, localData: GenericObject) {
-  let indices: GenericObject = {};
+  const indices: GenericObject = {};
 
   // Here's what the lack of expression interpolation in polymer makes people do:
 

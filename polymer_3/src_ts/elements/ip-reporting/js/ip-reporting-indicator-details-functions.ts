@@ -10,7 +10,7 @@ export function computeParams(val: boolean) {
 
   if (val === true) {
     params = Object.assign({}, params, {
-      hide_children: 1,
+      hide_children: 1
     });
   }
 
@@ -18,9 +18,9 @@ export function computeParams(val: boolean) {
 }
 
 export function computeIndicatorReportsUrl(indicator: GenericObject) {
-  let target_indicator_id = indicator.cluster_partner_indicator_reportable_id
-    ? indicator.cluster_partner_indicator_reportable_id
-    : indicator.id;
+  const target_indicator_id = indicator.cluster_partner_indicator_reportable_id ?
+    indicator.cluster_partner_indicator_reportable_id :
+    indicator.id;
   return Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
 }
 
@@ -29,10 +29,10 @@ export function computeHidden(data: any[], loading: boolean) {
 }
 
 export function bucketByLocation(data: any[]) {
-  //API gives us two objects, one for current reporting period and
-  //one for previous. We want to create a list of locations, each with a
-  //current and/or previous report.
-  let locations: GenericObject = {};
+  // API gives us two objects, one for current reporting period and
+  // one for previous. We want to create a list of locations, each with a
+  // current and/or previous report.
+  const locations: GenericObject = {};
 
   if (!data) {
     return [];
@@ -46,12 +46,12 @@ export function bucketByLocation(data: any[]) {
 
     report.indicator_location_data.forEach(function(locationReport: GenericObject) {
       if (locations[locationReport.location.id]) {
-        let toUpdate = locations[locationReport.location.id];
+        const toUpdate = locations[locationReport.location.id];
         toUpdate[timeframe] = locationReport;
         toUpdate.reportInfo[timeframe] = report;
         locations[locationReport.location.id] = toUpdate;
       } else {
-        let newDict: GenericObject = {reportInfo: {}};
+        const newDict: GenericObject = {reportInfo: {}};
         newDict[timeframe] = locationReport;
         newDict.name = locationReport.location.title;
         newDict.reportInfo[timeframe] = report;
@@ -60,7 +60,7 @@ export function bucketByLocation(data: any[]) {
     });
   });
 
-  let locationList: any[] = [];
+  const locationList: any[] = [];
 
   Object.keys(locations).forEach(function(i) {
     locationList.push(locations[i]);

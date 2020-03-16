@@ -2,7 +2,7 @@ import {GenericObject} from '../../../typings/globals.types';
 
 export function computePostBody(selectedFocalPoint: string) {
   return {
-    submitted_by_email: selectedFocalPoint,
+    submitted_by_email: selectedFocalPoint
   };
 }
 

@@ -239,7 +239,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;
 
-  @property({type: Object, computed: '_computeParams(isClusterApp)', })
+  @property({type: Object, computed: '_computeParams(isClusterApp)'})
   params!: GenericObject;
 
   static get observers() {
@@ -280,14 +280,14 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
   _openChanged() {
     if (this.isOpen) {
-      var thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
-      //need to check
+      let thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
+      // need to check
       // var action = Indicators;
-      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        // @ts-ignore
-        .catch(function(err) {
-          // TODO: error handling.
-        });
+      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id));
+        // eslint-disable-next-line
+        // .catch(function(err) {
+        //   // TODO: error handling.
+        // });
     } else {
       (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
     }

@@ -38,7 +38,7 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin LocalizeMixin
  */
 class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-  //not sure about data table styles....
+  // not sure about data table styles....
   static get template() {
     return html`
     ${tableStyles}
@@ -390,11 +390,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
             // @ts-ignore
-            .catch(function(err) {
-              // TODO: error handling
-            });
+            // .catch(function(err) {
+            //   // TODO: error handling
+            // });
         });
     }
   }

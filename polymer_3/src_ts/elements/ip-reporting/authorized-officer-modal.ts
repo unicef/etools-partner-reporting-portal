@@ -9,9 +9,10 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/iron-location/iron-location';
 import '../error-modal';
+import {ErrorModalEl} from '../error-modal';
 import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles'
-import {modalStyles} from '../../styles/modal-styles'
+import {buttonsStyles} from '../../styles/buttons-styles';
+import {modalStyles} from '../../styles/modal-styles';
 import '../etools-prp-ajax';
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
@@ -173,13 +174,14 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _save() {
     if (!this._fieldsAreValid()) {
       return;
     }
+
     const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
@@ -197,12 +199,12 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch(function(res: any) {
+      .catch((res: any) {
         const errors = res.data.non_field_errors;
         self.close();
-        return self.$.error.open(errors);
+        return (self.$.error as ErrorModalEl).open(errors);
       })
-      .then(function() {
+      .then(() => {
         self.set('busy', false);
       });
   }
@@ -214,3 +216,5 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 }
 
 window.customElements.define('authorized-officer-modal', AuthorizedOfficerModal);
+
+export {AuthorizedOfficerModal as AuthorizedOfficerModalEl}

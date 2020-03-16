@@ -48,7 +48,7 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
 
   _computeIndicatorsUrl(locationId: string) {
     return computeIndicatorsUrl(locationId);
-  };
+  }
 }
 
 window.customElements.define('indicators-toolbar', IndicatorsToolbar);
