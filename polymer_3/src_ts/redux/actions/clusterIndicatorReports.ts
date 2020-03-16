@@ -2,7 +2,7 @@ import Constants from "../../constants";
 
 //Actions.ClusterIndicatorReports
 
-export const clusterIndicatorReportsFetch = function(reportsThunk: any, reset: boolean) {
+export const clusterIndicatorReportsFetch = function(reportsThunk: any, reset?: boolean) {
   return function(dispatch: any) {
     if (reset) {
       dispatch(set([]));

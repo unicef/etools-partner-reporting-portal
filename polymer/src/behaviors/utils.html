@@ -137,7 +137,7 @@
 
         switch (indicatorType) {
           case 'percentage':
-            if(!percentize){
+            if (!percentize) {
               return this._toPercentage(value);
             }
             return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';

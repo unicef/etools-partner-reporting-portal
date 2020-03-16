@@ -12,7 +12,7 @@ import RoutingMixin from '../../../mixins/routing-mixin';
 import {tableStyles} from '../../../styles/table-styles'
 import '../../report-status';
 import '../../frequency-of-reporting';
-//<link rel="import" href="../../etools-prp-progress-bar.html">
+import '../../etools-prp-progress-bar';
 import '../../etools-prp-progress-bar-alt';
 import '../../labelled-item';
 import '../../list-placeholder';
@@ -183,8 +183,8 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.clusterDashboardData.loading)'})
   loading!: boolean;
 
-  _collapseAll(){
-    this.detailsOpened.slice().forEach(function (row: any) {
+  _collapseAll() {
+    this.detailsOpened.slice().forEach(function(row: any) {
       row.detailsOpened = false;
     });
   }
@@ -204,7 +204,7 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
     this.push('detailsOpened', row);
   }
 
-  _computeActivitiesUrl (baseUrl: string) {
+  _computeActivitiesUrl(baseUrl: string) {
     return this.buildUrl(baseUrl, '/planned-action/activities');
   }
 

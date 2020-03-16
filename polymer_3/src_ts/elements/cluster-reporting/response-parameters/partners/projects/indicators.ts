@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../elements/etools-prp-ajax';
+import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
@@ -16,7 +16,7 @@ import {tableStyles} from '../../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 import {partnerProjIndicatorsFetch} from '../../../../../redux/actions/partnerProjects';
 
 /**
@@ -25,8 +25,8 @@ import {partnerProjIndicatorsFetch} from '../../../../../redux/actions/partnerPr
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${tableStyles} ${buttonsStyles}
     <style include="iron-flex data-table-styles">
@@ -99,7 +99,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   @property({type: Number})
   projectId!: number;
 
-  
+
 
   @property({type: Array, computed: '_computeCurrentIndicators(projectId, allIndicators)'})
   data!: any[];
@@ -140,8 +140,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
   _computeCanEdit(permissions: any, projectData: GenericObject) {
     return projectData.clusters ?
-        permissions.editPartnerEntities(projectData.clusters) :
-        false;
+      permissions.editPartnerEntities(projectData.clusters) :
+      false;
   }
 
   _onSuccess() {
@@ -156,11 +156,10 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-
-    //@Lajos: again this is defined as number but it expects a string 
-    this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, this.projectId))
-      .catch(function (err) { // jshint ignore:line
-          // TODO: error handling.
+    this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
+      // @ts-ignore
+      .catch(function(err) {
+        // TODO: error handling.
       });
   }
 
@@ -183,7 +182,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-  }  
+  }
 }
 
 window.customElements.define('rp-partner-project-details-indicators', Indicators);

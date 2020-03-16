@@ -15,6 +15,7 @@ import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/
 import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
+import {getDomainByEnv} from '../config';
 
 /**
  * @polymer
@@ -246,7 +247,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
-        console.log('localstorage', app);
+        console.log('localstorage defaultApp:', app);
         localStorage.setItem('defaultApp', app);
 
         // Render
@@ -269,7 +270,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _pageChanged(page: string) {
-    const resolvedPageUrl = `./app/${page}.js`;//getDomainByEnv() + `/src/pages
+    if (page === 'pages') {
+      return;
+    }
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
+    console.log('app.ts loading...' + resolvedPageUrl);
     import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

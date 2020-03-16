@@ -54,6 +54,9 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   }
 
   _computePartnerNamesUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.clusterPartnerNames(responsePlanID);
   }
 
@@ -65,10 +68,12 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   }
 
   _fetchPartnerNames() {
+    if (!this.partnerNamesUrl) {
+      return;
+    }
+
     const self = this;
-
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-
     (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('partners', res.data);

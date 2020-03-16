@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../elements/etools-prp-ajax';
+import '../../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
@@ -16,7 +16,7 @@ import {tableStyles} from '../../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/partnerActivities';
 
 /**
@@ -25,8 +25,8 @@ import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/par
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
     ${tableStyles} ${buttonsStyles}
     <style include="iron-flex data-table-styles">
@@ -140,8 +140,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
   _computeCanEdit(permissions: GenericObject, activityData: GenericObject) {
     return activityData.cluster ?
-        permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
-        false;
+      permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
+      false;
   }
 
   _onSuccess() {
@@ -156,11 +156,10 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    //@Lajos: bellow was original
-    //this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
-    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, this.activityId))
-      .catch(function (err) { // jshint ignore:line
-          // TODO: error handling.
+    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+      // @ts-ignore
+      .catch(function(err) {
+        // TODO: error handling.
       });
   }
 
@@ -184,7 +183,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-  
+
 }
 
 window.customElements.define('rp-partner-activity-details-indicators', Indicators);

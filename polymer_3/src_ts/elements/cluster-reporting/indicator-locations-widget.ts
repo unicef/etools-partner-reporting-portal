@@ -7,6 +7,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/paper-tooltip/paper-tooltip';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import Settings from '../../settings';
@@ -15,13 +16,13 @@ import NotificationsMixin from '../../mixins/notifications-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {sharedStyles} from '../../styles/shared-styles';
-// <link rel='import' href='../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html'>
 import '../json-field';
 import '../etools-prp-ajax';
 import '../etools-prp-reset';
 import '../etools-prp-permissions';
 import '../labelled-item';
 import './message-imo-modal';
+import {MessageImoModalEl} from './message-imo-modal';
 import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
@@ -34,14 +35,14 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
  * @appliesMixin NotificationsMixin
  * @appliesMixin LocalizeMixin
  */
-class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMixin(ReduxConnectedElement))){
-  public static get template(){
+class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMixin(ReduxConnectedElement))) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-alignment app-grid-style">
         :host {
           display: block;
-  
+
           --app-grid-columns: 3;
           --app-grid-gutter: 24px;
           --app-grid-item-height: auto;
@@ -50,71 +51,71 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
             height: 350px;
           };
         }
-  
+
         .app-grid {
           padding-top: 0;
           margin: 0 -var(--app-grid-gutter);
         }
-  
+
         .item-2-col {
           @apply --app-grid-expandible-item;
         }
-  
+
         header {
           background-color: var(--paper-grey-200);
           padding: 5px 10px;
           margin: 0 0 1em;
         }
-  
+
         h3 {
           margin: 0;
           font-size: 14px;
         }
-  
+
         .row {
           margin-bottom: 1em;
         }
-  
+
         .col-actions {
           width: 40px;
           margin-right: 24px;
           border-right: 1px solid var(--paper-grey-400);
         }
-  
+
         .remove-btn {
           width: 34px;
           height: 34px;
           color: var(--paper-deep-orange-a700);
         }
-  
+
         labelled-item {
           padding: 8px 0;
         }
-  
+
         .readonly {
           display: block;
           font-size: 16px;
           line-height: 1.5;
           color: var(--theme-primary-text-color-medium);
-  
+
           @apply --truncate;
         }
-  
+
         .imo-msg-label {
           font-size: 12px;
           color: var(--theme-secondary-text-color);
         }
-  
+
         .imo-msg-btn {
           padding: 0;
           margin: 0;
         }
       </style>
-      
+
       <etools-prp-permissions
           permissions="{{permissions}}">
       </etools-prp-permissions>
-  
+
       <template
           is="dom-repeat"
           items="[[ajaxData]]">
@@ -124,11 +125,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
             params="[[item.params]]">
         </etools-prp-ajax>
       </template>
-  
+
       <etools-prp-ajax
         id="search">
       </etools-prp-ajax>
-      
+
       <template
           is="dom-if"
           if="[[canMessageIMO]]"
@@ -139,7 +140,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
             indicator-id="[[indicatorId]]">
         </message-imo-modal>
       </template>
-  
+
       <header>
         <h3>[[localize('locations_plural')]] ([[value.length]])</h3>
         <template
@@ -159,7 +160,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           </div>
         </template>
       </header>
-      
+
       <template
           is="dom-repeat"
           items="[[value]]">
@@ -173,7 +174,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                 reset="{{item.location}}"
                 skip-initial>
             </etools-prp-reset>
-  
+
             <div class="flex-none layout vertical center-center col-actions">
               <div>
                 <paper-icon-button
@@ -187,7 +188,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
               </div>
             </div>
           </template>
-  
+
           <div class="flex">
             <div class="app-grid">
               <template
@@ -200,11 +201,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                   <span class="readonly">Admin [[_getLocationAdminLevel(item)]]</span>
                 </labelled-item>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[!_isLocked(item, lockedItems)]]"
                   restamp="true">
+                <!--
                 <etools-single-selection-menu
                     class="item"
                     label="[[localize('location_administrative_level')]]"
@@ -216,8 +218,20 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                     on-selected-changed="_onLocTypeChanged"
                     required>
                 </etools-single-selection-menu>
+                -->
+                <etools-dropdown
+                    class="item"
+                    label="[[localize('location_administrative_level')]]"
+                    options="[[locationTypes]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{item.loc_type}}"
+                    trigger-value-change-event
+                    on-etools-selected-item-changed="_onLocTypeChanged"
+                    required>
+              </etools-dropdown>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[_isLocked(item, lockedItems)]]"
@@ -228,11 +242,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                   <span class="readonly">[[_getLocationTitle(locations, item, item.id, index)]]</span>
                 </labelled-item>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[!_isLocked(item, lockedItems)]]"
                   restamp="true">
+                <!--
                 <etools-single-selection-menu
                     class="item item-2-col validate"
                     label="[[localize('location')]]"
@@ -245,8 +260,21 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                     disabled="[[_getPending(pending, item.loc_type, index)]]"
                     required>
                 </etools-single-selection-menu>
+                -->
+                <etools-dropdown
+                    class="item item-2-col validate"
+                    label="[[localize('location')]]"
+                    options="[[_getLocations(locations, item.loc_type, index)]]"
+                    option-value="id"
+                    option-label="title"
+                    selected-item="{{item.location}}"
+                    disabled="[[_getPending(pending, item.loc_type, index)]]"
+                    on-etools-selected-item-changed="_onValueChanged"
+                    trigger-value-change-event
+                    required>
+                </etools-dropdown>
               </template>
-  
+
               <template
                   is="dom-if"
                   if="[[indicatorType]]"
@@ -261,7 +289,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                     disabled="[[!canEditDetails]]"
                     required="[[baselineRequirement]]">
                 </json-field>
-  
+
                 <template
                     is="dom-if"
                     if="[[isNumber]]"
@@ -276,7 +304,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                       disabled="[[!canEditDetails]]">
                   </json-field>
                 </template>
-  
+
                 <json-field
                     class="item validate"
                     type="[[indicatorType]]"
@@ -299,6 +327,9 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       </paper-button>
     `;
   }
+
+  @property({type: Object})
+  messageModal!: MessageImoModalEl | null;
 
   @property({type: String})
   indicatorType!: string;
@@ -389,7 +420,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       return;
     }
 
-    event.path.forEach( (node: GenericObject) => {
+    event.path.forEach((node: GenericObject) => {
       if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
         index = node.dataset.index;  // Grab index of current location widget component
         return;
@@ -402,7 +433,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(100),
-      () =>{
+      () => {
         let self = this;
 
         let thunk = self.$.search;
@@ -418,7 +449,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
             self._setPending(loc_type, false, index);
             self._setLocations(loc_type, res.data.results, index);
           })
-          .catch( (err: GenericObject) => {
+          .catch((err: GenericObject) => {
             console.error(err);
             self._setPending(loc_type, false, index);
           });
@@ -436,12 +467,15 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeLocationsUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.clusterLocationNames(responsePlanId);
   }
 
   _computeLocationTypes(maxAdminLevel: number) {
     return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function (_, index) {
+      .map(function(_, index) {
         return {
           id: String(index),
           title: 'Admin' + index,
@@ -451,7 +485,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   _computeAjaxData(maxAdminLevel: number) {
     return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function (_, index) {
+      .map(function(_, index) {
         return {
           id: 'locations' + index,
           params: {
@@ -478,7 +512,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('valueInitialized', true);
 
-    setTimeout( () => {
+    setTimeout(() => {
       this.set('lockedItems', value.slice());
     });
   }
@@ -500,7 +534,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     let newLocations = this.get('locations');
     let value = this.get('value');
 
-    value.forEach(function (location, index) {
+    value.forEach(function(location, index) {
       if (location.location === undefined && newLocations[index] === undefined) {
         newLocations[index] = {0: []};
       }
@@ -539,10 +573,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     e.target!.validate();
   }
 
-  _onLocTypeChanged(event: CustomEvent, data: GenericObject) {
+  _onLocTypeChanged(event: CustomEvent) {
     let index = -1;
-
-    event.path.forEach( (node: GenericObject) => {
+    //(dci) need to check this
+    event.path.forEach((node: GenericObject) => {
       if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
         index = node.dataset.index;
         return;
@@ -553,7 +587,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       return;
     }
 
-    this._fetchLocations(data.value, undefined, index);
+    this._fetchLocations(event.detail.selectedItem.value, undefined, index);//data.value
   }
 
   _fetchLocations(loc_type, title, index) {
@@ -575,24 +609,24 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
 
         const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
-        thunk().then( (res: GenericObject) => {
+        thunk().then((res: GenericObject) => {
           self.set('url', res.xhr.responseURL);
           self._setPending(loc_type, false, index);
           self._setLocations(loc_type, res.data.results, index);
         })
-          .catch(function () {
+          .catch(function() {
             self._setPending(loc_type, false, index);
           });
-      }
+      });
   }
 
-  _fetchInitialLocations(lockedItems) {
+  _fetchInitialLocations(lockedItems: any[]) {
     this.set('savedLocations', lockedItems);
 
     let newLocations = Object.assign({}, this.get('locations'));
 
     if (lockedItems.length > 0) {
-      lockedItems.forEach(function (location, index) {
+      lockedItems.forEach(function(location, index) {
         if (location.admin_level === undefined) {
           newLocations[index] = {};
           newLocations[index][location.loc_type] = [location];
@@ -602,7 +636,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
       });
     } else {
-      lockedItems.forEach(function (location, index) {
+      lockedItems.forEach(function(location, index) {
         newLocations[index] = {0: []};
       });
     }
@@ -610,30 +644,30 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this.set('locations', newLocations);
   }
 
-  _getPending(pending: GenericObject, loc_type, index: number) {
+  _getPending(pending: GenericObject, loc_type: string, index: number) {
     return !!pending[index][loc_type];
   }
 
-  _getLocations(locations: any[], loc_type, index: number) {
+  _getLocations(locations: any[], loc_type: string, index: number) {
     return locations[index][loc_type] || [];
   }
 
-  _getLocationAdminLevel(location) {
+  _getLocationAdminLevel(location: GenericObject) {
     return location.loc_type >= 0 ? location.loc_type : location.admin_level;
   }
 
-  _getLocationTitle(locations: any[], location, locationId: string, index: number) {
+  _getLocationTitle(locations: any[], location: GenericObject, locationId: string, index: number) {
     let loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
     let allLocations = this._getLocations(locations, loc_type, index);
 
-    let targetLocation = allLocations.find(function (loc) {
+    let targetLocation = allLocations.find(function(loc: GenericObject) {
       return String(loc.id) === String(locationId);
     });
 
     return targetLocation ? targetLocation.title : '';
   }
 
-  _setPending(loc_type, value, index: number) {
+  _setPending(loc_type: string, value: any, index: number) {
     let newPending = Object.assign({}, this.get('pending'));
 
     if (newPending[index] === undefined) {
@@ -645,7 +679,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this.set('pending', newPending);
   }
 
-  _setLocations(loc_type, value, index: number) {
+  _setLocations(loc_type: string, value: any, index: number) {
     let newLocations = Object.assign({}, this.get('locations'));
 
     if (newLocations[index] === undefined) {
@@ -658,7 +692,9 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _msgIMO() {
-    this.messageModal.open();
+    if (this.messageModal) {
+      this.messageModal.open();
+    }
   }
 
   _handleMessageSent(e: CustomEvent) {
@@ -677,11 +713,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this.set('pending', {});
 
     this._handleMessageSent = this._handleMessageSent.bind(this);
-    this.messageModal = this.shadowRoot!.querySelector('#message-modal');
+    this.messageModal = this.shadowRoot!.querySelector('#message-modal') as MessageImoModalEl;
 
     if (this.messageModal) {
-      this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent);
-
+      this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent as any);
       document.body.appendChild(this.messageModal);
     }
   }
@@ -690,7 +725,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     super.disconnectedCallback();
     let locTypeDebouncers = Array(this.get('maxAdminLevel'))
       .fill('fetch-locations-')
-      .map(function (item, index) {
+      .map(function(item, index) {
         return item + (++index);
       });
 
@@ -699,7 +734,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     if (this.messageModal) {
       document.body.removeChild(this.messageModal);
 
-      this.messageModal.removeEventListener('imo-message-sent', this._handleMessageSent);
+      this.messageModal.removeEventListener('imo-message-sent', this._handleMessageSent as any);
       this.messageModal = null;
     }
   }

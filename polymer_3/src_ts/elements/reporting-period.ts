@@ -11,13 +11,6 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-//TODO: need to be checked the code made by @lajos
-// behaviors: [
-//     App.Behaviors.UtilsBehavior,
-//     App.Behaviors.ReduxBehavior,
-//     App.Behaviors.LocalizeBehavior,
-//     Polymer.AppLocalizeBehavior,
-//   ],
 class ReportingPeriod extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`

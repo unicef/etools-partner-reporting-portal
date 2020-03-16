@@ -1,9 +1,9 @@
 import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../etools-prp-ajax';
 import '../../../etools-prp-permissions';
 import '../../../page-body';
 import UtilsMixin from '../../../../mixins/utils-mixin';
@@ -11,10 +11,10 @@ import LocalizeMixin from '../../../../mixins/localize-mixin';
 import Endpoints from '../../../../endpoints';
 import {tableStyles} from '../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
-// <link rel='import' href='../../indicator-modal.html'>
+import '../../indicator-modal';
 import '../../../list-view-indicators';
-import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
+import '../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProjects';
 
@@ -26,39 +26,39 @@ import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProje
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${tableStyles}
       <style include="iron-flex data-table-styles">
         :host {
           display: block;
         }
-  
+
         div#action {
           margin: 25px 0;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
       </style>
-      
+
       <etools-prp-permissions
           permissions="{{permissions}}">
       </etools-prp-permissions>
-  
+
       <iron-location query="{{query}}"></iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{queryParams}}">
       </iron-query-params>
-  
+
       <etools-prp-ajax
           id="indicators"
           url="[[url]]"
           params="[[queryParams]]">
       </etools-prp-ajax>
-    
+
       <page-body>
         <template
             is="dom-if"
@@ -70,14 +70,14 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
             </paper-button>
           </div>
         </template>
-  
+
         <indicator-modal
           id="indicatorModal"
           object-id="[[projectId]]"
           object-type="partner.partnerproject"
           modal-title="Add Project Indicator">
         </indicator-modal>
-  
+
         <list-view-indicators
             data="[[data]]"
             total-results="[[totalResults]]"
@@ -89,6 +89,10 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
   @property({type: Object})
   permissions!: GenericObject;
+
+
+  @property({type: String})
+  query!: string;
 
   @property({type: Object})
   queryParams!: GenericObject;
@@ -112,7 +116,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   allIndicatorsCount!: number;
 
 
-  static get observers(){
+  static get observers() {
     return ['_indicatorsAjax(queryParams, projectId)'];
   }
 
@@ -129,6 +133,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
   }
 
   _computeCurrentIndicatorsCount(projectId: number, allIndicatorsCount: number) {
+    // (dci) to be checked
     return allIndicatorsCount[projectId];
   }
 
@@ -144,8 +149,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, this.projectId))
-      .catch(function (err) { // jshint ignore:line
+    this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
+      // @ts-ignore
+      .catch(function(err) {
         // TODO: error handling.
       });
   }

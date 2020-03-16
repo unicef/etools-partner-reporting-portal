@@ -39,19 +39,13 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 
   static get template() {
     return html`
-    ${buttonsStyles}
-    ${modalStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {
           width: 750px;
-
-          &>* {
-            margin: 0;
-          }
         }
-        ;
       }
     </style>
 
@@ -67,7 +61,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog with-backdrop opened=[[opened]]>
+    <paper-dialog opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 
@@ -187,16 +181,17 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     if (!this._fieldsAreValid()) {
       return;
     }
-    let self = this;
+
+    const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
-        let newPath = self.buildUrl(
+        const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
 
-        store.dispatch(pdReportsUpdateSingle(
+        self.reduxStore.dispatch(pdReportsUpdateSingle(
           self.pdId,
           self.reportId,
           res.data
@@ -204,8 +199,8 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch((res: any) => {
-        let errors = res.data.non_field_errors;
+      .catch((res: any) {
+        const errors = res.data.non_field_errors;
         self.close();
         return (self.$.error as ErrorModalEl).open(errors);
       })

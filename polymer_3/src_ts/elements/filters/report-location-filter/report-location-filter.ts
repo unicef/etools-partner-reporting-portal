@@ -56,7 +56,7 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocations() {
-    var self = this;
+    const self = this;
     const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     thunk()
@@ -64,7 +64,7 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
         self.set('options', [{
           id: '',
           title: 'All',
-        }].concat(res.data));
+        }].concat(res.data || []));
       })
       .catch(function(err: any) {
         // TODO: error handling

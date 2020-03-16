@@ -40,11 +40,8 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
 
           --paper-dialog: {
             width: 400px;
-
-            & > * {
-              margin: 0;
+            margin: 0;
             }
-          };
         }
 
         .row {

@@ -1,15 +1,15 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../../../../filter-list';
-import '../../../../filters/text-filter';
+import '../../../../filters/text-filter/text-filter';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 
 /**
@@ -18,7 +18,7 @@ import { GenericObject } from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class ClusterActivitiesFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
@@ -59,6 +59,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   queryParams!: GenericObject;
 }
 
-window.customElements.define('cluster-activities-filters', Filters);
+window.customElements.define('cluster-activities-filters', ClusterActivitiesFilters);
 
-export {Filters as FiltersEl};
+export {ClusterActivitiesFilters as ClusterActivitiesFiltersEl};

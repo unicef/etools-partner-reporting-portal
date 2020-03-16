@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import { ReduxConnectedElement } from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -17,6 +17,8 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-dialog/paper-dialog';
 import '../../../../form-fields/dropdown-form-input';
 import '../../../../form-fields/cluster-dropdown-content';
@@ -24,6 +26,8 @@ import '../../../../error-box';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../../styles/modal-styles';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -32,11 +36,11 @@ import {buttonsStyles} from '../../../../../styles/buttons-styles';
  * @appliesMixin UtilsMixin
  * @appliesMixin DateMixin
  */
-class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElement))) {
+class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
+    ${buttonsStyles} ${modalStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -47,40 +51,8 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 700px;
-
-          & > * {
-            margin: 0;
-          }
-        };
-      }
-
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
-
-      .header {
-        height: 48px;
-        padding: 0 24px;
-        margin: 0;
-        color: white;
-        background: var(--theme-primary-color);
-      }
-
-      .header h2 {
-        @apply --paper-font-title;
-
-        margin: 0;
-        line-height: 48px;
-      }
-
-      .header paper-icon-button {
-        margin: 0 -13px 0 20px;
-        color: white;
-      }
-
-      .buttons {
-        padding: 24px;
+            width: 700px;
+        }
       }
     </style>
 
@@ -106,7 +78,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
         id="dialog"
         with-backdrop
         opened="{{opened}}">
-      <div class="header layout horizontal justified">
+      <div id="header" class="header layout horizontal justified">
         <h2>[[localize('add_cluster_activity')]]</h2>
           <paper-icon-button
               class="self-center"
@@ -208,7 +180,7 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
   url!: string;
 
   @property({type: Object})
-  data = {};
+  data: GenericObject = {};
 
   @property({type: Array})
   clusters = [];
@@ -230,34 +202,39 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
 
   static get observers() {
     return [
-      '_getObjectivesByClusterID(data.cluster)',
+      '_getObjectivesByClusterID(data.cluster, objectivesUrl)',
     ];
   }
 
   _computeUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterActivities(responsePlanID);
   }
 
   _computeObjectivesUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanID);
   }
 
-  //@Lajos: not sure
   _isObjectivesDisabled(clusterID: number) {
     return !clusterID;
   }
 
-  _getObjectivesByClusterID(clusterID: number) {
+  _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
     let self = this;
-    if (clusterID) {
+    if (clusterID && objectivesUrl) {
       const thunk = (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk();
       this.objectivesParams = {cluster_id: this.data.cluster};
 
       thunk()
-        .then(function (res: any) {
+        .then(function(res: any) {
           self.set('objectives', res.data.results);
         })
-        .catch(function (err) { // jshint ignore:line
+        .catch(function(err) {
           self.updatePending = false;
           // TODO: error handling
         });
@@ -292,25 +269,25 @@ class CreationModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedEle
   _save() {
     let self = this;
     const thunk = (this.$.createActivity as EtoolsPrpAjaxEl).thunk();
-    
+
     if (!this._fieldsAreValid()) {
       return;
     }
 
     self.updatePending = true;
     thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         self.updatePending = false;
         self.set('errors', {});
         self._redirectToDetail(res.data.id);
       })
-      .catch(function (err: any) {
+      .catch(function(err: any) {
         self.set('errors', err.data);
         self.updatePending = false;
       });
   }
 }
 
-window.customElements.define('cluster-activities-modal', CreationModal);
+window.customElements.define('cluster-activities-modal', CreationModalActivities);
 
-export {CreationModal as CreationModalEl};
+export {CreationModalActivities as CreationModalActivitiesEl};

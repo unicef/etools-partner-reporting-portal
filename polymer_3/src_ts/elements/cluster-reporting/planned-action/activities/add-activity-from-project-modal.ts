@@ -7,19 +7,13 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
-import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
-// <link rel="import" href = "../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html" >
-//   <link rel="import" href = "../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html" >
-//<link rel="import" href="../../../../polyfills/es6-shim.html">
 import Endpoints from '../../../../endpoints';
-
-import '@polymer/paper-input/paper-input';
 import '@polymer/paper-input/paper-input';
 import ModalMixin from '../../../../mixins/modal-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
@@ -28,18 +22,14 @@ import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {modalStyles} from '../../../../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-ajax';
 import '../../../etools-prp-permissions';
-//@Lajos: bellow was not found!!!!!!!!!!
-import '../../../etools-prp-date-input';
+import '@unicef-polymer/etools-date-time/datepicker-lite';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
-//@Lajos: bellow was originally <link rel="import" href="../../../error-box.html"> but assumed bellow:
 import '../../../error-box-errors';
-//@Lajos: unable to find bellow
 import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
-
-
 
 
 /**
@@ -65,11 +55,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
         --paper-dialog: {
           width: 600px;
-
-          & > * {
-            margin: 0;
-          }
-        };
+        }
       }
 
       .app-grid {
@@ -272,6 +258,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                   <div class="flex">
                     <div class="app-grid">
                       <div class="item">
+                        <!--
                         <etools-single-selection-menu
                             disabled
                             class="validate"
@@ -286,6 +273,18 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                             trigger-value-change-event
                             required>
                         </etools-single-selection-menu>
+                        -->
+                        <etools-dropdown
+                            class="validate"
+                            label="[[localize('partner_project')]]"
+                            options="[[data.cluster.projects]]"
+                            option-value="project_id"
+                            option-label="title"
+                            selected="{{item.project_id}}"
+                            auto-validate
+                            disabled="[[_equals(projects.length, 0)]]"
+                            required>
+                        </etools-dropdown>
                       </div>
 
                       <div class="item">
@@ -311,6 +310,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                       </div>
 
                       <div class="item">
+                        <!--
                         <etools-prp-date-input
                             disabled
                             class="start-date"
@@ -320,10 +320,19 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                             required
                             no-init>
                         </etools-prp-date-input>
-                        </etools-date-input>
+                        -->
+                        <datepicker-lite
+                          disabled
+                          class="start-date"
+                          label="[[localize('start_date')]]"
+                          value="{{item.start_date}}"
+                          error-message=""
+                          required>
+                        </datepicker-lite>
                       </div>
 
-                      <div class="item">
+                       <div class="item">
+                        <!--
                         <etools-prp-date-input
                             disabled
                             class="end-date"
@@ -333,6 +342,15 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                             required
                             no-init>
                         </etools-prp-date-input>
+                        -->
+                        <datepicker-lite
+                          disabled
+                          class="end-date"
+                          label="[[localize('end_date')]]"
+                          value="{{item.end_date}}"
+                          error-message=""
+                          required>
+                        </datepicker-lite>
                       </div>
                     </div>
                   </div>
@@ -374,6 +392,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                   </paper-dropdown-menu>
                 </div>
                 <div class="item">
+                  <!--
                   <etools-single-selection-menu
                       class="validate"
                       label="[[localize('cluster_objective')]]"
@@ -386,6 +405,18 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
+                  -->
+                  <etools-dropdown
+                      class="validate"
+                      label="[[localize('cluster_objective')]]"
+                      options="[[objectives]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.cluster_objective}}"
+                      disabled="[[_equals(objectives.length, 0)]]"
+                      auto-validate
+                      required>
+                  </etools-dropdown>
                 </div>
                 <div class="item item-wide">
                   <paper-input
@@ -409,7 +440,8 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                   <div class="row layout horizontal item-wide">
                     <div class="flex">
                       <div class="app-grid">
-                        <div class="item">
+                          <div class="item">
+                          <!--
                           <etools-single-selection-menu
                               disabled
                               class="validate"
@@ -424,6 +456,18 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                               trigger-value-change-event
                               required>
                           </etools-single-selection-menu>
+                          -->
+                          <etools-dropdown
+                              class="validate"
+                              label="[[localize('partner_project')]]"
+                              options="[[data.custom.projects]]"
+                              option-value="project_id"
+                              option-label="title"
+                              selected="[[item.project_id]]"
+                              auto-validate
+                              disabled="[[_equals(projects.length, 0)]]"
+                              required>
+                          </etools-dropdown>
                         </div>
 
                         <div class="item">
@@ -449,6 +493,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                         </div>
 
                         <div class="item">
+                          <!--
                           <etools-prp-date-input
                               class="start-date"
                               label="[[localize('start_date')]]"
@@ -457,10 +502,18 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                               required
                               no-init>
                           </etools-prp-date-input>
-                          </etools-date-input>
+                          -->
+                          <datepicker-lite
+                              class="start-date"
+                              label="[[localize('start_date')]]"
+                              value="{{item.start_date}}"
+                              error-message=""
+                              required>
+                          </datepicker-lite>
                         </div>
 
                         <div class="item">
+                          <!--
                           <etools-prp-date-input
                               class="end-date"
                               label="[[localize('end_date')]]"
@@ -469,6 +522,14 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
                               required
                               no-init>
                           </etools-prp-date-input>
+                          -->
+                          <datepicker-lite
+                            class="end-date"
+                            label="[[localize('end_date')]]"
+                            value="{{item.end_date}}"
+                            error-message=""
+                            required>
+                          </datepicker-lite>
                         </div>
                       </div>
                     </div>
@@ -591,7 +652,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _remove(e: CustomEvent) {
-    var currentIndex = +e.target.dataset.index;
+    const currentIndex = +e.target.dataset.index;
 
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);
@@ -603,9 +664,8 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _setDefaults() {
-    var simpleProjectData = {};
+    const simpleProjectData: GenericObject = {};
 
-    //@Lajos not sure if correct
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
     simpleProjectData.status = this.projectData.status;
@@ -652,10 +712,13 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.responseParametersClusterObjectives(responsePlanId);
   }
 
-  _fetchActivities(clusterId: strign) {
+  _fetchActivities(clusterId: string) {
     var self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     this.set('partnerActivitiesUrl', Endpoints.partnerActivityList(this.responsePlanId)
@@ -677,8 +740,6 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
       .then(function(res: any) {
         self.set('activities', res.data.results);
 
-        //@Lajos: original bellow
-        // return self.$.partnerActivities.thunk()();
         return (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk()();
       })
       .then(function(res: any) {
@@ -694,7 +755,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
         }));
 
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -716,7 +777,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) { // jshint ignore:line
+      .catch(function(err) {
         // TODO: error handling
       });
   }
@@ -750,7 +811,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
         self.set('updatePending', false);
         fireEvent(self, 'project-details-selection-refit');
       });
-  },
+  }
 
   _close(e: CustomEvent) {
     if (e === 'saved' ||
@@ -773,13 +834,13 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    //@Lajos: bellow throws error
+
     this.addEventListener('mode.selected-changed', this.adjustPosition as any);
     this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    //@Lajos: bellow throws error
+
     this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
     this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
@@ -794,6 +855,6 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
     this._removeEventListeners();
   }
 }
-window.customElements.define('calculation-methods-demo-modal', AddActivityFromProjectModal);
+window.customElements.define('planned-action-add-activity-from-project-modal', AddActivityFromProjectModal);
 
 export {AddActivityFromProjectModal as AddActivityFromProjectModalEl};

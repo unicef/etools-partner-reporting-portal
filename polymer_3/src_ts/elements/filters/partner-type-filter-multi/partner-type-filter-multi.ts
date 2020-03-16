@@ -27,6 +27,8 @@ class PartnerTypeFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
     </dropdown-filter-multi>
   `;
   }
+  @property({type: String})
+  value!: string;
 
   @property({type: Array})
   data = [

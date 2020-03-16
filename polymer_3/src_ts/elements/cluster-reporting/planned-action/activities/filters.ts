@@ -9,13 +9,13 @@ import LocalizeMixin from '../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import {filterStyles} from '../../../../styles/filter-styles';
 import '../../../filter-list';
-import '../../../filter/text-filter/text-filter';
-import '../../../filter/dropdown-filter/dropdown-filter';
-import '../../../filter/checkbox-filter/checkbox-filter';
-import '../../../filter/date-filter/date-filter';
-import '../../../filter/status-filter/project-status-filter';
-import '../../../filter/cluster-location-filter/cluster-location-filter';
-import '../../../filter/cluster-project-filter/cluster-project-filter';
+import '../../../filters/text-filter/text-filter';
+import '../../../filters/dropdown-filter/dropdown-filter';
+import '../../../filters/checkbox-filter/checkbox-filter';
+import '../../../filters/date-filter/date-filter';
+import '../../../filters/status-filter/project-status-filter';
+import '../../../filters/cluster-location-filter/cluster-location-filter';
+import '../../../filters/cluster-project-filter/cluster-project-filter';
 import {GenericObject} from '../../../../typings/globals.types';
 
 /**
@@ -23,7 +23,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin UtilsBehavior
 */
-class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class PlannedActionActivitiesFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -98,6 +98,6 @@ class Filters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   filters!: GenericObject;
 }
 
-window.customElements.define('planned-action-activities-filters', Filters);
+window.customElements.define('planned-action-activities-filters', PlannedActionActivitiesFilters);
 
-export {Filters as FiltersEl};
+export {PlannedActionActivitiesFilters as PlannedActionActivitiesFiltersEl};

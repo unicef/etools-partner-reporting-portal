@@ -40,7 +40,7 @@
 
       _filterValueChanged: function () {
         this.debounce('input', function propagateChange() {
-          if(this.$.field.value) {
+          if (this.$.field.value) {
             var newValue = this.$.field.value.trim();
 
             if (newValue !== this.lastValue) {
