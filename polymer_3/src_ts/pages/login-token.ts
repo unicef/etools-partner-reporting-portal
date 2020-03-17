@@ -44,6 +44,9 @@ class PageLoginToken extends PolymerElement {
     `;
   }
 
+  @property({type: String})
+  query!: string;
+
   @property({type: Object})
   data = {};
 
@@ -53,20 +56,20 @@ class PageLoginToken extends PolymerElement {
 
   connectedCallback() {
     super.connectedCallback();
-
     const token = this.query.split('=')[1];
     this.set('data', {'token': token});
     const self = this;
     const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.data.success) {
           window.location.href = '/app_poly3/';
         }
       })
-      .catch(function() {
+      .catch(function () {
         fireEvent(self, 'token-error');
       });
   }
+
 }
 window.customElements.define('page-login-token', PageLoginToken);
