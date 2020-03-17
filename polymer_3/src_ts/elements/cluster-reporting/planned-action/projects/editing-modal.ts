@@ -34,7 +34,7 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
  * @appliesMixin RoutingMixin
  * @appliesMixin UtilsMixin
  */
-class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
+class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       ${buttonsStyles}
@@ -380,6 +380,6 @@ class EditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
 }
 
-window.customElements.define('planned-action-projects-editing-modal', EditingModal);
+window.customElements.define('planned-action-projects-editing-modal', PlannedActionProjectsEditingModal);
 
-export {EditingModal as PlannedActionProjectsEditingModalEl}
+export {PlannedActionProjectsEditingModal as PlannedActionProjectsEditingModalEl}

@@ -14,7 +14,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 * @polymer
 * @appliesMixin LocalizeMixin
 */
-class Overview extends LocalizeMixin(ReduxConnectedElement) {
+class PaActivityDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
 
   static get template() {
     return html`
@@ -65,6 +65,6 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
   }
 }
 
-window.customElements.define('pa-activity-details-overview', Overview);
+window.customElements.define('pa-activity-details-overview', PaActivityDetailsOverview);
 
-export {Overview as OverviewEl};
+export {PaActivityDetailsOverview as PaActivityDetailsOverviewEl};

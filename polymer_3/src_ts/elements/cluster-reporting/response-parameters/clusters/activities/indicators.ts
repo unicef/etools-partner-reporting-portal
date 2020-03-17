@@ -192,4 +192,4 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 window.customElements.define('rp-clusters-activity-indicators', Indicators);
 
-export {Indicators as IndicatorsEl};
+export {Indicators as RpClusterActivityIndicatorsEl};

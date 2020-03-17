@@ -8,15 +8,15 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import '../../../activity-details';
 import '../../../../etools-prp-permissions';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin LocalizeMixin
  */
-class Overview extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template(){
+class RpPartnerActivityDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
     ${buttonsStyles}
     <style>
@@ -68,6 +68,6 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
   }
 }
 
-window.customElements.define('rp-partner-activity-details-overview', Overview);
+window.customElements.define('rp-partner-activity-details-overview', RpPartnerActivityDetailsOverview);
 
-export {Overview as OverviewEl};
+export {RpPartnerActivityDetailsOverview as RpPartnerActivityDetailsOverviewEl};

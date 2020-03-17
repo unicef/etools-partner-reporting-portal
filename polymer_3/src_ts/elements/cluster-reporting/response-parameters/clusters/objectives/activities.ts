@@ -110,4 +110,4 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
 
 window.customElements.define('rp-clusters-details-activities', Activitites);
 
-export {Activitites as ActivititesEl};
+export {Activitites as RpClustersDetailsActivititesEl};

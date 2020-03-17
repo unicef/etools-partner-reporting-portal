@@ -183,4 +183,4 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
 window.customElements.define('rp-partner-project-details-activities', Activities);
 
-export {Activities as ProjectActivitiesEl};
+export {Activities as RpPartnerProjectDetailsActivitiesEl};

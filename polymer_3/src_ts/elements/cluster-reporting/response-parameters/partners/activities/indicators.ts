@@ -188,4 +188,4 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
 window.customElements.define('rp-partner-activity-details-indicators', Indicators);
 
-export {Indicators as IndicatorsEl};
+export {Indicators as RpPartnerActivityDetailsIndicatorsEl};

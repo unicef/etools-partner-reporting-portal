@@ -167,4 +167,4 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
 
 }
 
-window.customElements.define('activities', Activities);
+window.customElements.define('pa-project-details-activities', Activities);

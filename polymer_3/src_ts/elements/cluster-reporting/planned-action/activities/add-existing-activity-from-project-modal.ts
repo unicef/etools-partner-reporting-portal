@@ -618,4 +618,4 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 }
 window.customElements.define('planned-action-add-existing-activity-from-project-modal', AddExistingActivityFromProjectModal);
 
-export {AddExistingActivityFromProjectModal as AddExistingActivityFromProjectModalEl};
+export {AddExistingActivityFromProjectModal as PlannedActioAddExistingActivityFromProjectModalEl};

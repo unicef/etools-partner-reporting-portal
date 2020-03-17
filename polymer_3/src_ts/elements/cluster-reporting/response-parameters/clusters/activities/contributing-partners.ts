@@ -1,4 +1,4 @@
-import {html, PolymerElement} from '@polymer/polymer';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
@@ -100,4 +100,4 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
 
 window.customElements.define('rp-clusters-activity-contributing-partners', ContributingPartners);
 
-export {ContributingPartners as ContributingPartnersEl};
+export {ContributingPartners as RpClustersActivityContributingPartnersEl};

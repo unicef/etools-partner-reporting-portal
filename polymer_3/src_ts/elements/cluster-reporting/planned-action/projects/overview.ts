@@ -16,7 +16,7 @@ import {GenericObject} from '../../../../typings/globals.types';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class Overview extends LocalizeMixin(ReduxConnectedElement){
+class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
   public static get template(){
     return html`
       ${buttonsStyles}
@@ -24,18 +24,18 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
         :host {
           display: block;
         }
-  
+
         div#action {
           margin: 25px 0;
           @apply --layout-horizontal;
           @apply --layout-end-justified;
         }
       </style>
-      
+
       <etools-prp-permissions
         permissions="{{ permissions }}">
       </etools-prp-permissions>
-      
+
       <page-body>
         <template is="dom-if"
                   if="[[_canEdit(permissions, projectData)]]"
@@ -45,8 +45,8 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
             edit-data="[[projectData]]"
             edit>
           </planned-action-projects-modal>
-  
-  
+
+
           <div id="action">
             <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
               [[localize('edit_project')]]
@@ -55,7 +55,7 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
         </template>
         <project-details-display project-data=[[projectData]]></project-details-display>
       </page-body>
-    
+
     `;
   }
 
@@ -77,6 +77,6 @@ class Overview extends LocalizeMixin(ReduxConnectedElement){
 
 }
 
-window.customElements.define('pa-project-details-overview', Overview);
+window.customElements.define('pa-project-details-overview', PaProjectDetailsOverview);
 
-export {Overview as PaProjectDetailsOverviewEl};
+export {PaProjectDetailsOverview as PaProjectDetailsOverviewEl};

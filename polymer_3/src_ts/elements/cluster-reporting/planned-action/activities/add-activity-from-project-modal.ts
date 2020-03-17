@@ -857,4 +857,4 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 }
 window.customElements.define('planned-action-add-activity-from-project-modal', AddActivityFromProjectModal);
 
-export {AddActivityFromProjectModal as AddActivityFromProjectModalEl};
+export {AddActivityFromProjectModal as PlannedActionAddActivityFromProjectModalEl};
