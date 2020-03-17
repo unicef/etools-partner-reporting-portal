@@ -32,7 +32,7 @@ import {fireEvent} from '../../../../../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin DateMixin
  */
-class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElement))) {
+class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElement))) {
   public static get template() {
     // language=HTML
     return html`
@@ -203,6 +203,6 @@ class EditingModal extends LocalizeMixin(UtilsMixin(DateMixin(ReduxConnectedElem
   }
 }
 
-window.customElements.define('cluster-activities-editing-modal', EditingModal);
+window.customElements.define('cluster-activities-editing-modal', ClusterActivitiesEditingModal);
 
-export {EditingModal as ClusterActivitiesEditingModalEl};
+export {ClusterActivitiesEditingModal as ClusterActivitiesEditingModalEl};

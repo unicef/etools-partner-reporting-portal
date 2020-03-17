@@ -17,7 +17,7 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin ModalMixin
  * @appliesMixin UtilsMixin
  */
-class ActivityDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
@@ -133,5 +133,5 @@ class ActivityDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   activityData!: GenericObject;
 }
 
-window.customElements.define('activity-details-display', ActivityDetails);
+window.customElements.define('activity-details-display', ActivityDetailsDetails);
 

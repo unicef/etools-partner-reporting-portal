@@ -57,11 +57,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
           permissions="{{ permissions }}">
         </etools-prp-permissions>
 
-<<<<<<< HEAD
-        <app-route route="{{ route }}"></app-route>
-=======
         <app-route route="{{route}}"></app-route>
->>>>>>> polymer3-migration
 
         <iron-location
           query="{{query}}">
@@ -90,15 +86,6 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
                 </a>
               </paper-item>
 
-<<<<<<< HEAD
-              <div name="response-parameters" class="selectable">
-                <paper-submenu>
-                  <paper-item class="menu-trigger">
-                    <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
-                      <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
-                    </a>
-                  </paper-item>
-=======
               <paper-item class="menu-trigger" opened="{{subMenuOpened}}">
                 <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
                   <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
@@ -106,7 +93,6 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
              </paper-item>
 
               <iron-collapse id="details" opened="{{subMenuOpened}}">
->>>>>>> polymer3-migration
                   <paper-listbox class="menu-content">
                     <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
                       <a href="[[_appendQuery(clustersUrl, clusterQuery)]]">[[localize('clusters')]]</a>
@@ -116,12 +102,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
                       </a>
                     </paper-item>
                   </paper-listbox>
-<<<<<<< HEAD
-                </paper-submenu>
-              </div>
-=======
               </iron-collapse>
->>>>>>> polymer3-migration
 
               <template
                 is="dom-if"
@@ -149,12 +130,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
               </paper-item>
 
               <template is="dom-if" if="[[permissions.accessClusterIdManagement]]" restamp="true">
-<<<<<<< HEAD
-                <paper-divider></paper-divider>
-
-=======
                 <hr>
->>>>>>> polymer3-migration
                 <paper-item name="id-management" id="id-management" on-tap="goToIdManagement">
                   <a href="/id-management/cluster-reporting/">
                     <span><iron-icon icon="social:people"

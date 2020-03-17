@@ -3,7 +3,7 @@ import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import {EditingModalEl} from './editing-modal';
+import {ClusterObjectivesEditingModalEl} from './editing-modal';
 import '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
@@ -20,7 +20,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  * @appliesMixin UtilsMixin
  */
-class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class RpClustersDetailsOverview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
@@ -106,7 +106,7 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
 
   _openModal() {
-    (this.shadowRoot!.querySelector('#modal') as EditingModalEl).open();
+    (this.shadowRoot!.querySelector('#modal') as ClusterObjectivesEditingModalEl).open();
   }
 
   _canEditActivity(permissions: GenericObject, clusterId: number) {
@@ -117,6 +117,6 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 }
 
-window.customElements.define('rp-clusters-details-overview', Overview);
+window.customElements.define('rp-clusters-details-overview', RpClustersDetailsOverview);
 
-export {Overview as RpClustersDetailsOverviewEl};
+export {RpClustersDetailsOverview as RpClustersDetailsOverviewEl};

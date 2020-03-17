@@ -20,7 +20,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  * @appliesMixin UtilsMixin
  */
-class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class RpClustersActivityOverview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
@@ -118,6 +118,6 @@ class Overview extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 }
 
-window.customElements.define('rp-clusters-activity-overview', Overview);
+window.customElements.define('rp-clusters-activity-overview', RpClustersActivityOverview);
 
-export {Overview as RpClusterActivityOverviewEl};
+export {RpClustersActivityOverview as RpClusterActivityOverviewEl};
