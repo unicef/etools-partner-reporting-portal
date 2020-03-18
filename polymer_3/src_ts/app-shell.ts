@@ -170,9 +170,9 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         self._goToLanding();
         self.reduxStore.dispatch(reset())
       })
-      .catch(function (err: any) {
-        // TODO: error handling
-      });
+      // .catch((err: any) => {
+      //   // TODO: error handling
+      // });
   }
 
   _notFound() {

@@ -34,6 +34,9 @@ import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, Clus
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
+import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
+import {FeedbackModalEl} from './feedback-modal';
+import {SendBackModalEl} from "./send-back-modal";
 
 
 
@@ -597,18 +600,16 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     const submitThunk = (this.$.submit as EtoolsPrpAjaxEl).thunk();
     const self = this;
 
-    return this.reduxStore.dispatch(
-      clusterIndicatorReportsSubmit(submitThunk)
-    )
+    return this.reduxStore.dispatch(clusterIndicatorReportsSubmit(submitThunk))
       // @ts-ignore
       .then(function() {
         self.set('busy', false);
         fireEvent(self, 'report-submitted', self.data.id);
       })
-      .catch(function(res: any) {
-        var errors = res.data.non_field_errors;
+      .catch((res: any) => {
+        let errors = res.data.non_field_errors;
 
-        return self.$.error.open(errors).then(function() {
+        return (self.$.error as ErrorModalEl).open(errors).then(() => {
           return Promise.reject(); // Revert
         });
       });
@@ -647,9 +648,9 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       .then(function() {
         self._notifyChangesSaved();
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _computeExportParams(queryParams: any, data: GenericObject) {
@@ -693,18 +694,18 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _sendBack() {
-    this.shadowRoot!.querySelector('#sendBackModal').open();
+    (this.shadowRoot!.querySelector('#sendBackModal') as SendBackModalEl).open();
 
     setTimeout(() => {
-      this.shadowRoot!.querySelector('#viewMenu').select(2);
+      (this.shadowRoot!.querySelector('#viewMenu') as PaperListboxElement).select(2);
     });
   }
 
   _viewFeedback() {
-    this.shadowRoot!.querySelector('#feedbackModal').open();
+    (this.shadowRoot!.querySelector('#feedbackModal') as FeedbackModalEl).open();
 
     setTimeout(() => {
-      this.shadowRoot!.querySelector('#nonViewMenu').select(1);
+      (this.shadowRoot!.querySelector('#nonViewMenu') as PaperListboxElement).select(1);
     });
   }
 

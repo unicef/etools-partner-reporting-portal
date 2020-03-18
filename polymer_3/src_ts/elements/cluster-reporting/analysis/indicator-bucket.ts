@@ -248,7 +248,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
       const indicatorDetails = (e.target as HTMLElement)!.querySelector('analysis-indicator-details');
       try {
         if (indicatorDetails) {
-          indicatorDetails.init();
+          (indicatorDetails as any).init();
         }
       } catch (err) {}
     }

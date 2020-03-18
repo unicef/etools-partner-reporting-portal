@@ -132,3 +132,5 @@ class FeedbackModal extends ModalMixin(PolymerElement) {
 }
 
 window.customElements.define('feedback-modal', FeedbackModal);
+
+export {FeedbackModal as FeedbackModalEl}

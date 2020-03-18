@@ -111,8 +111,8 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
 
   _computeRows(data: GenericObject) {
     return Object.keys(data || {}).map(function(key) {
-      var target = data[key].target;
-      var progress = data[key].progress;
+      let target = data[key].target;
+      let progress = data[key].progress;
 
       return [
         key,
@@ -125,10 +125,10 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   }
 
   _buildTooltipContent(title: string, data: GenericObject) {
-    var target = this._fromJSON(data.target);
-    var inNeed = this._fromJSON(data.in_need);
-    var progressAgainstTarget = data.progress / target;
-    var progressAgainstInNeed = data.progress / inNeed;
+    let target = this._fromJSON(data.target);
+    let inNeed = this._fromJSON(data.in_need);
+    let progressAgainstTarget = data.progress / target;
+    let progressAgainstInNeed = data.progress / inNeed;
 
     return [
       '<div class="tooltip-content">',

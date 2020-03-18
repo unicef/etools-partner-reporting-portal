@@ -168,7 +168,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   }
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
-  activities!: any[];
+  activities!: GenericObject[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerActivities.loading)'})
   loading!: boolean;
@@ -186,14 +186,14 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   responsePlanID!: string;
 
   @property({type: Object})
-  projects = {};
+  projects: GenericObject = {};
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
-  _detailUrl(activity: string, query: string) {
-    var path = '/response-parameters/partners/activity/' + activity.id;
+  _detailUrl(activity: GenericObject, query: string) {
+    let path = '/response-parameters/partners/activity/' + activity.id;
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;
     }
@@ -206,14 +206,14 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
       return;
     }
 
-    var self = this;
-    var projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
+    let self = this;
+    let projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     projectsThunk()
-      .then(function(res) {
-        var allProjects = {};
-        res.data.results.forEach(function(project) {
+      .then((res: GenericObject) => {
+        let allProjects: GenericObject[] = [];
+        res.data.results.forEach((project: GenericObject) => {
           allProjects[project.id] = project;
         });
 

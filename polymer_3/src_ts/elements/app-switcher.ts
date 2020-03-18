@@ -131,7 +131,7 @@ class AppSwitcher extends RoutingMixin(ReduxConnectedElement) {
 
   public _navigate(e: CustomEvent) {
     e.preventDefault();
-    location.href = e.target.href;
+    location.href = (e.target as any).href;
   }
 
 }
