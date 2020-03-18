@@ -343,7 +343,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
   _toggle(e: CustomEvent) {
     const node = toggle(e);
 
-    this.shadowRoot!.querySelector('#collapse-' + node.toggles).toggle();
+    (this.shadowRoot!.querySelector('#collapse-' + node!.toggles) as any).toggle();
   }
 
   _computeIcon(opened: boolean) {
@@ -415,12 +415,12 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
       .then(function () {
         self._notifyChangesSaved();
       })
-      .catch(function (err) {
-        //   // TODO: error handling
-      });
+      // .catch(function (err: GenericObject) {
+      //   //   // TODO: error handling
+      // });
   }
 
-  _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
+  _computeMode(mode: string, overrideMode: string, permissions: GenericObject) {
     return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }
 

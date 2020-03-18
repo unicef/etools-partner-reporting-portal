@@ -96,7 +96,7 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
     return Endpoints.allPDIndicators(workspaceId);
   }
 
-  _indicatorsAjax(_, queryParams: GenericObject) {
+  _indicatorsAjax(queryParams: GenericObject) {
     if (!Object.keys(queryParams).length) {
       return;
     }

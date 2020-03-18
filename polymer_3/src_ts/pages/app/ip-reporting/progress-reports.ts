@@ -76,7 +76,7 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     return locationId ? Endpoints.progressReports(locationId) : '';
   }
 
-  _handleInputChange(_, queryParams: GenericObject) {
+  _handleInputChange(queryParams: GenericObject) {
     if (!queryParams || !Object.keys(queryParams).length || !this.reduxStore) {
       return;
     }

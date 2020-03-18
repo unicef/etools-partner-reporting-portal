@@ -16,8 +16,8 @@ export function calculationFormulaAcrossPeriods(indicator: GenericObject, locali
 export function toggle(e: CustomEvent) {
   let node = e.target;
 
-  while (node && typeof node.toggles === 'undefined') {
-    node = node.parentNode;
+  while (node && typeof (node as any).toggles === 'undefined') {
+    node = (node as any).parentNode;
   }
   return node;
 }

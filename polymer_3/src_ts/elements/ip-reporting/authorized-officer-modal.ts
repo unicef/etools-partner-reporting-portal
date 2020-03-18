@@ -21,7 +21,6 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
-import {store} from '../../redux/store';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {RootState} from '../../typings/redux.types';
@@ -174,7 +173,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _save() {

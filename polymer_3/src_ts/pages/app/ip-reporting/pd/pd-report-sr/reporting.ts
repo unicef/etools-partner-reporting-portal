@@ -215,7 +215,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
     // get the current progress report's due date
     const progressReportDueDate = allPdReports[pdId]
-      .find(function(report) {
+      .find((report: GenericObject) => {
         return report.id === parseInt(reportId);
       })
       .due_date;
@@ -226,7 +226,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     });
 
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = currentPdReport.reporting_periods.find(function(reporting_period) {
+    const currentSrReport = currentPdReport.reporting_periods.find((reporting_period: GenericObject) => {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
     });
@@ -238,7 +238,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     }
   }
 
-  _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
+  _computeMode(mode: string, overrideMode: string, permissions: GenericObject) {
     return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }
 

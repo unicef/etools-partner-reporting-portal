@@ -238,8 +238,8 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     const self = this;
     const textInputs = this.shadowRoot!.querySelectorAll('paper-input');
 
-    textInputs.forEach(function(input) {
-      self.set(['localData', input.id], input.$.input.value.trim());
+    textInputs.forEach((input) => {
+      self.set(['localData', input.id], (input as any).$.input.value.trim());
     });
   }
 
@@ -279,8 +279,8 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     return computeUpdateUrl(locationId, reportId);
   }
 
-  _computeMode(mode: string, overrideMode: string, report: any, permissions: GenericObject) {
-    return computeMode(mode, overrideMode, report, permissions);
+  _computeMode(mode: string, overrideMode: string, permissions: GenericObject) {
+    return computeMode(mode, overrideMode, permissions);
   }
 
   connectedCallback() {

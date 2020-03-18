@@ -155,7 +155,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
-  _handleInputChange(programmeDocumentsUrl) {
+  _handleInputChange(programmeDocumentsUrl: string) {
     if (!programmeDocumentsUrl) {
       return;
     }
