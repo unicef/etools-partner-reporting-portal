@@ -468,7 +468,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: any) {
@@ -487,7 +487,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _fetchPartnerActivities(clusterId: string) {
-    var self = this;
+    let self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -509,13 +509,13 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         });
         self.set('partnerActivities', filteredActivities);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchObjectives(clusterId: string) {
-    var self = this;
+    let self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -531,9 +531,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _save() {
@@ -571,7 +571,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         self._close('saved');
         window.location.reload();
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
         fireEvent(self, 'project-details-selection-refit');
@@ -580,9 +580,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   _close(e: CustomEvent) {
     if (e === 'saved' ||
-      e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON'
+      e.target!.nodeName === 'PAPER-DIALOG' ||
+      e.target!.nodeName === 'PAPER-BUTTON' ||
+      e.target!.nodeName === 'PAPER-ICON-BUTTON'
     ) {
       this.set('data', {});
 

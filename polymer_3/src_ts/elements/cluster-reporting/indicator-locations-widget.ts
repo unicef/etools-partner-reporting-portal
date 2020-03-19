@@ -436,7 +436,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       () => {
         let self = this;
 
-        let thunk = self.$.search;
+        let thunk: GenericObject = self.$.search;
         thunk.url = self.get('url');
 
         thunk.params = {
@@ -505,7 +505,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
-  _lockItems(value) {
+  _lockItems(value: any) {
     if (this.get('valueInitialized')) {
       return;
     }
@@ -517,7 +517,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     });
   }
 
-  _isLocked(item, locked: any[]) {
+  _isLocked(item: string, locked: any[]) {
     return locked.indexOf(item) !== -1;
   }
 
@@ -534,7 +534,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     let newLocations = this.get('locations');
     let value = this.get('value');
 
-    value.forEach(function(location, index) {
+    value.forEach((location: GenericObject, index: number) => {
       if (location.location === undefined && newLocations[index] === undefined) {
         newLocations[index] = {0: []};
       }
@@ -590,7 +590,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this._fetchLocations(event.detail.selectedItem.value, undefined, index);//data.value
   }
 
-  _fetchLocations(loc_type, title, index) {
+  _fetchLocations(loc_type: any, title: any, index: number) {
     if (loc_type === undefined) {
       return;
     }
@@ -605,7 +605,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         this._setPending(loc_type, true, index);
 
         if (title !== undefined) {
-          this.shadowRoot!.querySelector('#locations' + loc_type).params.title = title;
+          this.shadowRoot!.querySelector('#locations' + loc_type)!.params.title = title;
         }
 
         const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
@@ -636,7 +636,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
       });
     } else {
-      lockedItems.forEach(function(location, index) {
+      lockedItems.forEach((index) => {
         newLocations[index] = {0: []};
       });
     }

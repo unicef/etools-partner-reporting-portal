@@ -14,6 +14,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
+import {PaperDropdownMenuElement} from "@polymer/paper-dropdown-menu/paper-dropdown-menu";
 
 
 /**
@@ -202,7 +203,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   _setDisaggregation(e: CustomEvent, data: GenericObject) {
     let index = +e.target!.index;
 
-    let id;
+    let id: string;
     if (data.value) {
       id = data.value.name;
     }
@@ -210,7 +211,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     let selected;
 
     if (id) {
-      selected = this.disaggregations.find(function(dis) {
+      selected = this.disaggregations.find((dis) => {
         return dis.id === id;
       });
     }
@@ -226,8 +227,8 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     }
   }
 
-  _formatChoices(selected) {
-    return selected.choices.map( (choice) => {
+  _formatChoices(selected: GenericObject) {
+    return selected.choices.map( (choice: GenericObject) => {
       return choice.value;
     }).join(', ');
   }
@@ -239,7 +240,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   validate() {
     let self = this;
     this.set('invalid', false);
-    let allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
+    let allMenus = (this.shadowRoot!.querySelectorAll('.dis-menu') as PaperDropdownMenuElement);
     allMenus.forEach((menu) => {
       menu.set('invalid', false);
     });

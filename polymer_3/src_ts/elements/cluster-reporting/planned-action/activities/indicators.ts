@@ -16,6 +16,7 @@ import '../../indicator-modal';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../styles/table-styles';
 import {GenericObject} from '../../../../typings/globals.types';
+import {IndicatorModalEl} from '../../indicator-modal';
 
 /**
 * @polymer
@@ -116,7 +117,7 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {

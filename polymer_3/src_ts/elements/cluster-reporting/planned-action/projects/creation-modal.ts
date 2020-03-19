@@ -1001,7 +1001,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   open() {
     if (this.edit && this.editData) {
       this.set('data', Object.assign({}, this.editData));
-      this.selectedClusters = this.editData.clusters.map(function(cluster) {
+      this.selectedClusters = this.editData.clusters.map((cluster: GenericObject) => {
         return cluster.id;
       });
       this.set('mode', 'custom');

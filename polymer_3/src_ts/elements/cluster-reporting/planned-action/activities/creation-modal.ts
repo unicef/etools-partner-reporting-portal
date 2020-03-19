@@ -738,7 +738,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _remove(e: CustomEvent) {
-    var currentIndex = +e.target.dataset.index;
+    let currentIndex = +e.target!.dataset.index;
 
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);
@@ -774,7 +774,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: string) {
@@ -804,7 +804,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _fetchActivities(clusterId: string) {
-    var self = this;
+    let self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -820,13 +820,13 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('activities', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
-  _fetchProjects(partnerId: string, mode: string, clusterId: string) {
-    var self = this;
+  _fetchProjects(partnerId: string, clusterId: string) {
+    let self = this;
     const thunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
     if (this.data === undefined) {
       return;
@@ -843,13 +843,13 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('projects', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchObjectives(clusterId: string) {
-    var self = this;
+    let self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -865,15 +865,15 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _save() {
-    var self = this;
+    let self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    var valid = [
+    let valid = [
       this._fieldsAreValid(),
       this._dateRangeValid('.start-date', '.end-date'),
     ].every(Boolean);
@@ -884,17 +884,17 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     this.set('updatePending', true);
 
-    this.$.activity.body = Object.assign({
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.partner,
     }, this.data[this.mode]);
     thunk()
-      .then(function(res: any) {
+      .then((res: GenericObject) => {
         fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self._close();
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
         fireEvent(self, 'project-details-selection-refit');
@@ -902,9 +902,9 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _close(e: CustomEvent) {
-    if (e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON') {
+    if (e.target!.nodeName === 'PAPER-DIALOG' ||
+      e.target!.nodeName === 'PAPER-BUTTON' ||
+      e.target!.nodeName === 'PAPER-ICON-BUTTON') {
       this.set('mode', '');
       this.set('data', {});
 

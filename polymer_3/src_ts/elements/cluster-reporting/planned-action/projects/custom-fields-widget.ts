@@ -147,7 +147,7 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
   _remove(e: CustomEvent) {
     let value = this.get('customFields');
     let toRemove = value.findIndex( (field: GenericObject) => {
-      return String(field.id) === String(e.target.id);
+      return String(field.id) === String(e.target!.id);
     });
     this.splice('customFields', toRemove, 1);
   }

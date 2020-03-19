@@ -15,6 +15,8 @@ import '../activities/add-activity-from-project-modal';
 import '../activities/add-existing-activity-from-project-modal';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
+import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/add-existing-activity-from-project-modal';
+import {PlannedActionAddActivityFromProjectModalEl} from '../activities/add-activity-from-project-modal';
 
 
 /**
@@ -139,11 +141,11 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionAddActivityFromProjectModalEl).open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal')!.open();
+    (this.shadowRoot!.querySelector('#existing-modal') as PlannedActioAddExistingActivityFromProjectModalEl).open();
   }
 
   _addEventListeners() {

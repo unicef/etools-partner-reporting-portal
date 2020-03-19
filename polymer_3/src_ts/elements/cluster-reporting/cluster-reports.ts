@@ -94,7 +94,7 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   _fetchData(reset?: boolean) {
     const reportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
 
-    (this.$.reports as EtoolsPrpAjaxE).abort();
+    (this.$.reports as EtoolsPrpAjaxEl).abort();
 
     this.reduxStore.dispatch(
       clusterIndicatorReportsFetch(reportsThunk, reset)

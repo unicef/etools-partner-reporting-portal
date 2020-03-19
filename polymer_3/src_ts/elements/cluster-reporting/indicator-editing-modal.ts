@@ -590,7 +590,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let dates = this.get('data.cs_dates');
     let startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter((d) => {
+    this.set('data.cs_dates', dates && dates.filter((d: string) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }

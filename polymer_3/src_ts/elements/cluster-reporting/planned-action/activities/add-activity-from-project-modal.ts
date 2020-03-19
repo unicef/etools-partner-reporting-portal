@@ -696,7 +696,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: string) {
@@ -755,9 +755,9 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
         }));
 
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchObjectives(clusterId: string) {
@@ -777,15 +777,15 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch(function(err) {
+      //   // TODO: error handling
+      // });
   }
 
   _save() {
-    var self = this;
-    var thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    var valid = [
+    let self = this;
+    let thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
+    let valid = [
       this._fieldsAreValid(),
       this._dateRangeValid('.start-date', '.end-date'),
     ].every(Boolean);
@@ -815,9 +815,9 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
   _close(e: CustomEvent) {
     if (e === 'saved' ||
-      e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON'
+      e.target!.nodeName === 'PAPER-DIALOG' ||
+      e.target!.nodeName === 'PAPER-BUTTON' ||
+      e.target!.nodeName === 'PAPER-ICON-BUTTON'
     ) {
       this.set('mode', '');
       this.set('data', {});

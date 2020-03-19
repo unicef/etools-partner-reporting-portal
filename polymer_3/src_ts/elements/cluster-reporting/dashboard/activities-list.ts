@@ -190,8 +190,8 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   }
 
   _handleOpenedChanged(e: CustomEvent, data: any[]) {
-    var row = e.target;
-    var openedIndex = this.detailsOpened.indexOf(row);
+    let row = e.target;
+    let openedIndex = this.detailsOpened.indexOf(row);
 
     if (!data.value) {
       if (openedIndex !== -1) {

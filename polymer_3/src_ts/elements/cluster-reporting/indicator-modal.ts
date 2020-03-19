@@ -37,6 +37,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 
 /**
@@ -1069,7 +1070,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
       timeOut.after(250),
       () => {
-        this.$.dialog.refit();
+        (this.$.dialog as PaperDialogElement).refit();
       });
   }
 
@@ -1120,7 +1121,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('data', newData);
   }
 
-  _setFrequency(e: CustomEvent, data: GenericObject) {
+  _setFrequency(data: GenericObject) {
     let freq = (this.shadowRoot!.querySelector('#frequencies') as DomRepeat).itemForElement(data.value);
     if (!freq) {
       return;
@@ -1264,9 +1265,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       .then((res: GenericObject) => {
         self.set('activities', res.data.results);
       })
-      .catch((err: GenericObject) => {
-        // TODO: error handling
-      });
+      // .catch((err: GenericObject) => {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchActivityIndicatorsList(selectedId: string) {
@@ -1326,9 +1327,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('objectives', res.data.results);
             fireEvent(self, 'details-loaded');
           })
-          .catch((err: GenericObject) => {
-            // TODO: error handling
-          });
+          // .catch((err: GenericObject) => {
+          //   // TODO: error handling
+          // });
       });
   }
 
@@ -1362,9 +1363,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('indicators', simpleIndicatorsList);
             fireEvent(self, 'details-loaded');
           })
-          .catch((err: GenericObject) => {
-            // TODO: error handling
-          });
+          // .catch((err: GenericObject) => {
+          //   // TODO: error handling
+          // });
       });
   }
 
@@ -1400,9 +1401,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           .then((res: GenericObject) => {
             self.set('selectedIndicatorDetailType', res.data.display_type);
           })
-          .catch((err: GenericObject) => {
-            // TODO: error handling
-          });
+          // .catch((err: GenericObject) => {
+          //   // TODO: error handling
+          // });
       });
   }
 
@@ -1481,7 +1482,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         data.in_need.d = 100;
       }
 
-      data.locations.forEach(function(location: GenericObject, idx, arr) {
+      data.locations.forEach(function(location: GenericObject, idx: number, arr: any[]) {
         location.baseline.d = 100;
         location.target.d = 100;
         location.baseline.v = parseInt(location.baseline.v);
@@ -1589,7 +1590,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       data.baseline.c = data.baseline.v / data.baseline.d;
       data.target.c = data.target.v / data.target.d;
 
-      data.locations.forEach(function(location: GenericObject, idx, arr) {
+      data.locations.forEach((location: GenericObject, idx: number, arr: any[]) => {
         location.baseline.v = parseInt(location.baseline.v);
         location.target.v = parseInt(location.target.v);
 
@@ -1658,7 +1659,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     let dates = this.get('data.cs_dates');
     let startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter((d) => {
+    this.set('data.cs_dates', dates && dates.filter((d: string) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
@@ -1770,3 +1771,5 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 }
 
 window.customElements.define('indicator-modal', IndicatorModal);
+
+export {IndicatorModal as IndicatorModalEl}

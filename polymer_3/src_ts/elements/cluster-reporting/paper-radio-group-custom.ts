@@ -117,7 +117,7 @@ class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElem
   /**
    * Selects the given value.
    */
-  select(value) {
+  select(value: string) {
     let newItem = this._valueToItem(value);
     if (newItem && newItem.hasAttribute('disabled')) {
       return;

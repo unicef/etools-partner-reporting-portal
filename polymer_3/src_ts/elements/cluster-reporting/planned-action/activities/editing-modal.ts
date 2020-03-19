@@ -643,7 +643,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _remove(e: CustomEvent) {
-    var currentIndex = +e.target.dataset.index;
+    let currentIndex = +e.target!.dataset.index;
     this.splice('data.projects', currentIndex, 1);
     fireEvent(this, 'project-details-selection-refit');
   }
@@ -682,8 +682,8 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('errors', {});
   }
 
-  _validate(e) {
-    e.target.validate();
+  _validate(e: CustomEvent) {
+    e.target!.validate();
   }
 
   _computePartnerId(partner: GenericObject, editPartner: GenericObject) {
@@ -733,9 +733,9 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
       .then(function(res: any) {
         self.set('activities', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch((err) => {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchObjectives(clusterId: string) {
@@ -755,9 +755,9 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch((err) => {
+      //   // TODO: error handling
+      // });
   }
 
   _fetchProjects(partnerId: string) {
@@ -773,9 +773,9 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
       .then(function(res: any) {
         self.set('projects', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
-      });
+      // .catch((err) => {
+      //   // TODO: error handling
+      // });
   }
 
   _save() {
@@ -799,7 +799,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
         self.set('errors', {});
         self.close();
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
       });
