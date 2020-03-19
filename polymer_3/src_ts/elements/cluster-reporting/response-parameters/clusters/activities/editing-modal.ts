@@ -178,7 +178,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _save() {
@@ -191,14 +191,15 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
 
     self.updatePending = true;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         fireEvent(self, 'activity-edited', res.data);
         self.close();
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
+        console.error(err)
       });
   }
 }

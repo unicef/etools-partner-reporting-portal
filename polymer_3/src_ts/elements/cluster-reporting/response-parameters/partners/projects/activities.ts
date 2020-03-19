@@ -20,6 +20,8 @@ import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerPr
 import {GenericObject} from '../../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {PlannedActioAddExistingActivityFromProjectModalEl} from '../../../planned-action/activities/add-existing-activity-from-project-modal';
+import {PlannedActionAddActivityFromProjectModalEl} from '../../../planned-action/activities/add-activity-from-project-modal';
 
 /**
  * @polymer
@@ -115,8 +117,8 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   _onSuccess(e: CustomEvent) {
     const data = e.detail;
-    var path = '/response-parameters/partners/activity/' + String(data.id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    let path = '/response-parameters/partners/activity/' + String(data.id);
+    let url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -132,11 +134,11 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
+        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId));
           // @ts-ignore
-          .catch(function(err) {
-            // TODO: error handling.
-          });
+          // .catch((err) => {
+          //   TODO: error handling.
+          // });
       });
   }
 
@@ -147,11 +149,11 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionAddActivityFromProjectModalEl).open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal').open();
+    (this.shadowRoot!.querySelector('#existing-modal') as PlannedActioAddExistingActivityFromProjectModalEl).open();
   }
 
   _computeUrl(responsePlanId: string) {

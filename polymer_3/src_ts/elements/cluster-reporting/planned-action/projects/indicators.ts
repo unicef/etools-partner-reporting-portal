@@ -17,6 +17,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 import '../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProjects';
+import {IndicatorModalEl} from '../../indicator-modal';
 
 
 /**
@@ -121,7 +122,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('indicatorModal')!.open();
+    (this.shadowRoot!.querySelector('indicatorModal') as IndicatorModalEl).open();
   }
 
   _onSuccess() {

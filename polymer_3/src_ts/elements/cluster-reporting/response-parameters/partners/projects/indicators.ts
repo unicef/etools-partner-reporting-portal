@@ -18,6 +18,7 @@ import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 import {partnerProjIndicatorsFetch} from '../../../../../redux/actions/partnerProjects';
+import {IndicatorModalEl} from '../../../indicator-modal';
 
 /**
  * @polymer
@@ -149,7 +150,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _indicatorsAjax() {

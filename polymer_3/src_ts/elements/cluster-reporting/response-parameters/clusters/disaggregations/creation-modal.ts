@@ -182,26 +182,27 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
     let self = this;
     const thunk = (this.$.createDisaggregation as EtoolsPrpAjaxEl).thunk();
     let newChoices = [];
-    for (var i = 0; i < this.data.choices.length; i++) {
+    for (let i = 0; i < this.data.choices.length; i++) {
       newChoices.push({'value': this.data.choices[i], 'active': true});
     }
     this.data.choices = newChoices;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         fireEvent(self, 'disaggregation-added', res.data);
         self.updatePending = false;
         self.close();
 
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         // TODO: error handling
         self.updatePending = false;
+        console.error(err);
       });
   }
 
   _checkMatchingName() {
     let disaggregations = this.disaggregations;
-    for (var i = 0; i < disaggregations.length; i++) {
+    for (let i = 0; i < disaggregations.length; i++) {
       if (disaggregations[i].name === this.data.name.trim()) {
         return false;
       }

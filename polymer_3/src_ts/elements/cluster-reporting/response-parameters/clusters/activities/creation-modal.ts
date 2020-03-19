@@ -231,11 +231,12 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
       this.objectivesParams = {cluster_id: this.data.cluster};
 
       thunk()
-        .then(function(res: any) {
+        .then((res: any) => {
           self.set('objectives', res.data.results);
         })
-        .catch(function(err) {
+        .catch((err: GenericObject) => {
           self.updatePending = false;
+          console.error(err);
           // TODO: error handling
         });
     } else {
@@ -257,7 +258,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    e.target!.validate();
   }
 
   _redirectToDetail(id: number) {

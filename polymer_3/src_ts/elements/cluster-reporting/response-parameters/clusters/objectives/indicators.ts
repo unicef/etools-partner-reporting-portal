@@ -18,6 +18,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {IndicatorModalEl} from "../../../indicator-modal";
 
 /**
  * @polymer
@@ -125,7 +126,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {
@@ -152,10 +153,10 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
-      .catch(function(err) {
-        // TODO: error handling.
-      });
+    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId));
+      // .catch((err: GenericObject) => {
+      //   // TODO: error handling.
+      // });
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {

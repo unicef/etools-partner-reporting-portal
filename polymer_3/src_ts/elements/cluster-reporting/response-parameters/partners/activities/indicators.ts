@@ -18,6 +18,7 @@ import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/partnerActivities';
+import {IndicatorModalEl} from '../../../indicator-modal';
 
 /**
  * @polymer
@@ -149,7 +150,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _indicatorsAjax() {
@@ -158,9 +159,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
-      .catch(function(err) {
-        // TODO: error handling.
-      });
+      // .catch((err: GenericObject) => {
+      //   // TODO: error handling.
+      // });
   }
 
   _addEventListeners() {

@@ -19,7 +19,6 @@ import {GenericObject} from '../../../../../typings/globals.types';
 /**
  * @polymer
  * @customElement
- * @appliesMixin ModalMixin
  * @appliesMixin UtilsMixin
  * @appliesMixin DataTableMixin
  * @appliesMixin RoutingMixin

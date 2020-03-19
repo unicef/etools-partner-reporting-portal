@@ -9,6 +9,7 @@ import '../../../../etools-prp-permissions';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {PlannedActionProjectsModalEl} from '../../../planned-action/projects/creation-modal';
 
 /**
  * @polymer
@@ -64,7 +65,7 @@ class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElemen
   responsePlanCurrent!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
 
   _canEditActivity(permissions: GenericObject, projectData: GenericObject) {

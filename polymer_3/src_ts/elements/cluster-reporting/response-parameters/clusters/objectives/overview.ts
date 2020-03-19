@@ -11,7 +11,6 @@ import '../../../../frequency-of-reporting';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import '../../../../labelled-item';
-import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**

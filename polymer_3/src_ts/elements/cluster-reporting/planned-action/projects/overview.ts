@@ -8,6 +8,7 @@ import '../../project-details';
 import './creation-modal';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
+import {PlannedActionProjectsModalEl} from "./creation-modal";
 
 
 /**
@@ -72,7 +73,7 @@ class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
 
 }

@@ -178,13 +178,13 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
   }
 
   _redirectToDetail(id: number) {
-    var path = '/response-parameters/clusters/objective/' + String(id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    let path = '/response-parameters/clusters/objective/' + String(id);
+    let url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    (e.target as any).validate();
   }
 
   _save() {
@@ -194,12 +194,13 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
     const thunk = (this.$.createObjective as EtoolsPrpAjaxEl).thunk();
     let self = this;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self._redirectToDetail(res.data.id);
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.updatePending = false;
+        console.error(err);
         // TODO: error handling
       });
   }

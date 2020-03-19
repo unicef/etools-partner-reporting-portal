@@ -22,7 +22,6 @@ import {GenericObject} from '../../../../../typings/globals.types';
 /**
  * @polymer
  * @customElement
- * @appliesMixin ModalMixin
  * @appliesMixin UtilsMixin
  * @appliesMixin DataTableMixin
  * @appliesMixin RoutingMixin
@@ -138,7 +137,7 @@ class ClustersObjectivesList extends LocalizeMixin(DataTableMixin(RoutingMixin(P
   anchorQueryParams!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(id: number, query: string) {
