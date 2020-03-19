@@ -20,8 +20,6 @@ import {
   computeParams, computeIsClusterApp, computeIndicatorReportsUrl,
   bucketByLocation, computeHidden
 } from './js/ip-reporting-indicator-details-functions';
-// (dci) to be checked - it's missing in original ?
-// import {setIndicatorDisaggregations} from '../../redux/actions/indicators';
 
 /**
  * @polymer
@@ -110,7 +108,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
     <template
         is="dom-if"
-        if="[[_computeHidden(data, loading)]]">
+        if="[[_computeHidden(data, 'true')]]">
       <div class="report-meta app-grid">
         <template
             is="dom-repeat"
@@ -148,15 +146,16 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
         </template>
       </div>
     </template>
+
     <list-placeholder
       data="[[data]]"
       loading="[[loading]]"
-      message="No report data associated with this indicator has been submitted yet">
+      message="no_report_data">
     </list-placeholder>
 
     <template
         is="dom-if"
-        if="[[!loading]]">
+        if="[[_computeHidden(locations, 'true')]]">
       <paper-tabs
           selected="{{selected}}"
           fallback-selection="location-[[locations.0.current.id]]"
@@ -221,19 +220,19 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   @property({type: Object})
   indicator!: GenericObject;
 
-  @property({type: Boolean, computed: 'getReduxStateValue(state.indicators.loadingDetails)'})
+  @property({type: Boolean, computed: 'getReduxStateValue(rootState.indicators.loadingDetails)'})
   loading!: boolean;
 
   @property({type: Array})
   data!: any[];
 
-  @property({type: Object, computed: 'getReduxStateObject(state.indicators.details)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.indicators.details)'})
   dataDict!: GenericObject;
 
   @property({type: Array, computed: '_bucketByLocation(data)'})
   locations!: any;
 
-  @property({type: String, computed: 'getReduxStateValue(state.app.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
 
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
@@ -262,12 +261,6 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
     return bucketByLocation(data);
   }
 
-  // (dci) - NOT used, check if can be removed
-  //_updateDisaggregationStore(data: GenericObject) {
-  //this.dispatch(App.Actions.setIndicatorDisaggregations(data));
-  //this.reduxStore.dispatch(Actions .setIndicatorDisaggregations(data));
-  //}
-
   _getDataByKey(dataDict: GenericObject) {
     if (dataDict.details) {
       this.data = dataDict.details[this.indicator.id];
@@ -281,13 +274,11 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   _openChanged() {
     if (this.isOpen) {
       let thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
-      // need to check
-      // var action = Indicators;
-      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id));
-        // eslint-disable-next-line
-        // .catch(function(err) {
-        //   // TODO: error handling.
-        // });
+      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
+        // @ts-ignore
+        .catch(function (err) {
+          //   // TODO: error handling.
+        });
     } else {
       (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
     }

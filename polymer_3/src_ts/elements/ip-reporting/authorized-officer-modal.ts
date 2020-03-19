@@ -21,7 +21,6 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
-import {store} from '../../redux/store';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {RootState} from '../../typings/redux.types';
@@ -47,6 +46,9 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
           width: 750px;
         }
       }
+      .dialog-content {
+        padding-bottom: 24px;
+      }
     </style>
 
     <iron-location
@@ -69,43 +71,43 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         </paper-icon-button>
       </div>
       <paper-dialog-scrollable>
+        <div class="dialog-content">
+            <h3>[[localize('could_not_be_submitted')]]</h3>
+            <!--
+            <paper-dropdown-menu
+              id="officerDropdown"
+              class="validate"
+              label="[[localize('authorized_officer')]]"
+              placeholder="[[localize('select')]]"
+              on-value-changed="_validate"
+              always-float-label
+              required>
+              <paper-listbox
+                selected="{{selectedFocalPoint}}"
+                attr-for-selected="value"
+                slot="dropdown-content"
+                class="dropdown-content">
+                <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
+                  <paper-item value="[[item.value]]">[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            -->
 
-        <h3>[[localize('could_not_be_submitted')]]</h3>
-        <!--
-        <paper-dropdown-menu
-          id="officerDropdown"
-          class="validate"
-          label="[[localize('authorized_officer')]]"
-          placeholder="[[localize('select')]]"
-          on-value-changed="_validate"
-          always-float-label
-          required>
-          <paper-listbox
-            selected="{{selectedFocalPoint}}"
-            attr-for-selected="value"
-            slot="dropdown-content"
-            class="dropdown-content">
-            <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
-              <paper-item value="[[item.value]]">[[item.title]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        -->
-
-        <etools-dropdown
-          id="officerDropdown"
-          label="[[localize('authorized_officer')]]"
-          placeholder="[[localize('select')]]"
-          options="[[currentAuthorizedPartners]]"
-          option-value="value"
-          option-label="title"
-          required
-          trigger-value-change-event
-          on-etools-selected-item-changed="_validate"
-          selected="{{selectedFocalPoint}}"
-          hide-search>
-        </etools-dropdown>
-
+            <etools-dropdown
+              id="officerDropdown"
+              class="validate"
+              label="[[localize('authorized_officer')]]"
+              placeholder="[[localize('select')]]"
+              options="[[currentAuthorizedPartners]]"
+              option-value="value"
+              option-label="title"
+              required
+              trigger-value-change-event
+              selected="{{selectedFocalPoint}}"
+              hide-search>
+            </etools-dropdown>
+        </div>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -171,10 +173,6 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
-  }
-
-  _validate(e: CustomEvent) {
-    e.target!.validate();
   }
 
   _save() {
