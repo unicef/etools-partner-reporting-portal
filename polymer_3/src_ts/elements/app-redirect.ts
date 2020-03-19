@@ -23,17 +23,17 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
   public static get observers() {
     return [
-      '_redirectIfNeeded(app, workspace, profile.access)',
+      '_redirectIfNeeded(app, workspace, profile)',
     ]
   }
 
-  _redirectIfNeeded(app: string, workspace: string, access: string[]) {
-    if (!app || !workspace) {
+  _redirectIfNeeded(app: string, workspace: string, profile: GenericObject) {
+    if (!app || !workspace || !profile) {
       return;
     }
-    if (!access || !access.length) {
-      location.href = getDomainByEnv() + '/src/pages/unauthorized';
-    } else if (access.indexOf(app) === -1) {
+    if (!profile.access || !profile.access.length) {
+      location.href = '/unauthorized';
+    } else if (profile.access.indexOf(app) === -1) {
       location.href = this.buildBaseUrl(workspace, access[0]);
     }
   }
