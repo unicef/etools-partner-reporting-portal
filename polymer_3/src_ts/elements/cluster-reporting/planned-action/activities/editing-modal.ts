@@ -562,7 +562,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   activitiesUrl!: string;
 
   @property({type: Object})
-  editData = {};
+  editData: GenericObject = {};
 
   @property({type: Boolean})
   updatePending = false;
@@ -584,7 +584,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     page_size: 99999,
   };
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
@@ -629,11 +629,11 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     ];
   }
 
-  _computeLocalizedStatuses(localize: any) {
+  _computeLocalizedStatuses() {
     return [
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   }
 

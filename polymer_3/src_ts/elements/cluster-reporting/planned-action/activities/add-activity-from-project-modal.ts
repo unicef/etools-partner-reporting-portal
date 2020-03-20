@@ -39,7 +39,7 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))) {
+class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -595,7 +595,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
   clusters!: any[];
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
@@ -634,11 +634,12 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
     ];
   }
 
-  _computeLocalizedStatuses(localize: any) {
+  _computeLocalizedStatuses() {
+
     return [
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   }
 

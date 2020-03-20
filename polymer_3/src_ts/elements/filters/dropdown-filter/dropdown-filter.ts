@@ -44,14 +44,14 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
         always-float-label>
       <paper-listbox
           slot="dropdown-content"
-          class="dropdown-content"
-          selected="[[selected]]"
+          selected="{{value}}"
+          attr-for-selected="item-value"
           on-iron-select="_handleFilterChange">
         <template
             id="repeat"
             is="dom-repeat"
             items="[[data]]">
-          <paper-item>[[item.title]]</paper-item>
+          <paper-item item-value="[[item.id]]">[[item.title]]</paper-item>
         </template>
       </paper-listbox>
     </paper-dropdown-menu>
@@ -62,21 +62,11 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   @property({type: Boolean})
   disabled!: boolean;
 
-  @property({type: Number})
-  selected!: number;
-
   @property({type: String})
   value = '';
 
   @property({type: Array, observer: '_handleData'})
   data = [];
-
-
-  public static get observers() {
-    return [
-      '_updateSelected(value, data)',
-    ]
-  }
 
   _handleFilterChange(e: CustomEvent) {
     const newValue = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).id;
@@ -84,18 +74,6 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
     fireEvent(this, 'filter-changed', {
       name: this.name,
       value: String(newValue),
-    });
-  };
-
-  _updateSelected(value: String, data: any) {
-    setTimeout(() => {
-      const selectedIndex = data.findIndex(function(item: any) {
-        return String(item.id) === String(value)
-      });
-
-      if (selectedIndex !== this.selected) {
-        this.set('selected', selectedIndex);
-      }
     });
   }
 

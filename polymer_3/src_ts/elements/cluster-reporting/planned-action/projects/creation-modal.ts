@@ -834,7 +834,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   @property({type: String})
   partnerForClusters: string = '';
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
 
   @property({type: Array})
@@ -859,10 +859,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   @property({type: Array, computed: '_computeImoClusters(profile)'})
   imoClusters!: any[];
 
-  @property({type: Array, computed: '_computeLocalizedAgencyTypes(localize)'})
+  @property({type: Array, computed: '_computeLocalizedAgencyTypes(resources)'})
   agencyTypes!: any[];
 
-  @property({type: Array, computed: '_computeLocalizedClassifications(localize)'})
+  @property({type: Array, computed: '_computeLocalizedClassifications(resources)'})
   classifications!: any[];
 
   @property({type: Array})
@@ -895,30 +895,30 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       '_updatePartnerForClusters(partnerID)'];
   }
 
-  _computeLocalizedStatuses(localize: Function) {
+  _computeLocalizedStatuses() {
     return [
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   }
 
-  _computeLocalizedAgencyTypes(localize: Function) {
+  _computeLocalizedAgencyTypes() {
     return [
-      {title: localize('un_agency'), id: 'UN Agency'},
-      {title: localize('government_organization'), id: 'Government Organisation'},
-      {title: localize('international_ngo'), id: 'International NGO'},
-      {title: localize('national_ngo'), id: 'National NGO'},
-      {title: localize('community_based_organization'), id: 'Community based organisation'},
-      {title: localize('other'), id: 'Other'},
+      {title: this.localize('un_agency'), id: 'UN Agency'},
+      {title: this.localize('government_organization'), id: 'Government Organisation'},
+      {title: this.localize('international_ngo'), id: 'International NGO'},
+      {title: this.localize('national_ngo'), id: 'National NGO'},
+      {title: this.localize('community_based_organization'), id: 'Community based organisation'},
+      {title: this.localize('other'), id: 'Other'},
     ];
   }
 
-  _computeLocalizedClassifications(localize: Function) {
+  _computeLocalizedClassifications() {
     return [
-      {title: localize('high'), id: 'High'},
-      {title: localize('medium'), id: 'Medium'},
-      {title: localize('low'), id: 'Low'},
+      {title: this.localize('high'), id: 'High'},
+      {title: this.localize('medium'), id: 'Medium'},
+      {title: this.localize('low'), id: 'Low'},
     ];
   }
 
