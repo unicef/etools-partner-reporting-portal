@@ -266,15 +266,15 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _fieldValueChanged(e: CustomEvent) {
-    let key = e.detail.key;
-    let value = e.detail.value;
+    const key = e.detail.key;
+    const value = e.detail.value;
     let totals;
 
-    let newValue = Object.assign(
+    const newValue = Object.assign(
       {
         c: null,
         d: null,
-        v: null,
+        v: null
       },
       this.get(['localData.disaggregation', key]),
       value
@@ -332,17 +332,12 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _computeLabelVisibility(app: string, indicatorType: string) {
-    if ((String(app) === String('ip-reporting'))
-      && (String(indicatorType) === String('number'))) {
+    if ((String(app) === String('ip-reporting')) && (String(indicatorType) === String('number'))) {
       return false;
     } else {return true;}
   }
 
   save() {
-    let updateThunk;
-    let cellsValid;
-    let percentagesValid;
-
     if (!this.editable) {
       return Promise.reject();
     }
@@ -351,18 +346,18 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       field.validate();
     });
 
-    cellsValid = this.fields.every(function(field) {
+    const cellsValid = this.fields.every(function(field) {
       return !field.invalid;
     });
 
-    percentagesValid = this._fieldsAreValid();
+    const percentagesValid = this._fieldsAreValid();
 
     if (!cellsValid || !percentagesValid) {
       return Promise.reject();
     }
 
     const self = this;
-    updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
+    const updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(
@@ -394,7 +389,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       return;
     }
 
-    let reportedOn = formattedData.disaggregation_reported_on;
+    const reportedOn = formattedData.disaggregation_reported_on;
 
     return editableBool ? mapping.filter(function(disagg) {
       return reportedOn.indexOf(disagg.id) !== -1;
@@ -423,12 +418,12 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       .map(function(location) {
         return {
           title: location.reporting_entity.title,
-          percentage: 1,
+          percentage: 1
         };
       });
   }
 
-  _initPercentageMap(localData: GenericObject, map: any[]) {
+  _initPercentageMap(map: any[]) {
     if (!map.length) {
       return;
     }
@@ -445,7 +440,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _handleInput(e: CustomEvent) {
-    let input = e.target;
+    const input = e.target as any;
 
     input.validate();
 
@@ -490,4 +485,3 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
 window.customElements.define('disaggregation-table', DisaggregationTable);
 
 export {DisaggregationTable as DisaggregationTableEl};
-

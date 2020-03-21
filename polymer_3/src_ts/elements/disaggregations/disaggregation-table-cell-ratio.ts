@@ -10,6 +10,7 @@ import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import '@polymer/iron-meta/iron-meta';
 import {IronMeta} from '@polymer/iron-meta/iron-meta';
+import {DisaggregationFieldEl} from "./disaggregation-field";
 
 /**
  * @polymer
@@ -116,10 +117,9 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   coords!: string;
 
   _handleInput(e: CustomEvent) {
-    let key = e.detail.key;
-    let value = e.detail.value;
+    const key = e.detail.key;
+    const value = e.detail.value;
     let calculated;
-    let change;
 
     if (e.detail.internal) {
       // Dont handle self-fired events.
@@ -128,20 +128,20 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
     e.stopPropagation();
 
-    let v = this.shadowRoot!.querySelector('#v');
-    let d = this.shadowRoot!.querySelector('#d');
+    const v = (this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl);
+    const d = (this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl);
 
     if (typeof value.v !== 'undefined') {
-      d!.validate();
+      d.validate();
     }
 
     if (typeof value.d !== 'undefined') {
-      v!.validate();
+      v.validate();
     }
 
-    change = Object.assign({}, this.get('localData'), value);
+    const change = Object.assign({}, this.get('localData'), value);
 
-    if (v.invalid || d.invalid) {
+    if ((v as any).invalid || (d as any).invalid) {
       change.c = null;
     } else {
       calculated = change.v / change.d;
@@ -155,7 +155,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
       fireEvent(this, 'field-value-changed', {
         key: key,
         value: change,
-        internal: true,
+        internal: true
       });
     }
 
@@ -169,20 +169,20 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   }
 
   _bindValidation(coords: string) {
-    let vName = 'v-' + coords;
+    const vName = 'v-' + coords;
     const self = this;
     let validator = {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
         return Number(value) !== 0 || Number(self!.shadowRoot!.querySelector('#v')!.getField().value) === 0;
-      }.bind(self),
+      }.bind(self)
     };
 
     new IronMeta({
       type: validator.validatorType,
       key: validator.validatorName,
-      value: validator,
+      value: validator
     });
 
     this.set('vName', vName);
@@ -203,7 +203,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
     super.connectedCallback();
 
     this._addEventListeners();
-    let nullData = this._clone(this.data);
+    const nullData = this._clone(this.data);
     if (nullData !== undefined && nullData.v === 0) {
       nullData.v = null;
     }

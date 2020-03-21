@@ -774,7 +774,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: string) {

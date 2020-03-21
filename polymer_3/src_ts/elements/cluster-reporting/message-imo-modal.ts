@@ -143,7 +143,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _setDefaults(opened: boolean, indicatorId: number, clusterId: number) {

@@ -178,7 +178,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _save() {

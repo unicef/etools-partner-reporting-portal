@@ -258,7 +258,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _redirectToDetail(id: number) {

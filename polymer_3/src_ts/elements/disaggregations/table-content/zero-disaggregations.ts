@@ -40,8 +40,8 @@ class ZeroDisaggregations extends PolymerElement {
       title: 'total',
       total: {
         key: '()',
-        data: data.disaggregation['()'],
-      },
+        data: data.disaggregation['()']
+      }
     };
   }
 

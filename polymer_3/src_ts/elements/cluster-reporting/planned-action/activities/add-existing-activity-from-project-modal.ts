@@ -468,7 +468,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: any) {

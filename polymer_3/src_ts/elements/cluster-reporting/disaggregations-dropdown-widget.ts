@@ -31,49 +31,49 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
         :host {
           display: block;
         }
-  
+
         h2 {
           padding: 5px 10px;
           margin: 0 0 1em;
           font-size: 14px;
           background-color: var(--paper-grey-200);
         }
-  
+
         .error,
         .remove-btn {
           color: var(--paper-deep-orange-a700);
         }
-  
+
         .row {
           margin-bottom: 1em;
         }
-  
+
         .remove-btn {
           width: 34px;
           height: 34px;
         }
-  
+
         .add-disaggregation-btn {
           margin: 0;
         }
-  
+
         .col-actions {
           width: 40px;
           border-right: 1px solid var(--paper-grey-400);
         }
-  
+
         .col-name:not(:first-of-type),
         .col-values {
           padding-left: 24px;
         }
-  
+
         paper-dropdown-menu {
           width: 100%;
         }
       </style>
-      
+
       <h2>[[localize('disaggregations')]] ([[value.length]])</h2>
-      
+
       <template is="dom-repeat" items="[[value]]" as="dataDisagg">
         <div class="row layout horizontal">
           <template
@@ -92,7 +92,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               </div>
             </div>
           </template>
-  
+
           <div class="col-name flex">
             <template
                 is="dom-if"
@@ -105,7 +105,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
                   disabled>
               </paper-input>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[!readonly]]"
@@ -133,7 +133,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               </paper-dropdown-menu>
             </template>
           </div>
-  
+
           <div class="col-values flex">
             <paper-input
               index="[[index]]"
@@ -143,10 +143,10 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               disabled>
             </paper-input>
           </div>
-  
+
         </div>
       </template>
-      
+
       <template
           is="dom-if"
           if="[[!readonly]]"
@@ -234,7 +234,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   validate() {

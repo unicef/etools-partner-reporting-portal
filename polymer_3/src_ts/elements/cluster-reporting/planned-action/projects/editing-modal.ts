@@ -333,7 +333,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _formatForMultiselect(list) {
@@ -374,6 +374,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
       })
       .catch((err: GenericObject) => {
         self.updatePending = false;
+        console.error(err);
         // TODO: error handling
       });
   }
