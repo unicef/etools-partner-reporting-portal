@@ -1,5 +1,5 @@
 import {ReduxConnectedElement} from './ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
@@ -15,7 +15,7 @@ import './elements/etools-prp-auth';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
 import {reset, userLogout} from './redux/actions';
-import {getDomainByEnv} from './config';
+import {getDomainByEnv, BASE_PATH} from './config';
 import {locales} from './locales';
 
 /**
@@ -65,9 +65,9 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         selected="[[page]]"
         attr-for-selected="name"
         role="main">
-      <template is="dom-if" if="[[_equals(page, 'app_poly3')]]" restamp="true">
+      <template is="dom-if" if="[[_equals(page, basePath)]]" restamp="true">
         <page-app
-            name="app_poly3"
+            name="[[basePath]]"
             route="{{subroute}}">
         </page-app>
       </template>
@@ -91,6 +91,8 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     </iron-pages>
     `;
   }
+  @property({type: String})
+  basePath = BASE_PATH;
 
   @property({type: Object})
   routeData!: GenericObject;
@@ -127,11 +129,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
+    const validPages = [BASE_PATH, 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      location.pathname = '/app_poly3';
+      location.pathname = '/' + BASE_PATH;
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
     } else {
@@ -145,7 +147,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   async _pageChanged(page: string) {
-    // TODO : remove after migration is finished and we no longer use app_poly3
     let componentName = '';
     if (page === 'app_poly3') {
       componentName = 'app';
@@ -180,7 +181,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _computeRedirectPath(authenticated: boolean) {
-    return authenticated ? '/app_poly3' : '/landing';
+    return authenticated ? '/' + BASE_PATH : '/landing';
   }
 
   _addEventListeners() {

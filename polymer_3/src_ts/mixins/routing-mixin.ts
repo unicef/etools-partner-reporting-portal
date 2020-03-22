@@ -1,6 +1,7 @@
 import {property} from '@polymer/decorators';
 import {Constructor} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {BASE_PATH} from '../config';
 
 /**
  * @polymer
@@ -28,7 +29,7 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
 
 
     public _$computeBaseUrl(workspace: string, app: string) {
-      return '/app_poly3/' + workspace + '/' + app;
+      return '/' + BASE_PATH + '/' + workspace + '/' + app;
     }
 
     public _$computeBaseUrlCluster(workspace: string, app: string, planId: string) {

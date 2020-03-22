@@ -8,6 +8,7 @@ import '../elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
 import Endpoints from '../endpoints';
 import {fireEvent} from '../utils/fire-custom-event';
+import {BASE_PATH} from '../config';
 
 /**
  * @polymer
@@ -63,7 +64,7 @@ class PageLoginToken extends PolymerElement {
     thunk()
       .then(function (res: any) {
         if (res.data.success) {
-          window.location.href = '/app_poly3/';
+          window.location.href = `/${BASE_PATH}/`;
         }
       })
       .catch(function () {

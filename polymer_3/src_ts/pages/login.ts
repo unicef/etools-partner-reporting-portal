@@ -1,5 +1,5 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
 import '@polymer/paper-card/paper-card';
@@ -19,6 +19,7 @@ import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
 import '../elements/etools-prp-ajax';
 import '../elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
+import {BASE_PATH} from '../config';
 
 
 /**
@@ -249,12 +250,12 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
     const thunk = (this.$.getProfile as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.status === 200) {
-          window.location.href = '/app_poly3/';
+          window.location.href = `/${BASE_PATH}/`;
         }
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         // TODO: error handling
       });
   }
@@ -267,11 +268,11 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
     }
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function() {
+      .then(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       })
-      .catch(function() {
+      .catch(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       });
