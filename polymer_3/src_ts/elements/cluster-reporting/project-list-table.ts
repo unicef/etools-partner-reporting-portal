@@ -230,7 +230,7 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(project: GenericObject, query: string) {

@@ -53,17 +53,17 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
 
   public static get observers() {
     return [
-      '_setSelectedValues(value, data)',
-    ]
+      '_setSelectedValues(value, data)'
+    ];
   }
 
-  _handleChange(e: CustomEvent, detail: any) {
+  _handleChange(detail: any) {
     if (detail.selectedItems) {
-      let newValue = detail.selectedItems.map((item: any) => item['id']).join(',');
+      const newValue = detail.selectedItems.map((item: any) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
           name: this.name,
-          value: String(newValue || ''),
+          value: String(newValue || '')
         });
       }
     }

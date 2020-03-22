@@ -299,14 +299,14 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   statuses: GenericObject[] = [
     {title: 'Ongoing', id: 'Ong'},
     {title: 'Planned', id: 'Pla'},
-    {title: 'Completed', id: 'Com'},
+    {title: 'Completed', id: 'Com'}
   ];
 
   @property({type: Array})
   frequencies: GenericObject = [
     {title: 'Weekly', id: 'Wee'},
     {title: 'Monthly', id: 'Mon'},
-    {title: 'Quarterly', id: 'Qua'},
+    {title: 'Quarterly', id: 'Qua'}
   ];
 
   @property({type: Array})
@@ -325,7 +325,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
   open() {
     this.set('data', Object.assign({}, this.editData));
-    this.selectedClusters = this.editData.clusters.map(function(item) {
+    this.selectedClusters = this.editData.clusters.map((item: GenericObject) => {
       return item.id;
     });
     this.set('opened', true);
@@ -341,7 +341,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
       return {
         id: item.id,
         value: item.id,
-        label: item.title,
+        label: item.title
       };
     });
   }
@@ -351,7 +351,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
     let valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {

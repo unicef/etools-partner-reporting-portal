@@ -1,10 +1,10 @@
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable-dropdown-filter';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 
 
 /**
@@ -62,12 +62,12 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       .then(function(res: any) {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
-      })
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {

@@ -76,7 +76,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
 
   static get observers() {
     return ['_fetchClusterNames(clusterNamesUrl, params)'];
-  };
+  }
 
   private clusterNamesDebouncer!: Debouncer;
 
@@ -94,7 +94,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
-        var self = this;
+        let self = this;
         const thunk = (this.$.clusterNames as EtoolsPrpAjaxEl).thunk();
         (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
@@ -102,12 +102,12 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
           .then(function(res: any) {
             self.set('data', [{
               id: '',
-              title: 'All',
+              title: 'All'
             }].concat(res.data || []));
-          })
-          .catch(function(err) {
-            // TODO: error handling
           });
+        // .catch((err) => {
+        //   // TODO: error handling
+        // });
       });
   }
 

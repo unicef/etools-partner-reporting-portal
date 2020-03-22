@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -87,7 +87,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   _computeObjectivesParams(params: GenericObject) {
     const objectivesParams: GenericObject = {
-      page_size: 99999,
+      page_size: 99999
     };
 
     if (params.clusters) {
@@ -116,9 +116,10 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch(function(err: any) {
+          .catch((err: any) => {
             // TODO: error handling
             self.set('pending', false);
+            console.error(err);
           });
       });
   }

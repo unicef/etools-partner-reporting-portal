@@ -6,6 +6,7 @@ import FilterMixin from '../../../mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '../../../utils/fire-custom-event';
+import {PaperInputElement} from "@polymer/paper-input/paper-input";
 
 /**
  * @polymer
@@ -45,18 +46,18 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       function propagateChange() {
-        if (self.$.field.value) {
-          var newValue = self.$.field.value.trim();
+        if ((self.$.field as PaperInputElement).value) {
+          const newValue = (self.$.field as PaperInputElement).value!.trim();
 
           if (newValue !== self.lastValue) {
             fireEvent(self, 'filter-changed', {
               name: self.name,
-              value: newValue,
+              value: newValue
             });
           }
         }
       });
-  };
+  }
 
   connectedCallback() {
     super.connectedCallback();

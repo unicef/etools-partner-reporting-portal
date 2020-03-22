@@ -79,7 +79,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       function() {
-        var index = data.findIndex(function(item: GenericObject) {
+        const index = data.findIndex((item: GenericObject) => {
           return value === String(item.id);
         });
 
@@ -93,18 +93,17 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     // this.$.partnerNames.abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.activities as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         const data = (self.required ? [] : [{
           id: '',
-          title: 'All',
+          title: 'All'
         }]).concat(res.data || []);
 
         self.set('data', data);
-      })
-      // @ts-ignore
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {

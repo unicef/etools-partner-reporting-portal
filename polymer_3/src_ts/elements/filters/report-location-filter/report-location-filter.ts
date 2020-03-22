@@ -63,12 +63,12 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
       .then(function(res: any) {
         self.set('options', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
-      })
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {

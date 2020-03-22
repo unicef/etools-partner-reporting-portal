@@ -67,15 +67,15 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data.results);
-      })
-      .catch(function(err) {
-        // TODO: error handling
       });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {
     super.connectedCallback();
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();;
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
   }
 
 }

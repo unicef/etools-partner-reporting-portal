@@ -18,7 +18,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {IndicatorModalEl} from "../../../indicator-modal";
+import {IndicatorModalEl} from '../../../indicator-modal';
 
 /**
  * @polymer

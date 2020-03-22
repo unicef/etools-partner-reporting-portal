@@ -49,8 +49,8 @@ class ClusterDropdownContent extends ReduxConnectedElement {
 
   public static get observers() {
     return [
-      '_fetchClusterNames(clusterNamesUrl, params)',
-    ]
+      '_fetchClusterNames(clusterNamesUrl, params)'
+    ];
   }
 
   _computeClusterNamesUrl(responsePlanId: string) {

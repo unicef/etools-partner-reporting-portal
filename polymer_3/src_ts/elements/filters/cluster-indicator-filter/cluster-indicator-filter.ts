@@ -69,12 +69,12 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
       .then(function(res: any) {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
-      })
-      .catch(function(err) {
-        // TODO: error handling
       });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {

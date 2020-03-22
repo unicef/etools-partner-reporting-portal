@@ -168,7 +168,7 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _computeCurrentActivitiesCount(projectId: number, activitiesCountDict: number) {

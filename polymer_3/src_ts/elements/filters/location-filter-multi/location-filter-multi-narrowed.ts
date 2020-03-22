@@ -103,20 +103,21 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch(function(err: any) {
+          .catch((err: GenericObject) => {
             // TODO: error handling
             self.set('pending', false);
+            console.error(err);
           });
 
       });
-  };
+  }
 
   _onValueChanged(e: CustomEvent) {
 
     if (e.detail.value === '') {
       return;
     }
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -125,7 +126,7 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
     }
-  };
+  }
 }
 
 window.customElements.define('location-filter-multi-narrowed', LocationFilterMultiNarrowed);

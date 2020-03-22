@@ -24,7 +24,10 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ClustersActivityList extends LocalizeMixin(DataTableMixin(RoutingMixin(PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
+class ClustersActivityList extends LocalizeMixin
+                                  (DataTableMixin
+                                  (RoutingMixin
+                                  (PaginationMixin(UtilsMixin(ReduxConnectedElement))))) {
   public static get template() {
     // language=HTML
     return html`
@@ -147,7 +150,7 @@ class ClustersActivityList extends LocalizeMixin(DataTableMixin(RoutingMixin(Pag
   anchorQueryParams!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(id: string, query: string) {

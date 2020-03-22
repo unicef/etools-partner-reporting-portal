@@ -6,6 +6,7 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
+import DatePickerLite from '@unicef-polymer/etools-date-time/datepicker-lite';
 declare const moment: any;
 
 /**
@@ -66,10 +67,10 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   format = 'DD MMM YYYY';
 
   _handleInput() {
-    var newValue = this.$.field.value;
+    const newValue = (this.$.field as DatePickerLite).value;
     fireEvent(this, 'filter-changed', {
       name: this.name,
-      value: newValue,
+      value: newValue
     });
   }
 

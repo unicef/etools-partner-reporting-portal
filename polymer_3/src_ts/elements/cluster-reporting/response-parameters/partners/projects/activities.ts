@@ -20,8 +20,10 @@ import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerPr
 import {GenericObject} from '../../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {PlannedActioAddExistingActivityFromProjectModalEl} from '../../../planned-action/activities/add-existing-activity-from-project-modal';
-import {PlannedActionAddActivityFromProjectModalEl} from '../../../planned-action/activities/add-activity-from-project-modal';
+import {PlannedActioAddExistingActivityFromProjectModalEl}
+  from '../../../planned-action/activities/add-existing-activity-from-project-modal';
+import {PlannedActionAddActivityFromProjectModalEl}
+  from '../../../planned-action/activities/add-activity-from-project-modal';
 
 /**
  * @polymer
@@ -117,8 +119,8 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   _onSuccess(e: CustomEvent) {
     const data = e.detail;
-    let path = '/response-parameters/partners/activity/' + String(data.id);
-    let url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/response-parameters/partners/activity/' + String(data.id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -135,16 +137,16 @@ class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId));
-          // @ts-ignore
-          // .catch((err) => {
-          //   TODO: error handling.
-          // });
+        // @ts-ignore
+        // .catch((err) => {
+        //   TODO: error handling.
+        // });
       });
   }
 
   _computeParams(queryParams: string, projectId: number) {
     return Object.assign({}, queryParams, {
-      project: projectId,
+      project: projectId
     });
   }
 

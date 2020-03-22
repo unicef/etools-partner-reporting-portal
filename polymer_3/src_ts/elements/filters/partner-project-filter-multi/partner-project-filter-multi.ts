@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter-multi';
 import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 
 /**
  * @polymer
@@ -67,10 +67,10 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
     (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data.results);
-      })
-      .catch(function(err) {
-        // TODO: error handling
       });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {

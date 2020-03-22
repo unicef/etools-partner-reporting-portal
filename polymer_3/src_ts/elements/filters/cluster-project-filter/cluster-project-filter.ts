@@ -7,7 +7,7 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
@@ -100,12 +100,12 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
           .then(function(res: any) {
             self.set('data', [{
               id: '',
-              title: 'All',
+              title: 'All'
             }].concat(res.data || []));
-          })
-          .catch(function(err: any) {
-            // TODO: error handling
           });
+        // .catch((err: any) => {
+        //   // TODO: error handling
+        // });
       });
   }
 

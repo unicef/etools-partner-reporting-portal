@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter-multi';
@@ -57,20 +57,20 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocationNames() {
-    var self = this;
+    let self = this;
     const thunk = (this.$.locationNames as EtoolsPrpAjaxEl).thunk();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
-      })
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
   disconnectedCallback() {
