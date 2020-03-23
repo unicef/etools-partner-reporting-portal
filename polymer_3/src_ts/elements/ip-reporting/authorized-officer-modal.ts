@@ -102,8 +102,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
               options="[[currentAuthorizedPartners]]"
               option-value="value"
               option-label="title"
-              required
-              trigger-value-change-event
+              required              
               selected="{{selectedFocalPoint}}"
               hide-search>
             </etools-dropdown>
