@@ -47,7 +47,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _detailsChange(event: CustomEvent) {
-      const element = event.composedPath()[0];
+      const element = (event.composedPath()[0] as any);
       const isOpen = element && element.detailsOpened;
       if (isOpen) {
         return this.push('openedDetails', element);

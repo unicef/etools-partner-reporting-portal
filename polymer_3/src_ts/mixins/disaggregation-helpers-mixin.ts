@@ -39,7 +39,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       '(?,?,Z)': function(z: string) {
         return new RegExp('^\\((\\d+),\\s?(\\d+),\\s?(' + z + ')\\)$');
-      },
+      }
     };
 
     private identity(val: any) {
@@ -53,13 +53,11 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
     }
 
     private sumDisaggValues(fields: any[], transform?: Function) {
-      let result;
-
       if (typeof transform === 'undefined') {
         transform = this.identity;
       }
 
-      result = fields
+      const result = fields
         .filter(function(field) {
           return ['v', 'd'].every(function(key) {
             return !isNaN(field[key]);
@@ -87,7 +85,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
     private getCoords(key: string) {
       const match = [
         this.matchers['(?,?)'](),
-        this.matchers['(?,?,?)'](),
+        this.matchers['(?,?,?)']()
       ]
         .map(function(re) {
           return re.exec(key);
@@ -123,8 +121,9 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       const yRe = this.matchers['(?,Y)'](y);
 
-      let totals: GenericObject = {};
+      const totals: GenericObject = {};
 
+      // @ts-ignore
       const yKey = this.formatKey(y);
 
       const yFields = this.extractFields(data, yRe);
@@ -144,10 +143,12 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
       const yRe = this.matchers['(?,Y)'](y);
       const tRe = this.matchers['(?,Y)']('');
 
-      let tmpTotals1: GenericObject = {};
-      let tmpTotals2: GenericObject = {};
+      const tmpTotals1: GenericObject = {};
+      const tmpTotals2: GenericObject = {};
 
+      // @ts-ignore
       const xKey = this.formatKey(x, '');
+      // @ts-ignore
       const yKey = this.formatKey(y, '');
 
       const xFields = this.extractFields(data, xRe);
@@ -158,6 +159,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       data = Object.assign({}, data, tmpTotals1);
 
+      // @ts-ignore
       const tKey = this.formatKey('');
 
       const tFields = this.extractFields(data, tRe);
@@ -182,12 +184,15 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
       const zRe = this.matchers['(?,?,Z)'](z);
       const tRe = this.matchers['(?,Y)']('');
 
-      let tmpTotals1: GenericObject = {};
-      let tmpTotals2: GenericObject = {};
-      let tmpTotals3: GenericObject = {};
+      const tmpTotals1: GenericObject = {};
+      const tmpTotals2: GenericObject = {};
+      const tmpTotals3: GenericObject = {};
 
+      // @ts-ignore
       const xyKey = this.formatKey(x, y);
+      // @ts-ignore
       const xzKey = this.formatKey(x, z);
+      // @ts-ignore
       const yzKey = this.formatKey(y, z);
 
       const xyFields = this.extractFields(data, xyRe);
@@ -200,8 +205,11 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       data = Object.assign({}, data, tmpTotals1);
 
+      // @ts-ignore
       const xKey = this.formatKey(x, '');
+      // @ts-ignore
       const yKey = this.formatKey(y, '');
+      // @ts-ignore
       const zKey = this.formatKey(z, '');
 
       const xFields = this.extractFields(data, xRe);
@@ -214,6 +222,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       data = Object.assign({}, data, tmpTotals2);
 
+      // @ts-ignore
       const tKey = this.formatKey('');
 
       const tFields = this.extractFields(data, tRe);

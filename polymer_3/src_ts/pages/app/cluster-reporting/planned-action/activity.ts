@@ -205,14 +205,14 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     thunk()
       // @ts-ignore
       .then((res: GenericObject) => {
-        self.updatePending = false;
+        (self as any).updatePending = false;
         res.data.projects.forEach(function(project: GenericObject) {
           project.title = self.projects[project.project_id].title;
         });
         self.activityData = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        (self as any).updatePending = false;
         // TODO: error handling
       });
   }

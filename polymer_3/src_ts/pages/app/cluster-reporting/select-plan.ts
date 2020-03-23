@@ -286,9 +286,9 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
 
   // Gets correct target element when using Chrome.
   _handleRadioButtonChange(e: CustomEvent) {
-    let target = e.target;
-    if (e.target!.id === 'onRadio' || e.target!.id === 'offRadio') {
-      target = e.target!.parentNode.parentNode;
+    let target = e.target as any;
+    if ((e.target as any).id === 'onRadio' || (e.target as any).id === 'offRadio') {
+      target = (e.target as any).parentNode.parentNode;
     }
 
     if (target!.checked) {
@@ -306,6 +306,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   }
 
   _redirectToAdmin() {
+    // @ts-ignore
     window.location = '/api/admin/core/responseplan/';
   }
 

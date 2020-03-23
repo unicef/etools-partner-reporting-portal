@@ -178,7 +178,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   static get observers() {
     return [
-      '_fetchData(dataUrl, queryParams)',
+      '_fetchData(dataUrl, queryParams)'
     ];
   }
 

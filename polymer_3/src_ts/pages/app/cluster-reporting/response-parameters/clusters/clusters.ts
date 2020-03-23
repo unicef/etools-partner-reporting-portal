@@ -110,7 +110,7 @@ class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   static get observers() {
     return [
       '_routeChanged(routeData.subpage)'
-    ]
+    ];
   }
 
   _routeChanged(subpage: string) {
@@ -124,17 +124,18 @@ class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _displayHeader(subpage: string) {
-    var requiresHeader = ['objectives', 'activities', 'disaggregations',
+    const requiresHeader = ['objectives', 'activities', 'disaggregations',
       'response-plans'];
     return this._displayClusterHeader(subpage, requiresHeader);
   }
 
   _resetPage(e: CustomEvent) {
-    var isSelected = false;
-    var queryParams = {};
+    let isSelected = false;
+    const queryParams: GenericObject = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');
+      // eslint-disable-next-line no-empty
     } catch (err) {}
 
     if (isSelected) {

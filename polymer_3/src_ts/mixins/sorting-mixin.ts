@@ -18,7 +18,7 @@ function SortingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._sortOrderDebouncer = Debouncer.debounce(this._sortOrderDebouncer,
         timeOut.after(100),
         () => {
-          const newParams = Object.assign({}, self.queryParams, {
+          const newParams = Object.assign({}, (self as any).queryParams, {
             sort: data.field + '.' + data.direction
           });
 

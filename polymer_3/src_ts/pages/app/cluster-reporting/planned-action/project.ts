@@ -183,12 +183,11 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
+        (self as any).updatePending = false;
         self.projectData = res.data;
       })
-      .catch((err: GenericObject) => {
-        self.updatePending = false;
-        console.error(err);
+      .catch((_err: GenericObject) => {
+        (self as any).updatePending = false;
         // TODO: error handling
       });
   }

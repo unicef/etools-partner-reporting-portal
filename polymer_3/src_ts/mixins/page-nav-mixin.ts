@@ -38,7 +38,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       super.connectedCallback();
 
       // Don't toggle submenus
-      const self = this;
+      const self: any = this;
       this.shadowRoot!.querySelectorAll('.menu-trigger').forEach((trigger: any) => {
         trigger.addEventListener('tap', function(e: CustomEvent) {
           if (self.subMenuOpened) {
