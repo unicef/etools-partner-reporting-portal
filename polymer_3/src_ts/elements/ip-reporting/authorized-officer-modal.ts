@@ -49,6 +49,12 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       .dialog-content {
         padding-bottom: 24px;
       }
+      .buttons {
+        justify-content: flex-start;
+      }
+      paper-dialog-scrollable {
+        margin-top: 0px;
+      }
     </style>
 
     <iron-location
@@ -63,7 +69,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog opened=[[opened]]>
+    <paper-dialog with-backdrop opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 
@@ -102,7 +108,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
               options="[[currentAuthorizedPartners]]"
               option-value="value"
               option-label="title"
-              required              
+              required
               selected="{{selectedFocalPoint}}"
               hide-search>
             </etools-dropdown>
@@ -182,7 +188,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res: any) {
+      .then(function(res: any) {
         const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
