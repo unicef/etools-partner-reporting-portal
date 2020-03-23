@@ -104,10 +104,10 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
               id: '',
               title: 'All'
             }].concat(res.data || []));
+          })
+          .catch((_err: GenericObject) => {
+            // TODO: error handling
           });
-        // .catch((err) => {
-        //   // TODO: error handling
-        // });
       });
   }
 

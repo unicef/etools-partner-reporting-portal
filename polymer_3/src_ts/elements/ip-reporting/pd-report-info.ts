@@ -266,12 +266,12 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
           )
         )
           // @ts-ignore
-          .then(function() {
+          .then(() => {
             self._notifyChangesSaved();
+          })
+          .catch((_err: GenericObject) => {
+            // TODO: error handling
           });
-          // .catch(function(err) {
-          //   // TODO: error handling
-          // });
       });
   }
 
@@ -279,8 +279,8 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     return computeUpdateUrl(locationId, reportId);
   }
 
-  _computeMode(mode: string, overrideMode: string, permissions: GenericObject) {
-    return computeMode(mode, overrideMode, permissions);
+  _computeMode(mode: string, overrideMode: string, report: any, permissions: GenericObject) {
+    return computeMode(mode, overrideMode, report, permissions);
   }
 
   connectedCallback() {

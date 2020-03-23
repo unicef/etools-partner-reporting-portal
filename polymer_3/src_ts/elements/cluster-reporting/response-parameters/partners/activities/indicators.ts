@@ -157,7 +157,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)));
       // @ts-ignore
       // .catch((err: GenericObject) => {
       //   // TODO: error handling.

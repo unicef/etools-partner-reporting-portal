@@ -88,8 +88,8 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
 
   public static get observers() {
     return [
-      '_indicatorsAjax(indicatorsUrl, queryParams)',
-    ]
+      '_indicatorsAjax(indicatorsUrl, queryParams)'
+    ];
   }
 
   _computeIndicatorsUrl(workspaceId: string) {
@@ -111,9 +111,9 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
 
         this.reduxStore.dispatch(fetchIndicators(indicatorsThunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
-          })
+          });
       });
   }
 

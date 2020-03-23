@@ -310,12 +310,12 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   progressBarType!: string;
 
 
-  _flagIndicator(target, baseline, isCustom: boolean) {
+  _flagIndicator(target: number, baseline: number, isCustom: boolean) {
     return !isCustom && (!target || !baseline);
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.dataset.modalType)!.open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).dataset.modalType)as any).open();
   }
 
   _computeIsClusterApp(appName: string) {

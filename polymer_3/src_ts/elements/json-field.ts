@@ -153,7 +153,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
   _onInput(e: CustomEvent) {
     const change: GenericObject = {};
 
-    change[e.target!.dataset.field] = e.target!.value;
+    change[(e.target as any).dataset.field] = (e.target as any)!.value;
 
     this.set('value', Object.assign({}, this.get('value'), change));
   }

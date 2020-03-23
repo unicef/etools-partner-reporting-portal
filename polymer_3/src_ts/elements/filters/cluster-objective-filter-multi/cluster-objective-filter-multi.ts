@@ -116,10 +116,9 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch((err: any) => {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
             self.set('pending', false);
-            console.error(err);
           });
       });
   }

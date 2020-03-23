@@ -177,14 +177,13 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
     const self = this;
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self.data = res.data;
       })
-      .catch((err: GenericObject) => {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
-        console.error(err);
       });
   }
 

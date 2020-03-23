@@ -509,9 +509,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         });
         self.set('partnerActivities', filteredActivities);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err) => {
+        // TODO: error handling
+      });
   }
 
   _fetchObjectives(clusterId: string) {
@@ -528,12 +528,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('objectives', res.data.results);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _save() {

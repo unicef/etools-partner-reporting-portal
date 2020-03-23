@@ -253,10 +253,10 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
         if (res.status === 200) {
           window.location.href = '/app_poly3/';
         }
+      })
+      .catch((_err: any) => {
+        // TODO: error handling
       });
-    // .catch((err: any) => {
-    //   // TODO: error handling
-    // });
   }
 
   submit() {

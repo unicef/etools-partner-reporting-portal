@@ -5,6 +5,7 @@ import './dropdown-form-input';
 import '../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import Endpoints from '../../endpoints';
+import {GenericObject} from '../../typings/globals.types';
 
 /**
  * @polymer
@@ -51,12 +52,12 @@ class ClusterLocationContent extends ReduxConnectedElement {
     const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
     (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
-      .then((res: any) => {
+      .then((res: GenericObject) => {
         self.set('locations', res.data);
+      })
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
       });
-    // .catch((err: any) => {
-    //   // TODO: error handling
-    // });
   }
 
   disconnectedCallback() {

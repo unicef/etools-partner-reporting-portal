@@ -99,14 +99,13 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
 
         (this.$.locations as EtoolsPrpAjaxEl).abort();
         (this.$.locations as EtoolsPrpAjaxEl).thunk()()
-          .then(function(res: any) {
+          .then((res: any) => {
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch((err: GenericObject) => {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
             self.set('pending', false);
-            console.error(err);
           });
 
       });

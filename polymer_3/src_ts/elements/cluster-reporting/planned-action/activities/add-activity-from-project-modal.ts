@@ -755,9 +755,9 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
         }));
 
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _fetchObjectives(clusterId: string) {
@@ -777,9 +777,9 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _save() {
@@ -787,7 +787,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
     let thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     let valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
@@ -796,8 +796,8 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
     this.set('updatePending', true);
 
-    this.$.activity.body = Object.assign({
-      partner: this.projectData.partner_id,
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
+      partner: this.projectData.partner_id
     }, this.data[this.mode]);
     thunk()
       .then(function(res: any) {
@@ -815,9 +815,9 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
 
   _close(e: CustomEvent) {
     if (e === 'saved' ||
-      e.target!.nodeName === 'PAPER-DIALOG' ||
-      e.target!.nodeName === 'PAPER-BUTTON' ||
-      e.target!.nodeName === 'PAPER-ICON-BUTTON'
+      (e.target as any).nodeName === 'PAPER-DIALOG' ||
+      (e.target as any).nodeName === 'PAPER-BUTTON' ||
+      (e.target as any).nodeName === 'PAPER-ICON-BUTTON'
     ) {
       this.set('mode', '');
       this.set('data', {});

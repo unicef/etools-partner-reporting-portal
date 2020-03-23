@@ -5,6 +5,7 @@ import '../dropdown-filter/dropdown-filter-multi';
 import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from '../../../endpoints';
+import {GenericObject} from "../../../typings/globals.types";
 
 /**
  * @polymer
@@ -67,10 +68,10 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
     (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data.results);
+      })
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
       });
-    // .catch((err) => {
-    //   // TODO: error handling
-    // });
   }
 
   disconnectedCallback() {

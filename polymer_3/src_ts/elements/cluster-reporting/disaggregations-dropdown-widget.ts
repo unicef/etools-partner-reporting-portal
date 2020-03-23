@@ -14,7 +14,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
-import {PaperDropdownMenuElement} from "@polymer/paper-dropdown-menu/paper-dropdown-menu";
+import {PaperDropdownMenuElement} from '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 
 
 /**
@@ -23,8 +23,8 @@ import {PaperDropdownMenuElement} from "@polymer/paper-dropdown-menu/paper-dropd
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style include="iron-flex iron-flex-alignment">
@@ -180,7 +180,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   readonly: boolean = false;
 
 
-  static get observers(){
+  static get observers() {
     return ['_setCanAddMore(value.splices)'];
   }
 
@@ -191,17 +191,17 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   _add() {
     this.push('value', {
       name: '',
-      choices: [],
+      choices: []
     });
   }
 
   _remove(e: CustomEvent) {
-    let toRemove = +e.target!.index;
+    const toRemove = +(e.target as any).index;
     this.splice('value', toRemove, 1);
   }
 
   _setDisaggregation(e: CustomEvent, data: GenericObject) {
-    let index = +e.target!.index;
+    const index = +(e.target as any).index;
 
     let id: string;
     if (data.value) {
@@ -238,9 +238,9 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   validate() {
-    let self = this;
+    const self = this;
     this.set('invalid', false);
-    let allMenus = (this.shadowRoot!.querySelectorAll('.dis-menu') as PaperDropdownMenuElement);
+    const allMenus = (this.shadowRoot!.querySelectorAll('.dis-menu') as PaperDropdownMenuElement);
     allMenus.forEach((menu) => {
       menu.set('invalid', false);
     });
@@ -253,7 +253,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (allMenus.length < 2) {
       return;
     }
-    let chosen = allMenus.map((choice) => {
+    const chosen = allMenus.map((choice) => {
       return choice.value;
     });
 

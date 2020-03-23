@@ -100,10 +100,10 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
         }]).concat(res.data || []);
 
         self.set('data', data);
+      })
+      .catch((_err: any) => {
+        // TODO: error handling
       });
-    // .catch((err: any) => {
-    //   // TODO: error handling
-    // });
   }
 
   disconnectedCallback() {

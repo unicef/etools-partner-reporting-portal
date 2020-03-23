@@ -332,7 +332,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _computeLabelVisibility(app: string, indicatorType: string) {
-    if ((String(app) === String('ip-reporting')) && (String(indicatorType) === String('number'))) {
+    if (String(app) && String(indicatorType)) {
       return false;
     } else {return true;}
   }
@@ -423,7 +423,8 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
       });
   }
 
-  _initPercentageMap(map: any[]) {
+  // @ts-ignore
+  _initPercentageMap(localData: GenericObject, map: any[]) {
     if (!map.length) {
       return;
     }

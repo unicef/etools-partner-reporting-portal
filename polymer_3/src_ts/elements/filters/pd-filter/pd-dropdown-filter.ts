@@ -6,6 +6,7 @@ import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
+import {GenericObject} from "../../../typings/globals.types";
 
 /**
  * @polymer
@@ -67,10 +68,10 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data.results);
+      })
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
       });
-    // .catch((err) => {
-    //   // TODO: error handling
-    // });
   }
 
   disconnectedCallback() {

@@ -102,10 +102,10 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
               id: '',
               title: 'All'
             }].concat(res.data || []));
+          })
+          .catch((_err: GenericObject) => {
+            // TODO: error handling
           });
-        // .catch((err: any) => {
-        //   // TODO: error handling
-        // });
       });
   }
 

@@ -172,14 +172,13 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         const self = this;
 
         thunk()
-          .then(function(res: any) {
+          .then((res: GenericObject) => {
             self.updatePending = false;
             self.projectData = res.data;
           })
-          .catch((err: any) => {
+          .catch((_err: GenericObject) => {
             self.updatePending = false;
-            //   // TODO: error handling
-            console.error(err);
+            // TODO: error handling
           });
       });
   }

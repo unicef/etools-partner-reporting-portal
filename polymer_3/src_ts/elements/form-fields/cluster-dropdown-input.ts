@@ -6,6 +6,7 @@ import {DropdownFormInputEl} from './dropdown-form-input';
 import '../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import Endpoints from '../../endpoints';
+import {GenericObject} from "../../typings/globals.types";
 
 /**
  * @polymer
@@ -82,12 +83,12 @@ class ClusterDropdownInput extends ReduxConnectedElement {
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
-      .then((res: any) => {
+      .then((res: GenericObject) => {
         self.set('data', res.data);
+      })
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
       });
-    // .catch((err: any) => {
-    //   // TODO: error handling
-    // });
   }
 
   _computeInvalid(required: boolean, value?: number) {

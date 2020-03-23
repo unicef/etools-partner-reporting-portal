@@ -196,10 +196,9 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
         fireEvent(self, 'activity-edited', res.data);
         self.close();
       })
-      .catch((err: GenericObject) => {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
-        console.error(err)
       });
   }
 }

@@ -412,15 +412,15 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
       )
     )
       // @ts-ignore
-      .then(function () {
+      .then(() => {
         self._notifyChangesSaved();
       })
-      // .catch(function (err: GenericObject) {
-      //   //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        //   // TODO: error handling
+      });
   }
 
-  _computeMode(mode: string, overrideMode: string, permissions: GenericObject) {
+  _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
     return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }
 

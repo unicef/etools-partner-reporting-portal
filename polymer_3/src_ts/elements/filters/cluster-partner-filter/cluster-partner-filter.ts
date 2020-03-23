@@ -5,6 +5,7 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import Endpoints from '../../../endpoints';
+import {GenericObject} from "../../../typings/globals.types";
 
 
 /**
@@ -64,10 +65,10 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
           id: '',
           title: 'All'
         }].concat(res.data || []));
+      })
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
       });
-    // .catch((err: any) => {
-    //   // TODO: error handling
-    // });
   }
 
   disconnectedCallback() {

@@ -57,7 +57,8 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
     ];
   }
 
-  _handleChange(detail: any) {
+  // @ts-ignore
+  _handleChange(e: CustomEvent, detail: any) {
     if (detail.selectedItems) {
       const newValue = detail.selectedItems.map((item: any) => item['id']).join(',');
       if (newValue !== this.value) {

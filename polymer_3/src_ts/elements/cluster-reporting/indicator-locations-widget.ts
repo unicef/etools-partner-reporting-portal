@@ -636,7 +636,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
       });
     } else {
-      lockedItems.forEach((index) => {
+      lockedItems.forEach((location, index) => {
         newLocations[index] = {0: []};
       });
     }

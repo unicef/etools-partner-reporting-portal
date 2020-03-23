@@ -211,9 +211,8 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
         });
         self.activityData = res.data;
       })
-      .catch((err: GenericObject) => {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
-        console.error(err);
         // TODO: error handling
       });
   }

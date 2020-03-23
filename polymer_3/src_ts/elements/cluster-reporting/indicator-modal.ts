@@ -1121,7 +1121,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('data', newData);
   }
 
-  _setFrequency(data: GenericObject) {
+  _setFrequency(e: CustomEvent, data: GenericObject) {
     let freq = (this.shadowRoot!.querySelector('#frequencies') as DomRepeat).itemForElement(data.value);
     if (!freq) {
       return;
@@ -1265,9 +1265,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       .then((res: GenericObject) => {
         self.set('activities', res.data.results);
       })
-      // .catch((err: GenericObject) => {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _fetchActivityIndicatorsList(selectedId: string) {
@@ -1327,9 +1327,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('objectives', res.data.results);
             fireEvent(self, 'details-loaded');
           })
-          // .catch((err: GenericObject) => {
-          //   // TODO: error handling
-          // });
+          .catch((_err: GenericObject) => {
+            // TODO: error handling
+          });
       });
   }
 
@@ -1363,9 +1363,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('indicators', simpleIndicatorsList);
             fireEvent(self, 'details-loaded');
           })
-          // .catch((err: GenericObject) => {
-          //   // TODO: error handling
-          // });
+          .catch((_err: GenericObject) => {
+            // TODO: error handling
+          });
       });
   }
 

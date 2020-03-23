@@ -153,10 +153,10 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId));
-      // .catch((err: GenericObject) => {
-      //   // TODO: error handling.
-      // });
+    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
+      .catch((_err: GenericObject) => {
+        // TODO: error handling.
+      });
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {

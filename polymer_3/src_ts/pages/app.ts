@@ -181,8 +181,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return [
       '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
       '_routeAppChanged(routeData.app)',
-      '_handleWorkspaceChange(currentWorkspace, workspaces)',
-    ]
+      '_handleWorkspaceChange(currentWorkspace, workspaces)'
+    ];
   }
 
   _redirectToWorkspace(workspace: GenericObject) {
@@ -290,7 +290,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    let currentWorkspaceData = workspaces.filter(function(workspace) {
+    const currentWorkspaceData = workspaces.filter(function(workspace) {
       return workspace.code === currentWorkspace;
     })[0];
 
@@ -336,11 +336,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
     await Promise.all([
       this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
-      this._fetchProfile(),
+      this._fetchProfile()
     ])
-      .catch((err: any) => {
+      .catch((_err: GenericObject) => {
         window.location.href = '/landing';
-        console.error(err);
       });
   }
 

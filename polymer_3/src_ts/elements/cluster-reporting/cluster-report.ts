@@ -645,12 +645,12 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       ClusterIndicatorReportsUpdate(updateThunk, this.data.id)
     )
       // @ts-ignore
-      .then(function() {
+      .then(() => {
         self._notifyChangesSaved();
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _computeExportParams(queryParams: any, data: GenericObject) {
@@ -660,32 +660,28 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _computeEditMode(mode: string, data: GenericObject, permissions: any) {
-    var canEdit;
-
     if (mode === 'view') {
       return mode;
     }
 
-    canEdit = permissions.editIndicatorReport(data);
+    const canEdit = permissions.editIndicatorReport(data);
 
     return canEdit ? mode : 'view';
   }
 
   _computeSubmitMode(mode: string, data: GenericObject, permissions: any) {
-    var canSubmit;
-
     if (mode === 'view') {
       return mode;
     }
 
-    canSubmit = permissions.submitIndicatorReport(data);
+    const canSubmit = permissions.submitIndicatorReport(data);
 
     return canSubmit ? mode : 'view';
   }
 
   _computeCanSendBack(data: GenericObject, permissions: any) {
-    return (data.report_status === 'Sub' || data.report_status === 'Acc')
-      && permissions.sendBackIndicatorReport;
+    return (data.report_status === 'Sub' || data.report_status === 'Acc') &&
+      permissions.sendBackIndicatorReport;
   }
 
   _computeShowFeedback(data: GenericObject, permissions: any) {
