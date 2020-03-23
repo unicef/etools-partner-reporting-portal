@@ -37,14 +37,13 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
     <paper-input
         id="field"
         value="[[value]]"
-        allowed-pattern="^\d*\.?\d*$"
+        allowed-pattern="^\\d*\\.?\\d*$"
         invalid="{{invalid}}"
         validator="[[validator]]"
         min="[[min]]"
         on-value-changed="_inputValueChanged"
         no-label-float
-        required
-        auto-validate>
+        required>
     </paper-input>
     `;
   }
@@ -68,11 +67,6 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
   invalid!: boolean;
 
 
-  ready() {
-    super.ready();
-    (this.$.field as PaperInputElement).validate();
-  }
-
   connectedCallback() {
     super.connectedCallback();
 
@@ -91,7 +85,7 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
   _inputValueChanged(e: CustomEvent) {
     let change: GenericObject = {};
 
-    change[this.key] = e.target.value;
+    change[this.key] = (e.target as any).value;
 
     fireEvent(this, 'field-value-changed', {
       key: this.coords,
@@ -102,3 +96,5 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
 }
 
 window.customElements.define('disaggregation-field', DisaggregationField);
+
+export {DisaggregationField as DisaggregationFieldEl};
