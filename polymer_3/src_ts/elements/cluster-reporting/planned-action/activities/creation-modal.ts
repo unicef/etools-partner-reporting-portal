@@ -668,7 +668,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
   clusters!: any[];
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
@@ -720,11 +720,11 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     ];
   }
 
-  _computeLocalizedStatuses(localize: any) {
+  _computeLocalizedStatuses() {
     return [
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   }
 

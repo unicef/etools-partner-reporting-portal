@@ -41,22 +41,20 @@ class ClusterIndicatorTypeFilter extends LocalizeMixin(UtilsMixin(ReduxConnected
   @property({type: Array, computed: '_computeData(isPartner, options)'})
   data!: GenericObject[];
 
-  @property({type: Array, computed: '_computeLocalizedOptions(localize)'})
+  @property({type: Array, computed: '_computeLocalizedOptions(resources)'})
   options!: any;
 
   @property({type: String})
   value!: string;
 
-  _computeLocalizedOptions(localize: any) {
-    var options = [
-      {title: localize('all'), id: ''},
-      {title: localize('partner_activity'), id: 'partner_activity'},
-      {title: localize('partner_project'), id: 'partner_project'},
-      {title: localize('cluster_objective'), id: 'cluster_objective'},
-      {title: localize('cluster_activity'), id: 'cluster_activity'},
+  _computeLocalizedOptions() {
+    return [
+      {title: this.localize('all'), id: ''},
+      {title: this.localize('partner_activity'), id: 'partner_activity'},
+      {title: this.localize('partner_project'), id: 'partner_project'},
+      {title: this.localize('cluster_objective'), id: 'cluster_objective'},
+      {title: this.localize('cluster_activity'), id: 'cluster_activity'},
     ];
-
-    return options;
   }
 
   _computeData(isPartner: boolean, options: any) {

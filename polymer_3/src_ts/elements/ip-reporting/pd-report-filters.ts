@@ -66,17 +66,17 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, notify: true})
   filters!: GenericObject;
 
-  @property({type: Array, computed: '_localizeStatuses(localize)'})
+  @property({type: Array, computed: '_localizeStatuses(resources)'})
   statuses!: any[];
 
-  _localizeStatuses(localize: Function) {
+  _localizeStatuses() {
     return [
-      {title: localize('overdue'), id: 'Ove'},
-      {title: localize('sent_back'), id: 'Sen'},
-      {title: localize('due'), id: 'Due'},
-      {title: localize('all'), id: ''},
-      {title: localize('submitted'), id: 'Sub'},
-      {title: localize('accepted'), id: 'Acc'}
+      {title: this.localize('overdue'), id: 'Ove'},
+      {title: this.localize('sent_back'), id: 'Sen'},
+      {title: this.localize('due'), id: 'Due'},
+      {title: this.localize('all'), id: ''},
+      {title: this.localize('submitted'), id: 'Sub'},
+      {title: this.localize('accepted'), id: 'Acc'}
     ];
   }
 
