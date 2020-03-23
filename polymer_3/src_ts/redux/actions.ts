@@ -5,7 +5,7 @@ import {GenericObject} from '../typings/globals.types';
 export const setL11NResources = function(resources: GenericObject) {
   return {
     type: Constants.SET_L11N_RESOURCES,
-    resources: resources,
+    resources: resources
   };
 };
 
@@ -21,19 +21,19 @@ export const setLanguage = function(language: string) {
 export const setToken = function(token: string) {
   return {
     type: Constants.SET_TOKEN,
-    token: token,
+    token: token
   };
 };
 
 export const resetToken = function() {
   return {
-    type: Constants.RESET_TOKEN,
+    type: Constants.RESET_TOKEN
   };
 };
 
 export const userLogin = function() {
   return {
-    type: Constants.USER_LOGIN,
+    type: Constants.USER_LOGIN
   };
 };
 
@@ -43,6 +43,28 @@ export const userLogout = function(logoutThunk: any) {
       .then(function() {
         dispatch(resetToken());
       });
+  };
+};
+
+export const setUserProfile = function(data: any) {
+  return {
+    type: Constants.SET_USER_PROFILE,
+    data: data
+  };
+};
+
+export const setAccountType = function(data: Record<string, any>) {
+  return {
+    type: Constants.SET_ACCOUNT_TYPE,
+    data: data
+  };
+};
+
+// Partner data
+export const setPartner = function(partnerData: any) {
+  return {
+    type: Constants.SET_PARTNER,
+    partnerData: partnerData
   };
 };
 
@@ -57,17 +79,10 @@ export const fetchUserProfile = function(profileThunk: any) {
   };
 };
 
-export const setUserProfile = function(data: any) {
+export const setWorkspaces = function(workspaces: any) {
   return {
-    type: Constants.SET_USER_PROFILE,
-    data: data,
-  };
-};
-
-export const setAccountType = function(data: Object) {
-  return {
-    type: Constants.SET_ACCOUNT_TYPE,
-    data: data,
+    type: Constants.SET_WORKSPACES,
+    workspaces: workspaces
   };
 };
 
@@ -76,7 +91,7 @@ export const fetchWorkspaces = function(interventionsThunk: any) {
   return function(dispatch: any) {
     return interventionsThunk()
       .then(function(res: any) {
-        let workspaces = (res.data || [])
+        const workspaces = (res.data || [])
           .map(function(workspace: any) {
             return {
               id: workspace.id,
@@ -95,14 +110,14 @@ export const fetchWorkspaces = function(interventionsThunk: any) {
 export const setWorkspace = function(newWorkspace: any) {
   return {
     type: Constants.SET_WORKSPACE,
-    workspace: newWorkspace,
+    workspace: newWorkspace
   };
 };
 
-export const setWorkspaces = function(workspaces: any) {
+export const setResponsePlans = function(plans: any) {
   return {
-    type: Constants.SET_WORKSPACES,
-    workspaces: workspaces,
+    type: Constants.SET_RESPONSE_PLANS,
+    plans: plans
   };
 };
 
@@ -116,46 +131,38 @@ export const fetchResponsePlans = function(responsePlansThunk: any) {
   };
 };
 
-export const setResponsePlans = function(plans: any) {
-  return {
-    type: Constants.SET_RESPONSE_PLANS,
-    plans: plans
-  };
-};
-
 export const setCurrentResponsePlanID = function(newPlanID: any) {
   return {
     type: Constants.SET_CURRENT_RESPONSE_PLAN_ID,
-    planID: newPlanID,
+    planID: newPlanID
   };
 };
 
 export const setCurrentResponsePlan = function(newPlan: any) {
   return {
     type: Constants.SET_CURRENT_RESPONSE_PLAN,
-    plan: newPlan,
+    plan: newPlan
   };
 };
 
 export const addResponsePlan = function(newPlan: any) {
   return {
     type: Constants.ADD_RESPONSE_PLAN,
-    plan: newPlan,
+    plan: newPlan
   };
 };
 
 export const setApp = function(app: any) {
   return {
     type: Constants.SET_APP,
-    app: app,
+    app: app
   };
 };
 
-// Partner data
-export const setPartner = function(partnerData: any) {
+export const setProgrammeDocuments = function(data: any) {
   return {
-    type: Constants.SET_PARTNER,
-    partnerData: partnerData,
+    type: Constants.SET_PROGRAMME_DOCUMENTS,
+    data: data
   };
 };
 
@@ -164,17 +171,17 @@ export const fetchProgrammeDocuments = function(pdThunk: any) {
   return function(dispatch: any) {
     return pdThunk()
       .then(function(res: any) {
-        let pdData = res.data;
+        const pdData = res.data;
 
         dispatch(setProgrammeDocuments(pdData));
       });
   };
 };
 
-export const setProgrammeDocuments = function(data: any) {
+export const setProgrammeDocumentDetails = function(pdDetailsData: GenericObject) {
   return {
-    type: Constants.SET_PROGRAMME_DOCUMENTS,
-    data: data,
+    type: Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
+    pdDetailsData: pdDetailsData
   };
 };
 
@@ -182,22 +189,15 @@ export const fetchProgrammeDocumentDetails = function(pdDetailsThunk: any) {
   return function(dispatch: any) {
     return pdDetailsThunk()
       .then(function(res: any) {
-        let pdDetailsData = res.data;
+        const pdDetailsData = res.data;
         dispatch(setProgrammeDocumentDetails(pdDetailsData));
       });
-  };
-};
-
-export const setProgrammeDocumentDetails = function(pdDetailsData) {
-  return {
-    type: Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
-    pdDetailsData: pdDetailsData,
   };
 };
 
 // Master reset
 export const reset = function() {
   return {
-    type: Constants.RESET,
+    type: Constants.RESET
   };
 };

@@ -271,7 +271,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
 
 
   _determineIfChecked(selected: number, id: number) {
-    if (id === this.selected) {
+    if (id === selected) {
       return true;
     }
     return false;
@@ -284,22 +284,22 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   on-tap and change events target different elements in Chrome than in Safari and FF.
   */
 
-  //Gets correct target element when using Chrome.
+  // Gets correct target element when using Chrome.
   _handleRadioButtonChange(e: CustomEvent) {
-    var target = e.target;
-    if (e.target.id === 'onRadio' || e.target.id === 'offRadio') {
-      target = e.target.parentNode.parentNode;
+    let target = e.target;
+    if (e.target!.id === 'onRadio' || e.target!.id === 'offRadio') {
+      target = e.target!.parentNode.parentNode;
     }
 
-    if (target.checked) {
-      this.selected = target.name;
+    if (target!.checked) {
+      this.selected = target!.name;
     } else {
       this.selected = null;
     }
   }
 
   _redirectToPlan(planId: string) {
-    var newPath = this.buildUrl(this._baseUrl, '/plan/' + planId + '/');
+    const newPath = this.buildUrl(this._baseUrl, '/plan/' + planId + '/');
 
     this.set('queryParams', {});
     this.set('path', newPath);
@@ -314,6 +314,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   }
 
   _confirm() {
+    // @ts-ignore
     this._redirectToPlan(this.selected);
   }
 
@@ -321,6 +322,5 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
     return plan.plan_type === 'OTHER' ? plan.plan_custom_type_label : plan.plan_type;
   }
 }
-
 
 window.customElements.define('page-cluster-reporting-select-plan', PageClusterReportingSelectPlan);

@@ -652,7 +652,7 @@ class AddActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(Re
   }
 
   _remove(e: CustomEvent) {
-    const currentIndex = +e.target.dataset.index;
+    const currentIndex = (+e.target! as any).dataset.index;
 
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);

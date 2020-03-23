@@ -30,7 +30,7 @@ function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
         timeOut.after(100),
         () => {
-          this.$.dialog.refit();
+          (this.$.dialog as any).refit();
         });
     }
 

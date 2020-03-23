@@ -17,7 +17,7 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       const self = this;
       setTimeout(function() {
         self.shadowRoot!.querySelectorAll('paper-submenu').forEach((submenu: any) => {
-          let isSelected = !!self.shadowRoot.querySelector('[name="' + selected + '"]');
+          const isSelected = !!self.shadowRoot!.querySelector('[name="' + selected + '"]');
 
           switch (true) {
             case !submenu.opened && isSelected:

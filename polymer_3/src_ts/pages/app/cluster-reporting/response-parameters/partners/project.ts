@@ -19,6 +19,7 @@ import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
 
 /**
 * @polymer
@@ -129,7 +130,7 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   static get observers() {
     return [
       '_updateUrlTab(routeData.tab)'
-    ]
+    ];
   }
 
   private _projectAjaxDebouncer!: Debouncer;
@@ -143,7 +144,7 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -168,16 +169,17 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       timeOut.after(100),
       () => {
         const thunk = (this.$.project as EtoolsPrpAjaxEl).thunk();
-        let self = this;
+        const self = this;
 
         thunk()
           .then(function(res: any) {
             self.updatePending = false;
             self.projectData = res.data;
           })
-          .catch(function(err: any) {
+          .catch((err: any) => {
             self.updatePending = false;
             //   // TODO: error handling
+            console.error(err);
           });
       });
   }

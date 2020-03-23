@@ -82,16 +82,16 @@ class ClusterDropdownInput extends ReduxConnectedElement {
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', res.data);
-      })
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
-  _computeInvalid(required: Boolean, value?: Number) {
-    return this.required && !value;
+  _computeInvalid(required: boolean, value?: number) {
+    return required && !value;
   }
 
   validate() {

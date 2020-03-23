@@ -7,14 +7,14 @@ export class DisaggregationsState {
 }
 
 export const Disaggregations = combineReducers({
-  byIndicator: disaggregationsByIndicatorReducer,
+  byIndicator: disaggregationsByIndicatorReducer
 });
 
 function disaggregationsByIndicatorReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_DISAGGREGATIONS:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.indicatorId] = action.data;
 
@@ -22,34 +22,35 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
       }());
 
     case Constants.SET_DISAGGREGATIONS_FOR_LOCATION:
-      return (function () {
-        let newState = Object.assign({}, state);
+      return (function() {
+        const newState: GenericObject = Object.assign({}, state);
         let locations;
         let index;
 
         try {
           locations = newState[action.indicatorId].indicator_location_data;
 
-          index = locations.findIndex(function (item: any) {
+          index = locations.findIndex(function(item: any) {
             return item.location.id === action.locationId;
           });
 
           locations[index] = Object.assign(locations[index], action.data);
+          // eslint-disable-next-line no-empty
         } catch (err) {}
 
         return newState;
       }());
 
     case Constants.SET_PROGRESS_FOR_LOCATION:
-      return (function () {
-        let newState = Object.assign({}, state);
+      return (function() {
+        const newState: GenericObject = Object.assign({}, state);
         let locations;
         let index;
 
         try {
           locations = newState[action.indicatorId].indicator_location_data;
 
-          index = locations.findIndex(function (item) {
+          index = locations.findIndex(function(item: GenericObject) {
             return item.location.id === action.locationId;
           });
 

@@ -50,22 +50,22 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       'font-size: 1.15em;',
       'line-height: 1;',
       'color: #fff;',
-      '}',
+      '}'
     ].join('\n');
 
     @property({type: Object})
     _baseOptions = {
       bar: {
-        groupWidth: 20,
+        groupWidth: 20
       },
       chartArea: {
-        top: 0,
+        top: 0
       },
       legend: 'none',
       tooltip: {
         isHtml: true,
-        ignoreBounds: true,
-      },
+        ignoreBounds: true
+      }
     }
 
     @property({type: Object, computed: '_computeOptions(rows)'})
@@ -79,7 +79,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         numeral(data.length).format(Constants.FORMAT_NUMBER_DEFAULT),
         '</div>',
         '<div>' + this._joinWithComma(data) + '</div>',
-        '</div>',
+        '</div>'
       ].join('\n');
     }
 
@@ -91,11 +91,11 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     }
 
     _computeRows(data: GenericObject[]) {
-      return Object.keys(data).map(function(key) {
+      return Object.keys(data).map((key) => {
         return [
           key,
           data[key].length,
-          this._buildTooltipContent(key, data[key]),
+          this._buildTooltipContent(key, data[key])
         ];
       }, this);
     }

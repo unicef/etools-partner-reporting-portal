@@ -206,7 +206,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _toggle(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#collapse-' + e.target.toggles).toggle();
+    this.shadowRoot!.querySelector('#collapse-' (+ e.target! as any).toggles).toggle();
   }
 
   _computeObjectiveTitle(data: GenericObject) {

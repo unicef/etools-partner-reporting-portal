@@ -4,6 +4,7 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-repeat';
+import {PaperDropdownMenuElement} from "@polymer/paper-dropdown-menu/paper-dropdown-menu";
 
 /**
  * @polymer
@@ -56,7 +57,7 @@ class DropdownFormInput extends PolymerElement {
   disabled!: string;
 
   validate() {
-    return this.$.field.validate();
+    return (this.$.field as any).validate();
   }
 
   _getValue(e: CustomEvent) {

@@ -305,9 +305,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const options = e.detail;
     try {
       if (options.text) {
-        this.$[options.type].text = options.text;
+        (this.$[options.type] as any).text = options.text;
       }
-      this.$[options.type].open();
+      (this.$[options.type] as any).open();
+      // eslint-disable-next-line no-empty
     } catch (err) {}
   }
 
@@ -337,8 +338,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
       this._fetchProfile(),
     ])
-      .catch(function(err: any) {
+      .catch((err: any) => {
         window.location.href = '/landing';
+        console.error(err);
       });
   }
 

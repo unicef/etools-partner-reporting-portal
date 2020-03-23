@@ -20,6 +20,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {fetchPartnerActivitiesList} from '../../../../redux/actions/partnerActivities';
+import {PlannedActionActivityModalEl} from '../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 
 /**
  * @polymer
@@ -85,7 +86,7 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
 
   static get observers() {
     return [
-      '_activitiesAjax(queryParams, url)',
+      '_activitiesAjax(queryParams, url)'
     ];
   }
 
@@ -110,12 +111,12 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
   activitiesDebouncer!: Debouncer;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionActivityModalEl).open();
   }
 
   _onSuccess(e: CustomEvent) {
-    var path = '/planned-action/activity/' + String(e.detail.id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/planned-action/activity/' + String(e.detail.id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -145,11 +146,11 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
 
         (self.$.plannedActionsActivities as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(fetchPartnerActivitiesList(dataThunk))
-          // @ts-ignore
-          .catch(function(err) {
-            // TODO: error handling
-          });
+        self.reduxStore.dispatch(fetchPartnerActivitiesList(dataThunk));
+        // @ts-ignore
+        // .catch((err: GenericObject) => {
+        //   // TODO: error handling
+        // });
       });
   }
 

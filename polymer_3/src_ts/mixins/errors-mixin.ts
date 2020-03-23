@@ -24,7 +24,7 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
             // (dci)
             this.reduxStore.dispatch(userLogout())
               // @ts-ignore
-              .then(function() {
+              .then(() => {
                 location.pathname = '/landing';
               });
             break;
@@ -32,6 +32,7 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
           default:
             break;
         }
+        // eslint-disable-next-line no-empty
       } catch (err) {}
     }
 

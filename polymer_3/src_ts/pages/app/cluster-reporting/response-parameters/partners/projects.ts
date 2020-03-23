@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property, query} from '@polymer/decorators';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';

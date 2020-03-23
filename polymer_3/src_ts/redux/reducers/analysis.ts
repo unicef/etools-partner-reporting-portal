@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import Constants from '../../constants';
+import {GenericObject} from '../../typings/globals.types';
 
 export class AnalysisState {
   operationalPresence = {
@@ -7,9 +8,9 @@ export class AnalysisState {
     dataLoading: false,
     map: {
       type: 'FeatureCollection',
-      features: [],
+      features: []
     },
-    mapLoading: false,
+    mapLoading: false
   };
 
   indicators = {
@@ -17,8 +18,8 @@ export class AnalysisState {
     dataLoading: false,
     indicatorData: {
       byId: {},
-      loadingById: {},
-    },
+      loadingById: {}
+    }
   }
 }
 
@@ -27,7 +28,7 @@ export const Analysis = combineReducers({
     data: operationalPresenceDataReducer,
     dataLoading: operationalPresenceDataLoadingReducer,
     map: operationalPresenceMapReducer,
-    mapLoading: operationalPresenceMapLoadingReducer,
+    mapLoading: operationalPresenceMapLoadingReducer
   }),
 
   indicators: combineReducers({
@@ -35,9 +36,9 @@ export const Analysis = combineReducers({
     dataLoading: indicatorsDataLoadingReducer,
     indicatorData: combineReducers({
       byId: indicatorDataByIdReducer,
-      loadingById: indicatorDataLoadingByIdReducer,
-    }),
-  }),
+      loadingById: indicatorDataLoadingByIdReducer
+    })
+  })
 });
 
 function operationalPresenceDataReducer(state = {}, action: any) {
@@ -64,11 +65,11 @@ function operationalPresenceDataLoadingReducer(state = false, action: any) {
   }
 }
 
-function operationalPresenceMapReducer(state: {type: string, features: []}, action: any) {
+function operationalPresenceMapReducer(state: {type: string; features: []}, action: any) {
   if (typeof state === 'undefined') {
     state = {
       type: 'FeatureCollection',
-      features: [],
+      features: []
     };
   }
 
@@ -120,8 +121,8 @@ function indicatorsDataLoadingReducer(state = false, action: any) {
 function indicatorDataByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ANALYSIS_INDICATOR_DATA:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.indicatorId] = action.data;
 
@@ -136,8 +137,8 @@ function indicatorDataByIdReducer(state = {}, action: any) {
 function indicatorDataLoadingByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_START:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.indicatorId] = true;
 
@@ -145,8 +146,8 @@ function indicatorDataLoadingByIdReducer(state = {}, action: any) {
       }());
 
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_STOP:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.indicatorId] = false;
 

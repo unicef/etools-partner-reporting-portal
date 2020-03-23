@@ -19,7 +19,7 @@ function SortingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         timeOut.after(100),
         () => {
           const newParams = Object.assign({}, self.queryParams, {
-            sort: data.field + '.' + data.direction,
+            sort: data.field + '.' + data.direction
           });
 
           e.stopPropagation();

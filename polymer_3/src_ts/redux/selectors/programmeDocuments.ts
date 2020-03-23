@@ -1,5 +1,6 @@
 import {RootState} from '../../typings/redux.types';
 import {createSelector} from 'reselect';
+import {GenericObject} from '../../typings/globals.types';
 
 function getAllPD(state: RootState) {
   return state.programmeDocuments.all;
@@ -10,7 +11,7 @@ function getCurrentPDId(state: RootState) {
 }
 
 function getCurrentPD(pds: [], currentPdId: number) {
-  return pds.filter(function(pd) {
+  return pds.filter(function(pd: GenericObject) {
     return pd.id === currentPdId;
   })[0] || {};
 }
@@ -36,7 +37,7 @@ export const programmeDocuments_CurrentAuthorizedPartners = createSelector(
       return officer.is_authorized_officer;
     }).map(function(focalPoint: any) {
       return {
-        value: focalPoint.email, title: focalPoint.name + ' ' + focalPoint.title,
+        value: focalPoint.email, title: focalPoint.name + ' ' + focalPoint.title
       };
     });
   }

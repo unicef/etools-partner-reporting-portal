@@ -1,6 +1,32 @@
-import Constants from "../../constants";
+import Constants from '../../constants';
 
-//Actions.ClusterIndicatorReports
+const set = function(data: any) {
+  return {
+    type: Constants.SET_CLUSTER_INDICATOR_REPORTS,
+    data: data
+  };
+};
+
+const loadingStart = function() {
+  return {
+    type: Constants.CLUSTER_INDICATOR_REPORTS_LOADING_START
+  };
+};
+
+const setCount = function(count: number) {
+  return {
+    type: Constants.SET_CLUSTER_INDICATOR_REPORTS_COUNT,
+    count: count
+  };
+};
+
+const loadingStop = function() {
+  return {
+    type: Constants.CLUSTER_INDICATOR_REPORTS_LOADING_STOP
+  };
+};
+
+// Actions.ClusterIndicatorReports
 
 export const clusterIndicatorReportsFetch = function(reportsThunk: any, reset?: boolean) {
   return function(dispatch: any) {
@@ -22,7 +48,15 @@ export const clusterIndicatorReportsFetch = function(reportsThunk: any, reset?: 
         return Promise.reject(err);
       });
   };
-}
+};
+
+export const clusterIndicatorReportsUpdateSingle = function(reportId: string, data: any) {
+  return {
+    type: Constants.UPDATE_CLUSTER_INDICATOR_REPORT,
+    reportId: reportId,
+    data: data
+  };
+};
 
 export const clusterIndicatorReportsFetchSingle = function(reportThunk: any, reportId: any) {
   return function(dispatch: any) {
@@ -36,39 +70,13 @@ export const clusterIndicatorReportsFetchSingle = function(reportThunk: any, rep
         );
       });
   };
-}
-
-const set = function(data: any) {
-  return {
-    type: Constants.SET_CLUSTER_INDICATOR_REPORTS,
-    data: data,
-  };
-}
-
-const setCount = function(count: number) {
-  return {
-    type: Constants.SET_CLUSTER_INDICATOR_REPORTS_COUNT,
-    count: count,
-  };
-}
-
-const loadingStart = function() {
-  return {
-    type: Constants.CLUSTER_INDICATOR_REPORTS_LOADING_START,
-  };
-}
-
-const loadingStop = function() {
-  return {
-    type: Constants.CLUSTER_INDICATOR_REPORTS_LOADING_STOP,
-  };
-}
+};
 
 export const clusterIndicatorReportsSubmit = function(submitThunk: any) {
   return function(dispatch: any) {
     return submitThunk();
   };
-}
+};
 
 export const ClusterIndicatorReportsUpdate = function(updateThunk: any, reportId: any) {
   return function(dispatch: any) {
@@ -80,12 +88,4 @@ export const ClusterIndicatorReportsUpdate = function(updateThunk: any, reportId
         ));
       });
   };
-}
-
-export const clusterIndicatorReportsUpdateSingle = function(reportId: string, data: any) {
-  return {
-    type: Constants.UPDATE_CLUSTER_INDICATOR_REPORT,
-    reportId: reportId,
-    data: data,
-  };
-}
+};

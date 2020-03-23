@@ -162,8 +162,8 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
   static get observers() {
     return [
-      '_updateData(localData.*)',
-    ]
+      '_updateData(localData.*)'
+    ];
   }
 
   _reportInfoCurrent(rootState: RootState) {
@@ -199,7 +199,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         self.reduxStore.dispatch(pdReportsUpdate(updateThunk,
           this.pdId,
           this.reportId)
-        )
+        );
       });
   }
 

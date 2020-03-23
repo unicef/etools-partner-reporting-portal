@@ -18,11 +18,11 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     Ended: 'ended',
     Closed: 'closed',
     Terminated: 'terminated',
-    All: 'all',
+    All: 'all'
   };
 
   const buildQuery = (chunks: any[]): string => {
-    return chunks.map(function(chunk) {
+    return chunks.map((chunk) => {
       switch (typeof chunk) {
         case 'string':
           return chunk;
@@ -31,12 +31,12 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
           return buildQuery(Object.keys(chunk).map(function(key) {
             return [
               encodeURIComponent(key),
-              encodeURIComponent(chunk[key]),
+              encodeURIComponent(chunk[key])
             ].join('=');
           }));
       }
     }).join('&');
-  }
+  };
 
   class UtilsClass extends baseClass {
 
@@ -138,7 +138,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _deferred() {
-      let defer: GenericObject = {};
+      const defer: GenericObject = {};
 
       defer.promise = new Promise(function(resolve, reject) {
         defer.resolve = resolve;
@@ -158,7 +158,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         return value;
       }
 
-      let _value = value.toFixed(2);
+      const _value = value.toFixed(2);
 
       switch (indicatorType) {
         case 'percentage':
@@ -188,7 +188,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _commaSeparatedDictValues(items: any, key: string) {
-      let newList = (items || []).map(function(item: any) {
+      const newList = (items || []).map(function(item: any) {
         return item[key];
       });
 
@@ -211,7 +211,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _fieldsAreValid() {
       let valid = true;
-      let fields = this.shadowRoot!.querySelectorAll('.validate');
+      const fields = this.shadowRoot!.querySelectorAll('.validate');
 
       fields.forEach(function(field: any) {
         field.validate();
@@ -226,10 +226,10 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _dateRangeValid(start: any, end: any) {
-      let startField = this.shadowRoot!.querySelector(start);
-      let endField = this.shadowRoot!.querySelector(end);
-      let startValue = startField.value;
-      let endValue = endField.value;
+      const startField = this.shadowRoot!.querySelector(start);
+      const endField = this.shadowRoot!.querySelector(end);
+      const startValue = startField.value;
+      const endValue = endField.value;
 
       if (!Date.parse(startValue) || !Date.parse(endValue)) {
         if (startField.required) {
@@ -259,7 +259,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _withDefaultParams(queryParams: any) {
       return Object.assign({}, queryParams, {
         page: 1,
-        page_size: 10,
+        page_size: 10
       });
     }
 
@@ -272,11 +272,13 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _cloneNode(node: any) {
-      let newNode = node.cloneNode(true);
+      const newNode = node.cloneNode(true);
 
-      for (let prop in node.properties) {
+      // eslint-disable-next-line guard-for-in
+      for (const prop in node.properties) {
         try {
           newNode[prop] = node[prop];
+          // eslint-disable-next-line no-empty
         } catch (err) {}
       }
 
@@ -292,7 +294,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _cancelDebouncers(debouncers: Debouncer[]) {
-      debouncers.forEach(debouncer => {
+      debouncers.forEach((debouncer) => {
         if (debouncer && debouncer.isActive && debouncer.isActive()) {
           debouncer.cancel();
         }
@@ -305,10 +307,10 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _omit(src: any, keys: string[]) {
       return Object.keys(src)
-        .filter(function(key) {
+        .filter((key) => {
           return keys.indexOf(key) === -1;
         })
-        .reduce(function(acc, key) {
+        .reduce((acc, key) => {
           acc[key] = src[key];
 
           return acc;

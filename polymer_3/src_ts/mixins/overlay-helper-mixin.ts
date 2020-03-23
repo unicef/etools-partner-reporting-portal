@@ -30,7 +30,7 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       if (dialogOverlay.parentElement) {
         dialogOverlay.parentElement.removeChild(dialogOverlay);
       }
-      this.$.drawer.style.zIndex = '-1';
+      (this.$.drawer as any).zIndex = '-1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       if (!pageOverlay.classList.contains('opened')) {
         pageOverlay.style.zIndex = zIndex;
@@ -49,7 +49,7 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       // edge
       if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
 
-      this.$.drawer.style.zIndex = '1';
+      (this.$.drawer as any).style.zIndex = '1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
       pageOverlay.classList.remove('opened');

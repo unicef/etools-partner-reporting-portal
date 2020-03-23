@@ -19,6 +19,7 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
 
 /**
 * @polymer
@@ -144,7 +145,7 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   static get observers() {
     return [
       '_updateUrlTab(routeData.tab)'
-    ]
+    ];
   }
 
   _onSuccess() {
@@ -152,7 +153,7 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -180,9 +181,10 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
         self.updatePending = false;
         self.data = res.data;
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
+        console.error(err);
       });
   }
 

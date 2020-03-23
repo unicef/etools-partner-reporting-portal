@@ -67,8 +67,8 @@ function loadingPartnerProjectsReducer(state = false, action: any) {
 function activitiesByPartnerProjectIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
@@ -85,8 +85,8 @@ function activitiesByPartnerProjectIdReducer(state = {}, action: any) {
 function activitiesByPartnerProjectIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);
       }());
@@ -112,8 +112,8 @@ function activitiesByPartnerProjectIdLoadingReducer(state = false, action: any) 
 function indicatorsReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
@@ -130,8 +130,8 @@ function indicatorsReducer(state = {}, action: any) {
 function indicatorsCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);

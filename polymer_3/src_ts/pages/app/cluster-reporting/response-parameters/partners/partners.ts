@@ -15,7 +15,6 @@ import {sharedStyles} from '../../../../../styles/shared-styles';
 import '../../../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './router';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {Partner} from '../../../../../redux/reducers/partner';
 
 /**
 * @polymer
@@ -91,7 +90,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
   static get observers() {
     return [
       '_routeChanged(routeData.subpage)'
-    ]
+    ];
   }
 
   _routeChanged(subpage: string) {
@@ -111,10 +110,11 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
 
   _resetPage(e: CustomEvent) {
     let isSelected = false;
-    let queryParams = {};
+    const queryParams = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');
+      // eslint-disable-next-line no-empty
     } catch (err) {}
 
     if (isSelected) {

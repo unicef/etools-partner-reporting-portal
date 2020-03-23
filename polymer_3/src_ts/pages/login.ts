@@ -12,7 +12,7 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/iron-form/iron-form';
 
 import Endpoints from '../endpoints';
-import ResponsiveMixin from '../mixins/responsive-mixin'
+import ResponsiveMixin from '../mixins/responsive-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '../elements/etools-logo';
 import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
@@ -253,10 +253,10 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
         if (res.status === 200) {
           window.location.href = '/app_poly3/';
         }
-      })
-      .catch(function(err: any) {
-        // TODO: error handling
       });
+    // .catch((err: any) => {
+    //   // TODO: error handling
+    // });
   }
 
   submit() {
