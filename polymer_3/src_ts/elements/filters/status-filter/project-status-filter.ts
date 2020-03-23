@@ -32,15 +32,15 @@ class ProjectStatusFilter extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: String})
   value!: string;
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   data = [];
 
-  _computeLocalizedStatuses(localize: any) {
+  _computeLocalizedStatuses() {
     return [
-      {title: localize('all'), id: ''},
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('all'), id: ''},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   };
 }

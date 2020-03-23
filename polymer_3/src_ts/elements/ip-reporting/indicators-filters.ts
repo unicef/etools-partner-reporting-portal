@@ -95,23 +95,21 @@ class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
   @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: Array, computed: '_initStatuses(localize)'})
+  @property({type: Array, computed: '_initStatuses(resources)'})
   pd_statuses!: any;
 
   @property({type: Object, computed: '_computePostBody(selectedFocalPoint)'})
   postBody!: GenericObject;
 
-  _initStatuses(localize: any) {
-    var statuses = [
-      {title: localize('signed'), id: 'Sig'},
-      {title: localize('active'), id: 'Act'},
-      {title: localize('suspended'), id: 'Sus'},
-      {title: localize('ended'), id: 'End'},
-      {title: localize('closed'), id: 'Clo'},
-      {title: localize('terminated'), id: 'Ter'}
+  _initStatuses() {
+    return [
+      {title: this.localize('signed'), id: 'Sig'},
+      {title: this.localize('active'), id: 'Act'},
+      {title: this.localize('suspended'), id: 'Sus'},
+      {title: this.localize('ended'), id: 'End'},
+      {title: this.localize('closed'), id: 'Clo'},
+      {title: this.localize('terminated'), id: 'Ter'}
     ];
-
-    return statuses;
   }
 }
 
