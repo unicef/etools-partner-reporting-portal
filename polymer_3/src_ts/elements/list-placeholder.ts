@@ -35,11 +35,11 @@ class ListPlaceholder extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeHidden(data: GenericObject[], loading: boolean) {
     return loading || (data && !!data.length);
-  };
+  }
 
   _computeAriaHidden(hidden: boolean) {
     return hidden ? 'true' : 'false';
-  };
+  }
 }
 
 window.customElements.define('list-placeholder', ListPlaceholder);

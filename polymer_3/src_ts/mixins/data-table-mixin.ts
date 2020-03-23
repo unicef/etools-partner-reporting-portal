@@ -20,7 +20,19 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this.set('queryParams', Object.assign({}, this.queryParams, change));
     }
 
+    _colapseExpandedDetails() {
+      setTimeout(() => {
+        const openedDetails = (this.openedDetails as any[]) || [];
+        if (openedDetails.length > 0) {
+          const tempList = openedDetails.slice();
+          tempList.forEach((detail: any) => detail.detailsOpened = false);
+        }
+      }, 100);
+    }
+
     _pageNumberChanged(e: CustomEvent) {
+      this._colapseExpandedDetails();
+
       this.set('queryParams', Object.assign({}, this.queryParams, {
         page: e.detail.value,
       }));

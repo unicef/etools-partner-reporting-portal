@@ -34,7 +34,7 @@ import './cluster-reporting/indicator-locations-modal';
  * @appliesMixin LocalizeMixin
  * @appliesMixin RoutingMixin
  */
-class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(ReduxConnectedElement)))) {
+class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
       ${tableStyles} ${sharedStyles}
@@ -124,7 +124,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
         </indicator-locations-modal>
       </template>
 
-      <etools-data-table-row on-opened-changed="_handleOpenedChanged">
+      <etools-data-table-row details-opened="{{detailsOpened}}" on-details-opened-changed="onDetailsOpenedChanged">
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
             <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
@@ -322,10 +322,6 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
     return appName === 'cluster-reporting';
   }
 
-  _handleOpenedChanged() {
-    this.detailsOpened = !this.detailsOpened;
-  }
-
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
     if (!indicator) {
       return;
@@ -375,6 +371,16 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   _showLocationsWarning(indicator: GenericObject, type: string) {
     return !indicator.locations.length && type !== 'ca';
   }
+
+  onDetailsOpenedChanged(event: CustomEvent) {
+    this.dispatchEvent(new CustomEvent('details-opened-changed', {
+      detail: {row: event.target, detailsOpened: event.detail.value},
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+
 }
 
 window.customElements.define('list-view-single-indicator', ListViewSingleIndicator);
