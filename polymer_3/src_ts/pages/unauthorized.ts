@@ -11,6 +11,7 @@ import '../elements/message-box';
 import '../elements/page-body';
 import '../elements/user-profile/profile-dropdown';
 import {fireEvent} from '../utils/fire-custom-event';
+import {BASE_PATH} from '../config';
 
 /**
  * @polymer
@@ -108,7 +109,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then(function (res: any) {
         if (res.data.access.length) {
-          window.location.href = '/app_poly3/';
+          window.location.href = `/${BASE_PATH}/`;
         } else {
           self.set('loading', false);
         }

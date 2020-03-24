@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element';
+import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import {sharedStyles} from './shared-styles';
 
