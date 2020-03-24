@@ -11,6 +11,7 @@ export const tableStyles = html`
         box-sizing: border-box;
         width: 100%;
       };
+
     }
 
     etools-data-table-column {
@@ -23,7 +24,7 @@ export const tableStyles = html`
 
     etools-data-table-row {
       display: block;
-      border-bottom: 1px solid var(--paper-grey-300);
+      --list-divider-color: var(--paper-grey-300);
       --list-icon-color: var(--paper-grey-500);
     }
 
@@ -61,9 +62,7 @@ export const tableStyles = html`
       background-color: var(--paper-grey-100);
       border-top: 1px solid var(--list-divider-color, #9D9D9D);
     }
-  
-  
-  
+
   </style>
 
 
