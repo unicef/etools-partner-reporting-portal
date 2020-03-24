@@ -63,30 +63,30 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   cols = [
     {
       label: 'Partner',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Target',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
+        html: true
+      }
     },
     {
       label: 'Progress',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
-    },
+        html: true
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRows(data)'})
@@ -100,35 +100,35 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
         top: 0,
         bottom: 55,
         left: '30%',
-        width: '50%',
+        width: '50%'
       },
       bars: 'horizontal',
       legend: {
-        position: 'bottom',
-      },
+        position: 'bottom'
+      }
     });
   }
 
   _computeRows(data: GenericObject) {
-    return Object.keys(data || {}).map(function(key) {
-      let target = data[key].target;
-      let progress = data[key].progress;
+    return Object.keys(data || {}).map((key) => {
+      const target = data[key].target;
+      const progress = data[key].progress;
 
       return [
         key,
         this._fromJSON(target),
         this._buildTooltipContent(key, data[key]),
         progress,
-        this._buildTooltipContent(key, data[key]),
+        this._buildTooltipContent(key, data[key])
       ];
     }, this);
   }
 
   _buildTooltipContent(title: string, data: GenericObject) {
-    let target = this._fromJSON(data.target);
-    let inNeed = this._fromJSON(data.in_need);
-    let progressAgainstTarget = data.progress / target;
-    let progressAgainstInNeed = data.progress / inNeed;
+    const target = this._fromJSON(data.target);
+    const inNeed = this._fromJSON(data.in_need);
+    const progressAgainstTarget = data.progress / target;
+    const progressAgainstInNeed = data.progress / inNeed;
 
     return [
       '<div class="tooltip-content">',
@@ -145,7 +145,7 @@ class CurrentProgressByPartner extends UtilsMixin(LocalizeMixin(AnalysisChartMix
       '<br>',
       '<div>Locations:</div>',
       '<div>' + this._commaSeparated(data.locations) + '</div>',
-      '</div>',
+      '</div>'
     ].join('\n');
   }
 

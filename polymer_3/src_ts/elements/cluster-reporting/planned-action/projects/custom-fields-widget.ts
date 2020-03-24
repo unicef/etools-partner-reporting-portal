@@ -18,8 +18,8 @@ import {GenericObject} from '../../../../typings/globals.types';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
-  public static get template(){
+class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-alignment app-grid-style">
@@ -140,34 +140,34 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
     this.push('customFields', {
       id: this.fieldId,
       name: '',
-      value: '',
+      value: ''
     });
   }
 
   _remove(e: CustomEvent) {
     const value = this.get('customFields');
     const toRemove = value.findIndex( (field: GenericObject) => {
-      return String(field.id) === String(e.target!.id);
+      return String(field.id) === String((e.target as any).id);
     });
     this.splice('customFields', toRemove, 1);
   }
 
   _updateCustomFieldTitle(e: CustomEvent) {
     const field = this.customFields.find( (field) => {
-      return Number(field.id) === Number(e.target!.nameid);
+      return Number(field.id) === Number((e.target as any).nameid);
     });
-    field.name = e.target!.value;
+    field.name = (e.target as any).value;
   }
 
   _updateCustomFieldDescription(e: CustomEvent) {
     const field = this.customFields.find((field) => {
-      return Number(field.id) === Number(e.target!.valueid);
+      return Number(field.id) === Number((e.target as any).valueid);
     });
-    field.value = e.target!.value;
+    field.value = (e.target as any).value;
   }
 
   _updateVisibleCustomFields() {
-    const newCustomFields = this.customFields.map(function (field) {
+    const newCustomFields = this.customFields.map((field) => {
       return field;
     });
     this.customFields = newCustomFields;

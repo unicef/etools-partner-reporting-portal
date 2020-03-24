@@ -738,7 +738,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _remove(e: CustomEvent) {
-    const currentIndex = +e.target!.dataset.index;
+    const currentIndex = +(e.target as any).dataset.index;
 
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);
@@ -817,7 +817,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('activities', res.data.results);
       })
       .catch((_err: GenericObject) => {
@@ -841,7 +841,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     this.set('projectsParams.partner', partnerId);
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('projects', res.data.results);
       })
       .catch((_err: GenericObject) => {
@@ -893,6 +893,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
+        // @ts-ignore
         self._close();
       })
       .catch((err: GenericObject) => {

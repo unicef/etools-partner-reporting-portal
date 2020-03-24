@@ -336,7 +336,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
     (e.target as any).validate();
   }
 
-  _formatForMultiselect(list) {
+  _formatForMultiselect(list: any) {
     return list.map((item: GenericObject) => {
       return {
         id: item.id,
@@ -347,9 +347,9 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
-    let valid = [
+    const valid = [
       this._fieldsAreValid(),
       this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
@@ -358,14 +358,14 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
       return;
     }
 
-    this.data.clusters = this.selectedClusters.map(function(item) {
+    this.data.clusters = this.selectedClusters.map((item) => {
       return {id: Number(item)};
     });
 
     this.data.partner = this.partnerID;
 
     this.updatePending = true;
-    let thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
         self.updatePending = false;
@@ -383,4 +383,4 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
 window.customElements.define('planned-action-projects-editing-modal', PlannedActionProjectsEditingModal);
 
-export {PlannedActionProjectsEditingModal as PlannedActionProjectsEditingModalEl}
+export {PlannedActionProjectsEditingModal as PlannedActionProjectsEditingModalEl};

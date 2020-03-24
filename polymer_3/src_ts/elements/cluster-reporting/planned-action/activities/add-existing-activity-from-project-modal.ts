@@ -388,7 +388,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
@@ -411,7 +411,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String})
@@ -432,7 +432,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   static get observers() {
     return [
       '_fetchPartnerActivities(data.cluster)',
-      '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
+      '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)'
     ];
   }
 
@@ -440,12 +440,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     return [
       {title: localize('ongoing'), id: 'Ong'},
       {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: localize('completed'), id: 'Com'}
     ];
   }
 
   _setDefaults() {
-    let simpleProjectData: GenericObject = {};
+    const simpleProjectData: GenericObject = {};
 
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
@@ -487,7 +487,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _fetchPartnerActivities(clusterId: string) {
-    let self = this;
+    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -496,26 +496,26 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.set('data.partner_activity', undefined);
     this.set('activitiesParams.cluster_id', clusterId);
     this.set('activitiesUrl',
-      Endpoints.partnerActivityList(this.responsePlanId)
-      + '?cluster_id=' + clusterId);
+      Endpoints.partnerActivityList(this.responsePlanId) +
+      '?cluster_id=' + clusterId);
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
-        var filteredActivities = res.data.results.filter(function(item: any) {
+      .then((res: any) => {
+        const filteredActivities = res.data.results.filter(function(item: any) {
           return item.projects.find(function(element: any) {
             return element.project_id === parseInt(self.projectData.id);
           }) === undefined;
         });
         self.set('partnerActivities', filteredActivities);
       })
-      .catch((_err) => {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
   _fetchObjectives(clusterId: string) {
-    let self = this;
+    const self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -541,7 +541,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
@@ -561,11 +561,11 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     // save cloned data and not regular data, since cloned data has the combined projects
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
-      partner: this.partner,
+      partner: this.partner
     }, clonedData);
 
     thunk()
-      .then(function() {
+      .then(() => {
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
@@ -580,9 +580,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   _close(e: CustomEvent) {
     if (e === 'saved' ||
-      e.target!.nodeName === 'PAPER-DIALOG' ||
-      e.target!.nodeName === 'PAPER-BUTTON' ||
-      e.target!.nodeName === 'PAPER-ICON-BUTTON'
+      (e.target as any).nodeName === 'PAPER-DIALOG' ||
+      (e.target as any).nodeName === 'PAPER-BUTTON' ||
+      (e.target as any).nodeName === 'PAPER-ICON-BUTTON'
     ) {
       this.set('data', {});
 

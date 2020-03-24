@@ -121,7 +121,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get observers() {
     return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
+      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)'
     ];
   }
 
@@ -142,7 +142,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeUrl() {
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.objectiveId);
     return Endpoints.indicators('co');
   }

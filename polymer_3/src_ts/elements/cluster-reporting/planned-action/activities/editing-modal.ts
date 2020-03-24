@@ -581,7 +581,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
@@ -598,7 +598,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeObjectivesUrl(responsePlanId)'})
@@ -609,7 +609,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   projectsParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeProjectsUrl(responsePlanId)'})
@@ -625,7 +625,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     return [
       '_fetchProjects(partnerId)',
       '_fetchActivities(data.cluster)',
-      '_fetchObjectives(data.cluster)',
+      '_fetchObjectives(data.cluster)'
     ];
   }
 
@@ -633,7 +633,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     return [
       {title: localize('ongoing'), id: 'Ong'},
       {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: localize('completed'), id: 'Com'}
     ];
   }
 
@@ -643,7 +643,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _remove(e: CustomEvent) {
-    let currentIndex = +e.target!.dataset.index;
+    const currentIndex = +(e.target as any)!.dataset.index;
     this.splice('data.projects', currentIndex, 1);
     fireEvent(this, 'project-details-selection-refit');
   }
@@ -651,21 +651,21 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   _setDefaults() {
     this.set('data', Object.assign({},
       {
-        id: this.editData.id,
-        cluster: this.editData.cluster.id,
+        id: (this.editData as GenericObject).id,
+        cluster: (this.editData as GenericObject).cluster.id,
         cluster_activity: null,
-        cluster_objective: this.editData.cluster_objective.id,
-        title: this.editData.title,
-        is_custom: this.editData.is_custom,
-        partner: this.editData.partner,
-        reportables: this.editData.reportables,
-        projects: this.editData.projects
+        cluster_objective: (this.editData as GenericObject).cluster_objective.id,
+        title: (this.editData as GenericObject).title,
+        is_custom: (this.editData as GenericObject).is_custom,
+        partner: (this.editData as GenericObject).partner,
+        reportables: (this.editData as GenericObject).reportables,
+        projects: (this.editData as GenericObject).projects
       }));
 
-    if (this.editData.is_custom) {
-      this.set('data.title', this.editData.title);
+    if ((this.editData as GenericObject).is_custom) {
+      this.set('data.title', (this.editData as GenericObject).title);
     } else {
-      this.set('data.cluster_activity', this.editData.cluster_activity.id);
+      this.set('data.cluster_activity', (this.editData as GenericObject).cluster_activity.id);
     }
   }
 
@@ -725,17 +725,17 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('activities', []);
     this.set('activitiesParams.cluster_id', clusterId);
     this.set('activitiesUrl',
-      Endpoints.responseParametersClusterActivities(this.responsePlanId)
-      + '?cluster_id=' + clusterId);
+      Endpoints.responseParametersClusterActivities(this.responsePlanId) +
+      '?cluster_id=' + clusterId);
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then(function(res: any) {
         self.set('activities', res.data.results);
-      })
-      // .catch((err) => {
-      //   // TODO: error handling
-      // });
+      });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   _fetchObjectives(clusterId: string) {
@@ -754,10 +754,10 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     thunk()
       .then(function(res: any) {
         self.set('objectives', res.data.results);
-      })
-      // .catch((err) => {
-      //   // TODO: error handling
-      // });
+      });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   _fetchProjects(partnerId: string) {
@@ -772,10 +772,10 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     thunk()
       .then(function(res: any) {
         self.set('projects', res.data.results);
-      })
-      // .catch((err) => {
-      //   // TODO: error handling
-      // });
+      });
+    // .catch((err) => {
+    //   // TODO: error handling
+    // });
   }
 
   _save() {
@@ -783,7 +783,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     const thunk = (this.$.editActivity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {

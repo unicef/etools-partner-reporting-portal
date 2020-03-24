@@ -139,20 +139,20 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeUrl() {
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.projectId);
 
     return Endpoints.indicators('pp');
   }
 
   _indicatorsAjax() {
-    let thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
     this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err) => {
         // TODO: error handling.
       });
   }

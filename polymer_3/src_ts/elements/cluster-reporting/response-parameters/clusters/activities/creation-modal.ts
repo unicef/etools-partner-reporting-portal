@@ -202,7 +202,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
 
   static get observers() {
     return [
-      '_getObjectivesByClusterID(data.cluster, objectivesUrl)',
+      '_getObjectivesByClusterID(data.cluster, objectivesUrl)'
     ];
   }
 
@@ -225,7 +225,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
-    let self = this;
+    const self = this;
     if (clusterID && objectivesUrl) {
       const thunk = (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk();
       this.objectivesParams = {cluster_id: this.data.cluster};
@@ -234,9 +234,8 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
         .then((res: any) => {
           self.set('objectives', res.data.results);
         })
-        .catch((err: GenericObject) => {
+        .catch((_err: GenericObject) => {
           self.updatePending = false;
-          console.error(err);
           // TODO: error handling
         });
     } else {
@@ -268,7 +267,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _save() {
-    let self = this;
+    const self = this;
     const thunk = (this.$.createActivity as EtoolsPrpAjaxEl).thunk();
 
     if (!this._fieldsAreValid()) {
@@ -277,12 +276,12 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
 
     self.updatePending = true;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self.set('errors', {});
         self._redirectToDetail(res.data.id);
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         self.set('errors', err.data);
         self.updatePending = false;
       });

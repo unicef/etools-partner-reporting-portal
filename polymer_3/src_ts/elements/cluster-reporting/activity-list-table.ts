@@ -2,7 +2,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import '@polymer/app-route/app-route';
-import '@unicef-polymer/etools-data-table/etools-data-table'
+import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-location/iron-location';
@@ -22,7 +22,6 @@ import '../list-placeholder';
 import '../../redux/actions';
 import {tableStyles} from '../../styles/table-styles';
 import {GenericObject} from '../../typings/globals.types';
-
 
 
 /**
@@ -197,7 +196,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;
     }
-    //Query string is passed to construct the back button.
+    // Query string is passed to construct the back button.
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 
@@ -206,13 +205,13 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
       return;
     }
 
-    let self = this;
-    let projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
+    const self = this;
+    const projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     projectsThunk()
       .then((res: GenericObject) => {
-        let allProjects: GenericObject[] = [];
+        const allProjects: GenericObject[] = [];
         res.data.results.forEach((project: GenericObject) => {
           allProjects[project.id] = project;
         });

@@ -9,7 +9,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
-import {tableStyles} from '../../../styles/table-styles'
+import {tableStyles} from '../../../styles/table-styles';
 import '../../report-status';
 import '../../frequency-of-reporting';
 import '../../etools-prp-progress-bar';
@@ -174,7 +174,9 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   @property({type: Array})
   detailsOpened = [];
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDashboardData.data.my_project_activities)', observer: '_collapseAll'})
+  @property({type: Array,
+                    computed: 'getReduxStateArray(rootState.clusterDashboardData.data.my_project_activities)',
+                    observer: '_collapseAll'})
   data!: any[];
 
   @property({type: String, computed: '_computeActivitiesUrl(_baseUrlCluster)'})
@@ -190,8 +192,8 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   }
 
   _handleOpenedChanged(e: CustomEvent, data: any[]) {
-    let row = e.target;
-    let openedIndex = this.detailsOpened.indexOf(row);
+    const row = e.target;
+    const openedIndex = this.detailsOpened.indexOf(row);
 
     if (!data.value) {
       if (openedIndex !== -1) {
