@@ -59,15 +59,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
 
-        --paper-item-min-height: 56px;
-        --paper-item: {
-          cursor: pointer;
-        };
-
-        --paper-item-selected: {
-          background-color: var(--theme-secondary-color-d);
-        };
-
         --paper-tabs: {
           padding-left: 12px;
           border-bottom: 1px solid var(--paper-grey-300);
@@ -148,9 +139,14 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         height: 300px; /* 360px - 60px */
         overflow: auto;
       }
-
-      #tab-item {
+      #tabs-list #tab-item {
         padding-left: 10%;
+        min-height: 56px;
+        padding: 0px 16px;
+      }
+
+      #tabs-list #tab-item.iron-selected {
+        background-color: var(--theme-secondary-color-d);
       }
 
       #pages-container {

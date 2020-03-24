@@ -70,6 +70,8 @@ class LanguageDropdown extends ReduxConnectedElement {
           font-size: 15px;
           white-space: nowrap;
           cursor: pointer;
+          min-height: 48px;
+          padding: 0px 16px;
         }
       </style>
 
