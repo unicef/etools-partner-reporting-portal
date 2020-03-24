@@ -30,14 +30,14 @@ import {IndicatorDetailsEl} from '../indicator-details';
 import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
-import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate} from '../../redux/actions/clusterIndicatorReports';
+import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate}
+  from '../../redux/actions/clusterIndicatorReports';
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
-import {FeedbackModalEl} from './feedback-modal';
-import {SendBackModalEl} from "./send-back-modal";
-
+import {FeedbackModal} from './feedback-modal';
+import {SendBackModal} from './send-back-modal';
 
 
 /**
@@ -508,8 +508,8 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   containerClassName!: string;
 
   _calculationFormulaAcrossPeriods(indicator: any) {
-    return indicator.reportable.blueprint.display_type === 'ratio'
-      ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+    return indicator.reportable.blueprint.display_type === 'ratio' ?
+      'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
   }
 
   _computeIcon(opened: string) {
@@ -551,7 +551,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     return [
       Endpoints.clusterIndicatorReportsExport(responsePlanId),
       '?',
-      query,
+      query
     ].join('');
   }
 
@@ -564,7 +564,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _toggle() {
-    this.$.collapse.toggle();
+    (this.$.collapse as any).toggle();
   }
 
   _handleOpenedChanged(e: CustomEvent, data: GenericObject) {
@@ -607,7 +607,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
         fireEvent(self, 'report-submitted', self.data.id);
       })
       .catch((res: any) => {
-        let errors = res.data.non_field_errors;
+        const errors = res.data.non_field_errors;
 
         return (self.$.error as ErrorModalEl).open(errors).then(() => {
           return Promise.reject(); // Revert
@@ -626,7 +626,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       clusterIndicatorReportsUpdateSingle(
         data.indicatorId,
         {
-          can_submit: true,
+          can_submit: true
         }
       )
     );
@@ -655,7 +655,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _computeExportParams(queryParams: any, data: GenericObject) {
     return Object.assign({}, queryParams, {
-      indicator: data.reportable.id,
+      indicator: data.reportable.id
     });
   }
 
@@ -690,7 +690,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _sendBack() {
-    (this.shadowRoot!.querySelector('#sendBackModal') as SendBackModalEl).open();
+    (this.shadowRoot!.querySelector('#sendBackModal') as SendBackModal).open();
 
     setTimeout(() => {
       (this.shadowRoot!.querySelector('#viewMenu') as PaperListboxElement).select(2);
@@ -698,7 +698,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _viewFeedback() {
-    (this.shadowRoot!.querySelector('#feedbackModal') as FeedbackModalEl).open();
+    (this.shadowRoot!.querySelector('#feedbackModal') as FeedbackModal).open();
 
     setTimeout(() => {
       (this.shadowRoot!.querySelector('#nonViewMenu') as PaperListboxElement).select(1);

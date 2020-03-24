@@ -16,7 +16,7 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  * @appliesMixin ModalMixin
  */
-class FeedbackModal extends ModalMixin(PolymerElement) {
+export class FeedbackModal extends ModalMixin(PolymerElement) {
   public static get template() {
     return html`
         ${buttonsStyles} ${modalStyles}
@@ -132,5 +132,3 @@ class FeedbackModal extends ModalMixin(PolymerElement) {
 }
 
 window.customElements.define('feedback-modal', FeedbackModal);
-
-export {FeedbackModal as FeedbackModalEl}

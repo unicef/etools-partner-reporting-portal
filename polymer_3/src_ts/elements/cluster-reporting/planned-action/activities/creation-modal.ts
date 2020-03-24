@@ -662,7 +662,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
@@ -682,7 +682,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   projectsParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeProjectsUrl(responsePlanId)'})
@@ -693,7 +693,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String})
@@ -716,7 +716,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       '_fetchProjects(partner, mode, data.cluster.cluster)',
       '_fetchProjects(partner, mode, data.custom.cluster)',
       '_fetchActivities(data.cluster.cluster)',
-      '_fetchObjectives(data.custom.cluster)',
+      '_fetchObjectives(data.custom.cluster)'
     ];
   }
 
@@ -724,7 +724,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     return [
       {title: localize('ongoing'), id: 'Ong'},
       {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: localize('completed'), id: 'Com'}
     ];
   }
 
@@ -738,7 +738,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _remove(e: CustomEvent) {
-    let currentIndex = +e.target!.dataset.index;
+    const currentIndex = +e.target!.dataset.index;
 
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);
@@ -756,7 +756,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       },
       custom: {
         projects: []
-      },
+      }
     });
     this.set('activities', []);
     this.set('objectives', []);
@@ -804,7 +804,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _fetchActivities(clusterId: string) {
-    let self = this;
+    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -820,13 +820,14 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('activities', res.data.results);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
-  _fetchProjects(partnerId: string, clusterId: string) {
-    let self = this;
+  // @ts-ignore
+  _fetchProjects(partnerId: string, mode: string, clusterId: string) {
+    const self = this;
     const thunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
     if (this.data === undefined) {
       return;
@@ -843,13 +844,13 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('projects', res.data.results);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+        // TODO: error handling
+      });
   }
 
   _fetchObjectives(clusterId: string) {
-    let self = this;
+    const self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -862,20 +863,20 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('objectives', res.data.results);
       })
-      // .catch(function(err) {
-      //   // TODO: error handling
-      // });
+      .catch((_err: GenericObject) => {
+      // TODO: error handling
+      });
   }
 
   _save() {
-    let self = this;
+    const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    let valid = [
+    const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
@@ -885,7 +886,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     this.set('updatePending', true);
 
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
-      partner: this.partner,
+      partner: this.partner
     }, this.data[this.mode]);
     thunk()
       .then((res: GenericObject) => {
@@ -902,9 +903,9 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _close(e: CustomEvent) {
-    if (e.target!.nodeName === 'PAPER-DIALOG' ||
-      e.target!.nodeName === 'PAPER-BUTTON' ||
-      e.target!.nodeName === 'PAPER-ICON-BUTTON') {
+    if ((e.target as any).nodeName === 'PAPER-DIALOG' ||
+      (e.target as any).nodeName === 'PAPER-BUTTON' ||
+      (e.target as any).nodeName === 'PAPER-ICON-BUTTON') {
       this.set('mode', '');
       this.set('data', {});
 

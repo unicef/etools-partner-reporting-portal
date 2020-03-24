@@ -26,7 +26,7 @@ import {fireEvent} from '../../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin ModalMixin
  */
-class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
+export class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
 
   public static get template() {
     return html`
@@ -144,8 +144,8 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
 
   public static get observers() {
     return [
-      '_handleOpenedChanged(opened)',
-    ]
+      '_handleOpenedChanged(opened)'
+    ];
   }
 
   _handleOpenedChanged(opened: boolean) {
@@ -155,7 +155,7 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
 
     this.set('data', {
       status: 'Sen',
-      comment: '',
+      comment: ''
     });
 
     this.set('pending', false);
@@ -181,17 +181,15 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
     (this.$.sendBack as EtoolsPrpAjaxEl).abort();
 
     (this.$.sendBack as EtoolsPrpAjaxEl).thunk()()
-      .then(function() {
+      .then(() => {
         self.set('pending', false);
         self.close();
         fireEvent(self, 'report-reviewed');
       })
-      .catch(function() {
+      .catch(() => {
         self.set('pending', false);
       });
   }
 
 }
 window.customElements.define('send-back-modal', SendBackModal);
-
-export {SendBackModal as SendBackModalEl}
