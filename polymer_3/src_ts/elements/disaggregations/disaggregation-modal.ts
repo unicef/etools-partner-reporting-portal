@@ -160,3 +160,5 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 }
 
 window.customElements.define('disaggregation-modal', DisaggregationModal);
+
+export {DisaggregationModal as DisaggregationModalEl};

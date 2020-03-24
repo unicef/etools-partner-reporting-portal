@@ -22,8 +22,10 @@ import './status-badge';
 import './etools-prp-printer';
 import '../elements/disaggregations/disaggregation-table';
 import '../elements/disaggregations/disaggregation-modal';
+import {DisaggregationModalEl} from '../elements/disaggregations/disaggregation-modal';
 import './report-status';
 import './pull-modal';
+import {PullModalEl} from './pull-modal';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event';
@@ -465,6 +467,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   `;
   }
 
+  @property({type: Boolean})
+  loading = true;
+
   @property({type: Number})
   indicatorId!: number;
 
@@ -556,7 +561,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }
 
       this.set('initialized', true);
-
       this._fetchData()
         // @ts-ignore
         .then(function() {
@@ -606,15 +610,15 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).modalIndex) as DisaggregationModalEl).open();
   }
 
   _openPullModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#pull-modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#pull-modal-' + (e.target as any).modalIndex) as PullModalEl).open();
   }
 
   _updateModals(e: CustomEvent, data: GenericObject) {
-    const id = e.target!.id;
+    const id = (e.target as any).id;
 
     if (!id) {
       return;
