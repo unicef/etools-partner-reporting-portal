@@ -394,7 +394,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
   clusters!: any[];
 
-  @property({type: Array, computed: '_computeLocalizedStatuses(localize)'})
+  @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
@@ -436,11 +436,11 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     ];
   }
 
-  _computeLocalizedStatuses(localize: any) {
+  _computeLocalizedStatuses() {
     return [
-      {title: localize('ongoing'), id: 'Ong'},
-      {title: localize('planned'), id: 'Pla'},
-      {title: localize('completed'), id: 'Com'},
+      {title: this.localize('ongoing'), id: 'Ong'},
+      {title: this.localize('planned'), id: 'Pla'},
+      {title: this.localize('completed'), id: 'Com'},
     ];
   }
 
@@ -618,4 +618,4 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 }
 window.customElements.define('planned-action-add-existing-activity-from-project-modal', AddExistingActivityFromProjectModal);
 
-export {AddExistingActivityFromProjectModal as AddExistingActivityFromProjectModalEl};
+export {AddExistingActivityFromProjectModal as PlannedActioAddExistingActivityFromProjectModalEl};

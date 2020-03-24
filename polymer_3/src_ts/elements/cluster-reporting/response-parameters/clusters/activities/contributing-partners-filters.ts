@@ -7,7 +7,7 @@ import '../../../../filter-list';
 import '../../../../filters/partner-filter/partner-filter';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
@@ -54,4 +54,4 @@ class ContributingPartnersFilters extends UtilsMixin(PolymerElement) {
 
 window.customElements.define('cluster-activities-contributing-partners-filters', ContributingPartnersFilters);
 
-export {ContributingPartnersFilters as ContributingPartnersFiltersEl};
+export {ContributingPartnersFilters as ClusterActivitiesContributingPartnersFiltersEl};

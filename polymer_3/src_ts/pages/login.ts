@@ -19,6 +19,7 @@ import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
 import '../elements/etools-prp-ajax';
 import '../elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
+import {BASE_PATH} from '../config';
 
 
 /**
@@ -251,7 +252,7 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
     thunk()
       .then(function (res: any) {
         if (res.status === 200) {
-          window.location.href = '/app/';
+          window.location.href = `/${BASE_PATH}/`;
         }
       })
       .catch(function (err: any) {

@@ -21,7 +21,6 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
-import {store} from '../../redux/store';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {RootState} from '../../typings/redux.types';
@@ -47,6 +46,15 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
           width: 750px;
         }
       }
+      .dialog-content {
+        padding-bottom: 24px;
+      }
+      .buttons {
+        justify-content: flex-start;
+      }
+      paper-dialog-scrollable {
+        margin-top: 0px;
+      }
     </style>
 
     <iron-location
@@ -61,7 +69,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog opened=[[opened]]>
+    <paper-dialog with-backdrop opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 
@@ -69,43 +77,42 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
         </paper-icon-button>
       </div>
       <paper-dialog-scrollable>
+        <div class="dialog-content">
+            <h3>[[localize('could_not_be_submitted')]]</h3>
+            <!--
+            <paper-dropdown-menu
+              id="officerDropdown"
+              class="validate"
+              label="[[localize('authorized_officer')]]"
+              placeholder="[[localize('select')]]"
+              on-value-changed="_validate"
+              always-float-label
+              required>
+              <paper-listbox
+                selected="{{selectedFocalPoint}}"
+                attr-for-selected="value"
+                slot="dropdown-content"
+                class="dropdown-content">
+                <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
+                  <paper-item value="[[item.value]]">[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            -->
 
-        <h3>[[localize('could_not_be_submitted')]]</h3>
-        <!--
-        <paper-dropdown-menu
-          id="officerDropdown"
-          class="validate"
-          label="[[localize('authorized_officer')]]"
-          placeholder="[[localize('select')]]"
-          on-value-changed="_validate"
-          always-float-label
-          required>
-          <paper-listbox
-            selected="{{selectedFocalPoint}}"
-            attr-for-selected="value"
-            slot="dropdown-content"
-            class="dropdown-content">
-            <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
-              <paper-item value="[[item.value]]">[[item.title]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        -->
-
-        <etools-dropdown
-          id="officerDropdown"
-          label="[[localize('authorized_officer')]]"
-          placeholder="[[localize('select')]]"
-          options="[[currentAuthorizedPartners]]"
-          option-value="value"
-          option-label="title"
-          required
-          trigger-value-change-event
-          on-etools-selected-item-changed="_validate"
-          selected="{{selectedFocalPoint}}"
-          hide-search>
-        </etools-dropdown>
-
+            <etools-dropdown
+              id="officerDropdown"
+              class="validate"
+              label="[[localize('authorized_officer')]]"
+              placeholder="[[localize('select')]]"
+              options="[[currentAuthorizedPartners]]"
+              option-value="value"
+              option-label="title"
+              required
+              selected="{{selectedFocalPoint}}"
+              hide-search>
+            </etools-dropdown>
+        </div>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -173,10 +180,6 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     return currentProgrammeDocument(rootState);
   }
 
-  _validate(e: CustomEvent) {
-    e.target!.validate();
-  }
-
   _save() {
     if (!this._fieldsAreValid()) {
       return;
@@ -185,7 +188,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
     const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res: any) {
+      .then(function(res: any) {
         const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'

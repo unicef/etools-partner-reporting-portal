@@ -178,7 +178,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
     `;
   }
 
-  @property({type: Array, observer: '_tableContentChanged'})
+  @property({type: Array})
   data!: any[];
 
   @property({type: Boolean})
@@ -239,12 +239,10 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   }
 
   _addEventListeners() {
-    this.addEventListener('page-number-changed', this._tableContentChanged);
     this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('page-number-changed', this._tableContentChanged);
     this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 

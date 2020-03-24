@@ -22,8 +22,10 @@ import './status-badge';
 import './etools-prp-printer';
 import '../elements/disaggregations/disaggregation-table';
 import '../elements/disaggregations/disaggregation-modal';
+import {DisaggregationModalEl} from '../elements/disaggregations/disaggregation-modal';
 import './report-status';
 import './pull-modal';
+import {PullModalEl} from './pull-modal';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event';
@@ -58,15 +60,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         --app-grid-columns: 2;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-
-        --paper-item-min-height: 56px;
-        --paper-item: {
-          cursor: pointer;
-        };
-
-        --paper-item-selected: {
-          background-color: var(--theme-secondary-color-d);
-        };
 
         --paper-tabs: {
           padding-left: 12px;
@@ -148,9 +141,14 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         height: 300px; /* 360px - 60px */
         overflow: auto;
       }
-
-      #tab-item {
+      #tabs-list #tab-item {
         padding-left: 10%;
+        min-height: 56px;
+        padding: 0px 16px;
+      }
+
+      #tabs-list #tab-item.iron-selected {
+        background-color: var(--theme-secondary-color-d);
       }
 
       #pages-container {
@@ -469,6 +467,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   `;
   }
 
+  @property({type: Boolean})
+  loading = true;
+
   @property({type: Number})
   indicatorId!: number;
 
@@ -560,7 +561,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }
 
       this.set('initialized', true);
-
       this._fetchData()
         // @ts-ignore
         .then(function() {
@@ -610,15 +610,15 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).modalIndex) as DisaggregationModalEl).open();
   }
 
   _openPullModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#pull-modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#pull-modal-' + (e.target as any).modalIndex) as PullModalEl).open();
   }
 
   _updateModals(e: CustomEvent, data: GenericObject) {
-    const id = e.target!.id;
+    const id = (e.target as any).id;
 
     if (!id) {
       return;

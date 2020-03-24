@@ -8,15 +8,15 @@ import '../../../project-details';
 import '../../../../etools-prp-permissions';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import { GenericObject } from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin LocalizeMixin
  */
-class Overview extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template(){
+class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
     ${buttonsStyles}
     <style>
@@ -69,11 +69,11 @@ class Overview extends LocalizeMixin(ReduxConnectedElement) {
 
   _canEditActivity(permissions: GenericObject, projectData: GenericObject) {
     return projectData.clusters ?
-            permissions.editPartnerEntities(projectData.clusters) :
-            false;
+      permissions.editPartnerEntities(projectData.clusters) :
+      false;
   }
 }
 
-window.customElements.define('rp-partner-project-details-overview', Overview);
+window.customElements.define('rp-partner-project-details-overview', RpPartnerProjectDetailsOverview);
 
-export {Overview as ProjectsOverviewEl};
+export {RpPartnerProjectDetailsOverview as RpPartnerProjectDetailsOverviewEl};

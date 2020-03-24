@@ -5,11 +5,13 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import '../etools-prp-number';
 import './disaggregation-field';
 import './disaggregation-table-cell';
+import {DisaggregationFieldEl} from './disaggregation-field';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import '@polymer/iron-meta/iron-meta';
 import {IronMeta} from '@polymer/iron-meta/iron-meta';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -108,11 +110,8 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
 
 
   _handleInput(e: CustomEvent) {
-
     let key = e.detail.key;
     let value = e.detail.value;
-    let calculated;
-    let change;
 
     if (e.detail.internal) {
       // Dont handle self-fired events.
@@ -121,25 +120,15 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
 
     e.stopPropagation();
 
-    let v = this.shadowRoot!.querySelector('#v');
-    let d = this.shadowRoot!.querySelector('#d');
+    let v = this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl;
+    let d = this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl;
 
-    if (typeof value.v !== 'undefined') {
-      d.validate();
-    }
+    let change = Object.assign({}, this.get('localData'), value);
 
-    change = Object.assign({}, this.get('localData'), value);
-
-    if (v.invalid || d.invalid) {
+    if (!d.validate() || !v.validate()) {
       change.c = null;
     } else {
-      calculated = change.v / change.d;
-
-      if (calculated !== calculated) {
-        calculated = 0;
-      }
-
-      change.c = calculated;
+      change.c = change.d === 0 ? 0 : change.v / change.d;
 
       fireEvent(this, 'field-value-changed', {
         key: key,
@@ -158,7 +147,8 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
-        return Number(value) !== 0 || Number(self!.shadowRoot!.querySelector('#v')!.getField().value) === 0;
+        return Number(value) !== 0 ||
+          Number(((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value) === 0;
       }.bind(self),
     };
 

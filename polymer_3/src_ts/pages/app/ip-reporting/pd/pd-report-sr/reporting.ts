@@ -56,6 +56,12 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         font-size: 16px;
         word-wrap: break-word;
       }
+
+      paper-input-char-counter {
+        margin-top: 20px;
+        margin-bottom: -40px;
+        font-size: 12px;
+      }
     </style>
 
     <pd-sent-back></pd-sent-back>
@@ -93,14 +99,14 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-              <paper-input-container
-                  no-label-float>
+              <paper-input-container no-label-float>
                 <input
+                    slot="input"
                     id="narrative"
                     on-input="_handleInput"
                     value="[[data.narrative]]"
                     maxlength="2000">
-                <paper-input-char-counter></paper-input-char-counter>
+                <paper-input-char-counter slot="suffix"></paper-input-char-counter>
               </paper-input-container>
             </template>
           </labelled-item>
@@ -183,7 +189,6 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
   _updateData(change: GenericObject) {
     const self = this;
-
     if (change.path.split('.').length < 2) {
       // Skip the initial assignment
       return;
@@ -204,6 +209,9 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
   }
 
   _computeUpdateUrl(locationId: string, reportId: string) {
+    if (!locationId || !reportId) {
+      return;
+    }
     return Endpoints.programmeDocumentReportUpdate(locationId, reportId);
   }
 
@@ -215,18 +223,18 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
     // get the current progress report's due date
     const progressReportDueDate = allPdReports[pdId]
-      .find(function(report) {
+      .find(function (report) {
         return report.id === parseInt(reportId);
       })
       .due_date;
 
     // get the current programme document
-    const currentPdReport = programmeDocuments.find(function(report) {
+    const currentPdReport = programmeDocuments.find(function (report) {
       return report.id === pdId;
     });
 
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = currentPdReport.reporting_periods.find(function(reporting_period) {
+    const currentSrReport = currentPdReport.reporting_periods.find(function (reporting_period) {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
     });

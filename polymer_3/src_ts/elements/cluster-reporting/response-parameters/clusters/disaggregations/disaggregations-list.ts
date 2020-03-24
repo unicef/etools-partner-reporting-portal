@@ -127,4 +127,4 @@ class DisaggregationList extends LocalizeMixin(UtilsMixin(DataTableMixin(Paginat
 
 window.customElements.define('clusters-disaggregations-list', DisaggregationList);
 
-export {DisaggregationList as DisaggregationListEl};
+export {DisaggregationList as ClustersDisaggregationListEl};

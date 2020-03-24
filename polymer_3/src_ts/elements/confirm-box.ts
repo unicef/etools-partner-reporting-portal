@@ -7,9 +7,7 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/polymer/lib/elements/dom-if';
 import Constants from '../constants';
 import {GenericObject} from '../typings/globals.types';
-import {ConfirmBoxElem} from '../typings/entities.types';
 import {buttonsStyles} from '../styles/buttons-styles';
-
 
 /**
  * @polymer
@@ -104,7 +102,8 @@ class ConfirmBox extends PolymerElement {
     okLabel: 'Continue',
     cancelLabel: 'Cancel',
     maxWidth: '100%',
-    mode: Constants.CONFIRM_INLINE
+    mode: Constants.CONFIRM_INLINE,
+    result: <GenericObject>{}
   };
 
   _computePosition(config: GenericObject) {
@@ -113,14 +112,18 @@ class ConfirmBox extends PolymerElement {
         return 'absolute';
 
       case Constants.CONFIRM_MODAL:
+      default:
         return 'fixed';
     }
   }
 
   _ok() {
     try {
-      this.config.result.resolve();
+      if (this.config.result && this.config.result.promise) {
+        this.config.result.resolve();
+      }
     } catch (err) {
+      console.log(err);
     }
 
     this._close();
@@ -128,8 +131,11 @@ class ConfirmBox extends PolymerElement {
 
   _cancel() {
     try {
-      this.config.result.reject();
+      if (this.config.result && this.config.result.promise) {
+        this.config.result.reject();
+      }
     } catch (err) {
+      console.log(err);
     }
 
     this._close();

@@ -17,6 +17,7 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
       <style>
         :host {
           display: inline-block;
+          margin-right: .5em;
         }
 
         status-badge {

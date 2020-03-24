@@ -34,7 +34,7 @@ import {fireEvent} from '../../../../../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin RoutingMixin
  */
-class EditingModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
+class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
   public static get template() {
     // language=HTML
     return html`
@@ -205,6 +205,6 @@ class EditingModal extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedE
   }
 }
 
-window.customElements.define('cluster-objectives-editing-modal', EditingModal);
+window.customElements.define('cluster-objectives-editing-modal', ClusterObjectivesEditingModal);
 
-export {EditingModal as EditingModalEl};
+export {ClusterObjectivesEditingModal as ClusterObjectivesEditingModalEl};
