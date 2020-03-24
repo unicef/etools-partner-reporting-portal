@@ -66,9 +66,11 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
         }
 
         paper-item {
-            font-size: 15px;
-            white-space: nowrap;
-            cursor: pointer;
+          font-size: 15px;
+          white-space: nowrap;
+          cursor: pointer;
+          padding: 0px 16px;
+          min-height: 48px;
         }
       </style>
 

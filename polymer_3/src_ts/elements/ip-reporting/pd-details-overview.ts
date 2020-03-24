@@ -93,16 +93,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
       }
 
       .amendments {
-        --ecp-content: {
-          padding: 0;
-        };
+        --ecp-content-padding: 0px;
       }
 
       .reporting-requirements {
-        --ecp-content: {
-          padding-left: 0;
-          padding-right: 0;
-        };
+        --ecp-content-padding: 0px;
       }
 
       pd-details-reporting-requirements:not(:last-of-type) {
@@ -390,11 +385,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
+          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
             // @ts-ignore
-            // .catch(function(err) {
-            //   // TODO: error handling
-            // });
+            .catch(function(err) {
+              //   // TODO: error handling
+            });
         });
     }
   }
