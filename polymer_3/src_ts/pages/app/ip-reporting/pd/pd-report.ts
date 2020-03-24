@@ -17,11 +17,13 @@ import '../../../../elements/reporting-period';
 import '../../../../elements/report-status';
 import '../../../../elements/message-box';
 import '../../../../elements/error-modal';
+import {ErrorModalEl} from '../../../../elements/error-modal';
 import '../../../../elements/ip-reporting/pd-reports-report-title';
 import '../../../../elements/ip-reporting/pd-report-export-button';
 import '../../../../elements/ip-reporting/pd-modal';
 import {PdModalEl} from '../../../../elements/ip-reporting/pd-modal';
 import '../../../../elements/ip-reporting/authorized-officer-modal';
+import {AuthorizedOfficerModalEl} from '../../../../elements/ip-reporting/authorized-officer-modal';
 import './pd-report-sr';
 import './pd-report-hr';
 import './pd-report-qpr';
@@ -461,7 +463,6 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     const self = this;
 
     this.set('busy', true);
-
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         var newPath = self.buildUrl(
@@ -478,17 +479,17 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch(function(res) {
-        var authorizedError = res.data.error_codes.filter(function(error) {
+      .catch(function(res: GenericObject) {
+        let authorizedError = res.data.error_codes.filter(function(error: string) {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
         self.set('busy', false);
 
         if (authorizedError.length > 0) {
-          return self.$.officer.open();
+          return (self.$.officer as AuthorizedOfficerModalEl).open();
         }
-        return self.$.error.open(res.data.non_field_errors);
+        return (self.$.error as ErrorModalEl).open(res.data.non_field_errors);
       });
   }
 
@@ -499,8 +500,8 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     }
 
     (this.$.report as EtoolsPrpAjaxEl).abort();
-    this.$.error.close();
-    this.$.officer.close();
+    (this.$.error as ErrorModalEl).close();
+    (this.$.officer as AuthorizedOfficerModalEl).close();
   }
 
 }

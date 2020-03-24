@@ -34,9 +34,11 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
           width: 700px;
         }
       }
-
       ::slotted([slot=disaggregation-table]) {
         margin-bottom: 1em;
+      }
+     .buttons {
+        justify-content: flex-start;
       }
     </style>
 
@@ -72,6 +74,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
         </paper-button>
 
         <paper-button
+            class="btn-cancel"
             on-tap="close">
           [[localize('cancel')]]
         </paper-button>
