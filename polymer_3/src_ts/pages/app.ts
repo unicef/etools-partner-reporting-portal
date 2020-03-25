@@ -292,11 +292,16 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     let currentWorkspaceData = workspaces.filter(function(workspace) {
       return workspace.code === currentWorkspace;
-    })[0];
+    });
 
-    if (this.locationId !== currentWorkspaceData.id) {
-      this.locationId = currentWorkspaceData.id;
-      this.reduxStore.dispatch(locationSet(currentWorkspaceData.id));
+    if (!currentWorkspaceData.length) {
+      return;
+    }
+    const workspaceId = currentWorkspaceData[0].id;
+
+    if (this.locationId !== workspaceId) {
+      this.locationId = workspaceId;
+      this.reduxStore.dispatch(locationSet(workspaceId));
     }
   }
 

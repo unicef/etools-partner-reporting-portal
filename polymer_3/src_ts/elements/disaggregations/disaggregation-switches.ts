@@ -127,7 +127,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _fieldValueChanged(e: CustomEvent) {
-    let field = e.target;
+    const field = <GenericObject>e.target;
 
     this.fieldValueChanged = Debouncer.debounce(this.fieldValueChanged,
       timeOut.after(100),
@@ -136,7 +136,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
 
         this._confirmIntent(field)
           .then(this._commit.bind(this))
-          .catch(this._revert.bind(this));
+          .catch((err: any) => {this._revert.bind(this)});
       });
 
   }

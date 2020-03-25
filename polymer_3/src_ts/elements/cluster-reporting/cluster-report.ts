@@ -583,7 +583,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
     this._confirmIntent()
       .then(this._commit.bind(this))
-      .catch(this._revert.bind(this));
+      .catch((err: any) => {this._revert.bind(this)});
   }
 
   _confirmIntent() {
