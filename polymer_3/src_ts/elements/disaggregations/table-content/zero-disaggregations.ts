@@ -35,7 +35,7 @@ class ZeroDisaggregations extends PolymerElement {
   @property({type: Array, computed: '_determineTotalRow(mapping, data)'})
   totalRow!: any[];
 
-  _determineTotalRow(_, data: GenericObject) {
+  _determineTotalRow(_: any, data: GenericObject) {
     return {
       title: 'total',
       total: {

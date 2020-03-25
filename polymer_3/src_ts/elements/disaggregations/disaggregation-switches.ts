@@ -107,7 +107,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   fieldValueChanged !: Debouncer | null;
 
   static get observers() {
-    return ['_computeWarning(data.num_disaggregation, reportedOn.length)']
+    return ['_computeWarning(data.num_disaggregation, reportedOn.length)'];
   }
 
   _computeEditableBool(editable: number) {
@@ -123,11 +123,12 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _formatFieldName(name: string) {
+    // @ts-ignore
     return this._capitalizeFirstLetter(name);
   }
 
   _fieldValueChanged(e: CustomEvent) {
-    let field = e.target;
+    const field = e.target as any;
 
     this.fieldValueChanged = Debouncer.debounce(this.fieldValueChanged,
       timeOut.after(100),
@@ -142,7 +143,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _confirmIntent(field: GenericObject) {
-    let deferred = this._deferred();
+    const deferred = this._deferred();
 
     fireEvent(this, 'disaggregation-modal-confirm', deferred);
 
@@ -155,7 +156,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
     this.set('formattedData', Object.assign({}, this.formattedData, {
       disaggregation: {},
       level_reported: this.reportedOn.length,
-      disaggregation_reported_on: this.reportedOn,
+      disaggregation_reported_on: this.reportedOn
     }));
   }
 
@@ -170,8 +171,8 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _recordField(field: GenericObject) {
-    let id = Number(field.id);
-    let checked = field.checked;
+    const id = Number(field.id);
+    const checked = field.checked;
 
     if (checked) {
       this.push('reportedOn', id);
@@ -181,7 +182,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _initField(e: CustomEvent) {
-    this._recordField(e.target);
+    this._recordField(e.target as any);
   }
 
   connectedCallback() {

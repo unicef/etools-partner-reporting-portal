@@ -88,18 +88,19 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   }
 
   _fetchClusterNames() {
+    // @ts-ignore
     if (!this.clusterNamesUrl || !this.params) {
       return;
     }
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
-        let self = this;
+        const self = this;
         const thunk = (this.$.clusterNames as EtoolsPrpAjaxEl).thunk();
         (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
         thunk()
-          .then(function(res: any) {
+          .then((res: any) => {
             self.set('data', [{
               id: '',
               title: 'All'

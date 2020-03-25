@@ -94,6 +94,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.activities as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
+        // @ts-ignore
         const data = (self.required ? [] : [{
           id: '',
           title: 'All'

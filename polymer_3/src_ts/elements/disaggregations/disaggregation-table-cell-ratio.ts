@@ -10,7 +10,7 @@ import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import '@polymer/iron-meta/iron-meta';
 import {IronMeta} from '@polymer/iron-meta/iron-meta';
-import {DisaggregationFieldEl} from "./disaggregation-field";
+import {DisaggregationFieldEl} from './disaggregation-field';
 
 /**
  * @polymer
@@ -171,12 +171,12 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   _bindValidation(coords: string) {
     const vName = 'v-' + coords;
     const self = this;
-    let validator = {
+    const validator = {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
-        return Number(value) !== 0 || Number(self!.shadowRoot!.querySelector('#v')!.getField().value) === 0;
-      }.bind(self)
+        return Number(value) !== 0 || Number((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField().value) === 0;
+      }
     };
 
     new IronMeta({

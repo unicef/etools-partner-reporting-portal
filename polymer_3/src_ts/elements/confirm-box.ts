@@ -7,7 +7,6 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/polymer/lib/elements/dom-if';
 import Constants from '../constants';
 import {GenericObject} from '../typings/globals.types';
-import {ConfirmBoxElem} from '../typings/entities.types';
 import {buttonsStyles} from '../styles/buttons-styles';
 
 
@@ -17,7 +16,7 @@ import {buttonsStyles} from '../styles/buttons-styles';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class ConfirmBox extends PolymerElement {
+export class ConfirmBox extends PolymerElement {
   public static get template() {
     return html`
         ${buttonsStyles}
@@ -119,7 +118,8 @@ class ConfirmBox extends PolymerElement {
 
   _ok() {
     try {
-      this.config.result.resolve();
+      (this.config as GenericObject).result.resolve();
+      // eslint-disable-next-line no-empty
     } catch (err) {
     }
 
@@ -128,7 +128,8 @@ class ConfirmBox extends PolymerElement {
 
   _cancel() {
     try {
-      this.config.result.reject();
+      (this.config as GenericObject).result.reject();
+      // eslint-disable-next-line no-empty
     } catch (err) {
     }
 

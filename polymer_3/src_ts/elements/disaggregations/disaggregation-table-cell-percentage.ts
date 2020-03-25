@@ -144,7 +144,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
       fireEvent(this, 'field-value-changed', {
         key: key,
         value: change,
-        internal: true,
+        internal: true
       });
     }
 
@@ -152,14 +152,14 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
   }
 
   _bindValidation(coords: string) {
-    let vName = 'v-' + coords;
+    const vName = 'v-' + coords;
     const self = this;
-    let validator = {
+    const validator = {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
-        return Number(value) !== 0 || Number(self!.shadowRoot!.querySelector('#v')!.getField().value) === 0;
-      }.bind(self)
+        return Number(value) !== 0 || Number((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField().value) === 0;
+      }
     };
 
     new IronMeta({
