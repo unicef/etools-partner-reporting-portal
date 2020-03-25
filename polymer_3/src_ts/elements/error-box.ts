@@ -95,7 +95,7 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
           .map((key) => {
             return {
               field: key,
-              details: error[key].reduce((acc, err: GenericObject) => {
+              details: error[key].reduce((acc: any, err: GenericObject) => {
                 return acc.concat(errorMapper(err));
               }, [])
             };

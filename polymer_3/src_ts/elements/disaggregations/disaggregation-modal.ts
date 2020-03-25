@@ -23,7 +23,7 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin ModalMixin
  * @appliesMixin LocalizeMixin
  */
-class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement)) {
+export class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`

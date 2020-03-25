@@ -22,6 +22,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   };
 
   const buildQuery = (chunks: any[]): string => {
+    // @ts-ignore
     return chunks.map((chunk) => {
       switch (typeof chunk) {
         case 'string':

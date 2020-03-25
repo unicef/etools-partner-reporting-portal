@@ -23,8 +23,8 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
   public static get observers() {
     return [
-      '_redirectIfNeeded(app, workspace, profile.access)',
-    ]
+      '_redirectIfNeeded(app, workspace, profile.access)'
+    ];
   }
 
   _redirectIfNeeded(app: string, workspace: string, access: string[]) {
@@ -34,6 +34,7 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
     if (!access || !access.length) {
       location.href = getDomainByEnv() + '/src/pages/unauthorized';
     } else if (access.indexOf(app) === -1) {
+      // @ts-ignore
       location.href = this.buildBaseUrl(workspace, access[0]);
     }
   }

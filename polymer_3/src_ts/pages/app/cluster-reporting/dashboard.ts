@@ -182,6 +182,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     ];
   }
 
+  // @ts-ignore
   _computeMode(accountType: string) {
     if (!accountType) {
       return;

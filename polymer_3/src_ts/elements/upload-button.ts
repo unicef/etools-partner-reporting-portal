@@ -21,6 +21,7 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 import {fireEvent} from '../utils/fire-custom-event';
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 /**
  * @polymer
@@ -137,20 +138,19 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
   }
 
   _openModal() {
-    const dialog = this.shadowRoot!.querySelector('#dialog');
+    const dialog = (this.shadowRoot!.querySelector('#dialog') as PaperDialogElement);
     dialog!.open();
   }
 
   _save() {
-    let file = this.get('files.0');
-    let self = this;
-    let data;
+    const file = this.get('files.0');
+    const self = this;
 
     if (!file) {
       return;
     }
 
-    data = new FormData();
+    const data = new FormData();
 
     if (file) {
       data.append('file', file.raw, file.file_name);
@@ -169,7 +169,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
         self._notifyFileUploaded();
         fireEvent(this, 'file-uploaded');
       })
-      .catch(function(res: any) {
+      .catch((res: any) => {
         self.set('errors', res.data);
         self.set('pending', false);
       });

@@ -24,7 +24,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     static get observers() {
       return [
-        '_updateQueryParams(pageSize, pageNumber)',
+        '_updateQueryParams(pageSize, pageNumber)'
       ];
     }
 
@@ -39,13 +39,14 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _updateQueryParams(pageSize: number, pageNumber: number) {
       const newParams = Object.assign({}, this.queryParams, {
         page_size: pageSize,
-        page: pageNumber,
+        page: pageNumber
       });
       setTimeout(() => {
         this.set('queryParams', newParams);
       });
     }
 
+    // @ts-ignore
     _detailsChange(event: CustomEvent) {
       const element = (event.composedPath()[0] as any);
       const isOpen = element && element.detailsOpened;

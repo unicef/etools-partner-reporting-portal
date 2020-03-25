@@ -14,8 +14,8 @@ import {sharedStyles} from '../styles/shared-styles';
  * @polymer
  * @customElement
  */
-class EtoolsPrpChips extends PolymerElement{
-  public static get template(){
+class EtoolsPrpChips extends PolymerElement {
+  public static get template() {
     return html`
         ${sharedStyles}
       <style include="iron-flex">
@@ -23,25 +23,25 @@ class EtoolsPrpChips extends PolymerElement{
           display: block;
           padding: 8px 0;
         }
-  
+
         .chips {
           font-size: 16px;
           line-height: 24px;
         }
-  
+
         .chip {
           max-width: 100%;
           margin-right: .75em;
         }
-  
+
         .chip__content {
           @apply --truncate;
         }
-  
+
         .chip__content--disabled {
           color: var(--theme-primary-text-color-medium);
         }
-  
+
         .chip__actions iron-icon {
           width: 18px;
           height: 18px;
@@ -52,7 +52,7 @@ class EtoolsPrpChips extends PolymerElement{
           cursor: pointer;
         }
       </style>
-      
+
       <labelled-item label="[[label]]" invalid="[[_invalid]]">
         <div class="chips layout horizontal wrap">
           <template
@@ -61,7 +61,7 @@ class EtoolsPrpChips extends PolymerElement{
               as="chip">
             <div class="chip layout horizontal">
               <div class$="[[_chipContentClass]]">[[chip]]</div>
-  
+
               <template
                   is="dom-if"
                   if="[[!disabled]]"
@@ -76,11 +76,11 @@ class EtoolsPrpChips extends PolymerElement{
               </template>
             </div>
           </template>
-  
+
           <slot></slot>
         </div>
       </labelled-item>
-    
+
     `;
   }
 
@@ -119,18 +119,18 @@ class EtoolsPrpChips extends PolymerElement{
     return 'chip__content' + (disabled ? ' chip__content--disabled' : '');
   }
 
-  _onChipAdd(e) {
+  _onChipAdd(e: CustomEvent) {
     e.stopPropagation();
 
     if (this.value.indexOf(e.detail) === -1) {
       this.set('value', this.value.concat(e.detail));
-      fireEvent(this,'selected-chips-updated');
+      fireEvent(this, 'selected-chips-updated');
     }
   }
 
-  _onChipRemove(e) {
-    let value = this.value.slice();
-    let toRemove = +e.target.index;
+  _onChipRemove(e: CustomEvent) {
+    const value = this.value.slice();
+    const toRemove = +(e.target as any).index;
 
     value.splice(toRemove, 1);
 
@@ -139,10 +139,12 @@ class EtoolsPrpChips extends PolymerElement{
   }
 
   _addEventListeners() {
+    // @ts-ignore
     this.addEventListener('chip-add', this._onChipAdd);
   }
 
   _removeEventListeners() {
+    // @ts-ignore
     this.removeEventListener('chip-add', this._onChipAdd);
   }
 

@@ -36,6 +36,8 @@ import {disaggregationsFetch} from '../redux/actions/disaggregations';
 // import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
 // import {RootState} from '../typings/redux.types';
 import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
+import {PullModalEl} from './pull-modal';
+import {DisaggregationModal} from './disaggregations/disaggregation-modal';
 
 /**
  * @polymer
@@ -563,11 +565,11 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
       this._fetchData()
         // @ts-ignore
-        .then(function() {
+        .then(() => {
           self.set('loading', false);
         })
         // @ts-ignore
-        .catch(function(err) {
+        .catch((_err: GenericObject) => {
           // TODO: error handling
         });
     }
@@ -583,7 +585,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     }
     const params: GenericObject = {
       pks: indicatorId,
-      limit: 1,
+      limit: 1
     };
 
     if (currentPD.id !== undefined) {
@@ -600,9 +602,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeIsHfIndicator(disaggregations: GenericObject) {
-    return disaggregations !== undefined
-      && this.reportIsQpr === true
-      && disaggregations.is_hf_indicator === true;
+    return disaggregations !== undefined &&
+      this.reportIsQpr === true &&
+      disaggregations.is_hf_indicator === true;
   }
 
   _computeMode(mode: string, overrideMode: string) {
@@ -610,15 +612,15 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).modalIndex) as DisaggregationModal).open();
   }
 
   _openPullModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#pull-modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#pull-modal-' + (e.target as any).modalIndex) as PullModalEl).open();
   }
 
   _updateModals(e: CustomEvent, data: GenericObject) {
-    const id = e.target!.id;
+    const id = (e.target as any).id;
 
     if (!id) {
       return;
@@ -660,7 +662,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
     fireEvent(this, 'report-complete', {
       indicatorId: this.indicatorId,
-      reportableId: this.reportableId,
+      reportableId: this.reportableId
     });
   }
 
@@ -673,7 +675,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
           acc[locationId] = {
             title: location.location.title,
             byEntity: [],
-            selected: 0,
+            selected: 0
           };
         }
 

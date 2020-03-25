@@ -384,6 +384,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
 
       try {
         indicatorDetails.init();
+        // eslint-disable-next-line no-empty
       } catch (err) {}
     }
   }

@@ -16,7 +16,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import 'etools-file/etools-file';
-import {EtoolsFileEl} from 'etools-file/etools-file';
+import {EtoolsFile} from 'etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
 /**
@@ -188,7 +188,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     this.set('otherTwoAttachment', []);
 
     setFiles(this.attachments)
-      .forEach(function (attachment: GenericObject) {
+      .forEach(function(attachment: GenericObject) {
         if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
           self.set('otherTwoAttachment', [attachment]);
         } else if (attachment.type === 'Other') {
@@ -211,32 +211,32 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     e.stopPropagation();
 
-    let deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
+    const deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
 
     (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
       .then(() => {
-      self._notifyFileDeleted();
-      self.set('attachmentDeleteUrl', undefined);
+        self._notifyFileDeleted();
+        self.set('attachmentDeleteUrl', undefined);
 
-      if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-        (self.$.faceAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.faceAttachmentComponent as EtoolsFileEl).set('files', []);
-      } else if (self.get('otherOneAttachment').length !== 0 &&
+        if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
+          (self.$.faceAttachmentComponent as EtoolsFile).fileInput.value = null;
+          (self.$.faceAttachmentComponent as EtoolsFile).set('files', []);
+        } else if (self.get('otherOneAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherOneAttachment')[0].id) {
-        (self.$.otherOneAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.otherOneAttachmentComponent as EtoolsFileEl).set('files', []);
-      } else if (self.get('otherTwoAttachment').length !== 0 &&
+          (self.$.otherOneAttachmentComponent as EtoolsFile).fileInput.value = null;
+          (self.$.otherOneAttachmentComponent as EtoolsFile).set('files', []);
+        } else if (self.get('otherTwoAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
-        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).set('files', []);
-      }
-    });
+          (self.$.otherTwoAttachmentComponent as EtoolsFile).fileInput.value = null;
+          (self.$.otherTwoAttachmentComponent as EtoolsFile).set('files', []);
+        }
+      })
     // @ts-ignore
-    // .catch(function(err) {
-    //   // TODO: error handling
-    // });
+      .catch((_err: GenericObject) => {
+      // TODO: error handling
+      });
   }
 
   _filesChanged(change: GenericObject) {
@@ -251,7 +251,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     const files = isEmpty ? [] : change.base;
 
-    files.findIndex(function (file: GenericObject) {
+    files.findIndex(function(file: GenericObject) {
       if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
         file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
       }
@@ -272,7 +272,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       const data = new FormData();
       let thunk;
 
-      files.forEach(function (file: GenericObject) {
+      files.forEach(function(file: GenericObject) {
         data.append('path', file.raw, file.file_name);
         data.append('type', attachmentType);
       });
@@ -378,13 +378,13 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     if (!this.attachmentsListUrl) {
       return;
     }
-    let downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
+    const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(
       pdReportsAttachmentsSync(downloadThunk, this.reportId)
     )
       // @ts-ignore
-      .catch(function (err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -396,7 +396,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl
-    ].forEach(function (req: EtoolsPrpAjaxEl) {
+    ].forEach(function(req: EtoolsPrpAjaxEl) {
       req.abort();
     });
 

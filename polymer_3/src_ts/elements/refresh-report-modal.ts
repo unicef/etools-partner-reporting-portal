@@ -21,8 +21,8 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import './error-modal';
 import './etools-prp-number';
 import './etools-prp-ajax';
-import {buttonsStyles} from "../styles/buttons-styles";
-import {modalStyles} from "../styles/modal-styles";
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
@@ -120,10 +120,10 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
 
     const refreshThunk = (this.$.refreshReport as EtoolsPrpAjaxEl).thunk();
     refreshThunk()
-      .then(function() {
+      .then(() => {
         window.location.reload();
       })
-      .catch(function(res) {
+      .catch((res: GenericObject) => {
         console.log(res);
         self.set('busy', false);
       });
@@ -137,4 +137,3 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
 window.customElements.define('refresh-report-modal', RefreshReportModal);
 
 export {RefreshReportModal as RefreshReportModalEl};
-

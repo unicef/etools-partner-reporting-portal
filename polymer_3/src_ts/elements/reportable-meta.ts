@@ -162,7 +162,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   @property({type: String})
-  mode!: String;
+  mode!: string;
 
   @property({type: String})
   toggle: string = 'Edit';
@@ -228,8 +228,8 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         break;
 
       case 'narrative_assessment':
-        if (field.value !== null && this.data.narrative_assessment === field.value.trim()
-          || field.value === null && this.data.narrative_assessment === null
+        if (field.value !== null && this.data.narrative_assessment === field.value.trim() ||
+          field.value === null && this.data.narrative_assessment === null
         ) {
           this.set('toggle', 'Edit');
           narrativeTextInput.disabled = true;
@@ -292,8 +292,8 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const labelledItem = this.shadowRoot!.querySelectorAll('labelled-item');
     if (labelledItem && labelledItem.length > 1 && labelledItem[1] && labelledItem[1].querySelector('paper-input') !== null) {
       const paperButton = labelledItem[1].querySelector('paper-button');
-      if (paperButton && paperButton.textContent.trim() === 'Save') {
-        this.set(['localData', 'narrative_assessment'], labelledItem[1].querySelector('paper-input').value);
+      if (paperButton && paperButton.textContent!.trim() === 'Save') {
+        this.set(['localData', 'narrative_assessment'], labelledItem[1].querySelector('paper-input')!.value);
       }
 
       (this.$.refresh as RefreshReportModalEl).close();

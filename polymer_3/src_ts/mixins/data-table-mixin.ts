@@ -9,8 +9,8 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DataTableClass extends baseClass {
 
     _pageSizeChanged(e: CustomEvent) {
-      let change: GenericObject = {
-        page_size: e.detail.value,
+      const change: GenericObject = {
+        page_size: e.detail.value
       };
 
       if (this._pageNumberInitialized) {
@@ -22,7 +22,7 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _pageNumberChanged(e: CustomEvent) {
       this.set('queryParams', Object.assign({}, this.queryParams, {
-        page: e.detail.value,
+        page: e.detail.value
       }));
 
       setTimeout(() => {
