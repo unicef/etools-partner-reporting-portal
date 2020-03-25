@@ -38,16 +38,16 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       }
     }
 
-    _dialogClosing(event: CustomEvent) {
+    _dialogClosing(event: CustomEvent & any) {
       // chrome
       const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
       if (dialogOverlay && dialogOverlay.parentElement) {
         dialogOverlay.parentElement.removeChild(dialogOverlay);
       }
 
-      if ((event as any).path && (event as any).path[0] && (event as any).path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
+      if (event.path && event.path[0] && event.path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
       // edge
-      if ((event as any).__target && (event as any).__target.is && (event as any).__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
+      if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
 
       (this.$.drawer as any).style.zIndex = '1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
