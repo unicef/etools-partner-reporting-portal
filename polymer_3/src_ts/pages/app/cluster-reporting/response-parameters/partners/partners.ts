@@ -6,7 +6,6 @@ import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
-// <link rel="import" href="../../../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';

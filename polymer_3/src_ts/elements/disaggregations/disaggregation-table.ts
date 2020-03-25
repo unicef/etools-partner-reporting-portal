@@ -332,7 +332,8 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _computeLabelVisibility(app: string, indicatorType: string) {
-    if (String(app) && String(indicatorType)) {
+    if ((String(app) === 'ip-reporting') &&
+      (String(indicatorType) === 'number')) {
       return false;
     } else {return true;}
   }
