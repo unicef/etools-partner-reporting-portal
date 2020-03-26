@@ -4,13 +4,14 @@ import DialogActions from "../common/DialogActions";
 import TextFieldForm from "../form/TextFieldForm";
 import {Grid, Button} from "@material-ui/core";
 import {email, phoneNumber} from "../../helpers/validation";
-import {reduxForm} from 'redux-form';
+import {reduxForm, change} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
 import SearchSelectForm from "../form/SearchSelectForm";
 import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import withProps from "../hoc/withProps";
 import {clusterOptions, partnerTypeOptions} from "../../helpers/props";
 import partnerLabels from "./partnerLabels";
@@ -24,11 +25,13 @@ class PartnerDialog extends Component {
         super(props);
 
         this.state = {
-            loading: false
+            loading: false,
+            csoSelected: false
         };
 
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     onSubmit(values) {
@@ -51,8 +54,19 @@ class PartnerDialog extends Component {
     onClose() {
         const {reset, onClose} = this.props;
 
+        this.setState({ csoSelected: false });
+
         onClose();
         reset();
+    }
+
+    handleChange(e) {
+        if (e.target.value === "CSO") {
+            this.setState({ csoSelected: true });
+        } else {
+            this.setState({ csoSelected: false });
+            this.props.dispatch(change("addPartnerForm", "cso_type", ""));
+        }
     }
 
     render() {
@@ -115,11 +129,12 @@ class PartnerDialog extends Component {
 
                         <Grid item md={6}>
                             <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}
-                                        optional/>
+                                        onChange={this.handleChange} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions} optional/>
+                            <SelectForm fieldName="cso_type" label={labels.cso_type} values={csoTypeOptions}
+                                        selectFieldProps={{disabled: !this.state.csoSelected}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -192,6 +207,10 @@ const title = {
     edit: "Edit Partner"
 };
 
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({change}, dispatch);
+}
+
 const mapStateToProps = (state, ownProps) => {
     const {partner} = ownProps;
 
@@ -219,4 +238,4 @@ const mapStateToProps = (state, ownProps) => {
 export default withProps(
     clusterOptions,
     partnerTypeOptions
-)(connect(mapStateToProps)(reduxForm({form: "addPartnerForm", enableReinitialize: true})(PartnerDialog)));
+)(connect(mapStateToProps, mapDispatchToProps)(reduxForm({form: "addPartnerForm", enableReinitialize: true})(PartnerDialog)));

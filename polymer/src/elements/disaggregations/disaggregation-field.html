@@ -94,7 +94,7 @@
       _inputValueChanged: function (e) {
         var change = {};
 
-        change[this.key] = e.target.value;
+        change[this.key] = Polymer.dom(e).localTarget.value;
 
         this.fire('field-value-changed', {
           key: this.coords,

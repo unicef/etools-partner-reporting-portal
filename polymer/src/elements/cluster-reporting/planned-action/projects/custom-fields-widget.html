@@ -151,23 +151,23 @@
         _remove: function (e) {
           var value = this.get('customFields');
           var toRemove = value.findIndex(function (field) {
-            return String(field.id) === String(e.target.id);
+            return String(field.id) === String(Polymer.dom(e).localTarget.id);
           });
           this.splice('customFields', toRemove, 1);
         },
 
         _updateCustomFieldTitle: function (e) {
           var field = this.customFields.find(function (field) {
-            return Number(field.id) === Number(e.target.nameid);
+            return Number(field.id) === Number(Polymer.dom(e).localTarget.nameid);
           });
-          field.name = e.target.value;
+          field.name = Polymer.dom(e).localTarget.value;
         },
 
         _updateCustomFieldDescription: function (e) {
           var field = this.customFields.find(function (field) {
-            return Number(field.id) === Number(e.target.valueid);
+            return Number(field.id) === Number(Polymer.dom(e).localTarget.valueid);
           });
-          field.value = e.target.value;
+          field.value = Polymer.dom(e).localTarget.value;
         },
 
         _updateVisibleCustomFields: function () {

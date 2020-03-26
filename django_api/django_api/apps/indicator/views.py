@@ -793,11 +793,11 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
                 settings.FRONTEND_HOST,
                 cluster.response_plan.workspace.workspace_code,
                 cluster.response_plan.id,
-                reportable.content_object.cluster_activity.id
+                reportable.content_object.activity.cluster_activity.id
             )
 
         try:
-            project_name = reportable.content_object.projects.first().title
+            project_name = reportable.content_object.project.title
         except Exception:
             project_name = ''
 

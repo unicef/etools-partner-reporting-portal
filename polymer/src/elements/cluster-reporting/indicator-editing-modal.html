@@ -469,7 +469,7 @@
 
         canEditDetails: {
           type: Boolean,
-          computed: '_computeCanEditDetails(permissions, data, isPAI)',
+          computed: '_computeCanEditDetails(permissions, data)',
         },
 
         dateFormat: {
@@ -528,8 +528,8 @@
         return type === 'number';
       },
 
-      _computeCanEditDetails: function (permissions, data, isPAI) {
-        return (permissions.createClusterEntities && !isPAI) ||
+      _computeCanEditDetails: function (permissions, data) {
+        return permissions.createClusterEntities ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 
@@ -556,7 +556,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _showCSD: function (frequency) {
