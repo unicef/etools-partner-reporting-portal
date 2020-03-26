@@ -112,7 +112,7 @@
       </indicator-locations-modal>
     </template>
 
-    <etools-data-table-row on-opened-changed="_handleOpenedChanged">
+    <etools-data-table-row details-opened="{{detailsOpened}}">
       <div slot="row-data">
         <span class="table-cell table-cell--text self-center">
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
@@ -331,10 +331,6 @@
 
       _computeIsClusterApp: function(appName) {
         return appName === 'cluster-reporting';
-      },
-
-      _handleOpenedChanged: function() {
-        this.detailsOpened = !this.detailsOpened;
       },
 
       _computeIndicatorReportsUrl: function(baseUrl, indicator) {

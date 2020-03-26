@@ -321,6 +321,20 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.get_exporter_class()
+        if exporter_class:
+            filter_qs = self.filter_queryset(self.get_queryset())
+            # if exporting limit to submitted or accepted reports only
+            filter_qs = filter_qs.filter(
+                status__in=[
+                    PROGRESS_REPORT_STATUS.submitted,
+                    PROGRESS_REPORT_STATUS.accepted,
+                ],
+            )
+            return exporter_class(filter_qs).get_as_response()
+        return super().get(request, *args, **kwargs)
+
 
 class ProgressReportAnnexCPDFView(RetrieveAPIView):
     """

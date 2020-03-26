@@ -396,6 +396,10 @@
           computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
+        currentPartnerId: {
+          type: Number
+        },
+
         partner: {
           type: Object,
           computed: '_computePartner(storePartner, selectedPartner)'
@@ -441,6 +445,7 @@
         this.set('activities', []);
         this.set('objectives', []);
         this.set('errors', {});
+        this.set('currentPartnerId', this.projectData.partner_id);
       },
 
       _onOpenedChanged: function (opened) {
@@ -450,7 +455,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {
@@ -485,7 +490,10 @@
                   return element.project_id === parseInt(self.projectData.id);
                 }) === undefined;
               });
-              self.set('partnerActivities', filteredActivities);
+              var currentPartnerActivities = filteredActivities.filter(function (activity) {
+                return activity.partner.id === self.currentPartnerId;
+              });
+              self.set('partnerActivities', currentPartnerActivities);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -560,9 +568,9 @@
 
       _close: function (e) {
         if (e === 'saved' ||
-          e.target.nodeName === 'PAPER-DIALOG' ||
-          e.target.nodeName === 'PAPER-BUTTON' ||
-          e.target.nodeName === 'PAPER-ICON-BUTTON'
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-DIALOG' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-BUTTON' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-ICON-BUTTON'
         ) {
           this.set('data', {});
 

@@ -26,19 +26,9 @@
       }
     </style>
 
-    <paper-dropdown-menu
-        id="field"
-        label="[[label]]"
-        disabled="[[disabled]]"
-        always-float-label>
-      <paper-listbox
-          slot="dropdown-content"
-          class="dropdown-content"
-          selected="[[selected]]">
-        <template
-            id="repeat"
-            is="dom-repeat"
-            items="[[data]]">
+    <paper-dropdown-menu id="field" label="[[label]]" disabled="[[disabled]]" always-float-label>
+      <paper-listbox slot="dropdown-content" class="dropdown-content" selected="[[selected]]">
+        <template id="repeat" is="dom-repeat" items="[[data]]">
           <paper-item>[[item.title]]</paper-item>
         </template>
       </paper-listbox>

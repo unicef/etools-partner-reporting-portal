@@ -247,7 +247,7 @@
         },
 
         _validate: function (e) {
-          e.target.validate();
+          this._getValidateTarget(e).validate();
         },
 
         validate: function () {

@@ -1,53 +1,48 @@
 import csv
 import datetime
 import io
-import tempfile
 import os
-import xlrd
+import random
+import tempfile
 from unittest.mock import Mock, patch
 
+import xlrd
+from core.common import (INDICATOR_REPORT_STATUS, OVERALL_STATUS,
+                         PR_ATTACHMENT_TYPES, PROGRESS_REPORT_STATUS,
+                         PRP_ROLE_TYPES)
+from core.factories import (
+    CartoDBTableFactory, ClusterActivityFactory,
+    ClusterActivityPartnerActivityFactory, ClusterFactory,
+    ClusterIndicatorReportFactory, ClusterObjectiveFactory,
+    ClusterPRPRoleFactory, CountryFactory, DisaggregationFactory,
+    DisaggregationValueFactory, GatewayTypeFactory,
+    HRReportingPeriodDatesFactory, IPDisaggregationFactory, IPPRPRoleFactory,
+    LocationFactory, LocationWithReportableLocationGoalFactory,
+    LowerLevelOutputFactory, NonPartnerUserFactory,
+    PartnerActivityProjectContextFactory, PartnerFactory,
+    PartnerProjectFactory, PartnerUserFactory, PDResultLinkFactory,
+    PersonFactory, ProgrammeDocumentFactory, ProgressReportAttachmentFactory,
+    ProgressReportFactory, ProgressReportIndicatorReportFactory,
+    QPRReportingPeriodDatesFactory,
+    QuantityReportableToLowerLevelOutputFactory,
+    QuantityReportableToPartnerActivityProjectContextFactory,
+    QuantityTypeIndicatorBlueprintFactory, ResponsePlanFactory, SectionFactory,
+    WorkspaceFactory, faker)
+from core.management.commands._generate_disaggregation_fake_data import \
+    generate_3_num_disagg_data
+from core.models import Location
+from core.tests.base import BaseAPITestCase
 from django.conf import settings
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.urls import reverse
-from rest_framework import status
-from unicef_notification.models import Notification
-
-from core.common import (INDICATOR_REPORT_STATUS, OVERALL_STATUS,
-                         PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES, PR_ATTACHMENT_TYPES)
-from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
-                            ClusterActivityPartnerActivityFactory,
-                            ClusterFactory, ClusterIndicatorReportFactory,
-                            ClusterObjectiveFactory, ClusterPRPRoleFactory,
-                            CountryFactory, DisaggregationFactory,
-                            DisaggregationValueFactory, GatewayTypeFactory,
-                            HRReportingPeriodDatesFactory,
-                            IPDisaggregationFactory, IPPRPRoleFactory,
-                            LocationFactory,
-                            LocationWithReportableLocationGoalFactory,
-                            LowerLevelOutputFactory, NonPartnerUserFactory,
-                            PartnerFactory, PartnerProjectFactory,
-                            PartnerActivityProjectContextFactory,
-                            PartnerUserFactory, PDResultLinkFactory,
-                            PersonFactory, ProgrammeDocumentFactory,
-                            ProgressReportAttachmentFactory,
-                            ProgressReportFactory,
-                            ProgressReportIndicatorReportFactory,
-                            QPRReportingPeriodDatesFactory,
-                            QuantityReportableToLowerLevelOutputFactory,
-                            QuantityReportableToPartnerActivityProjectContextFactory,
-                            QuantityTypeIndicatorBlueprintFactory,
-                            ResponsePlanFactory, SectionFactory,
-                            WorkspaceFactory, faker)
-from core.management.commands._generate_disaggregation_fake_data import \
-    generate_3_num_disagg_data
-from core.models import Location
-from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (IndicatorBlueprint, IndicatorLocationData,
-                              IndicatorReport)
+                              IndicatorReport, Reportable)
+from rest_framework import status
 from unicef.models import ProgressReport, ProgressReportAttachment
+from unicef_notification.models import Notification
 
 
 def convert_xlsx_to_csv(response):
@@ -844,9 +839,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export(self, mock_create, mock_clean, mock_send):
-        # ensure at least one report has status overdue
+        # ensure at least one report has status submitted
         report = self.queryset.first()
-        report.status = PROGRESS_REPORT_STATUS.overdue
+        report.status = PROGRESS_REPORT_STATUS.submitted
         report.save()
 
         url = reverse(
@@ -861,11 +856,11 @@ class TestProgressReportAPIView(BaseAPITestCase):
             disposition.endswith('Progress Report(s) Summary.xlsx"'),
         )
         self.reports = self.queryset.filter(
-            status=PROGRESS_REPORT_STATUS.overdue
+            status=PROGRESS_REPORT_STATUS.submitted
         )
         self.assertTrue(len(self.reports))
         self.assertTrue(string_in_download(
-            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.submitted],
             response,
         ))
 
@@ -910,7 +905,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
             response,
         ))
-        self.assertTrue(string_in_download(
+        # Only submitted and accepted are allowed to be exported
+        self.assertFalse(string_in_download(
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.due],
             response,
         ))
@@ -972,7 +968,8 @@ class TestProgressReportAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
             response,
         ))
-        self.assertTrue(string_in_download(
+        # Only submitted and accepted are allowed to be exported
+        self.assertFalse(string_in_download(
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
             response,
         ))
@@ -1312,3 +1309,139 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
         response = self.client.delete(url, format='multipart')
 
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
+    def setUp(self):
+        self.country = CountryFactory()
+        self.workspace = WorkspaceFactory(countries=[self.country])
+        self.partner = PartnerFactory(
+            country_code=self.country.country_short_code,
+        )
+        self.user = PartnerUserFactory(partner=self.partner)
+        self.prp_role = IPPRPRoleFactory(
+            user=self.user,
+            workspace=self.workspace,
+            role=PRP_ROLE_TYPES.ip_authorized_officer,
+        )
+
+        self.unicef_officer = PersonFactory()
+        self.unicef_focal_point = PersonFactory()
+        self.partner_focal_point = PersonFactory()
+        self.pd = ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+        self.cp_output = PDResultLinkFactory(
+            programme_document=self.pd,
+        )
+        self.llo = LowerLevelOutputFactory(
+            cp_output=self.cp_output,
+        )
+        self.report_number = 1
+
+        super().setUp()
+
+    def _setup_reportable(self, report_status=None):
+        reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
+        report_status = report_status if report_status else random.choice(
+            [x[0] for x in PROGRESS_REPORT_STATUS]
+        )
+        pr = ProgressReportFactory(
+            start_date=hr_period.start_date,
+            end_date=hr_period.end_date,
+            due_date=hr_period.due_date,
+            report_number=self.report_number,
+            report_type=hr_period.report_type,
+            is_final=False,
+            status=report_status,
+            programme_document=self.pd,
+            submitted_by=self.user,
+            submitting_user=self.user,
+        )
+        self.report_number += 1
+        ProgressReportIndicatorReportFactory(
+                progress_report=pr,
+                reportable=reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+                overall_status=OVERALL_STATUS.met,
+            )
+        return reportable, pr
+
+    def test_get(self):
+        reportable, __ = self._setup_reportable()
+        reportable_qs = Reportable.objects.filter(
+            lower_level_outputs__isnull=False,
+        )
+        url = reverse(
+            "programme-document-indicators",
+            args=[self.workspace.pk],
+        )
+        self.assertTrue(reportable_qs.count())
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), reportable_qs.count())
+        data = response.data["results"][0]
+        self.assertEqual(data["id"], reportable.pk)
+
+    def test_filter_report_status(self):
+        report_status = "Sub"
+        reportable, __ = self._setup_reportable(report_status=report_status)
+        self.assertEqual(reportable.indicator_reports.count(), 1)
+        reportable_qs = Reportable.objects.filter(
+            indicator_reports__progress_report__status=report_status
+        )
+        self.assertTrue(reportable_qs.exists())
+        url = reverse(
+            "programme-document-indicators",
+            args=[self.workspace.pk],
+        )
+
+        # expect results
+        response = self.client.get(f"{url}?report_status={report_status}")
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+
+        # expect no results
+        for different_report_status, __ in PROGRESS_REPORT_STATUS:
+            if different_report_status != report_status:
+                break
+        response = self.client.get(
+            f"{url}?report_status={different_report_status}"
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_export(self):
+        report_status = "Sub"
+        url = reverse(
+            "programme-document-indicators",
+            args=[self.workspace.pk],
+        )
+        reportable, __ = self._setup_reportable(report_status=report_status)
+
+        # expect results
+        response = self.client.get(
+            f"{url}?report_status={report_status}&export=pdf"
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        response_length = len(response.content)
+
+        # add reportable that should not be part of export
+        self._setup_reportable(report_status="Due")
+        response = self.client.get(
+            f"{url}?report_status={report_status}&export=pdf"
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.content), response_length)

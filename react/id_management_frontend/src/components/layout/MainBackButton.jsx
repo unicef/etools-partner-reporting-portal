@@ -30,7 +30,7 @@ class MainBackButton extends Component {
     goBack() {
         const {portal} = this.props;
 
-        document.location.href = "/app/NE/" + portal;
+        document.location.href = "/app/" + portal;
     }
 
     render() {
