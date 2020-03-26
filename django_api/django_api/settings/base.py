@@ -346,7 +346,8 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Sensible settings for celery
-CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_ALWAYS_EAGER = bool(os.environ.get('CELERY_TASK_ALWAYS_EAGER', False))
+CELERY_ALWAYS_EAGER = bool(os.environ.get('CELERY_ALWAYS_EAGER', False))
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_PUBLISH_RETRY = True
 CELERY_WORKER_DISABLE_RATE_LIMITS = False

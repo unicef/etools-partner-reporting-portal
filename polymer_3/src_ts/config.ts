@@ -1,4 +1,4 @@
-export const BASE_PATH = "app_poly3";
+export const BASE_PATH = "app";
 
 export const isLocal = () => {
   return ['9000', '8081'].includes(window.location.port);

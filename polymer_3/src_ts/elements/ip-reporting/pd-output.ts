@@ -384,7 +384,8 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
 
       try {
         indicatorDetails.init();
-      } catch (err) {}
+      }
+      catch (err) {console.error("pd-output.ts", err)}
     }
   }
 
