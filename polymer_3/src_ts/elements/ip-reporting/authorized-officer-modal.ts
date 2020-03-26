@@ -199,16 +199,12 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
           self.reportId,
           res.data
         ));
-
         self.set('busy', false);
-        self.close();
-        setTimeout(() => {
-          self.set('path', newPath);
-        }, 200);
+        self.set('path', newPath);
       })
       .catch((res: any) => {
-        self.close();
         const errors = res.data.non_field_errors;
+        self.close();
         return (self.$.error as ErrorModalEl).open(errors);
       })
       .then(() => {

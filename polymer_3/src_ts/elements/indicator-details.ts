@@ -214,7 +214,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         params="[[params]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
+    <template is="dom-if" if="[[dataLoaded]]">
       <div>
         <template
             is="dom-if"
@@ -287,7 +287,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
               <template
                   is="dom-repeat"
                   items="[[locationData]]"
-                  as="topLevelLocation">
+                  as="topLevelLocation"
+                  on-rendered-item-count-changed="onLocationRendered">
                 <paper-item id="tab-item">
                   <status-badge type="[[_computeLocationStatus(topLevelLocation)]]"></status-badge>
                   [[topLevelLocation.title]]
@@ -468,6 +469,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   @property({type: Boolean})
+  dataLoaded = false;
+
+  @property({type: Boolean})
   loading = true;
 
   @property({type: Number})
@@ -554,22 +558,27 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   init() {
     if (this.indicatorId) {
-      const self = this;
 
       if (this.initialized) {
         return;
       }
-
+      const self = this;
       this.set('initialized', true);
       this._fetchData()
         // @ts-ignore
         .then(function() {
-          self.set('loading', false);
+          self.set('dataLoaded', true);
         })
         // @ts-ignore
         .catch(function(err) {
           // TODO: error handling
         });
+    }
+  }
+
+  onLocationRendered(e: CustomEvent) {
+    if (this.locationData.length === e.detail.value) {
+      this.set('loading', false);
     }
   }
 
