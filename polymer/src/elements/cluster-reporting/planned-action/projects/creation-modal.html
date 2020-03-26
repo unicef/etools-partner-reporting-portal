@@ -963,9 +963,10 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName === 'PAPER-DIALOG' ||
-            e.target.nodeName === 'PAPER-BUTTON' ||
-            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+        const nodeName = Polymer.dom(e).localTarget.nodeName;
+        if (nodeName === 'PAPER-DIALOG' ||
+            nodeName === 'PAPER-BUTTON' ||
+            nodeName === 'PAPER-ICON-BUTTON') {
           this.set('data', {});
           this.set('opened', false);
           this.set('refresh', false);
@@ -1126,7 +1127,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _redirectToDetail: function (id) {

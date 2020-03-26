@@ -32,7 +32,7 @@ We are using this component for custom specific dates in indicator modals for ex
 
 ## Tell us about the build process. Any reason for not using ‘polymer build’?
 
-PRP frontend app is using gulp to initiate build process. You can check out `gulpfile.js` in polymer folder for the details. PRP gulp build process is inspired by PMP frontend app build process. There should be a lot of similarities from there. PRP app is lintedd, is minified, and is bundled to serve the folder for any deployment.
+PRP frontend app is using gulp to initiate build process. You can check out `gulpfile.js` in polymer folder for the details. PRP gulp build process is inspired by PMP frontend app build process. There should be a lot of similarities from there. PRP app is linted, is minified, and is bundled to serve the folder for any deployment.
 
 We are not using `polymer build` command to do this in alignment with PMP app processes.
 
@@ -59,7 +59,7 @@ labelled-item is a simple UI component to show primary/secondary texts at the sa
 
 ## Paper-input being used in places where 2000 characters expected. Any reason for not using paper-textarea?
 
-It was a decision that the multi-column UI behavior on such long text was not adopted. Therefore, we chose paper-input instead to achieve this.
+It was a decision that the multi-column UI behavior on such long text was not adopted. Therefore, we chose paper-input instead to achieve this. Also, paper-textarea listens to a different DOM event compared to paper-input.
 
 ## What’s the difference between `Progress Report` file downloaded from `Download Report in standard Template Format` and `Progress Summary` downloaded from `XLS/PDF` links? At first glance they seem very similar.
 

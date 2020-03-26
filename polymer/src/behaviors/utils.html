@@ -129,7 +129,8 @@
       },
 
       _toPercentageRounded: function (value) {
-        return value == null ? value : Math.floor(value * 100) / 100 + '%';
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            value : Math.floor(value * 100) / 100 + '%';
       },
 
       _formatIndicatorValue: function(indicatorType, value, percentize) {
@@ -293,6 +294,16 @@
       _normalizeDate: function (date) {
         return moment(date, App.Settings.dateFormat).startOf('day').toDate();
       },
+
+      _getValidateTarget: function (e) {
+        var target = Polymer.dom(e).localTarget;
+        if (target && target.validate) {
+          return target;
+        } else {
+          return Polymer.dom(e).rootTarget;
+        }
+      },
+
     };
 
     function buildQuery(chunks) {
