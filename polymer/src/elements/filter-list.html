@@ -29,24 +29,17 @@
         margin: 0 10px;
         text-transform: uppercase;
       }
-
     </style>
 
-    <iron-location
-        query="{{query}}">
+    <iron-location query="{{query}}">
     </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
+    <iron-query-params params-string="{{query}}" params-object="{{queryParams}}">
     </iron-query-params>
 
     <content></content>
 
-    <template
-        is="dom-if"
-        if="[[!hideClear]]"
-        restamp="true">
+    <template is="dom-if" if="[[!hideClear]]" restamp="true">
       <div id="action">
         <paper-button on-tap="_clearFilters">[[localize('clear')]]</paper-button>
       </div>
@@ -67,8 +60,15 @@
 
       properties: {
         queryParams: Object,
-        filters: Array,
-        filtersReady: Object,
+        filters: {
+          type: Array,
+          value: []
+        },
+
+        filtersReady: {
+          type: Object,
+          value: {}
+        },
 
         ignore: {
           type: String,
@@ -82,7 +82,7 @@
 
         loading: {
           type: Boolean,
-          value: false,
+          value: true,
         },
 
         hideClear: {
@@ -92,7 +92,7 @@
       },
 
       observers: [
-        '_updateLoading(filters.splices, filtersReady.*)',
+        '_updateLoading(filters.splices, filters.length, filtersReady)',
       ],
 
       _onFilterChanged: function (e) {
@@ -147,22 +147,23 @@
           return;
         }
 
-        this.set(['filtersReady', name], true);
+        this.filtersReady[name] = true;
+        this.filtersReady = JSON.parse(JSON.stringify(this.filtersReady));
       },
 
       _clearFilters: function () {
         var self = this;
 
         this.set('queryParams', Object.keys(this.queryParams)
-            .reduce(function (prev, curr) {
-              if (self.filters.indexOf(curr) === -1) {
-                prev[curr] = self.queryParams[curr];
-              } else {
-                prev[curr] = ''; // Can't set to undefined (does not trigger observers)
-              }
+          .reduce(function (prev, curr) {
+            if (self.filters.indexOf(curr) === -1) {
+              prev[curr] = self.queryParams[curr];
+            } else {
+              prev[curr] = ''; // Can't set to undefined (does not trigger observers)
+            }
 
-              return prev;
-            }, {}));
+            return prev;
+          }, {}));
 
         this._resetPageNumber();
       },
@@ -175,15 +176,16 @@
 
       _computeIgnoredFilters: function (ignore) {
         return ignore.split(',')
-            .filter(Boolean);
+          .filter(Boolean);
       },
 
       _updateLoading: function () {
         this.async(function () {
           var filtersCount = this.filters.length - this.ignoredFilters.length;
           var readyCount = Object.keys(this.filtersReady).length;
-
-          this.set('loading', readyCount < filtersCount);
+          if (readyCount === filtersCount) {
+            this.set('loading', false);
+          }
         });
       },
 
@@ -198,12 +200,6 @@
         this.addEventListener('deregister-filter', this._deregisterFilter);
       },
 
-      attached: function () {
-        this.set('filters', []);
-        this.set('filtersReady', {});
-        this._addEventListeners();
-      },
-
       _removeEventListeners: function () {
         this.removeEventListener('filter-changed', this._onFilterChanged);
         this.removeEventListener('register-filter', this._registerFilter);
@@ -214,6 +210,16 @@
       detached: function () {
         this._removeEventListeners();
       },
+
+      attached: function() {
+        this.set('filters', []);
+        this.set('filtersReady', {});
+        this._addEventListeners();
+        this.async(function () {
+          this.loading = false;
+        }, 2000);
+      }
+
     });
   </script>
 </dom-module>

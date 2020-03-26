@@ -23,8 +23,9 @@
       },
 
       _filterReady: function () {
-        this.async(function () {
-          this.fire('filter-ready', this.name);
+        var self = this;
+        setTimeout(function () {
+          self.fire('filter-ready', this.name);
         });
       },
 

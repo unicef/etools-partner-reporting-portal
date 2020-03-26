@@ -44,9 +44,9 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin NotificationsMixin
  */
 class PdDetailsCalculationMethods extends LocalizeMixin(
-                                          NotificationsMixin(
-                                          DataTableMixin(
-                                          UtilsMixin(ReduxConnectedElement)))) {
+  NotificationsMixin(
+    DataTableMixin(
+      UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
@@ -268,8 +268,10 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
   programmeDocumentsUrl!: string;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
-                          observer: '_getPdReports'})
+  @property({
+    type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
+    observer: '_getPdReports'
+  })
   pdReportsCount!: GenericObject;
 
   private _debouncer!: Debouncer;
@@ -318,11 +320,11 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
         (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId));
+        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
           // @ts-ignore
-          // .catch(function(err) {
-          //   // TODO: error handling
-          // });
+          .catch(function(err) {
+            //   // TODO: error handling
+          });
       });
   }
 
@@ -349,8 +351,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
         return self.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
       })
-      .then(this._notifyChangesSaved.bind(this))
-      .catch();
+      .then(self._notifyChangesSaved.bind(self))
+      .catch((err: any) => {});
   }
 
   _confirmIntent() {
@@ -404,11 +406,11 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
+          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
             // @ts-ignore
-            // .catch(function(err) {
-            //   // TODO: error handling
-            // });
+            .catch(function(err) {
+              //   // TODO: error handling
+            });
         });
     }
   }

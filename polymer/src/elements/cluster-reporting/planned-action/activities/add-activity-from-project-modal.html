@@ -657,7 +657,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {
@@ -772,9 +772,9 @@
 
       _close: function (e) {
         if (e === 'saved' ||
-          e.target.nodeName === 'PAPER-DIALOG' ||
-          e.target.nodeName === 'PAPER-BUTTON' ||
-          e.target.nodeName === 'PAPER-ICON-BUTTON'
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-DIALOG' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-BUTTON' ||
+        Polymer.dom(e).localTarget.nodeName === 'PAPER-ICON-BUTTON'
         ) {
           this.set('mode', '');
           this.set('data', {});
