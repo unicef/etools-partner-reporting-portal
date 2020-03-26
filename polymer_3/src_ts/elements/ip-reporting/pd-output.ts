@@ -412,10 +412,10 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
       )
     )
       // @ts-ignore
-      .then(function () {
+      .then(function() {
         self._notifyChangesSaved();
       })
-      .catch(function (err) {
+      .catch(function(err) {
         //   // TODO: error handling
       });
   }
@@ -456,7 +456,8 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
     super.disconnectedCallback();
 
     this._removeEventListeners();
-    this.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
+
+    this.shadowRoot!.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
       section.opened = false;
     });
   }
