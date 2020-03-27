@@ -65,6 +65,11 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
       .fields {
         position: relative;
+        padding: 0px;
+      }
+
+      .buttons {
+        justify-content: flex-start;
       }
 
       paper-radio-group-custom {
@@ -241,6 +246,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     label="Start date"
                     value="{{data.start}}"
                     error-message=""
+                    selected-date-display-format="D MMM YYYY"
                     required>
                   </datepicker-lite>
                 </div>
@@ -260,6 +266,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     label="End date"
                     value="{{data.end}}"
                     error-message=""
+                    selected-date-display-format="D MMM YYYY"
                     required>
                   </datepicker-lite>
                 </div>
@@ -273,6 +280,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     selected-values="{{data.clusters}}"
                     on-etools-selected-items-changed="_validate"
                     trigger-value-change-event
+                    error-message=""
                     required>
                   </etools-dropdown-multi>
                 </div>
