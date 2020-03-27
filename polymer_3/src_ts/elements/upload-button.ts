@@ -21,7 +21,6 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 import {fireEvent} from '../utils/fire-custom-event';
-import {GenericObject} from '../typings/globals.types';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 /**
