@@ -108,13 +108,29 @@ services:
   #     - traefik.enable=true
 
 
+#  polymer:
+#    image: unicef/etools-prp-polymer:poly3
+#    command: ash -c "node express.js"
+#    labels:
+#      - "traefik.http.routers.polymer.rule=PathPrefix(`/`)"
+#      - traefik.http.routers.polymer.service=polymer
+#      # - traefik.http.routers.polymer.middlewares=polymer-stripprefix
+#      # - traefik.http.middlewares.polymer-stripprefix.stripprefix.prefixes=/app
+#      - traefik.http.services.polymer.loadBalancer.server.port=8082
+#      - traefik.enable=true
+
   polymer:
-    image: unicef/etools-prp-polymer:poly3
-    command: ash -c "node express.js"
+    image: unicef/etools-prp-polymer_3
+    build:
+      context: ./polymer_3
+      dockerfile: ./Dockerfile-dev
+    volumes:
+        - ./polymer_3/:/code
+    command: ash -c "npm run dev"
     labels:
       - "traefik.http.routers.polymer.rule=PathPrefix(`/`)"
       - traefik.http.routers.polymer.service=polymer
-      # - traefik.http.routers.polymer.middlewares=polymer-stripprefix
-      # - traefik.http.middlewares.polymer-stripprefix.stripprefix.prefixes=/app
-      - traefik.http.services.polymer.loadBalancer.server.port=8082
+#      - traefik.http.routers.polymer.middlewares=polymer-stripprefix
+#      - traefik.http.middlewares.polymer-stripprefix.stripprefix.prefixes=/app_poly3
+      - traefik.http.services.polymer.loadBalancer.server.port=8084
       - traefik.enable=true
