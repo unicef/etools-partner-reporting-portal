@@ -18,6 +18,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {mixinBehaviors} from '@polymer/polymer/lib/legacy/class';
 
+
 /**
  *
  Material design: [Radio button](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-radio-button)
@@ -145,7 +146,7 @@ class PaperRadioGroupCustom extends mixinBehaviors(IronMenuBehavior, PolymerElem
       }
     }
 
-    this.IronSelectableBehavior.select.apply(this, [value]);
+    this.set('selected', value);
     fireEvent(this, 'paper-radio-group-changed');
   }
 

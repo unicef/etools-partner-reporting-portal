@@ -26,7 +26,7 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import {configClusterTypes} from '../../redux/selectors/config';
 import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
-import '../error-box-errors';
+import '../error-box';
 import './paper-radio-group-custom';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
@@ -50,12 +50,12 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         display: block;
 
         --app-grid-columns: 3;
-        --app-grid-gutter: 24px;
+        --app-grid-gutter: 0px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px;
+          width: 640px;
         }
       }
 
@@ -72,23 +72,15 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         padding-top: 16px;
       }
 
-      paper-radio-group-custom > .fields {
-        padding: calc(var(--app-grid-gutter) / 2) 0;
-      }
-
-      paper-radio-group-custom > .fields[empty] {
-        padding: 0;
-      }
-
-      paper-radio-group-custom .app-grid {
-        margin: -var(--app-grid-gutter);
-      }
-
       paper-radio-button {
         margin-left: -12px;
       }
 
-      paper-dropdown-menu {
+      .item {
+        padding-right: 20px;
+        margin-bottom: 24px;
+      }
+      etools-dropdown, etools-dropdown-multi, datepicker-lite {
         width: 100%;
       }
     </style>
@@ -125,7 +117,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     <paper-dialog
       id="dialog"
       with-backdrop
-      opened="{{ opened }}">
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add Response Plan</h2>
         <paper-icon-button
@@ -187,9 +179,9 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
               <div class="app-grid">
                 <div class="item full-width">
                   <paper-input
-                    class="validate item full-width"
+                    class="validate full-width"
                     label="Response Plan"
-                    value="{{ data.title }}"
+                    value="{{data.title}}"
                     on-input="_validate"
                     always-float-label
                     required>
@@ -203,9 +195,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     options="[[types]]"
                     option-value="id"
                     option-label="title"
-                    selected="{{ data.plan_type }}"
-                    on-iron-activate="_validate"
-                    trigger-value-change-event
+                    selected="{{data.plan_type}}"
                     hide-search
                     required>
                   </etools-single-selection-menu>
@@ -216,7 +206,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                       options="[[types]]"
                       option-value="id"
                       option-label="title"
-                      selected="{{ data.plan_type }}"
+                      selected="{{data.plan_type}}"
                       auto-validate
                       hide-search
                       required>
@@ -227,7 +217,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     <paper-input
                       class="validate item full-width"
                       label="Custom Plan Type"
-                      value="{{ data.plan_custom_type_label }}"
+                      value="{{data.plan_custom_type_label}}"
                       on-input="_validate"
                       always-float-label
                       required
@@ -240,7 +230,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   <etools-prp-date-input
                     class="start-date"
                     label="Start date"
-                    value="{{ data.start }}"
+                    value="{{data.start}}"
                     error-message=""
                     required
                     no-init>
@@ -249,7 +239,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   <datepicker-lite
                     class="start-date"
                     label="Start date"
-                    value="{{ data.start }}"
+                    value="{{data.start}}"
                     error-message=""
                     required>
                   </datepicker-lite>
@@ -259,7 +249,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   <etools-prp-date-input
                     class="end-date"
                     label="End date"
-                    value="{{ data.end }}"
+                    value="{{data.end}}"
                     error-message=""
                     required
                     no-init>
@@ -268,7 +258,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   <datepicker-lite
                     class="end-date"
                     label="End date"
-                    value="{{ data.end }}"
+                    value="{{data.end}}"
                     error-message=""
                     required>
                   </datepicker-lite>
@@ -281,7 +271,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     option-value="value"
                     option-label="label"
                     selected-values="{{data.clusters}}"
-                    on-selected-values-changed="_validate"
+                    on-etools-selected-items-changed="_validate"
                     trigger-value-change-event
                     required>
                   </etools-dropdown-multi>
@@ -358,8 +348,8 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: String})
   selectedPlan = '';
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.configClusterTypes)'})
-  clusters!: string;
+  @property({type: Array, computed: '_configClusterTypes(rootState)'})
+  clusters!: any[];
 
   @property({type: Boolean})
   emptyClustersError!: boolean;
@@ -370,9 +360,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: Object})
   planDetails!: GenericObject;
 
-  @property({type: Object})
-  errors!: GenericObject;
-
 
   static get observers() {
     return [
@@ -381,6 +368,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       '_fetchPlanDetails(planDetailsUrl)',
       '_setEmptyClustersError(planDetails, mode)',
     ];
+  }
+
+  _configClusterTypes(rootState: RootState) {
+    return configClusterTypes(rootState);
   }
 
   _workspaceId(rootState: RootState) {
@@ -399,7 +390,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   }
 
   _computePlanDetailsUrl(planId: string) {
-    if (planId !== '') {
+    if (planId) {
       return Endpoints.ochaResponsePlanDetails(planId);
     }
     return '';
@@ -420,7 +411,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _computeFormattedPlans(plans: GenericObject[]) {
@@ -511,6 +502,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   }
 
   _savePlan() {
+
     const self = this;
     this.set('updatePending', true);
 
@@ -520,6 +512,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     } else {
       (this.$.plan as EtoolsPrpAjaxEl).body = Object.assign({}, this.data);
     }
+
     bodyThunk()
       .then(function(res: any) {
         self.set('updatePending', false);
@@ -530,11 +523,11 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         fireEvent(self, 'fetch-profile');
       })
       .catch(function(err: any) {
+        self.set('updatePending', false);
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
         self.set('errors', err.data);
-        self.set('updatePending', false);
       });
   }
 
