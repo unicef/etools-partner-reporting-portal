@@ -148,7 +148,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   async _pageChanged(page: string) {
     let componentName = '';
-    if (page === 'app') {
+    if (page === BASE_PATH) {
       componentName = 'app';
     } else {
       componentName = page;

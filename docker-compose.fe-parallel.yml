@@ -1,0 +1,42 @@
+version: '2.1'
+
+services:
+  django_api:
+    volumes: []
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 &&
+     python /code/manage.py makemigrations --merge --noinput &&
+     python /code/manage.py migrate && python manage.py collectstatic --noinput &&
+     python manage.py runserver 0.0.0.0:8080"
+
+  polymer1:
+    image: unicef/etools-prp-polymer1
+    build:
+      context: ./polymer
+      dockerfile: ./Dockerfile
+    volumes:
+        - ./polymer/:/code
+    command: ash -c "npm run dev"
+    labels:
+      - "traefik.http.routers.polymer1.rule=PathPrefix(`/app`)"
+      - traefik.http.routers.polymer1.service=polymer1
+      - traefik.http.routers.polymer1.middlewares=polymer1-stripprefix
+      - traefik.http.middlewares.polymer1-stripprefix.stripprefix.prefixes=/app
+      - traefik.http.services.polymer1.loadBalancer.server.port=8082
+      - traefik.enable=true
+
+
+  polymer:
+    image: unicef/etools-prp-polymer_3
+    build:
+      context: ./polymer_3
+      dockerfile: ./Dockerfile-dev
+    volumes:
+       - ./polymer_3/:/code
+    command: ash -c "npm run devPoly3"
+    labels:
+      - "traefik.http.routers.polymer33.rule=PathPrefix(`/app_poly3`)"
+      - traefik.http.routers.polymer33.service=polymer33
+      - traefik.http.routers.polymer33.middlewares=polymer33-stripprefix
+      - traefik.http.middlewares.polymer33-stripprefix.stripprefix.prefixes=/app_poly3
+      - traefik.http.services.polymer33.loadBalancer.server.port=8082
+      - traefik.enable=true

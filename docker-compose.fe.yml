@@ -1,81 +1,12 @@
 version: '2.1'
 
 services:
-
-  proxy:
-    image: traefik:v2.1
-    command: --api.insecure=true --providers.docker
-    ports:
-      - "8081:80"
-      - "8080:8080"
-    container_name: prp_proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    logging:
-      driver: none
-
   django_api:
-    image: unicef/etools-prp:local
-    env_file:
-      - .env
-    build:
-      context: ./django_api
-      dockerfile: ./Dockerfile
-      args:
-        ENV: dev
-        REQUIREMENT_FILE: dev.txt
-    volumes:
-      - './django_api:/code/'
-      - './data/django_api_logs:/data/django_api/logs'
-      - './data/django_api_uploads_unicef_progress_reports:/data/django_api/uploads/unicef/progress_reports'
-    command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
-    depends_on:
-      - db
-    labels:
-      - "traefik.http.routers.django_api.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
-      - traefik.http.routers.django_api.service=django_api
-      - traefik.http.services.django_api.loadBalancer.server.port=8080
-      - traefik.enable=true
-
-#  beater-prp:
-#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A django_api beat -l ${CELERY_LOG_LEVEL:-info} --scheduler django_celery_beat.schedulers:DatabaseScheduler -b $REDIS_URL"
-#    image: 'unicef/etools-prp'
-#    env_file:
-#      - .env
-#    depends_on:
-#      - django_api
-#      - prp_redis
-#    restart: always
-#    volumes:
-#      - './django_api:/code/'
-#
-#  worker-prp:
-#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A django_api worker -l ${CELERY_LOG_LEVEL:-info} -b $REDIS_URL"
-#    image: 'unicef/etools-prp'
-#    env_file:
-#      - .env
-#    depends_on:
-#      - django_api
-#      - prp_redis
-#    restart: always
-#    volumes:
-#      - './django_api:/code/'
-
-  db:
-    image: unicef/etools-prp-db
-    env_file:
-      - .env
-    build:
-      context: ./db
-      dockerfile: ./Dockerfile
-
-  # Make sure the django .env file has the correct path for redis url set to:
-  prp_redis:
-    image: redis:4.0.1-alpine
-    container_name: prp_redis
-    logging:
-      driver: none
-
+    volumes: []
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 &&
+     python /code/manage.py makemigrations --merge --noinput &&
+     python /code/manage.py migrate && python manage.py collectstatic --noinput &&
+     python manage.py runserver 0.0.0.0:8080"
   # id-management-frontend:
   #   image: unicef/etools-prp-id-management-frontend
   #   build:
@@ -140,12 +71,12 @@ services:
       - traefik.http.routers.polymer.service=polymer
       - traefik.http.services.polymer.loadBalancer.server.port=8082
       - traefik.enable=true
-
-  # ATTENTION: you can either have polymer-built or polymer running.. not both.. always have one commented out
-  # to renew the image, go to polymer_3 directory and run the following line:
-  # docker build -t unicef/etools-prp-polymer:3latest -f Dockerfile-bundle .
-  # if you work on the backend / want to get started quickly, pull latest before running docker-compose up by running:
-  # docker pull unicef/etools-prp-polymer:3latest
+#
+#  # ATTENTION: you can either have polymer-built or polymer running.. not both.. always have one commented out
+#  # to renew the image, go to polymer_3 directory and run the following line:
+#  # docker build -t unicef/etools-prp-polymer:3latest -f Dockerfile-bundle .
+#  # if you work on the backend / want to get started quickly, pull latest before running docker-compose up by running:
+#  # docker pull unicef/etools-prp-polymer:3latest
 #  polymer-built:
 #    image: unicef/etools-prp-polymer:3latest
 #    build:

@@ -12,6 +12,7 @@
   },
   "scripts": {
     "dev": "gulp serve",
+    "devPoly3": "gulp serve-app-poly3",
     "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
     "build": "export NODE_OPTIONS=--max_old_space_size=4096 && npm run tsToJs && polymer build",
     "tsToJs": "tsc --skipLibCheck || true",
