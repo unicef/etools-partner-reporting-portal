@@ -148,7 +148,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   async _pageChanged(page: string) {
     let componentName = '';
-    if (page === 'app') {
+    if (page === 'app_poly3') {
       componentName = 'app';
     } else {
       componentName = page;
@@ -167,11 +167,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
     this.reduxStore.dispatch(userLogout(thunk))
       // @ts-ignore
-      .then(function () {
+      .then(function() {
         self._goToLanding();
         self.reduxStore.dispatch(reset())
       })
-      .catch(function (err: any) {
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }
