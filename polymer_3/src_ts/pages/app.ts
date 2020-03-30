@@ -235,8 +235,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const self = this;
     setTimeout(() => {
       let defaultApp = localStorage.getItem('defaultApp');
-      defaultApp = defaultApp ?
-       /** Remove quotes "" */ this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
+      defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
 
       if (!self.routeData.workspace_code) {
         return;

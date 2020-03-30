@@ -26,7 +26,7 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
  * @appliesMixin LocalizeMixin
  * @appliesMixin DisaggregationHelpersMixin
  */
-class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpersMixin(ReduxConnectedElement))) {
+class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
       ${disaggregationTableStyles}
@@ -250,6 +250,9 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   @property({type: Array})
   mapping!: any[];
 
+  @property({type: Number})
+  indicatorId!: number;
+
   static get observers() {
     return ['_resetFields(formattedData.disaggregation_reported_on)',
       '_initPercentageMap(localData, reportingEntityPercentageMap)']
@@ -266,7 +269,11 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _fieldValueChanged(e: CustomEvent) {
+
     let key = e.detail.key;
+    if (!key) {
+      return;
+    }
     let value = e.detail.value;
     let totals;
 
@@ -368,8 +375,8 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
     return this.reduxStore.dispatch(
       disaggregationsUpdateForLocation(
         updateThunk,
-        this.indicatorId,
-        this.formattedData.location.id
+        String(self.indicatorId),
+        self.formattedData.location.id
       )
     )
       // @ts-ignore
@@ -445,7 +452,7 @@ class DisaggregationTable extends UtilsMixin(LocalizeMixin(DisaggregationHelpers
   }
 
   _handleInput(e: CustomEvent) {
-    let input = e.target;
+    let input = e.target as any;
 
     input.validate();
 

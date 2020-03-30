@@ -73,13 +73,8 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
           return acc;
         }, {});
 
-      const c = result.v / result.d;
-
-      if (c === c) {
-        result.c = c;
-      } else { // Defaulting c value to be 0 if both v and d values are zero
-        result.c = 0;
-      }
+      const c = result.d > 0 ? result.v / result.d : 0;
+      result.c = isNaN(c) ? 0 : c;
 
       return result;
     }
