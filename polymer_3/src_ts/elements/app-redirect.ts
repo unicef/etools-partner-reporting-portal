@@ -2,7 +2,6 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import RoutingMixin from '../mixins/routing-mixin';
 import {GenericObject} from '../typings/globals.types';
-import {getDomainByEnv} from '../config';
 
 /**
  * @polymer
