@@ -136,7 +136,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         <error-box errors="[[errors]]"></error-box>
         <paper-radio-group-custom
           id="mode"
-          selected="{{ mode }}">
+          selected="{{mode}}">
           <paper-radio-button name="ocha">
             <strong>From OCHA</strong>
           </paper-radio-button>
@@ -156,7 +156,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   option-label="title"
                   selected="{{selectedPlan}}"
                   disabled="[[plansLoading]]"
-                  on-selected-values-changed="_validate"
+                  on-etools-selected-item-changed="_validate"
                   trigger-value-change-event
                   required>
                 </etools-dropdown>
@@ -300,6 +300,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         </paper-button>
 
         <paper-button
+          class='btn-cancel'
           on-tap="close">
           Cancel
         </paper-button>
@@ -368,6 +369,8 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   @property({type: Object})
   planDetails!: GenericObject;
 
+  @property({type: Boolean})
+  clusterSelectionChanged = false;
 
   static get observers() {
     return [
@@ -410,6 +413,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     this.set('data', {});
     this.set('planDetails', {});
     this.set('errors', {});
+    this.clusterSelectionChanged = false;
   }
 
   _onOpenedChanged(opened: boolean) {
@@ -418,8 +422,21 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     }
   }
 
+  controlValueChanged(e: CustomEvent) {
+    if (e.type === 'etools-selected-items-changed' && !this.clusterSelectionChanged) {
+      if (!e.detail.selectedItems.length) {
+        return false;
+      } else {
+        this.clusterSelectionChanged = true;
+      }
+    }
+    return true;
+  }
+
   _validate(e: CustomEvent) {
-    (e.target as any).validate();
+    if (this.controlValueChanged(e)) {
+      (e.target as any).validate();
+    }
   }
 
   _computeFormattedPlans(plans: GenericObject[]) {
