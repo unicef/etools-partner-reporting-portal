@@ -17,13 +17,10 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
   public static get template() {
     return html`
       <style include="iron-flex iron-flex-alignment iron-flex-reverse">
-        :host {
-          color: var(--paper-input-container-invalid-color, --error-color);
-        }
-
         #box {
           background: var(--paper-grey-300);
           padding: 10px;
+          color: var(--error-color);
         }
 
         .header {
@@ -104,7 +101,6 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
           });
     }
   }
-
 
 
 }
