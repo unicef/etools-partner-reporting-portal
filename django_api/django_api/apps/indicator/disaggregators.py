@@ -7,7 +7,9 @@ indicator location data being saved for any disaggregation types.
 
 
 from core.helpers import (
-    generate_data_combination_entries,
+    get_all_subkeys,
+    calculate_sum,
+    get_zero_dict,
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
@@ -38,64 +40,33 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     """
     @staticmethod
     def post_process(indicator_location_data):
+        vt = ValueType.VALUE
+        dt = ValueType.DENOMINATOR
+        ct = ValueType.CALCULATED
+
         level_reported = indicator_location_data.level_reported
+        # copy of idl.disaggregation with the keys converted tuples from the original string type
+        disagg = get_cast_dictionary_keys_as_tuple(indicator_location_data.disaggregation)
 
-        ordered_dict = get_cast_dictionary_keys_as_tuple(
-            indicator_location_data.disaggregation)
+        calc_data = {}
+        for k in disagg.keys():
+            if len(k) == level_reported:
+                calc_data[k] = {
+                    vt: disagg[k][vt],
+                    ct: disagg[k][vt],
+                    dt: 1
+                }
+                for sk in get_all_subkeys(k):
+                    if sk not in calc_data:
+                        calc_data[sk] = get_zero_dict("SUM")
+                    calc_data[sk] = calculate_sum(calc_data[k], calc_data[sk])
 
-        ordered_dict_keys = list(ordered_dict.keys())
+        disaggregation = get_cast_dictionary_keys_as_string(calc_data)
 
-        if level_reported == 0:
-            ordered_dict[tuple()][ValueType.DENOMINATOR] = 1
-            ordered_dict[tuple()][ValueType.CALCULATED] = ordered_dict[tuple()][ValueType.VALUE]
-
-        else:
-            # Reset all subtotals
-            for key in ordered_dict_keys:
-                if len(key) == level_reported:
-                    ordered_dict[key][ValueType.DENOMINATOR] = 1
-                    ordered_dict[key][ValueType.CALCULATED] = ordered_dict[key][ValueType.VALUE]
-
-                    packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(
-                        packed_key,
-                        entries_only=True,
-                        key_type=tuple,
-                        r=level_reported - 1
-                    )
-
-                    for subkey in subkey_combinations:
-                        ordered_dict[subkey] = {
-                            ValueType.CALCULATED: 0,
-                            ValueType.DENOMINATOR: 1,
-                            ValueType.VALUE: 0,
-                        }
-
-            ordered_dict_keys = list(ordered_dict.keys())
-
-            # Calculating subtotals
-            for key in ordered_dict_keys:
-                if len(key) == level_reported:
-                    packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(
-                        packed_key,
-                        entries_only=True,
-                        key_type=tuple,
-                        r=level_reported - 1
-                    )
-
-                    # It is always SUM at IndicatorLocationData level
-                    for subkey in subkey_combinations:
-                        ordered_dict[subkey][ValueType.VALUE] += ordered_dict[key][ValueType.VALUE]
-                        ordered_dict[subkey][ValueType.CALCULATED] += ordered_dict[key][ValueType.CALCULATED]
-
-        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
-
-        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.disaggregation = disaggregation
         indicator_location_data.save()
 
         indicator_report = indicator_location_data.indicator_report
-
         QuantityIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
 
     @staticmethod
@@ -138,6 +109,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_report.save()
 
 
+
 class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Ratio indicator type disaggregation processing.
@@ -150,69 +122,29 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         1. Calculate SUM of all v and d for all level_reported.
         2. Calculate c value from v and d for all level_reported entries.
         """
+        vt = ValueType.VALUE
+        dt = ValueType.DENOMINATOR
+        ct = ValueType.CALCULATED
+
         level_reported = indicator_location_data.level_reported
 
-        ordered_dict = get_cast_dictionary_keys_as_tuple(
+        disagg = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
 
-        ordered_dict_keys = list(ordered_dict.keys())
+        calc_data = {}
+        for k in disagg.keys():
+            if len(k) == level_reported:
+                calc_data[k] = {
+                    vt: disagg[k][vt],
+                    ct: disagg[k][vt] / float(disagg[k][dt]) if disagg[k][dt] else 0,
+                    dt: disagg[k][dt]
+                }
+                for sk in get_all_subkeys(k):
+                    if sk not in calc_data:
+                        calc_data[sk] = get_zero_dict("SUM")
+                    calc_data[sk] = calculate_sum(calc_data[k], calc_data[sk])
 
-        if level_reported != 0:
-            # Reset all subtotals
-            for key in ordered_dict_keys:
-                if len(key) == level_reported:
-                    packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(
-                        packed_key,
-                        entries_only=True,
-                        key_type=tuple,
-                        r=level_reported - 1
-                    )
-
-                    for subkey in subkey_combinations:
-                        ordered_dict[subkey] = {
-                            ValueType.CALCULATED: 0,
-                            ValueType.DENOMINATOR: 0,
-                            ValueType.VALUE: 0,
-                        }
-
-            # Calculating subtotals
-            for key in ordered_dict_keys:
-                if len(key) == level_reported:
-                    packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(
-                        packed_key,
-                        entries_only=True,
-                        key_type=tuple,
-                        r=level_reported - 1
-                    )
-
-                    # It is always SUM at IndicatorLocationData level
-                    for subkey in subkey_combinations:
-                        # Ignore zero value entry from total calculation
-                        if ordered_dict[key][ValueType.VALUE] != 0:
-                            ordered_dict[subkey][ValueType.VALUE] += \
-                                ordered_dict[key][ValueType.VALUE]
-
-                        # Ignore zero value entry from total calculation
-                        if ordered_dict[key][ValueType.DENOMINATOR] != 0:
-                            ordered_dict[subkey][ValueType.DENOMINATOR] += \
-                                ordered_dict[key][ValueType.DENOMINATOR]
-
-        # Calculating all level_reported N c values
-        for key in ordered_dict.keys():
-            if ordered_dict[key][ValueType.VALUE] == 0 and ordered_dict[key][ValueType.DENOMINATOR] == 0:
-                ordered_dict[key][ValueType.CALCULATED] = 0
-            elif ordered_dict[key][ValueType.DENOMINATOR] == 0:
-                raise Exception(
-                    'Denominator is 0 when numerator is not for {}'.format(key))
-            else:
-                ordered_dict[key][ValueType.CALCULATED] = ordered_dict[key][ValueType.VALUE] / \
-                    (ordered_dict[key][ValueType.DENOMINATOR] * 1.0)
-
-        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
-
-        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.disaggregation = get_cast_dictionary_keys_as_string(calc_data)
         indicator_location_data.save()
 
         indicator_report = indicator_location_data.indicator_report
