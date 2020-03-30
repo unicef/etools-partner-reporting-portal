@@ -141,8 +141,8 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
                 }
                 for sk in get_all_subkeys(k):
                     if sk not in calc_data:
-                        calc_data[sk] = get_zero_dict("SUM")
-                    calc_data[sk] = calculate_sum(calc_data[k], calc_data[sk])
+                        calc_data[sk] = get_zero_dict("RATIO")
+                    calc_data[sk] = calculate_sum(calc_data[k], calc_data[sk], indicator_type="RATIO")
 
         indicator_location_data.disaggregation = get_cast_dictionary_keys_as_string(calc_data)
         indicator_location_data.save()
