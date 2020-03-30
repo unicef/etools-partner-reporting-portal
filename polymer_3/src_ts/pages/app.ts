@@ -16,7 +16,7 @@ import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
-
+import {reset} from '../redux/actions';
 /**
  * @polymer
  * @customElement
@@ -202,7 +202,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (change.value.length) {
         this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync as any);
         let workspace = change.value[0];
-
         this._redirectToWorkspace(workspace);
       }
     } catch (err) {}
@@ -212,20 +211,19 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     let workspace;
 
     if (!workspaceCodeFromUrl) {
-      //this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
+      // this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
 
       if (this.workspaces && this.workspaces.length) {
-
         // Default to first
         workspace = this.workspaces[0];
 
         this._redirectToWorkspace(workspace);
       }
-      //  else { //Cant' find any component that fires an 'all-changed' event
-      //   // Wait until workspaces are available, then pick one & redirect
-      //   this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-      //   this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
-      // }
+      else {
+        // Wait until workspaces are available, then pick one & redirect
+        //this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
+        //this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
+      }
     } else if (!this._workspaceCode) {
       this.reduxStore.dispatch(setWorkspace(workspaceCodeFromUrl));
     }

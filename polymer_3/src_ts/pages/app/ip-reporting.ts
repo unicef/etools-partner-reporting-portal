@@ -18,7 +18,6 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import OverlayHelperMixin from '../../mixins/overlay-helper-mixin';
 import {getDomainByEnv} from '../../config';
-import {locales} from '../../locales';
 
 /**
  * @polymer
@@ -162,7 +161,6 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
 
   connectedCallback() {
     super.connectedCallback();
-    this.dispatchResources(locales);
   }
 
 

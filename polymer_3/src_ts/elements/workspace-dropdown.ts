@@ -9,6 +9,7 @@ import RoutingMixin from '../mixins/routing-mixin';
 import {setWorkspace} from "../redux/actions";
 import {ReduxConnectedElement} from "../ReduxConnectedElement";
 import {GenericObject} from '../typings/globals.types';
+import {getDomainByEnv} from '../config';
 
 /**
  * @polymer
@@ -101,14 +102,13 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
 
   _workspaceSelected(e: CustomEvent) {
     let newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
-
     if (newCode === this.current) {
       return;
     }
 
     this.reduxStore.dispatch(setWorkspace(newCode));
+    window.location.href = getDomainByEnv() + `/${newCode}/`;
 
-    window.location.href = this.buildUrl(this._baseUrl, '/');
   }
 
   //code is defined current...assumed it will be number
@@ -121,7 +121,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _computeSelected(data: any[], workspace: string) {
-    return data.indexOf(workspace);
+    return data.findIndex(x => x.code === workspace);
   }
 }
 
