@@ -21,26 +21,6 @@ def up_recreate():
     local('docker-compose stop && docker-compose up')
 
 
-def dev(style="", change=False):
-    mapping = {
-        "": "",
-        "full": "-f docker-compose.full.yml",
-        "fe": "-f docker-compose.fe.yml",
-        "fe-parallel": "-f docker-compose.fe-parallel.yml",
-        "fe-polybuilt": "-f docker-compose.fe-polybuilt.yml",
-        "fe-id-mgmt": "-f docker-compose.fe-id-mgmt.yml",
-        "be": "-f docker-compose.be.yml"
-    }
-    if style in ["be"]:
-        local('docker pull unicef/etools-prp-polymer:3latest')
-    if style in ["fe"]:
-        local('docker pull unicef/etools-prp:local')
-
-    if change:
-        local('docker-compose rm django_api polymer')
-    local('docker-compose -f docker-compose.yml {} up --force-recreate'.format(mapping[style]))
-
-
 def up(rebuild=False):
     """
     Create and start containers.

@@ -127,32 +127,32 @@ services:
 #      - traefik.enable=true
 
   # ATTENTION: if you have the below block uncommented make sure the polymer3 and polymer1 sections are commented out
-  polymer:
-    image: unicef/etools-prp-polymer_3
-    build:
-      context: ./polymer_3
-      dockerfile: ./Dockerfile-dev
-    volumes:
-        - ./polymer_3/:/code
-    command: ash -c "npm run dev"
-    labels:
-      - "traefik.http.routers.polymer.rule=PathPrefix(`/`)"
-      - traefik.http.routers.polymer.service=polymer
-      - traefik.http.services.polymer.loadBalancer.server.port=8082
-      - traefik.enable=true
+#  polymer:
+#    image: unicef/etools-prp-polymer_3
+#    build:
+#      context: ./polymer_3
+#      dockerfile: ./Dockerfile-dev
+#    volumes:
+#        - ./polymer_3/:/code
+#    command: ash -c "npm run dev"
+#    labels:
+#      - "traefik.http.routers.polymer.rule=PathPrefix(`/`)"
+#      - traefik.http.routers.polymer.service=polymer
+#      - traefik.http.services.polymer.loadBalancer.server.port=8082
+#      - traefik.enable=true
 
   # ATTENTION: you can either have polymer-built or polymer running.. not both.. always have one commented out
   # to renew the image, go to polymer_3 directory and run the following line:
   # docker build -t unicef/etools-prp-polymer:3latest -f Dockerfile-bundle .
   # if you work on the backend / want to get started quickly, pull latest before running docker-compose up by running:
   # docker pull unicef/etools-prp-polymer:3latest
-#  polymer-built:
-#    image: unicef/etools-prp-polymer:3latest
-#    build:
-#      context: ./polymer_3
-#      dockerfile: ./Dockerfile-bundle
-#    labels:
-#      - "traefik.http.routers.polymerB.rule=PathPrefix(`/`)"
-#      - traefik.http.routers.polymerB.service=polymerB
-#      - traefik.http.services.polymerB.loadBalancer.server.port=8082
-#      - traefik.enable=true
+  polymer-built:
+    image: unicef/etools-prp-polymer:3latest
+    build:
+      context: ./polymer_3
+      dockerfile: ./Dockerfile-bundle
+    labels:
+      - "traefik.http.routers.polymerB.rule=PathPrefix(`/`)"
+      - traefik.http.routers.polymerB.service=polymerB
+      - traefik.http.services.polymerB.loadBalancer.server.port=8082
+      - traefik.enable=true
