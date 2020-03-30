@@ -76,6 +76,7 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
   }
 
   errorMapper(error: any) {
+    const self = this;
     switch (typeof error) {
       case 'string':
         return [
@@ -84,19 +85,20 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
           },
         ];
 
+      case null:
       case 'undefined':
         return [];
 
       default:
         return Object.keys(error)
-          .filter(function (key) {
+          .filter(function(key) {
             return key !== 'error_codes';
           })
-          .map(function (key) {
+          .map(function(key) {
             return {
               field: key,
-              details: error[key].reduce(function (acc, err) {
-                return acc.concat(errorMapper(err));
+              details: error[key].reduce(function(acc, err) {
+                return acc.concat(self.errorMapper(err));
               }, []),
             };
           });
