@@ -36,7 +36,7 @@ class LabelledItem extends PolymerElement {
             color: var(--paper-deep-orange-a700);
         }
 
-        :host ::content .field-value {
+        ::slotted(.field-value) {
             font-size: 16px;
         }
       </style>

@@ -13,7 +13,9 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {modalStyles} from '../../styles/modal-styles';
 import '../confirm-box';
+import '../disaggregations/disaggregation-table';
 import {DisaggregationTableEl} from '../disaggregations/disaggregation-table';
+import {ConfirmBoxEl} from '../confirm-box';
 
 /**
  * @polymer
@@ -95,9 +97,9 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
 
   _save() {
-    const tableSlot = this.shadowRoot!.querySelectorAll('.table')[0];
+    const tableSlot = this.shadowRoot!.querySelectorAll('.table')[0] as HTMLSlotElement;
     let tableElem: DisaggregationTableEl | null = null;
-    if (tableSlot && tableSlot.assignedElements) {
+    if (tableSlot && tableSlot!.assignedElements) {
       tableSlot.assignedElements().forEach((el) => {
         if (!tableElem && String(el.tagName).toUpperCase() === 'DISAGGREGATION-TABLE') {
           tableElem = el;
@@ -109,7 +111,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
       this.set('updatePending', true);
 
-      tableElem.save()
+      tableElem!.save()
         .then(function() {
           self.set('updatePending', false);
           self.close();
@@ -125,7 +127,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
   _confirm(e: CustomEvent) {
     e.stopPropagation();
 
-    this.$.confirm.run({
+    (this.$.confirm as ConfirmBoxEl).run({
       body: 'Changing disaggregation will cause your previous data to be lost. ' +
         'Do you want to continue?',
       result: e.detail,

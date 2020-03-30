@@ -21,6 +21,7 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
 import {fireEvent} from '../utils/fire-custom-event';
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 /**
  * @polymer
@@ -30,7 +31,7 @@ import {fireEvent} from '../utils/fire-custom-event';
  * @appliesMixin UtilsMixin
  * @appliesMixin NotificationsMixin
  */
-class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement)))) {
+class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
       ${buttonsStyles} ${modalStyles}
@@ -137,8 +138,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
   }
 
   _openModal() {
-    const dialog = this.shadowRoot!.querySelector('#dialog');
-    dialog!.open();
+    (this.shadowRoot!.querySelector('#dialog') as PaperDialogElement).open();
   }
 
   _save() {
@@ -151,18 +151,14 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     }
 
     data = new FormData();
-
-    if (file) {
-      data.append('file', file.raw, file.file_name);
-    }
+    data.append('file', file.raw, file.file_name);
 
     const upload = this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl;
     upload!.body = data;
 
     this.set('pending', true);
 
-    upload!.thunk()
-      // @ts-ignore
+    upload!.thunk()()
       .then(() => {
         self.set('pending', false);
         self.close();
@@ -170,8 +166,8 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
         fireEvent(this, 'file-uploaded');
       })
       .catch(function(res: any) {
-        self.set('errors', res.data);
         self.set('pending', false);
+        self.set('errors', res.data);
       });
   }
 

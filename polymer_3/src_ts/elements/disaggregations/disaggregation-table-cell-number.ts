@@ -24,13 +24,17 @@ class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement) {
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
+       <template is="dom-if" if="[[editable]]" restamp>
           <disaggregation-field
             slot="editable"
             key="v"
             value="[[data.v]]"
             coords="[[coords]]">
           </disaggregation-field>
+        </template>
+        <template is="dom-if" if="[[!editable]]" restamp>
           <etools-prp-number slot="non-editable" value="[[data.v]]"></etools-prp-number>
+        </template>
       </disaggregation-table-cell>
     `;
   }
