@@ -105,7 +105,6 @@ def generate_data_combination_entries(
     }
     """
 
-    print("monkeys")
     if entries_only:
         output = []
 
@@ -139,8 +138,8 @@ def generate_data_combination_entries(
         # [(32,)] or [(23,), (43,)]  or [(32,), (42,), (54,)] (basically same as array if array was passed in w tuples
         #
         # if idx = 1 the id_pairs will be
-        # [(23,), (43,), (23,43)] for [(23,), (43,)] or
-        # [(54,), (32,42), (32,54), (42,54)] for [(32,), (42,), (54,)]
+        # [(23,), (43,)] for [(23,), (43,)] or
+        # [(32,42), (32,54), (42,54)] for [(32,), (42,), (54,)]
         #
         # if idx = 2 the id_pairs will be:
         # [(23, 43)] for [(23,), (43,)]  or
