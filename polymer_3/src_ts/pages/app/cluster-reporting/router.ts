@@ -170,7 +170,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
   @property({type: Boolean})
   loading = false;
 
-  @property({type: String, observer: '_planChanged'})
+  @property({type: String})
   plan!: string;
 
   @property({type: String, observer: '_pageChanged'})
@@ -187,6 +187,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
       '_routePageChanged(routeData.page)',
       '_routePlanChanged(routeData.plan)',
       '_routeCurrentPlanChanged(routeData.plan, allPlans)',
+      '_planChanged(plan, reduxStore)',
     ];
   }
 
@@ -210,7 +211,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
 
 
   _planChanged(plan: string) {
-    if (this.reduxStore) {
+    if (this.reduxStore && plan) {
       this.reduxStore.dispatch(setCurrentResponsePlanID(plan));
     }
   }

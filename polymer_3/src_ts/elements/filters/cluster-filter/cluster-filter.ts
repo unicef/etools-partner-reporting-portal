@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/searchable-dropdown-filter';
 import '../../etools-prp-ajax';
 import UtilsMixin from '../../../mixins/utils-mixin';
-import FilterMixin from '../../../mixins/filter-mixin';
+import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import Endpoints from '../../../endpoints';
 import {property} from '@polymer/decorators';
@@ -22,7 +22,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
  * @appliesMixin FilterMixin
  * @appliesMixin LocalizeMixin
  */
-class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedElement))) {
+class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
     <style>
@@ -81,7 +81,7 @@ class ClusterFilter extends LocalizeMixin(FilterMixin(UtilsMixin(ReduxConnectedE
   private clusterNamesDebouncer!: Debouncer;
 
   _computeClusterNamesUrl(responsePlanId: string) {
-    if (responsePlanId) {
+    if (!responsePlanId) {
       return;
     }
     return Endpoints.clusterNames(responsePlanId);
