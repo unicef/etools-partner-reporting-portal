@@ -314,6 +314,8 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
     // Re-saving disaggregation data after total calculations
     // since totals contains entire disaggregation keyspace set
+    // delete wrong generated keys (on _calculateLevel3)
+    delete totals['(,)'];
     this.set(['localData.disaggregation'], totals);
 
     if (totals) {
