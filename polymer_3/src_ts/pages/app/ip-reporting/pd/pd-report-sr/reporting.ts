@@ -217,27 +217,28 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
   _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: any[], reportId: string) {
     // for some reason method was getting run on detach, so catch that
-    if (allPdReports[pdId] === undefined) {
+    if (!allPdReports || !allPdReports[pdId]) {
       return;
     }
 
     // get the current progress report's due date
-    const progressReportDueDate = allPdReports[pdId]
-      .find(function (report) {
+    const progressReport = allPdReports[pdId]
+      .find(function(report) {
         return report.id === parseInt(reportId);
-      })
-      .due_date;
+      });
+
+    const progressReportDueDate = progressReport && progressReport.due_date ? progressReport.due_date : null;
 
     // get the current programme document
-    const currentPdReport = programmeDocuments.find(function (report) {
+    const currentPdReport = programmeDocuments.find(function(report) {
       return report.id === pdId;
     });
 
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = currentPdReport.reporting_periods.find(function (reporting_period) {
+    const currentSrReport = progressReportDueDate ? currentPdReport.reporting_periods.find(function(reporting_period) {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
-    });
+    }) : undefined;
 
     if (currentSrReport !== undefined && currentSrReport.description !== undefined) {
       return currentSrReport.description;
