@@ -569,7 +569,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       })
       .catch(function(err) {
         self.set('errors', err.data);

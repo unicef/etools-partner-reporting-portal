@@ -1249,7 +1249,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           self.close();
           self.set('errors', {});
         } else {
-          self._redirectToDetail(res.data.id);
+          self.close();
+          setTimeout(() => {
+            self._redirectToDetail(res.data.id);
+          }, 100);
         }
       })
       .catch((err: GenericObject) => {

@@ -279,7 +279,10 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
       .then(function(res: any) {
         self.updatePending = false;
         self.set('errors', {});
-        self._redirectToDetail(res.data.id);
+        self.close();
+        setTimeout(() => {
+          self._redirectToDetail(res.data.id);
+        }, 100);
       })
       .catch(function(err: any) {
         self.set('errors', err.data);
