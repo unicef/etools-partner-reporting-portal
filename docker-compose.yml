@@ -93,38 +93,38 @@ services:
   #     - traefik.http.services.id-management-frontend.loadBalancer.server.port=3000
   #     - traefik.enable=true
 
-#  polymer1:
-#    image: unicef/etools-prp-polymer1
-#    build:
-#      context: ./polymer
-#      dockerfile: ./Dockerfile
-#    volumes:
-#        - ./polymer/:/code
-#    command: ash -c "npm run dev"
-#    labels:
-#      - "traefik.http.routers.polymer1.rule=PathPrefix(`/app`)"
-#      - traefik.http.routers.polymer1.service=polymer1
-#      - traefik.http.routers.polymer1.middlewares=polymer1-stripprefix
-#      - traefik.http.middlewares.polymer1-stripprefix.stripprefix.prefixes=/app
-#      - traefik.http.services.polymer1.loadBalancer.server.port=8082
-#      - traefik.enable=true
+  polymer1:
+    image: unicef/etools-prp-polymer1
+    build:
+      context: ./polymer
+      dockerfile: ./Dockerfile
+    volumes:
+        - ./polymer/:/code
+    command: ash -c "npm run dev"
+    labels:
+      - "traefik.http.routers.polymer1.rule=PathPrefix(`/app`)"
+      - traefik.http.routers.polymer1.service=polymer1
+      - traefik.http.routers.polymer1.middlewares=polymer1-stripprefix
+      - traefik.http.middlewares.polymer1-stripprefix.stripprefix.prefixes=/app
+      - traefik.http.services.polymer1.loadBalancer.server.port=8082
+      - traefik.enable=true
 #
 #
-#  polymer3:
-#    image: unicef/etools-prp-polymer_3
-#    build:
-#      context: ./polymer_3
-#      dockerfile: ./Dockerfile-dev
-#    volumes:
-#       - ./polymer_3/:/code
-#    command: ash -c "npm run devPoly3"
-#    labels:
-#      - "traefik.http.routers.polymer33.rule=PathPrefix(`/app_poly3`)"
-#      - traefik.http.routers.polymer33.service=polymer33
-#      - traefik.http.routers.polymer33.middlewares=polymer33-stripprefix
-#      - traefik.http.middlewares.polymer33-stripprefix.stripprefix.prefixes=/app_poly3
-#      - traefik.http.services.polymer33.loadBalancer.server.port=8082
-#      - traefik.enable=true
+  polymer3:
+    image: unicef/etools-prp-polymer_3
+    build:
+      context: ./polymer_3
+      dockerfile: ./Dockerfile-dev
+    volumes:
+       - ./polymer_3/:/code
+    command: ash -c "npm run devPoly3"
+    labels:
+      - "traefik.http.routers.polymer33.rule=PathPrefix(`/app_poly3`)"
+      - traefik.http.routers.polymer33.service=polymer33
+      - traefik.http.routers.polymer33.middlewares=polymer33-stripprefix
+      - traefik.http.middlewares.polymer33-stripprefix.stripprefix.prefixes=/app_poly3
+      - traefik.http.services.polymer33.loadBalancer.server.port=8082
+      - traefik.enable=true
 
   # ATTENTION: if you have the below block uncommented make sure the polymer3 and polymer1 sections are commented out
 #  polymer:
@@ -146,13 +146,13 @@ services:
   # docker build -t unicef/etools-prp-polymer:3latest -f Dockerfile-bundle .
   # if you work on the backend / want to get started quickly, pull latest before running docker-compose up by running:
   # docker pull unicef/etools-prp-polymer:3latest
-  polymer-built:
-    image: unicef/etools-prp-polymer:3latest
-    build:
-      context: ./polymer_3
-      dockerfile: ./Dockerfile-bundle
-    labels:
-      - "traefik.http.routers.polymerB.rule=PathPrefix(`/`)"
-      - traefik.http.routers.polymerB.service=polymerB
-      - traefik.http.services.polymerB.loadBalancer.server.port=8082
-      - traefik.enable=true
+#  polymer-built:
+#    image: unicef/etools-prp-polymer:3latest
+#    build:
+#      context: ./polymer_3
+#      dockerfile: ./Dockerfile-bundle
+#    labels:
+#      - "traefik.http.routers.polymerB.rule=PathPrefix(`/`)"
+#      - traefik.http.routers.polymerB.service=polymerB
+#      - traefik.http.services.polymerB.loadBalancer.server.port=8082
+#      - traefik.enable=true
