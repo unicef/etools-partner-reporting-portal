@@ -196,7 +196,10 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
     thunk()
       .then(function(res: any) {
         self.updatePending = false;
-        self._redirectToDetail(res.data.id);
+        self.close();
+        setTimeout(() => {
+          self._redirectToDetail(res.data.id);
+        }, 100);
       })
       .catch(function(err) {
         self.updatePending = false;
