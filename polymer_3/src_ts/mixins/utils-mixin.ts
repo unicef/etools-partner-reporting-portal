@@ -101,7 +101,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return Number(val);
     }
 
-    _capitalizeFirstLetter(text: string, localize: any) {
+    _capitalizeFirstLetter(text: string, localize?: Function) {
       if (localize !== undefined) {
         return localize(text);
       }
