@@ -1,10 +1,11 @@
 import Constants from '../../constants';
 
 export class UserProfileState {
-  profile = {}
+  profile = undefined
 };
 
-export const UserProfile = (state = {profile: {}}, action: any) => {
+export const UserProfile = (state = {profile: undefined}, action: any) => {
+
   switch (action.type) {
     case Constants.SET_USER_PROFILE:
       return {
@@ -13,7 +14,7 @@ export const UserProfile = (state = {profile: {}}, action: any) => {
 
     case Constants.RESET:
       return {
-        profile: {}
+        profile: undefined
       };
 
     default:
