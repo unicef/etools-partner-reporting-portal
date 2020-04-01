@@ -81,7 +81,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     <list-view-indicators
         data="[[data]]"
-        total-results="[[totalResults]]"
+        total-results="[[allIndicatorsCount]]"
         can-edit="[[canAddIndicator]]">
     </list-view-indicators>
   </page-body>
@@ -103,8 +103,8 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Array, computed: '_computeCurrentIndicators(objectiveId, allIndicators)'})
   data!: any[];
 
-  @property({type: Number, computed: '_computeCurrentIndicatorsCount(objectiveId, allIndicatorsCount)'})
-  totalResults!: number;
+  // @property({type: Number, computed: '_computeCurrentIndicatorsCount(objectiveId, allIndicatorsCount)'})
+  // totalResults!: number;
 
   @property({type: String, computed: '_computeUrl(objectiveId, queryParams)'})
   url!: string;
@@ -120,7 +120,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get observers() {
     return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
+      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId, reduxStore)',
     ];
   }
 
@@ -133,12 +133,16 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeCurrentIndicators(objectiveId: number, allIndicators: GenericObject) {
+    if (!objectiveId || !allIndicators) {
+      return;
+    }
     return allIndicators[objectiveId];
   }
 
-  _computeCurrentIndicatorsCount(objectiveId: number, allIndicatorsCount: GenericObject) {
-    return allIndicatorsCount[objectiveId];
-  }
+  // (dci) TO DO check how was used before (number[number]) ???
+  // _computeCurrentIndicatorsCount(objectiveId: number, allIndicatorsCount: GenericObject) {
+  //   return allIndicatorsCount[objectiveId];
+  // }
 
   _computeUrl() {
     //Make sure the queryParams are updated before the thunk is created:
@@ -147,12 +151,15 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterObjectiveIndicatorsAjax() {
+    if (!this.objectiveId || !this.reduxStore) {
+      return;
+    }
+
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
-
-
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
+    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, String(this.objectiveId)))
+      // @ts-ignore
       .catch(function(err) {
         // TODO: error handling.
       });

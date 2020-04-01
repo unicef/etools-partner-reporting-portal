@@ -17,8 +17,7 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
@@ -47,6 +46,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
         --app-grid-gutter: 15px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 3;
+        --app-grid-gutter: 0px;
 
         --paper-dialog: {
           width: 700px;
@@ -96,26 +96,16 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
                 required>
               </paper-input>
 
-              <paper-dropdown-menu
-                  class="item validate"
-                  label="[[localize('cluster')]]"
-                  id="cluster"
-                  on-value-changed="_validate"
-                  always-float-label
-                  required>
-                  <paper-listbox
-                      selected="{{data.cluster}}"
-                      attr-for-selected="value"
-                      slot="dropdown-content"
-                      class="dropdown-content">
-                    <template
-                        id="clusters"
-                        is="dom-repeat"
-                        items="[[clusters]]">
-                      <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                    </template>
-                  </paper-listbox>
-              </paper-dropdown-menu>
+              <etools-dropdown
+                class="item validate"
+                label="[[localize('cluster')]]"
+                options="[[clusters]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.cluster}}"
+                hide-search
+                required>
+              </etools-dropdown>
 
           </iron-form>
         </template>
@@ -126,7 +116,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
           [[localize('save')]]
         </paper-button>
 
-        <paper-button  on-tap="close">
+        <paper-button class="btn-cancel" on-tap="close">
           [[localize('cancel')]]
         </paper-button>
       </div>
@@ -178,8 +168,8 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
   }
 
   _redirectToDetail(id: number) {
-    var path = '/response-parameters/clusters/objective/' + String(id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/response-parameters/clusters/objective/' + String(id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 

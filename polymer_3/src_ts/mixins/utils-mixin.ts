@@ -61,7 +61,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _localizeLowerCased(text: string, localize: any) {
-      return localize(text.split(' ').join('_').toLowerCase());
+      return text ? localize(text.split(' ').join('_').toLowerCase()) : '';
     }
 
     _singularLocalized(text: string, localize: any) {

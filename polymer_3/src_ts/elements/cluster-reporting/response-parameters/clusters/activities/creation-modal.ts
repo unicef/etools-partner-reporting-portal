@@ -17,8 +17,7 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-dialog/paper-dialog';
 import '../../../../form-fields/dropdown-form-input';
 import '../../../../form-fields/cluster-dropdown-content';
@@ -49,6 +48,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
         --app-grid-gutter: 15px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 3;
+        --app-grid-gutter: 0px;
 
         --paper-dialog: {
             width: 700px;
@@ -105,48 +105,32 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
               required>
             </paper-input>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="[[localize('cluster')]]"
-                id="cluster"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-                <paper-listbox
-                    selected="{{data.cluster}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="clusters"
-                      is="dom-repeat"
-                      items="[[clusters]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            <etools-dropdown
+              class="item validate"
+              label="[[localize('cluster')]]"
+              id="cluster"
+              options="[[clusters]]"
+              option-value="id"
+              option-label="title"
+              selected="{{data.cluster}}"
+              hide-search
+              required>
+            </etools-dropdown>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="[[localize('cluster_objective')]]"
-                id="objective"
-                on-value-changed="_validate"
-                disabled="[[isObjectivesDisabled]]"
-                always-float-label
-                required>
-                <paper-listbox
-                    selected="{{data.cluster_objective}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="objectives"
-                      is="dom-repeat"
-                      items="[[objectives]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            <etools-dropdown
+              id="objective"
+              class="item validate"
+              label="[[localize('cluster_objective')]]"
+              options="[[objectives]]"
+              option-value="id"
+              option-label="title"
+              selected="{{data.cluster_objective}}"
+              disabled="[[isObjectivesDisabled]]"
+              hide-search
+              required>
+            </etools-dropdown>
+
+
           </iron-form>
         </template>
       </paper-dialog-scrollable>
@@ -156,7 +140,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
           [[localize('save')]]
         </paper-button>
 
-        <paper-button  on-tap="close">
+        <paper-button class="btn-cancel" on-tap="close">
           [[localize('cancel')]]
         </paper-button>
       </div>
@@ -227,10 +211,9 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
     let self = this;
     if (clusterID && objectivesUrl) {
-      const thunk = (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk();
       this.objectivesParams = {cluster_id: this.data.cluster};
 
-      thunk()
+      (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk()()
         .then(function(res: any) {
           self.set('objectives', res.data.results);
         })
@@ -267,15 +250,13 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _save() {
-    let self = this;
-    const thunk = (this.$.createActivity as EtoolsPrpAjaxEl).thunk();
-
     if (!this._fieldsAreValid()) {
       return;
     }
 
+    let self = this;
     self.updatePending = true;
-    thunk()
+    (this.$.createActivity as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.updatePending = false;
         self.set('errors', {});

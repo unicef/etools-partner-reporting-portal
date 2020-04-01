@@ -1146,7 +1146,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     let self = this;
     let radioGroup = this.shadowRoot!.querySelector('#mode');
 
-    if (radioGroup !== undefined) {
+    if (radioGroup) {
       let otherRadio = radioGroup!.children.find((element: GenericObject) => {
         return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
       });

@@ -5,7 +5,6 @@ export class UserProfileState {
 };
 
 export const UserProfile = (state = {profile: undefined}, action: any) => {
-
   switch (action.type) {
     case Constants.SET_USER_PROFILE:
       return {
