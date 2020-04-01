@@ -259,6 +259,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
     (this.$.createActivity as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.updatePending = false;
+        self.set('errors', {});
         self.close();
         setTimeout(() => {
           self._redirectToDetail(res.data.id);

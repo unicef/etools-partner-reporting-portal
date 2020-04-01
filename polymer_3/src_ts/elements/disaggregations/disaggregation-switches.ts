@@ -2,8 +2,9 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import {html} from '@polymer/polymer';
 import '@polymer/polymer/lib/elements/dom-repeat';
-import '@polymer/paper-checkbox';
+import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import DisaggregationMixin from '../../mixins/disaggregations-mixin';
@@ -63,7 +64,6 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
             <paper-checkbox
                 id="[[field.id]]"
                 checked="[[_computeChecked(field.id)]]"
-                on-iron-form-element-register="_initField"
                 on-change="_fieldValueChanged">
               [[_formatFieldName(field.name)]]
             </paper-checkbox>
@@ -93,7 +93,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   warning: boolean = true;
 
   @property({type: Array})
-  reportedOn: string[] = [];
+  reportedOn: number[] = [];
 
   @property({type: Object, notify: true})
   formattedData!: GenericObject;
@@ -119,7 +119,9 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _computeChecked(id: string) {
-    return this.formattedData.disaggregation_reported_on.indexOf(id) !== -1;
+    const checked = this.formattedData.disaggregation_reported_on.indexOf(id) !== -1;
+    this._updateReportedOn(id, checked);
+    return checked;
   }
 
   _formatFieldName(name: string) {
@@ -138,7 +140,6 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
           .then(this._commit.bind(this))
           .catch((err: any) => {this._revert.bind(this)});
       });
-
   }
 
   _confirmIntent(field: GenericObject) {
@@ -161,7 +162,6 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
 
   _revert(field: GenericObject) {
     field.checked = !field.checked;
-
     this._recordField(field);
   }
 
@@ -170,18 +170,16 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   }
 
   _recordField(field: GenericObject) {
-    let id = Number(field.id);
-    let checked = field.checked;
+    this._updateReportedOn(field.id, field.checked);
+  }
 
+  _updateReportedOn(ctrlId: string, checked: boolean) {
+    const id = Number(ctrlId);
     if (checked) {
       this.push('reportedOn', id);
     } else if (this.reportedOn.indexOf(id) !== -1) {
       this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
     }
-  }
-
-  _initField(e: CustomEvent) {
-    this._recordField(e.target);
   }
 
   connectedCallback() {

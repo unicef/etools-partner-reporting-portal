@@ -5,8 +5,6 @@ import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-styles/typography';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/iron-location/iron-location';
 import '../error-modal';
 import {ErrorModalEl} from '../error-modal';
@@ -79,27 +77,6 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       <paper-dialog-scrollable>
         <div class="dialog-content">
             <h3>[[localize('could_not_be_submitted')]]</h3>
-            <!--
-            <paper-dropdown-menu
-              id="officerDropdown"
-              class="validate"
-              label="[[localize('authorized_officer')]]"
-              placeholder="[[localize('select')]]"
-              on-value-changed="_validate"
-              always-float-label
-              required>
-              <paper-listbox
-                selected="{{selectedFocalPoint}}"
-                attr-for-selected="value"
-                slot="dropdown-content"
-                class="dropdown-content">
-                <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
-                  <paper-item value="[[item.value]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
-            -->
-
             <etools-dropdown
               id="officerDropdown"
               class="validate"
@@ -199,8 +176,13 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
           self.reportId,
           res.data
         ));
+
         self.set('busy', false);
-        self.set('path', newPath);
+        self.close();
+
+        setTimeout(() => {
+          self.set('path', newPath);
+        }, 100);
       })
       .catch((res: any) => {
         const errors = res.data.non_field_errors;
