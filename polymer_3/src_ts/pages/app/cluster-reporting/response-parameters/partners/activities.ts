@@ -54,10 +54,10 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
     </style>
 
     <etools-prp-permissions
-        permissions="{{permissions}}">
+      permissions="{{permissions}}">
     </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
         params-string="{{query}}"
@@ -65,8 +65,8 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
     </iron-query-params>
 
     <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]"
+        id="partnerActivities"
+        url="[[url]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
 
@@ -98,14 +98,14 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
   responsePlanID!: string;
 
   @property({type: String, computed: '_computeUrl(responsePlanID)'})
-  activitiesUrl!: string;
+  url!: string;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.responsePlans.current)'})
   responsePlanCurrent!: GenericObject;
 
   static get observers() {
     return [
-      '_activitiesAjax(queryParams, activitiesUrl)'
+      '_activitiesAjax(queryParams, url)'
     ]
   }
 
@@ -138,20 +138,20 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
   }
 
   _activitiesAjax(queryParams: GenericObject) {
-    if (!this.activitiesUrl || !queryParams) {
+    if (!this.url || !queryParams) {
       return;
     }
-
+    const self = this;
     this._activitiesAjaxDebouncer = Debouncer.debounce(this._activitiesAjaxDebouncer,
       timeOut.after(300),
       () => {
-        const thunk = (this.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
+        const thunk = (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
         if (!Object.keys(queryParams).length) {
           return;
         }
-        (this.$.partnerActivities as EtoolsPrpAjaxEl).abort();
+        (self.$.partnerActivities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchPartnerActivitiesList(thunk))
+        self.reduxStore.dispatch(fetchPartnerActivitiesList(thunk))
           // @ts-ignore
           .catch(function(err) {
             //   // TODO: error handling.

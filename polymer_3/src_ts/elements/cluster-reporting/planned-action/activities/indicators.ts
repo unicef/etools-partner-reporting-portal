@@ -124,11 +124,12 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
   _computeCurrentIndicators(activityId: number, allIndicators: GenericObject) {
-    return allIndicators[activityId];
+    if (allIndicators && activityId !== undefined) {
+      return allIndicators[activityId];
+    }
   }
 
   _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: any) {
-
     return allIndicatorsCount[activityId];
   }
 

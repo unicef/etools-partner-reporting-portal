@@ -23,7 +23,18 @@ export const modalStyles = html`
 
     .buttons {
       padding: 24px;
+      justify-content: flex-start;
     }
+
+     .item.full-width {
+       @apply --app-grid-expandible-item;
+     }
+
+     .item {
+      padding-right: 20px;
+      margin-bottom: 20px !important;
+    }
+
 
     // .full-width {
     //   @apply --app-grid-expandible-item;

@@ -93,6 +93,9 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
   }
 
   @property({type: Object})
+  permissions!: GenericObject;
+
+  @property({type: Object})
   queryParams!: GenericObject;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})

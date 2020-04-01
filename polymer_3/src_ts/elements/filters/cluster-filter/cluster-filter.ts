@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../dropdown-filter/searchable-dropdown-filter';
+import '../dropdown-filter/dropdown-filter';
 import '../../etools-prp-ajax';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
@@ -91,14 +91,12 @@ class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(Red
     if (!this.clusterNamesUrl || !this.params) {
       return;
     }
+    const self = this;
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer,
       timeOut.after(250),
       () => {
-        var self = this;
-        const thunk = (this.$.clusterNames as EtoolsPrpAjaxEl).thunk();
-        (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
-
-        thunk()
+        (self.$.clusterNames as EtoolsPrpAjaxEl).abort();
+        (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
           .then(function(res: any) {
             self.set('data', [{
               id: '',
@@ -112,7 +110,7 @@ class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(Red
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
+    super.disconnectedCallback();
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     if (this.clusterNamesDebouncer && this.clusterNamesDebouncer.isActive()) {

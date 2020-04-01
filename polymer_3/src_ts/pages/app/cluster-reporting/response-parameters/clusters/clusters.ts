@@ -7,11 +7,12 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
+import '@polymer/polymer/lib/elements/dom-if';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import {sharedStyles} from '../../../../../styles/shared-styles';
-import '../../../../../elements/page-body';
+import '../../../../../elements/page-header';
 import '../../../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './router';
 import {GenericObject} from '../../../../../typings/globals.types';
@@ -23,7 +24,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin RoutingMixin
 */
-class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
+class Clusters extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -124,14 +125,13 @@ class Clusters extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _displayHeader(subpage: string) {
-    var requiresHeader = ['objectives', 'activities', 'disaggregations',
-      'response-plans'];
+    const requiresHeader = ['objectives', 'activities', 'disaggregations', 'response-plans'];
     return this._displayClusterHeader(subpage, requiresHeader);
   }
 
   _resetPage(e: CustomEvent) {
-    var isSelected = false;
-    var queryParams = {};
+    let isSelected = false;
+    let queryParams: GenericObject = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');

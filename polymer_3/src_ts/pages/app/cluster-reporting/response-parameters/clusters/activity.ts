@@ -143,7 +143,8 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
 
   static get observers() {
     return [
-      '_updateUrlTab(routeData.tab)'
+      '_updateUrlTab(routeData.tab)',
+      '_getActivityAjax(url)'
     ]
   }
 
@@ -172,6 +173,10 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _getActivityAjax() {
+    if (!this.url) {
+      return;
+    }
+
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const self = this;
 
@@ -198,7 +203,6 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    this._getActivityAjax();
   }
 
   disconnectedCallback() {

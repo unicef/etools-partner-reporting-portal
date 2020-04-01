@@ -68,10 +68,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         padding: 0px;
       }
 
-      .buttons {
-        justify-content: flex-start;
-      }
-
       paper-radio-group-custom {
         display: block;
         padding-top: 16px;
@@ -81,10 +77,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         margin-left: -12px;
       }
 
-      .item {
-        padding-right: 20px;
-        margin-bottom: 24px;
-      }
       etools-dropdown, etools-dropdown-multi, datepicker-lite {
         width: 100%;
       }

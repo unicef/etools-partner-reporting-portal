@@ -39,9 +39,6 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
       ::slotted([slot=disaggregation-table]) {
         margin-bottom: 1em;
       }
-     .buttons {
-        justify-content: flex-start;
-      }
     </style>
 
     <paper-dialog

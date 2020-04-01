@@ -11,7 +11,6 @@ import '../../../../frequency-of-reporting';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import '../../../../labelled-item';
-import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
@@ -102,19 +101,22 @@ class RpClustersDetailsOverview extends LocalizeMixin(UtilsMixin(ReduxConnectedE
   }
 
   @property({type: Object})
-  properties!: GenericObject;
+  data!: GenericObject;
 
+  @property({type: Object})
+  permissions!: GenericObject;
 
   _openModal() {
     (this.shadowRoot!.querySelector('#modal') as ClusterObjectivesEditingModalEl).open();
   }
 
-  _canEditActivity(permissions: GenericObject, clusterId: number) {
-    if (permissions.createClusterEntities) {
+  _canEditObjective(permissions: GenericObject, clusterId: number) {
+    if (clusterId && permissions && permissions.createClusterEntities) {
       return permissions.createClusterEntitiesForCluster(clusterId);
     }
     return false;
   }
+
 }
 
 window.customElements.define('rp-clusters-details-overview', RpClustersDetailsOverview);
