@@ -112,7 +112,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Array, computed: 'getReduxStateObject(rootState.clusterObjectives.indicatorsCount)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.indicatorsCount)'})
   allIndicatorsCount!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanAddIndicator(permissions, clusterId)'})
