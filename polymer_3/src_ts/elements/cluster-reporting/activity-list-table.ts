@@ -188,6 +188,12 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   @property({type: Object})
   projects = {};
 
+  static get observers() {
+    return [
+      '_getProjects(responsePlanID)',
+    ];
+  }
+
   _openModal() {
     this.shadowRoot!.querySelector('#modal')!.open();
   }
