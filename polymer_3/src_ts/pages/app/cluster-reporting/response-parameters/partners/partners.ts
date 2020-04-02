@@ -23,7 +23,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
 * @appliesMixin RoutingMixin
 * @appliesMixin LocalizeMixin
 */
-class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement))) {
+class Partners extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -76,8 +76,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
       </div>
     </template>
 
-    <response-parameters-partners-router parent-route="{{route}}">
-    </response-parameters-partners-router>
+    <response-parameters-partners-router parent-route="{{route}}"></response-parameters-partners-router>
     `;
   }
 
@@ -110,7 +109,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
 
   _resetPage(e: CustomEvent) {
     let isSelected = false;
-    let queryParams = {};
+    let queryParams: GenericObject = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');

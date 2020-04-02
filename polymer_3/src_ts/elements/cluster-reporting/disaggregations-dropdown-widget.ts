@@ -6,12 +6,14 @@ import '@polymer/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-item/paper-item';
 import '@polymer/paper-tooltip/paper-tooltip';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
+import {PaperIconButtonElement} from '@polymer/paper-icon-button';
 
 
 /**
@@ -187,7 +189,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _remove(e: CustomEvent) {
-    let toRemove = +e.target!.index;
+    let toRemove = +(e.target! as PaperIconButtonElement).getAttribute('index')!;
     this.splice('value', toRemove, 1);
   }
 
@@ -195,8 +197,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (!e.detail.selectedItem) {
       return;
     }
-
-    let index = +e.target!.index;
+    let index = +(e.target as EtoolsDropdownEl).getAttribute('index')!;
     let id = e.detail.selectedItem.id;
 
     let selected = this.disaggregations.find(function(dis) {

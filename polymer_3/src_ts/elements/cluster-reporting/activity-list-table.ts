@@ -202,17 +202,16 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   }
 
   _getProjects() {
-    if (Object.keys(this.projects).length !== 0) {
+    if (Object.keys(this.projects).length !== 0 || !this.responsePlanID) {
       return;
     }
 
     var self = this;
-    var projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
-    projectsThunk()
+    (this.$.projects as EtoolsPrpAjaxEl).thunk()()
       .then(function(res) {
-        var allProjects = {};
+        const allProjects: GenericObject = {};
         res.data.results.forEach(function(project) {
           allProjects[project.id] = project;
         });
@@ -232,18 +231,17 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
     this._tableContentChanged = this._tableContentChanged.bind(this);
     this.addEventListener('page-number-changed', this._tableContentChanged);
     this._detailsChange = this._detailsChange.bind(this);
-    this.addEventListener('details-opened-changed', this._detailsChange);
+    this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('page-number-changed', this._tableContentChanged);
-    this.removeEventListener('details-opened-changed', this._detailsChange);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    this._getProjects();
   }
 
   disconnectedCallback() {

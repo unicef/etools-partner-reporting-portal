@@ -69,10 +69,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           --app-grid-expandible-item-columns: 2;
 
           --paper-dialog: {
-            width: 700px; & > *{
-          margin: 0;
-        }
-        };
+            width: 700px;
+          }
         }
 
         .full-width {
@@ -390,16 +388,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     </div>
 
                     <div class="item">
-                      <!--
-                      <etools-prp-date-input
-                        class="start-date"
-                        label="[[localize('start_date')]] *"
-                        value="{{ data.start_date }}"
-                        error-message=""
-                        required
-                        no-init>
-                      </etools-prp-date-input>
-                      -->
                       <datepicker-lite
                         class="start-date"
                         label="[[localize('start_date')]] *"
@@ -410,16 +398,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     </div>
 
                     <div class="item">
-                      <!--
-                      <etools-prp-date-input
-                        class="end-date"
-                        label="[[localize('end_date')]] *"
-                        value="{{ data.end_date }}"
-                        error-message=""
-                        required
-                        no-init>
-                      </etools-prp-date-input>
-                      -->
                       <datepicker-lite
                         class="end-date"
                         label="[[localize('end_date')]] *"
