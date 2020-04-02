@@ -5,15 +5,13 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-item/paper-item';
 import '@polymer/paper-tooltip/paper-tooltip';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
 
 
 /**
@@ -22,57 +20,57 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style include="iron-flex iron-flex-alignment">
         :host {
           display: block;
         }
-  
+
         h2 {
           padding: 5px 10px;
           margin: 0 0 1em;
           font-size: 14px;
           background-color: var(--paper-grey-200);
         }
-  
+
         .error,
         .remove-btn {
           color: var(--paper-deep-orange-a700);
         }
-  
+
         .row {
           margin-bottom: 1em;
         }
-  
+
         .remove-btn {
           width: 34px;
           height: 34px;
         }
-  
+
         .add-disaggregation-btn {
           margin: 0;
         }
-  
+
         .col-actions {
           width: 40px;
           border-right: 1px solid var(--paper-grey-400);
         }
-  
+
         .col-name:not(:first-of-type),
         .col-values {
           padding-left: 24px;
         }
-  
-        paper-dropdown-menu {
+
+        etools-dropdown {
           width: 100%;
         }
       </style>
-      
+
       <h2>[[localize('disaggregations')]] ([[value.length]])</h2>
-      
+
       <template is="dom-repeat" items="[[value]]" as="dataDisagg">
         <div class="row layout horizontal">
           <template
@@ -91,7 +89,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               </div>
             </div>
           </template>
-  
+
           <div class="col-name flex">
             <template
                 is="dom-if"
@@ -104,35 +102,29 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
                   disabled>
               </paper-input>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[!readonly]]"
                 restamp="true">
-              <paper-dropdown-menu
-                class="dis-menu validate"
-                id="disaggregationsDrop"
-                index="[[index]]"
-                label="[[localize('disaggregation_by')]]"
-                on-value-changed="_validate"
-                on-selected-item-changed="_setDisaggregation"
-                disabled="[[readonly]]"
-                always-float-label
-                required>
-                <paper-listbox
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                  <template
-                    is="dom-repeat"
-                    items="[[disaggregations]]">
-                    <paper-item name="[[item.id]]">[[item.name]]
-                    </paper-item>
-                  </template>
-                </paper-listbox>
-              </paper-dropdown-menu>
+                  <etools-dropdown
+                    class="dis-menu validate"
+                    id="disaggregationsDrop"
+                    index="[[index]]"
+                    label="[[localize('disaggregation_by')]]"
+                    options="[[disaggregations]]"
+                    option-value="id"
+                    option-label="name"
+                    trigger-value-change-event
+                    on-etools-selected-item-changed="_setDisaggregation"
+                    disabled="[[readonly]]"
+                    hide-search
+                    always-float-label
+                    required>
+                  </etools-dropdown>
             </template>
           </div>
-  
+
           <div class="col-values flex">
             <paper-input
               index="[[index]]"
@@ -142,10 +134,10 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               disabled>
             </paper-input>
           </div>
-  
+
         </div>
       </template>
-      
+
       <template
           is="dom-if"
           if="[[!readonly]]"
@@ -179,7 +171,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   readonly: boolean = false;
 
 
-  static get observers(){
+  static get observers() {
     return ['_setCanAddMore(value.splices)'];
   }
 
@@ -199,35 +191,27 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     this.splice('value', toRemove, 1);
   }
 
-  _setDisaggregation(e: CustomEvent, data: GenericObject) {
+  _setDisaggregation(e: CustomEvent) {
+    if (!e.detail.selectedItem) {
+      return;
+    }
+
     let index = +e.target!.index;
+    let id = e.detail.selectedItem.id;
 
-    let id;
-    if (data.value) {
-      id = data.value.name;
-    }
-
-    let selected;
-
-    if (id) {
-      selected = this.disaggregations.find(function(dis) {
-        return dis.id === id;
-      });
-    }
-
-    let newSelectedDisaggregations;
+    let selected = this.disaggregations.find(function(dis) {
+      return dis.id === id;
+    });
 
     if (selected) {
-      newSelectedDisaggregations = this.value.slice();
-
+      let newSelectedDisaggregations = this.value.slice();
       newSelectedDisaggregations[index] = selected;
-
       this.set('value', newSelectedDisaggregations);
     }
   }
 
   _formatChoices(selected) {
-    return selected.choices.map( (choice) => {
+    return selected.choices.map((choice) => {
       return choice.value;
     }).join(', ');
   }

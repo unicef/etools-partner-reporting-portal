@@ -3,6 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
+import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
@@ -27,7 +28,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin RoutingMixin
 */
-class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
+class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -153,7 +154,7 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -165,6 +166,9 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _computeUrl(activityId: string) {
+    if (!activityId) {
+      return;
+    }
     return Endpoints.responseParamtersClustersActivityDetail(activityId);
   }
 

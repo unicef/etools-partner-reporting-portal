@@ -506,6 +506,10 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _computeIndicatorType(data: GenericObject, localize: Function) {
+    if (!data) {
+      return;
+    }
+
     switch (data.blueprint.display_type) {
       case 'number':
         return localize('quantity');

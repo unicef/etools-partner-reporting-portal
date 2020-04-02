@@ -166,7 +166,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
-    return permissions.createClusterEntities &&
+    return permissions && permissions.createClusterEntities &&
       permissions.createClusterEntitiesForCluster(clusterId);
   }
 

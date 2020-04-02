@@ -113,7 +113,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
               restamp="true">
               <page-cluster-reporting-dashboard
                 name="dashboard"
-                route="{{ subroute }}">
+                route="{{subroute}}">
               </page-cluster-reporting-dashboard>
             </template>
 
@@ -123,7 +123,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
               restamp="true">
               <page-cluster-reporting-response-parameters
                 name="response-parameters"
-                route="{{ subroute }}">
+                route="{{subroute}}">
               </page-cluster-reporting-response-parameters>
             </template>
 

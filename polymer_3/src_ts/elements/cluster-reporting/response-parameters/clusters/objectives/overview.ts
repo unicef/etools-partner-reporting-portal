@@ -3,6 +3,7 @@ import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import './editing-modal';
 import {ClusterObjectivesEditingModalEl} from './editing-modal';
 import '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';

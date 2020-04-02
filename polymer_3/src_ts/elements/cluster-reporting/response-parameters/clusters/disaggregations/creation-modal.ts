@@ -114,7 +114,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
           [[localize('save')]]
         </paper-button>
 
-        <paper-button  on-tap="close">
+        <paper-button class="btn-cancel" on-tap="close">
           [[localize('cancel')]]
         </paper-button>
       </div>
@@ -191,7 +191,6 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
         fireEvent(self, 'disaggregation-added', res.data);
         self.updatePending = false;
         self.close();
-
       })
       .catch(function(err) {
         // TODO: error handling
@@ -201,7 +200,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
   _checkMatchingName() {
     let disaggregations = this.disaggregations;
-    for (var i = 0; i < disaggregations.length; i++) {
+    for (let i = 0; i < disaggregations.length; i++) {
       if (disaggregations[i].name === this.data.name.trim()) {
         return false;
       }

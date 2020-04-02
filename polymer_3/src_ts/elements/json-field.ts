@@ -163,6 +163,10 @@ class JsonField extends UtilsMixin(PolymerElement) {
   }
 
   _computeInvalid(required: boolean, isRatio: boolean, value: GenericObject) {
+    if (!value) {
+      return true;
+    }
+
     if (required) {
       if (isRatio) {
         return typeof value.v === 'undefined' || typeof value.d === 'undefined';

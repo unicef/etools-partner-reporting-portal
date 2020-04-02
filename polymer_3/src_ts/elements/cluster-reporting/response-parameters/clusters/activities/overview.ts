@@ -5,6 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import './editing-modal';
 import {ClusterActivitiesEditingModalEl} from './editing-modal';
 import '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
@@ -25,7 +26,7 @@ class RpClustersActivityOverview extends LocalizeMixin(UtilsMixin(ReduxConnected
     // language=HTML
     return html`
     ${buttonsStyles}
-    <style include="app-grid-style>
+    <style include="app-grid-style">
       :host {
         display: block;
         --app-grid-columns:4;
@@ -111,7 +112,7 @@ class RpClustersActivityOverview extends LocalizeMixin(UtilsMixin(ReduxConnected
   }
 
   _canEditActivity(permissions: GenericObject, clusterId: number) {
-    if (permissions.createClusterEntities) {
+    if (clusterId && permissions && permissions.createClusterEntities) {
       return permissions.createClusterEntitiesForCluster(clusterId);
     }
     return false;

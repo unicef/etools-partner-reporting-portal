@@ -22,6 +22,7 @@ import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../../styles/modal-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
 import {fireEvent} from '../../../../../utils/fire-custom-event';
 
@@ -36,7 +37,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
+    ${modalStyles} ${buttonsStyles}
     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
@@ -129,7 +130,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
           [[localize('save')]]
         </paper-button>
 
-        <paper-button  on-tap="close">
+        <paper-button class="btn-cancel" on-tap="close">
           [[localize('cancel')]]
         </paper-button>
       </div>
