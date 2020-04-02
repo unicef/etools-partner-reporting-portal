@@ -150,6 +150,7 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
   static get observers() {
     return [
       '_updateUrlTab(routeData.tab)',
+      '_getProjectAjax(overviewUrl)'
     ];
   }
 
@@ -179,6 +180,10 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
   }
 
   _getProjectAjax() {
+    if (!this.overviewUrl) {
+      return;
+    }
+
     const self = this;
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
@@ -205,7 +210,6 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
     super.connectedCallback();
 
     this._addEventListeners();
-    this._getProjectAjax();
   }
 
   disconnectedCallback() {
