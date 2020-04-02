@@ -255,6 +255,9 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   }
 
   _computeShowLocationsWarning(isClusterApp: boolean, type: string, canEdit: boolean, data: GenericObject) {
+    if (!data) {
+      return;
+    }
     let baseConditionsMet = isClusterApp && type !== 'ca' && canEdit;
 
     return baseConditionsMet && data.some((indicator: GenericObject) => {

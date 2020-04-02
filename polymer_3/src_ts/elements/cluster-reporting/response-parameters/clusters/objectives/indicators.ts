@@ -112,15 +112,15 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.clusterObjectives.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanAddIndicator(permissions, clusterId)'})
   canAddIndicator!: boolean;
 
   static get observers() {
     return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
+      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId, reduxStore)',
     ];
   }
 
@@ -132,11 +132,17 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this._clusterObjectiveIndicatorsAjax();
   }
 
-  _computeCurrentIndicators(objectiveId: number, allIndicators: GenericObject) {
+  _computeCurrentIndicators(objectiveId: number, allIndicators: any[]) {
+    if (!objectiveId || !allIndicators) {
+      return;
+    }
     return allIndicators[objectiveId];
   }
 
   _computeCurrentIndicatorsCount(objectiveId: number, allIndicatorsCount: GenericObject) {
+    if (!objectiveId || !allIndicatorsCount) {
+      return;
+    }
     return allIndicatorsCount[objectiveId];
   }
 
@@ -147,19 +153,22 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterObjectiveIndicatorsAjax() {
+    if (!this.objectiveId || !this.reduxStore) {
+      return;
+    }
+
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
-
-
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, this.objectiveId))
+    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, String(this.objectiveId)))
+      // @ts-ignore
       .catch(function(err) {
         // TODO: error handling.
       });
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
-    return permissions.createClusterEntities &&
+    return permissions && permissions.createClusterEntities &&
       permissions.createClusterEntitiesForCluster(clusterId);
   }
 

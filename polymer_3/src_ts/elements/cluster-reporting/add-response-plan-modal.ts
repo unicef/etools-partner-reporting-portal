@@ -68,10 +68,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         padding: 0px;
       }
 
-      .buttons {
-        justify-content: flex-start;
-      }
-
       paper-radio-group-custom {
         display: block;
         padding-top: 16px;
@@ -81,10 +77,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         margin-left: -12px;
       }
 
-      .item {
-        padding-right: 20px;
-        margin-bottom: 24px;
-      }
       etools-dropdown, etools-dropdown-multi, datepicker-lite {
         width: 100%;
       }
@@ -193,18 +185,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </paper-input>
                 </div>
                 <div class="item">
-                  <!--
-                  <etools-single-selection-menu
-                    class="validate"
-                    label="Plan Type"
-                    options="[[types]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.plan_type}}"
-                    hide-search
-                    required>
-                  </etools-single-selection-menu>
-                  -->
                   <etools-dropdown
                       class="validate"
                       label="Plan Type"
@@ -231,16 +211,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </div>
                 </template>
                 <div class="item">
-                  <!--
-                  <etools-prp-date-input
-                    class="start-date"
-                    label="Start date"
-                    value="{{data.start}}"
-                    error-message=""
-                    required
-                    no-init>
-                  </etools-prp-date-input>
-                  -->
                   <datepicker-lite
                     class="start-date"
                     label="Start date"
@@ -251,16 +221,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   </datepicker-lite>
                 </div>
                 <div class="item">
-                  <!--
-                  <etools-prp-date-input
-                    class="end-date"
-                    label="End date"
-                    value="{{data.end}}"
-                    error-message=""
-                    required
-                    no-init>
-                  </etools-prp-date-input>
-                  -->
                   <datepicker-lite
                     class="end-date"
                     label="End date"
@@ -280,6 +240,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     selected-values="{{data.clusters}}"
                     on-etools-selected-items-changed="_validate"
                     trigger-value-change-event
+                    hide-close
                     error-message=""
                     required>
                   </etools-dropdown-multi>

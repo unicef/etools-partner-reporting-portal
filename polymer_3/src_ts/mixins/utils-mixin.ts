@@ -61,7 +61,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _localizeLowerCased(text: string, localize: any) {
-      return localize(text.split(' ').join('_').toLowerCase());
+      return text ? localize(text.split(' ').join('_').toLowerCase()) : '';
     }
 
     _singularLocalized(text: string, localize: any) {
@@ -101,7 +101,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return Number(val);
     }
 
-    _capitalizeFirstLetter(text: string, localize: any) {
+    _capitalizeFirstLetter(text: string, localize?: Function) {
       if (localize !== undefined) {
         return localize(text);
       }
@@ -228,6 +228,9 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _dateRangeValid(start: any, end: any) {
       let startField = this.shadowRoot!.querySelector(start);
       let endField = this.shadowRoot!.querySelector(end);
+      if (!startField || !endField) {
+        return true;
+      }
       let startValue = startField.value;
       let endValue = endField.value;
 

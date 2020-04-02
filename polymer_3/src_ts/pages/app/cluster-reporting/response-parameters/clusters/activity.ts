@@ -3,6 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
+import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
@@ -27,7 +28,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
 * @appliesMixin LocalizeMixin
 * @appliesMixin RoutingMixin
 */
-class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
+class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -80,10 +81,10 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('cluster_activity')]]">
+        slot="above-title" name="[[localize('cluster_activity')]]">
       </page-badge>
 
-      <div class="toolbar">
+      <div slot="toolbar">
         <project-status status="[[data.status]]"></project-status>
       </div>
 
@@ -143,7 +144,8 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
 
   static get observers() {
     return [
-      '_updateUrlTab(routeData.tab)'
+      '_updateUrlTab(routeData.tab)',
+      '_getActivityAjax(url)'
     ]
   }
 
@@ -152,7 +154,7 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -164,6 +166,9 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _computeUrl(activityId: string) {
+    if (!activityId) {
+      return;
+    }
     return Endpoints.responseParamtersClustersActivityDetail(activityId);
   }
 
@@ -172,6 +177,10 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   }
 
   _getActivityAjax() {
+    if (!this.url) {
+      return;
+    }
+
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const self = this;
 
@@ -198,7 +207,6 @@ class Activity extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedEleme
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    this._getActivityAjax();
   }
 
   disconnectedCallback() {

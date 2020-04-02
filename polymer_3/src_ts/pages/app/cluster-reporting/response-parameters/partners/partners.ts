@@ -6,7 +6,6 @@ import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
-//<link rel="import" href="../../../../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
@@ -15,7 +14,7 @@ import {sharedStyles} from '../../../../../styles/shared-styles';
 import '../../../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './router';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {Partner} from '../../../../../redux/reducers/partner';
+
 
 /**
 * @polymer
@@ -24,7 +23,7 @@ import {Partner} from '../../../../../redux/reducers/partner';
 * @appliesMixin RoutingMixin
 * @appliesMixin LocalizeMixin
 */
-class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement))) {
+class Partners extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -77,8 +76,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
       </div>
     </template>
 
-    <response-parameters-partners-router parent-route="{{route}}">
-    </response-parameters-partners-router>
+    <response-parameters-partners-router parent-route="{{route}}"></response-parameters-partners-router>
     `;
   }
 
@@ -111,7 +109,7 @@ class Partners extends RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedEleme
 
   _resetPage(e: CustomEvent) {
     let isSelected = false;
-    let queryParams = {};
+    let queryParams: GenericObject = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');

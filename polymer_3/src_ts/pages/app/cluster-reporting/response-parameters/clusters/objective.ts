@@ -4,6 +4,8 @@ import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-location/iron-location';
+import '@polymer/app-route/app-route';
+import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-query-params';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/overview';
@@ -32,7 +34,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   static get template() {
     return html`
     ${sharedStyles}
-    <style include="shared-styles">
+    <style>
     :host {
       display: block;
 
@@ -79,7 +81,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('objective')]]">
+          slot="above-title" name="[[localize('objective')]]">
       </page-badge>
 
       <div class="toolbar">
@@ -123,6 +125,9 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   tab!: string;
 
   @property({type: Object})
+  route!: GenericObject;
+
+  @property({type: Object})
   routeData!: GenericObject;
 
   @property({type: String})
@@ -131,10 +136,10 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   @property({type: Object})
   data = {};
 
-  @property({type: String, observer: '_computeObjectiveUrl(objectiveId)'})
+  @property({type: String, computed: '_computeObjectiveUrl(objectiveId)'})
   objectiveUrl!: string;
 
-  @property({type: String, observer: '_computeBackLink(query)'})
+  @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
   @property({type: Boolean})
@@ -142,7 +147,8 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
 
   static get observers() {
     return [
-      '_updateUrlTab(routeData.tab)'
+      '_updateUrlTab(routeData.tab)',
+      '_getObjectiveAjax(objectiveUrl)'
     ]
   }
 
@@ -174,6 +180,9 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   }
 
   _getObjectiveAjax() {
+    if (!this.objectiveUrl) {
+      return;
+    }
     const thunk = (this.$.objective as EtoolsPrpAjaxEl).thunk();
     let self = this;
     thunk()
@@ -199,7 +208,6 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    this._getObjectiveAjax();
   }
 
   disconnectedCallback() {

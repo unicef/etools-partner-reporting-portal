@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-route/app-route';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import '../../../elements/etools-prp-auth';
@@ -68,6 +67,27 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
       .item-wide {
         @apply --app-grid-expandible-item;
       }
+
+      .no-padding-tl {
+        padding-top: 0;
+        padding-left: 0;
+      }
+
+      .max-w {
+        max-width: 100%;
+      }
+
+      .max-h {
+        max-height: 100%;
+      }
+
+      .zero-marg-r {
+        margin-right: 0;
+      }
+
+      .zero-marg-b {
+        margin-bottom: 0;
+      }
     </style>
 
     <etools-prp-auth
@@ -75,7 +95,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </etools-prp-auth>
 
     <iron-location
-      query="{{ query }}">
+      query="{{query}}">
     </iron-location>
 
     <iron-query-params
@@ -97,13 +117,14 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
     <page-body>
       <div class="row">
-        <div class="app-grid">
-          <div class="item">
+        <div class="app-grid no-padding-tl">
+          <div class="item max-w">
             <indicators-by-status></indicators-by-status>
           </div>
-          <div class="item">
-            <div class="app-grid">
-              <div class="item">
+
+          <div class="item max-w zero-marg-r max-h">
+            <div class="app-grid no-padding-tl max-h">
+              <div class="item max-w">
                 <template
                   is="dom-if"
                   if="[[_equals(mode, 'cluster')]]"
@@ -118,10 +139,10 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
                   <number-of-projects></number-of-projects>
                 </template>
               </div>
-              <div class="item">
+              <div class="item max-w zero-marg-r">
                 <number-of-due-reports></number-of-due-reports>
               </div>
-              <div class="item item-wide">
+              <div class="item max-w max-h zero-marg-r zero-marg-b">
                 <number-of-non-cluster-activities></number-of-non-cluster-activities>
               </div>
             </div>
@@ -155,6 +176,9 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   @property({type: Object})
   queryParams!: GenericObject;
+
+  @property({type: String})
+  route!: string;
 
   @property({type: String})
   query!: string;
@@ -218,7 +242,8 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   }
 
   _fetchData(dataUrl: string, queryParams: GenericObject) {
-    if (!dataUrl || !queryParams) {
+
+    if (!dataUrl || !queryParams || Object.keys(queryParams).length === 0) {
       return;
     }
     const self = this;

@@ -235,6 +235,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
           </paper-button>
 
           <paper-button
+              class="btn-cancel"
               on-tap="close">
             [[localize('cancel')]]
           </paper-button>

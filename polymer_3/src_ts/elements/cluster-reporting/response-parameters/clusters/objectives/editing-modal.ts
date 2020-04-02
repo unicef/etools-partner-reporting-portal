@@ -132,7 +132,7 @@ class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixi
           [[localize('save')]]
         </paper-button>
 
-        <paper-button on-tap="close">
+        <paper-button class="btn-cancel" on-tap="close">
           [[localize('cancel')]]
         </paper-button>
       </div>

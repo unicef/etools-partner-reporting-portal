@@ -66,10 +66,10 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('project')]]">
+        slot="above-title" name="[[localize('project')]]">
       </page-badge>
 
-      <div class="toolbar">
+      <div slot="toolbar">
         <project-status status="[[projectData.status]]"></project-status>
       </div>
 

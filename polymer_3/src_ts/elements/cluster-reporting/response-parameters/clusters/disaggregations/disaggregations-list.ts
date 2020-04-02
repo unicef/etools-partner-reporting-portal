@@ -113,7 +113,7 @@ class DisaggregationList extends LocalizeMixin(UtilsMixin(DataTableMixin(Paginat
   loading!: boolean;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDisaggregations.all)'})
-  allPartners!: GenericObject[];
+  disaggregations!: GenericObject[];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDisaggregations.count)'})
   totalResults!: number;

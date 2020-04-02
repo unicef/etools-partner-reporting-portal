@@ -91,7 +91,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('activity')]]">
+        slot="above-title" name="[[localize('activity')]]">
       </page-badge>
 
       <div class="toolbar">
@@ -162,6 +162,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     return [
       '_updateUrlTab(routeData.tab)',
       '_getActivityAjax(projects)',
+      '_getProjects(responsePlanID)'
     ];
   }
 
@@ -218,14 +219,17 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
   }
 
   _getProjects() {
-    var self = this;
-    var projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
+    if (!this.responsePlanID) {
+      return;
+    }
+    const self = this;
+    const projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
 
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     projectsThunk()
       .then(function(res) {
-        var allProjects = {};
+        let allProjects: GenericObject = {};
         res.data.results.forEach(function(project) {
           allProjects[project.id] = project;
         });
@@ -243,7 +247,6 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     super.connectedCallback();
 
     this._addEventListeners();
-    this._getProjects();
   }
 
   _removeEventListeners() {

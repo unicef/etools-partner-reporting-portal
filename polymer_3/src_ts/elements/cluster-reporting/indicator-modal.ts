@@ -214,20 +214,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                     <div class="app-grid">
                       <div class="item">
-                        <!--
-                        <etools-single-selection-menu
-                          id="clustersDropdown"
-                          class="validate"
-                          label="[[localize('clusters')]] *"
-                          options="[[clusters]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedCluster }}"
-                          on-iron-activate="_validate"
-                          disabled="[[_equals(selectedPartner, '')]]"
-                          required>
-                        </etools-single-selection-menu>
-                        -->
                         <etools-dropdown
                             id="clustersDropdown"
                             class="validate"
@@ -235,7 +221,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             options="[[clusters]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{ selectedCluster }}"
+                            selected="{{selectedCluster}}"
                             disabled="[[_equals(selectedPartner, '')]]"
                             auto-validate
                             required>
@@ -243,26 +229,13 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                       </div>
 
                       <div class="item">
-                        <!--
-                        <etools-single-selection-menu
-                            class="validate"
-                            label="[[localize('objective')]] *"
-                            options="[[objectives]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{ selectedObjective }}"
-                            on-iron-select="_validate"
-                            disabled="[[_equals(objectives.length, 0)]]"
-                            required>
-                        </etools-single-selection-menu>
-                        -->
                         <etools-dropdown
                             class="validate"
                             label="[[localize('objective')]] *"
                             options="[[objectives]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{ selectedObjective }}"
+                            selected="{{selectedObjective}}"
                             disabled="[[_equals(objectives.length, 0)]]"
                             auto-validate
                             required>
@@ -270,26 +243,13 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                       </div>
 
                       <div class="item full-width">
-                        <!--
-                        <etools-single-selection-menu
-                          class="validate"
-                          label="[[localize('indicator')]] *"
-                          options="[[indicators]]"
-                          option-value="id"
-                          option-label="title"
-                          selected="{{ selectedIndicator }}"
-                          on-iron-select="_validate"
-                          disabled="[[_equals(indicators.length, 0)]]"
-                          required>
-                        </etools-single-selection-menu>
-                        -->
                         <etools-dropdown
                             class="validate"
                             label="[[localize('indicator')]] *"
                             options="[[indicators]]"
                             option-value="id"
                             option-label="title"
-                            selected="{{ selectedIndicator }}"
+                            selected="{{selectedIndicator}}"
                             disabled="[[_equals(indicators.length, 0)]]"
                             auto-validate
                             required>
@@ -906,7 +866,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             [[localize('save')]]
           </paper-button>
 
-          <paper-button
+          <paper-button class="btn-cancel"
               on-tap="_close">
             [[localize('cancel')]]
           </paper-button>
@@ -1146,7 +1106,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     let self = this;
     let radioGroup = this.shadowRoot!.querySelector('#mode');
 
-    if (radioGroup !== undefined) {
+    if (radioGroup) {
       let otherRadio = radioGroup!.children.find((element: GenericObject) => {
         return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
       });
@@ -1770,3 +1730,5 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 }
 
 window.customElements.define('indicator-modal', IndicatorModal);
+
+export {IndicatorModal as IndicatorModalEl};

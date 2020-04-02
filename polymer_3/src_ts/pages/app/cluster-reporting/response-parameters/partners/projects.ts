@@ -116,7 +116,7 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
   }
 
   _canAddProject(permissions: GenericObject, responsePlanCurrent: GenericObject) {
-    if (responsePlanCurrent) {
+    if (responsePlanCurrent && permissions) {
       return permissions.addPartnerToProject;
     }
     return false;

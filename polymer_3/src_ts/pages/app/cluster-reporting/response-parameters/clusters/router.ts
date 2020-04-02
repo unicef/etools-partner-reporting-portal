@@ -6,6 +6,7 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import {getDomainByEnv} from '../../../../../config';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
 * @polymer
@@ -70,9 +71,13 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
           route="{{subroute}}">
         </clusters-disaggregations>
       </template>
+
     </iron-pages>
     `;
   }
+
+  @property({type: Object})
+  routeData!: GenericObject;
 
   @property({type: String})
   id!: string;

@@ -11,6 +11,7 @@ import '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
 import '../../../indicator-modal';
+import {IndicatorModalEl} from '../../../indicator-modal';
 import '../../../../list-view-indicators';
 import Endpoints from '../../../../../endpoints';
 import {clusterActivitiesIndicatorsFetch} from '../../../../../redux/actions/clusterActivities';
@@ -129,7 +130,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {
@@ -163,7 +164,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
-    return permissions.createClusterEntities &&
+    return permissions && permissions.createClusterEntities &&
       permissions.createClusterEntitiesForCluster(clusterId);
   }
 

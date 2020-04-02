@@ -16,8 +16,6 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-input/paper-input';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 
 import '@unicef-polymer/etools-date-time/datepicker-lite';
@@ -71,10 +69,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           --app-grid-expandible-item-columns: 2;
 
           --paper-dialog: {
-            width: 700px; & > *{
-          margin: 0;
-        }
-        };
+            width: 700px;
+          }
         }
 
         .full-width {
@@ -165,6 +161,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         paper-radio-group-custom {
           display: block;
           padding-top: 16px;
+          outline: none;
         }
 
         paper-radio-group-custom > .fields {
@@ -183,7 +180,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           margin-left: -12px;
         }
 
-        paper-dropdown-menu {
+        etools-dropdown {
           width: 100%;
         }
 
@@ -203,19 +200,19 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       </style>
 
       <etools-prp-permissions
-        permissions="{{ permissions }}">
+        permissions="{{permissions}}">
       </etools-prp-permissions>
 
       <iron-location path="{{ path }}"></iron-location>
 
-      <cluster-dropdown-content clusters="{{ clusters }}" partner="{{ partnerForClusters }}"></cluster-dropdown-content>
+      <cluster-dropdown-content clusters="{{clusters}}" partner="{{partnerForClusters}}"></cluster-dropdown-content>
 
       <template
         is="dom-if"
         if="[[permissions.addPartnerToProject]]"
         restamp="true">
         <partner-dropdown-content
-          partners="{{ partners }}"
+          partners="{{partners}}"
           clusters="[[imoClusters]]">
         </partner-dropdown-content>
       </template>
@@ -271,20 +268,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                 is="dom-if"
                 if="[[!edit]]"
                 restamp="true">
-                <!--
-                <etools-single-selection-menu
-                  class="item validate full-width"
-                  label="[[localize('partner')]]"
-                  options="[[partners]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.partner_id}}"
-                  selected-item="{{selectedPartner}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  required>
-                </etools-single-selection-menu>
-                -->
                 <etools-dropdown
                     class="item validate full-width"
                     label="[[localize('partner')]]"
@@ -293,7 +276,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     option-label="title"
                     selected="{{data.partner_id}}"
                     selected-item="{{selectedPartner}}"
-                    auto-validate
                     required>
                </etools-dropdown>
               </template>
@@ -325,29 +307,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                   if="[[_equals(mode, 'ocha')]]"
                   restamp="true">
                   <div>
-                    <!--
-                    <etools-single-selection-menu
-                      class="item validate full-width"
-                      label="[[localize('project')]]"
-                      options="[[formattedProjects]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{ selectedProject }}"
-                      on-iron-activate="_validate"
-                      disabled="[[projectsLoading]]"
-                      trigger-value-change-event
-                      required>
-                    </etools-single-selection-menu>
-                    -->
                     <etools-dropdown
                         class="item validate full-width"
                         label="[[localize('project')]]"
                         options="[[formattedProjects]]"
                         option-value="id"
                         option-label="title"
-                        selected="{{ selectedProject }}"
+                        selected="{{selectedProject}}"
                         disabled="[[projectsLoading]]"
-                        auto-validate
                         required>
                     </etools-dropdown>
                     <template
@@ -411,38 +378,16 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     </paper-input>
 
                     <div class="item full-width">
-                      <!--
-                      <etools-multi-selection-menu
-                        class="validate"
-                        label="[[localize('clusters')]] *"
-                        options="[[formattedClusters]]"
-                        selected-values="{{ selectedClusters }}"
-                        on-selected-values-changed="_validate"
-                        trigger-value-change-event
-                        required>
-                      </etools-multi-selection-menu>
-                      -->
                       <etools-dropdown-multi
                         class="validate"
                         label="[[localize('clusters')]] *"
                         options="[[formattedClusters]]"
                         selected-values="{{selectedClusters}}"
-                        auto-validate
                         required>
                       </etools-dropdown-multi>
                     </div>
 
                     <div class="item">
-                      <!--
-                      <etools-prp-date-input
-                        class="start-date"
-                        label="[[localize('start_date')]] *"
-                        value="{{ data.start_date }}"
-                        error-message=""
-                        required
-                        no-init>
-                      </etools-prp-date-input>
-                      -->
                       <datepicker-lite
                         class="start-date"
                         label="[[localize('start_date')]] *"
@@ -453,16 +398,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     </div>
 
                     <div class="item">
-                      <!--
-                      <etools-prp-date-input
-                        class="end-date"
-                        label="[[localize('end_date')]] *"
-                        value="{{ data.end_date }}"
-                        error-message=""
-                        required
-                        no-init>
-                      </etools-prp-date-input>
-                      -->
                       <datepicker-lite
                         class="end-date"
                         label="[[localize('end_date')]] *"
@@ -472,24 +407,16 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                       </datepicker-lite>
                     </div>
                     <div class="row">
-                      <paper-dropdown-menu
+                      <etools-dropdown
                         class="item validate"
                         label="[[localize('status')]] *"
-                        on-value-changed="_validate"
-                        always-float-label
+                        options="[[statuses]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{data.status}}"
+                        hide-search
                         required>
-                        <paper-listbox
-                          selected="{{ data.status }}"
-                          attr-for-selected="value"
-                          slot="dropdown-content"
-                          class="dropdown-content">
-                          <template
-                            is="dom-repeat"
-                            items="[[statuses]]">
-                            <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                          </template>
-                        </paper-listbox>
-                      </paper-dropdown-menu>
+                      </etools-dropdown>
                     </div>
 
                     <div class="item full-width">
@@ -570,19 +497,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                             on-input="_validate"
                             always-float-label>
                           </paper-input>
-                          <!--
-                          <etools-single-selection-menu
-                            class="item validate"
-                            label="[[localize('type_of_agency')]]"
-                            options="[[agencyTypes]]"
-                            option-value="title"
-                            option-label="title"
-                            selected="{{ data.agency_type }}"
-                            on-iron-activate="_validate"
-                            trigger-value-change-event
-                            always-float-label>
-                          </etools-single-selection-menu>
-                          -->
                           <etools-dropdown
                               class="item validate"
                               label="[[localize('type_of_agency')]]"
@@ -590,7 +504,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                               option-value="title"
                               option-label="title"
                               selected="{{data.agency_type}}"
-                              auto-validate>
+                              hide-search>
                           </etools-dropdown>
                           <paper-input
                             class="item validate full-width"
@@ -612,19 +526,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                               </paper-radio-group-custom>
                             </labelled-item>
                           </div>
-                          <!--
-                          <etools-single-selection-menu
-                            class="item validate"
-                            label="[[localize('prioritization_classification')]]"
-                            options="[[classifications]]"
-                            option-value="title"
-                            option-label="title"
-                            selected="{{ data.prioritization }}"
-                            on-iron-activate="_validate"
-                            trigger-value-change-event
-                            always-float-label>
-                          </etools-single-selection-menu>
-                          -->
                           <etools-dropdown
                               class="item validate"
                               label="[[localize('prioritization_classification')]]"
@@ -632,7 +533,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                               option-value="title"
                               option-label="title"
                               selected="{{data.prioritization}}"
-                              auto-validate>
+                              hide-search>
                           </etools-dropdown>
                           <paper-input
                             class="item validate"
@@ -756,7 +657,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     [[localize('save')]]
                   </paper-button>
 
-                  <paper-button on-tap="_close">
+                  <paper-button class="btn-cancel" on-tap="_close">
                     [[localize('cancel')]]
                   </paper-button>
                 </div>
@@ -879,6 +780,9 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
   @property({type: Boolean, computed: '_computeCustomDisabled(selectedPartner)'})
   customDisabled!: boolean;
+
+  @property({type: Object})
+  permissions!: GenericObject;
 
   private _setModeDebouncer!: Debouncer;
   private _fetchOchaProjectDebouncer!: Debouncer;
@@ -1249,7 +1153,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           self.close();
           self.set('errors', {});
         } else {
-          self._redirectToDetail(res.data.id);
+          self.close();
+          setTimeout(() => {
+            self._redirectToDetail(res.data.id);
+          }, 100);
         }
       })
       .catch((err: GenericObject) => {

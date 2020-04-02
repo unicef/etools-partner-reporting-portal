@@ -13,6 +13,7 @@ import '../../../etools-prp-permissions';
 import '../../../page-body';
 import '../../../list-view-indicators';
 import '../../indicator-modal';
+import {IndicatorModalEl} from '../../indicator-modal';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../styles/table-styles';
 import {GenericObject} from '../../../../typings/globals.types';
@@ -116,7 +117,7 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {
@@ -124,11 +125,12 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
   }
 
   _computeCurrentIndicators(activityId: number, allIndicators: GenericObject) {
-    return allIndicators[activityId];
+    if (allIndicators && activityId !== undefined) {
+      return allIndicators[activityId];
+    }
   }
 
   _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: any) {
-
     return allIndicatorsCount[activityId];
   }
 
@@ -143,7 +145,7 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, this.activityId.toString()))
+    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
       .catch(function(err) {
         // TODO: error handling.

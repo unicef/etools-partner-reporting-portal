@@ -123,7 +123,7 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
   }
 
   _canAddProject(permissions: GenericObject, responsePlanCurrent: GenericObject) {
-    if (responsePlanCurrent) {
+    if (responsePlanCurrent && permissions) {
       return permissions.addPlannedActionProject;
     }
     return false;

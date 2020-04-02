@@ -264,7 +264,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   responsePlans!: any[];
 
   @property({type: Number})
-  selected = null;
+  selected: number | null = null;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
@@ -286,13 +286,13 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
 
   //Gets correct target element when using Chrome.
   _handleRadioButtonChange(e: CustomEvent) {
-    var target = e.target;
-    if (e.target.id === 'onRadio' || e.target.id === 'offRadio') {
-      target = e.target.parentNode.parentNode;
+    let target = e.target as GenericObject;
+    if (target.id === 'onRadio' || target.id === 'offRadio') {
+      target = (e.target as HTMLElement).parentNode!.parentNode!;
     }
 
     if (target.checked) {
-      this.selected = target.name;
+      this.selected = Number(target.name);
     } else {
       this.selected = null;
     }
@@ -306,7 +306,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   }
 
   _redirectToAdmin() {
-    window.location = '/api/admin/core/responseplan/';
+    window.location.href = '/api/admin/core/responseplan/';
   }
 
   _cancel() {
@@ -314,7 +314,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   }
 
   _confirm() {
-    this._redirectToPlan(this.selected);
+    this._redirectToPlan(String(this.selected));
   }
 
   _planType(plan: GenericObject) {

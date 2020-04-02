@@ -45,7 +45,12 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         dialogOverlay.parentElement.removeChild(dialogOverlay);
       }
 
-      if (event.path && event.path[0] && event.path[0].tagName.toLowerCase().indexOf('dropdown') > -1) {return;}
+      const paths = (event as any).path || [];
+      if (paths.length) {
+        if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) || (paths.filter((x: any) => x.tagName === 'CHIP-DISAGG-VALUE').length)) {
+          return;
+        }
+      }
       // edge
       if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
 
