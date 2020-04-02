@@ -99,7 +99,7 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
 
   static get observers() {
     return [
-      '_clusterActivitiesAjax(_clusterDisaggregationsAjax(queryParams, disaggregationsUrl))'
+      '_clusterDisaggregationsAjax(queryParams, disaggregationsUrl)'
     ]
   }
 

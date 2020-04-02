@@ -553,7 +553,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _computeIndicatorType(data: GenericObject) {
-    return data.reportable.blueprint.display_type;
+    return data ? data.reportable.blueprint.display_type : undefined;
   }
 
   _computeCompleteIndicator(complete: string) {

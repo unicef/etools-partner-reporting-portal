@@ -26,6 +26,7 @@ import {MessageImoModalEl} from './message-imo-modal';
 import {GenericObject} from '../../typings/globals.types';
 import Endpoints from '../../endpoints';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown';
 
 
 /**
@@ -206,30 +207,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                   is="dom-if"
                   if="[[!_isLocked(item, lockedItems)]]"
                   restamp="true">
-                <!--
-                <etools-single-selection-menu
-                    class="item"
-                    label="[[localize('location_administrative_level')]]"
-                    options="[[locationTypes]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{item.loc_type}}"
-                    data-index$="[[index]]"
-                    on-selected-changed="_onLocTypeChanged"
-                    required>
-                </etools-single-selection-menu>
-                -->
-                <etools-dropdown
-                    class="item"
-                    label="[[localize('location_administrative_level')]]"
-                    options="[[locationTypes]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{item.loc_type}}"
-                    trigger-value-change-event
-                    on-etools-selected-item-changed="_onLocTypeChanged"
-                    required>
-              </etools-dropdown>
+                  <etools-dropdown
+                      class="item"
+                      label="[[localize('location_administrative_level')]]"
+                      options="[[locationTypes]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{item.loc_type}}"
+                      trigger-value-change-event
+                      on-etools-selected-item-changed="_onLocTypeChanged"
+                      data-index$="[[index]]"
+                      required>
+                  </etools-dropdown>
               </template>
 
               <template
@@ -247,30 +236,17 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                   is="dom-if"
                   if="[[!_isLocked(item, lockedItems)]]"
                   restamp="true">
-                <!--
-                <etools-single-selection-menu
-                    class="item item-2-col validate"
-                    label="[[localize('location')]]"
-                    options="[[_getLocations(locations, item.loc_type, index)]]"
-                    option-value="id"
-                    option-label="title"
-                    selected-item="{{item.location}}"
-                    on-value-changed="_onValueChanged"
-                    data-index$="[[index]]"
-                    disabled="[[_getPending(pending, item.loc_type, index)]]"
-                    required>
-                </etools-single-selection-menu>
-                -->
                 <etools-dropdown
                     class="item item-2-col validate"
                     label="[[localize('location')]]"
                     options="[[_getLocations(locations, item.loc_type, index)]]"
                     option-value="id"
                     option-label="title"
-                    selected-item="{{item.location}}"
+                    selected="{{item.location}}"
                     disabled="[[_getPending(pending, item.loc_type, index)]]"
-                    on-etools-selected-item-changed="_onValueChanged"
                     trigger-value-change-event
+                    on-etools-selected-item-changed="_onValueChanged"
+                    data-index$="[[index]]"
                     required>
                 </etools-dropdown>
               </template>
@@ -412,20 +388,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   private _debouncer!: Debouncer;
 
-  _onValueChanged(event: CustomEvent) {  // This method runs whenever user begins searching in locations dropdown
-    let loc_type = this.get('searchLocationType') || 0;
-    let index = -1;
-
-    if (event.detail.value === '') {
+  _onValueChanged(e: CustomEvent) {  // This method runs whenever user begins searching in locations dropdown
+    if (!e.detail.selectedItem) {
       return;
     }
 
-    event.path.forEach((node: GenericObject) => {
-      if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
-        index = node.dataset.index;  // Grab index of current location widget component
-        return;
-      }
-    });
+    let loc_type = this.get('searchLocationType') || 0;
+    let index = Number((e.target as EtoolsDropdownEl).dataset.index);
 
     if (loc_type === 0 && index === undefined) {
       index = 0;
@@ -436,15 +405,15 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       () => {
         let self = this;
 
-        let thunk = self.$.search;
+        let thunk = self.$.search as EtoolsPrpAjaxEl;
         thunk.url = self.get('url');
 
         thunk.params = {
           loc_type: loc_type,
-          title: event.detail.value
+          title: e.detail.selectedItem.title
         };
 
-        thunk.thunk()
+        (self.$.search as EtoolsPrpAjaxEl).thunk()()
           .then((res: GenericObject) => {
             self._setPending(loc_type, false, index);
             self._setLocations(loc_type, res.data.results, index);
@@ -496,12 +465,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeCanEditDetails(editing: boolean, parentIndicatorId: number, isPAI: boolean, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return !editing ||
       (permissions.createClusterEntities && !isPAI) ||
       (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
   }
 
   _computeCanMessageIMO(editing: boolean, parentIndicatorId: number, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
@@ -517,7 +492,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     });
   }
 
-  _isLocked(item, locked: any[]) {
+  _isLocked(item: any, locked: any[]) {
     return locked.indexOf(item) !== -1;
   }
 
@@ -573,24 +548,16 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     e.target!.validate();
   }
 
-  _onLocTypeChanged(event: CustomEvent) {
-    let index = -1;
-    //(dci) need to check this
-    event.path.forEach((node: GenericObject) => {
-      if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
-        index = node.dataset.index;
-        return;
-      }
-    });
-
-    if (index === -1) {
+  _onLocTypeChanged(e: CustomEvent) {
+    if (!e.detail.selectedItem) {
       return;
     }
 
-    this._fetchLocations(event.detail.selectedItem.value, undefined, index);//data.value
+    let index = Number((e.target as EtoolsDropdownEl).dataset.index);
+    this._fetchLocations(e.detail.selectedItem.id, undefined, index);
   }
 
-  _fetchLocations(loc_type, title, index) {
+  _fetchLocations(loc_type: string, title: any, index: number) {
     if (loc_type === undefined) {
       return;
     }

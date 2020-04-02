@@ -228,6 +228,9 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _dateRangeValid(start: any, end: any) {
       let startField = this.shadowRoot!.querySelector(start);
       let endField = this.shadowRoot!.querySelector(end);
+      if (!startField || !endField) {
+        return true;
+      }
       let startValue = startField.value;
       let endValue = endField.value;
 

@@ -66,7 +66,7 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   value = '';
 
   @property({type: Array, observer: '_handleData'})
-  data = [];
+  data!: any[];
 
   _handleFilterChange(e: CustomEvent) {
     const newValue = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).id;
@@ -78,7 +78,7 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   }
 
   _handleData(data: any) {
-    if (data.length) {
+    if (data) {
       this._filterReady();
     }
   }
