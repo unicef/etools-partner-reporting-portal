@@ -272,6 +272,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     selected-values="{{data.clusters}}"
                     on-etools-selected-items-changed="_validate"
                     trigger-value-change-event
+                    hide-close
                     error-message=""
                     required>
                   </etools-dropdown-multi>
