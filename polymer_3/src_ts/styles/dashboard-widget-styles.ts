@@ -5,7 +5,7 @@ import '@polymer/paper-styles/typography';
 export const dashboardWidgetStyles = html`
 
   <style>
-  
+
     :host {
       height: 100%;
     }
@@ -13,7 +13,7 @@ export const dashboardWidgetStyles = html`
     .widget-container {
       width: 100%;
       height: 100%;
-      padding: 16px;
+      padding: 32px;
     }
 
     .widget-heading {
@@ -46,7 +46,7 @@ export const dashboardWidgetStyles = html`
       text-decoration: none;
       color: var(--theme-primary-color);
     }
-    
+
   </style>
 
 `;
