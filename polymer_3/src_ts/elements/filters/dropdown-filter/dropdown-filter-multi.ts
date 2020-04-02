@@ -46,7 +46,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   hideSearch!: boolean;
 
   @property({type: Array, observer: '_handleData'})
-  data = [];
+  data!: any[];
 
   @property({type: Array})
   selectedValues = [];
@@ -57,9 +57,9 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
     ]
   }
 
-  _handleChange(e: CustomEvent, detail: any) {
-    if (detail.selectedItems) {
-      let newValue = detail.selectedItems.map((item: any) => item['id']).join(',');
+  _handleChange(e: CustomEvent) {
+    if (e.detail.selectedItems) {
+      let newValue = e.detail.selectedItems.map((item: any) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
           name: this.name,
@@ -70,7 +70,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   }
 
   _handleData(data: any) {
-    if (data.length) {
+    if (data) {
       this._filterReady();
     } else if (this.name === 'location' || this.name === 'locs') {
       // Locations get populated by PDs so user can filter by location, so if there are no PDs,
