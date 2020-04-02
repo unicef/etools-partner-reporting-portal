@@ -411,8 +411,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
             [[localize('save')]]
           </paper-button>
 
-          <paper-button
-              on-tap="close">
+          <paper-button class="btn-cancel" on-tap="close">
             [[localize('cancel')]]
           </paper-button>
         </div>
@@ -536,6 +535,9 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _computeCanEditDetails(permissions: GenericObject, data: GenericObject, isPAI: boolean) {
+    if (!permissions) {
+      return;
+    }
     return (permissions.createClusterEntities && !isPAI) ||
       (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
   }

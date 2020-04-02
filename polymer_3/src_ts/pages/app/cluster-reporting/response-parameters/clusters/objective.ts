@@ -81,7 +81,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('objective')]]">
+          slot="above-title" name="[[localize('objective')]]">
       </page-badge>
 
       <div class="toolbar">

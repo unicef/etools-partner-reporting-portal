@@ -81,10 +81,10 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('cluster_activity')]]">
+        slot="above-title" name="[[localize('cluster_activity')]]">
       </page-badge>
 
-      <div class="toolbar">
+      <div slot="toolbar">
         <project-status status="[[data.status]]"></project-status>
       </div>
 

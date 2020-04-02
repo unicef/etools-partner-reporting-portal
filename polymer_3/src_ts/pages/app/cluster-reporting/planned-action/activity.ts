@@ -91,7 +91,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('activity')]]">
+        slot="above-title" name="[[localize('activity')]]">
       </page-badge>
 
       <div class="toolbar">

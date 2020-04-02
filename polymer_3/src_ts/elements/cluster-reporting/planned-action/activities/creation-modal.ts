@@ -480,8 +480,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
           [[localize('add_activity')]]
         </paper-button>
 
-        <paper-button class="btn-cancel"
-            on-tap="_close">
+        <paper-button class="btn-cancel" on-tap="_close">
           [[localize('cancel')]]
         </paper-button>
       </div>

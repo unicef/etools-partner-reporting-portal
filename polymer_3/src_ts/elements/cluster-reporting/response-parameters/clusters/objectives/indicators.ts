@@ -81,7 +81,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     <list-view-indicators
         data="[[data]]"
-        total-results="[[allIndicatorsCount]]"
+        total-results="[[totalResults]]"
         can-edit="[[canAddIndicator]]">
     </list-view-indicators>
   </page-body>
@@ -103,8 +103,8 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Array, computed: '_computeCurrentIndicators(objectiveId, allIndicators)'})
   data!: any[];
 
-  // @property({type: Number, computed: '_computeCurrentIndicatorsCount(objectiveId, allIndicatorsCount)'})
-  // totalResults!: number;
+  @property({type: Number, computed: '_computeCurrentIndicatorsCount(objectiveId, allIndicatorsCount)'})
+  totalResults!: number;
 
   @property({type: String, computed: '_computeUrl(objectiveId, queryParams)'})
   url!: string;
@@ -112,8 +112,8 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterObjectives.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.clusterObjectives.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Array, computed: 'getReduxStateObject(rootState.clusterObjectives.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanAddIndicator(permissions, clusterId)'})
   canAddIndicator!: boolean;
@@ -132,17 +132,19 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this._clusterObjectiveIndicatorsAjax();
   }
 
-  _computeCurrentIndicators(objectiveId: number, allIndicators: GenericObject) {
+  _computeCurrentIndicators(objectiveId: number, allIndicators: any[]) {
     if (!objectiveId || !allIndicators) {
       return;
     }
     return allIndicators[objectiveId];
   }
 
-  // (dci) TO DO check how was used before (number[number]) ???
-  // _computeCurrentIndicatorsCount(objectiveId: number, allIndicatorsCount: GenericObject) {
-  //   return allIndicatorsCount[objectiveId];
-  // }
+  _computeCurrentIndicatorsCount(objectiveId: number, allIndicatorsCount: GenericObject) {
+    if (!objectiveId || !allIndicatorsCount) {
+      return;
+    }
+    return allIndicatorsCount[objectiveId];
+  }
 
   _computeUrl() {
     //Make sure the queryParams are updated before the thunk is created:

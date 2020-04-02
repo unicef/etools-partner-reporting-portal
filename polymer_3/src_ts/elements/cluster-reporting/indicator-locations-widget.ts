@@ -465,12 +465,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeCanEditDetails(editing: boolean, parentIndicatorId: number, isPAI: boolean, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return !editing ||
       (permissions.createClusterEntities && !isPAI) ||
       (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
   }
 
   _computeCanMessageIMO(editing: boolean, parentIndicatorId: number, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
