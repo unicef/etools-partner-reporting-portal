@@ -81,7 +81,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="[[localize('objective')]]">
+          slot="above-title" name="[[localize('objective')]]">
       </page-badge>
 
       <div class="toolbar">
@@ -125,6 +125,9 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   tab!: string;
 
   @property({type: Object})
+  route!: GenericObject;
+
+  @property({type: Object})
   routeData!: GenericObject;
 
   @property({type: String})
@@ -133,10 +136,10 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   @property({type: Object})
   data = {};
 
-  @property({type: String, observer: '_computeObjectiveUrl(objectiveId)'})
+  @property({type: String, computed: '_computeObjectiveUrl(objectiveId)'})
   objectiveUrl!: string;
 
-  @property({type: String, observer: '_computeBackLink(query)'})
+  @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
   @property({type: Boolean})

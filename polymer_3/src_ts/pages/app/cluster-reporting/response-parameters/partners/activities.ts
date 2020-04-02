@@ -1,22 +1,19 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
-
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/filters';
 import '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/activity-list-table';
 import {PlannedActionActivityModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
 import '../../../../../elements/etools-prp-permissions';
-
-import {tableStyles} from '../../../../../styles/table-styles';
+import {sharedStyles} from '../../../../../styles/shared-styles';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
 import {GenericObject} from '../../../../../typings/globals.types';
@@ -32,24 +29,19 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 * @appliesMixin RoutingMixin
 * @appliesMixin SortingMixin
 */
-class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
+class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(ReduxConnectedElement)))) {
 
   static get template() {
     return html`
-    ${tableStyles} ${buttonsStyles}
-    <style include="data-table-styles">
+    ${sharedStyles} ${buttonsStyles}
+    <style>
       :host {
         display: block;
       }
-
       div#action {
         margin: 25px 0;
         @apply --layout-horizontal;
         @apply --layout-end-justified;
-      }
-
-      a {
-        color: var(--theme-primary-color);
       }
     </style>
 
@@ -71,22 +63,22 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
     </etools-prp-ajax>
 
     <page-body>
-      <cluster-activities-filters></cluster-activities-filters>
 
+      <partner-activities-filters></partner-activities-filters>
       <template
-          is="dom-if"
-          if="[[permissions.createClusterEntities]]"
-          restamp="true">
-        <cluster-activities-modal id="modal"></cluster-activities-modal>
-
+        is="dom-if"
+        if="[[_canAddActivity(permissions, responsePlanCurrent)]]"
+        restamp="true">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_cluster_activity')]]
+            [[localize('add_activity')]]
           </paper-button>
         </div>
+        <planned-action-activity-modal id="modal"></planned-action-activity-modal>
       </template>
 
-      <clusters-activities-list></clusters-activities-list>
+      <activity-list-table page="response-parameters"></activity-list-table>
+
     </page-body>
     `;
   }
@@ -112,9 +104,6 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
   private _activitiesAjaxDebouncer!: Debouncer;
 
   _openModal() {
-    //CreationModalEl is imported
-    //TO DO: if not refactored yet, refactor export line of CreationModal => change name
-    // this.shadowRoot.querySelector('#modal').open();
     (this.shadowRoot!.querySelector('#modal') as PlannedActionActivityModalEl).open();
   }
 
@@ -132,9 +121,10 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
   }
 
   _canAddActivity(permissions: GenericObject, responsePlanCurrent: GenericObject) {
-    if (responsePlanCurrent) {
-      return permissions.createPartnerEntitiesByResponsePlan(responsePlanCurrent.clusters);
+    if (!permissions || !responsePlanCurrent) {
+      return;
     }
+    return permissions.createPartnerEntitiesByResponsePlan(responsePlanCurrent.clusters);
   }
 
   _activitiesAjax(queryParams: GenericObject) {
@@ -171,8 +161,6 @@ class RpPartnersActivities extends LocalizeMixin(UtilsMixin(RoutingMixin(Sorting
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
-    // (dci) need to check if it's working on original
-    // this._getObjectiveAjax();
   }
 
   disconnectedCallback() {

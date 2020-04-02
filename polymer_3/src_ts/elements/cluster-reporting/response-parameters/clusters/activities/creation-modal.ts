@@ -4,6 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import DateMixin from '../../../../../mixins/date-mixin';
+import RoutingMixin from '../../../../../mixins/routing-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-loading/etools-loading';
@@ -35,7 +36,7 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin DateMixin
  */
-class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxConnectedElement))) {
+class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     // language=HTML
     return html`
@@ -224,7 +225,6 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
     } else {
       self.set('objectives', []);
     }
-
   }
 
   close() {
@@ -244,7 +244,7 @@ class CreationModalActivities extends LocalizeMixin(DateMixin(UtilsMixin(ReduxCo
   }
 
   _redirectToDetail(id: number) {
-    const path = '/response-parameters/clusters/activity/' + String(id);
+    const path = `/response-parameters/clusters/activity/${id}`;
     const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }

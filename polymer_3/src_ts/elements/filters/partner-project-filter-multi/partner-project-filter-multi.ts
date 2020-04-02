@@ -46,10 +46,6 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
   @property({type: Array})
   data = [];
 
-  static get observers() {
-    return ['_computeValue(data, value)'];
-  }
-
   _computePartnerProjectsUrl(responsePlanId: string) {
     if (!responsePlanId) {
       return;

@@ -351,8 +351,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
           [[localize('add_activity')]]
         </paper-button>
 
-        <paper-button
-            on-tap="_close">
+        <paper-button class="btn-cancel" on-tap="_close">
           [[localize('cancel')]]
         </paper-button>
       </div>

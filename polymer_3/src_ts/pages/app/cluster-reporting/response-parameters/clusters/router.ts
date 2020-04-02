@@ -50,7 +50,6 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
         </clusters-objective-details>
       </template>
 
-      <!--
       <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
         <clusters-activities
           name="activities"
@@ -72,7 +71,7 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
           route="{{subroute}}">
         </clusters-disaggregations>
       </template>
-      -->
+
     </iron-pages>
     `;
   }

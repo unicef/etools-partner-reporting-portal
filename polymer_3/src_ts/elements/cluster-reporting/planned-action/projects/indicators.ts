@@ -12,6 +12,7 @@ import Endpoints from '../../../../endpoints';
 import {tableStyles} from '../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
 import '../../indicator-modal';
+import {IndicatorModalEl} from '../../indicator-modal';
 import '../../../list-view-indicators';
 import {GenericObject} from '../../../../typings/globals.types';
 import '../../../etools-prp-ajax';
@@ -121,7 +122,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('indicatorModal')!.open();
+    (this.shadowRoot!.querySelector('indicatorModal') as IndicatorModalEl).open();
   }
 
   _onSuccess() {

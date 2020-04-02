@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-route/app-route';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import '../../../elements/etools-prp-auth';
@@ -75,7 +74,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </etools-prp-auth>
 
     <iron-location
-      query="{{ query }}">
+      query="{{query}}">
     </iron-location>
 
     <iron-query-params
@@ -157,6 +156,9 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   queryParams!: GenericObject;
 
   @property({type: String})
+  route!: string;
+
+  @property({type: String})
   query!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
@@ -218,7 +220,8 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   }
 
   _fetchData(dataUrl: string, queryParams: GenericObject) {
-    if (!dataUrl || !queryParams) {
+
+    if (!dataUrl || !queryParams || Object.keys(queryParams).length === 0) {
       return;
     }
     const self = this;
