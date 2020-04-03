@@ -1104,7 +1104,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     let self = this;
 
     let locationError = false;
-    let rawLocations = this.get('data.locations');
+    let rawLocations = this.get('data.locations') || [];
 
     let changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location !== undefined) {
