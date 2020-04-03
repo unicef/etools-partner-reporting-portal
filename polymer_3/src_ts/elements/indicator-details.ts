@@ -97,7 +97,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       .table-container {
         max-height: 500px;
         padding-bottom: 25px;
-        overflow: auto;
+        overflow: inherit;
       }
 
       .table-container dl {
