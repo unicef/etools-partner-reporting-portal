@@ -3,6 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '../../../planned-action/projects/creation-modal';
+import {PlannedActionProjectsModalEl} from '../../../planned-action/projects/creation-modal';
 import '../../../../page-body';
 import '../../../project-details';
 import '../../../../etools-prp-permissions';
@@ -64,14 +65,18 @@ class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElemen
   responsePlanCurrent!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
 
-  _canEditActivity(permissions: GenericObject, projectData: GenericObject) {
+  _canEdit(permissions: GenericObject, projectData: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return projectData.clusters ?
       permissions.editPartnerEntities(projectData.clusters) :
       false;
   }
+
 }
 
 window.customElements.define('rp-partner-project-details-overview', RpPartnerProjectDetailsOverview);
