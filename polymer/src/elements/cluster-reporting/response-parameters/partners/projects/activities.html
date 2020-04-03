@@ -4,22 +4,36 @@
 
 <link rel="import" href="../../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../etools-prp-permissions.html">
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../project-activity-table.html">
+<link rel="import" href="../../../planned-action/activities/add-activity-from-project-modal.html">
+<link rel="import" href="../../../planned-action/activities/add-existing-activity-from-project-modal.html">
 
 <dom-module id="rp-partner-project-details-activities">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
       }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
     </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <iron-query-params
       params-string="{{query}}"
@@ -33,6 +47,24 @@
     </etools-prp-ajax>
 
     <page-body>
+      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
+      <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
+
+      <template
+          is="dom-if"
+          if="[[_displayButtons(permissions)]]"
+          restamp="true">
+        <div id="action">
+          <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
+            [[localize('add_new_project_activity')]]
+          </paper-button>
+
+          <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
+            [[localize('add_existing_project_activity')]]
+          </paper-button>
+        </div>
+      </template>
+
       <project-activity-table
         page="response-parameters"
         project-id="[[projectId]]">
@@ -46,13 +78,18 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
         queryParams: Object,
 
         projectId: Number,
+
+        projectData: Object,
 
         responsePlanId: {
           type: String,
@@ -73,6 +110,20 @@
       observers: [
         '_activitiesByPartnerProjectIdAjax(queryParams)',
       ],
+
+      listeners: {
+        'activity-added': '_onSuccess',
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/response-parameters/partners/activity/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _displayButtons: function (permissions) {
+        return !permissions.viewPlannedAction;
+      },
 
       _computeUrl: function (responsePlanId) {
         return App.Endpoints.partnerActivityList(responsePlanId);
@@ -101,6 +152,14 @@
         if (this.isDebouncerActive('activities-by-partner')) {
           this.cancelDebouncer('activities-by-partner');
         }
+      },
+
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
+
+      _openExistingModal: function () {
+        this.$$('#existing-modal').open();
       },
     });
   </script>

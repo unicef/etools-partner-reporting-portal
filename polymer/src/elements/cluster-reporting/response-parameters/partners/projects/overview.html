@@ -5,6 +5,7 @@
 <link rel="import" href="../../../project-details.html">
 <link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 
 <dom-module id="rp-partner-project-details-overview">
   <template>
@@ -31,7 +32,7 @@
         restamp="true">
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-            Edit Project
+            [[localize('edit_project')]]
           </paper-button>
         </div>
         <planned-action-projects-modal
@@ -51,6 +52,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

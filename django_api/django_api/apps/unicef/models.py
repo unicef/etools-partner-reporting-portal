@@ -327,7 +327,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def funds_received_to_date_percentage(self):
-        return self.funds_received_to_date_percent
+        return self.funds_received_to_date_percent if self.funds_received_to_date_percent and self.funds_received_to_date_percent != -1 else 0
 
     @property
     def calculated_budget(self):
@@ -567,6 +567,7 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
     description = models.CharField(max_length=512, blank=True, null=True)
 
     class Meta:
+        verbose_name_plural = 'Reporting period dates'
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'report_type', 'programme_document')
         )
@@ -591,6 +592,7 @@ class PDResultLink(TimeStampedExternalBusinessAreaModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name = 'Programme document result link'
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'external_cp_output_id')
         )

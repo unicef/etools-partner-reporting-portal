@@ -4,6 +4,7 @@
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/localize.html">
 
 <dom-module id="cluster-indicator-filter">
   <template>
@@ -19,7 +20,7 @@
     </etools-prp-ajax>
 
     <searchable-dropdown-filter
-        label="Indicator"
+        label="[[localize('indicator')]]"
         name="indicator"
         value="[[value]]"
         data="[[data]]">
@@ -32,6 +33,8 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

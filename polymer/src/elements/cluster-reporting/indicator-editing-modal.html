@@ -25,6 +25,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../error-box.html">
@@ -103,7 +104,7 @@
         opened="{{opened}}">
 
       <div class="header layout horizontal justified">
-        <h2>Edit Indicator</h2>
+        <h2>[[localize('edit_indicator')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -122,7 +123,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Title"
+                label="[[localize('title')]]"
                 on-input="_validate"
                 value="{{data.blueprint.title}}"
                 always-float-label
@@ -132,7 +133,7 @@
           </div>
 
           <div class="row">
-            <labelled-item label="Type">
+            <labelled-item label="[[localize('type')]]">
               <span class="indicator-type">[[indicatorType]]</span>
             </labelled-item>
           </div>
@@ -141,7 +142,7 @@
             <div class="layout horizontal">
               <labelled-item
                   class="calculation-method"
-                  label="Calculation method across locations">
+                  label="[[localize('calculation_method_across_locations')]]">
                 <calculation-method
                     value="{{data.blueprint.calculation_formula_across_locations}}"
                     readonly>
@@ -150,7 +151,7 @@
 
               <labelled-item
                   class="calculation-method"
-                  label="Calculation method across reporting periods">
+                  label="[[localize('calculation_method_across_reporting')]]">
                 <calculation-method
                     value="{{data.blueprint.calculation_formula_across_periods}}"
                     readonly>
@@ -162,7 +163,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Comments (optional)"
+                label="[[localize('comments')]]"
                 on-input="_validate"
                 value="{{data.comments}}"
                 disabled="[[!canEditDetails]]"
@@ -173,7 +174,7 @@
           <div class="row">
             <paper-input
                 class="validate"
-                label="Measurement specifications (optional)"
+                label="[[localize('measurement_specifications')]]"
                 on-input="_validate"
                 value="{{data.measurement_specifications}}"
                 disabled="[[!canEditDetails]]"
@@ -181,12 +182,34 @@
             </paper-input>
           </div>
 
+
+          <template
+              is="dom-if"
+              if="[[isPAI]]"
+              restamp="true">
+            <div class="row">
+              <etools-single-selection-menu
+                class="item validate pair"
+                label="[[localize('project_context')]]"
+                options="[[projects]]"
+                option-value="context_id"
+                option-label="project_name"
+                selected="{{data.project_context_id}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                hide-search
+                disabled
+                required>
+              </etools-single-selection-menu>
+            </div>
+          </template>
+
           <div class="row">
             <div class="app-grid">
               <etools-single-selection-menu
                   class="item validate"
-                  label="Frequency of reporting"
-                  options="[[frequencies]]"
+                  label="[[localize('frequency_of_reporting')]]"
+                  options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
                   option-value="id"
                   option-label="title"
                   selected="{{data.frequency}}"
@@ -204,7 +227,7 @@
                 <etools-prp-chips
                     class="item validate"
                     value="{{data.cs_dates}}"
-                    label="Due date of report"
+                    label="[[localize('due_date_of_report')]]"
                     on-selected-chips-updated="_validate"
                     disabled="[[!canEditDetails]]"
                     required>
@@ -219,7 +242,7 @@
 
               <etools-prp-date-input
                   class="item validate"
-                  label="Start date of reporting period"
+                  label="[[localize('start_date_reporting')]]"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
                   format="[[dateFormat]]"
@@ -236,7 +259,7 @@
                 restamp="true">
               <paper-input
                   class="validate"
-                  label="Label"
+                  label="[[localize('label')]]"
                   on-input="_validate"
                   value="{{data.label}}"
                   disabled="[[!canEditDetails]]"
@@ -251,7 +274,7 @@
               <div class="app-grid">
                 <paper-input
                     class="item validate"
-                    label="Numerator Label"
+                    label="[[localize('numerator_label')]]"
                     on-input="_validate"
                     value="{{data.numerator_label}}"
                     disabled="[[!canEditDetails]]"
@@ -260,7 +283,7 @@
 
                 <paper-input
                     class="item validate"
-                    label="Denominator Label"
+                    label="[[localize('denominator_label')]]"
                     on-input="_validate"
                     value="{{data.denominator_label}}"
                     disabled="[[!canEditDetails]]"
@@ -275,7 +298,7 @@
               <json-field
                   class="item validate"
                   type="[[data.blueprint.display_type]]"
-                  label="Baseline"
+                  label="[[localize('baseline')]]"
                   on-input="_validate"
                   value="{{data.baseline}}"
                   allowed-pattern="[+\-\d]"
@@ -289,7 +312,7 @@
                 <json-field
                     class="item validate"
                     type="[[data.blueprint.display_type]]"
-                    label="In need (optional)"
+                    label="[[localize('in_need')]]"
                     on-input="_validate"
                     value="{{data.in_need}}"
                     allowed-pattern="[+\-\d]"
@@ -300,7 +323,7 @@
               <json-field
                   class="item validate"
                   type="[[data.blueprint.display_type]]"
-                  label="Target"
+                  label="[[localize('target')]]"
                   on-input="_validate"
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
@@ -340,12 +363,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -361,6 +384,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -380,7 +405,7 @@
 
         indicatorType: {
           type: String,
-          computed: '_computeIndicatorType(data)',
+          computed: '_computeIndicatorType(data, localize)',
         },
 
         locationsUrl: {
@@ -401,6 +426,11 @@
         locations: {
           type: Array,
           value: [],
+        },
+
+        projects: {
+          type: Array,
+          computed: '_computeProjects(data)',
         },
 
         frequencies: {
@@ -439,7 +469,7 @@
 
         canEditDetails: {
           type: Boolean,
-          computed: '_computeCanEditDetails(permissions, data, isPAI)',
+          computed: '_computeCanEditDetails(permissions, data)',
         },
 
         dateFormat: {
@@ -463,16 +493,34 @@
         '_updateCSDates(data.start_date_of_reporting_period)',
       ],
 
-      _computeIndicatorType: function (data) {
+      _computeLocalizedFrequencies: function (frequencies, localize) {
+        var self = this;
+
+        return frequencies.map(function (frequency) {
+          frequency.title = self._localizeLowerCased(frequency.title, localize);
+          return frequency;
+        });
+      },
+
+      _computeIndicatorType: function (data, localize) {
         switch (data.blueprint.display_type) {
           case 'number':
-            return 'Quantity (#)';
+            return localize('quantity');
 
           case 'percentage':
-            return 'Percent';
+            return localize('percent');
 
           case 'ratio':
-            return 'Ratio';
+            return localize('ratio');
+        }
+      },
+
+      _computeProjects: function (data) {
+        if (this._computeIsPAI(data)) {
+          this.set('data.project_context_id', data.object_id);
+          return [{context_id: data.object_id, project_name: data.content_object_title}];
+        } else {
+          return [];
         }
       },
 
@@ -480,13 +528,13 @@
         return type === 'number';
       },
 
-      _computeCanEditDetails: function (permissions, data, isPAI) {
-        return (permissions.createClusterEntities && !isPAI) ||
+      _computeCanEditDetails: function (permissions, data) {
+        return permissions.createClusterEntities ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 
       _computeIsPAI: function (data) {
-        return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivity';
+        return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivityprojectcontext';
       },
 
       _computeMinDate: function (date) {
@@ -508,7 +556,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _showCSD: function (frequency) {

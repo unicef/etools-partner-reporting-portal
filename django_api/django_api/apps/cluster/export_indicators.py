@@ -123,7 +123,8 @@ class IndicatorsXLSXExporter:
             cluster_objective = indicator.reportable.cluster_objectives.first()
             cluster_activity = indicator.reportable.cluster_activities.first()
             partner_project = indicator.reportable.partner_projects.first()
-            partner_activity = indicator.reportable.partner_activities.first()
+            partner_activity = None
+            partner_activity_project_context = indicator.reportable.partner_activity_project_contexts.first()
             locations_data = indicator.indicator_location_data
 
             cluster = None
@@ -138,12 +139,13 @@ class IndicatorsXLSXExporter:
                 cluster_objective = cluster_activity.cluster_objective
                 partner_activity = cluster_activity.partner_activities.first()
                 partner_project = cluster_activity.cluster_objective.cluster.partner_projects.first()
-            elif partner_activity:
+            elif partner_activity_project_context:
+                partner_activity = partner_activity_project_context.activity
                 cluster = partner_activity.cluster_activity.cluster_objective.cluster if \
                     partner_activity.cluster_activity else partner_activity.cluster_objective.cluster
                 cluster_objective = partner_activity.cluster_activity.cluster_objective if \
                     partner_activity.cluster_activity else partner_activity.cluster_objective
-                partner_project = partner_activity.projects.first().project
+                partner_project = partner_activity_project_context.project
             elif partner_project:
                 cluster = partner_project.clusters.first()
                 cluster_objective = cluster.cluster_objectives.first()
@@ -192,9 +194,9 @@ class IndicatorsXLSXExporter:
                     row=start_row_id,
                     column=13).value = partner_project.get_status_display() if partner_project else ""
                 self.sheet.cell(row=start_row_id,
-                                column=14).value = partner_activity.start_date if partner_activity else ""
+                                column=14).value = partner_activity_project_context.start_date if partner_activity_project_context else ""
                 self.sheet.cell(row=start_row_id,
-                                column=15).value = partner_activity.end_date if partner_activity else ""
+                                column=15).value = partner_activity_project_context.end_date if partner_activity_project_context else ""
 
                 self.sheet.cell(
                     row=start_row_id,

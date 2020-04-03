@@ -3,6 +3,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../ip-reporting/partner-details.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
@@ -73,17 +74,17 @@
       }
     </style>
 
-    <etools-content-panel panel-title="Project Details">
+    <etools-content-panel panel-title="[[localize('project_details')]]">
         <div class="row">
           <ul class="app-grid">
             <li class="item">
-              <labelled-item label="Title">
+              <labelled-item label="[[localize('title')]]">
                 <span class="value">[[projectData.title]]</span>
               </labelled-item>
             </li>
 
             <li class="item extended">
-              <labelled-item label="Locations">
+              <labelled-item label="[[localize('locations_plural')]]">
                 <template
                     is="dom-repeat"
                     items="[[projectData.locations]]">
@@ -93,41 +94,41 @@
             </li>
 
             <li class="item">
-              <labelled-item label="Clusters">
+              <labelled-item label="[[localize('clusters')]]">
                 <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Start Date">
+              <labelled-item label="[[localize('start_date')]]">
                 <span class="value">[[projectData.start_date]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="End Date">
+              <labelled-item label="[[localize('end_date')]]">
                 <span class="value">[[projectData.end_date]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Total Budget">
+              <labelled-item label="[[localize('total_budget')]] (USD)">
                 <span class="value">
                   <etools-prp-number value="[[projectData.total_budget]]"></etools-prp-number>
                 </span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Funding Source">
+              <labelled-item label="[[localize('funding_source')]]">
                 <span class="value">[[projectData.funding_source]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Description">
+              <labelled-item label="[[localize('description')]]">
                 <span class="value">[[projectData.description]]</span>
               </labelled-item>
             </li>
 
             <li class="item">
-              <labelled-item label="Additional Information (e.g. links)">
+              <labelled-item label="[[localize('additional_information')]]">
                 [[_withDefault(projectData.additional_information)]]
               </labelled-item>
             </li>
@@ -142,7 +143,7 @@
             <paper-button
               class="btn-primary"
               on-tap="_handleDetailsChange">
-                [[_computeDetailsButtonMsg(detailsOpened)]]
+                [[_computeDetailsButtonMsg(detailsOpened, localize)]]
                 <div id="detailsIcon">
                   <iron-icon
                     icon="expand-more"
@@ -161,75 +162,75 @@
             >
               <ul class="app-grid">
                 <li class="item">
-                  <labelled-item label="Name of Agency (acronyms)">
+                  <labelled-item label="[[localize('name_of_agency')]]">
                     <span class="value">[[_withDefault(projectData.agency_name)]]</span>
                   </labelled-item>
                 </li>
                <li class="item">
-                  <labelled-item label="Type of Agency">
+                  <labelled-item label="[[localize('type_of_agency')]]">
                     <span class="value">[[_withDefault(projectData.agency_type)]]</span>
                   </labelled-item>
                </li>
               <li class="item full-width">
-                <labelled-item label="Additional implementing partners">
+                <labelled-item label="[[localize('additional_implementing_partners')]]">
                   <span class="value">[[_withDefault(projectData.additional_partners)]]</span>
                 </labelled-item>
               </li>
               <li class="item">
-                <labelled-item label="Prioritization Classification">
+                <labelled-item label="[[localize('prioritization_classification')]]">
                   <span class="value">[[_withDefault(projectData.prioritization)]]</span>
                 </labelled-item>
               </li>
               <li class="item">
-                <labelled-item label="Project code in HRP">
+                <labelled-item label="[[localize('project_code_hrp')]]">
                   <span class="value">[[_withDefault(projectData.code)]]</span>
                 </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding Requirements (US$)">
+                <labelled-item label="[[localize('funding_requirements')]]">
                     <span class="value">[[_withDefault(projectData.funding.required_funding)]]</span>
                   </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)">
+                <labelled-item label="[[localize('funding_received_confirmed_own_agency')]]">
                   <span class="value">[[_withDefault(projectData.funding.internal_funding)]]</span>
                 </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding received / confirmed from CERF (US$)">
+                <labelled-item label="[[localize('funding_received_confirmed_cerf')]]">
                   <span class="value">[[_withDefault(projectData.funding.cerf_funding)]]</span>
                 </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)">
+                <labelled-item label="[[localize('funding_received_confirmed_cbpf')]]">
                   <span class="value">
                      [[_withDefault(projectData.funding.cbpf_funding)]]
                   </span>
                 </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding received / confirmed from bilateral agreements, not including UNICEF/WFP (US$)">
+                <labelled-item label="[[localize('funding_received_confirmed_bilateral')]]">
                   <span class="value">
                      [[_withDefault(projectData.funding.bilateral_funding)]]
                   </span>
                 </labelled-item>
              </li>
              <li class="item full-width">
-              <labelled-item label="Funding received / confirmed from UNICEF including supplies cost (US$)">
+              <labelled-item label="[[localize('funding_received_confirmed_unicef')]]">
                 <span class="value">
                    [[_withDefault(projectData.funding.unicef_funding)]]
                 </span>
               </labelled-item>
             </li>
             <li class="item full-width">
-              <labelled-item label="Funding received / confirmed from WFP including supplies cost (US$)">
+              <labelled-item label="[[localize('funding_received_confirmed_wfp')]]">
                 <span class="value">
                    [[_withDefault(projectData.funding.wfp_funding)]]
                 </span>
               </labelled-item>
             </li>
             <li class="item full-width">
-              <labelled-item label="Funding gap (US$)">
+              <labelled-item label="[[localize('funding_gap')]]">
                   <span class="value">
                      [[_withDefault(projectData.funding.funding_gap)]]
                   </span>
@@ -258,6 +259,9 @@
 
     behaviors: [
       App.Behaviors.UtilsBehavior,
+      App.Behaviors.ReduxBehavior,
+      App.Behaviors.LocalizeBehavior,
+      Polymer.AppLocalizeBehavior,
     ],
 
     properties: {
@@ -273,11 +277,11 @@
         this.detailsOpened = !this.detailsOpened;
     },
 
-    _computeDetailsButtonMsg: function(detailsOpened) {
+    _computeDetailsButtonMsg: function(detailsOpened, localize) {
       if (detailsOpened) {
-        return 'show less details';
+        return localize('show_less_details');
       }
-      return 'show more details';
+      return localize('show_more_details');
     },
 
   });

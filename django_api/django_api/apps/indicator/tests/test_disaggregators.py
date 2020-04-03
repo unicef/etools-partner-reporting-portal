@@ -17,9 +17,9 @@ from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
                             LocationWithReportableLocationGoalFactory,
                             NonPartnerUserFactory, PartnerFactory,
                             PartnerProjectFactory,
-                            QuantityReportableToPartnerActivityFactory,
+                            QuantityReportableToPartnerActivityProjectContextFactory,
                             QuantityTypeIndicatorBlueprintFactory,
-                            RatioReportableToPartnerActivityFactory,
+                            RatioReportableToPartnerActivityProjectContextFactory,
                             RatioTypeIndicatorBlueprintFactory,
                             ResponsePlanFactory, WorkspaceFactory)
 from core.management.commands._generate_disaggregation_fake_data import (add_disaggregations_to_reportable,
@@ -103,8 +103,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -149,8 +149,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -196,8 +196,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -244,8 +244,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -296,8 +296,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -350,8 +350,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -467,8 +467,8 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -519,8 +519,8 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -571,8 +571,8 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -629,8 +629,8 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()
@@ -682,8 +682,8 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityFactory(
-            content_object=self.p_activity, blueprint=blueprint
+        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context, blueprint=blueprint
         )
 
         partneractivity_reportable.disaggregations.clear()

@@ -433,11 +433,37 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
     reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
-    reportable_data_to_sync["content_object"] = pa
     reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
     reportable_data_to_sync["parent_indicator"] = ca_reportable
-    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
 
+    for project_context in pa.partneractivityprojectcontext_set.all():
+        reportable_data_to_sync["content_object"] = project_context
+        pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+        pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
+def create_reportable_for_papc_from_ca_reportable(papc, ca_reportable):
+    """
+    Copies one CA reportable instance to a partner activity project context.
+
+    Arguments:
+        papc {partner.models.PartnerActivityProjectContext} -- PartnerActivityProjectContext to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    """
+
+    if ca_reportable.content_object != papc.activity.cluster_activity:
+        raise serializers.ValidationError("The Parent-child relationship is not valid")
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+
+    reportable_data_to_sync["content_object"] = papc
+    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
     pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
 
 
@@ -503,11 +529,28 @@ def create_pa_reportables_from_ca(pa, ca):
         ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
     """
 
-    if pa.reportables.count() > 0:
+    if Reportable.objects.filter(partner_activity_project_contexts__activity=pa).count() > 0:
         return
 
     for reportable in ca.reportables.all():
         create_reportable_for_pa_from_ca_reportable(pa, reportable)
+
+
+def create_papc_reportables_from_ca(papc, ca):
+    """
+    Creates a set of PartnerActivityProjectContext Reportable instances from
+    ClusterActivity instance to target PartnerActivityProjectContext instance
+
+    Arguments:
+        papc {partner.models.PartnerActivityProjectContext} -- Target PartnerActivityProjectContext instance
+        ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
+    """
+
+    if Reportable.objects.filter(partner_activity_project_contexts=papc).count() > 0:
+        return
+
+    for reportable in ca.reportables.all():
+        create_reportable_for_papc_from_ca_reportable(papc, reportable)
 
 
 def create_pa_reportables_for_new_ca_reportable(instance):
@@ -804,8 +847,8 @@ def send_notification_on_status_change(sender, instance, **kwargs):
         elif content_type_model == 'clusteractivity':
             cluster = content_object.cluster_objective.cluster
             indicator_type = 'cluster_activity'
-        elif content_type_model == 'partneractivity' and content_object.cluster_activity:
-            cluster = content_object.cluster_activity.cluster_objective.cluster
+        elif content_type_model == 'partneractivityprojectcontext' and content_object.activity.cluster_activity:
+            cluster = content_object.activity.cluster_activity.cluster_objective.cluster
             indicator_type = 'partner_activity'
         else:
             cluster = None
@@ -964,6 +1007,7 @@ class ReportingEntity(TimeStampedModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name_plural = 'Reporting entities'
 
     def __str__(self):
         return "Reporting entity: {}".format(self.title)
@@ -999,6 +1043,7 @@ class IndicatorLocationData(TimeStampedModel):
 
     class Meta:
         ordering = ['id']
+        verbose_name_plural = 'Indicator location data'
         # TODO: enable
         # unique_together = ('indicator_report', 'location')
 

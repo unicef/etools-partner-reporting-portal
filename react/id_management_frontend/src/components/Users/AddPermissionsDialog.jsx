@@ -8,6 +8,8 @@ import renderPermissionsFields from "./renderPermissionsFields";
 import labels from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import {api} from "../../infrastructure/api";
+import {fetch, FETCH_OPTIONS} from "../../fetch";
+import {connect} from "react-redux";
 
 const title = "Add permissions";
 
@@ -21,6 +23,12 @@ export class AddPermissionsDialog extends Component {
 
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+
+        if (!props.user.partner) {
+            props.dispatchFetchClusters();
+        } else {
+            props.dispatchFetchClustersForPartner(props.user.partner.id)
+        }
     }
 
     onSubmit(values) {
@@ -30,7 +38,6 @@ export class AddPermissionsDialog extends Component {
         request.user_id = id;
 
         this.setState({loading: true});
-
 
         return api.post("id-management/role-group/", request)
             .then(() => {
@@ -73,9 +80,23 @@ export class AddPermissionsDialog extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        dispatchFetchClustersForPartner: (partner_id) => dispatch(fetch(FETCH_OPTIONS.CLUSTERS_FOR_PARTNER, partner_id)),
+        dispatchFetchClusters: () => dispatch(fetch(FETCH_OPTIONS.CLUSTERS)),
+    }
+};
+
 AddPermissionsDialog.propTypes = {
     error: PropTypes.string,
     handleSubmit: PropTypes.func.isRequired,
+    dispatchFetchClusters: PropTypes.func.isRequired,
+    dispatchFetchClustersForPartner: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
     open: PropTypes.bool,
@@ -84,8 +105,8 @@ AddPermissionsDialog.propTypes = {
     width: PropTypes.string
 };
 
-export default reduxForm({
+export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({
     form: "addPermissionsForm",
     initialValues: {prp_roles: [{}]}
-})(AddPermissionsDialog);
+})(AddPermissionsDialog));
 

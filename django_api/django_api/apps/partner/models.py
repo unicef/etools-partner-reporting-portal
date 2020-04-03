@@ -199,7 +199,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = JSONField(default=[])
+    custom_fields = JSONField(default=[], blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(
@@ -365,6 +365,7 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        verbose_name_plural = 'Partner activities'
         permissions = (
             ('imo_object', 'IMO Object'),
             ('partner_object', 'Partner Object'),
@@ -404,6 +405,11 @@ class PartnerActivityProjectContext(TimeStampedModel):
     # PartnerActivity shares the status flags with PartnerProject
     status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
                               default=PARTNER_PROJECT_STATUS.ongoing)
+
+    reportables = GenericRelation(
+        'indicator.Reportable',
+        related_query_name='partner_activity_project_contexts'
+    )
 
     class Meta:
         unique_together = ('project', 'activity')

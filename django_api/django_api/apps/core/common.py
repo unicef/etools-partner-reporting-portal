@@ -27,6 +27,10 @@ DISPLAY_CLUSTER_TYPES = Choices(
     ('logistics', 'Logistics'),
     ('nutrition', 'Nutrition'),
     ('protection', 'Protection'),
+    ('child_protection_aor', 'Child Protection AoR'),
+    ('gender_based_violence_aor', 'Gender-Based Violence AoR'),
+    ('mine_action_aor', 'Mine Action AoR'),
+    ('housing_land_and_property_aor', 'Housing, Land and Property AoR'),
     ('shelter', 'Shelter'),
     ('wash', 'WASH'),
 )

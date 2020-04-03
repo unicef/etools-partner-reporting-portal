@@ -4,6 +4,7 @@
 <link rel="import" href="analysis-widget.html">
 <link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
 
@@ -20,7 +21,7 @@
       }
     </style>
 
-    <analysis-widget widget-title="[[widgetTitle]]">
+    <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
       <div hidden$="[[!rows.length]]">
         <google-chart
             type="bar"
@@ -32,7 +33,7 @@
 
       <list-placeholder
           data="[[rows]]"
-          message="No data for [[widgetTitle]] yet.">
+          message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
       </list-placeholder>
     </analysis-widget>
   </template>
@@ -44,6 +45,9 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.AnalysisChart,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -70,7 +74,7 @@
 
         rows: {
           type: Array,
-          computed: '_computeRows(data)',
+          computed: '_computeRows(data, localize)',
         },
       },
 
@@ -92,10 +96,11 @@
         });
       },
 
-      _computeRows: function (data) {
+      _computeRows: function (data, localize) {
+        var self = this;
         return Object.keys(data || {}).map(function (key) {
           return [
-            key,
+            self._localizeLowerCased(key, localize),
             data[key],
           ];
         });

@@ -112,7 +112,7 @@
       </indicator-locations-modal>
     </template>
 
-    <etools-data-table-row on-opened-changed="_handleOpenedChanged">
+    <etools-data-table-row details-opened="{{detailsOpened}}">
       <div slot="row-data">
         <span class="table-cell table-cell--text self-center">
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
@@ -121,6 +121,14 @@
           [[indicator.blueprint.title]]
           <paper-tooltip>[[indicator.blueprint.title]]</paper-tooltip>
         </span>
+        <template
+          is="dom-if"
+          if="[[_equals(indicator.content_type_key, 'partner.partneractivityprojectcontext')]]"
+          restamp="[[true]]">
+          <span class="table-cell table-cell--text self-center">
+            [[indicator.content_object_title]]
+          </span>
+        </template>
         <span class="table-cell table-cell--text self-center">
           [[indicator.blueprint.calculation_formula_across_locations]]
         </span>
@@ -227,7 +235,7 @@
         <template is="dom-if" if="[[canEdit]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="#" on-tap="_openModal" data-modal-type="edit">
-              EDIT
+              [[localize('edit')]]
               <template
                   is="dom-if"
                   if="[[_showLocationsWarning(indicator, type)]]"
@@ -240,8 +248,8 @@
 
         <template is="dom-if" if="[[canEditLocations]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
-            <a href="#" on-tap="_openModal" data-modal-type="locations">LOCATIONS</a>
-            <paper-tooltip>Location goals for partners</paper-tooltip>
+            <a href="#" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</a>
+            <paper-tooltip>[[localize('location_goals_for_partners')]]</paper-tooltip>
           </span>
         </template>
       </div>
@@ -323,10 +331,6 @@
 
       _computeIsClusterApp: function(appName) {
         return appName === 'cluster-reporting';
-      },
-
-      _handleOpenedChanged: function() {
-        this.detailsOpened = !this.detailsOpened;
       },
 
       _computeIndicatorReportsUrl: function(baseUrl, indicator) {

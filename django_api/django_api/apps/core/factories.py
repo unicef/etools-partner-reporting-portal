@@ -862,19 +862,19 @@ class QuantityReportableToClusterActivityFactory(QuantityReportableBaseFactory):
         model = Reportable
 
 
-class QuantityReportableToPartnerActivityFactory(QuantityReportableBaseFactory):
+class QuantityReportableToPartnerActivityProjectContextFactory(QuantityReportableBaseFactory):
     """
     Arguments:
-        content_object {PartnerActivity} -- PartnerActivity ORM object to bind
+        content_object {PartnerActivityProjectContext} -- PartnerActivityProjectContext ORM object to bind
         blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
 
-    Ex) QuantityReportableToPartnerActivityFactory(
-            content_object=activity1, blueprint=blueprint1
+    Ex) QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=activity_project_context1, blueprint=blueprint1
         )
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory',
+        'core.factories.PartnerActivityProjectContextFactory',
     )
 
     class Meta:
@@ -955,19 +955,19 @@ class RatioReportableToClusterActivityFactory(RatioReportableBaseFactory):
         model = Reportable
 
 
-class RatioReportableToPartnerActivityFactory(RatioReportableBaseFactory):
+class RatioReportableToPartnerActivityProjectContextFactory(RatioReportableBaseFactory):
     """
     Arguments:
-        content_object {PartnerActivity} -- PartnerActivity ORM object to bind
+        content_object {PartnerActivityProjectContext} -- PartnerActivityProjectContext ORM object to bind
         blueprint {IndicatorBlueprint} -- IndicatorBlueprint ORM object to bind
 
-    Ex) RatioReportableToPartnerActivityFactory(
-            content_object=activity1, blueprint=blueprint1
+    Ex) RatioReportableToPartnerActivityProjectContextFactory(
+            content_object=activity_project_context1, blueprint=blueprint1
         )
     """
 
     content_object = factory.SubFactory(
-        'core.factories.PartnerActivityFactory',
+        'core.factories.PartnerActivityProjectContextFactory',
     )
 
     class Meta:

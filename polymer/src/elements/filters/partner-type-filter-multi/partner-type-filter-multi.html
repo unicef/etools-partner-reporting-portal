@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
+<link rel="import" href="../../../behaviors/localize.html">
 
 <dom-module id="partner-type-filter-multi">
   <template>
@@ -11,7 +12,7 @@
     </style>
 
     <dropdown-filter-multi
-        label="Partner Type"
+        label="[[localize('partner_type')]]"
         name="partner_types"
         value="[[value]]"
         data="[[data]]"
@@ -22,6 +23,12 @@
   <script>
     Polymer({
       is: 'partner-type-filter-multi',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         data: {

@@ -10,25 +10,23 @@ Gives partner details and risk ratings. This data comes from the PMP system and 
 {% tab title="Programme Documents" %}
 Filterable \(defaults to signed and active PD's\) list of the PD's associated with the partner. Can filter by ref \#, title, pd status and location. Report \# will not be on the PD list page.
 
-![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.11.46-pm.png)
+![Programme Document List](../../.gitbook/assets/screen-shot-2019-11-14-at-2.10.59-pm.png)
 
 Clicking a PD will give more details \(shown in mockup below\) about this PD, its associated reports \(separate tab\), and also being able to set the [method of calculation](setting-calculation-methods-for-indicators.md) \(separate tab\) for each indicator associated with each output \(LLO\) within this PD.
 
-![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-L4c0bvrfEPWnSxYQa0b%2F-L4c0iMbmQhsWwBUj8sx%2FScreen%20Shot%202018-02-05%20at%202.10.21%20PM.png?alt=media&token=f8c9102a-d906-4aa9-9840-938997f333aa)
+![Programme Document Details](../../.gitbook/assets/screen-shot-2019-11-13-at-5.02.37-pm.png)
 
 Amendment section will not display if there are no amendments \(\#[732](https://github.com/unicef/etools-partner-reporting-portal/issues/732)\)
 
 Additionally we will show a "Reporting Requirements" in a blue box, under which will have all reports in the future. The columns will be:
 
 * Report name
-* Due date - \(DD/MM/YYY \#[740](https://github.com/unicef/etools-partner-reporting-portal/issues/740)\)
+* Due date - \(DD/MM/YYYY \#[740](https://github.com/unicef/etools-partner-reporting-portal/issues/740)\)
 * Reporting period
 
 Nothing in it is clickable.
 
-
-
-![Reporting Requirements](https://lh4.googleusercontent.com/p9SwdJ5o1cX2-McWj1RS0cpfPBoqLhHeajL4jwc8qeWJpQ6o51RnAJJZ3gGV7n-sNS_XiDkS2bS0J_jTA1L5TCiEmn8OSTOqmrohXO8AWSVaY61aFtNZFdyEBsiBN20ljzrrnjq4)
+![Reporting requirements on Programme Document](../../.gitbook/assets/screen-shot-2019-11-13-at-5.02.44-pm.png)
 
 This data comes from the PMP system and displayed to the partner for their information only. It cannot be modified in PRP.
 
@@ -44,7 +42,7 @@ See the [progress reports section](progress-reports/) for more details on submis
 
 The default list view for progress reports will be status, sent back and due report, and report type: QPR, HR & SR. The partner will have the ability to select a different report status to show all reports. The columns in progress report list will also be sortable.
 
-![](../../.gitbook/assets/screen-shot-2018-02-05-at-1.58.35-pm.png)
+![](../../.gitbook/assets/screen-shot-2019-11-14-at-2.12.03-pm.png)
 {% endtab %}
 
 {% tab title="Indicators" %}

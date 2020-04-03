@@ -9,6 +9,7 @@
 <link rel="import" href="../../../../../behaviors/data-table.html">
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/utils.html">>
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 
 <dom-module id="clusters-disaggregations-list">
@@ -45,12 +46,12 @@
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <etools-data-table-column field="disaggregation">
-          <div class="table-column">Disaggregation</div>
+          <div class="table-column">[[localize('disaggregation')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="groups">
-          <div class="table-column">Disaggregation Groups</div>
+          <div class="table-column">[[localize('disaggregation_groups')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -103,6 +104,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

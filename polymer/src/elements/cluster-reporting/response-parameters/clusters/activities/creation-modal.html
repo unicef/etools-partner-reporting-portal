@@ -20,6 +20,7 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/date.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../error-box.html">
 
 <dom-module id="cluster-activities-modal">
@@ -94,7 +95,7 @@
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Cluster Activity</h2>
+        <h2>[[localize('add_cluster_activity')]]</h2>
           <paper-icon-button
               class="self-center"
               on-tap="close"
@@ -113,7 +114,7 @@
             <paper-input
               class="item validate full-width"
               id="title"
-              label="Title"
+              label="[[localize('title')]]"
               value="{{data.title}}"
               type="string"
               on-input="_validate"
@@ -122,7 +123,7 @@
 
             <paper-dropdown-menu
                 class="item validate"
-                label="Cluster"
+                label="[[localize('cluster')]]"
                 id="cluster"
                 on-value-changed="_validate"
                 always-float-label
@@ -143,7 +144,7 @@
 
             <paper-dropdown-menu
                 class="item validate"
-                label="Cluster Objective"
+                label="[[localize('cluster_objective')]]"
                 id="objective"
                 on-value-changed="_validate"
                 disabled="[[isObjectivesDisabled]]"
@@ -168,11 +169,11 @@
 
       <div class="buttons layout horizontal-reverse">
         <paper-button class="btn-primary" on-tap="_save" raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button  on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -190,6 +191,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       observers: [
@@ -301,7 +304,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _redirectToDetail: function (id) {

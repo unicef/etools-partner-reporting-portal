@@ -89,6 +89,7 @@ class Country(TimeStampedModel):
 
     class Meta:
         ordering = ['name']
+        verbose_name_plural = 'Countries'
 
     def __str__(self):
         return self.name
@@ -219,6 +220,15 @@ class PRPRole(TimeStampedExternalSourceModel):
         blank=True, null=True
     )
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = 'PRP roles'
+        unique_together = (
+            'user',
+            'role',
+            'workspace',
+            'cluster',
+        )
 
     def __str__(self):
         return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
@@ -415,8 +425,8 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         """
         from indicator.models import Reportable, IndicatorReport
         reportables = Reportable.objects.filter(
-            Q(partner_activities__cluster_activity__cluster_objective__cluster__in=clusters) |
-            Q(partner_activities__cluster_objective__cluster__in=clusters))
+            Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__in=clusters) |
+            Q(partner_activity_project_contexts__activity__cluster_objective__cluster__in=clusters))
         return IndicatorReport.objects.filter(
             reportable__in=reportables).order_by(
             '-time_period_end').distinct()
@@ -452,7 +462,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if partner:
             indicator_reports = indicator_reports.filter(
                 Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activities__partner=partner)
+                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
 
         if limit:
@@ -469,7 +479,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if partner:
             indicator_reports = indicator_reports.filter(
                 Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activities__partner=partner)
+                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
         indicator_reports = indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.accepted,
@@ -505,7 +515,7 @@ class GatewayType(TimeStampedModel):
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'Location Type'
+        verbose_name = 'Location type'
         unique_together = ('country', 'admin_level')
 
     def __str__(self):
@@ -642,6 +652,9 @@ class CartoDBTable(MPTTModel):
     )
 
     country = models.ForeignKey(Country, related_name="carto_db_tables")
+
+    class Meta:
+        verbose_name_plural = 'CartoDB tables'
 
     def __str__(self):
         return self.table_name

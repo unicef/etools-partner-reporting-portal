@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 
@@ -55,12 +56,12 @@
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
         <etools-data-table-column field="title" flex-3 sortable>
-          <span class="table-column">Cluster Objective Title</span>
+          <span class="table-column">[[localize('cluster_objective_title')]]</span>
         </etools-data-table-column>
         <etools-data-table-column field="cluster" sortable>
-          <span class="table-column">Cluster</span>
+          <span class="table-column">[[localize('cluster')]]</span>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -114,6 +115,8 @@
         App.Behaviors.RoutingBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

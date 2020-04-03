@@ -11,6 +11,7 @@
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/shared-styles.html">
@@ -127,19 +128,19 @@
     </template>
 
     <header>
-      <h3>Locations ([[value.length]])</h3>
+      <h3>[[localize('locations_plural')]] ([[value.length]])</h3>
       <template
           is="dom-if"
           if="[[canMessageIMO]]"
           restamp="true">
         <div class="layout horizontal justified">
-          <div class="imo-msg-label self-end">To propose "Baseline" and "In need" for locations added by you, please contact IMO.</div>
+          <div class="imo-msg-label self-end">[[localize('to_propose_baseline')]]</div>
           <div>
             <paper-button
                 class="imo-msg-btn btn-primary"
                 on-tap="_msgIMO"
                 noink>
-              Send a message to IMO
+              [[localize('send_message_imo')]]
             </paper-button>
           </div>
         </div>
@@ -169,7 +170,7 @@
                   on-tap="_remove"
                   icon="icons:cancel">
               </paper-icon-button>
-              <paper-tooltip offset="5">Remove</paper-tooltip>
+              <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
             </div>
           </div>
         </template>
@@ -193,7 +194,7 @@
                 restamp="true">
               <etools-single-selection-menu
                   class="item"
-                  label="Location - administrative level"
+                  label="[[localize('location_administrative_level')]]"
                   options="[[locationTypes]]"
                   option-value="id"
                   option-label="title"
@@ -210,7 +211,7 @@
                 restamp="true">
               <labelled-item
                   class="item item-2-col"
-                  label="Location">
+                  label="[[localize('location')]]">
                 <span class="readonly">[[_getLocationTitle(locations, item, item.id, index)]]</span>
               </labelled-item>
             </template>
@@ -221,7 +222,7 @@
                 restamp="true">
               <etools-single-selection-menu
                   class="item item-2-col validate"
-                  label="Location"
+                  label="[[localize('location')]]"
                   options="[[_getLocations(locations, item.loc_type, index)]]"
                   option-value="id"
                   option-label="title"
@@ -240,11 +241,12 @@
               <json-field
                   class="item validate"
                   type="[[indicatorType]]"
-                  label="Baseline"
+                  label="[[localize('baseline')]]"
                   on-input="_validate"
                   value="{{item.baseline}}"
                   allowed-pattern="[+\-\d]"
-                  disabled="[[!canEditDetails]]">
+                  disabled="[[!canEditDetails]]"
+                  required="[[baselineRequirement]]">
               </json-field>
 
               <template
@@ -254,7 +256,7 @@
                 <json-field
                     class="item validate"
                     type="[[indicatorType]]"
-                    label="In need (optional)"
+                    label="[[localize('in_need')]]"
                     on-input="_validate"
                     value="{{item.in_need}}"
                     allowed-pattern="[+\-\d]"
@@ -265,7 +267,7 @@
               <json-field
                   class="item validate"
                   type="[[indicatorType]]"
-                  label="Target"
+                  label="[[localize('target')]]"
                   on-input="_validate"
                   value="{{item.target}}"
                   allowed-pattern="[+\-\d]"
@@ -280,7 +282,7 @@
     <paper-button
         class="btn-primary"
         on-tap="_add">
-      Add location
+      [[localize('add_location')]]
     </paper-button>
   </template>
 
@@ -292,6 +294,8 @@
           App.Behaviors.UtilsBehavior,
           App.Behaviors.ReduxBehavior,
           App.Behaviors.NotificationsBehavior,
+          App.Behaviors.LocalizeBehavior,
+          Polymer.AppLocalizeBehavior,
         ],
 
         properties: {
@@ -302,12 +306,20 @@
           locations: Object,
           savedLocations: Object,
           pending: Object,
-          isPai: Boolean,
+          isPai: {
+            type: Boolean,
+            value: false,
+          },
           searchLocationType: String,
 
           editing: {
             type: Boolean,
             value: false,
+          },
+
+          baselineRequirement: {
+            type: Boolean,
+            computed: '_computeBaselineRequirement(isPai, editing)',
           },
 
           lockedItems: {
@@ -395,7 +407,7 @@
             return;
           }
 
-          event.path.forEach(function (node) {
+          Polymer.dom(event).path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
               index = node.dataset.index;  // Grab index of current location widget component
               return;
@@ -434,6 +446,10 @@
           return type === 'number';
         },
 
+        _computeBaselineRequirement: function (isPai, editing) {
+          return isPai && !editing;
+        },
+
         _computeLocationsUrl: function (responsePlanId) {
           return App.Endpoints.clusterLocationNames(responsePlanId);
         },
@@ -462,7 +478,7 @@
 
         _computeCanEditDetails: function (editing, parentIndicatorId, isPAI, permissions) {
           return !editing ||
-              (permissions.createClusterEntities && !isPAI) ||
+              permissions.createClusterEntities ||
               (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
         },
 
@@ -521,7 +537,7 @@
 
         _remove: function (e) {
           var value = this.get('value');
-          var toRemove = +e.target.dataset.index;
+          var toRemove = +Polymer.dom(e).localTarget.dataset.index;
           var pending = this.get('pending');
           var locations = this.get('locations');
 
@@ -535,13 +551,13 @@
         },
 
         _validate: function (e) {
-          e.target.validate();
+          this._getValidateTarget(e).validate();
         },
 
         _onLocTypeChanged: function (event, data) {
           var index = -1;
 
-          event.path.forEach(function (node) {
+          Polymer.dom(event).path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
               index = node.dataset.index;
               return;
@@ -616,11 +632,11 @@
         },
 
         _getLocationAdminLevel: function (location) {
-          return location.loc_type ? location.loc_type : location.admin_level;
+          return location.loc_type >= 0 ? location.loc_type : location.admin_level;
         },
 
         _getLocationTitle: function (locations, location, locationId, index) {
-          var loc_type = location.loc_type ? location.loc_type : location.admin_level;
+          var loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
           var allLocations = this._getLocations(locations, loc_type, index);
 
           var targetLocation = allLocations.find(function (loc) {

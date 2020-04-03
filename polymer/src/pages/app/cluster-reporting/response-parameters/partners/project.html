@@ -13,6 +13,7 @@
 <link rel="import" href="../../../../../elements/page-header.html">
 <link rel="import" href="../../../../../elements/page-badge.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/localize.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -55,7 +56,7 @@
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="project">
+          class="above-title" name="[[localize('project')]]">
       </page-badge>
 
       <div class="toolbar">
@@ -68,9 +69,9 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="overview">Overview</paper-tab>
-          <paper-tab name="indicators">Project Indicators</paper-tab>
-          <paper-tab name="activities">Activities</paper-tab>
+          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+          <paper-tab name="indicators">[[localize('project_indicators')]]</paper-tab>
+          <paper-tab name="activities">[[localize('activities')]]</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -90,6 +91,7 @@
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
       <rp-partner-project-details-activities
+          project-data="[[projectData]]"
           project-id="[[parentRouteData.id]]">
       </rp-partner-project-details-activities>
     </template>
@@ -101,6 +103,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       observers: [

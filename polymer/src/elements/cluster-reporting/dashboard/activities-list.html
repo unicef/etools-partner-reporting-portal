@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="../../report-status.html">
 <link rel="import" href="../../frequency-of-reporting.html">
 <link rel="import" href="../../etools-prp-progress-bar.html">
@@ -55,22 +56,22 @@
       }
     </style>
 
-    <etools-content-panel panel-title="List of My Project Activities">
+    <etools-content-panel panel-title="[[localize('list_of_my_project_activities')]]">
       <etools-data-table-header no-title>
         <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
+          <div class="table-column">[[localize('cluster')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="status">
-          <div class="table-column flex-2">Status</div>
+          <div class="table-column flex-2">[[localize('status')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="title" flex-2>
-          <div class="table-column">Activity</div>
+          <div class="table-column">[[localize('activity')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="is_cluster">
-          <div class="table-column cell-is-cluster">Cluster Activity</div>
+          <div class="table-column cell-is-cluster">[[localize('cluster_activity')]]</div>
         </etools-data-table-column>
         <etools-data-table-column field="location">
-          <div class="table-column">Location</div>
+          <div class="table-column">[[localize('location')]]</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -116,23 +117,23 @@
                   as="reportable">
                 <div class="reportable layout horizontal">
                   <div class="table-cell table-cell--text">
-                    <labelled-item label="Start Date">
+                    <labelled-item label="[[localize('start_date')]]">
                       <span class="value">[[reportable.start_date]]</span>
                     </labelled-item>
                   </div>
                   <div class="table-cell table-cell--text">
-                    <labelled-item label="End Date">
+                    <labelled-item label="[[localize('end_date')]]">
                       <span class="value">[[reportable.end_date]]</span>
                     </labelled-item>
                   </div>
                   <div class="table-cell table-cell--text" flex-2>
-                    <labelled-item label="Project">
+                    <labelled-item label="[[localize('project')]]">
                       <span class="value">[[activity.project.title]]</span>
                     </labelled-item>
                   </div>
                   <div class="table-cell">&nbsp;</div>
                   <div class="table-cell table-cell--text">
-                    <labelled-item label="Frequency of reporting">
+                    <labelled-item label="[[localize('frequency_of_reporting')]]">
                       <span class="value">
                         <frequency-of-reporting
                             type="[[reportable.frequency]]">
@@ -152,7 +153,7 @@
       </list-placeholder>
 
       <footer>
-        <a href="[[activitiesUrl]]">See more</a>
+        <a href="[[activitiesUrl]]">[[localize('see_more')]]</a>
       </footer>
 
       <etools-loading active="[[loading]]"></etools-loading>
@@ -166,6 +167,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

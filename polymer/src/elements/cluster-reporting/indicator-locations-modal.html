@@ -13,6 +13,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
@@ -114,7 +115,7 @@
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Location settings for indicator</h2>
+        <h2>[[localize('location_settings_for_indicator')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -132,12 +133,12 @@
 
           <div class="row">
             <div class="layout horizontal justified">
-              <labelled-item label="Title">
+              <labelled-item label="[[localize('title')]]">
                 [[data.blueprint.title]]
               </labelled-item>
 
               <dl class="data-key">
-                <dt>Label -</dt>
+                <dt>[[localize('label')]] -</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(data.blueprint.display_type, 'number')]]"
@@ -162,14 +163,14 @@
             <table>
               <thead>
                 <tr>
-                  <th>Location - Admin level</th>
-                  <th>Location</th>
-                  <th>Baseline</th>
+                  <th>[[localize('location_admin_level')]]</th>
+                  <th>[[localize('location')]]</th>
+                  <th>[[localize('baseline')]]</th>
                   <template
                       is="dom-if"
                       if="[[isNumber]]"
                       restamp="true">
-                    <th>In need (optional)</th>
+                    <th>[[localize('in_need')]]</th>
                   </template>
                 </tr>
               </thead>
@@ -222,12 +223,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -243,6 +244,8 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -338,7 +341,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _save: function () {

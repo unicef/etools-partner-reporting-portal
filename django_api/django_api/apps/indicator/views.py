@@ -36,7 +36,7 @@ from core.common import (
     PRP_ROLE_TYPES,
 )
 from core.serializers import ShortLocationSerializer
-from partner.models import PartnerProject
+from partner.models import PartnerProject, PartnerActivityProjectContext
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
@@ -212,13 +212,16 @@ class IndicatorListAPIView(ListAPIView):
                 partner_projects__isnull=False)
         elif content_object == REPORTABLE_PA_CONTENT_OBJECT:
             queryset = Reportable.objects.filter(
-                partner_activities__isnull=False)
+                partner_activity_project_contexts__isnull=False)
         else:
             raise Http404
 
         object_id = self.request.query_params.get('object_id', None)
         if content_object is not None and object_id is not None:
-            queryset = queryset.filter(object_id=object_id)
+            if content_object == REPORTABLE_PA_CONTENT_OBJECT:
+                queryset = queryset.filter(partner_activity_project_contexts__activity=object_id)
+            else:
+                queryset = queryset.filter(object_id=object_id)
 
         q_list = []
 
@@ -254,7 +257,7 @@ class IndicatorListAPIView(ListAPIView):
                 cluster_activities__cluster_objective__cluster__id__in=cluster_list))
             q_list.append(Q(partner_projects__clusters__id__in=cluster_list))
             q_list.append(Q(
-                partner_activities__project__clusters__id__in=cluster_list))
+                partner_activity_project_contexts__project__clusters__id__in=cluster_list))
 
         if pd_statuses:
             pd_status_list = map(
@@ -309,15 +312,20 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     def check_permissions(self, request):
         super().check_permissions(request)
         reportable_id = self.kwargs.get('reportable_id')
+        reportable = Reportable.objects.get(id=reportable_id)
+        or_q_list = [
+            Q(cluster__cluster_objectives__reportables=reportable_id),
+            Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id),
+            Q(cluster__partner_projects__reportables=reportable_id),
+        ]
+
+        if isinstance(reportable.content_object, PartnerActivityProjectContext):
+            or_q_list.append(Q(cluster__cluster_objectives__cluster_activities__partner_activities=reportable.content_object.activity))
+            or_q_list.append(Q(cluster__cluster_objectives__partner_activities=reportable.content_object.activity))
 
         if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
-            Q(role=PRP_ROLE_TYPES.cluster_imo),
-            Q(cluster__cluster_objectives__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__cluster_activities__reportables=reportable_id) |
-            Q(cluster__partner_projects__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables=reportable_id) |
-            Q(cluster__cluster_objectives__partner_activities__reportables=reportable_id),
-        ).exists():
+            role=PRP_ROLE_TYPES.cluster_imo
+        ).filter(reduce(operator.or_, or_q_list)).exists():
             self.permission_denied(request)
 
     def get_queryset(self, *args, **kwargs):
@@ -368,14 +376,19 @@ class IndicatorDataAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def check_indicator_report_permission(self, request, obj):
+        or_q_list = [
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj),
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj),
+            Q(cluster__partner_projects__reportables__indicator_reports=obj),
+        ]
+
+        if isinstance(obj.reportable.content_object, PartnerActivityProjectContext):
+            or_q_list.append(Q(cluster__cluster_objectives__cluster_activities__partner_activities=obj.reportable.content_object.activity))
+            or_q_list.append(Q(cluster__cluster_objectives__partner_activities=obj.reportable.content_object.activity))
+
         if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
-            Q(role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member)),
-            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
-            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj)
-        ).exists():
+            role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+        ).filter(reduce(operator.or_, or_q_list)).exists():
             self.permission_denied(request)
 
     def get_indicator_report(self, id):
@@ -585,14 +598,19 @@ class IndicatorReportReviewAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def check_indicator_report_permission(self, request, obj):
+        or_q_list = [
+            Q(cluster__cluster_objectives__reportables__indicator_reports=obj),
+            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj),
+            Q(cluster__partner_projects__reportables__indicator_reports=obj),
+        ]
+
+        if isinstance(obj.reportable.content_object, PartnerActivityProjectContext):
+            or_q_list.append(Q(cluster__cluster_objectives__cluster_activities__partner_activities=obj.reportable.content_object.activity))
+            or_q_list.append(Q(cluster__cluster_objectives__partner_activities=obj.reportable.content_object.activity))
+
         if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
-            Q(role=PRP_ROLE_TYPES.cluster_imo),
-            Q(cluster__cluster_objectives__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj) |
-            Q(cluster__partner_projects__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__cluster_activities__partner_activities__reportables__indicator_reports=obj) |
-            Q(cluster__cluster_objectives__partner_activities__reportables__indicator_reports=obj),
-        ).exists():
+            role=PRP_ROLE_TYPES.cluster_imo,
+        ).filter(reduce(operator.or_, or_q_list)).exists():
             self.permission_denied(request)
 
     def get_object(self):
@@ -775,11 +793,11 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
                 settings.FRONTEND_HOST,
                 cluster.response_plan.workspace.workspace_code,
                 cluster.response_plan.id,
-                reportable.content_object.cluster_activity.id
+                reportable.content_object.activity.cluster_activity.id
             )
 
         try:
-            project_name = reportable.content_object.projects.first().title
+            project_name = reportable.content_object.project.title
         except Exception:
             project_name = ''
 

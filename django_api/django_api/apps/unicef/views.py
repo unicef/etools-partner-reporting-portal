@@ -321,6 +321,20 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.get_exporter_class()
+        if exporter_class:
+            filter_qs = self.filter_queryset(self.get_queryset())
+            # if exporting limit to submitted or accepted reports only
+            filter_qs = filter_qs.filter(
+                status__in=[
+                    PROGRESS_REPORT_STATUS.submitted,
+                    PROGRESS_REPORT_STATUS.accepted,
+                ],
+            )
+            return exporter_class(filter_qs).get_as_response()
+        return super().get(request, *args, **kwargs)
+
 
 class ProgressReportAnnexCPDFView(RetrieveAPIView):
     """
@@ -339,8 +353,8 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         report = self.get_object()
 
-        funds_received_to_date_percentage = "%.1f" % (
-            report.programme_document.funds_received_to_date * 100 / report.programme_document.budget
+        funds_received_to_date_percentage = "%.2f" % (
+            report.programme_document.funds_received_to_date_percentage
         ) if report.programme_document and report.programme_document.budget > 0 else 0
 
         data = {

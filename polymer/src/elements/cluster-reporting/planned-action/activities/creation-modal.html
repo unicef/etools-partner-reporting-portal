@@ -8,7 +8,6 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -21,6 +20,7 @@
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
@@ -30,6 +30,7 @@
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../error-box.html">
+<link rel="import" href="../../paper-radio-group-custom.html">
 
 <dom-module id="planned-action-activity-modal">
   <template>
@@ -71,7 +72,6 @@
       }
 
       .add-project-btn {
-        width: 100px;
         margin: 0;
         text-align: start;
 
@@ -103,20 +103,20 @@
         border-right: 1px solid var(--paper-grey-400);
       }
 
-      paper-radio-group {
+      paper-radio-group-custom {
         display: block;
         padding-top: 16px;
       }
 
-      paper-radio-group > .fields {
+      paper-radio-group-custom > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
       }
 
-      paper-radio-group > .fields[empty] {
+      paper-radio-group-custom > .fields[empty] {
         padding: 0;
       }
 
-      paper-radio-group .app-grid {
+      paper-radio-group-custom .app-grid {
         margin: -var(--app-grid-gutter);
       }
 
@@ -129,7 +129,7 @@
       }
     </style>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <cluster-dropdown-content clusters="{{clusters}}" partner="{{ partner }}"></cluster-dropdown-content>
 
     <etools-prp-permissions
       permissions="{{permissions}}">
@@ -176,7 +176,7 @@
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add activity</h2>
+        <h2>[[localize('add_activity')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -193,7 +193,7 @@
           restamp="true">
           <etools-single-selection-menu
             class="item validate full-width"
-            label="Partner"
+            label="[[localize('partner')]]"
             options="[[partners]]"
             option-value="id"
             option-label="title"
@@ -204,11 +204,11 @@
           </etools-single-selection-menu>
         </template>
 
-        <paper-radio-group
+        <paper-radio-group-custom
             id="mode"
             selected="{{mode}}">
           <paper-radio-button name="cluster">
-            <strong>Add from Cluster Activities</strong>
+            <strong>[[localize('add_from_cluster_activities')]]</strong>
           </paper-radio-button>
           <div
               class="fields"
@@ -221,7 +221,7 @@
                 <div class="item">
                   <paper-dropdown-menu
                       class="validate"
-                      label="Cluster"
+                      label="[[localize('cluster')]]"
                       on-value-changed="_validate"
                       always-float-label
                       required>
@@ -242,7 +242,7 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Activity"
+                      label="[[localize('activity')]]"
                       options="[[activities]]"
                       option-value="id"
                       option-label="title"
@@ -261,7 +261,7 @@
                 if="[[data.cluster.cluster_activity]]"
                 restamp="true">
                 <header class="item-wide">
-                  <h3>Projects ([[data.cluster.projects.length]])</h3>
+                  <h3>[[localize('projects')]] ([[data.cluster.projects.length]])</h3>
                 </header>
               </template>
 
@@ -278,7 +278,7 @@
                         on-tap="_remove"
                         icon="icons:cancel">
                     </paper-icon-button>
-                    <paper-tooltip offset="5">Remove</paper-tooltip>
+                    <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
                   </div>
 
                   <div class="flex">
@@ -286,7 +286,7 @@
                       <div class="item">
                         <etools-single-selection-menu
                             class="validate"
-                            label="Partner Project"
+                            label="[[localize('partner_project')]]"
                             options="[[projects]]"
                             option-value="id"
                             option-label="title"
@@ -302,7 +302,7 @@
                       <div class="item">
                         <paper-dropdown-menu
                             class="validate"
-                            label="Status"
+                            label="[[localize('status')]]"
                             on-value-changed="_validate"
                             always-float-label
                             required>
@@ -323,7 +323,7 @@
                       <div class="item">
                         <etools-prp-date-input
                             class="start-date"
-                            label="Start date"
+                            label="[[localize('start_date')]]"
                             value="{{item.start_date}}"
                             error-message=""
                             required
@@ -335,7 +335,7 @@
                       <div class="item">
                         <etools-prp-date-input
                             class="end-date"
-                            label="End date"
+                            label="[[localize('end_date')]]"
                             value="{{item.end_date}}"
                             error-message=""
                             required
@@ -354,14 +354,14 @@
                 <paper-button
                     class="btn-primary add-project-btn"
                     on-tap="_add">
-                  Add Project
+                  [[localize('add_project')]]
                 </paper-button>
               </template>
             </template>
           </div>
 
           <paper-radio-button name="custom">
-            <strong>Add Custom Activity</strong>
+            <strong>[[localize('add_custom_activity')]]</strong>
           </paper-radio-button>
 
           <div
@@ -375,7 +375,7 @@
                 <div class="item">
                   <paper-dropdown-menu
                       class="validate"
-                      label="Cluster"
+                      label="[[localize('cluster')]]"
                       on-value-changed="_validate"
                       always-float-label
                       required>
@@ -395,7 +395,7 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Cluster Objective"
+                      label="[[localize('cluster_objective')]]"
                       options="[[objectives]]"
                       option-value="id"
                       option-label="title"
@@ -409,7 +409,7 @@
                 <div class="item item-wide">
                   <paper-input
                       class="validate"
-                      label="Title"
+                      label="[[localize('title')]]"
                       value="{{data.custom.title}}"
                       on-input="_validate"
                       always-float-label
@@ -418,7 +418,7 @@
                 </div>
 
                 <header class="item-wide">
-                  <h3>Projects ([[data.custom.projects.length]])</h3>
+                  <h3>[[localize('projects')]] ([[data.custom.projects.length]])</h3>
                 </header>
 
                 <template
@@ -434,7 +434,7 @@
                           on-tap="_remove"
                           icon="icons:cancel">
                       </paper-icon-button>
-                      <paper-tooltip offset="5">Remove</paper-tooltip>
+                      <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
                     </div>
 
                     <div class="flex">
@@ -442,7 +442,7 @@
                         <div class="item">
                           <etools-single-selection-menu
                               class="validate"
-                              label="Partner Project"
+                              label="[[localize('partner_project')]]"
                               options="[[projects]]"
                               option-value="id"
                               option-label="title"
@@ -458,7 +458,7 @@
                         <div class="item">
                           <paper-dropdown-menu
                               class="validate"
-                              label="Status"
+                              label="[[localize('status')]]"
                               on-value-changed="_validate"
                               always-float-label
                               required>
@@ -479,7 +479,7 @@
                         <div class="item">
                           <etools-prp-date-input
                               class="start-date"
-                              label="Start date"
+                              label="[[localize('start_date')]]"
                               value="{{item.start_date}}"
                               error-message=""
                               required
@@ -491,7 +491,7 @@
                         <div class="item">
                           <etools-prp-date-input
                               class="end-date"
-                              label="End date"
+                              label="[[localize('end_date')]]"
                               value="{{item.end_date}}"
                               error-message=""
                               required
@@ -506,13 +506,13 @@
                 <paper-button
                     class="btn-primary add-project-btn"
                     on-tap="_add">
-                  Add Project
+                  [[localize('add_project')]]
                 </paper-button>
-                
+
               </div>
             </template>
           </div>
-        </paper-radio-group>
+        </paper-radio-group-custom>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -520,12 +520,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Add activity
+          [[localize('add_activity')]]
         </paper-button>
 
         <paper-button
             on-tap="_close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -541,6 +541,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -587,11 +589,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         locationId: {
@@ -666,10 +664,19 @@
       },
 
       observers: [
-        '_fetchProjects(partner)',
+        '_fetchProjects(partner, mode, data.cluster.cluster)',
+        '_fetchProjects(partner, mode, data.custom.cluster)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
+
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
 
       _add: function () {
         if (this.mode === 'cluster') {
@@ -717,7 +724,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _computePartner: function(storePartner, selectedPartner) {
@@ -749,8 +756,7 @@
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
-            + '?cluster_id=' + clusterId);
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId));
         this.$.activities.abort();
 
         this.$.activities.thunk()()
@@ -762,13 +768,17 @@
             });
       },
 
-      _fetchProjects: function (partnerId) {
+      _fetchProjects: function (partnerId, mode, clusterId) {
         var self = this;
+        if (this.data === undefined) {
+          return;
+        }
 
         if (typeof partnerId === 'undefined') {
           return;
         }
 
+        this.set('projectsParams.cluster_id', clusterId);
         this.set('projectsParams.partner', partnerId);
 
         this.$.projects.thunk()()
@@ -834,9 +844,10 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName === 'PAPER-DIALOG' ||
-            e.target.nodeName === 'PAPER-BUTTON' ||
-            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+        const nodeName = Polymer.dom(e).localTarget.nodeName;
+        if (nodeName === 'PAPER-DIALOG' ||
+            nodeName === 'PAPER-BUTTON' ||
+            nodeName === 'PAPER-ICON-BUTTON') {
           this.set('mode', '');
           this.set('data', {});
 

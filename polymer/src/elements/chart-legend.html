@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="etools-prp-number.html">
+<link rel="import" href="../behaviors/localize.html">
 
 <dom-module id="chart-legend">
   <template>
@@ -48,7 +49,7 @@
                 class="color"
                 style="background: [[_getColor(colors, index)]];">
             </span>
-            [[item.0]]
+            [[localize(item.0)]]
           </span>
           <etools-prp-number value="[[item.1]]"></etools-prp-number>
         </li>
@@ -59,6 +60,12 @@
   <script>
     Polymer({
       is: 'chart-legend',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
 
       properties: {
         rows: {

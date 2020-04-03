@@ -87,6 +87,29 @@ class ClusterListAPIView(ListAPIView):
         return queryset
 
 
+class ClusterListForPartnerAPIView(ListAPIView):
+    """
+    Cluster object list API - GET
+    Authentication required.
+
+    Parameters:
+    - response_plan_id: Response Plan ID
+
+    Returns:
+        ClusterSimpleSerializer object list.
+    """
+    serializer_class = ClusterSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'pk'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+
+    def get_queryset(self, *args, **kwargs):
+        pk = self.kwargs.get(self.lookup_field)
+        queryset = Cluster.objects.filter(partners=pk)
+
+        return queryset
+
+
 class ClusterObjectiveAPIView(APIView):
     """
     ClusterObjective object API - GET/PATCH/PUT/DELETE
@@ -437,7 +460,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
             | Q(reportable__partner_projects__isnull=False)
-            | Q(reportable__partner_activities__isnull=False)
+            | Q(reportable__partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
               **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
@@ -445,10 +468,10 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
                 **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
                 **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,    # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))   # noqa: E501
-            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))   # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,    # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__'))   # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))   # noqa: E501
         ).distinct()
         return queryset
 
@@ -487,7 +510,7 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
             | Q(reportable__partner_projects__isnull=False)
-            | Q(reportable__partner_activities__isnull=False)
+            | Q(reportable__partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
               **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
@@ -495,10 +518,10 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
                 **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
                 **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
-            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,  # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))  # noqa: E501
         ).distinct()
         return queryset
 
@@ -548,7 +571,7 @@ class ClusterReportablesIdListAPIView(ListAPIView):
             Q(cluster_objectives__isnull=False)
             | Q(cluster_activities__isnull=False)
             | Q(partner_projects__isnull=False)
-            | Q(partner_activities__isnull=False)
+            | Q(partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(cluster_objectives__cluster__response_plan=response_plan_id,
               **self.get_user_check_kwarg('cluster_objectives__cluster__'))
@@ -556,8 +579,8 @@ class ClusterReportablesIdListAPIView(ListAPIView):
                 **self.get_user_check_kwarg('cluster_activities__cluster_objective__cluster__'))
             | Q(partner_projects__clusters__response_plan=response_plan_id,
                 **self.get_user_check_kwarg('partner_projects__clusters__'))
-            | Q(partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('partner_activities__cluster_objective__cluster__'))  # noqa: E501
+            | Q(partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('partner_activity_project_contexts__activity__cluster_objective__cluster__'))  # noqa: E501
         ).distinct()
         return queryset
 
@@ -774,7 +797,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
             | Q(reportable__partner_projects__isnull=False)
-            | Q(reportable__partner_activities__isnull=False)
+            | Q(reportable__partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
               **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
@@ -782,10 +805,10 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
                 **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
                 **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
-            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activities__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__'))  # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))  # noqa: E501
         )
         return queryset
 
@@ -863,11 +886,11 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
         result = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__partner_projects__isnull=False)
-            | Q(reportable__partner_activities__isnull=False)
+            | Q(reportable__partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            | Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
 
@@ -1174,11 +1197,11 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             )
 
         cluster_obj_pa_reportable_loc = ReportableLocationGoal.objects.filter(
-            reportable__partner_activities__cluster_activity__cluster_objective__in=objectives
+            reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__in=objectives
         ).distinct().values_list('location_id', flat=True)
 
         cluster_obj_pa_custom_reportable_loc = ReportableLocationGoal.objects.filter(
-            reportable__partner_activities__cluster_objective__in=objectives
+            reportable__partner_activity_project_contexts__activity__cluster_objective__in=objectives
         ).distinct().values_list('location_id', flat=True)
 
         if filter_parameters['partner_types']:
@@ -1189,7 +1212,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
             if cluster_obj_pa_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
-                    'reportable__partner_activities'
+                    'reportable__partner_activity_project_contexts__activity'
                     '__cluster_activity__'
                     'cluster_objective__'
                     'cluster__partners__partner_type', flat=True).distinct()
@@ -1198,7 +1221,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             if cluster_obj_pa_custom_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_custom_reportable_loc.values_list(
                     'reportable__'
-                    'partner_activities__'
+                    'partner_activity_project_contexts__activity__'
                     'cluster_objective__'
                     'cluster__partners__'
                     'partner_type', flat=True)
@@ -1209,12 +1232,12 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
         if cluster_obj_pa_reportable_loc.exists():
             partner_types_loc.extend(cluster_obj_pa_reportable_loc.filter(
-                reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types  # noqa: #E501
+                reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types  # noqa: #E501
             ).distinct().values_list('location_id', flat=True))
 
         if cluster_obj_pa_custom_reportable_loc.exists():
             partner_types_loc.extend(cluster_obj_pa_custom_reportable_loc.filter(
-                reportable__partner_activities__cluster_objective__cluster__partners__partner_type__in=partner_types
+                reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__partners__partner_type__in=partner_types
             ).distinct().values_list('location_id', flat=True))
 
         loc_ids = set(partner_types_loc)
@@ -1337,10 +1360,10 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             )
 
             partner_activity_q = Q(
-                content_type__model="partneractivity",
-                partner_activities__partner__clusters__in=clusters,
-                partner_activities__partner__partner_type__in=partner_types,
-                partner_activities__projects__in=projects,
+                content_type__model="partneractivityprojectcontext",
+                partner_activity_project_contexts__activity__partner__clusters__in=clusters,
+                partner_activity_project_contexts__activity__partner__partner_type__in=partner_types,
+                partner_activity_project_contexts__activity__projects__in=projects,
             )
 
             partner_project_q = Q(
@@ -1362,9 +1385,9 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             )
 
             partner_activity_q = Q(
-                content_type__model="partneractivity",
-                partner_activities__partner__clusters__in=clusters,
-                partner_activities__projects__in=projects,
+                content_type__model="partneractivityprojectcontext",
+                partner_activity_project_contexts__activity__partner__clusters__in=clusters,
+                partner_activity_project_contexts__activity__projects__in=projects,
             )
 
             partner_project_q = Q(

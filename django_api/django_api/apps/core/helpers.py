@@ -35,6 +35,42 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 
+def get_zero_dict(indicator_type):
+    v = 0
+    d = 1 if indicator_type is "SUM" else 0
+    c = v / d if indicator_type is "SUM" else 0
+    return {
+        "c": c,
+        "v": v,
+        "d": d
+    }
+
+
+def calculate_sum(v1, v2, indicator_type="SUM"):
+    vt = "v"
+    dt = "d"
+    ct = "c"
+
+    data = {
+        vt: v1[vt] + v2[vt],
+    }
+    if indicator_type == "SUM":
+        data[dt] = 1
+        data[ct] = data[vt]
+        return data
+
+    data[dt] = v1[dt] + v2[dt]
+    data[ct] = data[vt] / data[dt] if data[dt] else 0
+    return data
+
+
+def get_all_subkeys(key):
+    keys = []
+    for i in range(0, len(key)):
+        keys += combinations(key, i)
+    return keys
+
+
 def get_combination_pairs(array, r=3):
     """
     Returns an array of tuples where
@@ -49,6 +85,26 @@ def get_combination_pairs(array, r=3):
 def generate_data_combination_entries(
         array, entries_only=False, key_type=str,
         indicator_type="quantity", r=3):
+    """
+
+    :param array: examples [(23,), (43,)] or [(32,)] or [(32,), (42,), (54,)]
+    :param entries_only: bool, if entries only is True function returns an array, otherwise returns a dict
+    :param key_type: tuple or str
+    :param indicator_type: indicator type
+    :param r: reported level
+    :return:
+    array:
+
+
+
+    dict: if r=2 and array = [(23,), (43,)] then return will look like:
+    {
+      (23,43): {c: 0, d:0, v:0},
+      (23,): {c: 0, d:0, v:0}
+      (43,): {c: 0, d:0, v:0}
+    }
+    """
+
     if entries_only:
         output = []
 
@@ -59,18 +115,39 @@ def generate_data_combination_entries(
         id_pairs = []
 
         if idx == 0:
+            # TODO: id_pairs.extend(array) instead of next couple of lines
+            # actually the tod might break if the format is list of list not list of tuples
             for id_list in array:
                 id_pairs.extend(list(product(id_list)))
 
         elif idx == 1:
+            # TODO: if we can count on array being list of tuples we can simplify this:
+            #
+            # list(combinations([e[0] for e in array], 2))
             combination_id_list_pairs = get_combination_pairs(array, r=2)
 
             for id_list_pair in combination_id_list_pairs:
                 id_pairs.extend(list(product(*id_list_pair)))
 
         elif idx == 2:
+            # TODO: simplfify [tuple(i[0] for i in array)]
             id_pairs = list(product(*array))
 
+        # assuming the passed in array is one of [(32,)] or [(23,), (43,)]  or [(32,), (42,), (54,)]
+        # if idx = 0 the id_pairs will be:
+        # [(32,)] or [(23,), (43,)]  or [(32,), (42,), (54,)] (basically same as array if array was passed in w tuples
+        #
+        # if idx = 1 the id_pairs will be
+        # [(23,), (43,)] for [(23,), (43,)] or
+        # [(32,42), (32,54), (42,54)] for [(32,), (42,), (54,)]
+        #
+        # if idx = 2 the id_pairs will be:
+        # [(23, 43)] for [(23,), (43,)]  or
+        # [(32, 42, 54,)] for [(32,), (42,), (54,)] - because idx2 elif replaces id_pairs
+        # note that the following code executes for every idx
+
+        # on idx = 1 the following code replaces the already existing 0 or if the output is array it adds the
+        #  same keys twice
         for id_tuple in id_pairs:
             key = key_type(id_tuple)
 
@@ -231,16 +308,15 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         indicator_start_date = indicator.content_object.start_date
         indicator_end_date = indicator.content_object.end_date
 
-    if indicator.content_type.model == "partneractivity":
+    if indicator.content_type.model == "partneractivityprojectcontext":
         indicator_start_date = None
         indicator_end_date = None
 
-        for context in indicator.content_object.partneractivityprojectcontext_set.all():
-            if not indicator_start_date or indicator_start_date > context.start_date:
-                indicator_start_date = context.start_date
+        if not indicator_start_date or indicator_start_date > indicator.content_object.start_date:
+            indicator_start_date = indicator.content_object.start_date
 
-            if not indicator_end_date or indicator_end_date < context.end_date:
-                indicator_end_date = context.end_date
+        if not indicator_end_date or indicator_end_date < indicator.content_object.end_date:
+            indicator_end_date = indicator.content_object.end_date
 
     # Override start date if indicator has its own start date
     if indicator.start_date_of_reporting_period:
@@ -374,8 +450,10 @@ def get_latest_pr_by_type(pd, report_type):
             .filter(report_type="QPR").order_by('start_date').last()
 
     if report_type == "HR":
+        # Ordering by id since reporting period can now alternate
+        # from cluster indicator segregation
         return pd.progress_reports \
-            .filter(report_type="HR").order_by('start_date').last()
+            .filter(report_type="HR").order_by('id').last()
 
     if report_type == "SR":
         return pd.progress_reports \
@@ -455,6 +533,11 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
         ReportingEntity,
     )
 
+    if not pai_ir_for_period:
+        ir_title = reportable.blueprint.title
+    else:
+        ir_title = f"{reportable.blueprint.title} -- Project {pai_ir_for_period.reportable.content_object.project.title}"
+
     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
         logger.info("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
         indicator_report = IndicatorReport.objects.create(
@@ -464,7 +547,7 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
             time_period_start=start_date,
             time_period_end=end_date,
             due_date=due_date,
-            title=reportable.blueprint.title,
+            title=ir_title,
             total={'c': 0, 'd': 0, 'v': 0},
             overall_status="NoS",
             report_status="Due",
@@ -497,7 +580,7 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
             time_period_start=start_date,
             time_period_end=end_date,
             due_date=due_date,
-            title=reportable.blueprint.title,
+            title=ir_title,
             total={'c': 0, 'd': 0, 'v': 0},
             overall_status="NoS",
             report_status="Due",
@@ -577,17 +660,19 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
             if len(ir_list) == 0:
                 # Re-assign report_number to new HR
                 report_number = next_progress_report.report_number
+                is_final_hr_req = next_progress_report.is_final
                 next_progress_report.delete()
 
             else:
                 # Pre-populate new HR report_number in case a new Progress Report needs to be generated
                 report_number = next_progress_report.report_number + 1
+                is_final_hr_req = next_progress_report.is_final
                 hr_reports.append(next_progress_report)
 
             # Process cluster Reportables separately
             for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=False):
                 cai_indicator = reportable.ca_indicator_used_by_reporting_entity
-                pai_ir_for_period = None
+                pai_irs_for_periods = None
 
                 # If LLO indicator has ClusterActivity Indicator ID reference,
                 # find the adopted PartnerActivity indicator from ClusterActivity Indicator
@@ -596,65 +681,122 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                 # given the start & end date
                 if cai_indicator:
                     try:
-                        # Grabbing first adopted partner activity in case
-                        # multiple adopted partner activities happen, although this is illegal state!
-                        pai_indicator = cai_indicator.children \
-                            .filter(partner_activities__partner=pd.partner) \
-                            .first()
-                        pai_ir_for_period = pai_indicator.indicator_reports.get(
+                        # Grabbing all adopted partner activities
+                        pai_indicators = cai_indicator.children \
+                            .filter(partner_activity_project_contexts__activity__partner=pd.partner)
+
+                        # Cluster indicators matching PMP HR reporting requirement
+                        pai_irs_for_periods = IndicatorReport.objects.filter(
+                            reportable__in=pai_indicators,
                             time_period_start=start_date,
                             time_period_end=end_date,
-                        )
+                        ).distinct()
 
-                        if pai_ir_for_period:
-                            indicator_report = create_pr_ir_for_reportable(
-                                pd,
-                                reportable,
-                                pai_ir_for_period,
-                                pai_ir_for_period.time_period_start,
-                                pai_ir_for_period.time_period_end,
-                                pai_ir_for_period.due_date,
-                            )
-
-                            # Bundle this cluster LLO Indicator report to HR progress report generated so far
-                            # for this iteration if the dates are matching
-                            for hr_report in hr_reports:
-                                if indicator_report.time_period_start == hr_report.start_date \
-                                        and indicator_report.time_period_end == hr_report.end_date \
-                                        and indicator_report.due_date == hr_report.due_date:
-                                    indicator_report.progress_report = hr_report
-                                    break
-
-                            if not indicator_report.progress_report:
-                                # Otherwise, create a brand new HR progress report
-                                # for this cluster LLO Indicator report
-                                new_cluster_hr_progress_report = ProgressReport.objects.create(
-                                    start_date=indicator_report.time_period_start,
-                                    end_date=indicator_report.time_period_end,
-                                    due_date=indicator_report.due_date,
-                                    programme_document=pd,
-                                    report_type="HR",
-                                    report_number=report_number,
-                                    is_final=False,
+                        if pai_irs_for_periods.exists():
+                            for pai_ir_for_period in pai_irs_for_periods:
+                                indicator_report = create_pr_ir_for_reportable(
+                                    pd,
+                                    reportable,
+                                    pai_ir_for_period,
+                                    pai_ir_for_period.time_period_start,
+                                    pai_ir_for_period.time_period_end,
+                                    pai_ir_for_period.due_date,
                                 )
-                                indicator_report.progress_report = new_cluster_hr_progress_report
 
-                                # Increment report_number for next HR progress report to be created if needed
-                                report_number += 1
-                                hr_reports.append(new_cluster_hr_progress_report)
+                                # Bundle this cluster LLO Indicator report to HR progress report generated so far
+                                # for this iteration if the dates are matching
+                                for hr_report in hr_reports:
+                                    if indicator_report.time_period_start == hr_report.start_date \
+                                            and indicator_report.time_period_end == hr_report.end_date \
+                                            and indicator_report.due_date == hr_report.due_date:
+                                        indicator_report.progress_report = hr_report
+                                        break
 
-                            indicator_report.save()
+                                if not indicator_report.progress_report:
+                                    # Otherwise, create a brand new HR progress report
+                                    # for this cluster LLO Indicator report
+                                    new_cluster_hr_progress_report = ProgressReport.objects.create(
+                                        start_date=indicator_report.time_period_start,
+                                        end_date=indicator_report.time_period_end,
+                                        due_date=indicator_report.due_date,
+                                        programme_document=pd,
+                                        report_type="HR",
+                                        report_number=report_number,
+                                        is_final=False,
+                                    )
+                                    indicator_report.progress_report = new_cluster_hr_progress_report
+
+                                    # Increment report_number for next HR progress report to be created if needed
+                                    report_number += 1
+                                    hr_reports.append(new_cluster_hr_progress_report)
+
+                                indicator_report.save()
+
+                        else:
+                            # Cluster only progress report segregation
+                            pai_irs_for_periods = IndicatorReport.objects.filter(
+                                reportable__in=pai_indicators,
+                                time_period_start__gte=start_date,
+                                time_period_end__lte=end_date,
+                            ).distinct()
+
+                            for pai_ir_for_period in pai_irs_for_periods:
+                                indicator_report = create_pr_ir_for_reportable(
+                                    pd,
+                                    reportable,
+                                    pai_ir_for_period,
+                                    pai_ir_for_period.time_period_start,
+                                    pai_ir_for_period.time_period_end,
+                                    pai_ir_for_period.due_date,
+                                )
+
+                                # Bundle this cluster LLO Indicator report to HR progress report generated so far
+                                # for this iteration if the dates are matching
+                                for hr_report in hr_reports:
+                                    if indicator_report.time_period_start == hr_report.start_date \
+                                            and indicator_report.time_period_end == hr_report.end_date \
+                                            and indicator_report.due_date == hr_report.due_date:
+                                        indicator_report.progress_report = hr_report
+                                        break
+
+                                if not indicator_report.progress_report:
+                                    # Otherwise, create a brand new HR progress report
+                                    # for this cluster LLO Indicator report
+                                    new_cluster_hr_progress_report = ProgressReport.objects.create(
+                                        start_date=indicator_report.time_period_start,
+                                        end_date=indicator_report.time_period_end,
+                                        due_date=indicator_report.due_date,
+                                        programme_document=pd,
+                                        report_type="HR",
+                                        report_number=report_number,
+                                        is_final=False,
+                                    )
+                                    indicator_report.progress_report = new_cluster_hr_progress_report
+
+                                    # Increment report_number for next HR progress report to be created if needed
+                                    report_number += 1
+                                    hr_reports.append(new_cluster_hr_progress_report)
+
+                                indicator_report.save()
 
                     except Reportable.DoesNotExist as e:
                         logger.exception(
-                            "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
+                            "FAILURE: CANNOT FIND adopted PartnerActivity Reportables "
                             "from given ClusterActivity Reportable and PD Partner ID. "
                             "Skipping link!", e)
                     except IndicatorReport.DoesNotExist as e:
                         logger.exception(
-                            "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
+                            "FAILURE: CANNOT FIND IndicatorReports from adopted PartnerActivity Reportables "
                             "linked with LLO Reportable. "
                             "Skipping link!", e)
+
+                    # If this function is called with next_progress_report as final report
+                    # We may have to recalculate latest progress report and re-assign is_final flag again
+                    if is_final_hr_req:
+                        pd.progress_reports.filter(report_type="HR", is_final=True).update(is_final=False)
+                        latest_hr = pd.progress_reports.filter(report_type="HR").order_by('id').last()
+                        latest_hr.is_final = True
+                        latest_hr.save()
 
 
 def create_ir_for_cluster(reportable, start_date, end_date, project):

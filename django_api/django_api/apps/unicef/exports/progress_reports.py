@@ -117,8 +117,8 @@ class ProgressReportDetailPDFExporter:
         return tables
 
     def get_context(self):
-        funds_received_to_date_percentage = "%.1f" % (
-            self.progress_report.programme_document.funds_received_to_date * 100 / self.progress_report.programme_document.budget
+        funds_received_to_date_percentage = "%.2f" % (
+            self.progress_report.programme_document.funds_received_to_date_percentage
         ) if self.progress_report.programme_document and self.progress_report.programme_document.budget > 0 else 0
 
         context = {

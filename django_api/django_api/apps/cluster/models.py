@@ -71,31 +71,31 @@ class Cluster(TimeStampedExternalSourceModel):
     def num_of_met_indicator_reports(self, partner=None):
         qset = self.met_indicator_reports
         if partner:
-            qset = qset.filter(reportable__partner_activities__partner=partner)
+            qset = qset.filter(reportable__partner_activity_project_contexts__activity__partner=partner)
         return qset.count()
 
     def num_of_constrained_indicator_reports(self, partner=None):
         qset = self.constrained_indicator_reports
         if partner:
-            qset = qset.filter(reportable__partner_activities__partner=partner)
+            qset = qset.filter(reportable__partner_activity_project_contexts__activity__partner=partner)
         return qset.count()
 
     def num_of_on_track_indicator_reports(self, partner=None):
         qset = self.on_track_indicator_reports
         if partner:
-            qset = qset.filter(reportable__partner_activities__partner=partner)
+            qset = qset.filter(reportable__partner_activity_project_contexts__activity__partner=partner)
         return qset.count()
 
     def num_of_no_progress_indicator_reports(self, partner=None):
         qset = self.no_progress_indicator_reports
         if partner:
-            qset = qset.filter(reportable__partner_activities__partner=partner)
+            qset = qset.filter(reportable__partner_activity_project_contexts__activity__partner=partner)
         return qset.count()
 
     def num_of_no_status_indicator_reports(self, partner=None):
         qset = self.no_status_indicator_reports
         if partner:
-            qset = qset.filter(reportable__partner_activities__partner=partner)
+            qset = qset.filter(reportable__partner_activity_project_contexts__activity__partner=partner)
         return qset.count()
 
     def num_of_non_cluster_activities(self, partner=None):
@@ -124,8 +124,8 @@ class Cluster(TimeStampedExternalSourceModel):
     @cached_property
     def partner_activity_reportables_queryset(self):
         return Reportable.objects.filter(
-            Q(partner_activities__cluster_activity__cluster_objective__cluster=self)
-            | Q(partner_activities__cluster_objective__cluster=self)).distinct()
+            Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster=self)
+            | Q(partner_activity_project_contexts__activity__cluster_objective__cluster=self)).distinct()
 
     @cached_property
     def latest_indicator_reports(self):
@@ -209,9 +209,9 @@ class Cluster(TimeStampedExternalSourceModel):
 
         if partner:
             overdue = overdue.filter(
-                reportable__partner_activities__partner=partner)
+                reportable__partner_activity_project_contexts__activity__partner=partner)
             due = due.filter(
-                reportable__partner_activities__partner=partner)
+                reportable__partner_activity_project_contexts__activity__partner=partner)
 
         return overdue.count() + due.count()
 
@@ -225,7 +225,7 @@ class Cluster(TimeStampedExternalSourceModel):
 
     def overdue_indicator_reports_partner(self, partner=None):
         return self.overdue_indicator_reports.filter(
-            reportable__partner_activities__partner=partner)
+            reportable__partner_activity_project_contexts__activity__partner=partner)
 
     def my_project_activities_partner(self, partner=None):
         return partner.partner_activities.filter(
@@ -233,7 +233,7 @@ class Cluster(TimeStampedExternalSourceModel):
 
     def constrained_indicator_reports_partner(self, partner=None):
         return self.constrained_indicator_reports.filter(
-            reportable__partner_activities__partner=partner
+            reportable__partner_activity_project_contexts__activity__partner=partner
         )
 
 
@@ -296,6 +296,7 @@ class ClusterActivity(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
+        verbose_name_plural = 'Cluster activities'
         unique_together = (
             TimeStampedExternalSourceModel.Meta.unique_together
         )

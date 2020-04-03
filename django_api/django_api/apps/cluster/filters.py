@@ -99,13 +99,13 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
         return queryset.filter(
             Q(reportable__cluster_objectives__cluster=value) |
             Q(reportable__cluster_activities__cluster_objective__cluster=value) |
-            Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster=value) |
+            Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster=value) |
             Q(reportable__partner_projects__clusters__id__exact=value)
         )
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(
-            Q(reportable__partner_activities__partner=value) |
+            Q(reportable__partner_activity_project_contexts__project__partner=value) |
             Q(reportable__partner_projects__partner=value)
         ).distinct()
 
@@ -124,7 +124,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects__in=value_list) |
             Q(reportable__cluster_activities__partner_activities__projects__in=value_list)
             |
-            Q(reportable__partner_activities__projects__in=value_list) |
+            Q(reportable__partner_activity_project_contexts__project__in=value_list) |
             Q(reportable__partner_projects__in=value_list)
         ).distinct()
 
@@ -140,7 +140,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
 
     def get_indicator_type(self, queryset, name, value):
         if value == "partner_activity":
-            return queryset.filter(reportable__partner_activities__isnull=False)
+            return queryset.filter(reportable__partner_activity_project_contexts__isnull=False)
         elif value == "partner_project":
             return queryset.filter(reportable__partner_projects__isnull=False)
         elif value == "cluster_objective":

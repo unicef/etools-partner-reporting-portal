@@ -8,7 +8,6 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -21,6 +20,7 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/modal.html">
+<link rel="import" href="../../../../behaviors/localize.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
@@ -157,7 +157,7 @@
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Edit activity</h2>
+        <h2>[[localize('edit_activity')]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -176,9 +176,10 @@
             <div class="item">
               <paper-dropdown-menu
                   class="validate"
-                  label="Cluster"
+                  label="[[localize('cluster')]]"
                   on-value-changed="_validate"
                   always-float-label
+                  disabled
                   required>
                 <paper-listbox
                     selected="{{data.cluster}}"
@@ -198,20 +199,20 @@
             <div class="item">
               <etools-single-selection-menu
                   class="validate"
-                  label="Cluster Activity"
+                  label="[[localize('cluster_activity')]]"
                   options="[[activities]]"
                   option-value="id"
                   option-label="title"
                   selected="{{data.cluster_activity}}"
                   on-iron-activate="_validate"
-                  disabled="[[_equals(activities.length, 0)]]"
+                  disabled
                   trigger-value-change-event
                   required>
               </etools-single-selection-menu>
             </div>
 
             <header class="item-wide">
-              <h3>Projects ([[data.projects.length]])</h3>
+              <h3>[[localize('projects')]] ([[data.projects.length]])</h3>
             </header>
             <template
               is="dom-repeat"
@@ -226,7 +227,7 @@
                       on-tap="_remove"
                       icon="icons:cancel">
                   </paper-icon-button>
-                  <paper-tooltip offset="5">Remove</paper-tooltip>
+                  <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
                 </div>
 
                 <div class="flex">
@@ -234,7 +235,7 @@
                     <div class="item">
                       <etools-single-selection-menu
                           class="validate"
-                          label="Partner Project"
+                          label="[[localize('partner_project')]]"
                           options="[[projects]]"
                           option-value="id"
                           option-label="title"
@@ -250,7 +251,7 @@
                     <div class="item">
                       <paper-dropdown-menu
                           class="validate"
-                          label="Status"
+                          label="[[localize('status')]]"
                           on-value-changed="_validate"
                           always-float-label
                           required>
@@ -271,7 +272,7 @@
                     <div class="item">
                       <etools-prp-date-input
                           class="start-date"
-                          label="Start date"
+                          label="[[localize('start_date')]]"
                           value="{{item.start_date}}"
                           error-message=""
                           required
@@ -283,7 +284,7 @@
                     <div class="item">
                       <etools-prp-date-input
                           class="end-date"
-                          label="End date"
+                          label="[[localize('end_date')]]"
                           value="{{item.end_date}}"
                           error-message=""
                           required
@@ -298,7 +299,7 @@
             <paper-button
                 class="btn-primary add-project-btn"
                 on-tap="_add">
-              Add Project
+              [[localize('add_project')]]
             </paper-button>
 
           </iron-form>
@@ -312,7 +313,7 @@
             <div class="item">
               <paper-dropdown-menu
                   class="validate"
-                  label="Cluster"
+                  label="[[localize('cluster')]]"
                   on-value-changed="_validate"
                   always-float-label
                   required>
@@ -334,7 +335,7 @@
             <div class="item">
               <etools-single-selection-menu
                   class="validate"
-                  label="Cluster Objective"
+                  label="[[localize('cluster_objective')]]"
                   options="[[objectives]]"
                   option-value="id"
                   option-label="title"
@@ -349,7 +350,7 @@
             <div class="item item-wide">
               <paper-input
                   class="validate"
-                  label="Title"
+                  label="[[localize('title')]]"
                   value="{{data.title}}"
                   on-input="_validate"
                   always-float-label
@@ -358,7 +359,7 @@
             </div>
 
             <header class="item-wide">
-              <h3>Projects ([[data.projects.length]])</h3>
+              <h3>[[localize('projects')]] ([[data.projects.length]])</h3>
             </header>
             <template
               is="dom-repeat"
@@ -373,7 +374,7 @@
                       on-tap="_remove"
                       icon="icons:cancel">
                   </paper-icon-button>
-                  <paper-tooltip offset="5">Remove</paper-tooltip>
+                  <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
                 </div>
 
                 <div class="flex">
@@ -381,7 +382,7 @@
                     <div class="item">
                       <etools-single-selection-menu
                           class="validate"
-                          label="Partner Project"
+                          label="[[localize('partner_project')]]"
                           options="[[projects]]"
                           option-value="id"
                           option-label="title"
@@ -397,7 +398,7 @@
                     <div class="item">
                       <paper-dropdown-menu
                           class="validate"
-                          label="Status"
+                          label="[[localize('status')]]"
                           on-value-changed="_validate"
                           always-float-label
                           required>
@@ -418,7 +419,7 @@
                     <div class="item">
                       <etools-prp-date-input
                           class="start-date"
-                          label="Start date"
+                          label="[[localize('start_date')]]"
                           value="{{item.start_date}}"
                           error-message=""
                           required
@@ -430,7 +431,7 @@
                     <div class="item">
                       <etools-prp-date-input
                           class="end-date"
-                          label="End date"
+                          label="[[localize('end_date')]]"
                           value="{{item.end_date}}"
                           error-message=""
                           required
@@ -445,7 +446,7 @@
             <paper-button
                 class="btn-primary add-project-btn"
                 on-tap="_add">
-              Add Project
+              [[localize('add_project')]]
             </paper-button>
           </iron-form>
         </template>
@@ -456,12 +457,12 @@
             on-tap="_save"
             class="btn-primary"
             raised>
-          Save
+          [[localize('save')]]
         </paper-button>
 
         <paper-button
             on-tap="close">
-          Cancel
+          [[localize('cancel')]]
         </paper-button>
       </div>
 
@@ -477,6 +478,8 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -523,11 +526,7 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
+          computed: '_computeLocalizedStatuses(localize)'
         },
 
         locationId: {
@@ -595,6 +594,14 @@
         '_fetchObjectives(data.cluster)',
       ],
 
+      _computeLocalizedStatuses: function (localize) {
+        return [
+          {title: localize('ongoing'), id: 'Ong'},
+          {title: localize('planned'), id: 'Pla'},
+          {title: localize('completed'), id: 'Com'},
+        ];
+      },
+
       _add: function () {
         this.push('data.projects', {});
         this.fire('project-details-selection-refit');
@@ -639,7 +646,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _computePartnerId: function(partner, editPartner) {

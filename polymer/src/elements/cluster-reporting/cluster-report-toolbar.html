@@ -2,6 +2,7 @@
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
 <link rel="import" href="../upload-button.html">
@@ -22,7 +23,7 @@
     <etools-prp-toolbar
       query="{{ query }}"
       response-plan-id="{{ responsePlanId }}">
-      <download-button url="[[exportUrl]]">Export</download-button>
+      <download-button url="[[exportUrl]]">[[localize('export')]]</download-button>
 
       <template
         is="dom-if"
@@ -31,14 +32,14 @@
         <upload-button
           url="[[importUrl]]"
           modal-title="Import Template">
-          Import Template
+          [[localize('import_template')]]
         </upload-button>
       </template>
       <template
         is="dom-if"
         if="[[_equals(submitted, 0)]]"
         restamp="true">
-        <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
+        <download-button url="[[exportTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
       </template>
     </etools-prp-toolbar>
   </template>
@@ -49,6 +50,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

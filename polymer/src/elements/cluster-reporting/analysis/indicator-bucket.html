@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../etools-prp-progress-bar-alt.html">
+<link rel="import" href="../../../behaviors/localize.html">
 <link rel="import" href="indicator-details.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 
@@ -45,6 +46,25 @@
       }
 
       .cluster-objective dt {
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .partner-project {
+        margin: 0;
+        padding-top: 0px;
+        padding-left: 25px;
+        padding-right: 25px;
+        padding-bottom: 25px;
+        font-size: 12px;
+      }
+
+      .partner-project dt,
+      .partner-project dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .partner-project dt {
         color: var(--theme-primary-text-color-medium);
       }
 
@@ -94,11 +114,22 @@
       }
     </style>
 
-    <etools-content-panel panel-title="[[prefix]] [[data.title]]">
+    <etools-content-panel panel-title="[[prefix]] [[_computeIndicatorTitle(data)]]">
       <dl class="cluster-objective">
-        <dt>Cluster Objective:</dt>
-        <dd>[[_computeTitle(data)]]</dd>
+        <dt>[[localize('cluster_objective')]]:</dt>
+        <dd>[[_computeObjectiveTitle(data)]]</dd>
       </dl>
+
+      <template
+        is="dom-if"
+        if="[[_computePartnerProjectTitle(data)]]"
+        restamp="true"
+      >
+        <dl class="partner-project">
+          <dt>[[localize('partner_project')]]:</dt>
+          <dd>[[_computePartnerProjectTitle(data)]]</dd>
+        </dl>
+      </template>
 
       <template
           is="dom-repeat"
@@ -117,19 +148,21 @@
 
           <div class="self-center flex-none">
             <dl class="indicator-progress layout horizontal">
-              <dt class="flex-none self-center">Against Target:</dt>
+              <dt class="flex-none self-center">[[localize('against_target')]]:</dt>
               <dd class="flex-none">
                 <etools-prp-progress-bar
-                    number="[[indicator.total_against_target]]">
+                    number="[[indicator.total_against_target]]"
+                    display-type="[[indicator.display_type]]">
                 </etools-prp-progress-bar>
               </dd>
             </dl>
 
             <dl class="indicator-progress layout horizontal">
-                <dt class="flex-none self-center">Against In need:</dt>
+                <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
                 <dd class="flex-none">
                   <etools-prp-progress-bar-alt
-                      number="[[indicator.total_against_in_need]]">
+                      number="[[indicator.total_against_in_need]]"
+                      display-type="[[indicator.display_type]]">
                   </etools-prp-progress-bar-alt>
                 </dd>
               </dl>
@@ -153,12 +186,18 @@
     Polymer({
       is: 'analysis-indicator-bucket',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
+      ],
+
       properties: {
         data: Object,
 
         prefix: {
           type: String,
-          computed: '_computePrefix(data)',
+          computed: '_computePrefix(data, localize)',
         },
       },
 
@@ -170,16 +209,33 @@
         this.$$('#collapse-' + e.target.toggles).toggle();
       },
 
-      _computeTitle: function (data) {
-        return data.cluster_objective_title === undefined ? data.title : data.cluster_objective_title;
+      _computeObjectiveTitle: function (data) {
+        if (data.type === 'partneractivityprojectcontext') {
+          return data.cluster_objective_name;
+        } else {
+          return data.cluster_objective_title === undefined ? data.title : data.cluster_objective_title;
+        }
       },
 
-      _computePrefix: function (data) {
+      _computePartnerProjectTitle: function (data) {
+        if (data.type === 'partneractivityprojectcontext') {
+          return data.project_name;
+        } else {
+          return undefined;
+        }
+      },
+
+      _computeIndicatorTitle: function (data) {
+        return data.type === 'partneractivityprojectcontext' ? data.activity_name : data.title;
+      },
+
+      _computePrefix: function (data, localize) {
         var prefix = {
-          partneractivity: 'Partner Activity',
-          partnerproject: 'Partner Project',
-          clusterobjective: 'Cluster Objective',
-          clusteractivity: 'Cluster Activity',
+          partneractivity: localize('partner_activity'),
+          partnerproject: localize('partner_project'),
+          clusterobjective: localize('cluster_objective'),
+          clusteractivity: localize('cluster_activity'),
+          partneractivityprojectcontext: localize('partner_activity_project_context'),
         }[data.type];
 
         return prefix ? prefix + ':' : '';

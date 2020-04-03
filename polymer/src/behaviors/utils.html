@@ -38,6 +38,10 @@
         return localize(text).toLowerCase();
       },
 
+      _localizeLowerCased: function (text, localize) {
+        return localize(text.split(' ').join('_').toLowerCase());
+      },
+
       _singularLocalized: function (text, localize) {
         return localize(text).substring(0, text.length - 1);
       },
@@ -122,6 +126,11 @@
       _toPercentage: function (value) {
         return value == null /* undefinded & null */ ? // jshint ignore:line
             value : Math.floor(value * 100) + '%';
+      },
+
+      _toPercentageRounded: function (value) {
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            value : Math.floor(value * 100) / 100 + '%';
       },
 
       _formatIndicatorValue: function(indicatorType, value, percentize) {
@@ -285,6 +294,16 @@
       _normalizeDate: function (date) {
         return moment(date, App.Settings.dateFormat).startOf('day').toDate();
       },
+
+      _getValidateTarget: function (e) {
+        var target = Polymer.dom(e).localTarget;
+        if (target && target.validate) {
+          return target;
+        } else {
+          return Polymer.dom(e).rootTarget;
+        }
+      },
+
     };
 
     function buildQuery(chunks) {

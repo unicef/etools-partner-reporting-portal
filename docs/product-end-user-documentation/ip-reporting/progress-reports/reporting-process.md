@@ -6,7 +6,7 @@ The email of the person submitting the report should be checked against the emai
 
 ![](https://lh3.googleusercontent.com/IfJAnt9u8yQFNk0ZbcePRtc7SoW00bEEIRMEwAosNf9bctDRLjdqWbU01QxKs5_tTpIyqkfZZDmQ0ZFu5AJssyIgMLm55cvemDMcJ1JgJl05Mn1YCHvzv6pC3oTXVzNhFdb_5dCd)
 
-#### **Final Report Submission**
+### **Final Report Submission**
 
 The final report is generated then right after the end of the final reporting period and the PD has reached the "**ended**" status.
 
@@ -18,20 +18,21 @@ Once a final report has been generated, no change to the PD reporting periods sh
 
 **Edge case** \(to be handled in a future release\): Super-users in PMP can make changes that might not be in alignment with above restrictions. If that were to happen then a manual administrative data fix might be required on the PRP side as well.
 
-### **Refreshing report**
+## **Refreshing report**
+
 It is possible that Programme Document may get updated for locations which become deactivated over the course of the program period, and generated Progress Reports may not reflect such location changes. PRP provides a **"resetting"** mechanism for target Progress Report to destroy its Indicator Reports along with their location data entries in order to regenerate the Indicator Reports from current state of Programme Document in PRP system at given time.
 
-![Progress Report Refresh button action](../../.gitbook/assets/progress_report_refresh.png)
+![Progress Report Refresh button action](https://github.com/unicef/etools-partner-reporting-portal/tree/6d86c44140002ade68a6afb3236212b31a2641e1/docs/product-end-user-documentation/.gitbook/assets/progress_report_refresh.png)
 
 Upon clicking `Refresh` button, a warning modal will be opened to show possible consequences by refreshing current Progress Report. When the user agrees to do so, PRP will perform an irreversible action to delete and regenerate Indicator Reports based on current state of Programme Document which may have up-to-date location information, pertinent to current reporting purposes.
 
-![Progress Report Refresh modal](../../.gitbook/assets/progress_report_refresh_modal.png)
+![Progress Report Refresh modal](https://github.com/unicef/etools-partner-reporting-portal/tree/6d86c44140002ade68a6afb3236212b31a2641e1/docs/product-end-user-documentation/.gitbook/assets/progress_report_refresh_modal.png)
 
-### **Acceptance of a report**
+## **Acceptance of a report**
 
 The UNICEF PO is responsible for acceptance of a progress reports that are submitted \(There is no workflow following the submission by the IP to UNICEF and Cluster\). This happens in the PMP system. The PO can also **send the report back with a note**, in which case the partner should get an email informing them that should review the note and re-submit the report \(data in the report becomes editable once its been sent back\). In that case the partner can log back in, make any changes recommended \(edit data and upload attachment \#[947](https://github.com/unicef/etools-partner-reporting-portal/issues/947)\) and resubmit the report back to UNICEF.
 
-### **Reporting Restrictions**
+## **Reporting Restrictions**
 
 Partner must be able to report \(enter data and submit\) on Active, Ended, Suspended & Terminated PD’s. The only reports partners should not be able to report on are signed and closed. If a partner goes into a suspended PD it will still be active but we will have a header message letting thee partner know “PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement”.
 
@@ -41,7 +42,7 @@ To add in case a PD is terminated or suspended in middle of the agreement then t
 
 If PD is not active then in PMP we cannot "send back the report" even.
 
-### **Miscellaneous Reporting Info**
+## **Miscellaneous Reporting Info**
 
 For IP only: Ratio and Percentage Indicators will have labels representing the numerator and denominator. Quantity indicators will not have any labels \(\#[868](https://github.com/unicef/etools-partner-reporting-portal/issues/868)\).
 
