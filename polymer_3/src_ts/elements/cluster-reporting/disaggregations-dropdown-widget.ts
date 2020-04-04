@@ -184,7 +184,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   _add() {
     this.push('value', {
       name: '',
-      choices: [],
+      choices: []
     });
   }
 
@@ -229,7 +229,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
       menu.set('invalid', false);
     });
     allMenus.forEach((menu) => {
-      if (!menu.value) {
+      if (!menu.selected) {
         menu.set('invalid', true);
         self.set('invalid', true);
       }
