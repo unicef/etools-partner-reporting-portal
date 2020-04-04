@@ -10,6 +10,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
 import '../../../indicator-modal';
+import {IndicatorModalEl} from '../../../indicator-modal';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {tableStyles} from '../../../../../styles/table-styles';
@@ -149,7 +150,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _indicatorsAjax() {

@@ -174,12 +174,12 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.addEventListener('indicator-added', this._onSuccess);
     this.addEventListener('indicator-edited', this._onSuccess);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.removeEventListener('indicator-added', this._onSuccess);
     this.removeEventListener('indicator-edited', this._onSuccess);
   }
 

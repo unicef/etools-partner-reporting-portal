@@ -197,6 +197,9 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         message-box {
           margin-bottom: 1em;
         }
+        custom-fields-widget{
+          min-width: 100%;
+        }
       </style>
 
       <etools-prp-permissions
@@ -642,7 +645,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                           </paper-input>
 
                           <custom-fields-widget
-                            class="item full-width"
                             custom-fields="{{ data.custom_fields }}"
                             edit="[[edit]]">
                           </custom-fields-widget>
