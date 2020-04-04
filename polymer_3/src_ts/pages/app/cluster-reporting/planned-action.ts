@@ -9,7 +9,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
-import {GenericObject} from '../../../typings/globals.types'
+import {GenericObject} from '../../../typings/globals.types';
 import '../../../elements/page-header';
 import '../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './planned-action/router';
@@ -103,7 +103,7 @@ class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxCo
 
   static get observers() {
     return [
-      '_routeChanged(routeData.subpage)',
+      '_routeChanged(routeData.subpage)'
     ];
   }
 
@@ -111,7 +111,7 @@ class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxCo
     if (!subpage) {
       setTimeout(() => {
         this.set('route.path', '/projects');
-      })
+      });
     } else {
       this.subpage = subpage;
     }

@@ -48,6 +48,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
       .toolbar {
         position: relative;
+        width: 225px;
       }
 
       filter-list-by-cluster {
@@ -110,7 +111,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </etools-prp-ajax>
 
     <page-header title="{{page_title}}">
-      <div class="toolbar">
+      <div slot="toolbar" class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
       </div>
     </page-header>
@@ -202,7 +203,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   static get observers() {
     return [
-      '_fetchData(dataUrl, queryParams)',
+      '_fetchData(dataUrl, queryParams)'
     ];
   }
 
@@ -242,7 +243,6 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   }
 
   _fetchData(dataUrl: string, queryParams: GenericObject) {
-
     if (!dataUrl || !queryParams || Object.keys(queryParams).length === 0) {
       return;
     }
@@ -280,4 +280,3 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
 }
 window.customElements.define('page-cluster-reporting-dashboard', PageClusterReportingDashboard);
-

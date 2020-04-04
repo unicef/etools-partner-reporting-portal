@@ -45,7 +45,7 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
 
   _onFilterChanged(e: CustomEvent) {
     const change: GenericObject = {
-      page: 1,
+      page: 1
     };
     const data = e.detail;
     change[data.name] = data.value;
