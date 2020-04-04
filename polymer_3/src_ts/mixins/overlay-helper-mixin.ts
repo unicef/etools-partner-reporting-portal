@@ -47,7 +47,8 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
       const paths = (event as any).path || [];
       if (paths.length) {
-        if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) || (paths.filter((x: any) => x.tagName === 'CHIP-DISAGG-VALUE').length)) {
+        if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) ||
+          (paths.filter((x: any) => x.tagName === 'CHIP-DISAGG-VALUE' || x.tagName === 'CHIP-DATE-OF-REPORT').length)) {
           return;
         }
       }

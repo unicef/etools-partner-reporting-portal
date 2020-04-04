@@ -374,20 +374,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                       <div class="item full-width">
                         <div class="app-grid double">
-                          <!--
-                          <etools-single-selection-menu
-                            class="item validate pair"
-                            label="[[localize('frequency_of_reporting')]]"
-                            options="[[frequencies]]"
-                            option-value="id"
-                            option-label="title"
-                            selected="{{data.frequency}}"
-                            on-iron-activate="_validate"
-                            trigger-value-change-event
-                            hide-search
-                            required>
-                          </etools-single-selection-menu>
-                          -->
                           <etools-dropdown
                               class="item validate pair"
                               label="[[localize('frequency_of_reporting')]]"
@@ -412,16 +398,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                               <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
                             </etools-prp-chips>
                           </template>
-                          <!--
-                          <etools-prp-date-input
-                            class="item validate pair"
-                            label="[[localize('start_date_reporting')]]"
-                            value="{{data.start_date_of_reporting_period}}"
-                            error-message=""
-                            format="[[dateFormat]]"
-                            no-init>
-                          </etools-prp-date-input>
-                          -->
                           <datepicker-lite
                               class="item validate pair"
                               label="[[localize('start_date_reporting')]]"
@@ -639,20 +615,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                 if="[[_equals(modalTitle, 'Add Activity Indicator')]]"
                 restamp="true">
                   <div class="item full-width">
-                    <!--
-                    <etools-single-selection-menu
-                      class="item validate pair"
-                      label="[[localize('project_context')]]"
-                      options="[[activityData.projects]]"
-                      option-value="context_id"
-                      option-label="project_name"
-                      selected="{{data.project_context_id}}"
-                      on-iron-activate="_validate"
-                      trigger-value-change-event
-                      hide-search
-                      required>
-                    </etools-single-selection-menu>
-                    -->
                     <etools-dropdown
                         class="item validate pair"
                         label="[[localize('project_context')]]"
@@ -669,20 +631,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                 <div class="item full-width">
                   <div class="app-grid double">
-                    <!--
-                    <etools-single-selection-menu
-                      class="item validate pair"
-                      label="[[localize('frequency_of_reporting')]]"
-                      options="[[frequencies]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.frequency}}"
-                      on-iron-activate="_validate"
-                      trigger-value-change-event
-                      hide-search
-                      required>
-                    </etools-single-selection-menu>
-                    -->
                     <etools-dropdown
                         class="item validate pair"
                         label="[[localize('frequency_of_reporting')]]"
@@ -707,16 +655,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
                       </etools-prp-chips>
                     </template>
-                    <!--
-                    <etools-prp-date-input
-                      class="item validate pair"
-                      label="[[localize('start_date_reporting')]]"
-                      value="{{data.start_date_of_reporting_period}}"
-                      error-message=""
-                      format="[[dateFormat]]"
-                      no-init>
-                    </etools-prp-date-input>
-                    -->
                     <datepicker-lite
                         class="item validate pair"
                         label="[[localize('start_date_reporting')]]"
@@ -1628,7 +1566,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     let dataCopy = this._clone(this.data);
 
     let noLocationSet = false;
-    let rawLocations = this.get('data.locations');
+    let rawLocations = this.get('data.locations') || [];
 
     let changedLocations = rawLocations.map(function(location: GenericObject) {
       if (location.location !== undefined && location.location.id !== undefined) {
