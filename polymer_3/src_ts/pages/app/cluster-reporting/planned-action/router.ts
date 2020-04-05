@@ -64,7 +64,6 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
   `;
   }
 
-
   static get observers() {
     return [
       '_routeChanged(routeData.id)',
@@ -72,13 +71,13 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
   }
 
   @property({type: String})
-  id!: String;
+  id!: string;
 
   @property({type: Boolean})
   visible!: boolean;
 
   @property({type: String, observer: '_pageChanged'})
-  page!: String;
+  page!: string;
 
 
   _routeChanged(id: string) {
@@ -93,7 +92,7 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
     if (!this.visible) {
       return;
     }
-    //  resolvedPageUrl = this.resolveUrl(page + '.html');
+
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/planned-action/${page}.js`;
     console.log('cluster planned-action router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {

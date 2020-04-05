@@ -853,7 +853,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
-    if (!responsePlanID) {
+    if ((edit && !data.id) || !responsePlanID) {
       return;
     }
 

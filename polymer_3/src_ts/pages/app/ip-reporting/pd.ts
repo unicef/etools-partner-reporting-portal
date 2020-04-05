@@ -141,7 +141,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    // resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
     console.log('pd page changed: ' + resolvedPageUrl);
     await import(resolvedPageUrl)

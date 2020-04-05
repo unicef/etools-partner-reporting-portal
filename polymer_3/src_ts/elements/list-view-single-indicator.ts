@@ -323,11 +323,11 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
-    if (!indicator) {
+    if (!baseUrl || !indicator) {
       return;
     }
 
-    let query_params = 'results/draft?page_size=10&page=1&indicator_type=';
+    let query_params = 'results?page_size=10&page=1&indicator_type=';
 
     if (indicator.content_type_key === 'cluster.clusterobjective') {
       query_params += 'cluster_objective';
