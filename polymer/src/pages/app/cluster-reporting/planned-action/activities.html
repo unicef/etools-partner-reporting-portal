@@ -22,8 +22,8 @@
       }
       div#action {
         margin: 25px 0;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified);
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
     </style>
 
@@ -69,7 +69,7 @@
       is: 'planned-action-activities-list',
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       observers: [
@@ -108,12 +108,8 @@
         },
       },
 
-      listeners: {
-        'modal.activity-added': '_onSuccess',
-      },
-
-      _onSuccess: function(e, data) {
-        var path = '/planned-action/activity/' + String(data.id);
+      _onSuccess: function(e) {
+        var path = '/planned-action/activity/' + String(e.detail.id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
       },
@@ -140,11 +136,25 @@
           }, 300);
       },
 
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('modal.activity-added', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('modal.activity-added', this._onSuccess);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         if (this.isDebouncerActive('activities-ajax')) {
           this.cancelDebouncer('activities-ajax');
         }
-      },
+      }
 
     });
   </script>

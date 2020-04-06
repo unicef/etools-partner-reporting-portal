@@ -182,12 +182,7 @@
         },
 
         _openModal: function () {
-          this.$$('#modal').open();
-        },
-
-        listeners: {
-          'page-number-changed': '_tableContentChanged',
-          'details-opened-changed': '_detailsChange'
+          this.shadowRoot.querySelector('#modal').open();
         },
 
         _computeCurrentActivitiesCount: function(projectId, activitiesCountDict) {
@@ -205,6 +200,26 @@
           }
           //Query string is passed to construct the back button.
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+        },
+
+        _addEventListeners: function () {
+          this._tableContentChanged = this._tableContentChanged.bind(this);
+          this.addEventListener('page-number-changed', this._tableContentChanged);
+          this._detailsChange = this._detailsChange.bind(this);
+          this.addEventListener('details-opened-changed', this._detailsChange);
+        },
+
+        _removeEventListeners: function () {
+          this.removeEventListener('page-number-changed', this._tableContentChanged);
+          this.removeEventListener('details-opened-changed', this._detailsChange);
+        },
+
+        attached: function () {
+          this._addEventListeners();
+        },
+
+        detached: function () {
+          this._removeEventListeners();
         },
       });
     </script>

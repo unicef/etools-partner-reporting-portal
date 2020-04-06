@@ -344,10 +344,6 @@
         },
       },
 
-      listeners: {
-        'reportable-meta-changed': '_updateMeta',
-      },
-
       _calculationFormulaAcrossPeriods: function (indicator, localize) {
         return PdOutputUtils.calculationFormulaAcrossPeriods(indicator, localize);
       },
@@ -355,7 +351,7 @@
       _toggle: function (e) {
         var node = PdOutputUtils.toggle(e);
 
-        this.$$('#collapse-' + node.toggles).toggle();
+        this.shadowRoot.querySelector('#collapse-' + node.toggles).toggle();
       },
 
       _computeIcon: function (opened) {
@@ -405,12 +401,12 @@
         return indicatorReport.parent_ir_id ? indicatorReport.parent_ir_id : indicatorReport.id;
       },
 
-      _updateMeta: function (e, data) {
+      _updateMeta: function (e) {
         var self = this;
         var updateThunk;
 
         e.stopPropagation();
-
+        const data = e.detail;
         this.set('reportableMeta', data);
 
         updateThunk = this.$.update.thunk();
@@ -450,7 +446,21 @@
         return isCluster ? 'cluster' : 'default';
       },
 
+      _addEventListeners: function () {
+        this._updateMeta = this._updateMeta.bind(this);
+        this.addEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         this._forEach('[id^="collapse-"]', function (section) {
           section.opened = false;
         });

@@ -1,0 +1,88 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/app-shell.js",
+  "fragments": [
+    "src/pages/not-found.js",
+    "src/pages/login.js",
+    "src/pages/login-token.js",
+    "src/pages/unauthorized.js",
+    "src/pages/app.js",
+    "src/pages/app/ip-reporting.js",
+    "src/pages/app/ip-reporting/overview.js",
+    "src/pages/app/ip-reporting/pd.js",
+    "src/pages/app/ip-reporting/pd/pd-index.js",
+    "src/pages/app/ip-reporting/pd/pd-router.js",
+    "src/pages/app/ip-reporting/pd/pd-details.js",
+    "src/pages/app/ip-reporting/pd/pd-report.js",
+    "src/pages/app/ip-reporting/indicators.js",
+    "src/pages/app/ip-reporting/progress-reports.js",
+    "src/pages/app/cluster-reporting.js",
+    "src/pages/app/cluster-reporting/select-plan.js",
+    "src/pages/app/cluster-reporting/router.js",
+    "src/pages/app/cluster-reporting/dashboard.js",
+    "src/pages/app/cluster-reporting/response-parameters.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/clusters.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/objective.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/objectives.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/activity.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/activities.js",
+    "src/pages/app/cluster-reporting/response-parameters/clusters/disaggregations.js",
+    "src/pages/app/cluster-reporting/response-parameters/partners/partners.js",
+    "src/pages/app/cluster-reporting/response-parameters/partners/project.js",
+    "src/pages/app/cluster-reporting/response-parameters/partners/projects.js",
+    "src/pages/app/cluster-reporting/response-parameters/partners/activities.js",
+    "src/pages/app/cluster-reporting/response-parameters/partners/activity.js",
+    "src/pages/app/cluster-reporting/planned-action.js",
+    "src/pages/app/cluster-reporting/planned-action/project.js",
+    "src/pages/app/cluster-reporting/planned-action/projects.js",
+    "src/pages/app/cluster-reporting/planned-action/activity.js",
+    "src/pages/app/cluster-reporting/planned-action/activities.js",
+    "src/pages/app/cluster-reporting/results.js",
+    "src/pages/app/cluster-reporting/analysis.js"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "package.json"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "node_modules/@webcomponents/webcomponentsjs/**",
+    "node_modules/web-animations-js/web-animations-next-lite.min.js",
+    "node_modules/moment/min/moment.min.js",
+    "node_modules/numeral/min/numeral.min.js",
+    "node_modules/intl-messageformat/dist/umd/intl-messageformat.min.js"
+  ],
+  "builds": [
+    {
+      "name": "esm-bundled",
+      "browserCapabilities": [
+        "es2015",
+        "modules"
+      ],
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      },
+      "bundle": true,
+      "addServiceWorker": true
+    },
+    {
+      "name": "es6-bundled",
+      "preset": "es6-bundled",
+      "addServiceWorker": true
+    },
+    {
+      "name": "es5-bundled",
+      "preset": "es5-bundled",
+      "addServiceWorker": true
+    }
+  ],
+  "moduleResolution": "node",
+  "npm": true
+}

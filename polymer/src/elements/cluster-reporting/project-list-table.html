@@ -42,8 +42,8 @@
 
       div#action {
         margin-bottom: 25px;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified)
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
 
       a {
@@ -231,12 +231,7 @@
         },
 
         _openModal: function () {
-          this.$$('#modal').open();
-        },
-
-        listeners: {
-          'page-number-changed': '_tableContentChanged',
-          'details-opened-changed': '_detailsChange'
+          this.shadowRoot.querySelector('#modal').open();
         },
 
         _detailUrl: function(project, query) {
@@ -248,10 +243,26 @@
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
 
-        detached: function () {
-          this.openedDetails.length = 0;
+        _addEventListeners: function () {
+          this._tableContentChanged = this._tableContentChanged.bind(this);
+          this.addEventListener('page-number-changed', this._tableContentChanged);
+          this._detailsChange = this._detailsChange.bind(this);
+          this.addEventListener('details-opened-changed', this._detailsChange);
         },
 
+        _removeEventListeners: function () {
+          this.removeEventListener('page-number-changed', this._tableContentChanged);
+          this.removeEventListener('details-opened-changed', this._detailsChange);
+        },
+
+        attached: function () {
+          this._addEventListeners();
+        },
+
+        detached: function () {
+          this._removeEventListeners();
+          this.openedDetails.length = 0;
+        },
       });
     </script>
   </dom-module>

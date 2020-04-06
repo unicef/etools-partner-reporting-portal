@@ -23,8 +23,8 @@
 
       div#action {
         margin: 25px 0;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified)
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
     </style>
 
@@ -101,12 +101,8 @@
         '_activitiesByPartnerProjectIdAjax(url, params)',
       ],
 
-      listeners: {
-        'modal.activity-added': '_onSuccess',
-      },
-
-      _onSuccess: function(e, data) {
-        var path = '/planned-action/activity/' + String(data.id);
+      _onSuccess: function(e) {
+        var path = '/planned-action/activity/' + String(e.detail.id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
       },
@@ -137,11 +133,28 @@
       },
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       _openExistingModal: function () {
-        this.$$('#existing-modal').open();
+        this.shadowRoot.querySelector('#existing-modal').open();
+      },
+
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('modal.activity-added', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('modal.activity-added', this._onSuccess);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

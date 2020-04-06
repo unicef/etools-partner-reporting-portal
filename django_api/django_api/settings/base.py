@@ -55,7 +55,7 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
 )
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
@@ -454,7 +454,7 @@ SOCIAL_AUTH_PIPELINE = (
 
 
 # PMP API
-PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.19.0.1:8082/api")
+PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.18.0.1:8082/api")
 PMP_API_USER = os.getenv('PMP_API_USER')
 PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
 

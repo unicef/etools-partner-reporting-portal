@@ -584,10 +584,6 @@
         },
       },
 
-      listeners: {
-        'project-details-selection-refit': 'adjustPosition',
-      },
-
       observers: [
         '_fetchProjects(partnerId)',
         '_fetchActivities(data.cluster)',
@@ -758,6 +754,23 @@
               self.set('errors', err.data);
               self.set('updatePending', false);
             });
+      },
+
+      _addEventListeners: function () {
+        this.adjustPosition = this.adjustPosition.bind(this);
+        this.addEventListener('project-details-selection-refit', this.adjustPosition);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

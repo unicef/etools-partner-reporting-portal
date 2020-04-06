@@ -27,8 +27,8 @@
 
       div#action {
         margin: 25px 0;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified);
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
 
       a {
@@ -106,7 +106,7 @@
       },
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       _computeUrl: function(responsePlanID) {
