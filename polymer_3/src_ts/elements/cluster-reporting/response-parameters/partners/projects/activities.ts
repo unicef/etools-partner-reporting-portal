@@ -9,6 +9,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import '../../../../etools-prp-permissions';
 import '../../../../page-body';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
+import RoutingMixin from '../../../../../mixins/routing-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import Endpoints from '../../../../../endpoints';
 import '../../../project-activity-table';
@@ -27,7 +28,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class Activities extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
     ${buttonsStyles}

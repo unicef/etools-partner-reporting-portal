@@ -117,19 +117,25 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   @property({type: Boolean, computed: '_computeCanEdit(permissions, activityData)'})
   canEdit!: boolean;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.partnerActivities.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partnerActivities.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
   static get observers() {
     return ['_indicatorsAjax(queryParams, activityId)'];
   }
 
   _computeCurrentIndicators(activityId: number, allIndicators: GenericObject) {
+    if (!activityId || !allIndicators) {
+      return;
+    }
     return allIndicators[activityId];
   }
 
   _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: any) {
-    return allIndicatorsCount[activityId];
+    if (!activityId || !allIndicatorsCount) {
+      return;
+    }
+    return allIndicatorsCount[activityId] || 0;
   }
 
   _computeUrl() {
@@ -140,6 +146,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeCanEdit(permissions: GenericObject, activityData: GenericObject) {
+    if (!permissions || !activityData) {
+      return;
+    }
     return activityData.cluster ?
       permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
       false;
@@ -154,6 +163,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _indicatorsAjax() {
+    if (!this.activityId || !this.url) {
+      return;
+    }
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();

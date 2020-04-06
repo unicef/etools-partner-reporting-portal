@@ -3,6 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '../../../../cluster-reporting/planned-action/activities/editing-modal';
+import {PlannedActionActivityEditingModalEl} from '../../../../cluster-reporting/planned-action/activities/editing-modal';
 import '../../../../page-body';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import '../../../activity-details';
@@ -54,6 +55,10 @@ class RpPartnerActivityDetailsOverview extends LocalizeMixin(ReduxConnectedEleme
     `;
   }
 
+  _openModal() {
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionActivityEditingModalEl).open();
+  }
+
   @property({type: Object})
   activityData!: GenericObject;
 
@@ -61,6 +66,9 @@ class RpPartnerActivityDetailsOverview extends LocalizeMixin(ReduxConnectedEleme
   responsePlanCurrent!: GenericObject;
 
   _canEditActivity(permissions: GenericObject, activityData: GenericObject) {
+    if (!permissions || !activityData) {
+      return;
+    }
     if (activityData.cluster) {
       return permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]);
     }

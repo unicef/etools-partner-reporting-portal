@@ -568,11 +568,11 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let rawLocations = this.get('data.locations') || [];
 
     let changedLocations = rawLocations.map(function(location: GenericObject) {
-      if (location.location !== undefined && location.location.id !== undefined) {
+      if (location.location && location.location.id) {
         let id = location.location.id;
         location.location = id;
         return location;
-      } else if (location.loc_type !== undefined && location.location === undefined) {
+      } else if (location.loc_type && !location.location) {
         self.set('errors', 'No location set - please set a location.');
         noLocationSet = true;
         return location;

@@ -152,7 +152,7 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
 
     this.set('tab', tab);
-    this.notifyPath('route.path', '/' + this.tab);
+    this.set('route.path', '/' + this.tab);
   }
 
   _onSuccess() {

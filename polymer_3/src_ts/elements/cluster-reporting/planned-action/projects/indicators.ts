@@ -113,8 +113,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.partnerProjects.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.partnerProjects.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partnerProjects.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
 
   static get observers() {
@@ -130,22 +130,33 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeCurrentIndicators(projectId: number, allIndicators: GenericObject) {
+    if (!projectId || !allIndicators) {
+      return;
+    }
     return allIndicators[projectId];
   }
 
-  _computeCurrentIndicatorsCount(projectId: number, allIndicatorsCount: number) {
-    // (dci) to be checked
+  _computeCurrentIndicatorsCount(projectId: number, allIndicatorsCount: GenericObject) {
+    if (!projectId || !allIndicatorsCount) {
+      return;
+    }
     return allIndicatorsCount[projectId];
   }
 
   _computeUrl() {
     //Make sure the queryParams are updated before the thunk is created:
+    if (!this.projectId) {
+      return;
+    }
     this.set('queryParams.object_id', this.projectId);
 
     return Endpoints.indicators('pp');
   }
 
   _indicatorsAjax() {
+    if (!this.projectId || !this.url) {
+      return;
+    }
     let thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
@@ -159,12 +170,12 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.addEventListener('indicator-added', this._onSuccess);
     this.addEventListener('indicator-edited', this._onSuccess);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.removeEventListener('indicator-added', this._onSuccess);
     this.removeEventListener('indicator-edited', this._onSuccess);
   }
 
