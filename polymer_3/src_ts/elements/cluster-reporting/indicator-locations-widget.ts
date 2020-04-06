@@ -243,7 +243,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                     option-value="id"
                     option-label="title"
                     selected-item="{{item.location}}"
-                    disabled="[[_getPending(pending, item.loc_type, index)]]"
+                    disabled$="[[_getPending(pending, item.loc_type, index)]]"
                     data-index$="[[index]]"
                     required>
                 </etools-dropdown>
@@ -439,7 +439,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
-  _lockItems(value) {
+  _lockItems(value: any[]) {
     if (this.get('valueInitialized')) {
       return;
     }
@@ -451,7 +451,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     });
   }
 
+
   _isLocked(item: any, locked: any[]) {
+    if (!locked) {
+      return false;
+    }
     return locked.indexOf(item) !== -1;
   }
 
