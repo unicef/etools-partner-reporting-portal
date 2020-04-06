@@ -107,25 +107,22 @@
         },
       },
 
-      listeners: {
-        'field-value-changed': '_handleInput',
-      },
+      _handleInput: function (e) {
 
-      _handleInput: function (e, data) {
-        var key = data.key;
-        var value = data.value;
+        var key = e.detail.key;
+        var value = e.detail.value;
         var calculated;
         var change;
 
-        if (data.internal) {
+        if (e.detail.internal) {
           // Dont handle self-fired events.
           return;
         }
 
         e.stopPropagation();
 
-        var v = this.$$('#v');
-        var d = this.$$('#d');
+        var v = this.shadowRoot.querySelector('#v');
+        var d = this.shadowRoot.querySelector('#d');
 
         if (typeof value.v !== 'undefined') {
           d.validate();
@@ -161,7 +158,7 @@
           validatorName: vName,
           validatorType: 'validator',
           validate: function (value) {
-            return Number(value) !== 0 || Number(this.$$('#v').getField().value) === 0;
+            return Number(value) !== 0 || Number(this.shadowRoot.querySelector('#v').getField().value) === 0;
           }.bind(this),
         };
 
@@ -180,7 +177,13 @@
         }
       },
 
+      _addEventListeners: function () {
+        this._handleInput = this._handleInput.bind(this);
+        this.addEventListener('field-value-changed', this._handleInput);
+      },
+
       attached: function () {
+        this._addEventListeners();
         var nullData = this._clone(this.data);
         if (nullData !== undefined && nullData.v === 0) {
           nullData.v = null;
@@ -189,6 +192,14 @@
           nullData.d = null;
         }
         this.set('data', nullData);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('field-value-changed', this._handleInput);
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

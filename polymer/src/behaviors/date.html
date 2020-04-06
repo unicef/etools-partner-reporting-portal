@@ -54,7 +54,7 @@
         var id = Polymer.dom(event).localTarget.getAttribute('data-selector');
         if (id) {
           var datepickerId = '#' + id;
-          var datePicker = this.$$(datepickerId);
+          var datePicker = this.shadowRoot.querySelector(datepickerId);
           if (datePicker) {
             datePicker.open = true;
           }

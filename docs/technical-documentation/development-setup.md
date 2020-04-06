@@ -5,7 +5,7 @@
 1. Install [Docker](https://docs.docker.com/engine/installation/) for your OS. Also install Fabric via `pip install fabric`
 2. Create .env file with the reference of`.env.example`or receive .env file from your team member.
 3. Run`fab up`
-4. Go to [http://127.0.0.1:8082/](http://127.0.0.1:8082/) to see the frontend / polymer running. The Django app is running under [http://127.0.0.1:8082/api/](http://127.0.0.1:8082/api/). ID management will be running at [http://127.0.0.1:8082/id-management/](http://127.0.0.1:8082/id-management/).
+4. Go to [http://127.0.0.1:8081/](http://127.0.0.1:8081/) to see the frontend / polymer running. The Django app is running under [http://127.0.0.1:8082/api/](http://127.0.0.1:8082/api/). ID management will be running at [http://127.0.0.1:8082/id-management/](http://127.0.0.1:8082/id-management/).
 5. Run`fab fixtures`
    * It loads fake data like account, core, partner and other modules!
    * Once fixtures are loaded, the Celery Periodic Tasks will be shown at Django Admin -&gt; djcelery -&gt; Periodic Tasks. Once the tasks are enabled, they will be scheduled to run automatically.
@@ -22,9 +22,9 @@
 7. Run `fab ssh:django_api`  and run `./manage.py shell_plus` to create some superusers. Make sure you use `.set_password()` method to set the password and save the user.
    1. Make sure you create a User with username `default_unicef_user` for PMP integration.
 8. After creating some users, go to Django Admin -&gt; Core -&gt; Prp roles. Create new Prp role per user to give ID management access on IP reporting and cluster reporting.
-9. Go to [http://127.0.0.1:8082/api/admin/](http://127.0.0.1:8082/api/admin/) login with admin/Passw0rd! and can now go to
+9. Go to [http://127.0.0.1:8081/api/admin/](http://127.0.0.1:8081/api/admin/) login with admin/Passw0rd! and can now go to
 
-   [http://127.0.0.1:8082/app/](http://127.0.0.1:8082/app/) to see the frontend interface. Replace 'ip-reporting' or 'cluster-reporting' in the URL's or use UI switcher to switch between the two interfaces.
+   [http://127.0.0.1:8081/app/](http://127.0.0.1:8081/app/) to see the frontend interface. Replace 'ip-reporting' or 'cluster-reporting' in the URL's or use UI switcher to switch between the two interfaces.
 
 ## K8s remote environment setup
 

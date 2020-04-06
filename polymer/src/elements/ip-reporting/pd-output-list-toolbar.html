@@ -152,10 +152,6 @@
         },
       },
 
-      listeners: {
-        'file-uploaded': '_onFileUploaded',
-      },
-
       _computeImportTemplateUrl: function (locationId, reportId) {
         return PdOutputListToolbarUtils.computeImportTemplateUrl(locationId, reportId);
       },
@@ -194,7 +190,21 @@
         window.location.reload();
       },
 
+      _addEventListeners: function () {
+        this._onFileUploaded = this._onFileUploaded.bind(this);
+        this.addEventListener('file-uploaded', this._onFileUploaded);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('file-uploaded', this._onFileUploaded);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         this.$.refresh.close();
       },
     });

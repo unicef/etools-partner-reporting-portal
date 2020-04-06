@@ -28,8 +28,8 @@
 
       div#action {
         margin: 25px 0;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified);
+        @apply --layout-horizontal;
+        @apply --layout-end-justified;
       }
 
       a {
@@ -88,9 +88,6 @@
       observers: [
         '_clusterDisaggregationsAjax(queryParams, disaggregationsUrl)',
       ],
-      listeners: {
-        'disaggregation-added': '_onSuccess',
-      },
 
       properties: {
         queryParams: Object,
@@ -111,7 +108,7 @@
       },
 
       _openModal: function () {
-        this.$$('#modal').open();
+        this.shadowRoot.querySelector('#modal').open();
       },
 
       _computeUrl: function(responsePlanID) {
@@ -138,7 +135,21 @@
         return permissions.createClusterEntities;
       },
 
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('disaggregation-added', this._onSuccess);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('disaggregation-added', this._onSuccess);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         if (this.isDebouncerActive('cluster-disaggregations-ajax')) {
           this.cancelDebouncer('cluster-disaggregations-ajax');
         }

@@ -113,11 +113,6 @@
         Polymer.AppLocalizeBehavior,
       ],
 
-      listeners: {
-        'delete-file': '_onDeleteFile',
-        'prp-file-progress-changed': '_onProgressChanged',
-      },
-
       properties: {
         readonly: Boolean,
 
@@ -362,7 +357,21 @@
         });
       },
 
+      _addEventListeners: function () {
+        this._onDeleteFile = this._onDeleteFile.bind(this);
+        this.addEventListener('delete-file', this._onDeleteFile);
+        // TODO(dci): NOT FOUND !!!
+        // this._onProgressChanged = this._onProgressChanged.bind(this);
+        // this.addEventListener('prp-file-progress-changed', this._onProgressChanged);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('delete-file', this._onDeleteFile);
+        // this.removeEventListener('prp-file-progress-changed', this._onProgressChanged);
+      },
+
       attached: function () {
+        this._addEventListeners();
         var downloadThunk = this.$.download.thunk();
 
         this.$.download.abort();
@@ -370,12 +379,13 @@
         this.dispatch(
           App.Actions.PDReportsAttachments.sync(downloadThunk, this.reportId)
         )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
       },
 
       detached: function () {
+        this._removeEventListeners();
         [
           this.$.download,
           this.$.upload,

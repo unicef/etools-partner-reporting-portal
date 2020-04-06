@@ -127,11 +127,6 @@
         '_handleResources(resources)',
       ],
 
-      listeners: {
-        'sign-out': '_onSignOut',
-        'token-error': '_onTokenError',
-      },
-
       _goToLanding: function () {
         location.pathname = '/landing';
       },
@@ -185,10 +180,29 @@
         this.dispatch(App.Actions.setL11NResources(resources));
       },
 
-      attached: function () {
-        this.listen(this.root, 'error', '_handleError');
-        this.loadResources(this.resolveUrl('locales.json'));
+      _addEventListeners: function () {
+        this._handleError = this._handleError.bind(this);
+        this.addEventListener('error', this._handleError);
+        this._onSignOut = this._onSignOut.bind(this);
+        this.addEventListener('sign-out', this._onSignOut);
+        this._onTokenError = this._onTokenError.bind(this);
+        this.addEventListener('token-error', this._onTokenError);
       },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('error', this._handleError);
+        this.removeEventListener('sign-out', this._onSignOut);
+        this.removeEventListener('token-error', this._onTokenError);
+      },
+
+      attached: function () {
+        this.loadResources(this.resolveUrl('locales.json'));
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
+      }
     });
   </script>
 </dom-module>

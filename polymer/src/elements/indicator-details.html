@@ -309,7 +309,7 @@
                             </template>
                             <template is="dom-if" if="[[!_equals(location.display_type, 'number')]]" restamp="true">
                               <dt>[[localize('location_progress')]]:</dt>
-                              <dd>[[_formatIndicatorValue(location.display_type, location.location_progress.c, 1)]]</dd>
+                              <dd>[[_formatIndicatorValue(location.display_type, location.location_progress.c)]]</dd>
                               <dt>[[localize('previous_location_progress')]]:</dt>
                               <dd>[[_formatIndicatorValue(location.display_type, location.previous_location_progress.c,
                                 1)]]</dd>
@@ -496,10 +496,6 @@
         },
       },
 
-      listeners: {
-        'locations-updated': '_onLocationsUpdated',
-      },
-
       _fetchData: function () {
         var disaggregationsThunk = this.$.disaggregations.thunk();
 
@@ -561,11 +557,11 @@
       },
 
       _openModal: function (e) {
-        this.$$('#modal-' + e.target.modalIndex).open();
+        this.shadowRoot.querySelector('#modal-' + e.target.modalIndex).open();
       },
 
       _openPullModal: function (e) {
-        this.$$('#pull-modal-' + e.target.modalIndex).open();
+        this.shadowRoot.querySelector('#pull-modal-' + e.target.modalIndex).open();
       },
 
       _updateModals: function (e, data) {
@@ -658,8 +654,22 @@
         return reportStatus === 'Sub' || reportStatus === 'Acc';
       },
 
+      _addEventListeners: function () {
+        this._onLocationsUpdated = this._onLocationsUpdated.bind(this);
+        this.addEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('locations-updated', this._onLocationsUpdated);
+      },
+
       attached: function () {
         this.set('opened', {});
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

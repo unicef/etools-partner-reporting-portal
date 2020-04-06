@@ -1,5 +1,4 @@
 <link rel="import" href="../polyfills/es6-shim.html">"
-
 <script>
   (function () {
     'use strict';
@@ -7,11 +6,9 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.SortingBehavior = {
-      listeners: {
-        'sort-changed': '_sortOrderChanged',
-      },
 
-      _sortOrderChanged: function (e, data) {
+      _sortOrderChanged: function (e) {
+        const data = e.detail;
         this.debounce('sort-order-changed', function () {
           var newParams = Object.assign({}, this.queryParams, {
             sort: data.field + '.' + data.direction,
@@ -23,7 +20,13 @@
         }, 100);
       },
 
+      attached: function () {
+        this._sortOrderChanged = this._sortOrderChanged.bind(this);
+        this.addEventListener('sort-changed', this._sortOrderChanged);
+      },
+
       detached: function () {
+        this.removeEventListener('sort-changed', this._sortOrderChanged);
         if (this.isDebouncerActive('sort-order-changed')) {
           this.cancelDebouncer('sort-order-changed');
         }

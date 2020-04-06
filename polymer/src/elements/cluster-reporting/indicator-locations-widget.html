@@ -584,10 +584,10 @@
             this._setPending(loc_type, true, index);
 
             if (title !== undefined) {
-              this.$$('#locations' + loc_type).params.title = title;
+              this.shadowRoot.querySelector('#locations' + loc_type).params.title = title;
             }
 
-            this.$$('#locations' + loc_type).thunk()()
+            this.shadowRoot.querySelector('#locations' + loc_type).thunk()()
               .then(function (res) {
                 self.set('url', res.xhr.responseURL);
                 self._setPending(loc_type, false, index);
@@ -689,7 +689,7 @@
           this.set('pending', {});
 
           this._handleMessageSent = this._handleMessageSent.bind(this);
-          this.messageModal = this.$$('#message-modal');
+          this.messageModal = this.shadowRoot.querySelector('#message-modal');
 
           if (this.messageModal) {
             this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent);
