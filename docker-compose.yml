@@ -7,7 +7,7 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
       - "8081:80"
-      - "8080:8080"
+      - "8097:8080"
     container_name: prp_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -28,7 +28,7 @@ services:
       - './django_api:/code/'
       - './data/django_api_logs:/data/django_api/logs'
       - './data/django_api_uploads_unicef_progress_reports:/data/django_api/uploads/unicef/progress_reports'
-    command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8080"
     depends_on:
       - db
     labels:
