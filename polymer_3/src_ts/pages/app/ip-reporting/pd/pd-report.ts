@@ -330,8 +330,8 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
 
   static get observers() {
     return [
-      '_fetchReport(reportUrl, queryParams, reduxStore)',
-      '_onReportChanged(routeData.report_id, routeData.mode, reduxStore)',
+      '_fetchReport(reportUrl, queryParams)',
+      '_onReportChanged(routeData.report_id, routeData.mode)',
       '_onReportStatusChanged(currentReport, routeData.mode)',
       '_handlePermissions(permissions, mode, _baseUrl, backLink)',
     ]
@@ -360,9 +360,10 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _onReportChanged(reportId: string, mode: any) {
-    if (this.reduxStore) {
-      this.reduxStore.dispatch(pdReportsSetCurrent(reportId, mode));
+    if (!reportId || !mode) {
+      return;
     }
+    this.reduxStore.dispatch(pdReportsSetCurrent(reportId, mode));
   }
 
   _onReportStatusChanged(currentReport: GenericObject, mode: any) {
@@ -382,16 +383,18 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _fetchReport() {
-    if (this.pdId) {
-      const self = this;
-      this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer,
-        timeOut.after(300),
-        () => {
-          const reportThunk = (self.$.report as EtoolsPrpAjaxEl).thunk();
-          (self.$.report as EtoolsPrpAjaxEl).abort();
-          self.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
-        });
+    if (!this.pdId || !this.reportUrl) {
+      return;
     }
+
+    const self = this;
+    this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer,
+      timeOut.after(300),
+      () => {
+        const reportThunk = (self.$.report as EtoolsPrpAjaxEl).thunk();
+        (self.$.report as EtoolsPrpAjaxEl).abort();
+        self.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
+      });
   }
 
   _computeHeadingPrefix(mode: string, localize: Function) {

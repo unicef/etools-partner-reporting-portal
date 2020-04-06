@@ -48,6 +48,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
       .toolbar {
         position: relative;
+        width: 225px;
       }
 
       filter-list-by-cluster {
@@ -110,7 +111,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     </etools-prp-ajax>
 
     <page-header title="{{page_title}}">
-      <div class="toolbar">
+      <div slot="toolbar" class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
       </div>
     </page-header>

@@ -109,7 +109,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   public static get observers() {
     return [
       '_handleInputChange(programmeDocumentsUrl, queryParams)',
-      '_routePdIdChanged(routeData.pd_id, reduxStore)',
+      '_routePdIdChanged(routeData.pd_id)',
       '_routePathChanged(route.path)',
     ]
   }
@@ -119,7 +119,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _routePdIdChanged(pd_id: number) {
-    if (pd_id !== this.pdId && this.reduxStore) {
+    if (pd_id !== this.pdId) {
       this.reduxStore.dispatch(pdSetCurrent(pd_id));
     }
 
@@ -141,7 +141,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    // resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
     console.log('pd page changed: ' + resolvedPageUrl);
     await import(resolvedPageUrl)

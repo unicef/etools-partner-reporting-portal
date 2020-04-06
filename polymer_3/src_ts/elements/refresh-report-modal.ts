@@ -7,8 +7,6 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/paper-styles/typography';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/iron-location/iron-location';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';

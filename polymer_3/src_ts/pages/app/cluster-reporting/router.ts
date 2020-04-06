@@ -187,7 +187,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
       '_routePageChanged(routeData.page)',
       '_routePlanChanged(routeData.plan)',
       '_routeCurrentPlanChanged(routeData.plan, allPlans)',
-      '_planChanged(plan, reduxStore)',
+      '_planChanged(plan)',
     ];
   }
 
@@ -195,7 +195,6 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
   async _pageChanged(page: string) {
 
     this.set('loading', true);
-    //const resolvedPageUrl = this.resolveUrl(page + '.html');
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/${page}.js`;
     console.log('cluster router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl)
@@ -211,7 +210,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
 
 
   _planChanged(plan: string) {
-    if (this.reduxStore && plan) {
+    if (plan) {
       this.reduxStore.dispatch(setCurrentResponsePlanID(plan));
     }
   }

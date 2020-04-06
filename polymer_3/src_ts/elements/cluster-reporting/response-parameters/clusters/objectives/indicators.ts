@@ -120,7 +120,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get observers() {
     return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId, reduxStore)',
+      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
     ];
   }
 
@@ -143,7 +143,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     if (!objectiveId || !allIndicatorsCount) {
       return;
     }
-    return allIndicatorsCount[objectiveId];
+    return allIndicatorsCount[objectiveId] || 0;
   }
 
   _computeUrl() {
@@ -153,7 +153,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterObjectiveIndicatorsAjax() {
-    if (!this.objectiveId || !this.reduxStore) {
+    if (!this.objectiveId || !this.url) {
       return;
     }
 
@@ -174,12 +174,12 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.addEventListener('indicator-added', this._onSuccess);
     this.addEventListener('indicator-edited', this._onSuccess);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.removeEventListener('indicator-added', this._onSuccess);
     this.removeEventListener('indicator-edited', this._onSuccess);
   }
 

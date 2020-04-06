@@ -114,8 +114,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.partnerProjects.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.partnerProjects.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Number, computed: 'getReduxStateObject(rootState.partnerProjects.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanEdit(permissions, projectData)'})
   canEdit!: boolean;
@@ -125,11 +125,17 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeCurrentIndicators(projectId: number, allIndicators: GenericObject) {
+    if (!projectId || !allIndicators) {
+      return;
+    }
     return allIndicators[projectId];
   }
 
   _computeCurrentIndicatorsCount(projectId: number, allIndicatorsCount: any) {
-    return allIndicatorsCount[projectId];
+    if (!projectId || !allIndicatorsCount) {
+      return;
+    }
+    return allIndicatorsCount[projectId] || 0;
   }
 
   _computeUrl() {
@@ -140,6 +146,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeCanEdit(permissions: any, projectData: GenericObject) {
+    if (!permissions || !projectData) {
+      return;
+    }
     return projectData.clusters ?
       permissions.editPartnerEntities(projectData.clusters) :
       false;
@@ -154,6 +163,9 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _indicatorsAjax() {
+    if (!this.projectId || !this.url) {
+      return;
+    }
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
