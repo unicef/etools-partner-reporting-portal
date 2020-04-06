@@ -360,7 +360,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _onReportChanged(reportId: string, mode: any) {
-    if (!this.reportId || !mode) {
+    if (!reportId || !mode) {
       return;
     }
     this.reduxStore.dispatch(pdReportsSetCurrent(reportId, mode));
