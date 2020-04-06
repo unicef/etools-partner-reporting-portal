@@ -26,9 +26,10 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
         //}
       });
   }
-  connectedCallback() {
+
+  constructor() {
+    super();
     this.reduxStore = store;
-    super.connectedCallback();
   }
 
   getReduxStateValue(pathValue: string) {

@@ -242,10 +242,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                     options="[[_getLocations(locations, item.loc_type, index)]]"
                     option-value="id"
                     option-label="title"
-                    selected="{{item.location}}"
-                    disabled="[[_getPending(pending, item.loc_type, index)]]"
-                    trigger-value-change-event
-                    on-etools-selected-item-changed="_onValueChanged"
+                    selected-item="{{item.location}}"
+                    disabled$="[[_getPending(pending, item.loc_type, index)]]"
                     data-index$="[[index]]"
                     required>
                 </etools-dropdown>
@@ -388,45 +386,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   private _debouncer!: Debouncer;
 
-  _onValueChanged(e: CustomEvent) {  // This method runs whenever user begins searching in locations dropdown
-    if (!e.detail.selectedItem) {
-      return;
-    }
-
-    let loc_type = this.get('searchLocationType') || 0;
-    let index = Number((e.target as EtoolsDropdownEl).dataset.index);
-
-    if (loc_type === 0 && index === undefined) {
-      index = 0;
-    }
-
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(100),
-      () => {
-        let self = this;
-
-        let thunk = self.$.search as EtoolsPrpAjaxEl;
-        thunk.url = self.get('url');
-
-        thunk.params = {
-          loc_type: loc_type,
-          title: e.detail.selectedItem.title
-        };
-
-        (self.$.search as EtoolsPrpAjaxEl).thunk()()
-          .then((res: GenericObject) => {
-            self._setPending(loc_type, false, index);
-            self._setLocations(loc_type, res.data.results, index);
-          })
-          .catch((err: GenericObject) => {
-            console.error(err);
-            self._setPending(loc_type, false, index);
-          });
-        return;
-      });
-
-  }
-
   _computeIsNumber(type: string) {
     return type === 'number';
   }
@@ -480,7 +439,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
-  _lockItems(value) {
+  _lockItems(value: any[]) {
     if (this.get('valueInitialized')) {
       return;
     }
@@ -492,7 +451,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     });
   }
 
+
   _isLocked(item: any, locked: any[]) {
+    if (!locked) {
+      return false;
+    }
     return locked.indexOf(item) !== -1;
   }
 

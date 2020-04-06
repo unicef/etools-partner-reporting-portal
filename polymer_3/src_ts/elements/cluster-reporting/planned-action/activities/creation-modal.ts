@@ -727,9 +727,9 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _save() {
-    var self = this;
+    const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    var valid = [
+    const valid = [
       this._fieldsAreValid(),
       this._dateRangeValid('.start-date', '.end-date'),
     ].every(Boolean);
@@ -745,10 +745,12 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     }, this.data[this.mode]);
     thunk()
       .then(function(res: any) {
-        fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
-        self._close();
+        self.close();
+        setTimeout(() => {
+          fireEvent(self, 'activity-added', res.data);
+        });
       })
       .catch(function(err) {
         self.set('errors', err.data);
@@ -758,9 +760,10 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _close(e: CustomEvent) {
-    if (e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON') {
+    if (e &&
+      (e.target.nodeName === 'PAPER-DIALOG' ||
+        e.target.nodeName === 'PAPER-BUTTON' ||
+        e.target.nodeName === 'PAPER-ICON-BUTTON')) {
       this.set('mode', '');
       this.set('data', {});
 
@@ -777,12 +780,12 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   _addEventListeners() {
     this.adjustPosition = this.adjustPosition.bind(this);
-    this.addEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.addEventListener('paper-radio-group-changed', this.adjustPosition as any);
     this.addEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.removeEventListener('paper-radio-group-changed', this.adjustPosition as any);
     this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 

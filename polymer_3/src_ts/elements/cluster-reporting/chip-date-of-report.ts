@@ -5,9 +5,8 @@ import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import ChipMixin from '../../mixins/chip-mixin';
-import dateFormat from '../../settings';
+import Settings from '../../settings';
 import {buttonsStyles} from '../../styles/buttons-styles';
-import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 declare const moment: any;
@@ -65,17 +64,9 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
       <datepicker-lite
         id="picker"
         value="{{_date}}"
-        min-date="[[minDate]]">
+        min-date="[[minDate]]"
+        selected-date-display-format="[[dateFormat]]">
       </datepicker-lite>
-
-      <!--
-      <paper-date-picker
-          id="picker"
-          date="{{_date}}"
-          min-date="[[minDate]]"
-          force-narrow>
-      </paper-date-picker>
-      -->
 
       <div class="buttons layout horizontal-reverse">
         <paper-button
@@ -93,30 +84,28 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
   `;
   }
 
-  @property({type: Object})
-  _date!: GenericObject;
+  @property({type: String})
+  _date!: string;
 
   @property({type: Date})
   minDate!: Date;
 
+  @property({type: String})
+  dateFormat = Settings.dateFormat;
 
   _add() {
-    var formatted = moment(this._date).format(dateFormat);
-
+    const formatted = moment(this._date).format(this.dateFormat);
     fireEvent(this, 'chip-add', formatted);
     this._close();
   }
 
   _setDefaults(adding: any) {
-    var today;
-
     if (!adding) {
       return;
     }
 
-    today = new Date();
-
-    this.set('_date', today < this.minDate ? this.minDate : today);
+    const today = new Date();
+    this.set('_date', moment(today < this.minDate ? this.minDate : today).format(Settings.datepickerFormat));
   }
 
   connectedCallback() {

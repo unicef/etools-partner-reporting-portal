@@ -154,8 +154,8 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerProjects.activitiesLoading)'})
   loading!: boolean;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.partnerProjects.activitiesCount)'})
-  activitiesCountDict!: number;
+  @property({type: Object, computed: 'getReduxStateObject(rootState.partnerProjects.activitiesCount)'})
+  activitiesCountDict!: GenericObject;
 
   @property({type: Number, computed: '_computeCurrentActivitiesCount(projectId, activitiesCountDict)'})
   totalResults!: number;
@@ -171,11 +171,17 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
     this.shadowRoot!.querySelector('#modal')!.open();
   }
 
-  _computeCurrentActivitiesCount(projectId: number, activitiesCountDict: number) {
+  _computeCurrentActivitiesCount(projectId: number, activitiesCountDict: GenericObject) {
+    if (!projectId || !activitiesCountDict) {
+      return;
+    }
     return activitiesCountDict[projectId];
   }
 
   _computeCurrentActivities(projectId: string, activitiesDict: GenericObject) {
+    if (!projectId || !activitiesDict) {
+      return;
+    }
     return activitiesDict[projectId];
   }
 

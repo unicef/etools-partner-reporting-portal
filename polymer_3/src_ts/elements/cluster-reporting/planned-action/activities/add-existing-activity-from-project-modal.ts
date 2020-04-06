@@ -11,8 +11,6 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
@@ -30,7 +28,8 @@ import '../../../error-box-errors';
 import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
-
+import Settings from '../../../../settings';
+declare const moment: any;
 
 /**
 * @polymer
@@ -131,7 +130,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         margin-left: -12px;
       }
 
-      paper-dropdown-menu {
+      etools-dropdown {
         width: 100%;
       }
     </style>
@@ -186,40 +185,17 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
         <div class="app-grid">
           <div class="item">
-            <paper-dropdown-menu
-                class="validate"
-                label="[[localize('cluster')]]"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.cluster}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                    is="dom-repeat"
-                    items="[[clusters]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
+            <etools-dropdown
+              class="validate"
+              label="[[localize('cluster')]]"
+              selected="{{data.cluster}}"
+              options="[[clusters]]"
+              option-value="id"
+              option-label="title"
+              required>
+            </etools-dropdown>
           </div>
           <div class="item">
-            <!--
-            <etools-single-selection-menu
-                class="validate"
-                label="[[localize('partner_activity')]]"
-                options="[[partnerActivities]]"
-                option-value="id"
-                option-label="title"
-                selected="{{data.partner_activity}}"
-                on-iron-activate="_validate"
-                disabled="[[_equals(partnerActivities.length, 0)]]"
-                trigger-value-change-event
-                required>
-            </etools-single-selection-menu>
-            -->
             <etools-dropdown
                 class="validate"
                 label="[[localize('partner_activity')]]"
@@ -230,7 +206,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                 disabled="[[_equals(partnerActivities.length, 0)]]"
                 auto-validate
                 required>
-            </etools-dropdown>
+             </etools-dropdown>
           </div>
 
           <header class="item-wide">
@@ -245,21 +221,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
               <div class="flex">
                 <div class="app-grid">
                   <div class="item">
-                    <!--
-                    <etools-single-selection-menu
-                        disabled
-                        class="validate"
-                        label="[[localize('partner_project')]]"
-                        options="[[data.projects]]"
-                        option-value="project_id"
-                        option-label="title"
-                        selected="[[item.project_id]]"
-                        data-index$="[[index]]"
-                        on-iron-activate="_validate"
-                        trigger-value-change-event
-                        required>
-                    </etools-single-selection-menu>
-                    -->
                     <etools-dropdown
                       class="validate"
                       label="[[localize('partner_project')]]"
@@ -267,6 +228,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                       option-value="project_id"
                       option-label="title"
                       selected="[[item.project_id]]"
+                      data-index$="[[index]]"
                       auto-validate
                       disabled
                       required>
@@ -274,64 +236,35 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                   </div>
 
                   <div class="item">
-                    <paper-dropdown-menu
-                        disabled
-                        class="validate"
-                        label="[[localize('status')]]"
-                        on-value-changed="_validate"
-                        always-float-label
-                        required>
-                      <paper-listbox
-                          selected="{{item.status}}"
-                          attr-for-selected="value"
-                          slot="dropdown-content"
-                          class="dropdown-content">
-                        <template
-                            is="dom-repeat"
-                            items="[[statuses]]">
-                          <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                        </template>
-                      </paper-listbox>
-                    </paper-dropdown-menu>
+                    <etools-dropdown
+                      class="validate"
+                      label="[[localize('status')]]"
+                      options="[[statuses]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{item.status}}"
+                      disabled
+                      required>
+                    </etools-dropdown>
                   </div>
 
                   <div class="item">
-
-                  <!--
-                    <etools-prp-date-input
-                        class="start-date"
-                        label="[[localize('start_date')]]"
-                        value="{{item.start_date}}"
-                        error-message=""
-                        required
-                        no-init>
-                    </etools-prp-date-input>
-                    </etools-date-input>
-                    -->
                     <datepicker-lite
                       class="start-date"
                       label="[[localize('start_date')]]"
                       value="{{item.start_date}}"
+                      selected-date-display-format="[[dateFormat]]"
                       error-message=""
                       required>
                     </datepicker-lite>
                   </div>
 
                   <div class="item">
-                    <!--
-                    <etools-prp-date-input
-                        class="end-date"
-                        label="[[localize('end_date')]]"
-                        value="{{item.end_date}}"
-                        error-message=""
-                        required
-                        no-init>
-                    </etools-prp-date-input>
-                    -->
                     <datepicker-lite
                       class="end-date"
                       label="[[localize('end_date')]]"
                       value="{{item.end_date}}"
+                      selected-date-display-format="[[dateFormat]]"
                       error-message=""
                       required>
                     </datepicker-lite>
@@ -428,6 +361,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
+  @property({type: String})
+  dateFormat = Settings.dateFormat;
+
   static get observers() {
     return [
       '_fetchPartnerActivities(data.cluster)',
@@ -449,8 +385,8 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
     simpleProjectData.status = this.projectData.status;
-    simpleProjectData.start_date = this.projectData.start_date;
-    simpleProjectData.end_date = this.projectData.end_date;
+    simpleProjectData.start_date = moment(this.projectData.start_date).format(Settings.datepickerFormat);
+    simpleProjectData.end_date = moment(this.projectData.end_date).format(Settings.datepickerFormat);
 
     this.set('data', {
       projects: [simpleProjectData]
@@ -471,6 +407,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: any) {
+    if (!storePartner) {
+      return;
+    }
     return storePartner.id || selectedPartner || undefined;
   }
 
@@ -580,11 +519,10 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _close(e: CustomEvent) {
-    if (e === 'saved' ||
+    if (e && (e === 'saved' ||
       e.target.nodeName === 'PAPER-DIALOG' ||
       e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON'
-    ) {
+      e.target.nodeName === 'PAPER-ICON-BUTTON')) {
       this.set('data', {});
 
       this.set('objectives', []);
