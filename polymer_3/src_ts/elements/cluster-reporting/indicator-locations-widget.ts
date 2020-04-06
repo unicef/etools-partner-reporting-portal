@@ -439,8 +439,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
   }
 
-  _lockItems(value) {
-    debugger;
+  _lockItems(value: any[]) {
     if (this.get('valueInitialized')) {
       return;
     }
@@ -454,7 +453,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
 
   _isLocked(item: any, locked: any[]) {
-    if (!locked){
+    if (!locked) {
       return false;
     }
     return locked.indexOf(item) !== -1;
@@ -552,7 +551,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _fetchInitialLocations(lockedItems: any[]) {
-    // debugger;
     this.set('savedLocations', lockedItems);
 
     let newLocations = Object.assign({}, this.get('locations'));
