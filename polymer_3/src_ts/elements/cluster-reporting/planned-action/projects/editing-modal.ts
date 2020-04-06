@@ -13,6 +13,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../etools-prp-ajax';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
@@ -126,17 +127,6 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
               </paper-input>
 
               <div class="row">
-                <!--
-                <etools-multi-selection-menu
-                    class="validate"
-                    label="Clusters"
-                    options="[[formattedClusters]]"
-                    selected-values="{{selectedClusters}}"
-                    on-selected-values-changed="_validate"
-                    trigger-value-change-event
-                    required>
-                </etools-multi-selection-menu>
-                -->
                 <etools-dropdown-multi
                   class="validate"
                   label="Clusters"
@@ -148,16 +138,6 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
               </div>
 
               <div class="item">
-                 <!--
-                 <etools-prp-date-input
-                    class="start-date"
-                    label="Start date"
-                    value="{{data.start_date}}"
-                    error-message=""
-                    required
-                    no-init>
-                 </etools-prp-date-input>
-                 -->
                  <datepicker-lite
                     class="start-date"
                     label="Start date"
@@ -168,16 +148,6 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
               </div>
 
               <div class="item">
-                <!--
-                <etools-prp-date-input
-                    class="end-date"
-                    label="End date"
-                    value="{{data.end_date}}"
-                    error-message=""
-                    required
-                    no-init>
-                </etools-prp-date-input>
-                -->
                 <datepicker-lite
                     class="end-date"
                     label="End date"
@@ -187,24 +157,15 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
                 </datepicker-lite>
               </div>
 
-              <paper-dropdown-menu
-                  class="item validate"
-                  label="Status"
-                  on-value-changed="_validate"
-                  always-float-label
-                  required>
-                <paper-listbox
-                    selected="{{data.status}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                    is="dom-repeat"
-                    items="[[statuses]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-              </paper-dropdown-menu>
+              <etools-dropdown
+                class="item validate"
+                label="Status"
+                options="[[statuses]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.status}}"
+                required>
+              </etools-dropdown>
 
               <paper-input
                 class="item validate"
@@ -314,6 +275,9 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
 
   _computeUrl(projectID: string) {
+    if (!projectID) {
+      return;
+    }
     return Endpoints.plannedActionsProjectOverview(projectID);
   }
 

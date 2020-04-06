@@ -12,8 +12,6 @@ import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
 
 import '@polymer/paper-styles/typography';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '../error-modal';
 import {filterStyles} from '../../styles/filter-styles';
 import LocalizeMixin from '../../mixins/localize-mixin';

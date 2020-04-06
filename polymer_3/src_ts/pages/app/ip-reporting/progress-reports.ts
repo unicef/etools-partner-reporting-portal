@@ -68,7 +68,7 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
 
   public static get observers() {
     return [
-      '_handleInputChange(reportsUrl, queryParams, reduxStore)',
+      '_handleInputChange(reportsUrl, queryParams)',
     ]
   }
 
@@ -76,8 +76,8 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     return locationId ? Endpoints.progressReports(locationId) : '';
   }
 
-  _handleInputChange(_, queryParams: GenericObject) {
-    if (!queryParams || !Object.keys(queryParams).length || !this.reduxStore) {
+  _handleInputChange(reportsUrl: string, queryParams: GenericObject) {
+    if (!reportsUrl || !queryParams || !Object.keys(queryParams).length) {
       return;
     }
 

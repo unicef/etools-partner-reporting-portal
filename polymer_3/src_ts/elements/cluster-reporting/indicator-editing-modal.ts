@@ -32,7 +32,7 @@ import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from '../../utils/fire-custom-event';
-
+declare const moment: any;
 
 /**
  * @polymer
@@ -191,27 +191,11 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
               </paper-input>
             </div>
 
-
             <template
                 is="dom-if"
                 if="[[isPAI]]"
                 restamp="true">
               <div class="row">
-                <!--
-                <etools-single-selection-menu
-                  class="item validate pair"
-                  label="[[localize('project_context')]]"
-                  options="[[projects]]"
-                  option-value="context_id"
-                  option-label="project_name"
-                  selected="{{data.project_context_id}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  hide-search
-                  disabled
-                  required>
-                </etools-single-selection-menu>
-                -->
                 <etools-dropdown
                   class="item validate pair"
                   label="[[localize('project_context')]]"
@@ -229,21 +213,6 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
             <div class="row">
               <div class="app-grid">
-                <!--
-                <etools-single-selection-menu
-                    class="item validate"
-                    label="[[localize('frequency_of_reporting')]]"
-                    options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.frequency}}"
-                    on-iron-activate="_validate"
-                    disabled="[[!canEditDetails]]"
-                    trigger-value-change-event
-                    hide-search
-                    required>
-                </etools-single-selection-menu>
-                -->
                 <etools-dropdown
                     class="item validate"
                     label="[[localize('frequency_of_reporting')]]"
@@ -275,24 +244,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     </template>
                   </etools-prp-chips>
                 </template>
-                <!--
-                <etools-prp-date-input
-                    class="item validate"
-                    label="[[localize('start_date_reporting')]]"
-                    value="{{data.start_date_of_reporting_period}}"
-                    disabled="[[!canEditDetails]]"
-                    format="[[dateFormat]]"
-                    error-message=""
-                    no-init>
-                </etools-prp-date-input>
-                -->
                 <datepicker-lite
                   class="item validate"
                   label="[[localize('start_date_reporting')]]"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
-                  error-message=""
-                  selected-date-display-format="[[dateFormat]]">
+                  selected-date-display-format="[[dateFormat]]"
+                  error-message="">
                 </datepicker-lite>
               </div>
             </div>
@@ -593,6 +551,8 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
       return;
     }
 
+    this.data.start_date_of_reporting_period = moment(this.data.start_date_of_reporting_period).format(Settings.datepickerFormat);
+
     let dates = this.get('data.cs_dates');
     let startDate = this._normalizeDate(startDateStr);
 
@@ -605,14 +565,14 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let self = this;
 
     let noLocationSet = false;
-    let rawLocations = this.get('data.locations');
+    let rawLocations = this.get('data.locations') || [];
 
     let changedLocations = rawLocations.map(function(location: GenericObject) {
-      if (location.location !== undefined && location.location.id !== undefined) {
+      if (location.location && location.location.id) {
         let id = location.location.id;
         location.location = id;
         return location;
-      } else if (location.loc_type !== undefined && location.location === undefined) {
+      } else if (location.loc_type && !location.location) {
         self.set('errors', 'No location set - please set a location.');
         noLocationSet = true;
         return location;

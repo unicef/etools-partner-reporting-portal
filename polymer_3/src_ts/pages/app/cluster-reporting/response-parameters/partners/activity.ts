@@ -17,6 +17,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
 * @polymer
@@ -103,7 +104,16 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String})
   tab!: string;
 
-  @property({type: String, computed: 'getReduxStateValues(rootState.responsePlans.currentID)'})
+  @property({type: Object})
+  route!: GenericObject;
+
+  @property({type: Object})
+  routeData!: GenericObject;
+
+  @property({type: Object})
+  parentRouteData!: GenericObject;
+
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanID!: string;
 
   @property({type: Object})
@@ -135,7 +145,7 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeOverviewUrl(responsePlanID: string, activityId: string) {
-    if (!responsePlanID) {
+    if (!responsePlanID || !activityId) {
       return;
     }
     return Endpoints.plannedActionsActivityOverview(responsePlanID, activityId);
@@ -151,7 +161,7 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
 
     this.set('tab', tab);
-    this.notifyPath('route.path', '/' + this.tab);
+    this.set('route.path', '/' + this.tab);
   }
 
   _getActivityAjax() {

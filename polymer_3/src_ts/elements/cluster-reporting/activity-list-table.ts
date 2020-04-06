@@ -186,7 +186,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   responsePlanID!: string;
 
   @property({type: Object})
-  projects = {};
+  projects: GenericObject = {};
 
   static get observers() {
     return [
@@ -198,7 +198,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
     this.shadowRoot!.querySelector('#modal')!.open();
   }
 
-  _detailUrl(activity: string, query: string) {
+  _detailUrl(activity: GenericObject, query: string) {
     var path = '/response-parameters/partners/activity/' + activity.id;
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;

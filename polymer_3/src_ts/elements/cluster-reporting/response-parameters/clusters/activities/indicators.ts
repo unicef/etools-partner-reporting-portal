@@ -117,8 +117,8 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.clusterActivities.indicators)'})
   allIndicators!: GenericObject;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.clusterActivities.indicatorsCount)'})
-  allIndicatorsCount!: number;
+  @property({type: Object, computed: 'getReduxStateObject(rootState.clusterActivities.indicatorsCount)'})
+  allIndicatorsCount!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanAddIndicator(permissions, clusterId)'})
   canAddIndicator!: boolean;
@@ -138,14 +138,23 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeCurrentIndicators(activityId: number, allIndicators: GenericObject) {
+    if (!activityId || !allIndicators) {
+      return;
+    }
     return allIndicators[activityId];
   }
 
-  _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: number) {
+  _computeCurrentIndicatorsCount(activityId: number, allIndicatorsCount: GenericObject) {
+    if (!activityId || !allIndicatorsCount) {
+      return;
+    }
     return allIndicatorsCount[activityId];
   }
 
   _computeUrl() {
+    if (!this.activityId) {
+      return;
+    }
     //Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.activityId);
 
@@ -153,6 +162,9 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterActivityIndicatorsAjax() {
+    if (!this.activityId || !this.url) {
+      return;
+    }
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
@@ -171,12 +183,12 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.addEventListener('indicator-added', this._onSuccess);
     this.addEventListener('indicator-edited', this._onSuccess);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('indicatorModal.indicator-added', this._onSuccess);
+    this.removeEventListener('indicator-added', this._onSuccess);
     this.removeEventListener('indicator-edited', this._onSuccess);
   }
 
