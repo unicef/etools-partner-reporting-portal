@@ -551,7 +551,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
       return;
     }
 
-    this.data.start_date_of_reporting_period = moment(this.data.start_date_of_reporting_period).format('YYYY-MM-DD');
+    this.data.start_date_of_reporting_period = moment(this.data.start_date_of_reporting_period).format(Settings.datepickerFormat);
 
     let dates = this.get('data.cs_dates');
     let startDate = this._normalizeDate(startDateStr);

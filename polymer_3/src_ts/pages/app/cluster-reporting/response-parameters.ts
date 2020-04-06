@@ -92,12 +92,7 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
   }
 
   async _pageChanged(page: string) {
-
     if (!page) {
-      return;
-    }
-
-    if (!this.visible) {
       return;
     }
 
