@@ -82,7 +82,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
             <div class="flex-none layout vertical center-center col-actions">
               <div>
                 <paper-icon-button
-                    index="[[index]]"
+                    index$="[[index]]"
                     class="remove-btn"
                     on-tap="_remove"
                     icon="icons:cancel">
@@ -112,7 +112,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
                   <etools-dropdown
                     class="dis-menu validate"
                     id="disaggregationsDrop"
-                    index="[[index]]"
+                    index$="[[index]]"
                     label="[[localize('disaggregation_by')]]"
                     options="[[disaggregations]]"
                     option-value="id"
@@ -129,7 +129,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
 
           <div class="col-values flex">
             <paper-input
-              index="[[index]]"
+              index$="[[index]]"
               label="[[localize('disaggregation_groups')]]"
               value="[[_formatChoices(dataDisagg)]]"
               always-float-label
@@ -237,8 +237,8 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (allMenus.length < 2) {
       return;
     }
-    let chosen = allMenus.map((choice) => {
-      return choice.value;
+    let chosen = Array.from(allMenus).map((choice) => {
+      return choice.selected;
     });
 
     for (let i = 0; i < chosen.length - 1; i++) {
