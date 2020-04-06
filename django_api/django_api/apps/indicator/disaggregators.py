@@ -44,9 +44,14 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         dt = ValueType.DENOMINATOR
         ct = ValueType.CALCULATED
 
-        level_reported = indicator_location_data.level_reported
         # copy of idl.disaggregation with the keys converted tuples from the original string type
         disagg = get_cast_dictionary_keys_as_tuple(indicator_location_data.disaggregation)
+
+        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure 
+        # therefore calculating it:
+        level_reported = 0
+        for k in disagg.keys():
+            level_reported = len(k) if len(k) > level_reported else level_reported
 
         calc_data = {}
         for k in disagg.keys():
@@ -126,10 +131,12 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         dt = ValueType.DENOMINATOR
         ct = ValueType.CALCULATED
 
-        level_reported = indicator_location_data.level_reported
-
-        disagg = get_cast_dictionary_keys_as_tuple(
-            indicator_location_data.disaggregation)
+        disagg = get_cast_dictionary_keys_as_tuple(indicator_location_data.disaggregation)
+        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure 
+        # therefore calculating it:
+        level_reported = 0
+        for k in disagg.keys():
+            level_reported = len(k) if len(k) > level_reported else level_reported
 
         calc_data = {}
         for k in disagg.keys():
