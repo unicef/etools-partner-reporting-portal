@@ -69,7 +69,7 @@ class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElemen
   }
 
   _canEdit(permissions: GenericObject, projectData: GenericObject) {
-    if (!permissions) {
+    if (!permissions || !projectData) {
       return;
     }
     return projectData.clusters ?

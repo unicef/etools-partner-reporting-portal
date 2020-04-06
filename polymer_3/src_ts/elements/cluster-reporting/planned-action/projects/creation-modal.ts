@@ -853,7 +853,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
-    if ((edit && !data.id) || !responsePlanID) {
+    if ((edit && !data) || (!mode || !responsePlanID)) {
       return;
     }
 
@@ -1109,7 +1109,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     let rawLocations = this.get('data.locations') || [];
 
     let changedLocations = rawLocations.map((location: GenericObject) => {
-      if (location.location !== undefined) {
+      if (location.location) {
         return location.location;
       } else {
         return location;
@@ -1117,7 +1117,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     });
 
     changedLocations.forEach((location: GenericObject) => {
-      if (location.title === undefined) {
+      if (!location || !location.title) {
         self.set('errors', 'No location set - please set a location.');
         locationError = true;
       } else if (changedLocations[0].admin_level !== location.admin_level) {

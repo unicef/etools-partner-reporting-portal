@@ -3,6 +3,7 @@ import {Constructor} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {PaperDialogElement} from '@polymer/paper-dialog';
 
 /**
  * @polymer
@@ -30,7 +31,7 @@ function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
         timeOut.after(100),
         () => {
-          this.$.dialog.refit();
+          (this.$.dialog as PaperDialogElement).refit();
         });
     }
 

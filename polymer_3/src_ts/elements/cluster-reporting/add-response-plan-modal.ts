@@ -9,8 +9,6 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/paper-radio-button/paper-radio-button';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
@@ -521,12 +519,12 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     this.adjustPosition = this.adjustPosition.bind(this);
 
     this.addEventListener('details-loaded', this.adjustPosition as any);
-    this.addEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.addEventListener('paper-radio-group-changed', this.adjustPosition as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('details-loaded', this.adjustPosition as any);
-    this.removeEventListener('mode.selected-changed', this.adjustPosition as any);
+    this.removeEventListener('paper-radio-group-changed', this.adjustPosition as any);
   }
 
   connectedCallback() {

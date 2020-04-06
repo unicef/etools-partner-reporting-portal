@@ -17,7 +17,7 @@ import {GenericObject} from '../../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  */
 class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template(){
+  public static get template() {
     return html`
       ${buttonsStyles}
       <style>
@@ -66,6 +66,9 @@ class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
   permissions!: GenericObject;
 
   _canEdit(permissions: GenericObject, projectData: GenericObject) {
+    if (!permissions || !projectData) {
+      return;
+    }
     return projectData.clusters ?
       permissions.editPartnerEntities(projectData.clusters) :
       false;

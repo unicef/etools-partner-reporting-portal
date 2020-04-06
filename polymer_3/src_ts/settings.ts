@@ -5,6 +5,7 @@ const Settings = {
   },
 
   dateFormat: 'DD-MMM-YYYY',
+  datepickerFromat: 'YYYY-MM-DD',
 
   ip: {
     readOnlyStatuses: [
