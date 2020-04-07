@@ -88,7 +88,6 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         indicator-locations-widget {
           margin: 2em 0;
         }
-
       </style>
 
       <etools-prp-permissions

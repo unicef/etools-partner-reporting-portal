@@ -124,7 +124,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         indicator-locations-widget {
           margin: 2em 0;
         }
-
       </style>
 
       <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
