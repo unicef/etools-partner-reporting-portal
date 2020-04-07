@@ -575,11 +575,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _getPending(pending: GenericObject, loc_type: string, index: number) {
-    return !!pending[index][loc_type];
+    return pending[index] ? !!pending[index][loc_type] : false;
   }
 
   _getLocations(locations: any[], loc_type: string, index: number) {
-    return locations[index][loc_type] || [];
+    return locations[index] ? locations[index][loc_type] : [];
   }
 
   _getLocationAdminLevel(location: GenericObject) {
