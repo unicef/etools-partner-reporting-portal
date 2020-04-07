@@ -247,6 +247,9 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   }
 
   _computeCanEditLocations(isClusterApp: boolean, type: string, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
   }
 

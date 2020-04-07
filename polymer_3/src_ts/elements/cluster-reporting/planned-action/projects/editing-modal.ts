@@ -21,6 +21,7 @@ import '../../../form-fields/cluster-dropdown-content';
 import RoutingMixin from '../../../../mixins/routing-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../styles/modal-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
 import Endpoints from '../../../../endpoints';
@@ -38,7 +39,7 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
 class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      ${buttonsStyles}
+      ${buttonsStyles} ${modalStyles}
       <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
