@@ -35,6 +35,10 @@ export const modalStyles = html`
       margin-bottom: 20px !important;
     }
 
+    datepicker-lite {
+      position: relative;
+    }
+
 
     // .full-width {
     //   @apply --app-grid-expandible-item;

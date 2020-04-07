@@ -32,6 +32,7 @@ import RoutingMixin from '../../../../mixins/routing-mixin';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../mixins/localize-mixin';
 import {buttonsStyles} from '../../../../styles/buttons-styles';
+import {modalStyles} from '../../../../styles/modal-styles';
 import '../../../labelled-item';
 import '../../../error-box';
 import {property} from '@polymer/decorators/lib/decorators';
@@ -58,7 +59,7 @@ import '../../paper-radio-group-custom';
 class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
-      ${buttonsStyles}
+      ${buttonsStyles} ${modalStyles}
       <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
@@ -201,9 +202,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           min-width: 100%;
         }
 
-        .datepicker {
-          position: relative;
-        }
       </style>
 
       <etools-prp-permissions
@@ -396,7 +394,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
                     <div class="item">
                       <datepicker-lite
-                        class="start-date datepicker"
+                        class="start-date"
                         label="[[localize('start_date')]] *"
                         value="{{data.start_date}}"
                         error-message=""
@@ -406,7 +404,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
                     <div class="item">
                       <datepicker-lite
-                        class="end-date datepicker"
+                        class="end-date"
                         label="[[localize('end_date')]] *"
                         value="{{data.end_date}}"
                         error-message=""

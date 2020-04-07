@@ -89,9 +89,6 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
           margin: 2em 0;
         }
 
-        .datepicker {
-          position: relative;
-        }
       </style>
 
       <etools-prp-permissions
@@ -249,7 +246,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   </etools-prp-chips>
                 </template>
                 <datepicker-lite
-                  class="item validate datepicker"
+                  class="item validate"
                   label="[[localize('start_date_reporting')]]"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
