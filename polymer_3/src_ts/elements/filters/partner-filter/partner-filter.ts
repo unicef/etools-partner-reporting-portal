@@ -54,6 +54,10 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Array})
   data = [];
 
+  @property({type: Boolean})
+  required!: boolean;
+
+
   private _debouncer!: Debouncer;
 
   static get observers() {
@@ -92,7 +96,7 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     // this.$.partnerNames.abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-    (this.$.activities as EtoolsPrpAjaxEl).thunk()()
+    (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         const data = (self.required ? [] : [{
           id: '',

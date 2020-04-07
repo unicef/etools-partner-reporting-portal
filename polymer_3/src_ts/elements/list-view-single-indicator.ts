@@ -345,6 +345,9 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   }
 
   _computeCanEditLocations(isClusterApp: boolean, type: string, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
   }
 
