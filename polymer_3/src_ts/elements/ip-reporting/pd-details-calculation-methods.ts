@@ -329,8 +329,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   }
 
   _onValueChanged(e: CustomEvent) {
-    const newValue = e.target!.selected;
-    const data = e.target!.dataset;
+    const newValue = (e.target as any).selected;
+    const data = (e.target as any).dataset;
     const indices = onValueChanged(data, this.localData);
 
     this.set([
@@ -408,7 +408,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
           this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
             // @ts-ignore
-            .catch(function(err) {
+            .catch((_err: GenericObject) => {
               //   // TODO: error handling
             });
         });

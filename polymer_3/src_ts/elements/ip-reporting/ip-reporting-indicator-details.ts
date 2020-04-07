@@ -275,7 +275,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
     if (this.isOpen) {
       let thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
       this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        // @ts-ignore
+        // eslint-disable-next-line
         .catch(function (err) {
           //   // TODO: error handling.
         });
