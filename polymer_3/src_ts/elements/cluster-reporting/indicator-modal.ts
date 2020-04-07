@@ -124,6 +124,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         indicator-locations-widget {
           margin: 2em 0;
         }
+
+        .datepicker {
+          position: relative;
+        }
       </style>
 
       <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
@@ -399,7 +403,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             </etools-prp-chips>
                           </template>
                           <datepicker-lite
-                              class="item validate pair"
+                              class="item validate pair datepicker"
                               label="[[localize('start_date_reporting')]]"
                               value="{{data.start_date_of_reporting_period}}"
                               error-message=""
@@ -656,7 +660,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                       </etools-prp-chips>
                     </template>
                     <datepicker-lite
-                        class="item validate pair"
+                        class="item validate pair datepicker"
                         label="[[localize('start_date_reporting')]]"
                         value="{{data.start_date_of_reporting_period}}"
                         error-message=""

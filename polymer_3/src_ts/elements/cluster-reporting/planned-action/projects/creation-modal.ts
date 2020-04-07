@@ -200,6 +200,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         custom-fields-widget{
           min-width: 100%;
         }
+
+        .datepicker {
+          position: relative;
+        }
       </style>
 
       <etools-prp-permissions
@@ -392,7 +396,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
                     <div class="item">
                       <datepicker-lite
-                        class="start-date"
+                        class="start-date datepicker"
                         label="[[localize('start_date')]] *"
                         value="{{data.start_date}}"
                         error-message=""
@@ -402,7 +406,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
                     <div class="item">
                       <datepicker-lite
-                        class="end-date"
+                        class="end-date datepicker"
                         label="[[localize('end_date')]] *"
                         value="{{data.end_date}}"
                         error-message=""
