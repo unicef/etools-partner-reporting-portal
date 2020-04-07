@@ -1,5 +1,5 @@
-import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -251,14 +251,23 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
   openedDetails = [];
 
   _computeCurrentPartners(activityId: number, allPartners: GenericObject) {
-    return allPartners[activityId];
+    if (!allPartners) {
+      return;
+    }
+    return allPartners[activityId] || [];
   }
 
   _computeCurrentPartnersCount(activityId: number, allPartnersCount: GenericObject) {
-    return allPartnersCount[activityId];
+    if (!allPartnersCount) {
+      return;
+    }
+    return allPartnersCount[activityId] || 0;
   }
 
   _getActivityUrl(_baseUrlCluster: string, activityId: number, partner_activities: GenericObject) {
+    if (!partner_activities) {
+      return;
+    }
     const id = (partner_activities.filter(function(activity: GenericObject) {
       return Number(activity.cluster_activity) === Number(activityId);
     })[0] || {}).id;
@@ -302,4 +311,4 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
 
 window.customElements.define('contributing-partners-list', ContributingPartnersList);
 
-export {ContributingPartnersList as ContributinPartnersListEl};
+export {ContributingPartnersList as ContributingPartnersListEl};

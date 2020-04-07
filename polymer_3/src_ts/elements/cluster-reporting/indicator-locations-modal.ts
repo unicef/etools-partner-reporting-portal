@@ -298,6 +298,9 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _getLocationName(locationId: string, locations: GenericObject[]) {
+    if (!locations) {
+      return;
+    }
     let location = locations.results.find((loc: GenericObject) => {
       return String(loc.id) === String(locationId);
     });
