@@ -5,6 +5,8 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
+import '@polymer/paper-item/paper-item';
+import {PaperItemElement} from '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-if';
 
 import './ip-reporting/ip-reporting-indicator-details';
@@ -64,6 +66,12 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
         a {
           @apply --link;
+        }
+
+        .paper-link{
+          @apply --link;
+          font-size: 13px;
+          cursor: pointer;
         }
 
         .indicator-progress {
@@ -246,22 +254,20 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
           <template is="dom-if" if="[[canEdit]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
-              <a href="#" on-tap="_openModal" data-modal-type="edit">
-                [[localize('edit')]]
+              <paper-item class="paper-link" on-tap="_openModal" data-modal-type="edit">[[localize('edit')]]
                 <template
                     is="dom-if"
                     if="[[_showLocationsWarning(indicator, type)]]"
                     restamp="true">
                   <iron-icon class="locations-warning" icon="icons:error"></iron-icon>
                 </template>
-              </a>
+              </paper-item>
             </span>
           </template>
 
           <template is="dom-if" if="[[canEditLocations]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
-              <a href="#" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</a>
-              <paper-tooltip>[[localize('location_goals_for_partners')]]</paper-tooltip>
+              <paper-item class="paper-link" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</paper-item>
             </span>
           </template>
         </div>
@@ -315,7 +321,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.dataset.modalType)!.open();
+    this.shadowRoot!.querySelector('#modal-' + (e.target as PaperItemElement).dataset.modalType)!.open();
   }
 
   _computeIsClusterApp(appName: string) {

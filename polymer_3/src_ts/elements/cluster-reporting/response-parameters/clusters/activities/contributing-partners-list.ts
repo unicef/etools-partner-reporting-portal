@@ -254,14 +254,14 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
     if (!allPartners) {
       return;
     }
-    return allPartners[activityId];
+    return allPartners[activityId] || [];
   }
 
   _computeCurrentPartnersCount(activityId: number, allPartnersCount: GenericObject) {
     if (!allPartnersCount) {
       return;
     }
-    return allPartnersCount[activityId];
+    return allPartnersCount[activityId] || 0;
   }
 
   _getActivityUrl(_baseUrlCluster: string, activityId: number, partner_activities: GenericObject) {

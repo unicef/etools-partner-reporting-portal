@@ -86,8 +86,8 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
         var index = data.findIndex(function(item: GenericObject) {
           return value === String(item.id);
         });
-
-        self.set('computedValue', data[index === -1 ? 0 : index].id);
+        const item = data[index === -1 ? 0 : index];
+        self.set('computedValue', item ? item.id : '');
       });
   }
 
