@@ -12,7 +12,6 @@ import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
-import './paper-radio-group-custom';
 import './disaggregations-dropdown-widget';
 import './indicator-locations-widget';
 import './chip-date-of-report';
