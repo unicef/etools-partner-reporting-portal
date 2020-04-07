@@ -1,6 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-icons/iron-icons';
-import '@polymer/paper-button/paper-button.js';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/paper-button/paper-button';
 import {property} from '@polymer/decorators/lib/decorators';
 
 

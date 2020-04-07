@@ -1,10 +1,12 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/iron-location';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/iron-location/iron-location';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-query-params';
-// <link rel="import" href="../styles/buttons.html">
+import {buttonsStyles} from '../styles/buttons-styles';
+import {GenericObject} from '../typings/globals.types';
 
 
 /**
@@ -13,51 +15,48 @@ import '@polymer/iron-location/iron-query-params';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpToolbar extends (UtilsMixin(PolymerElement)){
-  public static get template(){
+class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
+
+  public static get template() {
     return html`
-    
-      <style include="iron-flex iron-flex-reverse button-styles">
+      ${buttonsStyles}
+      <style include="iron-flex iron-flex-reverse">
         :host {
           display: block;
           margin: 25px 0;
         }
       </style>
-      
+
       <iron-location
           query="{{query}}">
       </iron-location>
-  
+
       <iron-query-params
           params-string="{{query}}"
           params-object="{{params}}">
       </iron-query-params>
-  
+
       <div class="layout horizontal-reverse">
         <slot></slot>
       </div>
-    
+
     `;
   }
 
   @property({type: String, notify: true})
   properties!: string;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   _responsePlanId!: string;
-  // statePath: 'responsePlans.currentID'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   _locationId!: string;
-  // statePath: 'location.id'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   _pdId!: string;
-  // statePath: 'programmeDocuments.current'
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
   _reportId!: string;
-  // statePath: 'programmeDocumentReports.current.id'
 
   @property({type: String, computed: '_identity(_responsePlanId)', notify: true})
   responsePlanId!: string;
@@ -71,6 +70,11 @@ class EtoolsPrpToolbar extends (UtilsMixin(PolymerElement)){
   @property({type: String, computed: '_identity(_reportId)', notify: true})
   reportId!: string;
 
+  @property({type: String})
+  query!: string;
+
+  @property({type: Object})
+  params!: GenericObject;
 }
 
 window.customElements.define('etools-prp-toolbar', EtoolsPrpToolbar);

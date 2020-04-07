@@ -2,31 +2,21 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-radio-group/paper-radio-group.js';
-import '@polymer/paper-radio-button/paper-radio-button.js';
-import '@polymer/paper-input/paper-input.js';
+import '@polymer/paper-radio-group/paper-radio-group';
+import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-input/paper-input';
 import './labelled-item';
 import './report-status';
 import {RefreshReportModalEl} from './refresh-report-modal';
 import './refresh-report-modal';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import {GenericObject} from '../typings/globals.types';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
-
-// (dci)
-// <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../behaviors/progressReportUtils.html">
-// <link rel="import" href="../styles/buttons.html">
-
-// <!-- behaviors: [
-// App.Behaviors.UtilsBehavior,
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
-// ]
+import {buttonsStyles} from '../styles/buttons-styles';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -38,7 +28,8 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
-    <style include="button-styles">
+    ${buttonsStyles}
+    <style>
       :host {
         display: block;
 
@@ -209,9 +200,10 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     ]
   }
 
+
   _handleInput(event: CustomEvent) {
-    let field = event.composedPath()[0];
-    const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment');
+    let field = event.target as GenericObject;
+    const narrativeTextInput = this.shadowRoot!.querySelector('#narrative_assessment') as PaperInputElement;
 
     if (narrativeTextInput && this.toggle === 'Edit' && field.id === 'toggle-button') {
       narrativeTextInput.disabled = false;
@@ -303,10 +295,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (paperButton && paperButton.textContent.trim() === 'Save') {
         this.set(['localData', 'narrative_assessment'], labelledItem[1].querySelector('paper-input').value);
       }
-      // (dci) need to get the Debouncer here
-      // if (this.isDebouncerActive('local-data-changed')) {
-      //   this.cancelDebouncer('local-data-changed');
-      // }
+
       (this.$.refresh as RefreshReportModalEl).close();
     }
   }

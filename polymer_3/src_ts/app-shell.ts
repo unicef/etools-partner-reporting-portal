@@ -1,5 +1,5 @@
 import {ReduxConnectedElement} from './ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
@@ -12,21 +12,11 @@ import Endpoints from './endpoints';
 import './elements/app-redirect';
 import './elements/etools-prp-ajax';
 import './elements/etools-prp-auth';
-import './pages/login';
-import './pages/login-token';
-import './pages/not-found';
-import './pages/unauthorized';
 import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
 import {GenericObject} from './typings/globals.types';
-import {reset, userLogout, setL11NResources} from './redux/actions';
-import {getDomainByEnv} from './config';
-
-// behaviors: [
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ErrorHandlerBehavior,
-//   App.Behaviors.ReduxBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {reset, userLogout} from './redux/actions';
+import {getDomainByEnv, BASE_PATH} from './config';
+import {locales} from './locales';
 
 /**
  * @polymer
@@ -70,13 +60,14 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
 
+
     <iron-pages
         selected="[[page]]"
         attr-for-selected="name"
         role="main">
-      <template is="dom-if" if="[[_equals(page, 'app_poly3')]]" restamp="true">
+      <template is="dom-if" if="[[_equals(page, basePath)]]" restamp="true">
         <page-app
-            name="app_poly3"
+            name="[[basePath]]"
             route="{{subroute}}">
         </page-app>
       </template>
@@ -100,6 +91,8 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
     </iron-pages>
     `;
   }
+  @property({type: String})
+  basePath = BASE_PATH;
 
   @property({type: Object})
   routeData!: GenericObject;
@@ -122,7 +115,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   @property({type: Boolean})
   error: boolean = false;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.userProfile.profile)'})
+  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
   public static get observers() {
@@ -136,12 +129,11 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _routePageChanged(page: string) {
-    const validPages = ['app_poly3', 'landing', 'unauthorized', 'not-found', 'login-token'];  // Array of valid pages
+    const validPages = [BASE_PATH, 'landing', 'unauthorized', 'not-found', 'login-token'];  // TODO - add `app` when app_poly3 is no longer used
     const isPageValid = validPages.includes(page);  // Check if page is valid
 
     if (!page) {
-      //page = 'app_poly3'
-      location.pathname = '/app_poly3';
+      location.pathname = '/' + BASE_PATH;
     } else if (isPageValid === false) {
       this.page = 'not-found';  // If page is invalid, redirect to not-found page
     } else {
@@ -155,15 +147,14 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   async _pageChanged(page: string) {
-    // TODO : remove after migration is finished and we no longer use app_poly3
     let componentName = '';
-    if (page === 'app_poly3') {
+    if (page === BASE_PATH) {
       componentName = 'app';
     } else {
       componentName = page;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
-    //`./pages/${page}.js`;
+    console.log('app-shell loading' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
@@ -174,15 +165,15 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   _onSignOut() {
     const self = this;
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
-    this.reduxStore.dispatch(userLogout(thunk));
-    //(dci) it was a then before
-    setTimeout(() => {
-      self._goToLanding();
-      this.reduxStore.dispatch(reset());
-    });
-    //     .catch(function(err: any) { //jshint ignore:line
-    //   // TODO: error handling
-    // });
+    this.reduxStore.dispatch(userLogout(thunk))
+      // @ts-ignore
+      .then(function () {
+        self._goToLanding();
+        self.reduxStore.dispatch(reset())
+      })
+      .catch(function (err: any) {
+        // TODO: error handling
+      });
   }
 
   _notFound() {
@@ -190,7 +181,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
   }
 
   _computeRedirectPath(authenticated: boolean) {
-    return authenticated ? '/app_poly3' : '/landing';
+    return authenticated ? '/' + BASE_PATH : '/landing';
   }
 
   _addEventListeners() {
@@ -210,8 +201,7 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.loadResources(getDomainByEnv() + '/src/locales.json');
+    this.dispatchResources(locales);
     this._addEventListeners();
   }
 

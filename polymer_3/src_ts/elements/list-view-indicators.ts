@@ -1,11 +1,14 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 
 import DataTableMixin from '../mixins/data-table-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -17,8 +20,7 @@ import './list-placeholder';
 import './message-box';
 import './etools-prp-permissions';
 import {GenericObject} from '../typings/globals.types';
-
-// <link rel="import" href="../styles/table-styles.html">
+import {tableStyles} from '../styles/table-styles';
 
 
 /**
@@ -34,8 +36,8 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
 
   public static get template() {
     return html`
-
-      <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+        ${tableStyles}
+      <style include="iron-flex iron-flex-factors data-table-styles">
         :host {
           --ecp-content: {
             padding: 1px 0 0;
@@ -173,16 +175,20 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
         </etools-data-table-footer>
 
       </etools-content-panel>
-
-
     `;
   }
 
-  @property({type: Array, observer: '_tableContentChanged'})
+  @property({type: Array})
   data!: any[];
 
   @property({type: Boolean})
   loading!: boolean;
+
+  @property({type: Boolean})
+  isCustom!: boolean;
+
+  @property({type: Boolean})
+  canEdit!: boolean;
 
   @property({type: Number})
   totalResults!: number;
@@ -206,7 +212,7 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   type!: string;
 
   @property({type: Array})
-  openedDetails!: any[];
+  openedDetails = [];
 
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;
@@ -214,9 +220,8 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   @property({type: Boolean, computed: '_computeHaveReports(isClusterApp, type)'})
   haveReports!: boolean;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
-  // statePath: 'app.current',
 
   @property({type: Boolean, computed: '_computeCanEditLocations(isClusterApp, type, permissions)'})
   canEditLocations!: boolean;
@@ -234,12 +239,10 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   }
 
   _addEventListeners() {
-    this.addEventListener('page-number-changed', this._tableContentChanged);
     this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('page-number-changed', this._tableContentChanged);
     this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
@@ -252,6 +255,9 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   }
 
   _computeShowLocationsWarning(isClusterApp: boolean, type: string, canEdit: boolean, data: GenericObject) {
+    if (!data) {
+      return;
+    }
     let baseConditionsMet = isClusterApp && type !== 'ca' && canEdit;
 
     return baseConditionsMet && data.some((indicator: GenericObject) => {

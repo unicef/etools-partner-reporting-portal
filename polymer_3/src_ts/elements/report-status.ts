@@ -1,10 +1,9 @@
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import './status-badge';
 import LocalizeMixin from '../mixins/localize-mixin';
-import "@polymer/polymer/lib/elements/dom-if";
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
-// <link rel="import" href="status-badge.html">
+import '@polymer/polymer/lib/elements/dom-if';
 
 /**
  * @polymer
@@ -18,6 +17,7 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
       <style>
         :host {
           display: inline-block;
+          margin-right: .5em;
         }
 
         status-badge {
@@ -43,11 +43,8 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Boolean})
   noLabel = false;
 
-  @property({type: String})
-  type!: string;
-
   @property({type: String, computed: '_computeType(status)'})
-  range!: string;
+  type!: string;
 
   @property({type: String, computed: '_computeLabel(status, final, app, reportType, localize)'})
   label!: string;
@@ -60,6 +57,34 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
 
   @property({type: String})
   reportType = '';
+
+  _computeType(status: string) {
+    switch (status) {
+      case '1':
+      case 'Sub':
+      case 'Met':
+      case 'OnT':
+      case 'Com':
+      case 'Acc':
+        return 'success';
+      case '2':
+      case 'Ove':
+      case 'Sen':
+        return 'error';
+      case '3':
+      case 'Due':
+      case 'NoP':
+      case 'Ong':
+        return 'neutral';
+      case 'Rej':
+      case 'Con':
+      case 'Pla':
+        return 'warning';
+      case 'NoS':
+        return 'no-status';
+    }
+    return 'no-status';
+  }
 
   _computeLabel(status: string, final: Boolean, app: string, reportType: string, localize: any) {
     switch (status) {

@@ -1,15 +1,15 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/iron-media-query/iron-media-query.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/iron-form/iron-form.js';
+import '@polymer/paper-card/paper-card';
+import '@polymer/iron-media-query/iron-media-query';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior';
+import '@polymer/paper-button/paper-button';
+import '@polymer/paper-styles/typography';
+import '@polymer/paper-input/paper-input';
+import '@polymer/iron-form/iron-form';
 
 import Endpoints from '../endpoints';
 import ResponsiveMixin from '../mixins/responsive-mixin'
@@ -18,7 +18,9 @@ import '../elements/etools-logo';
 import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
 import '../elements/etools-prp-ajax';
 import '../elements/page-title';
-import '../styles/app-theme-ip-styles';
+import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
+import {BASE_PATH} from '../config';
+
 
 /**
  * @polymer
@@ -30,7 +32,8 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
   public static get template() {
     return html`
-    <style include="app-theme-ip-styles">
+    ${appThemeIpStyles}
+    <style>
       :host {
         display: block;
         height: 100%;
@@ -232,10 +235,7 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
   @property({type: Object})
   keyEventTarget = () => document.body;
 
-  // (dci)
-  // keyBindings: {
-  //   'enter': 'submit',
-  // },
+  keyBindings = {'enter': 'submit'}
 
   _computeLogoSize(isDesktop: boolean) {
     return isDesktop ? 180 : 120;
@@ -250,29 +250,29 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
     const thunk = (this.$.getProfile as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.status === 200) {
-          window.location.href = '/app_poly3/';
+          window.location.href = `/${BASE_PATH}/`;
         }
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function (err: any) {
         // TODO: error handling
       });
   }
 
   submit() {
     const self = this;
-    this.shadowRoot!.querySelector('#email').validate();
-    if (this.shadowRoot!.querySelector('#email').invalid) {
+    (this.shadowRoot!.querySelector('#email') as any).validate();
+    if ((this.shadowRoot!.querySelector('#email') as any).invalid) {
       return;
     }
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function() {
+      .then(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       })
-      .catch(function() {
+      .catch(function () {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       });

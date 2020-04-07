@@ -16,7 +16,7 @@ export const Localize = combineReducers({
 
 
 function languageReducer(state: string, action: any) {
-  var currentLanguage = navigator.language.split('-')[0];
+  const currentLanguage = navigator.language.split('-')[0];
   if (typeof state === 'undefined') {
     state = currentLanguage;
   }

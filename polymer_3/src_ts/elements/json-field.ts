@@ -1,8 +1,8 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/paper-input/paper-input';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import './labelled-item';
 import {GenericObject} from '../typings/globals.types';
 import UtilsMixin from '../mixins/utils-mixin';
@@ -163,6 +163,10 @@ class JsonField extends UtilsMixin(PolymerElement) {
   }
 
   _computeInvalid(required: boolean, isRatio: boolean, value: GenericObject) {
+    if (!value) {
+      return true;
+    }
+
     if (required) {
       if (isRatio) {
         return typeof value.v === 'undefined' || typeof value.d === 'undefined';

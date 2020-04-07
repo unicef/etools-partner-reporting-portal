@@ -1,70 +1,57 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
+import '@polymer/paper-dialog/paper-dialog';
+import '@polymer/paper-button/paper-button';
+import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/paper-styles/typography';
+import '@polymer/iron-location/iron-location';
+import '@polymer/paper-input/paper-input';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import {GenericObject} from '../typings/globals.types';
 import ModalMixin from '../mixins/modal-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import './etools-prp-permissions';
 import './confirm-box';
-import './project-status.js';
-import './page-body.js';
-import './list-placeholder.js';
-import './status-badge.js';
+import './project-status';
+import './page-body';
+import './list-placeholder';
+import './status-badge';
 import './etools-prp-ajax';
 import {fireEvent} from '../utils/fire-custom-event';
 import Endpoints from '../endpoints';
-// (dci)
-
-// <link rel="import" href="../behaviors/modal.html">
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
-// <link rel="import" href="../styles/table-styles.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../behaviors/notifications.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.ModalBehavior,
-//   App.Behaviors.NotificationsBehavior,
-// ],
+import {tableStyles} from '../styles/table-styles';
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
+ * @appliesMixin NotificationsMixin
+ * @appliesMixin ModalMixin
  */
 class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
-    <style
-      include="data-table-styles table-styles iron-flex button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+    ${tableStyles} ${buttonsStyles} ${modalStyles}
+    <style include="data-table-styles iron-flex iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
         --paper-dialog: {
-          width: 800px; & > *{
-        margin: 0;
-      }
-      };
+          width: 800px;
+        }
       }
 
       .qpr-header {
@@ -91,7 +78,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     </style>
 
     <etools-prp-permissions
-      permissions="{{ permissions }}">
+      permissions="{{permissions}}">
     </etools-prp-permissions>
 
     <etools-prp-ajax
@@ -110,7 +97,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     <paper-dialog
       id="dialog"
       with-backdrop
-      opened="{{ opened }}">
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Pull data</h2>
         <div class="layout horizontal">
@@ -232,7 +219,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
   _save() {
     const self = this;
-    this.$.pull.thunk()()
+    (this.$.pull as EtoolsPrpAjaxEl).thunk()()
       .then(function() {
         self.close();
         fireEvent(self, 'locations-updated');
@@ -249,9 +236,9 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
   open() {
     const self = this;
-    this.$.reports.abort();
+    (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    const thunk = this.$.reports.thunk();
+    const thunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then(function(res: GenericObject) {
         self.set('data', {'reports': res.data});

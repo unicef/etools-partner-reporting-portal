@@ -1,7 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element.js';
-import "@polymer/paper-styles/typography";
-// <link rel="import" href="../../bower_components/polymer/polymer.html">
-// <link rel="import" href="../../bower_components/paper-styles/typography.html">
+import {html} from '@polymer/polymer';
 
 export const modalStyles = html`
   <style>
@@ -26,6 +23,21 @@ export const modalStyles = html`
 
     .buttons {
       padding: 24px;
+      justify-content: flex-start;
     }
+
+     .item.full-width {
+       @apply --app-grid-expandible-item;
+     }
+
+     .item {
+      padding-right: 20px;
+      margin-bottom: 20px !important;
+    }
+
+
+    // .full-width {
+    //   @apply --app-grid-expandible-item;
+    // }
   </style>`
   ;

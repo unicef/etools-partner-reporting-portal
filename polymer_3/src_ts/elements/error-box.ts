@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/iron-icon/iron-icon';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
@@ -13,28 +13,25 @@ import './error-box-errors';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class ErrorBox extends UtilsMixin(PolymerElement){
+class ErrorBox extends UtilsMixin(PolymerElement) {
   public static get template() {
     return html`
       <style include="iron-flex iron-flex-alignment iron-flex-reverse">
-        :host {
-          color: var(--paper-input-container-invalid-color, --error-color);
-        }
-  
         #box {
           background: var(--paper-grey-300);
           padding: 10px;
+          color: var(--error-color);
         }
-  
+
         .header {
           margin-bottom: 1em;
         }
-  
+
         iron-icon {
           margin-right: 5px;
         }
       </style>
-      
+
       <div
           id="box"
           hidden$="[[_hidden]]">
@@ -42,12 +39,12 @@ class ErrorBox extends UtilsMixin(PolymerElement){
           <iron-icon icon="icons:error"></iron-icon>
           <span>Error(s) occurred. Please check the list to save the form.</span>
         </div>
-  
+
         <error-box-errors
             errors="[[mappedErrors]]">
         </error-box-errors>
       </div>
-      
+
     `;
   }
 
@@ -66,8 +63,8 @@ class ErrorBox extends UtilsMixin(PolymerElement){
   }
 
   _scrollToBox() {
-    setTimeout(function () {
-      this.shadowRoot!.querySelector('#box').scrollIntoView();
+    setTimeout(() => {
+      (this.shadowRoot!.querySelector('#box') as HTMLDivElement).scrollIntoView();
     });
   }
 
@@ -76,6 +73,7 @@ class ErrorBox extends UtilsMixin(PolymerElement){
   }
 
   errorMapper(error: any) {
+    const self = this;
     switch (typeof error) {
       case 'string':
         return [
@@ -84,25 +82,25 @@ class ErrorBox extends UtilsMixin(PolymerElement){
           },
         ];
 
+      case null:
       case 'undefined':
         return [];
 
       default:
         return Object.keys(error)
-          .filter(function (key) {
+          .filter(function(key) {
             return key !== 'error_codes';
           })
-          .map(function (key) {
+          .map(function(key) {
             return {
               field: key,
-              details: error[key].reduce(function (acc, err) {
-                return acc.concat(errorMapper(err));
+              details: error[key].reduce(function(acc, err) {
+                return acc.concat(self.errorMapper(err));
               }, []),
             };
           });
     }
   }
-
 
 
 }

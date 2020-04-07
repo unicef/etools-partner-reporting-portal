@@ -165,7 +165,7 @@
       _onInput: function (e) {
         var change = {};
 
-        change[e.target.dataset.field] = e.target.value;
+        change[Polymer.dom(e).localTarget.dataset.field] = Polymer.dom(e).localTarget.value;
 
         this.set('value', Object.assign({}, this.get('value'), change));
       },

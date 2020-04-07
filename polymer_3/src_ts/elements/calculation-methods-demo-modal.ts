@@ -1,9 +1,10 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/paper-dialog/paper-dialog';
+import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
+import '@polymer/paper-button/paper-button';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/paper-styles/typography';
 import {GenericObject} from '../typings/globals.types';
@@ -12,10 +13,9 @@ import UtilsMixin from '../mixins/utils-mixin';
 import './calculation-methods-demo-locations.js';
 import './calculation-methods-demo-periods.js';
 import './etools-prp-number';
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
 
-// (dci)
-// <link rel="import" href="../styles/buttons.html">
-// <link rel="import" href="../styles/modal.html">
 
 /**
  * @polymer
@@ -27,7 +27,8 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
 
   static get template() {
     return html`
-    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+    ${buttonsStyles} ${modalStyles}
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --paper-dialog: {
@@ -209,6 +210,10 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   description!: string;
 
   _computeFinalTotal(selectedType: string, totals: GenericObject[]) {
+    if (!totals) {
+      return;
+    }
+
     switch (selectedType) {
       case 'sum':
         return this._totalSum(totals);

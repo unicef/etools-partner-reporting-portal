@@ -1,28 +1,29 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/polymer/lib/elements/dom-if';
 
-// <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
+import './ip-reporting/ip-reporting-indicator-details';
 import './etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
 import './etools-prp-number';
 
-// <link rel="import" href="../styles/table-styles.html">
-// <link rel="import" href="../styles/shared-styles.html">
 import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
 import './etools-prp-permissions';
+import './status-badge';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
-
-// <link rel="import" href="status-badge.html">
-// <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
-// <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
+import {tableStyles} from '../styles/table-styles';
+import {sharedStyles} from '../styles/shared-styles';
+import './cluster-reporting/indicator-editing-modal';
+import './cluster-reporting/indicator-locations-modal';
 
 
 /**
@@ -33,10 +34,11 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin LocalizeMixin
  * @appliesMixin RoutingMixin
  */
-class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(ReduxConnectedElement)))) {
+class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">
+      ${tableStyles} ${sharedStyles}
+      <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles">
         :host {
           display: block;
 
@@ -122,7 +124,7 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
         </indicator-locations-modal>
       </template>
 
-      <etools-data-table-row on-opened-changed="_handleOpenedChanged">
+      <etools-data-table-row details-opened="{{detailsOpened}}" on-details-opened-changed="onDetailsOpenedChanged">
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
             <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
@@ -283,15 +285,17 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   @property({type: Boolean})
   detailsOpened: boolean = false;
 
+  @property({type: Boolean})
+  isCustom!: boolean;
+
   @property({type: String, computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)'})
   indicatorReportsUrl!: string;
 
   @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
   isClusterApp!: boolean;
 
-  @property({type: String})
+  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
-  // statePath: 'app.current',
 
   @property({type: String})
   type: string = '';
@@ -306,20 +310,24 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   progressBarType!: string;
 
 
-  _openModal(e) {
-    this.shadowRoot.querySelector('#modal-' + e.target.dataset.modalType).open();
+  _flagIndicator(target, baseline, isCustom: boolean) {
+    return !isCustom && (!target || !baseline);
+  }
+
+  _openModal(e: CustomEvent) {
+    this.shadowRoot!.querySelector('#modal-' + e.target.dataset.modalType)!.open();
   }
 
   _computeIsClusterApp(appName: string) {
     return appName === 'cluster-reporting';
   }
 
-  _handleOpenedChanged() {
-    this.detailsOpened = !this.detailsOpened;
-  }
-
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
-    var query_params = 'results/draft?page_size=10&page=1&indicator_type=';
+    if (!baseUrl || !indicator) {
+      return;
+    }
+
+    let query_params = 'results?page_size=10&page=1&indicator_type=';
 
     if (indicator.content_type_key === 'cluster.clusterobjective') {
       query_params += 'cluster_objective';
@@ -341,6 +349,10 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   }
 
   _computeProgressBarType(isClusterApp: boolean, indicator: GenericObject) {
+    if (!indicator) {
+      return;
+    }
+
     switch (true) {
       case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
         return 'cluster';
@@ -359,6 +371,16 @@ class ListViewSingleIndicator extends (UtilsMixin(LocalizeMixin(RoutingMixin(Red
   _showLocationsWarning(indicator: GenericObject, type: string) {
     return !indicator.locations.length && type !== 'ca';
   }
+
+  onDetailsOpenedChanged(event: CustomEvent) {
+    this.dispatchEvent(new CustomEvent('details-opened-changed', {
+      detail: {row: event.target, detailsOpened: event.detail.value},
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+
 }
 
 window.customElements.define('list-view-single-indicator', ListViewSingleIndicator);

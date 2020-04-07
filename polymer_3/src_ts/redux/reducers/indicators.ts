@@ -71,16 +71,16 @@ function loadingDetailsReducer(state = false, action: any) {
 function indicatorDetailsReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATOR_DETAILS:
-      var indicatorKey = Object.keys(action.details)[0];
+      const indicatorKey = Object.keys(action.details)[0];
 
       // // Make a copy of the existing details state.
-      var copy = Object.assign({}, (state as any).details);
+      const copy = Object.assign({}, (state as any).details);
 
       //Override any prior data at this key.
       copy[indicatorKey] = action.details[indicatorKey];
 
       // Add the updated disaggregations state to the full state.
-      var fullState = Object.assign({}, state, {
+      const fullState = Object.assign({}, state, {
         details: copy
       });
 

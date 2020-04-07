@@ -9,6 +9,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import '@polymer/paper-styles/typography';
 import RoutingMixin from '../mixins/routing-mixin';
+import '@polymer/polymer/lib/elements/dom-repeat';
 
 /**
  * @polymer

@@ -1,10 +1,10 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
-import '@polymer/paper-button/paper-button.js';
-import '@unicef-polymer/etools-loading/etools-loading.js'
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/iron-location/iron-location';
+import '@polymer/iron-location/iron-query-params';
+import '@polymer/paper-button/paper-button';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/polymer/lib/elements/dom-if';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {GenericObject} from '../typings/globals.types';
@@ -96,24 +96,28 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
      * here's the place to put the logic for it.
      */
 
-    setTimeout(() => {
-      const newParams = Object.assign({}, this.queryParams);
+    //setTimeout(() => {
+    const newParams = Object.assign({}, this.queryParams);
 
-      if (change.value && change.value.length) {
-        newParams[change.name] = change.value;
-      } else {
-        delete newParams[change.name];
-      }
+    if (change.value && change.value.length) {
+      newParams[change.name] = change.value;
+    } else {
+      delete newParams[change.name];
+    }
 
-      this.set('queryParams', newParams);
+    this.set('queryParams', newParams);
 
-      this._resetPageNumber();
-    });
+    this._resetPageNumber();
+    //});
   }
 
   _registerFilter(e: CustomEvent) {
     e.stopPropagation();
     const name = e.detail;
+    if (!name) {
+      return;
+    }
+
     if (this.ignoredFilters.indexOf(name) !== -1) {
       return;
     }
@@ -136,6 +140,10 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
   _filterReady(e: CustomEvent) {
     e.stopPropagation();
     const name = e.detail;
+    if (!name) {
+      return;
+    }
+
     if (this.ignoredFilters.indexOf(name) !== -1) {
       return;
     }
@@ -145,8 +153,7 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
 
   _clearFilters() {
     const self = this;
-
-    this.set('queryParams', Object.keys(this.queryParams)
+    const clearParams = Object.keys(this.queryParams)
       .reduce(function(prev: any, curr) {
         if (self.filters.indexOf(curr) === -1) {
           prev[curr] = self.queryParams[curr];
@@ -155,7 +162,8 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
         }
 
         return prev;
-      }, {}));
+      }, {})
+    this.set('queryParams', clearParams);
 
     this._resetPageNumber();
   }
@@ -175,7 +183,6 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
     setTimeout(() => {
       const filtersCount = this.filters.length - this.ignoredFilters.length;
       const readyCount = Object.keys(this.filtersReady).length;
-
       this.set('loading', readyCount < filtersCount);
     });
   }

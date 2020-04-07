@@ -28,6 +28,10 @@ function FilterDependenciesMixin<T extends Constructor<PolymerElement>>(baseClas
     }
 
     _computeParams(dependencies: string, queryParams: GenericObject) {
+      if (!queryParams) {
+        return;
+      }
+
       const newParams = dependencies
         .split(',')
         .filter(Boolean)

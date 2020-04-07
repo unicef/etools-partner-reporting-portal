@@ -1,8 +1,8 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/paper-styles/typography.js';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/paper-styles/typography';
 import Endpoints from '../endpoints';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '../elements/etools-prp-ajax';
@@ -11,6 +11,7 @@ import '../elements/message-box';
 import '../elements/page-body';
 import '../elements/user-profile/profile-dropdown';
 import {fireEvent} from '../utils/fire-custom-event';
+import {BASE_PATH} from '../config';
 
 /**
  * @polymer
@@ -103,12 +104,12 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    var self = this;
 
+    const self = this;
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then(function (res: any) {
         if (res.data.access.length) {
-          location.href = '/';
+          window.location.href = `/${BASE_PATH}/`;
         } else {
           self.set('loading', false);
         }

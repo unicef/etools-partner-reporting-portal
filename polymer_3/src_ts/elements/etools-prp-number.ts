@@ -2,6 +2,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/polymer/lib/elements/dom-if';
 import {property} from '@polymer/decorators';
 import Constants from '../constants';
+import '../elements/numeral-js';
 
 /**
  * @polymer

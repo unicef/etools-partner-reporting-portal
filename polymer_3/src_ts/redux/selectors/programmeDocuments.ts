@@ -10,7 +10,7 @@ function getCurrentPDId(state: RootState) {
 }
 
 function getCurrentPD(pds: [], currentPdId: number) {
-  return pds.filter(function (pd) {
+  return pds.filter(function(pd) {
     return pd.id === currentPdId;
   })[0] || {};
 }
@@ -31,10 +31,10 @@ export const currentProgrammeDocument = createSelector(
 export const programmeDocuments_CurrentAuthorizedPartners = createSelector(
   getAllPD,
   getCurrentPDId,
-  function (allPDs, pdId) {
-    return (getCurrentPD(allPDs, pdId).partner_focal_point || []).filter(function (officer: any) {
+  function(allPDs, pdId) {
+    return (getCurrentPD(allPDs, pdId).partner_focal_point || []).filter(function(officer: any) {
       return officer.is_authorized_officer;
-    }).map(function (focalPoint: any) {
+    }).map(function(focalPoint: any) {
       return {
         value: focalPoint.email, title: focalPoint.name + ' ' + focalPoint.title,
       };

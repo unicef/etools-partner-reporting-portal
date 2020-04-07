@@ -1,21 +1,23 @@
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route.js';
-import '@polymer/app-layout/app-drawer-layout/app-drawer-layout.js';
-import '@polymer/app-layout/app-drawer/app-drawer.js';
-import '@polymer/app-layout/app-header/app-header.js';
-import '@polymer/app-layout/app-toolbar/app-toolbar.js';
-import '@polymer/iron-pages/iron-pages.js';
+import '@polymer/app-route/app-route';
+import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
+import '@polymer/app-layout/app-drawer/app-drawer';
+import '@polymer/app-layout/app-header/app-header';
+import '@polymer/app-layout/app-toolbar/app-toolbar';
+import '@polymer/iron-pages/iron-pages';
 import '../../elements/ip-reporting/nav';
 import '../../elements/ip-reporting/app-header';
 import '../../elements/page-title';
 import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-
+import OverlayHelperMixin from '../../mixins/overlay-helper-mixin';
+import {getDomainByEnv} from '../../config';
 
 /**
  * @polymer
@@ -23,7 +25,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
 
   static get template() {
     return html`
@@ -52,6 +54,9 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         @apply --layout-horizontal;
         @apply --layout-center;
       }
+      #page-container {
+        margin-left: -30px;
+      }
     </style>
 
     <page-title title="[[localize('ip_reporting')]]"></page-title>
@@ -79,42 +84,46 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             selected="{{page}}"
             role="navigation">
         </ip-reporting-nav>
+
       </app-drawer>
 
-      <ip-reporting-app-header></ip-reporting-app-header>
-      <!--
-      <iron-pages
-          selected="[[page]]"
-          attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
-          <page-ip-reporting-overview
-              name="overview"
-              route="{{subroute}}">
-          </page-ip-reporting-overview>
-        </template>
+      <main role="main" id="page-container">
+          <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
 
-        <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
-          <page-ip-reporting-pd
-              name="pd"
-              route="{{subroute}}">
-          </page-ip-reporting-pd>
-        </template>
+          <ip-reporting-app-header></ip-reporting-app-header>
 
-        <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
-          <page-ip-reporting-indicators
-              name="indicators"
-              route="{{subroute}}">
-          </page-ip-reporting-indicators>
-        </template>
+          <iron-pages
+              selected="[[page]]"
+              attr-for-selected="name">
+            <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
+              <page-ip-reporting-overview
+                  name="overview"
+                  route="{{subroute}}">
+              </page-ip-reporting-overview>
+            </template>
 
-        <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
-            <page-ip-progress-reports
-                name="progress-reports"
-                route="{{subroute}}">
-            </page-ip-progress-reports>
-         </template>
-       </iron-pages>
-       -->
+            <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
+              <page-ip-reporting-pd
+                  name="pd"
+                  route="{{subroute}}">
+              </page-ip-reporting-pd>
+            </template>
+
+            <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
+              <page-ip-reporting-indicators
+                  name="indicators"
+                  route="{{subroute}}">
+              </page-ip-reporting-indicators>
+            </template>
+
+            <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
+                <page-ip-progress-reports
+                    name="progress-reports"
+                    route="{{subroute}}">
+                </page-ip-progress-reports>
+            </template>
+          </iron-pages>
+       </main>
     </app-drawer-layout>
   `;
   }
@@ -137,8 +146,9 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   async _pageChanged(page: string) {
-    var resolvedPageUrl = `./ip-reporting/${page}.js`; //getDomainByEnv() + `/src/pages
-
+    //const resolvedPageUrl = `./ip-reporting/${page}.js`;
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
+    console.log('ipReporting loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
@@ -148,6 +158,11 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _notFound() {
     window.location.href = '/not-found';
   }
+
+  connectedCallback() {
+    super.connectedCallback();
+  }
+
 
 }
 window.customElements.define('page-ip-reporting', PageIpReporting);

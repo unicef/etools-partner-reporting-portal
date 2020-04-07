@@ -4,11 +4,11 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-repeat';
-import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {localizeSet} from '../redux/actions/localize';
+import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
 /**
  * @polymer
@@ -70,6 +70,8 @@ class LanguageDropdown extends ReduxConnectedElement {
           font-size: 15px;
           white-space: nowrap;
           cursor: pointer;
+          min-height: 48px;
+          padding: 0px 16px;
         }
       </style>
 

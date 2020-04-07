@@ -5,11 +5,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../styles/buttons.html">
-
+import {buttonsStyles} from '../styles/buttons-styles';
 
 /**
  * @polymer
@@ -21,15 +17,13 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
 class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+        ${buttonsStyles}
+      <style include="iron-flex iron-flex-reverse iron-flex-alignment">
         :host {
           --paper-dialog: {
             width: 500px;
             padding: 24px;
-
-            & > * {
-              margin: 0;
-            }
+            margin: 0;
           }
         }
       </style>
@@ -77,7 +71,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.set('errors', errors);
     this.set('opened', true);
 
-    this.set('_result', new Promise(function (resolve) {
+    this.set('_result', new Promise(function(resolve) {
       self.addEventListener('opened-changed', function onOpenedChanged() {
         self.removeEventListener('opened-changed', onOpenedChanged);
 
@@ -89,11 +83,11 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _localizeErrors(errors: string[], localize: any) {
-    if (errors.length === 0) {
+    if (!errors || errors.length === 0) {
       return;
     }
 
-    let localizedErrors = errors.map(function (error) {
+    let localizedErrors = errors.map(function(error) {
       switch (error) {
         case 'You have not selected overall status for one of Outputs':
           return localize('not_selected_overall_status');
@@ -122,3 +116,5 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 }
 
 window.customElements.define('error-modal', ErrorModal);
+
+export {ErrorModal as ErrorModalEl};

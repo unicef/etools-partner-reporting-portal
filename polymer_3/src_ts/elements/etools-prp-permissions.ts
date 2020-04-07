@@ -1,4 +1,4 @@
-import {PolymerElement} from '@polymer/polymer';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import UtilsMixin from '../mixins/utils-mixin';
 import Constants from '../constants';
 import {property} from '@polymer/decorators';
@@ -9,7 +9,7 @@ import {GenericObject} from '../typings/globals.types';
   const checkInResponsePlan = (roles: any[]) => {
     return function(params: GenericObject) {
       return params.prpRoles.filter(function(role: any) {
-        return params.responsePlan && params.responsePlan.clusters.some(function(cluster: any) {
+        return params.responsePlan && params.responsePlan.clusters && params.responsePlan.clusters.some(function(cluster: any) {
           return role.cluster && cluster.id === role.cluster.id;
         });
       }).some(function(item: any) {
@@ -215,23 +215,14 @@ import {GenericObject} from '../typings/globals.types';
     ]
   };
 
-
-  //(dci)
-  //<link rel="import" href="../redux/store.html">
-  // behaviors: [
-  //   App.Behaviors.ReduxBehavior,
-  //   App.Behaviors.UtilsBehavior,
-  // ],
-
   /**
    * @polymer
    * @customElement
    * @appliesMixin UtilsMixin
    */
-  class EtoolsPrpPermissions extends UtilsMixin(PolymerElement) {
+  class EtoolsPrpPermissions extends UtilsMixin(ReduxConnectedElement) {
 
-    // statePath: 'userProfile.profile',
-    @property({type: Object})
+    @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
     profile!: GenericObject;
 
     @property({type: Array, computed: '_computePrpRoles(profile)'})
@@ -240,16 +231,13 @@ import {GenericObject} from '../typings/globals.types';
     @property({type: Array, computed: '_computeImoClusters(profile)'})
     imoClusters!: any[];
 
-    // statePath: 'partner.current',
-    @property({type: Object})
+    @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
     partner!: GenericObject;
 
-    // statePath: 'workspaces.current'
-    @property({type: String})
+    @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
     workspace!: string;
 
-    // statePath: 'responsePlans.current'
-    @property({type: Object})
+    @property({type: Object, computed: 'getReduxStateObject(rootState.responsePlans.current)'})
     responsePlan!: GenericObject;
 
     @property({type: Object, computed: '_computeParams(prpRoles, imoClusters, partner, workspace, responsePlan)'})

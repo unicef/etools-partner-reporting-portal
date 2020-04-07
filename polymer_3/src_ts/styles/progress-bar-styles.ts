@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element';
+import {html} from '@polymer/polymer';
 
 
 export const progressBarStyles = html`

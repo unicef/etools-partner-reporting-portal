@@ -1,6 +1,6 @@
+export const BASE_PATH = document.getElementsByTagName('base')[0]
+  .href.replace(window.location.origin, '').slice(1,-1) || "app";
+
 export const getDomainByEnv = () => {
-  if (window.location.port === '8081') {
-    return 'http://127.0.0.1:8081/app_poly3';
-  }
-  return 'https://dev.partnerreportingportal.org';
+  return document.getElementsByTagName('base')[0].href.slice(0,-1)
 };

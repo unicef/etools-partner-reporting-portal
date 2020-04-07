@@ -2,7 +2,6 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-item/paper-item.js';
-// import '@polymer/paper-divider/paper-divider.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icons/social-icons.js';
@@ -13,16 +12,6 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import PageNavMixin from '../../mixins/page-nav-mixin';
 import '../etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
-
-// (dci)
-// behaviors: [
-// App.Behaviors.UtilsBehavior,
-// App.Behaviors.PageNavBehavior,
-// App.Behaviors.ReduxBehavior,
-// App.Behaviors.RoutingBehavior,
-// App.Behaviors.LocalizeBehavior,
-// Polymer.AppLocalizeBehavior,
-// ]
 
 /**
  * @polymer
@@ -43,11 +32,14 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
         min-height: 48px;
         padding: 0px 16px;
       }
-
+      hr {
+        color: #212121;
+        opacity: 0.2;
+      }
     </style>
 
     <etools-prp-permissions
-      permissions="{{ permissions }}">
+      permissions="{{permissions}}">
     </etools-prp-permissions>
 
     <paper-listbox
@@ -85,7 +77,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
           </paper-item>
 
           <template is="dom-if" if="[[permissions.accessIpIdManagement]]" restamp="true">
-          <!-- <paper-divider></paper-divider> -->
+            <hr>
 
             <paper-item name="id-management" on-tap="goToIdManagement">
               <a href="/id-management/ip-reporting/">
@@ -98,7 +90,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
         </div>
 
         <div>
-          <!-- <paper-divider></paper-divider> -->
+          <hr>
           <paper-item name="indicators">
             <a href="https://prphelp.zendesk.com/" target="_blank">
               <span><iron-icon icon="communication:import-contacts" role="presentation"></iron-icon>[[localize('knowledge_base')]]</span>

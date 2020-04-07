@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-repeat';
 
@@ -60,7 +60,7 @@ class DropdownFormInput extends PolymerElement {
   }
 
   _getValue(e: CustomEvent) {
-    var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+    const newValue = this.$.repeat.itemForElement(e.detail.item).id;
     this.value = newValue;
   }
 

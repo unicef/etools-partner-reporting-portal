@@ -1,62 +1,56 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/paper-tabs/paper-tab.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-icons/maps-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/paper-item/paper-item.js';
+import '@unicef-polymer/etools-loading/etools-loading';
+import '@polymer/paper-tabs/paper-tab';
+import '@polymer/paper-tabs/paper-tabs';
+import '@polymer/iron-pages/iron-pages';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons/maps-icons';
+import '@polymer/paper-button/paper-button';
+import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/paper-listbox/paper-listbox';
+import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 
 import '../utils/fire-custom-event';
-import './etools-prp-ajax.js';
-import './etools-prp-number.js';
-import './status-badge.js';
-import './etools-prp-printer.js';
-import '../disaggregations/disaggregation-table.js';
-import '../disaggregations/disaggregation-modal.js';
-import './report-status.js';
-import './pull-modal.js';
+import './etools-prp-ajax';
+import './etools-prp-number';
+import './status-badge';
+import './etools-prp-printer';
+import '../elements/disaggregations/disaggregation-table';
+import '../elements/disaggregations/disaggregation-modal';
+import {DisaggregationModalEl} from '../elements/disaggregations/disaggregation-modal';
+import './report-status';
+import './pull-modal';
+import {PullModalEl} from './pull-modal';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {fireEvent} from '../utils/fire-custom-event.js';
-import {GenericObject} from '../typings/globals.types.js';
+import {fireEvent} from '../utils/fire-custom-event';
+import {GenericObject} from '../typings/globals.types';
 import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-// @ts-ignore
-import {currentProgrammeDocuments} from '../redux/selectors/programmeDocuments';
+import {buttonsStyles} from '../styles/buttons-styles';
 import {disaggregationsFetch} from '../redux/actions/disaggregations';
+// (dci) make sure Pd is correct without these...
+// import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
+// import {RootState} from '../typings/redux.types';
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
-// (dci)
-// <link rel="import" href="../redux/store.html">
-// <link rel="import" href="../redux/actions.html">
-// <link rel="import" href="../redux/actions/localize.html">
-// <link rel="import" href="../redux/selectors/programmeDocuments.html">
-// <link rel="import" href="../styles/buttons.html">
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.UtilsBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
 /**
  * @polymer
  * @customElement
- * @appliesMixin EndpointsMixin
  * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
  */
 class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
-    <style include="button-styles iron-flex iron-flex-alignment app-grid-style">
+    ${buttonsStyles}
+    <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
         width: 100%;
@@ -66,15 +60,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         --app-grid-columns: 2;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-
-        --paper-item-min-height: 56px;
-        --paper-item: {
-          cursor: pointer;
-        };
-
-        --paper-item-selected: {
-          background-color: var(--theme-secondary-color-d);
-        };
 
         --paper-tabs: {
           padding-left: 12px;
@@ -112,7 +97,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       .table-container {
         max-height: 500px;
         padding-bottom: 25px;
-        overflow: auto;
+        overflow: inherit;
       }
 
       .table-container dl {
@@ -133,7 +118,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       }
 
       .table-container dd::after {
-        content: '\A';
+        content: '\\A';
 	      white-space: pre;
       }
 
@@ -156,9 +141,14 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         height: 300px; /* 360px - 60px */
         overflow: auto;
       }
-
-      #tab-item {
+      #tabs-list #tab-item {
         padding-left: 10%;
+        min-height: 56px;
+        padding: 0px 16px;
+      }
+
+      #tabs-list #tab-item.iron-selected {
+        background-color: var(--theme-secondary-color-d);
       }
 
       #pages-container {
@@ -224,7 +214,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
         params="[[params]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
+    <template is="dom-if" if="[[dataLoaded]]">
       <div>
         <template
             is="dom-if"
@@ -260,10 +250,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
               <div hidden aria-hidden="true">
                 <template
                     is="dom-if"
-                    if="[[currentPD.title]]">
+                    if="[[currentPd.title]]">
                   <dl class="printme" style="margin: 0;">
                     <dt style="display: inline;">[[_singularLocalized('programme_documents', localize)]]:</dt>
-                    <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+                    <dd style="display: inline; margin: 0;">[[currentPd.title]]</dd>
                   </dl>
                 </template>
 
@@ -297,7 +287,8 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
               <template
                   is="dom-repeat"
                   items="[[locationData]]"
-                  as="topLevelLocation">
+                  as="topLevelLocation"
+                  on-rendered-item-count-changed="onLocationRendered">
                 <paper-item id="tab-item">
                   <status-badge type="[[_computeLocationStatus(topLevelLocation)]]"></status-badge>
                   [[topLevelLocation.title]]
@@ -405,7 +396,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                       id="modal-[[topLevelLocationIndex]]"
                       reporting-period="[[reportingPeriod]]"
                       on-opened-changed="_updateModals">
-                    <div class="meta layout horizontal justified">
+                    <div slot="meta" class="layout horizontal justified">
                       <div>
                         <h3>[[indicatorName]]</h3>
                         <p class="location">
@@ -417,7 +408,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                             if="[[hasPD]]"
                             restamp="true">
                           <p class="current-pd">
-                            [[currentPD.agreement]] | [[currentPD.title]]
+                            [[currentPd.agreement]] | [[currentPd.title]]
                           </p>
                         </template>
                       </div>
@@ -447,6 +438,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                         if="[[_computeTableVisibility(opened, topLevelLocationIndex)]]"
                         restamp="true">
                       <disaggregation-table
+                          slot="disaggregation-table"
                           data="[[topLevelLocation.byEntity.0]]"
                           by-entity="[[topLevelLocation.byEntity]]"
                           mapping="[[disaggregations.disagg_lookup_map]]"
@@ -475,6 +467,12 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     <etools-loading active="[[loading]]"></etools-loading>
   `;
   }
+
+  @property({type: Boolean})
+  dataLoaded = false;
+
+  @property({type: Boolean})
+  loading = true;
 
   @property({type: Number})
   indicatorId!: number;
@@ -506,20 +504,18 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Boolean})
   initialized: boolean = false;
 
-  //DONE  statePath: App.Selectors.ProgrammeDocuments.current
-  @property({type: Object, computed: 'currentProgrammeDocuments(state)'})
-  currentPD!: GenericObject;
+  @property({type: Object})
+  currentPd!: GenericObject;
 
-  @property({type: Boolean, computed: '_computeHasPD(currentPD)'})
+  @property({type: Boolean, computed: '_computeHasPD(currentPd)'})
   hasPD!: boolean;
 
   @property({type: String, computed: '_computeDisaggregationsUrl(reportableId)'})
   disaggregationsUrl!: string;
 
-  @property({type: Object, computed: '_computeParams(indicatorId, currentPD)'})
+  @property({type: Object, computed: '_computeParams(indicatorId, currentPd)'})
   params!: GenericObject;
 
-  //DONE statePath: 'disaggregations.byIndicator'
   @property({type: Object, computed: 'getReduxStateObject(rootState.disaggregations.byIndicator)'})
   data!: GenericObject;
 
@@ -529,7 +525,6 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Array, computed: '_computeLocationData(disaggregations.indicator_location_data)'})
   locationData!: GenericObject[];
 
-  //DONE statePath: 'programmeDocumentReports.current.mode'
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode: string = '';
 
@@ -552,10 +547,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   isHfIndicator!: boolean;
 
   _fetchData() {
-    const disaggregationsThunk = this.$.disaggregations.thunk();
-
+    const disaggregationsThunk = (this.$.disaggregations as EtoolsPrpAjaxEl).thunk();
     // Cancel the pending request, if any
-    this.$.disaggregations.abort();
+    (this.$.disaggregations as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(
       disaggregationsFetch(disaggregationsThunk, String(this.indicatorId))
@@ -563,21 +557,29 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   init() {
-    const self = this;
+    if (this.indicatorId) {
 
-    if (this.initialized) {
-      return;
+      if (this.initialized) {
+        return;
+      }
+      const self = this;
+      this.set('initialized', true);
+      this._fetchData()
+        // @ts-ignore
+        .then(function() {
+          self.set('dataLoaded', true);
+        })
+        // @ts-ignore
+        .catch(function(err) {
+          // TODO: error handling
+        });
     }
+  }
 
-    this.set('initialized', true);
-
-    this._fetchData()
-      .then(function() {
-        self.set('loading', false);
-      })
-      .catch(function(err) { // jshint ignore:line
-        // TODO: error handling
-      });
+  onLocationRendered(e: CustomEvent) {
+    if (this.locationData.length === e.detail.value) {
+      this.set('loading', false);
+    }
   }
 
   _computeDisaggregationsUrl(reportableId: string) {
@@ -585,6 +587,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeParams(indicatorId: number, currentPD: GenericObject) {
+    if (!currentPD) {
+      return;
+    }
     const params: GenericObject = {
       pks: indicatorId,
       limit: 1,
@@ -598,7 +603,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeDisaggregations(data: GenericObject, key: string) {
-    return this._clone(data[key]);
+    if (data && key) {
+      return this._clone(data[key]);
+    }
   }
 
   _computeIsHfIndicator(disaggregations: GenericObject) {
@@ -612,15 +619,15 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).modalIndex) as DisaggregationModalEl).open();
   }
 
   _openPullModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#pull-modal-' + e.target.modalIndex).open();
+    (this.shadowRoot!.querySelector('#pull-modal-' + (e.target as any).modalIndex) as PullModalEl).open();
   }
 
   _updateModals(e: CustomEvent, data: GenericObject) {
-    const id = e.target!.id;
+    const id = (e.target as any).id;
 
     if (!id) {
       return;
@@ -649,7 +656,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
     this._fetchData();
 
-    fireEvent(this, 'refresh-report', this.indicatorId);
+    fireEvent(this, 'refresh-report', String(this.indicatorId));
 
     const allComplete = this.disaggregations.indicator_location_data
       .every(function(location: GenericObject) {

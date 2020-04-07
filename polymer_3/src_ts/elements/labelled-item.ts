@@ -1,7 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
-//@TODO @lajos to be refactored when styles will be migrated
-//<link rel="import" href="../styles/shared-styles.html">
+import {property} from '@polymer/decorators/lib/decorators';
+import {sharedStyles} from '../styles/shared-styles';
 
 /**
  * @polymer
@@ -10,7 +9,8 @@ import {property} from "@polymer/decorators/lib/decorators";
 class LabelledItem extends PolymerElement {
   public static get template() {
     return html`
-      <style include="shared-styles">
+        ${sharedStyles}
+      <style>
         :host {
             display: block;
             position: relative;
@@ -36,7 +36,7 @@ class LabelledItem extends PolymerElement {
             color: var(--paper-deep-orange-a700);
         }
 
-        :host ::content .field-value {
+        ::slotted(.field-value) {
             font-size: 16px;
         }
       </style>

@@ -1,21 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import './calculation-methods-demo-modal.js';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {html} from '@polymer/polymer';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/paper-button/paper-button';
+import './calculation-methods-demo-modal';
 import {CalculationMethodsDemoModalEl} from './calculation-methods-demo-modal';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../ReduxConnectedElement.js';
-
-//(dci)
-// < link rel = "import" href = "../styles/buttons.html" >
-// <link rel="import" href = "../redux/store.html" >
-// <link rel="import" href = "../redux/actions/localize.html" >
-// behaviors: [
-//   App.Behaviors.ReduxBehavior,
-//   App.Behaviors.LocalizeBehavior,
-//   Polymer.AppLocalizeBehavior,
-// ],
+import {buttonsStyles} from '../styles/buttons-styles';
+import {tableStyles} from '../styles/table-styles';
 
 /**
  * @polymer
@@ -26,7 +18,8 @@ class CalculationMethodsInfoBar extends LocalizeMixin(ReduxConnectedElement) {
 
   static get template() {
     return html`
-    <style include="button-styles data-table-styles table-styles iron-flex iron-flex-alignment iron-flex-reverse">
+    ${buttonsStyles} ${tableStyles}
+    <style include="data-table-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         background: #FCFCFC;

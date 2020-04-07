@@ -35,6 +35,42 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 
+def get_zero_dict(indicator_type):
+    v = 0
+    d = 1 if indicator_type is "SUM" else 0
+    c = v / d if indicator_type is "SUM" else 0
+    return {
+        "c": c,
+        "v": v,
+        "d": d
+    }
+
+
+def calculate_sum(v1, v2, indicator_type="SUM"):
+    vt = "v"
+    dt = "d"
+    ct = "c"
+
+    data = {
+        vt: v1[vt] + v2[vt],
+    }
+    if indicator_type == "SUM":
+        data[dt] = 1
+        data[ct] = data[vt]
+        return data
+
+    data[dt] = v1[dt] + v2[dt]
+    data[ct] = data[vt] / data[dt] if data[dt] else 0
+    return data
+
+
+def get_all_subkeys(key):
+    keys = []
+    for i in range(0, len(key)):
+        keys += combinations(key, i)
+    return keys
+
+
 def get_combination_pairs(array, r=3):
     """
     Returns an array of tuples where
@@ -49,6 +85,26 @@ def get_combination_pairs(array, r=3):
 def generate_data_combination_entries(
         array, entries_only=False, key_type=str,
         indicator_type="quantity", r=3):
+    """
+
+    :param array: examples [(23,), (43,)] or [(32,)] or [(32,), (42,), (54,)]
+    :param entries_only: bool, if entries only is True function returns an array, otherwise returns a dict
+    :param key_type: tuple or str
+    :param indicator_type: indicator type
+    :param r: reported level
+    :return:
+    array:
+
+
+
+    dict: if r=2 and array = [(23,), (43,)] then return will look like:
+    {
+      (23,43): {c: 0, d:0, v:0},
+      (23,): {c: 0, d:0, v:0}
+      (43,): {c: 0, d:0, v:0}
+    }
+    """
+
     if entries_only:
         output = []
 
@@ -59,18 +115,39 @@ def generate_data_combination_entries(
         id_pairs = []
 
         if idx == 0:
+            # TODO: id_pairs.extend(array) instead of next couple of lines
+            # actually the tod might break if the format is list of list not list of tuples
             for id_list in array:
                 id_pairs.extend(list(product(id_list)))
 
         elif idx == 1:
+            # TODO: if we can count on array being list of tuples we can simplify this:
+            #
+            # list(combinations([e[0] for e in array], 2))
             combination_id_list_pairs = get_combination_pairs(array, r=2)
 
             for id_list_pair in combination_id_list_pairs:
                 id_pairs.extend(list(product(*id_list_pair)))
 
         elif idx == 2:
+            # TODO: simplfify [tuple(i[0] for i in array)]
             id_pairs = list(product(*array))
 
+        # assuming the passed in array is one of [(32,)] or [(23,), (43,)]  or [(32,), (42,), (54,)]
+        # if idx = 0 the id_pairs will be:
+        # [(32,)] or [(23,), (43,)]  or [(32,), (42,), (54,)] (basically same as array if array was passed in w tuples
+        #
+        # if idx = 1 the id_pairs will be
+        # [(23,), (43,)] for [(23,), (43,)] or
+        # [(32,42), (32,54), (42,54)] for [(32,), (42,), (54,)]
+        #
+        # if idx = 2 the id_pairs will be:
+        # [(23, 43)] for [(23,), (43,)]  or
+        # [(32, 42, 54,)] for [(32,), (42,), (54,)] - because idx2 elif replaces id_pairs
+        # note that the following code executes for every idx
+
+        # on idx = 1 the following code replaces the already existing 0 or if the output is array it adds the
+        #  same keys twice
         for id_tuple in id_pairs:
             key = key_type(id_tuple)
 

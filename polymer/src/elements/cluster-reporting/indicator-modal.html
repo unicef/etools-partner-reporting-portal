@@ -1174,7 +1174,7 @@
       },
 
       _validate: function (e) {
-        e.target.validate();
+        this._getValidateTarget(e).validate();
       },
 
       _showCSD: function (frequency) {
@@ -1686,9 +1686,10 @@
       },
 
       _close: function (e) {
-        if (e.target.nodeName === 'PAPER-DIALOG' ||
-            e.target.nodeName === 'PAPER-BUTTON' ||
-            e.target.nodeName === 'PAPER-ICON-BUTTON') {
+        const nodeName = Polymer.dom(e).localTarget.nodeName;
+        if (nodeName === 'PAPER-DIALOG' ||
+            nodeName === 'PAPER-BUTTON' ||
+            nodeName === 'PAPER-ICON-BUTTON') {
 
           if (this.modalTitle === 'Add Project Indicator' || this.modalTitle === 'Add Activity Indicator') {
             this.set('mode', '');

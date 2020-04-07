@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import UtilsMixin from '../mixins/utils-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
 /**
  * @polymer
@@ -11,13 +11,6 @@ import {ReduxConnectedElement} from "../ReduxConnectedElement";
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-//TODO: need to be checked the code made by @lajos
-// behaviors: [
-//     App.Behaviors.UtilsBehavior,
-//     App.Behaviors.ReduxBehavior,
-//     App.Behaviors.LocalizeBehavior,
-//     Polymer.AppLocalizeBehavior,
-//   ],
 class ReportingPeriod extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`

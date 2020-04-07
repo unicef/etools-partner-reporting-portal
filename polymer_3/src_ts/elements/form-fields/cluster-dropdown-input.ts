@@ -40,11 +40,11 @@ class ClusterDropdownInput extends ReduxConnectedElement {
   `;
   }
 
-  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanID)', observer: '_fetchClusterNames'})
+  @property({type: String, computed: '_computeClusterNamesUrl(responsePlanId)', observer: '_fetchClusterNames'})
   clusterNamesUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
-  responsePlanID!: string;
+  responsePlanId!: string;
 
   @property({type: Boolean, computed: '_computeLoading(data)'})
   loading = true;
@@ -62,8 +62,11 @@ class ClusterDropdownInput extends ReduxConnectedElement {
   value!: number;
 
 
-  _computeClusterNamesUrl(responsePlanID: string) {
-    return Endpoints.clusterNames(responsePlanID);
+  _computeClusterNamesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
+    return Endpoints.clusterNames(responsePlanId);
   }
 
   _computeLoading(data: any[]) {
@@ -71,15 +74,18 @@ class ClusterDropdownInput extends ReduxConnectedElement {
   }
 
   _fetchClusterNames() {
-    var self = this;
+    if (!this.clusterNamesUrl) {
+      return;
+    }
 
+    const self = this;
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('data', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

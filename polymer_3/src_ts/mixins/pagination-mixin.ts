@@ -47,24 +47,28 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _detailsChange(event: CustomEvent) {
-      const element = event.composedPath()[0];
-      const isOpen = element && element.detailsOpened;
-      if (isOpen) {
-        return this.push('openedDetails', element);
+      if (!this.openedDetails) {
+        return;
       }
-      const index = this.openedDetails.indexOf(element);
-      if (index !== -1) {
-        return this.splice('openedDetails', index, 1);
+      const element = event.detail.row;
+      if (event.detail.detailsOpened) {
+        this.push('openedDetails', element);
+      } else {
+        const index = this.openedDetails.indexOf(element);
+        if (index !== -1) {
+          this.splice('openedDetails', index, 1);
+        }
       }
     }
 
     _tableContentChanged() {
-      this._tableContentDebouncer = Debouncer.debounce(this._tableContentDebouncer,
-        timeOut.after(100),
-        () => {
-          const tempList = this.openedDetails.slice();
-          tempList.forEach((detail: any) => detail.detailsOpened = false);
-        });
+      //(dci) to be removed, this logic moved to _pageNumberChanged
+      // this._tableContentDebouncer = Debouncer.debounce(this._tableContentDebouncer,
+      //   timeOut.after(100),
+      //   () => {
+      //     const tempList = this.openedDetails.slice();
+      //     tempList.forEach((detail: any) => detail.detailsOpened = false);
+      //   });
     }
 
     disconnectedCallback() {

@@ -1,5 +1,5 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor} from '../typings/globals.types';
+import {Constructor, GenericObject} from '../typings/globals.types';
 import Settings from '../settings';
 
 
@@ -15,12 +15,12 @@ function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseCla
       return Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
     }
 
-    _getMode(report: any, permissions: any) {
+    _getMode(report: GenericObject, permissions: GenericObject) {
       switch (true) {
         case this._isReadOnlyReport(report):
         case report.programme_document.status === 'Signed':
         case report.programme_document.status === 'Closed':
-        case !permissions.editProgressReport:
+        case (!permissions || !permissions.editProgressReport):
           return 'view';
 
         default:

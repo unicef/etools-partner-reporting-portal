@@ -407,7 +407,7 @@
             return;
           }
 
-          event.path.forEach(function (node) {
+          Polymer.dom(event).path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
               index = node.dataset.index;  // Grab index of current location widget component
               return;
@@ -537,7 +537,7 @@
 
         _remove: function (e) {
           var value = this.get('value');
-          var toRemove = +e.target.dataset.index;
+          var toRemove = +Polymer.dom(e).localTarget.dataset.index;
           var pending = this.get('pending');
           var locations = this.get('locations');
 
@@ -551,13 +551,13 @@
         },
 
         _validate: function (e) {
-          e.target.validate();
+          this._getValidateTarget(e).validate();
         },
 
         _onLocTypeChanged: function (event, data) {
           var index = -1;
 
-          event.path.forEach(function (node) {
+          Polymer.dom(event).path.forEach(function (node) {
             if (node.nodeName === 'ETOOLS-SINGLE-SELECTION-MENU') {
               index = node.dataset.index;
               return;

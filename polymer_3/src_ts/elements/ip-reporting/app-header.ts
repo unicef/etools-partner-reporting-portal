@@ -1,9 +1,9 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/app-layout/app-header/app-header.js';
-import '@polymer/app-layout/app-header-layout/app-header-layout.js';
-import '@polymer/app-layout/app-toolbar/app-toolbar.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
+import '@polymer/app-layout/app-header/app-header';
+import '@polymer/app-layout/app-header-layout/app-header-layout';
+import '@polymer/app-layout/app-toolbar/app-toolbar';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-icons/iron-icons';
 import {etoolsLogo} from '../etools-logo';
 import '../app-switcher';
 import '../workspace-dropdown';
@@ -20,12 +20,12 @@ class IpReportingAppHeader extends PolymerElement {
 
   static get template() {
     return html`
-
     <style>
       :host {
         display: block;
         position: relative;
         z-index: 100;
+        height: 65px;
       }
 
       app-header {

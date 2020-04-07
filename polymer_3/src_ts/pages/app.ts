@@ -1,9 +1,9 @@
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/paper-toast/paper-toast.js';
+import '@polymer/app-route/app-route';
+import '@polymer/iron-pages/iron-pages';
+import '@polymer/paper-toast/paper-toast';
 
 import '../elements/etools-prp-workspaces';
 import '../elements/etools-prp-ajax';
@@ -14,7 +14,9 @@ import Endpoints from '../endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
-
+import {locationSet} from '../redux/actions/location';
+import {getDomainByEnv} from '../config';
+import {reset} from '../redux/actions';
 /**
  * @polymer
  * @customElement
@@ -172,6 +174,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
   userHasPrpRolesOrAccess!: boolean;
 
+  @property({type: String})
+  locationId!: string;
+
   public static get observers() {
     return [
       '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
@@ -197,7 +202,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (change.value.length) {
         this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync as any);
         let workspace = change.value[0];
-
         this._redirectToWorkspace(workspace);
       }
     } catch (err) {}
@@ -207,20 +211,19 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     let workspace;
 
     if (!workspaceCodeFromUrl) {
-      //this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
+      // this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
 
       if (this.workspaces && this.workspaces.length) {
-
         // Default to first
         workspace = this.workspaces[0];
 
         this._redirectToWorkspace(workspace);
       }
-      //  else { //Cant' find any component that fires an 'all-changed' event
-      //   // Wait until workspaces are available, then pick one & redirect
-      //   this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-      //   this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
-      // }
+      else {
+        // Wait until workspaces are available, then pick one & redirect
+        //this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
+        //this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
+      }
     } else if (!this._workspaceCode) {
       this.reduxStore.dispatch(setWorkspace(workspaceCodeFromUrl));
     }
@@ -230,8 +233,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const self = this;
     setTimeout(() => {
       let defaultApp = localStorage.getItem('defaultApp');
-      defaultApp = defaultApp ?
-       /** Remove quotes "" */ this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
+      defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
 
       if (!self.routeData.workspace_code) {
         return;
@@ -242,7 +244,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
-        console.log('localstorage', app);
+        console.log('localstorage defaultApp:', app);
         localStorage.setItem('defaultApp', app);
 
         // Render
@@ -265,7 +267,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _pageChanged(page: string) {
-    const resolvedPageUrl = `./app/${page}.js`;//getDomainByEnv() + `/src/pages
+    if (page === 'pages') {
+      return;
+    }
+    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
+    console.log('app.ts loading...' + resolvedPageUrl);
     import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
@@ -283,9 +289,17 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     let currentWorkspaceData = workspaces.filter(function(workspace) {
       return workspace.code === currentWorkspace;
-    })[0];
+    });
 
-    //this.reduxStore.dispatch(locationSet(currentWorkspaceData.id)); TODO
+    if (!currentWorkspaceData.length) {
+      return;
+    }
+    const workspaceId = currentWorkspaceData[0].id;
+
+    if (this.locationId !== workspaceId) {
+      this.locationId = workspaceId;
+      this.reduxStore.dispatch(locationSet(workspaceId));
+    }
   }
 
   _notify(e: CustomEvent) {

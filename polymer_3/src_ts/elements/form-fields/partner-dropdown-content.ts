@@ -25,8 +25,7 @@ class PartnerDropdownContent extends ReduxConnectedElement {
     <etools-prp-ajax
         id="partnerNames"
         url="[[partnerNamesUrl]]"
-        params="[[params]]"
-        >
+        params="[[params]]">
     </etools-prp-ajax>
 
     <etools-prp-permissions
@@ -55,6 +54,9 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   }
 
   _computePartnerNamesUrl(responsePlanID: string) {
+    if (!responsePlanID) {
+      return;
+    }
     return Endpoints.clusterPartnerNames(responsePlanID);
   }
 
@@ -66,15 +68,18 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   }
 
   _fetchPartnerNames() {
-    var self = this;
+    if (!this.partnerNamesUrl) {
+      return;
+    }
 
+    const self = this;
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-
     (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
       .then(function(res: any) {
         self.set('partners', res.data);
       })
-      .catch(function(err: any) { // jshint ignore:line
+      // @ts-ignore
+      .catch(function(err: any) {
         // TODO: error handling
       });
   }

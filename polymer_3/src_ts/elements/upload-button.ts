@@ -1,23 +1,27 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog/paper-dialog';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
-// <link rel="import" href="../../bower_components/etools-file/etools-file.html">
-
+import '@polymer/polymer/lib/elements/dom-if';
+import 'etools-file/etools-file.js';
 import UtilsMixin from '../mixins/utils-mixin';
 import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';
 import './etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 import './error-box';
-import '../styles/buttons-styles';
-import '../styles/modal-styles';
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
-
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
+import {fireEvent} from '../utils/fire-custom-event';
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 /**
  * @polymer
@@ -27,21 +31,18 @@ import {ReduxConnectedElement} from "../ReduxConnectedElement";
  * @appliesMixin UtilsMixin
  * @appliesMixin NotificationsMixin
  */
-class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement)))) {
+class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
-
-      <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      ${buttonsStyles} ${modalStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           --etools-file-main-btn-color: var(--theme-primary-color);
 
           --paper-dialog: {
             width: 400px;
-
-            & > * {
-              margin: 0;
+            margin: 0;
             }
-          };
         }
 
         .row {
@@ -137,8 +138,7 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
   }
 
   _openModal() {
-    const dialog = this.shadowRoot!.querySelector('dialog');
-    dialog.open();
+    (this.shadowRoot!.querySelector('#dialog') as PaperDialogElement).open();
   }
 
   _save() {
@@ -151,26 +151,23 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     }
 
     data = new FormData();
+    data.append('file', file.raw, file.file_name);
 
-    if (file) {
-      data.append('file', file.raw, file.file_name);
-    }
-
-    const upload = this.shadowRoot!.querySelector('upload');
-    upload.body = data;
+    const upload = this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl;
+    upload!.body = data;
 
     this.set('pending', true);
 
-    upload.thunk()
+    upload!.thunk()()
       .then(() => {
         self.set('pending', false);
         self.close();
         self._notifyFileUploaded();
-        self.fire('file-uploaded');
+        fireEvent(this, 'file-uploaded');
       })
-      .catch(function(res) {
-        self.set('errors', res.data);
+      .catch(function(res: any) {
         self.set('pending', false);
+        self.set('errors', res.data);
       });
   }
 
@@ -182,13 +179,6 @@ class UploadButton extends (ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnec
     this.set('files', []);
     this.set('errors', {});
     this.set('pending', false);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._cancelDebouncers([
-      'set-payload',
-    ]);
   }
 
 }

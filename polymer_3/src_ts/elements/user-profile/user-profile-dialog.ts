@@ -14,7 +14,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../labelled-item';
-import '../../styles/modal-styles';
+import {modalStyles} from '../../styles/modal-styles';
 
 /**
  * @polymer
@@ -26,7 +26,8 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
   static get template() {
     return html`
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse modal-styles">
+    ${modalStyles}
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
         --app-grid-columns: 3;
@@ -36,10 +37,8 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
 
         --paper-dialog: {
           width: 700px;
-          & > *{
-            margin: 0;
-          }
-        };
+        }
+
       }
 
       .full-width {
@@ -51,12 +50,11 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
         padding: 0 24px;
         margin: 0;
         color: white;
-        background: var(--theme-primary-color);
+        background: var(--theme-primary-color, #0099ff);
       }
 
       .header h2 {
         @apply --paper-font-title;
-
         margin: 0;
         line-height: 48px;
       }
@@ -86,14 +84,14 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
         color: var(--secondary-text-color);
       }
 
-      paper-divider.p-divider {
-        --paper-divider-color: #737373;
+      hr {
+        color: #737373;
         margin-top: 5px;
         opacity: 1;
       }
     </style>
 
-    <paper-dialog id="userProfileDialog" opened="{{ opened }}" with-backdrop>
+    <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
       <div class="header layout horizontal justified">
         <h2>My Profile</h2>
 
@@ -107,17 +105,17 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
       <paper-dialog-scrollable>
         <iron-form class="app-grid">
           <div class="full-width">
-            <paper-input label="First Name" value="{{ profile.first_name }}" placeholder="---" readonly
+            <paper-input label="First Name" value="{{profile.first_name}}" placeholder="---" readonly
                          always-float-label></paper-input>
           </div>
 
           <div class="full-width">
-            <paper-input label="Last Name" value="{{ profile.last_name }}" placeholder="---" readonly
+            <paper-input label="Last Name" value="{{profile.last_name}}" placeholder="---" readonly
                          always-float-label></paper-input>
           </div>
 
           <div class="full-width">
-            <paper-input label="Email" value="{{ profile.email }}" placeholder="---" always-float-label
+            <paper-input label="Email" value="{{profile.email}}" placeholder="---" always-float-label
                          readonly></paper-input>
           </div>
 
@@ -130,19 +128,19 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
                   [[ role ]]
                 </div>
               </template>
-            <paper-divider class="p-divider" colored="black"/>
+            <hr>
           </div>
 
-          <template is="dom-if" if="{{ profile.partner }}">
+          <template is="dom-if" if="{{profile.partner}}">
             <div class="full-width">
-              <paper-input label="Partner" value="{{ profile.partner.title }}" placeholder="---" readonly
+              <paper-input label="Partner" value="{{profile.partner.title}}" placeholder="---" readonly
                            always-float-label></paper-input>
             </div>
           </template>
 
-          <template is="dom-if" if="{{ profile.organization }}">
+          <template is="dom-if" if="{{profile.organization}}">
             <div class="full-width">
-              <paper-input label="My Organization" value="{{ profile.organization }}" placeholder="---" readonly
+              <paper-input label="My Organization" value="{{profile.organization}}" placeholder="---" readonly
                            always-float-label></paper-input>
             </div>
           </template>
@@ -177,8 +175,11 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computePrpRoles(profile: GenericObject, portal: string) {
+    if (!profile) {
+      return;
+    }
     return (profile.prp_roles || []).map(function(role: any) {
-      var result = '';
+      let result = '';
 
       if (role.cluster && portal === 'cluster-reporting') {
         result += role.cluster.full_title;

@@ -1,44 +1,48 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon/iron-icon';
+import {IronIconElement} from '@polymer/iron-icon/iron-icon';
+import './labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../utils/fire-custom-event';
-
-// <link rel="import" href="labelled-item.html">
-// <link rel="import" href="../styles/shared-styles.html">
+import {sharedStyles} from '../styles/shared-styles';
 
 
 /**
  * @polymer
  * @customElement
  */
-class EtoolsPrpChips extends PolymerElement{
-  public static get template(){
+class EtoolsPrpChips extends PolymerElement {
+  public static get template() {
     return html`
-      <style include="iron-flex shared-styles">
+        ${sharedStyles}
+      <style include="iron-flex">
         :host {
           display: block;
           padding: 8px 0;
         }
-  
+
         .chips {
           font-size: 16px;
           line-height: 24px;
         }
-  
+
         .chip {
           max-width: 100%;
           margin-right: .75em;
         }
-  
+
         .chip__content {
           @apply --truncate;
         }
-  
+
         .chip__content--disabled {
           color: var(--theme-primary-text-color-medium);
         }
-  
+
         .chip__actions iron-icon {
           width: 18px;
           height: 18px;
@@ -49,7 +53,7 @@ class EtoolsPrpChips extends PolymerElement{
           cursor: pointer;
         }
       </style>
-      
+
       <labelled-item label="[[label]]" invalid="[[_invalid]]">
         <div class="chips layout horizontal wrap">
           <template
@@ -58,7 +62,7 @@ class EtoolsPrpChips extends PolymerElement{
               as="chip">
             <div class="chip layout horizontal">
               <div class$="[[_chipContentClass]]">[[chip]]</div>
-  
+
               <template
                   is="dom-if"
                   if="[[!disabled]]"
@@ -73,11 +77,11 @@ class EtoolsPrpChips extends PolymerElement{
               </template>
             </div>
           </template>
-  
+
           <slot></slot>
         </div>
       </labelled-item>
-    
+
     `;
   }
 
@@ -116,18 +120,18 @@ class EtoolsPrpChips extends PolymerElement{
     return 'chip__content' + (disabled ? ' chip__content--disabled' : '');
   }
 
-  _onChipAdd(e) {
+  _onChipAdd(e: CustomEvent) {
     e.stopPropagation();
 
     if (this.value.indexOf(e.detail) === -1) {
       this.set('value', this.value.concat(e.detail));
-      fireEvent(this,'selected-chips-updated');
+      fireEvent(this, 'selected-chips-updated');
     }
   }
 
-  _onChipRemove(e) {
+  _onChipRemove(e: CustomEvent) {
     let value = this.value.slice();
-    let toRemove = +e.target.index;
+    let toRemove = +(e.target as IronIconElement).getAttribute('index')!;
 
     value.splice(toRemove, 1);
 
@@ -136,11 +140,11 @@ class EtoolsPrpChips extends PolymerElement{
   }
 
   _addEventListeners() {
-    this.addEventListener('chip-add', this._onChipAdd);
+    this.addEventListener('chip-add', this._onChipAdd as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('chip-add', this._onChipAdd);
+    this.removeEventListener('chip-add', this._onChipAdd as any);
   }
 
   disconnectedCallback() {
