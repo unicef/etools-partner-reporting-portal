@@ -140,6 +140,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         .app-grid > * {
           margin-bottom: 0px;
         }
+
+        .fields{
+          margin-bottom: 24px;
+        }
       </style>
 
       <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>

@@ -92,13 +92,14 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _fetchData(reset?: boolean) {
+    if (!this.reportsUrl) {
+      return;
+    }
+
     const reportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
+    (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    (this.$.reports as EtoolsPrpAjaxE).abort();
-
-    this.reduxStore.dispatch(
-      clusterIndicatorReportsFetch(reportsThunk, reset)
-    )
+    this.reduxStore.dispatch(clusterIndicatorReportsFetch(reportsThunk, reset))
       // @ts-ignore
       .catch(function(err) {
         // TODO: error handling
@@ -122,14 +123,13 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
 
   _onRefreshReport(e: CustomEvent) {
     e.stopPropagation();
+
     const reportId = e.detail;
     let ajax = document.createElement('etools-prp-ajax') as EtoolsPrpAjaxEl;
 
     ajax.url = Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
 
-    this.reduxStore.dispatch(
-      clusterIndicatorReportsFetchSingle(ajax.thunk(), reportId)
-    )
+    this.reduxStore.dispatch(clusterIndicatorReportsFetchSingle(ajax.thunk(), reportId))
       // @ts-ignore
       .catch(function(err) {
         // TODO: error handling
