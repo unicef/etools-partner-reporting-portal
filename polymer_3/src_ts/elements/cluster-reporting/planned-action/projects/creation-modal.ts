@@ -182,7 +182,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         }
 
         #mode paper-radio-button {
-          display: block
+          display: block;
         }
 
         etools-dropdown {
