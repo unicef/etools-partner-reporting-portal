@@ -357,6 +357,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                                 is="dom-if"
                                 if="[[_equals(location.display_type, 'number')]]"
                                 restamp="true">
+                              // eslint-disable-next-line max-len
                               <dt>[[localize('location_progress_against')]] [[_localizeLowerCased(location.reporting_entity.title, localize)]]:</dt>
                               <dd>
                                 <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
@@ -426,6 +427,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
                                 is="dom-if"
                                 if="[[!_equals(topLevelLocation.byEntity.0.display_type, 'number')]]"
                                 restamp="true">
+                              // eslint-disable-next-line max-len
                               <span>[[_formatIndicatorValue(topLevelLocation.byEntity.0.display_type, topLevelLocation.byEntity.0.location_progress.c, 1)]]</span>
                             </template>
                           </dd>
@@ -566,11 +568,11 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       this.set('initialized', true);
       this._fetchData()
         // @ts-ignore
-        .then(function() {
+        .then(() => {
           self.set('dataLoaded', true);
         })
         // @ts-ignore
-        .catch(function(err) {
+        .catch((_err) => {
           // TODO: error handling
         });
     }
@@ -592,7 +594,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     }
     const params: GenericObject = {
       pks: indicatorId,
-      limit: 1,
+      limit: 1
     };
 
     if (currentPD.id !== undefined) {
@@ -609,9 +611,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _computeIsHfIndicator(disaggregations: GenericObject) {
-    return disaggregations !== undefined
-      && this.reportIsQpr === true
-      && disaggregations.is_hf_indicator === true;
+    return disaggregations !== undefined &&
+      this.reportIsQpr === true &&
+      disaggregations.is_hf_indicator === true;
   }
 
   _computeMode(mode: string, overrideMode: string) {
@@ -669,7 +671,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
     fireEvent(this, 'report-complete', {
       indicatorId: this.indicatorId,
-      reportableId: this.reportableId,
+      reportableId: this.reportableId
     });
   }
 
@@ -682,7 +684,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
           acc[locationId] = {
             title: location.location.title,
             byEntity: [],
-            selected: 0,
+            selected: 0
           };
         }
 

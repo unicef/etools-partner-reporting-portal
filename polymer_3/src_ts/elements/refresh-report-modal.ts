@@ -19,8 +19,8 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import './error-modal';
 import './etools-prp-number';
 import './etools-prp-ajax';
-import {buttonsStyles} from "../styles/buttons-styles";
-import {modalStyles} from "../styles/modal-styles";
+import {buttonsStyles} from '../styles/buttons-styles';
+import {modalStyles} from '../styles/modal-styles';
 import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
@@ -79,6 +79,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
                 is="dom-if"
                 if="[[_equals(data.report_type, 'IR')]]"
                 restamp="true">
+                // eslint-disable-next-line max-len
                 You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. <!-- Localize this line! -->
                 This action is irreversible. Please click "Refresh" if you wish to proceed.  <!-- Localize this line! -->
             </template>
@@ -118,10 +119,10 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
 
     const refreshThunk = (this.$.refreshReport as EtoolsPrpAjaxEl).thunk();
     refreshThunk()
-      .then(function() {
+      .then(() => {
         window.location.reload();
       })
-      .catch(function(res) {
+      .catch((res: any) => {
         console.log(res);
         self.set('busy', false);
       });
@@ -135,4 +136,3 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
 window.customElements.define('refresh-report-modal', RefreshReportModal);
 
 export {RefreshReportModal as RefreshReportModalEl};
-

@@ -21,7 +21,7 @@ class PageBadge extends PolymerElement {
       </style>
 
       [[name]]`
-      ;
+    ;
   }
 
   @property({type: String})

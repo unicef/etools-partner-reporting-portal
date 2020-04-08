@@ -78,8 +78,8 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
       case 'string':
         return [
           {
-            value: error,
-          },
+            value: error
+          }
         ];
 
       case null:
@@ -88,15 +88,15 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
 
       default:
         return Object.keys(error)
-          .filter(function(key) {
+          .filter((key) => {
             return key !== 'error_codes';
           })
-          .map(function(key) {
+          .map((key) => {
             return {
               field: key,
-              details: error[key].reduce(function(acc, err) {
+              details: error[key].reduce((acc: any, err: GenericObject) => {
                 return acc.concat(self.errorMapper(err));
-              }, []),
+              }, [])
             };
           });
     }

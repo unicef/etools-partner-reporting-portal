@@ -116,13 +116,13 @@ class LanguageDropdown extends ReduxConnectedElement {
     this.reduxStore.dispatch(localizeSet(newLanguage));
   }
 
-  _computeLanguage(data: any[], current: String) {
+  _computeLanguage(data: any[], current: string) {
     return data.filter(function(language: string) {
       return language === current;
     })[0];
   }
 
-  _computeSelected(data: any[], language: String) {
+  _computeSelected(data: any[], language: string) {
     if (!data || !data.length || !language) {
       return;
     }
@@ -136,4 +136,3 @@ class LanguageDropdown extends ReduxConnectedElement {
 }
 
 window.customElements.define('language-dropdown', LanguageDropdown);
-

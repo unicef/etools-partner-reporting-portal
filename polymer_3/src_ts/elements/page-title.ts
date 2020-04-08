@@ -17,7 +17,7 @@ class PageTitle extends PolymerElement {
 
   static get observers() {
     return [
-      '_setDocumentTitle(title, divider, baseTitle)',
+      '_setDocumentTitle(title, divider, baseTitle)'
     ];
   }
 

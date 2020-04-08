@@ -17,11 +17,11 @@ class EtoolsPrpCurrency extends PolymerElement {
 
   private currencies: GenericObject = {
     USD: {
-      prefix: '$ ',
+      prefix: '$ '
     },
     EUR: {
-      prefix: '€ ',
-    },
+      prefix: '€ '
+    }
   };
 
   @property({type: Number})
@@ -36,7 +36,7 @@ class EtoolsPrpCurrency extends PolymerElement {
 
   _computeMeta(currency: string) {
     return this.currencies[currency] || {
-      suffix: ' ' + currency,
+      suffix: ' ' + currency
     };
   }
 

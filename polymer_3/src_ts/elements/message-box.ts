@@ -52,7 +52,7 @@ class MessageBox extends PolymerElement {
           <slot></slot>
         </div>
       </div>`
-      ;
+    ;
   }
 
   @property({type: String})

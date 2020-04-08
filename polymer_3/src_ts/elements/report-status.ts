@@ -34,7 +34,7 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
           if="[[!noLabel]]">
         [[label]]
       </template>`
-      ;
+    ;
   }
 
   @property({type: String})
@@ -86,7 +86,7 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
     return 'no-status';
   }
 
-  _computeLabel(status: string, final: Boolean, app: string, reportType: string, localize: any) {
+  _computeLabel(status: string, final: boolean, app: string, reportType: string, localize: any) {
     switch (status) {
       case '1':
         return localize('nothing_due');
