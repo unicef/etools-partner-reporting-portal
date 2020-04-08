@@ -14,7 +14,7 @@ export function calculationFormulaAcrossPeriods(indicator: GenericObject, locali
 // No unit test for this one because it involves DOM manipulation
 // and not currently sure how to implement that in Jasmine
 export function toggle(e: CustomEvent) {
-  let node = e.target;
+  let node = e.target as any;
 
   while (node && typeof node.toggles === 'undefined') {
     node = node.parentNode;

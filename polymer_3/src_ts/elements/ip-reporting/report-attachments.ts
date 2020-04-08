@@ -215,6 +215,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
 
+    // @ts-ignore
     return this.reduxStore.dispatch(
       pdReportsAttachmentsSync(deleteThunk, this.reportId)
     ).then(() => {
@@ -233,11 +234,11 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         (self.$.otherTwoAttachmentComponent as EtoolsFileEl).fileInput.value = null;
         (self.$.otherTwoAttachmentComponent as EtoolsFileEl).set('files', []);
       }
-    });
+    })
     // @ts-ignore
-    // .catch(function(err) {
-    //   // TODO: error handling
-    // });
+      .catch((_err) => {
+        // TODO: error handling
+      });
   }
 
   _filesChanged(change: GenericObject) {
@@ -303,6 +304,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         attachmentPropertyName = attachmentPropertyName.split('.')[0];
       }
 
+      // @ts-ignore
       this.reduxStore.dispatch(
         pdReportsAttachmentsSync(thunk, this.reportId)
       )

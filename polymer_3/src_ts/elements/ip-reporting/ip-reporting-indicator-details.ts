@@ -273,10 +273,10 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
   _openChanged() {
     if (this.isOpen) {
-      let thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
+      const thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
       this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        // eslint-disable-next-line
-        .catch(function (err) {
+        // @ts-ignore
+        .catch((_err) => {
           //   // TODO: error handling.
         });
     } else {

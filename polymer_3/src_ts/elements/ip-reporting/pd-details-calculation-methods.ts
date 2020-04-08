@@ -352,7 +352,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
         return self.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
       })
       .then(self._notifyChangesSaved.bind(self))
-      .catch((err: any) => {});
+      .catch((_err: any) => {});
   }
 
   _confirmIntent() {
