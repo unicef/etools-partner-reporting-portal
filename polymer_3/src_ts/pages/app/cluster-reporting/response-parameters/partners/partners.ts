@@ -11,6 +11,7 @@ import UtilsMixin from '../../../../../mixins/utils-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {sharedStyles} from '../../../../../styles/shared-styles';
+import '../../../../../elements/page-header';
 import '../../../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './router';
 import {GenericObject} from '../../../../../typings/globals.types';

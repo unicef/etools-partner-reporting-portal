@@ -13,42 +13,14 @@ function PageNavMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return ['_selectedChanged(selected)'];
     }
 
-    public _selectedChanged(selected: any) {
+    public _selectedChanged(selected: string) {
       const self = this;
       setTimeout(function() {
-        self.shadowRoot!.querySelectorAll('paper-submenu').forEach((submenu: any) => {
-          let isSelected = !!self.shadowRoot.querySelector('[name="' + selected + '"]');
-
-          switch (true) {
-            case !submenu.opened && isSelected:
-              submenu.open();
-              break;
-            case submenu.opened && !isSelected:
-              submenu.close();
-              break;
-            default:
-              // Do nothing
-              break;
-          }
-        });
+        const normalMenuItemOpened = self.shadowRoot!.querySelectorAll(".nav-menu-item.iron-selected").length > 0;
+        self.subMenuOpened = !normalMenuItemOpened;
       }, 200);
     }
 
-    connectedCallback() {
-      super.connectedCallback();
-
-      // Don't toggle submenus
-      const self = this;
-      this.shadowRoot!.querySelectorAll('.menu-trigger').forEach((trigger: any) => {
-        trigger.addEventListener('tap', function(e: CustomEvent) {
-          if (self.subMenuOpened) {
-            e.stopPropagation();
-          } else {
-            self.subMenuOpened = true;
-          }
-        });
-      });
-    }
 
   }
   return PageNavClass;
