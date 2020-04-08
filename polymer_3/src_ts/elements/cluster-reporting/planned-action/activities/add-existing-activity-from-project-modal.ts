@@ -9,7 +9,6 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
@@ -25,7 +24,6 @@ import '../../../etools-prp-permissions';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
 import '../../../error-box-errors';
-import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import Settings from '../../../../settings';
@@ -107,27 +105,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         width: 40px;
         margin-right: 24px;
         border-right: 1px solid var(--paper-grey-400);
-      }
-
-      paper-radio-group {
-        display: block;
-        padding-top: 16px;
-      }
-
-      paper-radio-group > .fields {
-        padding: calc(var(--app-grid-gutter) / 2) 0;
-      }
-
-      paper-radio-group > .fields[empty] {
-        padding: 0;
-      }
-
-      paper-radio-group .app-grid {
-        margin: -var(--app-grid-gutter);
-      }
-
-      paper-radio-button {
-        margin-left: -12px;
       }
 
       etools-dropdown {

@@ -8,6 +8,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-item/paper-item';
@@ -25,7 +26,6 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
 import '../../../error-box-errors';
-import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import Settings from '../../../../settings';
@@ -74,6 +74,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
 
       .fields {
         margin-left: 24px;
+        --app-grid-gutter: 0px;
       }
 
       .add-project-btn {
@@ -108,20 +109,20 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
         border-right: 1px solid var(--paper-grey-400);
       }
 
-      paper-radio-group-custom {
+      paper-radio-group {
         display: block;
         padding-top: 16px;
       }
 
-      paper-radio-group-custom > .fields {
+      paper-radio-group > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
       }
 
-      paper-radio-group-custom > .fields[empty] {
+      paper-radio-group > .fields[empty] {
         padding: 0;
       }
 
-      paper-radio-group-custom .app-grid {
+      paper-radio-group .app-grid {
         margin: -var(--app-grid-gutter);
       }
 
@@ -129,8 +130,19 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
         margin-left: -12px;
       }
 
+      #mode {
+        padding: 12px 0px 12px 0px;
+      }
+
+      #mode paper-radio-button {
+        display: block;
+      }
+
       etools-dropdown {
         width: 100%;
+      }
+      paper-dialog-scrollable {
+        padding-bottom: 12px;
       }
     </style>
 
@@ -193,15 +205,17 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
 
-        <paper-radio-group-custom
-            id="mode"
-            selected="{{mode}}">
-          <paper-radio-button name="cluster">
-            <strong>[[localize('add_from_cluster_activities')]]</strong>
-          </paper-radio-button>
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'cluster')]]">
+        <paper-radio-group id="mode" selected="{{mode}}">
+            <paper-radio-button name="cluster">
+              <strong>[[localize('add_from_cluster_activities')]]</strong>
+            </paper-radio-button>
+
+            <paper-radio-button name="custom">
+              <strong>[[localize('add_custom_activity')]]</strong>
+            </paper-radio-button>
+        </paper-radio-group>
+
+          <div class="fields" empty$="[[!_equals(mode, 'cluster')]]">
             <template
                 is="dom-if"
                 if="[[_equals(mode, 'cluster')]]"
@@ -231,7 +245,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                     required>
                   </etools-dropdown>
                 </div>
-
               </div>
 
               <header class="item-wide">
@@ -302,13 +315,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
             </template>
           </div>
 
-          <paper-radio-button name="custom">
-            <strong>[[localize('add_custom_activity')]]</strong>
-          </paper-radio-button>
-
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'custom')]]">
+          <div class="fields" empty$="[[!_equals(mode, 'custom')]]">
             <template
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
@@ -416,7 +423,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
               </div>
             </template>
           </div>
-        </paper-radio-group-custom>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
