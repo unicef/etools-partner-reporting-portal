@@ -45,7 +45,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           display: block;
 
           --app-grid-columns: 3;
-          --app-grid-gutter: 24px;
+          --app-grid-gutter: 16px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
           --esmm-list-wrapper: {
