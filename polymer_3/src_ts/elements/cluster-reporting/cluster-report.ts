@@ -18,7 +18,9 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import NotificationsMixin from '../../mixins/notifications-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import './send-back-modal';
+import {SendBackModalEl} from './send-back-modal';
 import './feedback-modal';
+import {FeedbackModalEl} from './feedback-modal';
 import '../error-modal';
 import {ErrorModalEl} from '../error-modal';
 import '../report-status';
@@ -34,6 +36,7 @@ import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, Clus
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
+import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
 
 
 
@@ -423,7 +426,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       </div>
 
       <div>
-        <iron-collapse id="collapse" opened="{{ opened }}" on-opened-changed="_handleOpenedChanged" no-animation>
+        <iron-collapse id="collapse" opened="{{opened}}" on-opened-changed="_handleOpenedChanged" no-animation>
           <reportable-meta data="[[data]]" mode="[[editMode]]" allow-no-status is-cluster>
           </reportable-meta>
 
@@ -514,29 +517,47 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _computeCanSubmit(data: any, busy: boolean) {
+    if (!data) {
+      return;
+    }
     return data.can_submit && !busy;
   }
 
   _computeClusterObjectiveDetailUrl(baseUrl: string, coId: any) {
-    return this.buildUrl(baseUrl, 'response-parameters/clusters/objective/' + coId.toString() + '/overview');
+    if (!coId) {
+      return;
+    }
+    return this.buildUrl(baseUrl, 'response-parameters/clusters/objective/' + String(coId) + '/overview');
   }
 
   _computeClusterActivityDetailUrl(baseUrl: string, caId: any) {
-    return this.buildUrl(baseUrl, 'response-parameters/clusters/activity/' + caId.toString() + '/overview');
+    if (!caId) {
+      return;
+    }
+    return this.buildUrl(baseUrl, 'response-parameters/clusters/activity/' + String(caId) + '/overview');
   }
 
   _computePartnerProjectDetailUrl(baseUrl: string, paId: any) {
+    if (!paId) {
+      return;
+    }
     return this.buildUrl(
       baseUrl,
-      'response-parameters/partners/project/' + paId.toString() + '/overview'
+      'response-parameters/partners/project/' + String(paId) + '/overview'
     );
   }
 
   _computePartnerActivityDetailUrl(baseUrl: string, paId: any) {
-    return this.buildUrl(baseUrl, 'response-parameters/partners/activity/' + paId.toString() + '/overview');
+    if (!paId) {
+      return;
+    }
+    return this.buildUrl(baseUrl, 'response-parameters/partners/activity/' + String(paId) + '/overview');
   }
 
   _computeReportUrl(data: GenericObject) {
+    if (!data) {
+      return;
+    }
     return Endpoints.indicatorData(data.id);
   }
 
@@ -567,7 +588,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   _handleOpenedChanged(e: CustomEvent, data: GenericObject) {
     e.stopPropagation();
 
-    if (data.value) {
+    if (data && data.value) {
       const indicatorDetails = (e.target as HTMLElement)!.querySelector('indicator-details') as IndicatorDetailsEl;
       try {
         if (indicatorDetails) {
@@ -597,9 +618,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     const submitThunk = (this.$.submit as EtoolsPrpAjaxEl).thunk();
     const self = this;
 
-    return this.reduxStore.dispatch(
-      clusterIndicatorReportsSubmit(submitThunk)
-    )
+    return this.reduxStore.dispatch(clusterIndicatorReportsSubmit(submitThunk))
       // @ts-ignore
       .then(function() {
         self.set('busy', false);
@@ -640,9 +659,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     this.set('reportMeta', data);
 
     (this.$.update as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(
-      ClusterIndicatorReportsUpdate(updateThunk, this.data.id)
-    )
+    this.reduxStore.dispatch(ClusterIndicatorReportsUpdate(updateThunk, this.data.id))
       // @ts-ignore
       .then(function() {
         self._notifyChangesSaved();
@@ -659,56 +676,66 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _computeEditMode(mode: string, data: GenericObject, permissions: any) {
-    var canEdit;
-
     if (mode === 'view') {
       return mode;
     }
+    if (!permissions || !data) {
+      return;
+    }
 
-    canEdit = permissions.editIndicatorReport(data);
+    const canEdit = permissions.editIndicatorReport(data);
 
     return canEdit ? mode : 'view';
   }
 
   _computeSubmitMode(mode: string, data: GenericObject, permissions: any) {
-    var canSubmit;
-
     if (mode === 'view') {
       return mode;
     }
+    if (!permissions || !data) {
+      return;
+    }
 
-    canSubmit = permissions.submitIndicatorReport(data);
-
+    const canSubmit = permissions.submitIndicatorReport(data);
     return canSubmit ? mode : 'view';
   }
 
   _computeCanSendBack(data: GenericObject, permissions: any) {
+    if (!data || !permissions) {
+      return;
+    }
     return (data.report_status === 'Sub' || data.report_status === 'Acc')
       && permissions.sendBackIndicatorReport;
   }
 
   _computeShowFeedback(data: GenericObject, permissions: any) {
+    if (!data || !permissions) {
+      return;
+    }
     return data.report_status === 'Sen' &&
       permissions.editIndicatorReport(data);
   }
 
   _sendBack() {
-    this.shadowRoot!.querySelector('#sendBackModal').open();
+    (this.shadowRoot!.querySelector('#sendBackModal') as SendBackModalEl).open();
 
     setTimeout(() => {
-      this.shadowRoot!.querySelector('#viewMenu').select(2);
+      (this.shadowRoot!.querySelector('#viewMenu') as PaperListboxElement).select(2);
     });
   }
 
   _viewFeedback() {
-    this.shadowRoot!.querySelector('#feedbackModal').open();
+    (this.shadowRoot!.querySelector('#feedbackModal') as FeedbackModalEl).open();
 
     setTimeout(() => {
-      this.shadowRoot!.querySelector('#nonViewMenu').select(1);
+      (this.shadowRoot!.querySelector('#nonViewMenu') as PaperListboxElement).select(1);
     });
   }
 
   _computeContainerClassName(data: GenericObject, app: string) {
+    if (!data) {
+      return;
+    }
     switch (true) {
       case !!data.child_ir_ids && app === 'cluster-reporting':
         return 'special-report-cluster';
