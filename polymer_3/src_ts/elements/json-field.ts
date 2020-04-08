@@ -21,7 +21,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
         display: block;
 
         --app-grid-columns: 2;
-        --app-grid-gutter: 25px;
+        --app-grid-gutter: 16px;
         --app-grid-item-height: auto;
 
         --labelled-item-label: {
@@ -198,7 +198,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
 
   _computeRequired(required: boolean, value: GenericObject, key: string) {
     // May not be required yet still we need a valid value.
-    return required || !!value[key];
+    return required || (value ? !!value[key] : false);
   }
 
   _onValueChanged(e: CustomEvent) {

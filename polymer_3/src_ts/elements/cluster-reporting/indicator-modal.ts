@@ -12,7 +12,6 @@ import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
-import './paper-radio-group-custom';
 import './disaggregations-dropdown-widget';
 import './indicator-locations-widget';
 import './chip-date-of-report';
@@ -37,6 +36,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
+import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 
 /**
@@ -58,6 +58,8 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           --app-grid-gutter: 24px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
+
+          --paper-radio-group-item-padding: 12px;
 
           --paper-dialog: {
             width: 800px;
@@ -102,11 +104,17 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         }
 
         .item {
-          margin-bottom: 0;
+          margin-bottom: 0 !important;
+          padding-right: 0;
         }
 
         #mode {
+          margin-bottom: 24px;
+        }
+
+        #mode paper-radio-button {
           padding-top: 24px;
+          display: block;
         }
 
         #custom-form-only {
@@ -124,9 +132,17 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         indicator-locations-widget {
           margin: 2em 0;
         }
+
+        datepicker-lite {
+          --paper-input-container_-_width: 100%;
+        }
+
+        .app-grid > * {
+          margin-bottom: 0px;
+        }
       </style>
 
-      <cluster-dropdown-content clusters="{{ clusters }}"></cluster-dropdown-content>
+      <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
 
       <etools-prp-ajax
         id="disaggregations"
@@ -195,18 +211,16 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
               if="[[!_isClusterImo(prpRoles)]]"
               restamp="true">
 
-              <paper-radio-group-custom
-                id="mode"
-                selected="{{ mode }}"
-                on-change="adjustPosition">
-
+              <paper-radio-group id="mode" selected="{{mode}}" on-change="adjustPosition">
                 <paper-radio-button name="objectives">
                   <strong>[[localize('adopt_from_cluster_objective')]]</strong>
                 </paper-radio-button>
+                <paper-radio-button name="custom">
+                  <strong>[[localize('custom')]]</strong>
+                </paper-radio-button>
+              </paper-radio-group>
 
-                <div
-                  class="fields"
-                  empty$="[[!_equals(mode, 'objectives')]]">
+               <div class="fields" empty$="[[!_equals(mode, 'objectives')]]">
                   <template
                     is="dom-if"
                     if="[[_equals(mode, 'objectives')]]"
@@ -295,10 +309,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                   </template>
                 </div>
 
-                <paper-radio-button name="custom">
-                  <strong>[[localize('custom')]]</strong>
-                </paper-radio-button>
-
                 <div
                   class="fields"
                   empty$="[[!_equals(mode, 'custom')]]">
@@ -321,8 +331,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                       <div class="item full-width">
                         <labelled-item label="[[localize('type')]]">
-                          <paper-radio-group-custom
-                              selected="{{data.blueprint.display_type}}">
+                          <paper-radio-group selected="{{data.blueprint.display_type}}">
                             <paper-radio-button name="number">[[localize('quantity')]]</paper-radio-button>
                             <paper-radio-button name="percentage">[[localize('percent')]]</paper-radio-button>
                             <paper-radio-button name="ratio">[[localize('ratio')]]</paper-radio-button>
@@ -537,7 +546,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                   </template>
                 </div>
-              </paper-radio-group-custom>
             </template>
 
             <template
@@ -559,12 +567,11 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
                 <div class="item full-width">
                   <labelled-item label="[[localize('type')]]">
-                    <paper-radio-group-custom
-                        selected="{{data.blueprint.display_type}}">
+                    <paper-radio-group selected="{{data.blueprint.display_type}}">
                       <paper-radio-button name="number">[[localize('quantity')]]</paper-radio-button>
                       <paper-radio-button name="percentage">[[localize('percent')]]</paper-radio-button>
                       <paper-radio-button name="ratio">[[localize('ratio')]]</paper-radio-button>
-                    </paper-radio-group-custom>
+                    </paper-radio-group>
                   </labelled-item>
                 </div>
 
@@ -961,13 +968,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   private _fetchSelectedIndDebouncer!: Debouncer;
 
   adjustPosition(e: CustomEvent) {
+    if (!e) {
+      return;
+    }
     e.stopPropagation();
-
     // _adjustPositionDebouncer is from ModalMixin
     this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
       timeOut.after(250),
       () => {
-        this.$.dialog.refit();
+        (this.$.dialog as PaperDialogElement).refit();
       });
   }
 
@@ -1040,21 +1049,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('data.disaggregations', selected);
   }
 
-  _disableOtherRadioButton() {
-    let self = this;
-    let radioGroup = this.shadowRoot!.querySelector('#mode');
-
-    if (radioGroup) {
-      let otherRadio = radioGroup!.children.find((element: GenericObject) => {
-        return element.nodeName === 'PAPER-RADIO-BUTTON' && element.name !== self.mode;
-      });
-
-      if (otherRadio !== undefined) {
-        otherRadio.disabled = true;
-      }
-    }
-  }
-
   _setDefaults(opened: boolean) {
     if (!opened) {
       return;
@@ -1075,8 +1069,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         target: {d: 1},
         baseline: {d: 1}
       });
-
-      this._disableOtherRadioButton();
 
       this.set('indicatorsUrl', Endpoints.adoptedClusterIndicators());
     } else {
@@ -1100,8 +1092,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       this.set('indicatorsUrl', Endpoints.clusterIndicators());
 
       this._fetchDisaggregations();
-      this._disableOtherRadioButton();
+
     }
+    this.adjustPosition();
   }
 
   _validate(e: CustomEvent) {
