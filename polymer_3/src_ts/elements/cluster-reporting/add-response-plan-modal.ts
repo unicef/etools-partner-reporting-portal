@@ -9,6 +9,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/paper-radio-button/paper-radio-button';
+import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
@@ -25,7 +26,6 @@ import {configClusterTypes} from '../../redux/selectors/config';
 import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
 import '../error-box';
-import './paper-radio-group-custom';
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {fetchConfig} from '../../redux/actions/config';
@@ -66,13 +66,18 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         padding: 0px;
       }
 
-      paper-radio-group-custom {
-        display: block;
-        padding-top: 16px;
+      #mode {
+        margin-bottom: 12px;
       }
 
-      paper-radio-button {
+      #mode paper-radio-button {
+        padding-top: 12px;
+        display: block;
         margin-left: -12px;
+      }
+
+      paper-dialog-scrollable {
+        padding-bottom: 20px;
       }
 
       etools-dropdown, etools-dropdown-multi, datepicker-lite {
@@ -124,129 +129,127 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
       <paper-dialog-scrollable>
         <error-box errors="[[errors]]"></error-box>
-        <paper-radio-group-custom
-          id="mode"
-          selected="{{mode}}">
+
+        <paper-radio-group id="mode" selected="{{mode}}">
           <paper-radio-button name="ocha">
             <strong>From OCHA</strong>
           </paper-radio-button>
-          <div
-            class="fields"
-            empty$="[[!_equals(mode, 'ocha')]]">
-            <template
-              is="dom-if"
-              if="[[_equals(mode, 'ocha')]]"
-              restamp="true">
-              <div>
-                <etools-dropdown
-                  class="item validate full-width"
-                  label="Response Plan"
-                  options="[[formattedPlans]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedPlan}}"
-                  disabled="[[plansLoading]]"
-                  on-etools-selected-item-changed="_validate"
-                  trigger-value-change-event
-                  required>
-                </etools-dropdown>
-                <response-plan-details
-                  id="details"
-                  plan-data="[[planDetails]]"
-                  loading="[[planDetailsLoading]]"
-                  error="[[emptyClustersError]]">
-                </response-plan-details>
-                <etools-loading active$="[[plansLoading]]"></etools-loading>
-              </div>
-            </template>
-          </div>
 
           <paper-radio-button name="custom">
             <strong>Custom</strong>
           </paper-radio-button>
+        </paper-radio-group>
 
-          <div
-            empty$="[[!_equals(mode, 'custom')]]">
-            <template
-              is="dom-if"
-              if="[[_equals(mode, 'custom')]]"
-              restamp="true">
-              <div class="app-grid">
-                <div class="item full-width">
-                  <paper-input
-                    class="validate full-width"
-                    label="Response Plan"
-                    value="{{data.title}}"
-                    on-input="_validate"
-                    always-float-label
-                    required>
-                  </paper-input>
-                </div>
-                <div class="item">
-                  <etools-dropdown
-                      class="validate"
-                      label="Plan Type"
-                      options="[[types]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.plan_type}}"
-                      auto-validate
-                      hide-search
-                      required>
-                  </etools-dropdown>
-                </div>
-                <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
-                  <div class="item">
-                    <paper-input
-                      class="validate item full-width"
-                      label="Custom Plan Type"
-                      value="{{data.plan_custom_type_label}}"
-                      on-input="_validate"
-                      always-float-label
-                      required
-                      maxlength="255">
-                    </paper-input>
-                  </div>
-                </template>
-                <div class="item">
-                  <datepicker-lite
-                    class="start-date"
-                    label="Start date"
-                    value="{{data.start}}"
-                    error-message=""
-                    selected-date-display-format="D MMM YYYY"
-                    required>
-                  </datepicker-lite>
-                </div>
-                <div class="item">
-                  <datepicker-lite
-                    class="end-date"
-                    label="End date"
-                    value="{{data.end}}"
-                    error-message=""
-                    selected-date-display-format="D MMM YYYY"
-                    required>
-                  </datepicker-lite>
-                </div>
-                <div class="item full-width">
-                  <etools-dropdown-multi
-                    class="validate"
-                    label="Clusters"
-                    options="[[clusters]]"
-                    option-value="value"
-                    option-label="label"
-                    selected-values="{{data.clusters}}"
-                    on-etools-selected-items-changed="_validate"
-                    trigger-value-change-event
-                    hide-close
-                    error-message=""
-                    required>
-                  </etools-dropdown-multi>
-                </div>
+        <div class="fields" empty$="[[!_equals(mode, 'ocha')]]">
+          <template
+            is="dom-if"
+            if="[[_equals(mode, 'ocha')]]"
+            restamp="true">
+            <div>
+              <etools-dropdown
+                class="item validate full-width"
+                label="Response Plan"
+                options="[[formattedPlans]]"
+                option-value="id"
+                option-label="title"
+                selected="{{selectedPlan}}"
+                disabled="[[plansLoading]]"
+                on-etools-selected-item-changed="_validate"
+                trigger-value-change-event
+                required>
+              </etools-dropdown>
+              <response-plan-details
+                id="details"
+                plan-data="[[planDetails]]"
+                loading="[[planDetailsLoading]]"
+                error="[[emptyClustersError]]">
+              </response-plan-details>
+              <etools-loading active$="[[plansLoading]]"></etools-loading>
+            </div>
+          </template>
+        </div>
+
+      <div empty$="[[!_equals(mode, 'custom')]]">
+        <template
+          is="dom-if"
+          if="[[_equals(mode, 'custom')]]"
+          restamp="true">
+          <div class="app-grid">
+            <div class="item full-width">
+              <paper-input
+                class="validate full-width"
+                label="Response Plan"
+                value="{{data.title}}"
+                on-input="_validate"
+                always-float-label
+                required>
+              </paper-input>
+            </div>
+            <div class="item">
+              <etools-dropdown
+                  class="validate"
+                  label="Plan Type"
+                  options="[[types]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.plan_type}}"
+                  auto-validate
+                  hide-search
+                  required>
+              </etools-dropdown>
+            </div>
+            <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
+              <div class="item">
+                <paper-input
+                  class="validate item full-width"
+                  label="Custom Plan Type"
+                  value="{{data.plan_custom_type_label}}"
+                  on-input="_validate"
+                  always-float-label
+                  required
+                  maxlength="255">
+                </paper-input>
               </div>
             </template>
+            <div class="item">
+              <datepicker-lite
+                class="start-date"
+                label="Start date"
+                value="{{data.start}}"
+                error-message=""
+                selected-date-display-format="D MMM YYYY"
+                required>
+              </datepicker-lite>
+            </div>
+            <div class="item">
+              <datepicker-lite
+                class="end-date"
+                label="End date"
+                value="{{data.end}}"
+                error-message=""
+                selected-date-display-format="D MMM YYYY"
+                required>
+              </datepicker-lite>
+            </div>
+            <div class="item full-width">
+              <etools-dropdown-multi
+                class="validate"
+                label="Clusters"
+                options="[[clusters]]"
+                option-value="value"
+                option-label="label"
+                selected-values="{{data.clusters}}"
+                on-etools-selected-items-changed="_validate"
+                trigger-value-change-event
+                hide-close
+                error-message=""
+                required>
+              </etools-dropdown-multi>
+            </div>
           </div>
-        </paper-radio-group-custom>
+        </template>
+      </div>
+
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">

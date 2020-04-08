@@ -14,6 +14,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/paper-item/paper-item';
@@ -44,7 +45,6 @@ import Constants from '../../../../constants';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import '../../indicator-locations-widget';
-import '../../paper-radio-group-custom';
 
 
 /**
@@ -159,26 +159,30 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           display: none !important;
         }
 
-        paper-radio-group-custom {
+        paper-radio-group {
           display: block;
           padding-top: 16px;
           outline: none;
         }
 
-        paper-radio-group-custom > .fields {
+        paper-radio-group > .fields {
           padding: calc(var(--app-grid-gutter) / 2) 0;
         }
 
-        paper-radio-group-custom > .fields[empty] {
+        paper-radio-group > .fields[empty] {
           padding: 0;
         }
 
-        paper-radio-group-custom .app-grid {
+        paper-radio-group .app-grid {
           margin: -var(--app-grid-gutter);
         }
 
         paper-radio-button {
           margin-left: -12px;
+        }
+
+        #mode paper-radio-button {
+          display: block
         }
 
         etools-dropdown {
@@ -285,32 +289,32 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                </etools-dropdown>
               </template>
             </template>
-            <paper-radio-group-custom
-              id="mode"
-              selected="{{ mode }}"
-              on-change="adjustPosition">
-              <template
-                is="dom-if"
-                if="[[!edit]]"
-                restamp="true">
-                <template
-                  is="dom-if"
-                  if="[[canAddOchaProjects]]"
-                  restamp="true">
-                  <paper-radio-button
-                    disabled="[[fromOchaDisabled]]"
-                    name="ocha">
-                    <strong>[[localize('from_ocha')]]</strong>
-                  </paper-radio-button>
+            <paper-radio-group id="mode" selected="{{ mode }}" on-change="adjustPosition">
+                <template is="dom-if" if="[[!edit]]" restamp="true">
+                  <template is="dom-if" if="[[canAddOchaProjects]]" restamp="true">
+                    <paper-radio-button
+                      disabled="[[fromOchaDisabled]]"
+                      name="ocha">
+                      <strong>[[localize('from_ocha')]]</strong>
+                    </paper-radio-button>
+                  </template>
                 </template>
-              </template>
-              <div
-                class="fields"
-                empty$="[[!_equals(mode, 'ocha')]]">
-                <template
-                  is="dom-if"
-                  if="[[_equals(mode, 'ocha')]]"
-                  restamp="true">
+                <template is="dom-if" if="[[!edit]]" restamp="true">
+                  <template
+                    is="dom-if"
+                    if="[[canAddOchaProjects]]"
+                    restamp="true">
+                    <paper-radio-button
+                      disabled="[[customDisabled]]"
+                      name="custom">
+                      <strong>[[localize('custom')]]</strong>
+                    </paper-radio-button>
+                  </template>
+                </template>
+             </paper-radio-group>
+
+              <div class="fields" empty$="[[!_equals(mode, 'ocha')]]">
+                <template is="dom-if" if="[[_equals(mode, 'ocha')]]" restamp="true">
                   <div>
                     <etools-dropdown
                         class="item validate full-width"
@@ -341,23 +345,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                   </div>
                 </template>
               </div>
-              <template
-                is="dom-if"
-                if="[[!edit]]"
-                restamp="true">
-                <template
-                  is="dom-if"
-                  if="[[canAddOchaProjects]]"
-                  restamp="true">
-                  <paper-radio-button
-                    disabled="[[customDisabled]]"
-                    name="custom">
-                    <strong>[[localize('custom')]]</strong>
-                  </paper-radio-button>
-                </template>
-              </template>
-              <div
-                empty$="[[!_equals(mode, 'custom')]]">
+
+              <div empty$="[[!_equals(mode, 'custom')]]">
                 <template
                   is="dom-if"
                   if="[[_equals(mode, 'custom')]]"
@@ -523,12 +512,12 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
                           <div class="full-width">
                             <labelled-item label="[[localize('is_this_project_hrp_fa')]]">
-                              <paper-radio-group-custom
+                              <paper-radio-group
                                 selected="{{ data.part }}">
                                 <paper-radio-button name="hrp">HRP</paper-radio-button>
                                 <paper-radio-button name="fa">FA</paper-radio-button>
                                 <paper-radio-button name="no">[[localize('no')]]</paper-radio-button>
-                              </paper-radio-group-custom>
+                              </paper-radio-group>
                             </labelled-item>
                           </div>
                           <etools-dropdown
@@ -669,7 +658,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                 <etools-loading active="[[updatePending]]"></etools-loading>
 
               </div>
-            </paper-radio-group-custom>
           </template>
         </paper-dialog-scrollable>
       </paper-dialog>
