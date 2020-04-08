@@ -4,28 +4,9 @@ import "@polymer/iron-flex-layout/iron-flex-layout";
 export const pageNavStyles = html`
   <style>
     :host {
-      --paper-item-selected: {
-        color: var(--theme-primary-color);
-        background: var(--theme-selected-item-background-color);
-      };
-
-    --paper-item-focused-before: {
-      background: transparent;
-    };
-
-    --paper-menu-focused-item-after: {
-      background: transparent;
-    };
-
-    /*
-      Normal?
-
-      --paper-item-selected-weight: normal;
-
-      --paper-menu-selected-item: {
-        font-weight: normal;
-      };
-    */
+      @apply --layout-vertical;
+      height: 100%;
+      overflow-y: auto;
     }
 
     a {
@@ -56,6 +37,20 @@ export const pageNavStyles = html`
       font-size: 12px;
     }
 
+    .menu-content {
+      padding-left: 34px;
+    }
+
+    .menu-content paper-item {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      min-height: 32px;
+    }
+
+    .menu-content paper-item a {
+      font-size: 12px;
+    }
+
     .menu-trigger {
       --paper-item-selected: {
         color: inherit;
@@ -63,27 +58,46 @@ export const pageNavStyles = html`
       };
     }
 
+    .menu-trigger-opened {
+      background: var(--theme-selected-item-background-color);
+    }
+
     .menu-content {
       padding-top: 0;
       background: var(--theme-selected-item-background-color);
     }
 
-    .menu-content paper-item {
-      --paper-item: {
-        min-height: 32px;
-        font-size: 12px;
-      };
+    .nav-menu {
+      @apply --layout-vertical;
+      background: var(--primary-background-color);
+      min-height: 400px;
+      padding: 8px 0 0;
     }
 
-    .menu-content a {
-      padding-left: 50px;
+    .nav-menu, .nav-menu iron-selector[role="navigation"] {
+      @apply --layout-flex;
     }
 
-    .nav-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: calc(100vh - 80px);
+    .nav-menu-item {
+      min-height: 48px;
+      padding: 0px 16px;
+    }
+
+    .nav-menu-item.section-title{
+      width: 100%;
+      height:60px;
+      margin-bottom: 60px;
+      padding: 0px 0px 20px 0px;
+    }
+
+    .iron-selected {
+      color: var(--theme-primary-color);
+      background: var(--theme-selected-item-background-color);
+    }
+
+    .iron-selected .name,
+    .iron-selected iron-icon {
+      color: var(--theme-primary-color);
     }
   </style>`
   ;
