@@ -69,7 +69,7 @@ class EtoolsPrpChips extends PolymerElement {
                   restamp="true">
                 <div class="chip__actions">
                   <iron-icon
-                      index="[[index]]"
+                      data-index$="[[index]]"
                       on-tap="_onChipRemove"
                       icon="icons:clear">
                   </iron-icon>
@@ -131,7 +131,7 @@ class EtoolsPrpChips extends PolymerElement {
 
   _onChipRemove(e: CustomEvent) {
     let value = this.value.slice();
-    let toRemove = +(e.target as IronIconElement).getAttribute('index')!;
+    let toRemove = +(e.target as IronIconElement).dataset.index!;
 
     value.splice(toRemove, 1);
 
