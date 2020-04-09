@@ -34,20 +34,20 @@ class PartnerTypeFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
   data = [
     {
       id: 'B/M',
-      title: 'Bilateral / Multilateral',
+      title: 'Bilateral / Multilateral'
     },
     {
       id: 'CSO',
-      title: 'Civil Society Organization',
+      title: 'Civil Society Organization'
     },
     {
       id: 'Gov',
-      title: 'Government',
+      title: 'Government'
     },
     {
       id: 'UNA',
-      title: 'UN Agency',
-    },
+      title: 'UN Agency'
+    }
   ];
 }
 

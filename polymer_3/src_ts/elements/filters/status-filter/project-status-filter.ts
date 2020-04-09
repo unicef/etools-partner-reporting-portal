@@ -40,9 +40,9 @@ class ProjectStatusFilter extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
       {title: this.localize('all'), id: ''},
       {title: this.localize('ongoing'), id: 'Ong'},
       {title: this.localize('planned'), id: 'Pla'},
-      {title: this.localize('completed'), id: 'Com'},
+      {title: this.localize('completed'), id: 'Com'}
     ];
-  };
+  }
 }
 
 window.customElements.define('project-status-filter', ProjectStatusFilter);

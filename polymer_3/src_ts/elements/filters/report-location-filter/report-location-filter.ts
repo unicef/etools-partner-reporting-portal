@@ -6,6 +6,7 @@ import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -60,13 +61,13 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     thunk()
-      .then(function(res: any) {
+      .then((res: GenericObject) => {
         self.set('options', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
       })
-      .catch(function(err: any) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
