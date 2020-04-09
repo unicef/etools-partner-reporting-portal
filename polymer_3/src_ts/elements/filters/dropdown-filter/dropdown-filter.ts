@@ -11,6 +11,7 @@ import {fireEvent} from '../../../utils/fire-custom-event';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
+
 /**
  * @polymer
  * @customElement
@@ -73,7 +74,7 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
 
     fireEvent(this, 'filter-changed', {
       name: this.name,
-      value: String(newValue),
+      value: String(newValue)
     });
   }
 

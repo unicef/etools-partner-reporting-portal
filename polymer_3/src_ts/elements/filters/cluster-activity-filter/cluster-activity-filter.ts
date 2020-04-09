@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -13,6 +13,7 @@ import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+
 
 /**
  * @polymer

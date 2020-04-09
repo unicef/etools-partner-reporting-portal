@@ -6,6 +6,7 @@ import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -57,7 +58,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchPDs(url: string) {
-    var self = this;
+    const self = this;
 
     if (!url) {
       return;
@@ -65,17 +66,17 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
   disconnectedCallback() {
     super.connectedCallback();
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();;
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
   }
 
 }

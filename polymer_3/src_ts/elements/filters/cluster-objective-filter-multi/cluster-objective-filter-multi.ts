@@ -87,7 +87,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
 
   _computeObjectivesParams(params: GenericObject) {
     const objectivesParams: GenericObject = {
-      page_size: 99999,
+      page_size: 99999
     };
 
     if (params.clusters) {
@@ -112,11 +112,11 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
         (self.$.objectives as EtoolsPrpAjaxEl).abort();
 
         thunk()
-          .then(function(res: any) {
+          .then((res: any) => {
             self.set('pending', false);
             self.set('data', res.data.results);
           })
-          .catch(function(err: any) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
             self.set('pending', false);
           });

@@ -68,10 +68,10 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
     }
 
     const validData = Array.apply(null, Array(maxLocType + 1))
-      .map(function(_, index) {
+      .map((_, index) => {
         return {
           id: String(index),
-          title: 'Admin' + index,
+          title: 'Admin' + index
         };
       })
       .slice(Number(params.loc_type) + 1);
@@ -79,8 +79,8 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
     return [
       {
         id: '',
-        title: 'None',
-      },
+        title: 'None'
+      }
     ].concat(validData);
   }
 

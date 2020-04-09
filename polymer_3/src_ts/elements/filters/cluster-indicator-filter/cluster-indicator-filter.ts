@@ -7,6 +7,7 @@ import '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import Endpoints from '../../../endpoints';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -69,10 +70,10 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
       .then(function(res: any) {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }

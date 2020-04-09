@@ -46,16 +46,16 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _computeOptions(data: any) {
-    var other = data.map(function(item: any) {
+    const other = data.map((item: any) => {
       return {
         id: String(item.id),
-        title: item.title,
+        title: item.title
       };
     });
 
     return [{
       id: '',
-      title: 'All',
+      title: 'All'
     }].concat(other);
   }
 
