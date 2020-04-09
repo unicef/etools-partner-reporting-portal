@@ -387,7 +387,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
           self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
             // @ts-ignore
-            .catch(function(err) {
+            .catch((_err: GenericObject) => {
               //   // TODO: error handling
             });
         });

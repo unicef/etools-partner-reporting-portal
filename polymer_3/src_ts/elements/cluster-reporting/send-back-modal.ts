@@ -193,3 +193,5 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
 
 }
 window.customElements.define('send-back-modal', SendBackModal);
+
+export {SendBackModal as SendBackModalEl};

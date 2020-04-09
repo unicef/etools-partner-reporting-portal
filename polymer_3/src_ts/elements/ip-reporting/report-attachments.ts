@@ -15,7 +15,8 @@ import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-import 'etools-file/etools-file.js';
+import 'etools-file/etools-file';
+import {EtoolsFileEl} from 'etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
 /**
@@ -187,7 +188,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     this.set('otherTwoAttachment', []);
 
     setFiles(this.attachments)
-      .forEach(function (attachment: GenericObject) {
+      .forEach((attachment: GenericObject) => {
         if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
           self.set('otherTwoAttachment', [attachment]);
         } else if (attachment.type === 'Other') {
@@ -210,10 +211,11 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     e.stopPropagation();
 
-    let deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
+    const deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
 
     (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
 
+    // @ts-ignore
     return this.reduxStore.dispatch(
       pdReportsAttachmentsSync(deleteThunk, this.reportId)
     ).then(() => {
@@ -221,22 +223,22 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       self.set('attachmentDeleteUrl', undefined);
 
       if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-        self.$.faceAttachmentComponent.fileInput.value = null;
-        self.$.faceAttachmentComponent.set('files', []);
+        (self.$.faceAttachmentComponent as EtoolsFileEl).fileInput.value = null;
+        (self.$.faceAttachmentComponent as EtoolsFileEl).set('files', []);
       } else if (self.get('otherOneAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherOneAttachment')[0].id) {
-        self.$.otherOneAttachmentComponent.fileInput.value = null;
-        self.$.otherOneAttachmentComponent.set('files', []);
+        (self.$.otherOneAttachmentComponent as EtoolsFileEl).fileInput.value = null;
+        (self.$.otherOneAttachmentComponent as EtoolsFileEl).set('files', []);
       } else if (self.get('otherTwoAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
-        self.$.otherTwoAttachmentComponent.fileInput.value = null;
-        self.$.otherTwoAttachmentComponent.set('files', []);
+        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).fileInput.value = null;
+        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).set('files', []);
       }
-    });
+    })
     // @ts-ignore
-    // .catch(function(err) {
-    //   // TODO: error handling
-    // });
+      .catch((_err) => {
+        // TODO: error handling
+      });
   }
 
   _filesChanged(change: GenericObject) {
@@ -251,7 +253,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
     const files = isEmpty ? [] : change.base;
 
-    files.findIndex(function (file: GenericObject) {
+    files.findIndex((file: GenericObject) => {
       if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
         file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
       }
@@ -272,7 +274,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       const data = new FormData();
       let thunk;
 
-      files.forEach(function (file: GenericObject) {
+      files.forEach((file: GenericObject) => {
         data.append('path', file.raw, file.file_name);
         data.append('type', attachmentType);
       });
@@ -302,6 +304,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         attachmentPropertyName = attachmentPropertyName.split('.')[0];
       }
 
+      // @ts-ignore
       this.reduxStore.dispatch(
         pdReportsAttachmentsSync(thunk, this.reportId)
       )
@@ -314,7 +317,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
           const attachments = self.get('attachments');
 
-          attachments.forEach(function (item) {
+          attachments.forEach((item: GenericObject) => {
             if (attachment.id !== null && item.id === attachment.id) {
               self.set(attachmentPropertyName, [item]);
               return;
@@ -322,7 +325,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           });
 
           if (attachment.id === null) {
-            const duplicates = attachments.filter(function (item) {
+            const duplicates = attachments.filter((item: GenericObject) => {
               const tokens = attachment.file_name.split('.');
               if (tokens.length === 0) {
                 return item.file_name.indexOf(attachment.file_name) !== -1;
@@ -336,7 +339,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
             } else {
               let correctedItem;
 
-              duplicates.forEach(function (item) {
+              duplicates.forEach((item: GenericObject) => {
                 if (item.file_name !== attachment.file_name) {
                   correctedItem = item;
                   return;
@@ -349,8 +352,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
           self.set('attachmentDeleteUrl', undefined);
         })
-        .catch((err: GenericObject) => {
-          console.error(err);
+        .catch((_err: GenericObject) => {
           // TODO: error handling
         });
     });
@@ -380,13 +382,13 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     if (!this.attachmentsListUrl) {
       return;
     }
-    let downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
+    const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(
       pdReportsAttachmentsSync(downloadThunk, this.reportId)
     )
       // @ts-ignore
-      .catch(function (err) {
+      .catch((_err) => {
         // TODO: error handling
       });
   }
@@ -398,7 +400,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl,
       this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl
-    ].forEach(function (req: EtoolsPrpAjaxEl) {
+    ].forEach((req: EtoolsPrpAjaxEl) => {
       req.abort();
     });
 

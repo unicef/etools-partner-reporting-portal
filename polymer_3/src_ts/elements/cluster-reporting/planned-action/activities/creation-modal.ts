@@ -10,6 +10,7 @@ import {PaperIconButtonElement} from '@polymer/paper-icon-button/paper-icon-butt
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
+import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-item/paper-item';
@@ -26,7 +27,6 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
 import '../../../error-box-errors';
-import '../../paper-radio-group-custom';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 
@@ -108,25 +108,26 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         border-right: 1px solid var(--paper-grey-400);
       }
 
-      paper-radio-group-custom {
+      paper-radio-group {
         display: block;
         padding-top: 16px;
       }
 
-      paper-radio-group-custom > .fields {
+      paper-radio-group > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
       }
 
-      paper-radio-group-custom > .fields[empty] {
+      paper-radio-group > .fields[empty] {
         padding: 0;
       }
 
-      paper-radio-group-custom .app-grid {
+      paper-radio-group .app-grid {
         margin: -var(--app-grid-gutter);
       }
 
       paper-radio-button {
         margin-left: -12px;
+        display: block;
       }
 
       .full-width {
@@ -210,15 +211,16 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
           </etools-dropdown>
         </template>
 
-        <paper-radio-group-custom
-            id="mode"
-            selected="{{mode}}">
-          <paper-radio-button name="cluster">
-            <strong>[[localize('add_from_cluster_activities')]]</strong>
+        <paper-radio-group id="mode" selected="{{mode}}">
+            <paper-radio-button name="cluster">
+              <strong>[[localize('add_from_cluster_activities')]]</strong>
+            </paper-radio-button>
+            <paper-radio-button name="custom">
+            <strong>[[localize('add_custom_activity')]]</strong>
           </paper-radio-button>
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'cluster')]]">
+        </paper-radio-group>
+
+          <div class="fields" empty$="[[!_equals(mode, 'cluster')]]">
             <template
                 is="dom-if"
                 if="[[_equals(mode, 'cluster')]]"
@@ -341,13 +343,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
             </template>
           </div>
 
-          <paper-radio-button name="custom">
-            <strong>[[localize('add_custom_activity')]]</strong>
-          </paper-radio-button>
-
-          <div
-              class="fields"
-              empty$="[[!_equals(mode, 'custom')]]">
+          <div class="fields" empty$="[[!_equals(mode, 'custom')]]">
             <template
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
@@ -469,7 +465,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
               </div>
             </template>
           </div>
-        </paper-radio-group-custom>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
