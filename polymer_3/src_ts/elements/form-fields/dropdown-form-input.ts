@@ -56,7 +56,7 @@ class DropdownFormInput extends PolymerElement {
   disabled!: string;
 
   validate() {
-    return this.$.field.validate();
+    return (this.$.field as any).validate();
   }
 
   _getValue(e: CustomEvent) {
