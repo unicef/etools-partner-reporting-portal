@@ -163,7 +163,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
       validate: function(value: string) {
         return Number(value) !== 0 ||
           Number(((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value) === 0;
-      }
+      }.bind(self)
     };
 
     new IronMeta({
