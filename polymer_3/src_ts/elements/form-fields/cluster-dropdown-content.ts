@@ -79,7 +79,7 @@ class ClusterDropdownContent extends ReduxConnectedElement {
       .then((res: GenericObject) => {
         self.set('clusters', res.data);
       })
-      .catch((_err: GenericObject) => {
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }
