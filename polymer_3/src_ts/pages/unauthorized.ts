@@ -107,7 +107,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
     const self = this;
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
-      .then(function (res: any) {
+      .then((res: any) => {
         if (res.data.access.length) {
           window.location.href = `/${BASE_PATH}/`;
         } else {
@@ -117,4 +117,5 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   }
 
 }
+
 window.customElements.define('page-unauthorized', PageUnauthorized);
