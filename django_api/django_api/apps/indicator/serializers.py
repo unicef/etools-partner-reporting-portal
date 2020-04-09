@@ -1243,7 +1243,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
     in_need = serializers.JSONField(required=False, allow_null=True)
     project_context_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
-    cs_dates = SortedDateArrayField(required=False)
+    cs_dates = SortedDateArrayField(base_field=serializers.DateField)
 
     class Meta:
         model = Reportable
