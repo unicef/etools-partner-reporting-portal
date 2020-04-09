@@ -76,7 +76,7 @@ class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(Red
 
   static get observers() {
     return ['_fetchClusterNames(clusterNamesUrl, params)'];
-  };
+  }
 
   private clusterNamesDebouncer!: Debouncer;
 
@@ -97,13 +97,13 @@ class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(Red
       () => {
         (self.$.clusterNames as EtoolsPrpAjaxEl).abort();
         (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
-          .then(function(res: any) {
+          .then((res: any) => {
             self.set('data', [{
               id: '',
-              title: 'All',
+              title: 'All'
             }].concat(res.data || []));
           })
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
           });
       });

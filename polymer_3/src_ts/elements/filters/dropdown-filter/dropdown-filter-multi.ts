@@ -4,6 +4,7 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
+
 /**
  * @polymer
  * @customElement
@@ -53,17 +54,17 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
 
   public static get observers() {
     return [
-      '_setSelectedValues(value, data)',
-    ]
+      '_setSelectedValues(value, data)'
+    ];
   }
 
   _handleChange(e: CustomEvent) {
     if (e.detail.selectedItems) {
-      let newValue = e.detail.selectedItems.map((item: any) => item['id']).join(',');
+      const newValue = e.detail.selectedItems.map((item: any) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
           name: this.name,
-          value: String(newValue || ''),
+          value: String(newValue || '')
         });
       }
     }

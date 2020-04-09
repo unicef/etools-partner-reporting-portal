@@ -4,7 +4,8 @@ import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter-multi';
 import '../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from "../../../endpoints";
+import Endpoints from '../../../endpoints';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -61,10 +62,10 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
     const self = this;
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
     (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }

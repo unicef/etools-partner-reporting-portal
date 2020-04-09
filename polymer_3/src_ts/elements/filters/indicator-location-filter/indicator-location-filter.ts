@@ -61,14 +61,14 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
     (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
       })
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err) => {
         // TODO: error handling
       });
   }

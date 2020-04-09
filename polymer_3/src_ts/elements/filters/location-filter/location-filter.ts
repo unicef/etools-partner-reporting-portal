@@ -6,6 +6,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {GenericObject} from '../../../typings/globals.types';
 
 /**
  * @polymer
@@ -50,10 +51,10 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeLocationsUrl(locationId: string) {
     return locationId ? Endpoints.locations(locationId) : '';
-  };
+  }
 
   _fetchLocations(url: string) {
-    var self = this;
+    const self = this;
 
     if (!url) {
       return;
@@ -61,22 +62,22 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     (this.$.locations as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('data', [{
           id: '',
-          title: 'All',
+          title: 'All'
         }].concat(res.data || []));
       })
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
-  };
+  }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
-  };
+  }
 }
 
 window.customElements.define('location-filter', LocationFilter);

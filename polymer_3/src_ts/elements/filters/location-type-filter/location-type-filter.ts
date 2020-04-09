@@ -40,13 +40,13 @@ class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeData(maxLocType: number) {
     return Array.apply(null, Array(maxLocType + 1))
-      .map(function(_, index) {
+      .map((_, index) => {
         return {
           id: String(index),
-          title: 'Admin' + index,
+          title: 'Admin' + index
         };
       });
-  };
+  }
 }
 
 window.customElements.define('location-type-filter', LocationTypeFilter);
