@@ -154,7 +154,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _indicatorsAjax() {
-    if (!this.projectId || !this.url) {
+    if (!this.projectId || !this.url || !this.queryParams) {
       return;
     }
     let thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();

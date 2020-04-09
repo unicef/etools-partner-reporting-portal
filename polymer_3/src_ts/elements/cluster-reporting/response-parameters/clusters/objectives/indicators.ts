@@ -153,7 +153,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _clusterObjectiveIndicatorsAjax() {
-    if (!this.objectiveId || !this.url) {
+    if (!this.objectiveId || !this.url || !this.queryParams) {
       return;
     }
 
