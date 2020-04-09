@@ -79,7 +79,6 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
                 is="dom-if"
                 if="[[_equals(data.report_type, 'IR')]]"
                 restamp="true">
-                // eslint-disable-next-line max-len
                 You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. <!-- Localize this line! -->
                 This action is irreversible. Please click "Refresh" if you wish to proceed.  <!-- Localize this line! -->
             </template>
