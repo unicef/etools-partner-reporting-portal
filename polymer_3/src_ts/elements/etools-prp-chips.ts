@@ -9,7 +9,7 @@ import './labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../utils/fire-custom-event';
 import {sharedStyles} from '../styles/shared-styles';
-
+declare const moment: any;
 
 /**
  * @polymer
@@ -18,7 +18,7 @@ import {sharedStyles} from '../styles/shared-styles';
 class EtoolsPrpChips extends PolymerElement {
   public static get template() {
     return html`
-        ${sharedStyles}
+      ${sharedStyles}
       <style include="iron-flex">
         :host {
           display: block;
@@ -103,6 +103,12 @@ class EtoolsPrpChips extends PolymerElement {
   @property({type: Boolean, notify: true, computed: '_computeInvalid(required, value)'})
   invalid: boolean = true;
 
+  static get observers() {
+    return [
+      '_sortDateValues(value, value.length)'
+    ];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
@@ -114,6 +120,12 @@ class EtoolsPrpChips extends PolymerElement {
 
   _computeInvalid(required: boolean, value: any[]) {
     return required && !value.length;
+  }
+
+  _sortDateValues() {
+    this.value.sort((a: any, b: any) => {
+      return moment(a) - moment(b);
+    });
   }
 
   _computeChipContentClass(disabled: boolean) {
