@@ -100,8 +100,6 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   @property({type: Number})
   projectId!: number;
 
-
-
   @property({type: Array, computed: '_computeCurrentIndicators(projectId, allIndicators)'})
   data!: any[];
 
@@ -163,7 +161,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _indicatorsAjax() {
-    if (!this.projectId || !this.url) {
+    if (!this.projectId || !this.url || !this.queryParams) {
       return;
     }
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
