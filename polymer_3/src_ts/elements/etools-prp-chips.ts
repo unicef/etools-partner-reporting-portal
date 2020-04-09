@@ -9,6 +9,7 @@ import './labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../utils/fire-custom-event';
 import {sharedStyles} from '../styles/shared-styles';
+import Settings from '../settings';
 declare const moment: any;
 
 /**
@@ -124,7 +125,7 @@ class EtoolsPrpChips extends PolymerElement {
 
   _sortDateValues() {
     this.value.sort((a: any, b: any) => {
-      return moment(a) - moment(b);
+      return moment(a, Settings.dateFormat) - moment(b, Settings.dateFormat);
     });
   }
 
