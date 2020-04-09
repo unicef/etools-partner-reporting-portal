@@ -13,4 +13,4 @@ class SortedDateArrayField(serializers.Field):
         return sorted(dates)
 
     def to_internal_value(self, data):
-        return data
+        return sorted(data)
