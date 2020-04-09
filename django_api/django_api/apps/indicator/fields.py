@@ -3,7 +3,7 @@ import datetime
 from rest_framework import serializers
 
 
-class SortedDateArrayField(serializers.postgres_fields.ArrayField):
+class SortedDateArrayField(serializers.ListField):
     def to_representation(self, value):
         dates = []
         for v in value:
@@ -12,5 +12,5 @@ class SortedDateArrayField(serializers.postgres_fields.ArrayField):
             dates.append(v.strftime("%d-%b-%Y"))
         return sorted(dates)
 
-    def to_internal_value(self, data):
-        return sorted(data)
+    def to_internal_value(self, value):
+        return sorted(super().to_internal_value(value))
