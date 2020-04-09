@@ -97,24 +97,24 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     const tableSlot = this.shadowRoot!.querySelectorAll('.table')[0] as HTMLSlotElement;
     let tableElem: DisaggregationTableEl | null = null;
     if (tableSlot && tableSlot!.assignedElements) {
-      tableSlot.assignedElements().forEach((el) => {
+      tableSlot.assignedElements().forEach((el: any) => {
         if (!tableElem && String(el.tagName).toUpperCase() === 'DISAGGREGATION-TABLE') {
           tableElem = el;
         }
-      })
+      });
     }
     if (tableElem) {
       const self = this;
 
       this.set('updatePending', true);
 
-      tableElem!.save()
-        .then(function() {
+      (tableElem as DisaggregationTableEl).save()
+        .then(() => {
           self.set('updatePending', false);
           self.close();
         })
         // @ts-ignore
-        .catch(function(err) {
+        .catch((_err: GenericObject) => {
           // TODO: error handling
           self.set('updatePending', false);
         });
@@ -127,7 +127,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     (this.$.confirm as ConfirmBoxEl).run({
       body: 'Changing disaggregation will cause your previous data to be lost. ' +
         'Do you want to continue?',
-      result: e.detail,
+      result: e.detail
     });
   }
 

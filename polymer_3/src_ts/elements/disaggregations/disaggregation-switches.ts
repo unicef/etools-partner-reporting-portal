@@ -107,7 +107,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   fieldValueChanged !: Debouncer | null;
 
   static get observers() {
-    return ['_computeWarning(data.num_disaggregation, reportedOn.length)']
+    return ['_computeWarning(data.num_disaggregation, reportedOn.length)'];
   }
 
   _computeEditableBool(editable: number) {
@@ -138,12 +138,12 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
 
         this._confirmIntent(field)
           .then(this._commit.bind(this))
-          .catch((err: any) => {this._revert.bind(this)});
+          .catch((_err: GenericObject) => {this._revert.bind(this);});
       });
   }
 
   _confirmIntent(field: GenericObject) {
-    let deferred = this._deferred();
+    const deferred = this._deferred();
 
     fireEvent(this, 'disaggregation-modal-confirm', deferred);
 
@@ -156,7 +156,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
     this.set('formattedData', Object.assign({}, this.formattedData, {
       disaggregation: {},
       level_reported: this.reportedOn.length,
-      disaggregation_reported_on: this.reportedOn,
+      disaggregation_reported_on: this.reportedOn
     }));
   }
 
