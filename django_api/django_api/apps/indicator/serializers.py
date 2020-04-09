@@ -1243,7 +1243,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
     in_need = serializers.JSONField(required=False, allow_null=True)
     project_context_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
-    cs_dates = SortedDateArrayField(base_field=serializers.DateField)
+    cs_dates = SortedDateArrayField(child=serializers.DateField(), required=False)
 
     class Meta:
         model = Reportable
@@ -1270,6 +1270,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         )
 
     def check_disaggregation(self, disaggregations):
+
         if not isinstance(disaggregations, list) or False in [dis.get('id', False) for dis in disaggregations]:
             raise ValidationError(
                 {"disaggregations": "List of dict disaggregation expected"}
