@@ -143,7 +143,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _setDefaults(opened: boolean, indicatorId: number, clusterId: number) {
@@ -155,12 +155,12 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this.set('data', {
       reportable: indicatorId,
-      cluster: clusterId,
+      cluster: clusterId
     });
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
     if (!this._fieldsAreValid()) {
       return;
@@ -169,12 +169,12 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
     this.set('pending', true);
 
     (this.$.message as EtoolsPrpAjaxEl).thunk()()
-      .then(function() {
+      .then(() => {
         self.set('pending', false);
         fireEvent(self, 'imo-message-sent');
         self.close();
       })
-      .catch(function(err: GenericObject) {
+      .catch((err: GenericObject) => {
         self.set('pending', false);
         self.set('errors', err.data);
       });

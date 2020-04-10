@@ -460,19 +460,19 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _add() {
-    let initial = 0;
+    const initial = 0;
 
     this.push('value', {
-      loc_type: initial,
+      loc_type: initial
     });
 
     this.set('searchLocationType', 0);
     this.set('locationsInitialized', true);
 
-    let newLocations = this.get('locations');
-    let value = this.get('value');
+    const newLocations = this.get('locations');
+    const value = this.get('value');
 
-    value.forEach(function(location, index) {
+    value.forEach((location: GenericObject, index: number) => {
       if (location.location === undefined && newLocations[index] === undefined) {
         newLocations[index] = {0: []};
       }
@@ -480,8 +480,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('locations', newLocations);
 
-    let newPendingIndex = Object.keys(this.get('pending')).length;
-    let pending = this.get('pending');
+    const newPendingIndex = Object.keys(this.get('pending')).length;
+    const pending = this.get('pending');
 
     pending[newPendingIndex] = {
       initial: false
@@ -489,26 +489,27 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('pending', pending);
 
-    this._fetchLocations(initial, undefined, this.get('value').length - 1);
+    this._fetchLocations(String(initial), undefined, this.get('value').length - 1);
   }
 
   _remove(e: CustomEvent) {
-    let value = this.get('value');
-    let toRemove = +e.target!.dataset.index;
-    let pending = this.get('pending');
-    let locations = this.get('locations');
+    const value = this.get('value');
+    // @ts-ignore
+    const toRemove = +e.target!.dataset.index;
+    const pending = this.get('pending');
+    const locations = this.get('locations');
 
     delete locations[toRemove];
     delete pending[toRemove];
 
-    let newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+    const newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
 
     this.set('pending', pending);
     this.set('value', newValue);
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _onLocTypeChanged(e: CustomEvent) {
@@ -516,7 +517,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       return;
     }
 
-    let index = Number((e.target as EtoolsDropdownEl).dataset.index);
+    const index = Number((e.target as EtoolsDropdownEl).dataset.index);
     this._fetchLocations(e.detail.selectedItem.id, undefined, index);
   }
 
@@ -530,12 +531,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(100),
       () => {
-        let self = this;
+        const self = this;
 
         this._setPending(loc_type, true, index);
 
         if (title !== undefined) {
-          this.shadowRoot!.querySelector('#locations' + loc_type).params.title = title;
+          // @ts-ignore
+          this.shadowRoot!.querySelector('#locations' + loc_type)!.params.title = title;
         }
 
         const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
@@ -553,7 +555,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   _fetchInitialLocations(lockedItems: any[]) {
     this.set('savedLocations', lockedItems);
 
-    let newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = Object.assign({}, this.get('locations'));
 
     if (lockedItems.length > 0) {
       lockedItems.forEach(function(location, index) {
@@ -566,7 +568,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
       });
     } else {
-      lockedItems.forEach(function(location, index) {
+      // @ts-ignore
+      lockedItems.forEach((location, index) => {
         newLocations[index] = {0: []};
       });
     }
@@ -587,10 +590,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _getLocationTitle(locations: any[], location: GenericObject, locationId: string, index: number) {
-    let loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
-    let allLocations = this._getLocations(locations, loc_type, index);
+    const loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
+    const allLocations = this._getLocations(locations, loc_type, index);
 
-    let targetLocation = allLocations.find(function(loc: GenericObject) {
+    const targetLocation = allLocations.find(function(loc: GenericObject) {
       return String(loc.id) === String(locationId);
     });
 
@@ -598,7 +601,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _setPending(loc_type: string, value: any, index: number) {
-    let newPending = Object.assign({}, this.get('pending'));
+    const newPending = Object.assign({}, this.get('pending'));
 
     if (newPending[index] === undefined) {
       newPending[index] = {};
@@ -610,7 +613,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _setLocations(loc_type: string, value: any, index: number) {
-    let newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = Object.assign({}, this.get('locations'));
 
     if (newLocations[index] === undefined) {
       newLocations[index] = {};
@@ -653,7 +656,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    let locTypeDebouncers = Array(this.get('maxAdminLevel'))
+    const locTypeDebouncers = Array(this.get('maxAdminLevel'))
       .fill('fetch-locations-')
       .map(function(item, index) {
         return item + (++index);
