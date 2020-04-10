@@ -10,7 +10,7 @@ const keys = [
 ];
 
 
-//App.Selectors.ReportInfo
+// App.Selectors.ReportInfo
 export const reportInfoCurrent = createSelector(
   function(state: RootState) {
     return state.programmeDocumentReports.byPD;
@@ -22,14 +22,13 @@ export const reportInfoCurrent = createSelector(
     return state.programmeDocumentReports.current.id;
   },
   function(byPD: any, pdId: any, reportId: any) {
-    let reports = byPD[pdId];
-    let report: any;
+    const reports = byPD[pdId];
 
     if (!reports) {
       return {};
     }
 
-    report = byPD[pdId].filter(function(report: any) {
+    const report = byPD[pdId].filter(function(report: any) {
       return Number(report.id) === Number(reportId);
     })[0] || {};
 
@@ -39,4 +38,4 @@ export const reportInfoCurrent = createSelector(
       return acc;
     }, {});
   }
-)
+);
