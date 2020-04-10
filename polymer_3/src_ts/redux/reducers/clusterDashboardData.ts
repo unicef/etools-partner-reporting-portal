@@ -9,7 +9,7 @@ export class ClusterDashboardDataState {
 
 export const ClusterDashboardData = combineReducers({
   data: dataReducer,
-  loading: loadingReducer,
+  loading: loadingReducer
 });
 
 function dataReducer(state = {}, action: any) {

@@ -2,7 +2,7 @@ import Constants from '../../constants';
 
 export class ProgrammeDocumentDetailsState {
   current = {};
-};
+}
 
 export const ProgrammeDocumentDetails = (state = {current: {}}, action: any) => {
   switch (action.type) {
@@ -19,4 +19,4 @@ export const ProgrammeDocumentDetails = (state = {current: {}}, action: any) => 
     default:
       return state;
   }
-}
+};

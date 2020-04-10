@@ -5,13 +5,13 @@ import {combineReducers} from 'redux';
 let availableLangs: GenericObject;
 
 export class LocaLizeState {
-  language: string = "en";
+  language: string = 'en';
   resources = [];
 }
 
 export const Localize = combineReducers({
   language: languageReducer,
-  resources: resourcesReducer,
+  resources: resourcesReducer
 });
 
 

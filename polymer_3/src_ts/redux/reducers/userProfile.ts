@@ -2,7 +2,7 @@ import Constants from '../../constants';
 
 export class UserProfileState {
   profile = undefined
-};
+}
 
 export const UserProfile = (state = {profile: undefined}, action: any) => {
   switch (action.type) {
@@ -19,4 +19,4 @@ export const UserProfile = (state = {profile: undefined}, action: any) => {
     default:
       return state;
   }
-}
+};
