@@ -21,6 +21,8 @@ import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerPr
 import {GenericObject} from '../../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {PlannedActionAddActivityFromProjectModalEl} from "../../../planned-action/activities/add-activity-from-project-modal";
+import {PlannedActioAddExistingActivityFromProjectModalEl} from "../../../planned-action/activities/add-existing-activity-from-project-modal";
 
 /**
  * @polymer
@@ -116,8 +118,8 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
 
   _onSuccess(e: CustomEvent) {
     const data = e.detail;
-    var path = '/response-parameters/partners/activity/' + String(data.id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/response-parameters/partners/activity/' + String(data.id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -135,7 +137,7 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: any) => {
             // TODO: error handling.
           });
       });
@@ -143,16 +145,16 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
 
   _computeParams(queryParams: string, projectId: number) {
     return Object.assign({}, queryParams, {
-      project: projectId,
+      project: projectId
     });
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionAddActivityFromProjectModalEl).open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal').open();
+    (this.shadowRoot!.querySelector('#existing-modal') as PlannedActioAddExistingActivityFromProjectModalEl).open();
   }
 
   _computeUrl(responsePlanId: string) {

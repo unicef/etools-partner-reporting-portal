@@ -282,7 +282,7 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
     return this.buildUrl(
       _baseUrlCluster,
       '/response-parameters/partners/project/' + projectId + '/overview'
-    )
+    );
   }
 
   _addEventListeners() {
