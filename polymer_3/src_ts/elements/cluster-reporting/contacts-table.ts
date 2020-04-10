@@ -166,14 +166,12 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
     this._tableContentChanged = this._tableContentChanged.bind(this);
     this.addEventListener('page-number-changed', this._tableContentChanged);
     this._detailsChange = this._detailsChange.bind(this);
-    // @ts-ignore
-    this.addEventListener('details-opened-changed', this._detailsChange);
+    this.addEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   _removeEventListeners() {
     this.removeEventListener('page-number-changed', this._tableContentChanged);
-    // @ts-ignore
-    this.removeEventListener('details-opened-changed', this._detailsChange);
+    this.removeEventListener('details-opened-changed', this._detailsChange as any);
   }
 
   connectedCallback() {
