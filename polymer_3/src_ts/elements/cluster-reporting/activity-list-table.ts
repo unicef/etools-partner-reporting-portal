@@ -167,7 +167,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   }
 
   @property({type: String})
-  page!: String;
+  page!: string;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
   activities!: any[];

@@ -508,7 +508,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
@@ -528,7 +528,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   projectsParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeProjectsUrl(responsePlanId)'})
@@ -539,7 +539,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String})
@@ -562,7 +562,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       '_fetchProjects(partner, mode, data.cluster.cluster)',
       '_fetchProjects(partner, mode, data.custom.cluster)',
       '_fetchActivities(data.cluster.cluster)',
-      '_fetchObjectives(data.custom.cluster)',
+      '_fetchObjectives(data.custom.cluster)'
     ];
   }
 
@@ -570,7 +570,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     return [
       {title: this.localize('ongoing'), id: 'Ong'},
       {title: this.localize('planned'), id: 'Pla'},
-      {title: this.localize('completed'), id: 'Com'},
+      {title: this.localize('completed'), id: 'Com'}
     ];
   }
 
@@ -602,7 +602,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       },
       custom: {
         projects: []
-      },
+      }
     });
     this.set('activities', []);
     this.set('objectives', []);
@@ -620,7 +620,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    (e.target as any).validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: string) {
@@ -659,7 +659,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _fetchActivities(clusterId: string) {
-    var self = this;
+    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -672,14 +672,15 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('activities', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
+  // @ts-ignore
   _fetchProjects(partnerId: string, mode: string, clusterId: string) {
     const self = this;
 
@@ -694,7 +695,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('projects', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -716,8 +717,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
-        // TODO: error handling
+      .catch((_err: GenericObject) => {
+      // TODO: error handling
       });
   }
 
@@ -735,8 +736,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     this.set('updatePending', true);
 
-    this.$.activity.body = Object.assign({
-      partner: this.partner,
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
+      partner: this.partner
     }, this.data[this.mode]);
     thunk()
       .then(function(res: any) {
@@ -747,14 +748,14 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
           fireEvent(self, 'activity-added', res.data);
         });
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
         fireEvent(self, 'project-details-selection-refit');
       });
   }
 
-  _close(e: CustomEvent) {
+  _close(e: CustomEvent & any) {
     if (e &&
       (e.target.nodeName === 'PAPER-DIALOG' ||
         e.target.nodeName === 'PAPER-BUTTON' ||
