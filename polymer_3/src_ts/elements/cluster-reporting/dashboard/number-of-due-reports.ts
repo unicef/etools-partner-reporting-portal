@@ -5,7 +5,7 @@ import '@polymer/paper-card/paper-card';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-location/iron-query-params';
-import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles'
+import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
 import '../../etools-prp-number';
@@ -74,7 +74,7 @@ class NumberOfDueReports extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
 
   _computeResultsQueryParams(partner: GenericObject) {
     return {
-      partner: partner.id,
+      partner: partner.id
     };
   }
 }

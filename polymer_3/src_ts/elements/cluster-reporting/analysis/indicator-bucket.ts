@@ -13,6 +13,7 @@ import './indicator-details';
 import {sharedStyles} from '../../../styles/shared-styles';
 import {GenericObject} from '../../../typings/globals.types';
 import '../../cluster-reporting/analysis/indicator-details';
+import {IndicatorDetails} from './indicator-details';
 
 /**
 * @polymer
@@ -206,7 +207,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _toggle(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#collapse-' + e.target.toggles).toggle();
+    (this.shadowRoot!.querySelector('#collapse-' +( e.target! as any).toggles) as any).toggle();
   }
 
   _computeObjectiveTitle(data: GenericObject) {
@@ -235,7 +236,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
       partnerproject: localize('partner_project'),
       clusterobjective: localize('cluster_objective'),
       clusteractivity: localize('cluster_activity'),
-      partneractivityprojectcontext: localize('partner_activity_project_context'),
+      partneractivityprojectcontext: localize('partner_activity_project_context')
     };
 
     return localizations[data.type] ? localizations[data.type] + ':' : '';
@@ -248,8 +249,9 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
       const indicatorDetails = (e.target as HTMLElement)!.querySelector('analysis-indicator-details');
       try {
         if (indicatorDetails) {
-          indicatorDetails.init();
+          (indicatorDetails as IndicatorDetails).init();
         }
+        // eslint-disable-next-line no-empty
       } catch (err) {}
     }
   }

@@ -65,19 +65,19 @@ class PartnersPerClusterObjective extends LocalizeMixin(UtilsMixin(AnalysisChart
   cols = [
     {
       label: 'Cluster Objective',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Count',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
-    },
+        html: true
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRows(data)'})
@@ -88,12 +88,12 @@ class PartnersPerClusterObjective extends LocalizeMixin(UtilsMixin(AnalysisChart
       chartArea: {
         // top: 0,
         left: '40%',
-        width: '40%',
+        width: '40%'
       },
       height: rows.length * 45 + 30,
       colors: rows.map(function() {
         return '#88c245';
-      }),
+      })
     });
   }
 
