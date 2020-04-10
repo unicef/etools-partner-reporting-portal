@@ -15,7 +15,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
   class LocalizeClass extends baseClass {
 
     __localizationCache = {
-      messages: {}, /* Unique localized strings. Invalidated when the language,
+      messages: {} /* Unique localized strings. Invalidated when the language,
                       formats or resources change. */
     }
 
@@ -52,8 +52,10 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
 
       return function() {
         const key = arguments[0];
-        if (!key || !resources || !language || !resources[language])
+        if (!key || !resources || !language || !resources[language]) {
           return;
+        }
+
 
         // Cache the key/value pairs for the same language, so that we don't
         // do extra work if we're just reusing strings across an application.
@@ -72,7 +74,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
           proto.__localizationCache.messages[messageKey] = translatedMessage;
         }
 
-        let args: GenericObject = {};
+        const args: GenericObject = {};
         for (let i = 1; i < arguments.length; i += 2) {
           args[arguments[i]] = arguments[i + 1];
         }

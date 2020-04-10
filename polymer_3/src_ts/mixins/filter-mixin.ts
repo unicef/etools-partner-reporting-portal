@@ -16,7 +16,7 @@ function FilterMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     @property({type: String})
     name!: string;
 
-    @property({type: String, computed: '_computeLastValue(value)', })
+    @property({type: String, computed: '_computeLastValue(value)'})
     lastValue!: string;
 
     static _debounceDelay = 400;

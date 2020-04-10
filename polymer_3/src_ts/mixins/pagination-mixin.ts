@@ -2,7 +2,7 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
+
 
 /**
  * @polymer
@@ -24,7 +24,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     static get observers() {
       return [
-        '_updateQueryParams(pageSize, pageNumber)',
+        '_updateQueryParams(pageSize, pageNumber)'
       ];
     }
 
@@ -39,7 +39,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _updateQueryParams(pageSize: number, pageNumber: number) {
       const newParams = Object.assign({}, this.queryParams, {
         page_size: pageSize,
-        page: pageNumber,
+        page: pageNumber
       });
       setTimeout(() => {
         this.set('queryParams', newParams);
@@ -47,6 +47,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _detailsChange(event: CustomEvent) {
+      // @ts-ignore
       if (!this.openedDetails) {
         return;
       }
@@ -54,6 +55,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       if (event.detail.detailsOpened) {
         this.push('openedDetails', element);
       } else {
+        // @ts-ignore
         const index = this.openedDetails.indexOf(element);
         if (index !== -1) {
           this.splice('openedDetails', index, 1);
