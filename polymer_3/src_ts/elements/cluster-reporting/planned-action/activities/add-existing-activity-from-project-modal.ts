@@ -297,7 +297,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.current.clusters)'})
@@ -320,7 +320,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String})
@@ -357,7 +357,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _setDefaults() {
-    let simpleProjectData: GenericObject = {};
+    const simpleProjectData: GenericObject = {};
 
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
@@ -380,7 +380,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    (e.target as any).validate();
   }
 
   _computePartner(storePartner: GenericObject, selectedPartner: any) {
@@ -402,7 +402,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _fetchPartnerActivities(clusterId: string) {
-    var self = this;
+    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -416,21 +416,21 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
-        var filteredActivities = res.data.results.filter(function(item: any) {
+      .then((res: any) => {
+        const filteredActivities = res.data.results.filter((item: any) => {
           return item.projects.find(function(element: any) {
             return element.project_id === parseInt(self.projectData.id);
           }) === undefined;
         });
         self.set('partnerActivities', filteredActivities);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
   _fetchObjectives(clusterId: string) {
-    var self = this;
+    const self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -443,10 +443,10 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -456,7 +456,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
@@ -476,11 +476,11 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     // save cloned data and not regular data, since cloned data has the combined projects
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
-      partner: this.partner,
+      partner: this.partner
     }, clonedData);
 
     thunk()
-      .then(function() {
+      .then(() => {
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
@@ -488,14 +488,14 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
           window.location.reload();
         }, 100);
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
         fireEvent(self, 'project-details-selection-refit');
       });
   }
 
-  _close(e: CustomEvent) {
+  _close(e: CustomEvent & any) {
     if (e && (e === 'saved' ||
       e.target.nodeName === 'PAPER-DIALOG' ||
       e.target.nodeName === 'PAPER-BUTTON' ||

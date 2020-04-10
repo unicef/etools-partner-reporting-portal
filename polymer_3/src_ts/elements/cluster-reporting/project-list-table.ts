@@ -230,7 +230,7 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(project: GenericObject, query: string) {
@@ -238,7 +238,7 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
     if (this.page === 'planned-action') {
       path = '/planned-action/project/' + project.id;
     }
-    //Query string is passed to construct the back button.
+    // Query string is passed to construct the back button.
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 

@@ -261,14 +261,14 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   statuses: GenericObject[] = [
     {title: 'Ongoing', id: 'Ong'},
     {title: 'Planned', id: 'Pla'},
-    {title: 'Completed', id: 'Com'},
+    {title: 'Completed', id: 'Com'}
   ];
 
   @property({type: Array})
   frequencies: GenericObject = [
     {title: 'Weekly', id: 'Wee'},
     {title: 'Monthly', id: 'Mon'},
-    {title: 'Quarterly', id: 'Qua'},
+    {title: 'Quarterly', id: 'Qua'}
   ];
 
   @property({type: Array})
@@ -290,7 +290,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
   open() {
     this.set('data', Object.assign({}, this.editData));
-    this.selectedClusters = this.editData.clusters.map(function(item) {
+    this.selectedClusters = this.editData.clusters.map((item: GenericObject) => {
       return item.id;
     });
     this.set('opened', true);
@@ -298,46 +298,46 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
-  _formatForMultiselect(list) {
+  _formatForMultiselect(list: any) {
     return list.map((item: GenericObject) => {
       return {
         id: item.id,
         value: item.id,
-        label: item.title,
+        label: item.title
       };
     });
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
-    let valid = [
+    const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
       return;
     }
 
-    this.data.clusters = this.selectedClusters.map(function(item) {
+    this.data.clusters = this.selectedClusters.map((item) => {
       return {id: Number(item)};
     });
 
     this.data.partner = this.partnerID;
 
     this.updatePending = true;
-    let thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
         self.updatePending = false;
         fireEvent(self, 'project-edited', res.data);
         self.close();
       })
-      .catch((err: GenericObject) => {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });

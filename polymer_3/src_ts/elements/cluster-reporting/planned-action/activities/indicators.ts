@@ -157,7 +157,7 @@ class PaActivityDetailsIndicators extends UtilsMixin(LocalizeMixin(ReduxConnecte
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: any) => {
         // TODO: error handling.
       });
   }

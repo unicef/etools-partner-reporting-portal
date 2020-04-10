@@ -17,8 +17,8 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)){
-  public static get template(){
+class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
+  public static get template() {
     return html`
       <style include="app-grid-style">
         :host {
@@ -30,26 +30,26 @@ class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
           padding: 15px;
           background: var(--paper-grey-300);
         }
-  
+
         .app-grid {
           padding: 0;
           margin: 0;
           list-style: none;
         }
-  
+
         .full-width {
           @apply --app-grid-expandible-item;
         }
-  
+
         .indicators-list {
           padding-left: 15px;
         }
-  
+
         ul {
           padding-left: 0;
         }
-      </style>  
-      
+      </style>
+
       <div class="row">
         <ul class="app-grid">
           <li class="item full-width">

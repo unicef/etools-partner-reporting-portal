@@ -58,12 +58,12 @@ class ChangeResponsePlan extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
   currentPlanTitle!: string;
 
   @property({type: String, computed: '_computeChangePlanUrl(_baseUrl, responsePlanID)'})
-  changePlanUrl!: String;
+  changePlanUrl!: string;
 
 
   _getCurrentPlanTitle(plans: any, id: string) {
-    var i = 0;
-    var plan;
+    let i = 0;
+    let plan;
 
     while (i < plans.length) {
       plan = plans[i];
