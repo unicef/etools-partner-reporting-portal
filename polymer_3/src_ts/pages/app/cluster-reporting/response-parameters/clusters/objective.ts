@@ -21,6 +21,7 @@ import RoutingMixin from '../../../../../mixins/routing-mixin';
 import Endpoints from '../../../../../endpoints';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {PaperTabsElement} from "@polymer/paper-tabs/paper-tabs";
 
 /**
 * @polymer
@@ -149,7 +150,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
     return [
       '_updateUrlTab(routeData.tab)',
       '_getObjectiveAjax(objectiveUrl)'
-    ]
+    ];
   }
 
   _onSuccess() {
@@ -157,7 +158,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -170,7 +171,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
 
   _computeObjectiveUrl(objectiveId: string) {
     if (!objectiveId) {
-      return
+      return;
     }
     return Endpoints.responseParametersClustersObjectiveDetail(objectiveId);
   }
@@ -184,13 +185,13 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
       return;
     }
     const thunk = (this.$.objective as EtoolsPrpAjaxEl).thunk();
-    let self = this;
+    const self = this;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self.data = res.data;
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         //   // TODO: error handling
       });

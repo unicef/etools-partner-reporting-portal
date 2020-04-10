@@ -60,7 +60,7 @@ class PageAnalysisIndicators extends UtilsMixin(ReduxConnectedElement) {
 
   static get observers() {
     return [
-      '_fetchData(dataUrl, queryParams)',
+      '_fetchData(dataUrl, queryParams)'
     ];
   }
 
@@ -87,7 +87,7 @@ class PageAnalysisIndicators extends UtilsMixin(ReduxConnectedElement) {
 
         self.reduxStore.dispatch(analysis_indicators_fetchData(dataThunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: any) => {
             // TODO: error handling
           });
       });

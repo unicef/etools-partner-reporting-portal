@@ -202,7 +202,7 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
   static get observers() {
     return [
       '_fetchData(dataUrl, queryParams)',
-      '_fetchMap(mapUrl, queryParams)',
+      '_fetchMap(mapUrl, queryParams)'
     ];
   }
 
@@ -227,7 +227,7 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
 
         self.reduxStore.dispatch(analysis_operationalPresence_fetchData(dataThunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: any) => {
             // TODO: error handling
           });
       });
@@ -248,7 +248,7 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
 
         self.reduxStore.dispatch(analysis_operationalPresence_fetchMap(mapThunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: any) => {
             // TODO: error handling
           });
       });

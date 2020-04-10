@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property, query} from '@polymer/decorators';
+import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
@@ -99,7 +99,7 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
   static get observers() {
     return [
       '_projectsAjax(queryParams, url)'
-    ]
+    ];
   }
 
   private _projectsAjaxDebouncer!: Debouncer;
@@ -137,8 +137,8 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
 
         this.reduxStore.dispatch(fetchPartnerProjectsList(thunk))
           // @ts-ignore
-          .catch(function(err) {
-            //   // TODO: error handling.
+          .catch((_err: GenericObject) => {
+            // TODO: error handling.
           });
       });
   }

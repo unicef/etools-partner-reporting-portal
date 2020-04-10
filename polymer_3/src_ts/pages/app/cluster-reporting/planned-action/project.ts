@@ -163,7 +163,7 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
+    (this.$.tabContent as any).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -184,14 +184,14 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
       return;
     }
 
-    const self = this;
+    const self: any = this;
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res) {
+      .then((res: GenericObject) => {
         self.updatePending = false;
         self.projectData = res.data;
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });

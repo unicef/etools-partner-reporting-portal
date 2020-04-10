@@ -136,7 +136,7 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
         (this.$.disaggregations as EtoolsPrpAjaxEl).abort();
         this.reduxStore.dispatch(fetchClusterDisaggregationsList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             //   // TODO: error handling.
           });
       });

@@ -66,7 +66,7 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
 
   static get observers() {
     return [
-      '_routeChanged(routeData.page)',
+      '_routeChanged(routeData.page)'
     ];
   }
 
@@ -101,7 +101,7 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
-    })
+    });
 
   }
 

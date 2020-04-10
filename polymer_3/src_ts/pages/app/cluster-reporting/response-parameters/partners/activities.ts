@@ -98,7 +98,7 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
   static get observers() {
     return [
       '_activitiesAjax(queryParams, url)'
-    ]
+    ];
   }
 
   private _activitiesAjaxDebouncer!: Debouncer;
@@ -115,8 +115,8 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
   }
 
   _onSuccess(e: CustomEvent) {
-    var path = '/response-parameters/partners/activity/' + String(e.detail.id);
-    var url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/response-parameters/partners/activity/' + String(e.detail.id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -143,7 +143,7 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
 
         self.reduxStore.dispatch(fetchPartnerActivitiesList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             //   // TODO: error handling.
           });
       });
