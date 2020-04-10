@@ -15,6 +15,8 @@ import '../activities/add-activity-from-project-modal';
 import '../activities/add-existing-activity-from-project-modal';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
+import {PlannedActionAddActivityFromProjectModalEl} from '../activities/add-activity-from-project-modal';
+import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/add-existing-activity-from-project-modal';
 
 
 /**
@@ -102,8 +104,9 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _onSuccess(e: CustomEvent) {
-    let path = '/planned-action/activity/' + String(e.detail.id);
-    let url = this.buildUrl(this._baseUrlCluster, path);
+    const path = '/planned-action/activity/' + String(e.detail.id);
+    // @ts-ignore
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -126,24 +129,24 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(100), () => {
 
-        let thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
+        const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
         this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling.
           });
       });
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as PlannedActionAddActivityFromProjectModalEl).open();
   }
 
   _openExistingModal() {
-    this.shadowRoot!.querySelector('#existing-modal')!.open();
+    (this.shadowRoot!.querySelector('#existing-modal') as PlannedActioAddExistingActivityFromProjectModalEl).open();
   }
 
   _addEventListeners() {

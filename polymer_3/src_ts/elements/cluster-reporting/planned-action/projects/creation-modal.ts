@@ -734,7 +734,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   frequencies: GenericObject[] = [
     {title: 'Weekly', id: 'Wee'},
     {title: 'Monthly', id: 'Mon'},
-    {title: 'Quarterly', id: 'Qua'},
+    {title: 'Quarterly', id: 'Qua'}
   ];
 
   @property({type: Array})
@@ -795,7 +795,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     return [
       {title: this.localize('ongoing'), id: 'Ong'},
       {title: this.localize('planned'), id: 'Pla'},
-      {title: this.localize('completed'), id: 'Com'},
+      {title: this.localize('completed'), id: 'Com'}
     ];
   }
 
@@ -806,7 +806,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       {title: this.localize('international_ngo'), id: 'International NGO'},
       {title: this.localize('national_ngo'), id: 'National NGO'},
       {title: this.localize('community_based_organization'), id: 'Community based organisation'},
-      {title: this.localize('other'), id: 'Other'},
+      {title: this.localize('other'), id: 'Other'}
     ];
   }
 
@@ -814,7 +814,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     return [
       {title: this.localize('high'), id: 'High'},
       {title: this.localize('medium'), id: 'Medium'},
-      {title: this.localize('low'), id: 'Low'},
+      {title: this.localize('low'), id: 'Low'}
     ];
   }
 
@@ -842,6 +842,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     this.set('partnerForClusters', partner);
   }
 
+  // @ts-ignore
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
     if ((edit && !data) || (!mode || !responsePlanID)) {
       return;
@@ -869,7 +870,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       (selectedPartner && selectedPartner.ocha_external_id);
 
     return ocha_external_id ? {
-      ocha_external_id: ocha_external_id,
+      ocha_external_id: ocha_external_id
     } : {};
   }
 
@@ -877,10 +878,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     return Endpoints.ochaProjectDetails(selectedProject);
   }
 
-  _close(e: CustomEvent) {
-    if (e.target!.nodeName === 'PAPER-DIALOG' ||
-      e.target!.nodeName === 'PAPER-BUTTON' ||
-      e.target!.nodeName === 'PAPER-ICON-BUTTON') {
+  _close(e: CustomEvent & any) {
+    if (e.target.nodeName === 'PAPER-DIALOG' ||
+      e.target.nodeName === 'PAPER-BUTTON' ||
+      e.target.nodeName === 'PAPER-ICON-BUTTON') {
       this.set('data', {});
       this.set('opened', false);
       this.set('refresh', false);
@@ -897,7 +898,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   open() {
     if (this.edit && this.editData) {
       this.set('data', Object.assign({}, this.editData));
-      this.selectedClusters = this.editData.clusters.map(function(cluster) {
+      this.selectedClusters = this.editData.clusters.map((cluster) => {
         return cluster.id;
       });
       this.set('mode', 'custom');
@@ -909,7 +910,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         'custom_fields': [],
         'funding': {},
         'locations': [],
-        'description': '',
+        'description': ''
       };
       this.selectedClusters = [];
     }
@@ -959,15 +960,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       timeOut.after(100),
       () => {
         if (
-          (!partner || !partner.ocha_external_id)
-          &&
+          (!partner || !partner.ocha_external_id) &&
           (!selectedPartner || !selectedPartner.ocha_external_id)
         ) {
           return;
         }
 
         this.set('projectsLoading', true);
-        let self = this;
+        const self = this;
 
         const projectThunk = (this.$.projects as EtoolsPrpAjaxEl);
         projectThunk.abort();
@@ -975,12 +975,12 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           .then(function(res: GenericObject) {
             self.set('projectsLoading', false);
 
-            let filteredPartnerProjects = self.partnerProjects.filter(function(item) {
+            const filteredPartnerProjects = self.partnerProjects.filter((item) => {
               return item.is_ocha_imported === true;
             });
 
-            let filteredResData = res.data.filter((item: GenericObject) => {
-              return filteredPartnerProjects.find(function(element) {
+            const filteredResData = res.data.filter((item: GenericObject) => {
+              return filteredPartnerProjects.find((element) => {
                 return element.title.trim() === item.name.trim();
               }) === undefined;
             });
@@ -999,8 +999,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeOchaProjectRequestId(selectedProject: string) {
-    let ob = Object.assign({}, {'project': selectedProject});
-    let obb = Object.assign(ob, {'partner_id': this.data.partner_id});
+    const ob = Object.assign({}, {'project': selectedProject});
+    const obb = Object.assign(ob, {'partner_id': this.data.partner_id});
     return obb;
   }
 
@@ -1009,15 +1009,15 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       return;
     }
     this.set('projectDetailsLoading', true);
-    let self = this;
+    const self = this;
     (this.$.projectDetails as EtoolsPrpAjaxEl).abort();
     (this.$.projectDetails as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: GenericObject) {
+      .then((res: GenericObject) => {
         self.set('projectDetailsLoading', false);
         self.set('projectDetails', res.data);
         fireEvent(self, 'details-loaded');
       })
-      .catch(function(err: GenericObject) {
+      .catch((err: GenericObject) => {
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
@@ -1043,14 +1043,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _redirectToDetail(id: number) {
-    let path = this.permissions.addPartnerToProject
-      ? 'response-parameters/partners/project/' + String(id)
-      : '/planned-action/project/' + String(id);
-    let url = this.buildUrl(this._baseUrlCluster, path);
+    const path = this.permissions.addPartnerToProject ?
+      'response-parameters/partners/project/' + String(id) :
+      '/planned-action/project/' + String(id);
+    const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
 
@@ -1059,7 +1059,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       return {
         id: item.id,
         value: item.id,
-        label: item.title,
+        label: item.title
       };
     });
   }
@@ -1086,19 +1086,19 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       'custom_fields': [],
       'funding': {},
       'locations': [],
-      'description': '',
+      'description': ''
     });
     this.set('projectDetails', {});
     this.set('errors', {});
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
     let locationError = false;
-    let rawLocations = this.get('data.locations') || [];
+    const rawLocations = this.get('data.locations') || [];
 
-    let changedLocations = rawLocations.map((location: GenericObject) => {
+    const changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location) {
         return location.location;
       } else {
@@ -1136,7 +1136,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       (this.$.projectAjax as EtoolsPrpAjaxEl).body = Object.assign({}, this.data);
     }
     this.updatePending = true;
-    let thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
         self.updatePending = false;
@@ -1154,8 +1154,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       .catch((err: GenericObject) => {
         self.updatePending = false;
         self.set('errors', err.data);
-        self.set('data.locations', rawLocations);   // If there are backend validation errors, reset locations
-      });                                           // to what they were before request was sent!
+        self.set('data.locations', rawLocations); // If there are backend validation errors, reset locations
+      }); // to what they were before request was sent!
   }
 
   _addEventListeners() {

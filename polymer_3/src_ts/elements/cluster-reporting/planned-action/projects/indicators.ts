@@ -144,7 +144,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeUrl() {
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     if (!this.projectId) {
       return;
     }
@@ -163,7 +163,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
     this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err) => {
         // TODO: error handling.
       });
   }

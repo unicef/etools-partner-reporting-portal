@@ -451,7 +451,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   activitiesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
@@ -468,7 +468,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   objectivesParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeObjectivesUrl(responsePlanId)'})
@@ -479,7 +479,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
   @property({type: Object})
   projectsParams = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: String, computed: '_computeProjectsUrl(responsePlanId)'})
@@ -495,7 +495,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     return [
       '_fetchProjects(partnerId)',
       '_fetchActivities(data.cluster)',
-      '_fetchObjectives(data.cluster)',
+      '_fetchObjectives(data.cluster)'
     ];
   }
 
@@ -552,8 +552,8 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('errors', {});
   }
 
-  _validate(e) {
-    e.target.validate();
+  _validate(e: CustomEvent) {
+    (e.target as any).validate();
   }
 
   _computePartnerId(partner: GenericObject, editPartner: GenericObject) {
@@ -599,15 +599,15 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('activities', []);
     this.set('activitiesParams.cluster_id', clusterId);
     this.set('activitiesUrl',
-      Endpoints.responseParametersClusterActivities(this.responsePlanId)
-      + '?cluster_id=' + clusterId);
+      Endpoints.responseParametersClusterActivities(this.responsePlanId) +
+      '?cluster_id=' + clusterId);
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('activities', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -625,10 +625,10 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('objectives', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -643,10 +643,10 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('projectsParams.partner', partnerId);
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('projects', res.data.results);
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -656,7 +656,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     const thunk = (this.$.editActivity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
     if (!valid) {
@@ -666,13 +666,13 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     this.set('updatePending', true);
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         fireEvent(self, 'pa-activity-edited', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self.close();
       })
-      .catch(function(err) {
+      .catch((err: GenericObject) => {
         self.set('errors', err.data);
         self.set('updatePending', false);
       });
