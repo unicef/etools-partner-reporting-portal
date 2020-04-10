@@ -228,7 +228,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                 <labelled-item
                     class="item item-2-col"
                     label="[[localize('location')]]">
-                  <span class="readonly">[[_getLocationTitle(locations, item, item.id, index)]]</span>
+                  <span class="readonly">[[_getLocationTitle(item.id, index)]]</span>
                 </labelled-item>
               </template>
 
@@ -579,18 +579,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _getLocations(locations: any[], loc_type: string, index: number) {
-    return locations[index] ? locations[index][loc_type] : [];
+    return locations[index] ? locations[index][loc_type] : undefined;
   }
 
   _getLocationAdminLevel(location: GenericObject) {
     return location.loc_type >= 0 ? location.loc_type : location.admin_level;
   }
 
-  _getLocationTitle(locations: any[], location: GenericObject, locationId: string, index: number) {
-    let loc_type = location.loc_type >= 0 ? location.loc_type : location.admin_level;
-    let allLocations = this._getLocations(locations, loc_type, index);
-
-    let targetLocation = allLocations.find(function(loc: GenericObject) {
+  _getLocationTitle(locationId: string, index: number) {
+    if (!this.value || !this.value[index]) {
+      return;
+    }
+    let targetLocation = (this.value[index] || []).find(function(loc: GenericObject) {
       return String(loc.id) === String(locationId);
     });
 
