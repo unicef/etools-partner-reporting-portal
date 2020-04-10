@@ -21,8 +21,8 @@ import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerPr
 import {GenericObject} from '../../../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {PlannedActionAddActivityFromProjectModalEl} from "../../../planned-action/activities/add-activity-from-project-modal";
-import {PlannedActioAddExistingActivityFromProjectModalEl} from "../../../planned-action/activities/add-existing-activity-from-project-modal";
+import {PlannedActionAddActivityFromProjectModalEl} from '../../../planned-action/activities/add-activity-from-project-modal';
+import {PlannedActioAddExistingActivityFromProjectModalEl} from '../../../planned-action/activities/add-existing-activity-from-project-modal';
 
 /**
  * @polymer
