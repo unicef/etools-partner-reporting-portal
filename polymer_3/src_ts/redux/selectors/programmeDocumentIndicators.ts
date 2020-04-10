@@ -19,7 +19,7 @@ function byPd(pdId: any, data: any) {
 }
 
 function pick(key: string) {
-  return function (state: RootState) {
+  return function(state: RootState) {
     // @ts-ignore
     return state.programmeDocumentsIndicators[key];
   };
