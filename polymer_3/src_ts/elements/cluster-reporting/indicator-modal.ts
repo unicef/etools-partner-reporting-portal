@@ -917,7 +917,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
   @property({type: Object})
   disaggregationsParams: GenericObject = {
-    page_size: 99999,
+    page_size: 99999
   };
 
   @property({type: Array, notify: true})
@@ -927,20 +927,20 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   frequencies: GenericObject[] = [
     {
       id: 'Wee',
-      title: 'Weekly',
+      title: 'Weekly'
     },
     {
       id: 'Mon',
-      title: 'Monthly',
+      title: 'Monthly'
     },
     {
       id: 'Qua',
-      title: 'Quarterly',
+      title: 'Quarterly'
     },
     {
       id: 'Csd',
-      title: 'Custom specific dates',
-    },
+      title: 'Custom specific dates'
+    }
   ];
 
   @property({type: Array})
@@ -985,13 +985,13 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _isClusterImo(prpRoles: any[]) {
-    let isImo = prpRoles.find(function(role) {
+    const isImo = prpRoles.find(function(role) {
       return role.role === 'CLUSTER_IMO';
     });
 
-    if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator'
-      || isImo !== undefined && this.modalTitle === 'Add Activity Indicator'
-      || isImo !== undefined && this.modalTitle === 'Add Cluster Activity Indicator'
+    if (isImo !== undefined && this.modalTitle === 'Add Cluster Objective Indicator' ||
+      isImo !== undefined && this.modalTitle === 'Add Activity Indicator' ||
+      isImo !== undefined && this.modalTitle === 'Add Cluster Activity Indicator'
     ) {
       this.set('mode', 'custom');
       return true;
@@ -1012,14 +1012,14 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       return;
     }
 
-    let formula = 'sum';
+    const formula = 'sum';
 
     this.set('data.blueprint.calculation_formula_across_locations', formula);
     this.set('data.blueprint.calculation_formula_across_periods', formula);
   }
 
   _resetFields(isNumber: boolean) {
-    let data = this.get('data');
+    const data = this.get('data');
     let newData;
 
     if (isNumber) {
@@ -1031,8 +1031,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('data', newData);
   }
 
+  // @ts-ignore
   _setFrequency(e: CustomEvent, data: GenericObject) {
-    let freq = (this.shadowRoot!.querySelector('#frequencies') as DomRepeat).itemForElement(data.value);
+    const freq = (this.shadowRoot!.querySelector('#frequencies') as DomRepeat).itemForElement(data.value);
     if (!freq) {
       return;
     }
@@ -1044,10 +1045,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _setDisaggregations() {
-    let selected = this.selectedDisaggregations ?
+    const selected = this.selectedDisaggregations ?
       this.selectedDisaggregations.map(function(dis) {
         return {
-          id: dis.id,
+          id: dis.id
         };
       }) : [];
     this.set('data.disaggregations', selected);
@@ -1082,11 +1083,11 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         blueprint: {
           display_type: 'number',
           calculation_formula_across_locations: 'sum',
-          calculation_formula_across_periods: 'sum',
+          calculation_formula_across_periods: 'sum'
         },
         cs_dates: [],
         locations: [],
-        disaggregations: [],
+        disaggregations: []
       });
 
       if (this.mode === 'activity') {
@@ -1098,11 +1099,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       this._fetchDisaggregations();
 
     }
+    // @ts-ignore
     this.adjustPosition();
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _showCSD(frequency: string) {
@@ -1125,7 +1127,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _fetchDisaggregations() {
-    let self = this;
+    const self = this;
 
     (this.$.disaggregations as EtoolsPrpAjaxEl).thunk()()
       .then((res: GenericObject) => {
@@ -1144,22 +1146,22 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _fetchActivities(clusterId: string) {
-    let self = this;
+    const self = this;
     if (typeof clusterId === 'undefined' || typeof this.responsePlanId === 'undefined') {
       return;
     }
     this.set('activities', []);
     this.set('activitiesParams.cluster_id', clusterId);
     this.set('activitiesUrl',
-      Endpoints.responseParametersClusterActivities(this.responsePlanId)
-      + '?cluster_id=' + clusterId);
+      Endpoints.responseParametersClusterActivities(this.responsePlanId) +
+      '?cluster_id=' + clusterId);
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     (this.$.activities as EtoolsPrpAjaxEl).thunk()()
       .then((res: GenericObject) => {
         self.set('activities', res.data.results);
       })
-      .catch((err: GenericObject) => {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -1174,17 +1176,17 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
     this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer,
       timeOut.after(250), () => {
-        let self = this;
+        const self = this;
 
         this.set('indicators', []);
 
         (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
         (this.$.indicatorsList as EtoolsPrpAjaxEl).thunk()()
           .then((res: GenericObject) => {
-            let simpleIndicatorsList: GenericObject = [];
+            const simpleIndicatorsList: GenericObject = [];
 
             res.data.results.forEach((indicator: GenericObject) => {
-              let simpleIndicator = indicator;
+              const simpleIndicator = indicator;
               simpleIndicator.title = indicator.blueprint.title;
 
               simpleIndicatorsList.push(simpleIndicator);
@@ -1210,7 +1212,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this._fetchObjectivesDebouncer = Debouncer.debounce(this._fetchObjectivesDebouncer,
       timeOut.after(250),
       () => {
-        let self = this;
+        const self = this;
 
         this.set('objectives', []);
         this.set('objectivesParams.cluster_id', selectedClusterId);
@@ -1221,7 +1223,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('objectives', res.data.results);
             fireEvent(self, 'details-loaded');
           })
-          .catch((err: GenericObject) => {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
           });
       });
@@ -1237,17 +1239,17 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer,
       timeOut.after(250),
       () => {
-        let self = this;
+        const self = this;
 
         this.set('indicators', []);
 
         (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
         (this.$.indicatorsList as EtoolsPrpAjaxEl).thunk()()
           .then((res: GenericObject) => {
-            let simpleIndicatorsList: GenericObject = [];
+            const simpleIndicatorsList: GenericObject = [];
 
             res.data.results.forEach(function(indicator: GenericObject) {
-              let simpleIndicator: GenericObject = {};
+              const simpleIndicator: GenericObject = {};
               simpleIndicator.id = indicator.id;
               simpleIndicator.title = indicator.blueprint.title;
 
@@ -1257,7 +1259,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             self.set('indicators', simpleIndicatorsList);
             fireEvent(self, 'details-loaded');
           })
-          .catch((err: GenericObject) => {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
           });
       });
@@ -1271,14 +1273,14 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this._fetchSelectedIndDebouncer = Debouncer.debounce(this._fetchSelectedIndDebouncer,
       timeOut.after(250),
       () => {
-        let self = this;
+        const self = this;
 
         if (this.mode === 'objectives') {
           this.set('data.reportable_id', selectedIndicator);
         }
 
         if (this.mode === 'activity') {
-          let chosenActivityIndicator = this.indicators.find(function(indicator) {
+          const chosenActivityIndicator = this.indicators.find(function(indicator) {
             return indicator.id === selectedIndicator;
           });
 
@@ -1295,15 +1297,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           .then((res: GenericObject) => {
             self.set('selectedIndicatorDetailType', res.data.display_type);
           })
-          .catch((err: GenericObject) => {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
           });
       });
   }
 
   _processData(rawData: GenericObject) {
-    let data = this._clone(rawData);
-    let invalidLocations: string[] = [];
+    const data = this._clone(rawData);
+    const invalidLocations: string[] = [];
 
     if (data.frequency !== 'Csd') {
       delete data.cs_dates;
@@ -1376,7 +1378,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         data.in_need.d = 100;
       }
 
-      data.locations.forEach(function(location: GenericObject, idx, arr) {
+      data.locations.forEach(function(location: GenericObject, idx: number, arr: any[]) {
         location.baseline.d = 100;
         location.target.d = 100;
         location.baseline.v = parseInt(location.baseline.v);
@@ -1484,7 +1486,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       data.baseline.c = data.baseline.v / data.baseline.d;
       data.target.c = data.target.v / data.target.d;
 
-      data.locations.forEach(function(location: GenericObject, idx, arr) {
+      data.locations.forEach((location: GenericObject, idx: number, arr: any[]) => {
         location.baseline.v = parseInt(location.baseline.v);
         location.target.v = parseInt(location.target.v);
 
@@ -1550,25 +1552,25 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       return;
     }
 
-    let dates = this.get('data.cs_dates');
-    let startDate = this._normalizeDate(startDateStr);
+    const dates = this.get('data.cs_dates');
+    const startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter((d) => {
+    this.set('data.cs_dates', dates && dates.filter((d: string) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
 
   _save() {
-    let self = this;
-    let dataCopy = this._clone(this.data);
+    const self = this;
+    const dataCopy = this._clone(this.data);
 
     let noLocationSet = false;
-    let rawLocations = this.get('data.locations') || [];
+    const rawLocations = this.get('data.locations') || [];
 
-    let changedLocations = rawLocations.map(function(location: GenericObject) {
+    const changedLocations = rawLocations.map(function(location: GenericObject) {
       if (location.location && location.location.id) {
-        let id = location.location.id;
-        let title = location.location.title;
+        const id = location.location.id;
+        const title = location.location.title;
         location.location = id;
         location.title = title;
         return location;
@@ -1592,7 +1594,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('data.locations', changedLocations);
     this._setDisaggregations();
 
-    let data = this._processData(this.get('data'));
+    const data = this._processData(this.get('data'));
 
     if (data instanceof Array) {
       this.set('errors', {locations: data});
@@ -1632,7 +1634,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       }).finally();
   }
 
-  _close(e: CustomEvent) {
+  _close(e: CustomEvent & any) {
     if (e.target!.nodeName === 'PAPER-DIALOG' ||
       e.target!.nodeName === 'PAPER-BUTTON' ||
       e.target!.nodeName === 'PAPER-ICON-BUTTON') {

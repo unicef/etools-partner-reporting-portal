@@ -32,12 +32,12 @@ import {IndicatorDetailsEl} from '../indicator-details';
 import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
-import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate} from '../../redux/actions/clusterIndicatorReports';
+import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate}
+        from '../../redux/actions/clusterIndicatorReports';
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
-
 
 
 /**
@@ -508,8 +508,8 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   containerClassName!: string;
 
   _calculationFormulaAcrossPeriods(indicator: any) {
-    return indicator.reportable.blueprint.display_type === 'ratio'
-      ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+    return indicator.reportable.blueprint.display_type === 'ratio' ?
+      'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
   }
 
   _computeIcon(opened: string) {
@@ -569,7 +569,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     return [
       Endpoints.clusterIndicatorReportsExport(responsePlanId),
       '?',
-      query,
+      query
     ].join('');
   }
 
@@ -582,7 +582,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _toggle() {
-    this.$.collapse.toggle();
+    (this.$.collapse as any).toggle();
   }
 
   _handleOpenedChanged(e: CustomEvent, data: GenericObject) {
@@ -604,7 +604,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
     this._confirmIntent()
       .then(this._commit.bind(this))
-      .catch((err: any) => {this._revert.bind(this)});
+      .catch((_err: any) => {this._revert.bind(this);});
   }
 
   _confirmIntent() {
@@ -624,10 +624,10 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
         self.set('busy', false);
         fireEvent(self, 'report-submitted', self.data.id);
       })
-      .catch(function(res: any) {
-        var errors = res.data.non_field_errors;
+      .catch((res: any) => {
+        const errors = res.data.non_field_errors;
 
-        return self.$.error.open(errors).then(function() {
+        return (self.$.error as ErrorModalEl).open(errors).then(() => {
           return Promise.reject(); // Revert
         });
       });
@@ -644,7 +644,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       clusterIndicatorReportsUpdateSingle(
         data.indicatorId,
         {
-          can_submit: true,
+          can_submit: true
         }
       )
     );
@@ -661,17 +661,17 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     (this.$.update as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(ClusterIndicatorReportsUpdate(updateThunk, this.data.id))
       // @ts-ignore
-      .then(function() {
+      .then(() => {
         self._notifyChangesSaved();
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
   _computeExportParams(queryParams: any, data: GenericObject) {
     return Object.assign({}, queryParams, {
-      indicator: data.reportable.id,
+      indicator: data.reportable.id
     });
   }
 

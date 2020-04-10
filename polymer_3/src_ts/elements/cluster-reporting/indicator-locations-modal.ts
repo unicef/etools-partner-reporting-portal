@@ -22,7 +22,7 @@ import '../labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {fireEvent} from "../../utils/fire-custom-event";
+import {fireEvent} from '../../utils/fire-custom-event';
 
 
 /**
@@ -301,7 +301,8 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     if (!locations) {
       return;
     }
-    let location = locations.results.find((loc: GenericObject) => {
+    // @ts-ignore
+    const location = locations.results.find((loc: GenericObject) => {
       return String(loc.id) === String(locationId);
     });
 
@@ -319,7 +320,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _fetchLocations() {
-    let self = this;
+    const self = this;
 
     this.set('pending', true);
 
@@ -336,11 +337,11 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
     if (!this._fieldsAreValid()) {
       return;

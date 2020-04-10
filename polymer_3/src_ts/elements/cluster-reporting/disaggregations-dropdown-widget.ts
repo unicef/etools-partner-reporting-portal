@@ -14,6 +14,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button';
+import {GenericObject} from '../../typings/globals.types';
 
 
 /**
@@ -189,7 +190,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _remove(e: CustomEvent) {
-    let toRemove = +(e.target! as PaperIconButtonElement).dataset.index!;
+    const toRemove = +(e.target! as PaperIconButtonElement).dataset.index!;
     this.splice('value', toRemove, 1);
   }
 
@@ -197,38 +198,38 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (!e.detail.selectedItem) {
       return;
     }
-    let index = +(e.target as EtoolsDropdownEl).dataset.index!;
-    let id = e.detail.selectedItem.id;
+    const index = +(e.target as EtoolsDropdownEl).dataset.index!;
+    const id = e.detail.selectedItem.id;
 
-    let selected = this.disaggregations.find(function(dis) {
+    const selected = this.disaggregations.find(function(dis) {
       return dis.id === id;
     });
 
     if (selected) {
-      let newSelectedDisaggregations = this.value.slice();
+      const newSelectedDisaggregations = this.value.slice();
       newSelectedDisaggregations[index] = selected;
       this.set('value', newSelectedDisaggregations);
     }
   }
 
-  _formatChoices(selected) {
-    return selected.choices.map((choice) => {
+  _formatChoices(selected: GenericObject) {
+    return selected.choices.map( (choice: GenericObject) => {
       return choice.value;
     }).join(', ');
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   validate() {
-    let self = this;
+    const self = this;
     this.set('invalid', false);
-    let allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
-    allMenus.forEach((menu) => {
+    const allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
+    allMenus.forEach((menu: any) => {
       menu.set('invalid', false);
     });
-    allMenus.forEach((menu) => {
+    allMenus.forEach((menu: any) => {
       if (!menu.selected) {
         menu.set('invalid', true);
         self.set('invalid', true);
@@ -237,7 +238,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (allMenus.length < 2) {
       return;
     }
-    let chosen = Array.from(allMenus).map((choice) => {
+    const chosen = Array.from(allMenus).map((choice: any) => {
       return choice.selected;
     });
 
