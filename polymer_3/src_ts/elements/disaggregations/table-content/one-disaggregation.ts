@@ -74,22 +74,22 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
       title: 'total',
       total: {
         key: '', // unused
-        data: data.disaggregation['()'],
-      },
+        data: data.disaggregation['()']
+      }
     };
   }
 
   _determineRows(columns: any[], data: GenericObject) {
     const self = this;
     return columns.map(function(z) {
-      let formatted = self._formatDisaggregationIds([z.id]);
+      const formatted = self._formatDisaggregationIds([z.id]);
 
       return {
         title: z.value,
         data: [{
           key: formatted,
-          data: data.disaggregation[formatted],
-        }],
+          data: data.disaggregation[formatted]
+        }]
       };
     }, this);
   }

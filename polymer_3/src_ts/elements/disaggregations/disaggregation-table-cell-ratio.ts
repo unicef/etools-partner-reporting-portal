@@ -118,8 +118,8 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   coords!: string;
 
   _handleInput(e: CustomEvent) {
-    let key = e.detail.key;
-    let value = e.detail.value;
+    const key = e.detail.key;
+    const value = e.detail.value;
 
     if (e.detail.internal) {
       // Dont handle self-fired events.
@@ -128,10 +128,10 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
     e.stopPropagation();
 
-    let v = this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl;
-    let d = this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl;
+    const v = this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl;
+    const d = this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl;
 
-    let change = Object.assign({}, this.get('localData'), value);
+    const change = Object.assign({}, this.get('localData'), value);
 
     if (!v.validate() || !d.validate()) {
       change.c = null;
@@ -141,7 +141,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
       fireEvent(this, 'field-value-changed', {
         key: key,
         value: change,
-        internal: true,
+        internal: true
       });
     }
 
@@ -155,21 +155,21 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   }
 
   _bindValidation(coords: string) {
-    let vName = 'v-' + coords;
+    const vName = 'v-' + coords;
     const self = this;
-    let validator = {
+    const validator = {
       validatorName: vName,
       validatorType: 'validator',
       validate: function(value: string) {
         return Number(value) !== 0 ||
           Number(((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value) === 0;
-      }.bind(self),
+      }.bind(self)
     };
 
     new IronMeta({
       type: validator.validatorType,
       key: validator.validatorName,
-      value: validator,
+      value: validator
     });
 
     this.set('vName', vName);
@@ -190,7 +190,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
     super.connectedCallback();
 
     this._addEventListeners();
-    let nullData = this._clone(this.data);
+    const nullData = this._clone(this.data);
     if (nullData !== undefined && nullData.v === 0) {
       nullData.v = null;
     }

@@ -3,8 +3,8 @@ import '@polymer/polymer/lib/elements/dom-repeat';
 import DisaggregationMixin from '../../../mixins/disaggregations-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import {disaggregationTableStyles} from '../../../styles/disaggregation-table-styles';
-import {property} from "@polymer/decorators/lib/decorators";
-import {GenericObject} from "../../../typings/globals.types";
+import {property} from '@polymer/decorators/lib/decorators';
+import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 
 
@@ -93,12 +93,12 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
 
   _determineTotals(columns: any[], data: GenericObject) {
     const self = this;
-    let columnData = columns.map(function(z) {
-      let formatted = self._formatDisaggregationIds([z.id]);
+    const columnData = columns.map(function(z) {
+      const formatted = self._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,
-        data: data.disaggregation[formatted],
+        data: data.disaggregation[formatted]
       };
     }, this);
 
@@ -107,8 +107,8 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
       data: columnData,
       total: {
         key: '', // unused,
-        data: data.disaggregation['()'],
-      },
+        data: data.disaggregation['()']
+      }
     };
   }
 

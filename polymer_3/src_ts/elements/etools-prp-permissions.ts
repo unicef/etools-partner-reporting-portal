@@ -254,7 +254,7 @@ import {GenericObject} from '../typings/globals.types';
         acc[key] = (function() {
           switch (true) {
             case Array.isArray(granted):
-              return params.prpRoles.some(function(role: any) {
+              return (params.prpRoles || []).some(function(role: any) {
                 return granted.indexOf(role.role) > -1 &&
                   (Constants.WORKSPACE_ROLES.indexOf(role.role) > -1 ?
                     (role.workspace &&

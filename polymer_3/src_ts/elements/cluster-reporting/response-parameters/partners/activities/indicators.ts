@@ -163,7 +163,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _indicatorsAjax() {
-    if (!this.activityId || !this.url) {
+    if (!this.activityId || !this.url || !this.queryParams) {
       return;
     }
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();

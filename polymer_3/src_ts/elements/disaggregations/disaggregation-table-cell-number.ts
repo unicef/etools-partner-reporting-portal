@@ -50,7 +50,7 @@ class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    let nullData = this._clone(this.data);
+    const nullData = this._clone(this.data);
     if (nullData !== undefined && nullData.v === 0) {
       nullData.v = null;
     }

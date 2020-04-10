@@ -73,6 +73,9 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
   }
 
   errorMapper(error: any) {
+    if (!error) {
+      return [];
+    }
     const self = this;
     switch (typeof error) {
       case 'string':
@@ -81,10 +84,6 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
             value: error,
           },
         ];
-
-      case null:
-      case 'undefined':
-        return [];
 
       default:
         return Object.keys(error)

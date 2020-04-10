@@ -82,7 +82,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
             <div class="flex-none layout vertical center-center col-actions">
               <div>
                 <paper-icon-button
-                    index$="[[index]]"
+                    data-index$="[[index]]"
                     class="remove-btn"
                     on-tap="_remove"
                     icon="icons:cancel">
@@ -112,7 +112,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
                   <etools-dropdown
                     class="dis-menu validate"
                     id="disaggregationsDrop"
-                    index$="[[index]]"
+                    data-index$="[[index]]"
                     label="[[localize('disaggregation_by')]]"
                     options="[[disaggregations]]"
                     option-value="id"
@@ -189,7 +189,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _remove(e: CustomEvent) {
-    let toRemove = +(e.target! as PaperIconButtonElement).getAttribute('index')!;
+    let toRemove = +(e.target! as PaperIconButtonElement).dataset.index!;
     this.splice('value', toRemove, 1);
   }
 
@@ -197,7 +197,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     if (!e.detail.selectedItem) {
       return;
     }
-    let index = +(e.target as EtoolsDropdownEl).getAttribute('index')!;
+    let index = +(e.target as EtoolsDropdownEl).dataset.index!;
     let id = e.detail.selectedItem.id;
 
     let selected = this.disaggregations.find(function(dis) {

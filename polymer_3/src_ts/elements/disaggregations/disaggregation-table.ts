@@ -270,18 +270,18 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
   _fieldValueChanged(e: CustomEvent) {
 
-    let key = e.detail.key;
+    const key = e.detail.key;
     if (!key) {
       return;
     }
-    let value = e.detail.value;
+    const value = e.detail.value;
     let totals;
 
-    let newValue = Object.assign(
+    const newValue = Object.assign(
       {
         c: null,
         d: null,
-        v: null,
+        v: null
       },
       this.get(['localData.disaggregation', key]),
       value
@@ -341,17 +341,13 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   }
 
   _computeLabelVisibility(app: string, indicatorType: string) {
-    if ((String(app) === String('ip-reporting'))
-      && (String(indicatorType) === String('number'))) {
+    if ((String(app) === 'ip-reporting') &&
+      (String(indicatorType) === 'number')) {
       return false;
     } else {return true;}
   }
 
   save() {
-    let updateThunk;
-    let cellsValid;
-    let percentagesValid;
-
     if (!this.editable) {
       return Promise.reject();
     }
@@ -360,18 +356,18 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
       field.validate();
     });
 
-    cellsValid = this.fields.every(function(field) {
+    const cellsValid = this.fields.every(function(field) {
       return !field.invalid;
     });
 
-    percentagesValid = this._fieldsAreValid();
+    const percentagesValid = this._fieldsAreValid();
 
     if (!cellsValid || !percentagesValid) {
       return Promise.reject();
     }
 
     const self = this;
-    updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
+    const updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).abort();
 
     return this.reduxStore.dispatch(
@@ -403,7 +399,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
       return;
     }
 
-    let reportedOn = formattedData.disaggregation_reported_on;
+    const reportedOn = formattedData.disaggregation_reported_on;
 
     return editableBool ? mapping.filter(function(disagg) {
       return reportedOn.indexOf(disagg.id) !== -1;
@@ -432,11 +428,12 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
       .map(function(location) {
         return {
           title: location.reporting_entity.title,
-          percentage: 1,
+          percentage: 1
         };
       });
   }
 
+  // @ts-ignore
   _initPercentageMap(localData: GenericObject, map: any[]) {
     if (!map.length) {
       return;
@@ -454,7 +451,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   }
 
   _handleInput(e: CustomEvent) {
-    let input = e.target as any;
+    const input = e.target as any;
 
     input.validate();
 
@@ -499,4 +496,3 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 window.customElements.define('disaggregation-table', DisaggregationTable);
 
 export {DisaggregationTable as DisaggregationTableEl};
-

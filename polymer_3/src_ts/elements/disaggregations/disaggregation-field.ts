@@ -83,13 +83,13 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
   }
 
   _inputValueChanged(e: CustomEvent) {
-    let change: GenericObject = {};
+    const change: GenericObject = {};
 
     change[this.key] = (e.target as any).value;
 
     fireEvent(this, 'field-value-changed', {
       key: this.coords,
-      value: this._toNumericValues(change),
+      value: this._toNumericValues(change)
     });
   }
 
