@@ -18,6 +18,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {IndicatorModalEl} from '../../../indicator-modal';
 
 /**
  * @polymer
@@ -120,12 +121,12 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get observers() {
     return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)',
+      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)'
     ];
   }
 
   _openModal() {
-    this.$.indicatorModal.open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {
@@ -147,7 +148,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeUrl() {
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.objectiveId);
     return Endpoints.indicators('co');
   }
@@ -162,7 +163,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, String(this.objectiveId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: any) => {
         // TODO: error handling.
       });
   }

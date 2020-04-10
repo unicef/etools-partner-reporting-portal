@@ -87,7 +87,7 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
 
         this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err) => {
             // TODO: error handling.
           });
       });
