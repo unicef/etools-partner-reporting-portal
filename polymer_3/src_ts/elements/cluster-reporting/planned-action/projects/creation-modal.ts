@@ -842,7 +842,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     this.set('partnerForClusters', partner);
   }
 
-  // @ts-ignore
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
     if ((edit && !data) || (!mode || !responsePlanID)) {
       return;
@@ -855,6 +854,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     } else if (mode === 'ocha') {
       return Endpoints.ochaProjectsList(responsePlanID);
     }
+    return;
   }
 
   _computeOchaProjectsUrl(responsePlanID: string) {

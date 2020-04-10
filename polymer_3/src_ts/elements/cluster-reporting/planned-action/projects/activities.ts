@@ -5,6 +5,7 @@ import '@polymer/iron-location/iron-location';
 import '../../../page-body';
 import '../../../etools-prp-ajax';
 import UtilsMixin from '../../../../mixins/utils-mixin';
+import RoutingMixin from '../../../../mixins/routing-mixin';
 import Endpoints from '../../../../endpoints';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
@@ -25,7 +26,7 @@ import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/a
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class Activities extends UtilsMixin(ReduxConnectedElement) {
+class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style include="button-styles">
@@ -105,7 +106,6 @@ class Activities extends UtilsMixin(ReduxConnectedElement) {
 
   _onSuccess(e: CustomEvent) {
     const path = '/planned-action/activity/' + String(e.detail.id);
-    // @ts-ignore
     const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
