@@ -166,6 +166,9 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   `;
   }
 
+  @property({type: String})
+  page!: String;
+
   @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
   activities!: any[];
 
@@ -199,7 +202,6 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
 
   _detailUrl(activity: GenericObject, query: string) {
     let path = '/response-parameters/partners/activity/' + activity.id;
-    // @ts-ignore
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;
     }

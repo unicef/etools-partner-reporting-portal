@@ -489,8 +489,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('pending', pending);
 
-    // @ts-ignore
-    this._fetchLocations(initial, undefined, this.get('value').length - 1);
+    this._fetchLocations(String(initial), undefined, this.get('value').length - 1);
   }
 
   _remove(e: CustomEvent) {
