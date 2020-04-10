@@ -416,20 +416,20 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   frequencies: GenericObject[] = [
     {
       id: 'Wee',
-      title: 'Weekly',
+      title: 'Weekly'
     },
     {
       id: 'Mon',
-      title: 'Monthly',
+      title: 'Monthly'
     },
     {
       id: 'Qua',
-      title: 'Quarterly',
+      title: 'Quarterly'
     },
     {
       id: 'Csd',
-      title: 'Custom specific dates',
-    },
+      title: 'Custom specific dates'
+    }
   ];
 
   @property({type: Array})
@@ -454,7 +454,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _computeLocalizedFrequencies(frequencies: GenericObject[], localize: Function) {
-    let self = this;
+    const self = this;
 
     return frequencies.map(function(frequency) {
       frequency.title = self._localizeLowerCased(frequency.title, localize);
@@ -514,7 +514,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     }
 
     this.set('data', Object.assign({
-      cs_dates: [],
+      cs_dates: []
     }, this._clone(this.get('editData'))));
 
     this.set('errors', {});
@@ -523,7 +523,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _validate(e: CustomEvent) {
-    e.target!.validate();
+    (e.target as any).validate();
   }
 
   _showCSD(frequency: GenericObject) {
@@ -538,7 +538,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _fetchLocations() {
-    let self = this;
+    const self = this;
 
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     locThunk().then((res: GenericObject) => {
@@ -553,23 +553,23 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
     this.data.start_date_of_reporting_period = moment(this.data.start_date_of_reporting_period).format(Settings.datepickerFormat);
 
-    let dates = this.get('data.cs_dates');
-    let startDate = this._normalizeDate(startDateStr);
+    const dates = this.get('data.cs_dates');
+    const startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter((d) => {
+    this.set('data.cs_dates', dates && dates.filter((d: string) => {
       return this._normalizeDate(d) >= startDate;
     }, this));
   }
 
   _save() {
-    let self = this;
+    const self = this;
 
     let noLocationSet = false;
-    let rawLocations = this.get('data.locations') || [];
+    const rawLocations = this.get('data.locations') || [];
 
-    let changedLocations = rawLocations.map(function(location: GenericObject) {
+    const changedLocations = rawLocations.map(function(location: GenericObject) {
       if (location.location && location.location.id) {
-        let id = location.location.id;
+        const id = location.location.id;
         location.location = id;
         return location;
       } else if (location.loc_type && !location.location) {

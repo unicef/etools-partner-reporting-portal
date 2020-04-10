@@ -168,7 +168,7 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
 
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _computeCurrentActivitiesCount(projectId: number, activitiesCountDict: GenericObject) {
@@ -190,7 +190,7 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;
     }
-    //Query string is passed to construct the back button.
+    // Query string is passed to construct the back button.
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 

@@ -310,7 +310,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   types = [
     {title: 'HRP', id: 'HRP'},
     {title: 'FA', id: 'FA'},
-    {title: 'OTHER', id: 'OTHER'},
+    {title: 'OTHER', id: 'OTHER'}
   ];
 
   @property({type: Array})
@@ -339,7 +339,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       '_fetchPlans(mode, ochaPlansUrl)',
       '_fetchConfig(mode, configUrl)',
       '_fetchPlanDetails(planDetailsUrl)',
-      '_setEmptyClustersError(planDetails, mode)',
+      '_setEmptyClustersError(planDetails, mode)'
     ];
   }
 
@@ -435,11 +435,11 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     (this.$.plans as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('plansLoading', false);
         self.set('plans', res.data);
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
@@ -457,12 +457,12 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     const thunk = (this.$.planDetails as EtoolsPrpAjaxEl).thunk();
     (this.$.planDetails as EtoolsPrpAjaxEl).abort();
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('planDetailsLoading', false);
         self.set('planDetails', res.data);
         fireEvent(self, 'details-loaded');
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});
         }
@@ -475,9 +475,9 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     if (mode !== 'custom') {
       return;
     }
-    var configThunk = (this.$.config as EtoolsPrpAjaxEl).thunk();
+    const configThunk = (this.$.config as EtoolsPrpAjaxEl).thunk();
     (this.$.config as EtoolsPrpAjaxEl).thunk();
-    var self = this;
+    const self = this;
     (this.$.config as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(
       fetchConfig(configThunk, configClusterTypes)
@@ -489,7 +489,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   }
 
   _savePlan() {
-
     const self = this;
     this.set('updatePending', true);
 
@@ -501,7 +500,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     }
 
     bodyThunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('updatePending', false);
         self.close();
         self.set('errors', {});
@@ -509,7 +508,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         fireEvent(self, 'refresh-plan-list');
         fireEvent(self, 'fetch-profile');
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         self.set('updatePending', false);
         if (err.code === 504) {
           fireEvent(self, 'notify', {type: 'ocha-timeout'});

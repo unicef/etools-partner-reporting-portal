@@ -24,7 +24,6 @@ import {tableStyles} from '../../styles/table-styles';
 import {GenericObject} from '../../typings/globals.types';
 
 
-
 /**
 * @polymer
 * @customElement
@@ -167,6 +166,9 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   `;
   }
 
+  @property({type: String})
+  page!: String;
+
   @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
   activities!: any[];
 
@@ -190,20 +192,20 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
 
   static get observers() {
     return [
-      '_getProjects(responsePlanID)',
+      '_getProjects(responsePlanID)'
     ];
   }
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal')!.open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(activity: GenericObject, query: string) {
-    var path = '/response-parameters/partners/activity/' + activity.id;
+    let path = '/response-parameters/partners/activity/' + activity.id;
     if (this.page === 'planned-action') {
       path = '/planned-action/activity/' + activity.id;
     }
-    //Query string is passed to construct the back button.
+    // Query string is passed to construct the back button.
     return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
   }
 
@@ -216,9 +218,9 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     (this.$.projects as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res) {
+      .then((res: any) => {
         const allProjects: GenericObject = {};
-        res.data.results.forEach(function(project) {
+        res.data.results.forEach((project: GenericObject) => {
           allProjects[project.id] = project;
         });
 

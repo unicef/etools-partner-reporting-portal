@@ -10,6 +10,7 @@ import UtilsMixin from '../../mixins/utils-mixin';
 import PaginationMixin from '../../mixins/pagination-mixin';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import '../confirm-box';
+import {ConfirmBoxEl} from '../confirm-box';
 import '../list-placeholder';
 import './cluster-report-proxy';
 import {GenericObject} from '../../typings/globals.types';
@@ -137,28 +138,28 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
     e.stopPropagation();
     const result = e.detail;
     if (!this.isIMO) {
-      this.$.confirm.run({
+      (this.$.confirm as ConfirmBoxEl).run({
         body:
           'The IMO will be informed of this submission and you will ' +
           'not be able to make any changes on this report unless it ' +
           'is sent back to you. Are you sure you’d like to Submit this report?',
         result: result,
         maxWidth: '500px',
-        mode: Constants.CONFIRM_MODAL,
+        mode: Constants.CONFIRM_MODAL
       });
     } else if (this.isIMO) {
-      this.$.confirm.run({
+      (this.$.confirm as ConfirmBoxEl).run({
         body: 'Are you sure you’d like to Submit this report?',
         result: result,
         maxWidth: '500px',
-        mode: Constants.CONFIRM_MODAL,
+        mode: Constants.CONFIRM_MODAL
       });
     }
   }
 
   _onContentsChanged(e: CustomEvent) {
-    let tail = this.totalResults % this.pageSize;
-    let last = Math.ceil(this.totalResults / this.pageSize);
+    const tail = this.totalResults % this.pageSize;
+    const last = Math.ceil(this.totalResults / this.pageSize);
 
     if (tail === 1 && last !== 1 && this.pageNumber === last) {
       e.stopPropagation();
