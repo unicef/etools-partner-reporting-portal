@@ -77,6 +77,7 @@ class ChartLegend extends LocalizeMixin(ReduxConnectedElement) {
   colors: string[] = [];
 
   _getColor(colors: string[], index: string) {
+    // @ts-ignore
     return colors[index];
   }
 

@@ -28,6 +28,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
       return;
     }
 
+    // @ts-ignore
     let parent = this.shadowRoot!.parentNode;
     const toPrint = this.shadowRoot!.querySelectorAll(this.selector);
     const style = document.createElement('style');
