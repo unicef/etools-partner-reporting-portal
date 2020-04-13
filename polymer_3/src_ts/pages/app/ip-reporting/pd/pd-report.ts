@@ -333,11 +333,11 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
       '_fetchReport(reportUrl, queryParams)',
       '_onReportChanged(routeData.report_id, routeData.mode)',
       '_onReportStatusChanged(currentReport, routeData.mode)',
-      '_handlePermissions(permissions, mode, _baseUrl, backLink)',
-    ]
+      '_handlePermissions(permissions, mode, _baseUrl, backLink)'
+    ];
   }
 
-  _computeReportUrl(locationId: string, reportId: string, _) {
+  _computeReportUrl(locationId: string, reportId: string, _: any) {
     return Endpoints.programmeDocumentReport(locationId, reportId);
   }
 
@@ -352,7 +352,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState)
+    return currentProgrammeDocument(rootState);
   }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
@@ -439,8 +439,8 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     switch (true) {
       case mode === 'view':
       case report.programme_document &&
-        (report.programme_document.status === 'Sig'
-          || report.programme_document.status === 'Clo'):
+        (report.programme_document.status === 'Sig' ||
+          report.programme_document.status === 'Clo'):
       case (!permissions || !permissions.editProgressReport):
         return false;
 
@@ -467,8 +467,8 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
 
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
-        var newPath = self.buildUrl(
+      .then((res: any) => {
+        const newPath = self.buildUrl(
           self._baseUrl,
           'pd/' + self.pdId + '/view/reports'
         );
@@ -482,8 +482,8 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         self.set('busy', false);
         self.set('path', newPath);
       })
-      .catch(function(res: GenericObject) {
-        let authorizedError = res.data.error_codes.filter(function(error: string) {
+      .catch((res: GenericObject) => {
+        const authorizedError = res.data.error_codes.filter((error: string) => {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
