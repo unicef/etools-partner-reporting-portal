@@ -16,7 +16,8 @@ import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
-import {reset} from '../redux/actions';
+// import {reset} from '../redux/actions';  (dci) TODO check use of reset
+
 /**
  * @polymer
  * @customElement
@@ -181,8 +182,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return [
       '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
       '_routeAppChanged(routeData.app)',
-      '_handleWorkspaceChange(currentWorkspace, workspaces)',
-    ]
+      '_handleWorkspaceChange(currentWorkspace, workspaces)'
+    ];
   }
 
   _redirectToWorkspace(workspace: GenericObject) {
@@ -201,7 +202,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     try {
       if (change.value.length) {
         this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync as any);
-        let workspace = change.value[0];
+        const workspace = change.value[0];
         this._redirectToWorkspace(workspace);
       }
     } catch (err) {}
@@ -287,7 +288,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    let currentWorkspaceData = workspaces.filter(function(workspace) {
+    const currentWorkspaceData = workspaces.filter((workspace) => {
       return workspace.code === currentWorkspace;
     });
 
@@ -307,9 +308,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const options = e.detail;
     try {
       if (options.text) {
-        this.$[options.type].text = options.text;
+        (this.$[options.type] as any).text = options.text;
       }
-      this.$[options.type].open();
+      (this.$[options.type] as any).open();
+      // eslint-disable-next-line no-empty
     } catch (err) {}
   }
 
@@ -337,9 +339,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
     await Promise.all([
       this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
-      this._fetchProfile(),
+      this._fetchProfile()
     ])
-      .catch(function(err: any) {
+      .catch((_err: GenericObject) => {
         window.location.href = '/landing';
       });
   }
