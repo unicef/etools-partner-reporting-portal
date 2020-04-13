@@ -8,10 +8,10 @@ import {Constructor, GenericObject} from '../typings/globals.types';
 function DisaggregationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DisaggregationClass extends baseClass {
 
-    //Used to display rows for two and three disaggregations.
-    //It will NOT work for one and zero disaggregations.
+    // Used to display rows for two and three disaggregations.
+    // It will NOT work for one and zero disaggregations.
     _determineRows(self: any, rows: GenericObject[], columns: GenericObject[]) {
-      let rowsForDisplay: GenericObject[] = [];
+      const rowsForDisplay: GenericObject[] = [];
 
       rows.forEach(function(x) {
         let formatted = '';

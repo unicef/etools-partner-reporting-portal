@@ -9,19 +9,22 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DataTableClass extends baseClass {
 
     _pageSizeChanged(e: CustomEvent) {
-      let change: GenericObject = {
-        page_size: e.detail.value,
+      const change: GenericObject = {
+        page_size: e.detail.value
       };
 
+      // @ts-ignore
       if (this._pageNumberInitialized) {
         change.page = 1;
       }
 
+      // @ts-ignore
       this.set('queryParams', Object.assign({}, this.queryParams, change));
     }
 
     _colapseExpandedDetails() {
       setTimeout(() => {
+        // @ts-ignore
         const openedDetails = (this.openedDetails as any[]) || [];
         if (openedDetails.length > 0) {
           const tempList = openedDetails.slice();
@@ -33,8 +36,9 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _pageNumberChanged(e: CustomEvent) {
       this._colapseExpandedDetails();
 
+      // @ts-ignore
       this.set('queryParams', Object.assign({}, this.queryParams, {
-        page: e.detail.value,
+        page: e.detail.value
       }));
 
       setTimeout(() => {
