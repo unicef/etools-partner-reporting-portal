@@ -270,6 +270,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   workspace!: string;
 
 
+  // @ts-ignore
   _determineIfChecked(selected: number, id: number) {
     if (id === this.selected) {
       return true;
@@ -284,7 +285,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   on-tap and change events target different elements in Chrome than in Safari and FF.
   */
 
-  //Gets correct target element when using Chrome.
+  // Gets correct target element when using Chrome.
   _handleRadioButtonChange(e: CustomEvent) {
     let target = e.target as GenericObject;
     if (target.id === 'onRadio' || target.id === 'offRadio') {
@@ -299,7 +300,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
   }
 
   _redirectToPlan(planId: string) {
-    var newPath = this.buildUrl(this._baseUrl, '/plan/' + planId + '/');
+    const newPath = this.buildUrl(this._baseUrl, '/plan/' + planId + '/');
 
     this.set('queryParams', {});
     this.set('path', newPath);

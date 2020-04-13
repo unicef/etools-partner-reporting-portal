@@ -146,15 +146,11 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
     return [
       '_updateUrlTab(routeData.tab)',
       '_getActivityAjax(url)'
-    ]
+    ];
   }
 
   _onSuccess() {
     this._getActivityAjax();
-  }
-
-  _updateTabSelection() {
-    (this.$.tabContent as PaperTabsElement).select(this.tab);
   }
 
   _updateUrlTab(tab: string) {
@@ -185,11 +181,11 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
     const self = this;
 
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self.data = res.data;
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });

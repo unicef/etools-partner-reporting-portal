@@ -71,7 +71,7 @@ class ResponseParametersPartnersRouter extends UtilsMixin(PolymerElement) {
   static get observers() {
     return [
       '_routeChanged(parentRouteData.page)'
-    ]
+    ];
   }
 
   private _routeChangeDebouncer!: Debouncer;

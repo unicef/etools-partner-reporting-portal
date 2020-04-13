@@ -90,7 +90,7 @@ class Partners extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
   static get observers() {
     return [
       '_routeChanged(routeData.subpage)'
-    ]
+    ];
   }
 
   _routeChanged(subpage: string) {
@@ -110,10 +110,11 @@ class Partners extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
 
   _resetPage(e: CustomEvent) {
     let isSelected = false;
-    let queryParams: GenericObject = {};
+    const queryParams: GenericObject = {};
 
     try {
       isSelected = e.detail.item.classList.contains('iron-selected');
+      // eslint-disable-next-line no-empty
     } catch (err) {}
 
     if (isSelected) {

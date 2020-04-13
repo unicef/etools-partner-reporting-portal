@@ -1,13 +1,3 @@
-// <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-// <link rel="import" href="../../../../bower_components/app-route/app-route.html">
-// <link rel="import" href="../../../../bower_components/app-route/app-location.html">
-// <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
-
-// <link rel="import" href="../../../behaviors/utils.html">
-// <link rel="import" href="../../../elements/page-header.html">
-// <link rel="import" href="../../../elements/page-body.html">
-
-
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
@@ -66,7 +56,7 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
 
   static get observers() {
     return [
-      '_routeChanged(routeData.page)',
+      '_routeChanged(routeData.page)'
     ];
   }
 
@@ -101,7 +91,7 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
-    })
+    });
 
   }
 
