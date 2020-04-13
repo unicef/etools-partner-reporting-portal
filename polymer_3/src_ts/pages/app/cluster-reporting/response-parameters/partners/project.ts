@@ -143,10 +143,6 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return Endpoints.plannedActionsProjectOverview(projectId);
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as PaperTabsElement).select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';

@@ -153,10 +153,6 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
     this._getActivityAjax();
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as PaperTabsElement).select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';

@@ -152,10 +152,6 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return Endpoints.plannedActionsActivityOverview(responsePlanID, activityId);
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as PaperTabsElement).select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';

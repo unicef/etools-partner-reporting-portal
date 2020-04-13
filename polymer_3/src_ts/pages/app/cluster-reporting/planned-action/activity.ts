@@ -178,10 +178,6 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     return '/planned-action/activities' + '?' + this.query;
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as any).select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';

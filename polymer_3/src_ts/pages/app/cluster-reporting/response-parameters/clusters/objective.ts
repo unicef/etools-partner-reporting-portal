@@ -157,10 +157,6 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
     this._getObjectiveAjax();
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as PaperTabsElement).select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';
