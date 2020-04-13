@@ -1,5 +1,5 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/image-icons';
@@ -30,7 +30,7 @@ class StatusBadge extends PolymerElement {
         icon="[[icon]]"
         style="color: [[color]];">
       </iron-icon>`
-      ;
+    ;
   }
 
   @property({type: String})
@@ -74,7 +74,7 @@ class StatusBadge extends PolymerElement {
         return '#273d48';
     }
     return '#273d48';
-  };
+  }
 }
 
 window.customElements.define('status-badge', StatusBadge);

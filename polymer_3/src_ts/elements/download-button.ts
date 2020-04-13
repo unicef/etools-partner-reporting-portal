@@ -9,8 +9,8 @@ import {property} from '@polymer/decorators/lib/decorators';
  * @polymer
  * @customElement
  */
-class DownloadButton extends PolymerElement{
-  public static get template(){
+class DownloadButton extends PolymerElement {
+  public static get template() {
     return html`
       <style>
         a {
@@ -18,7 +18,7 @@ class DownloadButton extends PolymerElement{
           color: var(--theme-primary-color);
         }
       </style>
-      
+
       <a
           href="[[url]]"
           tabindex="-1"
@@ -28,7 +28,7 @@ class DownloadButton extends PolymerElement{
           <slot></slot>
         </paper-button>
       </a>
-    
+
     `;
   }
 

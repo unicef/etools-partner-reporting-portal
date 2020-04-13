@@ -316,12 +316,12 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   progressBarType!: string;
 
 
-  _flagIndicator(target, baseline, isCustom: boolean) {
+  _flagIndicator(target: number, baseline: number, isCustom: boolean) {
     return !isCustom && (!target || !baseline);
   }
 
   _openModal(e: CustomEvent) {
-    this.shadowRoot!.querySelector('#modal-' + (e.target as PaperButtonElement).dataset.modalType)!.open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as PaperButtonElement).dataset.modalType) as any).open();
   }
 
   _computeIsClusterApp(appName: string) {
@@ -366,7 +366,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
       case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
         return 'cluster';
 
-      // TODO: other cases
+        // TODO: other cases
 
       default:
         return 'default';

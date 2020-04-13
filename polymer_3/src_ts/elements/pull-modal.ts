@@ -220,11 +220,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   _save() {
     const self = this;
     (this.$.pull as EtoolsPrpAjaxEl).thunk()()
-      .then(function() {
+      .then(() => {
         self.close();
         fireEvent(self, 'locations-updated');
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
@@ -240,11 +240,11 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
     const thunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: GenericObject) {
+      .then((res: GenericObject) => {
         self.set('data', {'reports': res.data});
         self.set('opened', true);
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         self._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
@@ -253,4 +253,3 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 window.customElements.define('pull-modal', PullModal);
 
 export {PullModal as PullModalEl};
-

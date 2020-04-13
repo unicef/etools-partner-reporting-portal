@@ -59,7 +59,7 @@ class LabelledItem extends PolymerElement {
   @property({type: String, computed: '_computeLabelClassName(invalid)'})
   labelClassName!: string;
 
-  _computeLabelClassName(invalid: Boolean) {
+  _computeLabelClassName(invalid: boolean) {
     return invalid ? 'error' : '';
   }
 }
