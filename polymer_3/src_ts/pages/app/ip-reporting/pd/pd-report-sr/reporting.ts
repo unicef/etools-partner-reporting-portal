@@ -168,8 +168,8 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
   static get observers() {
     return [
-      '_updateData(localData.*)',
-    ]
+      '_updateData(localData.*)'
+    ];
   }
 
   _reportInfoCurrent(rootState: RootState) {
@@ -204,7 +204,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         self.reduxStore.dispatch(pdReportsUpdate(updateThunk,
           this.pdId,
           this.reportId)
-        )
+        );
       });
   }
 
@@ -223,19 +223,19 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
 
     // get the current progress report's due date
     const progressReport = allPdReports[pdId]
-      .find(function(report) {
+      .find((report: GenericObject) => {
         return report.id === parseInt(reportId);
       });
 
     const progressReportDueDate = progressReport && progressReport.due_date ? progressReport.due_date : null;
 
     // get the current programme document
-    const currentPdReport = programmeDocuments.find(function(report) {
+    const currentPdReport = programmeDocuments.find((report) => {
       return report.id === pdId;
     });
 
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = progressReportDueDate ? currentPdReport.reporting_periods.find(function(reporting_period) {
+    const currentSrReport = progressReportDueDate ? currentPdReport.reporting_periods.find((reporting_period: GenericObject) => {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
     }) : undefined;
@@ -247,6 +247,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     }
   }
 
+  // @ts-ignore
   _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
     return (permissions && permissions.savePdReport) ? (overrideMode || mode) : 'view';
   }

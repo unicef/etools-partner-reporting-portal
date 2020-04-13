@@ -9,7 +9,7 @@ export class ProgrammeDocumentReportsState {
   current = {
     id: '',
     mode: '',
-    loading: false,
+    loading: false
   };
 }
 
@@ -20,15 +20,15 @@ export const ProgrammeDocumentReports = combineReducers({
   current: combineReducers({
     id: idReducer,
     mode: modeReducer,
-    loading: loadingReducer,
-  }),
+    loading: loadingReducer
+  })
 });
 
 function reportsByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.pdId] = action.data;
 
@@ -36,12 +36,12 @@ function reportsByPDReducer(state = {}, action: any) {
       }());
 
     case Constants.SET_PD_REPORT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
-        let reports = state[action.pdId] || [];
+        const reports: GenericObject[] = state[action.pdId] || [];
 
-        let index = reports.findIndex(function (report) {
+        const index = reports.findIndex(function(report) {
           return Number(report.id) === Number(action.data.id);
         });
 
@@ -57,10 +57,10 @@ function reportsByPDReducer(state = {}, action: any) {
       }());
 
     case Constants.UPDATE_PD_REPORT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
-        change[action.pdId] = (state[action.pdId] || []).map(function (report) {
+        change[action.pdId] = (state[action.pdId] || []).map(function(report: GenericObject) {
           return Number(report.id) === Number(action.reportId) ?
             Object.assign({}, report, action.data) : report;
         });
@@ -69,22 +69,22 @@ function reportsByPDReducer(state = {}, action: any) {
       }());
 
     case Constants.AMEND_REPORTABLE:
-      return (function () {
+      return (function() {
         /**
          * Narrative & status for a given LLO are currently extracted
          * from the first of its indicator reports. Need to update all
          * of them, to be consistent :(
          */
 
-        let change = {};
+        const change = {};
 
-        change[action.pdId] = state[action.pdId].map(function (report) {
+        change[action.pdId] = state[action.pdId].map(function(report: GenericObject) {
           if (Number(report.id) !== Number(action.reportId)) {
             return report;
           }
 
           return Object.assign({}, report, {
-            indicator_reports: report.indicator_reports.map(function (indicatorReport) {
+            indicator_reports: report.indicator_reports.map(function(indicatorReport: GenericObject) {
               if (
                 Number(indicatorReport.reportable.object_id) !==
                 Number(action.reportableId)
@@ -93,7 +93,7 @@ function reportsByPDReducer(state = {}, action: any) {
               }
 
               return Object.assign({}, indicatorReport, action.data);
-            }),
+            })
           });
         });
 
@@ -111,8 +111,8 @@ function reportsByPDReducer(state = {}, action: any) {
 function reportsCountByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS_COUNT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.pdId] = action.count;
 
@@ -127,7 +127,7 @@ function reportsCountByPDReducer(state = {}, action: any) {
 function pdIdsReducer(state = [], action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
-      return (function () {
+      return (function() {
         if (state.indexOf(action.pdId) === -1) {
           return state.concat([action.pdId]);
         }

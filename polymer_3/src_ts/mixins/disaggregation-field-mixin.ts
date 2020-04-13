@@ -9,7 +9,7 @@ function DisaggregationFieldMixin<T extends Constructor<PolymerElement>>(baseCla
   class DisaggregationFieldClass extends baseClass {
 
     _toNumericValues(obj: GenericObject) {
-      return Object.keys(obj).reduce(function(prev, curr) {
+      return Object.keys(obj).reduce((prev, curr) => {
         prev[curr] = Number(obj[curr]);
 
         return prev;

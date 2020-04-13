@@ -15,7 +15,7 @@ function ResponsiveMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     @property({type: Object})
     isDesktop: GenericObject = {
-      type: Boolean,
+      type: Boolean
     };
 
     static get observers() {

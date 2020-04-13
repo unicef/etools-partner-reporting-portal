@@ -179,27 +179,27 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
       (this.shadowRoot!.querySelector('#name') as PaperInputElement).set('invalid', true);
       return;
     }
-    let self = this;
+    const self = this;
     const thunk = (this.$.createDisaggregation as EtoolsPrpAjaxEl).thunk();
-    let newChoices = [];
-    for (var i = 0; i < this.data.choices.length; i++) {
+    const newChoices = [];
+    for (let i = 0; i < this.data.choices.length; i++) {
       newChoices.push({'value': this.data.choices[i], 'active': true});
     }
     this.data.choices = newChoices;
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         fireEvent(self, 'disaggregation-added', res.data);
         self.updatePending = false;
         self.close();
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
         self.updatePending = false;
       });
   }
 
   _checkMatchingName() {
-    let disaggregations = this.disaggregations;
+    const disaggregations = this.disaggregations;
     for (let i = 0; i < disaggregations.length; i++) {
       if (disaggregations[i].name === this.data.name.trim()) {
         return false;
@@ -209,13 +209,13 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
   }
 
   _onInput(e: CustomEvent) {
-    let el = e.target;
+    const el = e.target;
 
     (el as any).validate();
   }
 
   _formatName(e: CustomEvent) {
-    let el = e.target as any;
+    const el = e.target as any;
 
     el.value = el.value.trim();
     el.validate();

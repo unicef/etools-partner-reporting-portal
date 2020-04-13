@@ -12,7 +12,7 @@ export const ProgrammeDocuments = combineReducers({
   all: allPDsReducer,
   current: currentPDReducer,
   count: PDsCountReducer,
-  loading: loadingPDsReducer,
+  loading: loadingPDsReducer
 });
 
 function allPDsReducer(state = [], action: any) {

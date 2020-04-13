@@ -12,7 +12,7 @@ function NotificationsMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
     _notify(type: any, options?: any) {
       fireEvent(this, 'notify', Object.assign({
-        type: type,
+        type: type
       }, options));
     }
 

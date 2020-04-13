@@ -187,7 +187,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
 
   static get observers() {
     return [
-      '_getObjectivesByClusterID(data.cluster, objectivesUrl)',
+      '_getObjectivesByClusterID(data.cluster, objectivesUrl)'
     ];
   }
 
@@ -210,15 +210,15 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
   }
 
   _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
-    let self = this;
+    const self = this;
     if (clusterID && objectivesUrl) {
       this.objectivesParams = {cluster_id: this.data.cluster};
 
       (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk()()
-        .then(function(res: any) {
+        .then((res: any) => {
           self.set('objectives', res.data.results);
         })
-        .catch(function(err) {
+        .catch((_err: GenericObject) => {
           self.updatePending = false;
           // TODO: error handling
         });
@@ -240,7 +240,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    (e.target as any).validate();
   }
 
   _redirectToDetail(id: number) {
@@ -254,10 +254,10 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
       return;
     }
 
-    let self = this;
+    const self = this;
     self.updatePending = true;
     (this.$.createActivity as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         self.set('errors', {});
         self.close();
@@ -265,7 +265,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
           self._redirectToDetail(res.data.id);
         }, 100);
       })
-      .catch(function(err: any) {
+      .catch((err: any) => {
         self.set('errors', err.data);
         self.updatePending = false;
       });

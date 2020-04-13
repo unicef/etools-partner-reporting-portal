@@ -1,4 +1,3 @@
-
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
@@ -134,7 +133,7 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
-    })
+    });
   }
 
   _computeResponsePlansUrl(workspaceId: string) {
@@ -150,7 +149,7 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
 
     this.reduxStore.dispatch(fetchResponsePlans(responsePlansThunk))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err) => {
         // TODO: error handling
       });
   }

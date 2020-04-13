@@ -81,7 +81,7 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
 
         this.reduxStore.dispatch(clusterActivitiesPartnersFetch(thunk, this.activityId))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: any) => {
             // TODO: error handling.
           });
       });

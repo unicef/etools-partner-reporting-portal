@@ -10,7 +10,7 @@ export class ProgressReportsState {
 export const ProgressReports = combineReducers({
   all: allProgressReportsReducer,
   count: ProgressReportsCountReducer,
-  loading: loadingProgressReportsReducer,
+  loading: loadingProgressReportsReducer
 });
 
 function allProgressReportsReducer(state = [], action: any) {

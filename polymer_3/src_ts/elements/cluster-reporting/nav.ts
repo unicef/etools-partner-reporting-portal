@@ -208,7 +208,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
     return permissions.viewPlannedAction;
   }
 
-  //Shows the submenu item selected upon initial load.
+  // Shows the submenu item selected upon initial load.
   _routeChanged() {
     if (this.route.path.indexOf('partners') >= 0) {
       this.partnersSelected = 'iron-selected';
@@ -220,7 +220,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
   }
 
   _computePartnerQuery(partner: GenericObject) {
-    let query: GenericObject = {};
+    const query: GenericObject = {};
     if (partner && partner.id) {
       query.partner = partner.id;
     }
@@ -228,7 +228,7 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
   }
 
   _computeClusterQuery(queryParams: GenericObject) {
-    let query: GenericObject = {};
+    const query: GenericObject = {};
 
     if (queryParams.cluster_id) {
       query.cluster_id = queryParams.cluster_id;

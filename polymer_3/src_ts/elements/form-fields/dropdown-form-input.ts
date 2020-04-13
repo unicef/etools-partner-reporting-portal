@@ -4,6 +4,7 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import '@polymer/polymer/lib/elements/dom-repeat';
+import {DomRepeat} from "@polymer/polymer/lib/elements/dom-repeat";
 
 /**
  * @polymer
@@ -56,11 +57,11 @@ class DropdownFormInput extends PolymerElement {
   disabled!: string;
 
   validate() {
-    return this.$.field.validate();
+    return (this.$.field as any).validate();
   }
 
   _getValue(e: CustomEvent) {
-    const newValue = this.$.repeat.itemForElement(e.detail.item).id;
+    const newValue = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).id;
     this.value = newValue;
   }
 

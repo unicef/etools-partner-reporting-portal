@@ -139,7 +139,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _computeUrl() {
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.activityId);
 
     return Endpoints.indicators('pa');
@@ -171,7 +171,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: any) => {
         // TODO: error handling.
       });
   }

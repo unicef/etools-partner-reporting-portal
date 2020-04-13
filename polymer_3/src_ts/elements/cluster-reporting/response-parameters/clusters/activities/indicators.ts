@@ -155,7 +155,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     if (!this.activityId) {
       return;
     }
-    //Make sure the queryParams are updated before the thunk is created:
+    // Make sure the queryParams are updated before the thunk is created:
     this.set('queryParams.object_id', this.activityId);
 
     return Endpoints.indicators('ca');
@@ -170,7 +170,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this.reduxStore.dispatch(clusterActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: any) => {
         // TODO: error handling.
       });
   }
