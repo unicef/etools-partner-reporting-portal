@@ -65,8 +65,8 @@ function loadingClusterActivitiesReducer(state = false, action: any) {
 function partnersByClusterActivityIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.clusterActivityId] = action.data;
         return Object.assign({}, state, change);
@@ -83,8 +83,8 @@ function partnersByClusterActivityIdReducer(state = {}, action: any) {
 function partnersByClusterActivityIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.clusterActivityId] = action.count;
         return Object.assign({}, state, change);
@@ -111,8 +111,8 @@ function partnersByClusterActivityIdLoadingReducer(state = false, action: any) {
 function indicatorsByClusterActivityIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.clusterActivityId] = action.data;
         return Object.assign({}, state, change);
@@ -129,8 +129,8 @@ function indicatorsByClusterActivityIdReducer(state = {}, action: any) {
 function indicatorsByClusterActivityIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID_COUNT:
-      return (function () {
-        let change = {};
+      return (function() {
+        const change: GenericObject = {};
 
         change[action.clusterActivityId] = action.count;
         return Object.assign({}, state, change);

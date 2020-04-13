@@ -27,4 +27,4 @@ export const Workspaces = (state = INITIAL_STATE, action: any) => {
     default:
       return state;
   }
-}
+};

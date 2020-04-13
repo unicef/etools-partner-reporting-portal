@@ -10,25 +10,25 @@ export class ProgrammeDocumentReportsAttachmentsState {
 
 export const ProgrammeDocumentReportsAttachments = combineReducers({
   byReport: attachmentByReportReducer,
-  pendingByReport: attachmentPendingByReportReducer,
+  pendingByReport: attachmentPendingByReportReducer
 });
 
 function updateForReport(state: any, reportId: any, newValue: any) {
-  let change: GenericObject = {};
+  const change: GenericObject = {};
   let isNew = true;
 
-  if (newValue instanceof Array === true
-    || newValue instanceof Boolean === true) {
+  if (newValue instanceof Array === true ||
+    newValue instanceof Boolean === true) {
     change[reportId] = newValue;
   } else if (newValue instanceof Object === true) {
     if (newValue.action !== undefined && newValue.action === 'delete') {
-      let newAttachments = state[reportId].filter(function (attachment: any) {
+      const newAttachments = state[reportId].filter(function(attachment: any) {
         return attachment.id !== newValue.id;
       });
 
       change[reportId] = newAttachments;
     } else {
-      state[reportId].forEach(function (attachment: any, idx: number) {
+      state[reportId].forEach(function(attachment: any, idx: number) {
         if (newValue.id === attachment.id) {
           state[reportId][idx] = newValue;
           isNew = false;
