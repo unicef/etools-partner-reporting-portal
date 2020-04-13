@@ -105,8 +105,8 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
 
   public static get observers() {
     return [
-      '_updateUrlTab(routeData.dashTab)',
-    ]
+      '_updateUrlTab(routeData.dashTab)'
+    ];
   }
 
   _updateTabSelection() {
