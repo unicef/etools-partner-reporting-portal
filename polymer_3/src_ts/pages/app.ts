@@ -16,7 +16,7 @@ import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../config';
-
+// import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**
  * @polymer
