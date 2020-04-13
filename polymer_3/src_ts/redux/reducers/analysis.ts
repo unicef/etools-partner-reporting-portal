@@ -65,7 +65,7 @@ function operationalPresenceDataLoadingReducer(state = false, action: any) {
   }
 }
 
-function operationalPresenceMapReducer(state: {type: string; features: []}, action: any) {
+function operationalPresenceMapReducer(state: {type: string, features: []}, action: any) {
   if (typeof state === 'undefined') {
     state = {
       type: 'FeatureCollection',
