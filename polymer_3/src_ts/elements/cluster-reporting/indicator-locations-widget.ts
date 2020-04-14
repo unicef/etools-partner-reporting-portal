@@ -477,11 +477,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('locations', newLocations);
 
-    // const newPendingIndex = this.get('pending').length;
     const pending = this.get('pending');
-
     pending.push({initial: false});
-
     this.set('pending', pending);
 
     this._fetchLocations(String(initial), undefined, this.get('value').length - 1);
