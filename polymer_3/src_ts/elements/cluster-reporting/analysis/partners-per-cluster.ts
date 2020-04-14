@@ -65,19 +65,19 @@ class PartnersPerCluster extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Red
   cols = [
     {
       label: 'Cluster',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Count',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
-    },
+        html: true
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRows(data)'})
@@ -88,7 +88,7 @@ class PartnersPerCluster extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Red
       height: rows.length * 45 + 30,
       colors: rows.map(function() {
         return '#88c245';
-      }),
+      })
     });
   }
 

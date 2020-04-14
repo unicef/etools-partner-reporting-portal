@@ -75,41 +75,41 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
   cols = [
     {
       label: 'Time',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Progress',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
+        html: true
+      }
     },
     {
       label: 'Target',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
+        html: true
+      }
     },
     {
       label: 'In need',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
-    },
+        html: true
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRowsLocal(data, actualTarget, actualInNeed)'})
@@ -119,11 +119,11 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     return Object.assign({}, this._baseOptions, {
       colors: ['#88c245', '#4069c5', '#f19e3a'],
       chartArea: {
-        top: 20,
+        top: 20
       },
       legend: {
-        position: 'bottom',
-      },
+        position: 'bottom'
+      }
     });
   }
 
@@ -137,15 +137,15 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
         target,
         self._buildDefaultTooltipContent('Target', target),
         inNeed,
-        self._buildDefaultTooltipContent('In Need', inNeed),
+        self._buildDefaultTooltipContent('In Need', inNeed)
       ];
     }, this);
   }
 
   _buildProgressTooltipContent(tick: any, target: number, inNeed: number) {
-    var progress = this._fromJSON(tick[1]);
-    var progressAgainstTarget = progress / target;
-    var progressAgainstInNeed = progress / inNeed;
+    const progress = this._fromJSON(tick[1]);
+    const progressAgainstTarget = progress / target;
+    const progressAgainstInNeed = progress / inNeed;
 
     return [
       '<div class="tooltip-content">',
@@ -159,7 +159,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       '<div class="progress">',
       this._toPercentage(progressAgainstInNeed) + ' of In Need',
       '</div>',
-      '</div>',
+      '</div>'
     ].join('\n');
   }
 
@@ -170,7 +170,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       '<div class="number-of-partners">',
       numeral(value).format(Constants.FORMAT_NUMBER_DEFAULT),
       '</div>',
-      '</div>',
+      '</div>'
     ].join('\n');
   }
 }
