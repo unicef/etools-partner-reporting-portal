@@ -162,9 +162,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         </template>
       </header>
 
-      <template
-          is="dom-repeat"
-          items="[[value]]">
+      <template is="dom-repeat" items="[[value]]">
         <div class="row layout horizontal">
           <template
               is="dom-if"
@@ -317,14 +315,14 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   @property({type: Number})
   clusterId!: number;
 
-  @property({type: Object})
-  locations!: GenericObject;
+  @property({type: Array})
+  locations!: any[];
 
-  @property({type: Object})
-  savedLocations!: GenericObject;
+  @property({type: Array})
+  savedLocations!: any[];
 
-  @property({type: Object})
-  pending!: GenericObject;
+  @property({type: Array})
+  pending!: any[];
 
   @property({type: Boolean})
   isPai: boolean = false;
@@ -461,7 +459,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   _add() {
     const initial = 0;
-
     this.push('value', {
       loc_type: initial
     });
@@ -480,12 +477,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('locations', newLocations);
 
-    const newPendingIndex = Object.keys(this.get('pending')).length;
+    // const newPendingIndex = this.get('pending').length;
     const pending = this.get('pending');
 
-    pending[newPendingIndex] = {
-      initial: false
-    };
+    pending.push({initial: false});
 
     this.set('pending', pending);
 
@@ -493,19 +488,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _remove(e: CustomEvent) {
-    const value = this.get('value');
+
     // @ts-ignore
     const toRemove = +e.target!.dataset.index;
-    const pending = this.get('pending');
-    const locations = this.get('locations');
 
-    delete locations[toRemove];
-    delete pending[toRemove];
+    this.get('locations').map((x: any) => x).splice(toRemove, 1);
 
-    const newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+    this.get('pending').map((x: any) => x).splice(toRemove, 1);
 
-    this.set('pending', pending);
-    this.set('value', newValue);
+    const newvalue = this.get('value').map((x: any) => x);
+    newvalue.splice(toRemove, 1);
+
+    this.set('value', newvalue);
   }
 
   _validate(e: CustomEvent) {
@@ -555,7 +549,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   _fetchInitialLocations(lockedItems: any[]) {
     this.set('savedLocations', lockedItems);
 
-    const newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = this.get('locations').map((x: any) => x);
 
     if (lockedItems.length > 0) {
       lockedItems.forEach(function(location, index) {
@@ -593,15 +587,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     if (!this.value || !this.value[index]) {
       return;
     }
-    let targetLocation = (this.value[index] || []).find(function(loc: GenericObject) {
-      return String(loc.id) === String(locationId);
-    });
-
+    let targetLocation = this.value[index];
     return targetLocation ? targetLocation.title : '';
   }
 
   _setPending(loc_type: string, value: any, index: number) {
-    const newPending = Object.assign({}, this.get('pending'));
+    const newPending = this.get('pending').map((x: any) => x);
 
     if (newPending[index] === undefined) {
       newPending[index] = {};
@@ -613,7 +604,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _setLocations(loc_type: string, value: any, index: number) {
-    const newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = this.get('locations').map((x: any) => x);
 
     if (newLocations[index] === undefined) {
       newLocations[index] = {};
@@ -642,8 +633,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   connectedCallback() {
     super.connectedCallback();
-    this.set('locations', {});
-    this.set('pending', {});
+    this.set('locations', []);
+    this.set('pending', []);
 
     this._handleMessageSent = this._handleMessageSent.bind(this);
     this.messageModal = this.shadowRoot!.querySelector('#message-modal') as MessageImoModalEl;
