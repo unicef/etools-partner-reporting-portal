@@ -1,54 +1,82 @@
 import Constants from '../../constants';
 
-//App.Actions.PartnerProjects
-export const fetchPartnerProjectsList = function (thunk: any) {
-  return function (dispatch: any) {
+
+const partnerProjectsLoadingStart = function() {
+  return {
+    type: Constants.PARTNER_PROJECTS_LOADING_START
+  };
+};
+
+const partnerProjectsLoadingStop = function() {
+  return {
+    type: Constants.PARTNER_PROJECTS_LOADING_STOP
+  };
+};
+
+export const setPartnerProjectsList = function(data: any) {
+  return {
+    type: Constants.SET_PARTNER_PROJECTS_LIST,
+    data: data
+  };
+};
+
+export const setPartnerProjectsCount = function(data: any) {
+  return {
+    type: Constants.SET_PARTNER_PROJECTS_COUNT,
+    count: data.count
+  };
+};
+
+// App.Actions.PartnerProjects
+export const fetchPartnerProjectsList = function(thunk: any) {
+  return function(dispatch: any) {
     dispatch(partnerProjectsLoadingStart());
     return thunk()
-      .catch(function () {
+      .catch(function() {
         dispatch(partnerProjectsLoadingStop());
       })
-      .then(function (res: any) {
+      .then(function(res: any) {
         dispatch(setPartnerProjectsList(res.data));
         dispatch(setPartnerProjectsCount(res.data));
         dispatch(partnerProjectsLoadingStop());
       });
   };
-}
+};
 
-export const setPartnerProjectsList = function (data: any) {
+const partnerProjActivitiesSetLoadingStart = function() {
   return {
-    type: Constants.SET_PARTNER_PROJECTS_LIST,
-    data: data,
+    type: Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_START
   };
-}
+};
 
-const partnerProjectsLoadingStart = function () {
+export const partnerProjActivitiesSet = function(partnerProjectId: string, data: any) {
   return {
-    type: Constants.PARTNER_PROJECTS_LOADING_START,
+    type: Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID,
+    partnerProjectId: partnerProjectId,
+    data: data
   };
-}
+};
 
-const partnerProjectsLoadingStop = function () {
+export const partnerProjActivitiesSetCount = function(partnerProjectId: string, count: number) {
   return {
-    type: Constants.PARTNER_PROJECTS_LOADING_STOP,
+    type: Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT,
+    partnerProjectId: partnerProjectId,
+    count: count
   };
-}
+};
 
-export const setPartnerProjectsCount = function (data: any) {
+const partnerProjActivitiesSetLoadingStop = function() {
   return {
-    type: Constants.SET_PARTNER_PROJECTS_COUNT,
-    count: data.count
+    type: Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_STOP
   };
-}
+};
 
-
-//App.Actions.PartnerProjects.activities =
-export const partnerProjActivitiesFetch = function (thunk: any, partnerProjectId: any) {
-  return function (dispatch: any) {
+// App.Actions.PartnerProjects.activities =
+export const partnerProjActivitiesFetch = function(thunk: any, partnerProjectId: any) {
+  return function(dispatch: any) {
     dispatch(partnerProjActivitiesSetLoadingStart());
     return thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         dispatch(partnerProjActivitiesSet(
           partnerProjectId, res.data.results
         ));
@@ -58,43 +86,42 @@ export const partnerProjActivitiesFetch = function (thunk: any, partnerProjectId
         dispatch(partnerProjActivitiesSetLoadingStop());
       });
   };
-}
+};
 
-export const partnerProjActivitiesSet = function (partnerProjectId: string, data: any) {
+const partnerProjIndicatorsSetLoadingStart = function() {
   return {
-    type: Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID,
+    type: Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START
+  };
+};
+
+export const partnerProjIndicatorsSetIndicators = function(partnerProjectId: string, data: any) {
+  return {
+    type: Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID,
     partnerProjectId: partnerProjectId,
-    data: data,
+    data: data
   };
-}
+};
 
-export const partnerProjActivitiesSetCount = function (partnerProjectId: string, count: number) {
+export const partnerProjIndicatorsSetCount = function(partnerProjectId: string, count: number) {
   return {
-    type: Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT,
+    type: Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT,
     partnerProjectId: partnerProjectId,
-    count: count,
+    count: count
   };
-}
+};
 
-const partnerProjActivitiesSetLoadingStop = function () {
+const partnerProjIndicatorsSetLoadingStop = function() {
   return {
-    type: Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_STOP,
+    type: Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP
   };
-}
+};
 
-const partnerProjActivitiesSetLoadingStart = function () {
-  return {
-    type: Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_START,
-  };
-}
-
-
-//App.Actions.PartnerProjects.indicators =
-export const partnerProjIndicatorsFetch = function (thunk: any, partnerProjectId: string) {
-  return function (dispatch: any) {
+// App.Actions.PartnerProjects.indicators =
+export const partnerProjIndicatorsFetch = function(thunk: any, partnerProjectId: string) {
+  return function(dispatch: any) {
     dispatch(partnerProjIndicatorsSetLoadingStart());
     return thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         dispatch(partnerProjIndicatorsSetIndicators(
           partnerProjectId, res.data.results
         ));
@@ -104,32 +131,4 @@ export const partnerProjIndicatorsFetch = function (thunk: any, partnerProjectId
         dispatch(partnerProjIndicatorsSetLoadingStop());
       });
   };
-}
-
-export const partnerProjIndicatorsSetIndicators = function (partnerProjectId: string, data: any) {
-  return {
-    type: Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID,
-    partnerProjectId: partnerProjectId,
-    data: data,
-  };
-}
-
-export const partnerProjIndicatorsSetCount = function (partnerProjectId: string, count: number) {
-  return {
-    type: Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT,
-    partnerProjectId: partnerProjectId,
-    count: count,
-  };
-}
-
-const partnerProjIndicatorsSetLoadingStop = function () {
-  return {
-    type: Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP,
-  };
-}
-
-const partnerProjIndicatorsSetLoadingStart = function () {
-  return {
-    type: Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START,
-  };
-}
+};

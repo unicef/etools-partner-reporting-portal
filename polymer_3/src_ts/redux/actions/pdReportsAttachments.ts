@@ -1,27 +1,24 @@
 import Constants from '../../constants';
 
-//use instead of App.Actions.PDReportsAttachments
-export const pdReportsAttachmentsSync = function (attachmentsThunk: any, reportId: string) {
-  return function (dispatch: any) {
-    dispatch(pdReportsAttachmentsLoadingStart(reportId));
 
-    return attachmentsThunk()
-      .then(function (res: any) {
-        dispatch(pdReportsAttachmentsLoadingStop(reportId));
-        dispatch(pdReportsAttachmentsSet(reportId, res.data, res));
-      })
-      .catch(function (err: any) {
-        dispatch(pdReportsAttachmentsLoadingStop(reportId));
-
-        return Promise.reject(err);
-      });
+export const pdReportsAttachmentsLoadingStart = function(reportId: string) {
+  return {
+    type: Constants.PD_REPORT_ATTACHMENT_LOADING_START,
+    reportId: reportId
   };
-}
+};
 
-export const pdReportsAttachmentsSet = function (reportId: string, data: any, res: any) {
+export const pdReportsAttachmentsLoadingStop = function(reportId: string) {
+  return {
+    type: Constants.PD_REPORT_ATTACHMENT_LOADING_STOP,
+    reportId: reportId
+  };
+};
+
+export const pdReportsAttachmentsSet = function(reportId: string, data: any, res: any) {
   if (res.status === 204) {
-    let resUrl = res.xhr.responseURL.split('/');
-    let deletedAttachmentId = resUrl[resUrl.length - 2];
+    const resUrl = res.xhr.responseURL.split('/');
+    const deletedAttachmentId = resUrl[resUrl.length - 2];
 
     return {
       type: Constants.SET_PD_REPORT_ATTACHMENT,
@@ -35,18 +32,22 @@ export const pdReportsAttachmentsSet = function (reportId: string, data: any, re
       data: data
     };
   }
-}
+};
 
-export const pdReportsAttachmentsLoadingStart = function (reportId: string) {
-  return {
-    type: Constants.PD_REPORT_ATTACHMENT_LOADING_START,
-    reportId: reportId,
-  };
-}
+// use instead of App.Actions.PDReportsAttachments
+export const pdReportsAttachmentsSync = function(attachmentsThunk: any, reportId: string) {
+  return function(dispatch: any) {
+    dispatch(pdReportsAttachmentsLoadingStart(reportId));
 
-export const pdReportsAttachmentsLoadingStop = function (reportId: string) {
-  return {
-    type: Constants.PD_REPORT_ATTACHMENT_LOADING_STOP,
-    reportId: reportId,
+    return attachmentsThunk()
+      .then(function(res: any) {
+        dispatch(pdReportsAttachmentsLoadingStop(reportId));
+        dispatch(pdReportsAttachmentsSet(reportId, res.data, res));
+      })
+      .catch(function(err: any) {
+        dispatch(pdReportsAttachmentsLoadingStop(reportId));
+
+        return Promise.reject(err);
+      });
   };
-}
+};

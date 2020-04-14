@@ -1,54 +1,82 @@
-import Constants from "../../constants";
+import Constants from '../../constants';
 
-//App.Actions.ClusterObjectives
-export const fetchClusterObjectivesList = function (thunk: any) {
-  return function (dispatch: any) {
+
+const clusterObjectivesLoadingStart = function() {
+  return {
+    type: Constants.CLUSTER_OBJECTIVES_LOADING_START
+  };
+};
+
+const setClusterObjectivesList = function(data: any) {
+  return {
+    type: Constants.SET_CLUSTER_OBJECTIVES_LIST,
+    data: data
+  };
+};
+
+const setClusterObjectivesCount = function(data: any) {
+  return {
+    type: Constants.SET_CLUSTER_OBJECTIVES_COUNT,
+    count: data.count
+  };
+};
+
+const clusterObjectivesLoadingStop = function() {
+  return {
+    type: Constants.CLUSTER_OBJECTIVES_LOADING_STOP
+  };
+};
+
+// App.Actions.ClusterObjectives
+export const fetchClusterObjectivesList = function(thunk: any) {
+  return function(dispatch: any) {
     dispatch(clusterObjectivesLoadingStart());
     return thunk()
-      .catch(function () {
+      .catch(function() {
         dispatch(clusterObjectivesLoadingStart());
       })
-      .then(function (res: any) {
+      .then(function(res: any) {
         dispatch(setClusterObjectivesList(res.data));
         dispatch(setClusterObjectivesCount(res.data));
         dispatch(clusterObjectivesLoadingStop());
       });
   };
-}
+};
 
-const setClusterObjectivesList = function (data: any) {
+const setLoadingStart = function() {
   return {
-    type: Constants.SET_CLUSTER_OBJECTIVES_LIST,
-    data: data,
+    type: Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_START
   };
-}
+};
 
-const clusterObjectivesLoadingStart = function () {
+const setIndicators = function(clusterObjectiveId: string, data: any) {
   return {
-    type: Constants.CLUSTER_OBJECTIVES_LOADING_START,
+    type: Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID,
+    clusterObjectiveId: clusterObjectiveId,
+    data: data
   };
-}
+};
 
-const clusterObjectivesLoadingStop = function () {
+const setCount = function(clusterObjectiveId: string, count: any) {
   return {
-    type: Constants.CLUSTER_OBJECTIVES_LOADING_STOP,
+    type: Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT,
+    clusterObjectiveId: clusterObjectiveId,
+    count: count
   };
-}
+};
 
-const setClusterObjectivesCount = function (data: any) {
+const setLoadingStop = function() {
   return {
-    type: Constants.SET_CLUSTER_OBJECTIVES_COUNT,
-    count: data.count
+    type: Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_STOP
   };
-}
+};
 
-
-//App.Actions.ClusterObjectives.indicators 
-export const clusterObjectivesIndicatorsFetch = function (thunk: any, clusterObjectiveId: string) {
-  return function (dispatch: any) {
+// App.Actions.ClusterObjectives.indicators
+export const clusterObjectivesIndicatorsFetch = function(thunk: any, clusterObjectiveId: string) {
+  return function(dispatch: any) {
     dispatch(setLoadingStart());
     return thunk()
-      .then(function (res: any) {
+      .then(function(res: any) {
         dispatch(setIndicators(
           clusterObjectiveId, res.data.results
         ));
@@ -58,32 +86,4 @@ export const clusterObjectivesIndicatorsFetch = function (thunk: any, clusterObj
         dispatch(setLoadingStop());
       });
   };
-}
-
-const setIndicators = function (clusterObjectiveId: string, data: any) {
-  return {
-    type: Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID,
-    clusterObjectiveId: clusterObjectiveId,
-    data: data,
-  };
-}
-
-const setCount = function (clusterObjectiveId: string, count: any) {
-  return {
-    type: Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT,
-    clusterObjectiveId: clusterObjectiveId,
-    count: count,
-  };
-}
-
-const setLoadingStop = function () {
-  return {
-    type: Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_STOP,
-  };
-}
-
-const setLoadingStart = function () {
-  return {
-    type: Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_START,
-  };
-}
+};
