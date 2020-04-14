@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import Constants from '../../../constants'
+import Constants from '../../../constants';
 import {ConfirmBoxEl} from '../../confirm-box';
 import '../../list-placeholder';
 import '../../cluster-reporting/cluster-report';
@@ -117,14 +117,14 @@ class ReportsList extends ReduxConnectedElement {
           'is sent back to you. Are you sure you’d like to Submit this report?',
         result: result,
         maxWidth: '500px',
-        mode: Constants.CONFIRM_MODAL,
+        mode: Constants.CONFIRM_MODAL
       });
     } else if (this.isIMO) {
       (this.$.confirm as ConfirmBoxEl).run({
         body: 'Are you sure you’d like to Submit this report?',
         result: result,
         maxWidth: '500px',
-        mode: Constants.CONFIRM_MODAL,
+        mode: Constants.CONFIRM_MODAL
       });
     }
   }

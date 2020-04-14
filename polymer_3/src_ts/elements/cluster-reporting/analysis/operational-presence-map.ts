@@ -337,31 +337,31 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     'font-size: 2.5em;',
     'line-height: 2;',
     'color: #fff;',
-    '}',
+    '}'
   ].join('\n');
 
   @property({type: Array})
   legend = [
     {
       threshold: 0,
-      color: '#e7f2fd',
+      color: '#e7f2fd'
     },
     {
       threshold: 5,
-      color: '#93b6e6',
+      color: '#93b6e6'
     },
     {
       threshold: 10,
-      color: '#5e84d0',
+      color: '#5e84d0'
     },
     {
       threshold: 15,
-      color: '#355ab8',
+      color: '#355ab8'
     },
     {
       threshold: 20,
-      color: '#123666',
-    },
+      color: '#123666'
+    }
   ];
 
   @property({type: Boolean})
@@ -384,12 +384,12 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     return [
       'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}',
       '?access_token=',
-      accessToken,
+      accessToken
     ].join('');
   }
 
   _setCurrentWorkspaceCoords(all: any, currentCode: string) {
-    var currentWorkspace = all.find(function(workspace: any) {
+    const currentWorkspace = all.find(function(workspace: any) {
       return workspace.code === currentCode;
     });
 
@@ -397,8 +397,8 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   }
 
   _getLegendIndex(properties: GenericObject, legend: any) {
-    var partnersCount = properties.partners.all.length;
-    var index = 0;
+    const partnersCount = properties.partners.all.length;
+    let index = 0;
 
     while (partnersCount >= legend[index].threshold) {
       index++;
@@ -408,13 +408,13 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   }
 
   _computePolygonColor(properties: GenericObject, legend: any) {
-    var index = this._getLegendIndex(properties, legend);
+    const index = this._getLegendIndex(properties, legend);
 
     return legend[index].color;
   }
 
   _computeMarkerIcon(properties: GenericObject, legend: any) {
-    var index = this._getLegendIndex(properties, legend);
+    const index = this._getLegendIndex(properties, legend);
 
     return '/app/images/marker' + index + '.png';
   }
@@ -428,11 +428,11 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   }
 
   _computeCenter(map: GenericObject) {
-    var minLon = 180;
-    var maxLon = -180;
-    var minLat = 90;
-    var maxLat = -90;
-    var self = this;
+    let minLon = 180;
+    let maxLon = -180;
+    let minLat = 90;
+    let maxLat = -90;
+    const self = this;
 
     function traverse(node: any) {
       if (self._isPoint(node)) {
@@ -459,7 +459,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     }
     return [
       minLon + (maxLon - minLon) / 2,
-      minLat + (maxLat - minLat) / 2,
+      minLat + (maxLat - minLat) / 2
     ];
   }
 

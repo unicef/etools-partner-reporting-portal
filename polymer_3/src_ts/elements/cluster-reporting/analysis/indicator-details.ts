@@ -26,7 +26,7 @@ import {analysis_indicators_fetchSingle} from '../../../redux/actions/analysis';
 * @appliesMixin LocalizeMixin
 * @appliesMixin UtilsMixin
 */
-class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+export class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   static get template() {
     return html`
@@ -286,7 +286,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   init() {
-    var indicatorThunk = (this.$.indicator as EtoolsPrpAjaxEl).thunk();;
+    const indicatorThunk = (this.$.indicator as EtoolsPrpAjaxEl).thunk();
 
     if (this.initialized) {
       return;
@@ -296,11 +296,13 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     (this.$.indicator as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(
       analysis_indicators_fetchSingle(indicatorThunk, this.indicatorId))
-      //@ts-ignore
-      .catch(function(_err: any) {
+      // @ts-ignore
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }
 }
 
 window.customElements.define('analysis-indicator-details', IndicatorDetails);
+
+export {IndicatorDetails as IndicatorDetailsEl};
