@@ -13,7 +13,7 @@ import './indicator-details';
 import {sharedStyles} from '../../../styles/shared-styles';
 import {GenericObject} from '../../../typings/globals.types';
 import '../../cluster-reporting/analysis/indicator-details';
-import {IndicatorDetails} from './indicator-details';
+import {IndicatorDetailsEl} from '../../cluster-reporting/analysis/indicator-details';
 
 /**
 * @polymer
@@ -207,7 +207,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _toggle(e: CustomEvent) {
-    (this.shadowRoot!.querySelector('#collapse-' +( e.target! as any).toggles) as any).toggle();
+    (this.shadowRoot!.querySelector('#collapse-' + (e.target! as any).toggles) as any).toggle();
   }
 
   _computeObjectiveTitle(data: GenericObject) {
@@ -249,7 +249,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
       const indicatorDetails = (e.target as HTMLElement)!.querySelector('analysis-indicator-details');
       try {
         if (indicatorDetails) {
-          (indicatorDetails as IndicatorDetails).init();
+          (indicatorDetails as IndicatorDetailsEl).init();
         }
         // eslint-disable-next-line no-empty
       } catch (err) {}

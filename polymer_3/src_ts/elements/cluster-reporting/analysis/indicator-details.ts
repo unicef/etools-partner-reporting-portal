@@ -304,3 +304,5 @@ export class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEle
 }
 
 window.customElements.define('analysis-indicator-details', IndicatorDetails);
+
+export {IndicatorDetails as IndicatorDetailsEl};
