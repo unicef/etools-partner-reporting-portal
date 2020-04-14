@@ -31,7 +31,7 @@ class ReportingPeriod extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         </style>
 
         [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>`
-      ;
+    ;
   }
 
   @property({type: String})

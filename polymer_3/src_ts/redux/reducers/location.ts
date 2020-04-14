@@ -19,4 +19,4 @@ export const Location = (state = INITIAL_STATE, action: any) => {
     default:
       return state;
   }
-}
+};

@@ -9,21 +9,21 @@ import {GenericObject} from '../typings/globals.types';
  * @polymer
  * @customElement
  */
-class ErrorBoxErrors extends PolymerElement{
-  public static get template(){
+class ErrorBoxErrors extends PolymerElement {
+  public static get template() {
     return html`
       <style>
         :host {
           display: block;
         }
-  
+
         ul {
           padding-left: 2em;
           margin: 0;
           font-size: 12px;
         }
       </style>
-      
+
       <ul>
         <template
             is="dom-repeat"
@@ -36,14 +36,14 @@ class ErrorBoxErrors extends PolymerElement{
                 restamp="true">
               <span>[[error.field]]:</span>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[error.value]]"
                 restamp="true">
               <span>[[error.value]]</span>
             </template>
-  
+
             <template
                 is="dom-if"
                 if="[[error.details]]"
@@ -55,8 +55,8 @@ class ErrorBoxErrors extends PolymerElement{
           </li>
         </template>
       </ul>
-      
-      
+
+
     `;
   }
 

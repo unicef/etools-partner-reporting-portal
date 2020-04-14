@@ -23,14 +23,14 @@ export const Auth = (state = INITIAL_STATE, action: any) => {
 
     case Constants.SET_ACCOUNT_TYPE:
       return (function() {
-        let isPartner = !!action.data.partner;
+        const isPartner = !!action.data.partner;
 
         return {
           ...state,
           accountType: (isPartner ?
             Constants.ACCOUNT_TYPE_PARTNER :
             Constants.ACCOUNT_TYPE_CLUSTER)
-        }
+        };
       }());
 
     case Constants.RESET:
@@ -43,4 +43,4 @@ export const Auth = (state = INITIAL_STATE, action: any) => {
     default:
       return state;
   }
-}
+};

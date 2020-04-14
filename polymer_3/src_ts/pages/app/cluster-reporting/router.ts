@@ -187,7 +187,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
       '_routePageChanged(routeData.page)',
       '_routePlanChanged(routeData.plan)',
       '_routeCurrentPlanChanged(routeData.plan, allPlans)',
-      '_planChanged(plan)',
+      '_planChanged(plan)'
     ];
   }
 
@@ -201,7 +201,7 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
       .catch((err: any) => {
         console.log(err);
         this._notFound();
-      }).then(() => {this.set('loading', false);})
+      }).then(() => {this.set('loading', false);});
   }
 
   _computeViewPlannedAction(permissions: GenericObject) {
@@ -233,14 +233,14 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
   }
 
   _routePageChanged(page: string) {
-    var newPage = page || 'dashboard';
+    const newPage = page || 'dashboard';
 
     this.set('page', newPage);
 
     if (newPage !== page) {
       setTimeout(() => {
         this.set('routeData.page', newPage);
-      })
+      });
     }
   }
 

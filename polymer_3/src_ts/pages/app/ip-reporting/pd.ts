@@ -110,8 +110,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
     return [
       '_handleInputChange(programmeDocumentsUrl, queryParams)',
       '_routePdIdChanged(routeData.pd_id)',
-      '_routePathChanged(route.path)',
-    ]
+      '_routePathChanged(route.path)'
+    ];
   }
 
   _currentProgrammeDocument(rootState: RootState) {
@@ -154,7 +154,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
-  _handleInputChange(programmeDocumentsUrl) {
+  _handleInputChange(programmeDocumentsUrl: string) {
     if (!programmeDocumentsUrl) {
       return;
     }
@@ -177,7 +177,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
 
         this.reduxStore.dispatch(pdFetch(pdThunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling
           });
       });

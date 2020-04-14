@@ -49,8 +49,8 @@ class ClusterDropdownContent extends ReduxConnectedElement {
 
   public static get observers() {
     return [
-      '_fetchClusterNames(clusterNamesUrl, params)',
-    ]
+      '_fetchClusterNames(clusterNamesUrl, params)'
+    ];
   }
 
   _computeClusterNamesUrl(responsePlanId: string) {
@@ -76,10 +76,10 @@ class ClusterDropdownContent extends ReduxConnectedElement {
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: GenericObject) => {
         self.set('clusters', res.data);
       })
-      .catch(function(err: any) {
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }

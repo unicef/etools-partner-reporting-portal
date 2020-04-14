@@ -87,7 +87,7 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
 
   static get observers() {
     return [
-      '_projectsAjax(queryParams, url)',
+      '_projectsAjax(queryParams, url)'
     ];
   }
 
@@ -148,10 +148,10 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
 
         this.reduxStore.dispatch(fetchPartnerProjectsList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling.
           });
-      })
+      });
   }
 
   disconnectedCallback() {

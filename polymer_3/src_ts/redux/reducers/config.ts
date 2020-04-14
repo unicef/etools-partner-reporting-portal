@@ -9,7 +9,7 @@ export class ConfigState {
 
 export const Config = combineReducers({
   data: configReducer,
-  loading: configLoadingReducer,
+  loading: configLoadingReducer
 });
 
 function configReducer(state = {}, action: any) {

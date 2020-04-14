@@ -10,7 +10,7 @@ export class ClusterDisaggregationsState {
 export const ClusterDisaggregations = combineReducers({
   all: clusterDisaggregationsListReducer,
   count: clusterDisaggregationsCountReducer,
-  loading: loadingClusterDisaggregationsReducer,
+  loading: loadingClusterDisaggregationsReducer
 });
 
 function clusterDisaggregationsListReducer(state = [], action: any) {

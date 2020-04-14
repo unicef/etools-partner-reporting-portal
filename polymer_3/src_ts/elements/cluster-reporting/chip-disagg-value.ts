@@ -134,7 +134,7 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _handleKeyup(e: CustomEvent) {
-    var key = e.which;
+    const key = (e as any).which;
 
     if (key === 13) {
       this._add();

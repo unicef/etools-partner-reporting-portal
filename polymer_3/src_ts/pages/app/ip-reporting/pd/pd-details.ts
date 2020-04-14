@@ -17,6 +17,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 import {sharedStyles} from '../../../../styles/shared-styles';
 import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments';
 import {RootState} from '../../../../typings/redux.types';
+import {IronPagesElement} from '@polymer/iron-pages/iron-pages';
 
 /**
  * @polymer
@@ -104,12 +105,12 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
 
   public static get observers() {
     return [
-      '_updateUrlTab(routeData.dashTab)',
-    ]
+      '_updateUrlTab(routeData.dashTab)'
+    ];
   }
 
   _updateTabSelection() {
-    this.$.tabContent.select(this.pdTab);
+    (this.$.tabContent as IronPagesElement).select(this.pdTab);
   }
 
   _updateUrlTab(dashTab: string) {

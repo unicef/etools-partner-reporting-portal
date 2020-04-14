@@ -79,7 +79,7 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
 
   _computeParams(queryParams: GenericObject) {
     return Object.assign({}, queryParams, {
-      submitted: this.submitted + '',
+      submitted: this.submitted + ''
     });
   }
 
@@ -101,7 +101,7 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
 
     this.reduxStore.dispatch(clusterIndicatorReportsFetch(reportsThunk, reset))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
@@ -125,13 +125,13 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
     e.stopPropagation();
 
     const reportId = e.detail;
-    let ajax = document.createElement('etools-prp-ajax') as EtoolsPrpAjaxEl;
+    const ajax = document.createElement('etools-prp-ajax') as EtoolsPrpAjaxEl;
 
     ajax.url = Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
 
     this.reduxStore.dispatch(clusterIndicatorReportsFetchSingle(ajax.thunk(), reportId))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err) => {
         // TODO: error handling
       });
   }

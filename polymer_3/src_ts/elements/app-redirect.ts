@@ -22,8 +22,8 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
 
   public static get observers() {
     return [
-      '_redirectIfNeeded(app, workspace, profile)',
-    ]
+      '_redirectIfNeeded(app, workspace, profile)'
+    ];
   }
 
   _redirectIfNeeded(app: string, workspace: string, profile: GenericObject) {
@@ -33,6 +33,7 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
     if (!profile.access || !profile.access.length) {
       location.href = '/unauthorized';
     } else if (profile.access.indexOf(app) === -1) {
+      // @ts-ignore
       location.href = this.buildBaseUrl(workspace, profile.access[0]);
     }
   }

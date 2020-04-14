@@ -181,7 +181,7 @@ class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixi
   }
 
   _validate(e: CustomEvent) {
-    e.target.validate();
+    (e.target as any).validate();
   }
 
   _save() {
@@ -189,15 +189,15 @@ class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixi
       return;
     }
 
-    let self = this;
+    const self = this;
     const thunk = (this.$.editObjective as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.updatePending = false;
         fireEvent(self, 'objective-edited', res.data);
         self.close();
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });

@@ -21,6 +21,7 @@ import {sharedStyles} from '../../../../styles/shared-styles';
 import {GenericObject} from '../../../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 
+
 /**
  * @polymer
  * @customElement
@@ -177,10 +178,6 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     return '/planned-action/activities' + '?' + this.query;
   }
 
-  _updateTabSelection() {
-    this.$.tabContent.select(this.tab);
-  }
-
   _updateUrlTab(tab: string) {
     if (!tab) {
       tab = 'overview';
@@ -201,18 +198,18 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     if (this.projects === undefined || this.queryParams === undefined) {
       return;
     }
-    const self = this;
+    const self: any = this;
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
       // @ts-ignore
-      .then(function(res) {
+      .then((res: GenericObject) => {
         self.updatePending = false;
         res.data.projects.forEach(function(project: GenericObject) {
           project.title = self.projects[project.project_id].title;
         });
         self.activityData = res.data;
       })
-      .catch(function(err) {
+      .catch((_err: GenericObject) => {
         self.updatePending = false;
         // TODO: error handling
       });
@@ -228,9 +225,9 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     projectsThunk()
-      .then(function(res) {
-        let allProjects: GenericObject = {};
-        res.data.results.forEach(function(project) {
+      .then((res: GenericObject) => {
+        const allProjects: GenericObject = {};
+        res.data.results.forEach((project: GenericObject) => {
           allProjects[project.id] = project;
         });
 

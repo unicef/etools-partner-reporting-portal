@@ -169,7 +169,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
       // @ts-ignore
-      .catch(function(err) {
+      .catch((_err: any) => {
         // TODO: error handling.
       });
   }

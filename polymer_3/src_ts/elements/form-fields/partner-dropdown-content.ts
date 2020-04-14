@@ -49,8 +49,8 @@ class PartnerDropdownContent extends ReduxConnectedElement {
 
   public static get observers() {
     return [
-      '_fetchPartnerNames(partnerNamesUrl, params)',
-    ]
+      '_fetchPartnerNames(partnerNamesUrl, params)'
+    ];
   }
 
   _computePartnerNamesUrl(responsePlanID: string) {
@@ -75,23 +75,21 @@ class PartnerDropdownContent extends ReduxConnectedElement {
     const self = this;
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
-      .then(function(res: any) {
+      .then((res: any) => {
         self.set('partners', res.data);
       })
       // @ts-ignore
-      .catch(function(err: any) {
+      .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
   }
 
 }
-
 
 window.customElements.define('partner-dropdown-content', PartnerDropdownContent);
 

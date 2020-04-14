@@ -9,7 +9,7 @@ export class ClusterObjectivesState {
   indicators: GenericObject = {};
   indicatorsCount = 0;
   indicatorsLoading = false;
-};
+}
 
 export const ClusterObjectives = combineReducers({
   all: clusterObjectivesListReducer,
@@ -60,7 +60,7 @@ function indicatorsByClusterObjectiveIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID:
       return (function() {
-        let change: GenericObject = {};
+        const change: GenericObject = {};
 
         change[action.clusterObjectiveId] = action.data;
         return Object.assign({}, state, change);
@@ -78,7 +78,7 @@ function indicatorsByClusterObjectiveIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT:
       return (function() {
-        let change: GenericObject = {};
+        const change: GenericObject = {};
 
         change[action.clusterObjectiveId] = action.count;
         return Object.assign({}, state, change);

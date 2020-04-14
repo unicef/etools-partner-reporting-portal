@@ -12,7 +12,7 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/iron-form/iron-form';
 
 import Endpoints from '../endpoints';
-import ResponsiveMixin from '../mixins/responsive-mixin'
+import ResponsiveMixin from '../mixins/responsive-mixin';
 import LocalizeMixin from '../mixins/localize-mixin';
 import '../elements/etools-logo';
 import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
@@ -250,12 +250,12 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
 
     const thunk = (this.$.getProfile as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function (res: any) {
+      .then((res: any) => {
         if (res.status === 200) {
           window.location.href = `/${BASE_PATH}/`;
         }
       })
-      .catch(function (err: any) {
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }
@@ -268,11 +268,11 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
     }
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function () {
+      .then(() => {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       })
-      .catch(function () {
+      .catch(() => {
         self.set('emailSubmitted', true);
         self.set('data.email', '');
       });

@@ -114,7 +114,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   static get observers() {
     return [
       '_clusterActivitiesAjax(queryParams, activitiesUrl)'
-    ]
+    ];
   }
 
   _computeUrl(responsePlanID: string) {
@@ -144,7 +144,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
 
         this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err: GenericObject) => {
             // TODO: error handling.
           });
       });

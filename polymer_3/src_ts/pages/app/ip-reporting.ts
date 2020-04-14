@@ -152,7 +152,7 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
-    })
+    });
   }
 
   _notFound() {

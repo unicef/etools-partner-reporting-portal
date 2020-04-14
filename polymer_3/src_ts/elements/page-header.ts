@@ -1,11 +1,11 @@
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
-import "@polymer/polymer/lib/elements/dom-if";
-import "@polymer/paper-styles/typography";
-import "@polymer/iron-icons/iron-icons";
-import "@polymer/paper-icon-button/paper-icon-button";
-import "@polymer/iron-flex-layout/iron-flex-layout-classes";
+import {property} from '@polymer/decorators/lib/decorators';
+import '@polymer/polymer/lib/elements/dom-if';
+import '@polymer/paper-styles/typography';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 
 import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';

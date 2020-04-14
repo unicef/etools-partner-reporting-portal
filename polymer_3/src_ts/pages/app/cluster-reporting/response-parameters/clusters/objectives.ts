@@ -107,7 +107,7 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
   static get observers() {
     return [
       '_clusterObjectivesAjax(queryParams, objectivesUrl)'
-    ]
+    ];
   }
 
   private _clusterObjectivesAjaxDebouncer!: Debouncer;
@@ -137,7 +137,7 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
 
         this.reduxStore.dispatch(fetchClusterObjectivesList(thunk))
           // @ts-ignore
-          .catch(function(err) {
+          .catch((_err) => {
             //   // TODO: error handling.
           });
       });

@@ -50,4 +50,3 @@ class AddPlanPanel extends PolymerElement {
 }
 
 window.customElements.define('add-plan-panel', AddPlanPanel);
-

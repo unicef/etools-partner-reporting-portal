@@ -6,8 +6,8 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
 import RoutingMixin from '../mixins/routing-mixin';
-import {setWorkspace} from "../redux/actions";
-import {ReduxConnectedElement} from "../ReduxConnectedElement";
+import {setWorkspace} from '../redux/actions';
+import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {GenericObject} from '../typings/globals.types';
 import {getDomainByEnv} from '../config';
 
@@ -85,7 +85,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
           </template>
         </paper-listbox>
       </paper-dropdown-menu>`
-      ;
+    ;
   }
 
   @property({type: Object, computed: '_computeWorkspace(data, current)'})
@@ -101,7 +101,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   data!: any[];
 
   _workspaceSelected(e: CustomEvent) {
-    let newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
+    const newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
     if (newCode === this.current) {
       return;
     }
@@ -111,7 +111,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
 
   }
 
-  //code is defined current...assumed it will be number
+  // code is defined current...assumed it will be number
   _computeWorkspace(data: any[], code: number) {
     if (data) {
       return data.filter(function(workspace) {

@@ -30,7 +30,7 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       if (dialogOverlay.parentElement) {
         dialogOverlay.parentElement.removeChild(dialogOverlay);
       }
-      this.$.drawer.style.zIndex = '-1';
+      (this.$.drawer as any).zIndex = '-1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       if (!pageOverlay.classList.contains('opened')) {
         pageOverlay.style.zIndex = zIndex;
@@ -38,14 +38,14 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       }
     }
 
-    _dialogClosing(event: CustomEvent) {
+    _dialogClosing(event: CustomEvent & any) {
       // chrome
       const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
       if (dialogOverlay && dialogOverlay.parentElement) {
         dialogOverlay.parentElement.removeChild(dialogOverlay);
       }
 
-      const paths = (event as any).path || [];
+      const paths = event.path || [];
       if (paths.length) {
         if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) ||
           (paths.filter((x: any) => x.tagName === 'CHIP-DISAGG-VALUE' || x.tagName === 'CHIP-DATE-OF-REPORT').length)) {
@@ -55,7 +55,7 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       // edge
       if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
 
-      this.$.drawer.style.zIndex = '1';
+      (this.$.drawer as any).style.zIndex = '1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
       pageOverlay.classList.remove('opened');

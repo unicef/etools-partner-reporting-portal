@@ -28,9 +28,10 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
       return;
     }
 
+    // @ts-ignore
     let parent = this.shadowRoot!.parentNode;
-    let toPrint = this.shadowRoot!.querySelectorAll(this.selector);
-    let style = document.createElement('style');
+    const toPrint = this.shadowRoot!.querySelectorAll(this.selector);
+    const style = document.createElement('style');
 
     style.innerHTML = 'body { color: #212121; font: 14px/1.5 Roboto, Noto, sans-serif; }';
 
@@ -42,7 +43,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
       'width=640',
       'height=480',
       'left=0',
-      'top=0',
+      'top=0'
     ].join()));
 
     this.printWindow.document.head.appendChild(style);

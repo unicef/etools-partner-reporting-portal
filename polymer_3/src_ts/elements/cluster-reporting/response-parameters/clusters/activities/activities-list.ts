@@ -148,7 +148,7 @@ class ClustersActivityList extends LocalizeMixin(DataTableMixin(RoutingMixin(Pag
   anchorQueryParams!: GenericObject;
 
   _openModal() {
-    this.shadowRoot!.querySelector('#modal').open();
+    (this.shadowRoot!.querySelector('#modal') as any).open();
   }
 
   _detailUrl(id: string, query: string) {

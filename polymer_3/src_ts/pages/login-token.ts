@@ -1,4 +1,3 @@
-
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
@@ -62,12 +61,12 @@ class PageLoginToken extends PolymerElement {
     const self = this;
     const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
     thunk()
-      .then(function (res: any) {
+      .then((res: any) => {
         if (res.data.success) {
           window.location.href = `/${BASE_PATH}/`;
         }
       })
-      .catch(function () {
+      .catch(() => {
         fireEvent(self, 'token-error');
       });
   }

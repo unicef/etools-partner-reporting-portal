@@ -66,7 +66,7 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
 
   static get observers() {
     return [
-      '_routeChanged(routeData.id)',
+      '_routeChanged(routeData.id)'
     ];
   }
 
@@ -98,7 +98,7 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
-    })
+    });
 
   }
 

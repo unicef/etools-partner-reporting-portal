@@ -101,4 +101,4 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
 
 window.customElements.define('planned-action-projects-filters', PlannedActionProjectsFilters);
 
-export {PlannedActionProjectsFilters as PlannedActionProjectsFiltersEl}
+export {PlannedActionProjectsFilters as PlannedActionProjectsFiltersEl};

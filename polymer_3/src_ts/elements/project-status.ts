@@ -38,7 +38,7 @@ class ProjectStatus extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, computed: '_computeLabel(status)'})
   label!: string;
 
-  _computeType(status: String) {
+  _computeType(status: string) {
     switch (status) {
       case 'Ong':
         return 'default';
@@ -50,7 +50,7 @@ class ProjectStatus extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return;
   }
 
-  _computeLabel(status: String) {
+  _computeLabel(status: string) {
     switch (status) {
       case 'Ong':
         return 'Ongoing';

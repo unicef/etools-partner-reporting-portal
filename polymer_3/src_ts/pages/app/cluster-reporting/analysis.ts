@@ -93,7 +93,7 @@ class PageClusterReportingAnalysis extends LocalizeMixin(UtilsMixin(ReduxConnect
 
   static get observers() {
     return [
-      '_routeTabChanged(routeData.tab)',
+      '_routeTabChanged(routeData.tab)'
     ];
   }
 

@@ -203,10 +203,11 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
   static get observers() {
     return [
-      '_fetchData(dataUrl, queryParams)',
+      '_fetchData(dataUrl, queryParams)'
     ];
   }
 
+  // @ts-ignore
   _computeMode(accountType: string) {
     if (!accountType) {
       return;
@@ -281,4 +282,3 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
 
 }
 window.customElements.define('page-cluster-reporting-dashboard', PageClusterReportingDashboard);
-
