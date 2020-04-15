@@ -16,7 +16,7 @@ class AnalysisWidget extends PolymerElement {
     <div class="analysis-widget">
       <h3 class="analysis-widget__header">[[widgetTitle]]</h3>
       <div class="analysis-widget__body">
-        <slot></slot>
+        <slot name="map"></slot>
       </div>
       <etools-loading active="[[loading]]"></etools-loading>
     </div>
