@@ -358,16 +358,17 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     (this.map.features || []).forEach((feature: any) => {
       if (feature.geometry.type === 'MultiPolygon') {
         (feature.geometry.coordinates || []).forEach((coords: any) => {
-          const featurePolygon = polygon([], {
+          const featurePolygon = polygon(coords, {
             'color': '#fff', 'fill-color': [[this._computePolygonColor(feature.properties, this.legend)]],
             'fill-opacity': '0.7', 'weight': '2'
           }).bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
             .addTo(presenceMap);
 
-          (coords || []).forEach((coord: any) => {
-            featurePolygon.feature.
-              point(coord[0], coord[1]).addTo(featurePolygon);
-          })
+          // (dci) cannot test this but I think the points before where polygon coordinates actually, need to be checked
+          // (coords || []).forEach((coord: any) => {
+          //   featurePolygon.feature.
+          //     point(coord[0], coord[1]).addTo(featurePolygon);
+          // })
         })
       } else if (feature.geometry.type === 'Point') {
         marker(latLng(feature.geometry.coordinates[0], feature.geometry.coordinates[1]),
