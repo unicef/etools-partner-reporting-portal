@@ -58,81 +58,9 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
       }
     </style>
 
-    <analysis-widget
-        widget-title="[[localize('operational_presence_map')]]"
-        loading="[[loading]]">
+    <analysis-widget widget-title="[[localize('operational_presence_map')]]" loading="[[loading]]">
       <template is="dom-if" if="[[showMap]]" restamp="true">
         <div id="map" slot="map"></div>
-
-        <!--
-        <leaflet-map
-            longitude="[[center.0]]"
-            latitude="[[center.1]]"
-            zoom="[[zoom]]"
-            no-scroll-wheel-zoom>
-          <leaflet-tilelayer url="[[tileUrl]]">
-            Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
-            <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
-            Imagery © <a href="http://mapbox.com">Mapbox</a>
-          </leaflet-tilelayer>
-
-          <template
-              is="dom-repeat"
-              items="[[map.features]]"
-              as="feature">
-            <template
-                is="dom-if"
-                if="[[_equals(feature.geometry.type, 'MultiPolygon')]]">
-              <template
-                  is="dom-repeat"
-                  items="[[feature.geometry.coordinates]]"
-                  as="coords_lvl1">
-                <template
-                    is="dom-repeat"
-                    items="[[coords_lvl1]]"
-                    as="coords_lvl2">
-                  <leaflet-polygon
-                      color="#fff"
-                      fill-color="[[_computePolygonColor(feature.properties, legend)]]"
-                      fill-opacity="0.7"
-                      weight="2">
-                    <template
-                        is="dom-repeat"
-                        items="[[coords_lvl2]]"
-                        as="point">
-                      <leaflet-point
-                          longitude="[[point.0]]"
-                          latitude="[[point.1]]">
-                      </leaflet-point>
-                    </template>
-
-                    <div>[[feature.properties.title]]</div>
-                    <div class="number-of-partners">
-                      [[_getPartnersCount(feature.properties.partners.all)]]
-                    </div>
-                    <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
-                  </leaflet-polygon>
-                </template>
-              </template>
-            </template>
-
-            <template
-                is="dom-if"
-                if="[[_equals(feature.geometry.type, 'Point')]]">
-              <leaflet-marker
-                  longitude="[[feature.geometry.coordinates.0]]"
-                  latitude="[[feature.geometry.coordinates.1]]"
-                  icon='{"iconUrl": "[[_computeMarkerIcon(feature.properties, legend)]]"}'>
-                <div>[[feature.properties.title]]</div>
-                <div class="number-of-partners">
-                  [[_getPartnersCount(feature.properties.partners.all)]]
-                </div>
-                <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
-              </leaflet-marker>
-            </template>
-          </template>
-        </leaflet-map>
-        -->
       </template>
 
       <div class="legend">
@@ -349,7 +277,8 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
       scrollWheelZoom: false
     })
 
-    tileLayer(this.tileUrl).addTo(presenceMap);
+    tileLayer(this.tileUrl, {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="http://mapbox.com">Mapbox</a>'})
+      .addTo(presenceMap);
 
     const style = document.createElement('style');
     style.innerHTML = this.mapStyles;
@@ -359,12 +288,12 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
       if (feature.geometry.type === 'MultiPolygon') {
         (feature.geometry.coordinates || []).forEach((coords: any) => {
           const featurePolygon = polygon(coords, {
-            'color': '#fff', 'fill-color': [[this._computePolygonColor(feature.properties, this.legend)]],
+            'color': '#fff', 'fill-color': this._computePolygonColor(feature.properties, this.legend),
             'fill-opacity': '0.7', 'weight': '2'
           }).bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
             .addTo(presenceMap);
 
-          // (dci) cannot test this but I think the points before where polygon coordinates actually, need to be checked
+          // (dci) cannot test this but I think the points (in the old app) were polygon coordinates actually, need to be checked
           // (coords || []).forEach((coord: any) => {
           //   featurePolygon.feature.
           //     point(coord[0], coord[1]).addTo(featurePolygon);
