@@ -162,9 +162,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         </template>
       </header>
 
-      <template
-          is="dom-repeat"
-          items="[[value]]">
+      <template is="dom-repeat" items="[[value]]">
         <div class="row layout horizontal">
           <template
               is="dom-if"
@@ -239,9 +237,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                 <etools-dropdown
                     class="item item-2-col validate"
                     label="[[localize('location')]]"
-                    options="[[_getLocations(locations, item.loc_type, index)]]"
+                    options="[[_getLocations(locations, item.loc_type, index, item)]]"
                     option-value="id"
                     option-label="title"
+                    selected="{{item.location.id}}"
                     selected-item="{{item.location}}"
                     disabled$="[[_getPending(pending, item.loc_type, index)]]"
                     data-index$="[[index]]"
@@ -317,14 +316,14 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   @property({type: Number})
   clusterId!: number;
 
-  @property({type: Object})
-  locations!: GenericObject;
+  @property({type: Array})
+  locations!: any[];
 
-  @property({type: Object})
-  savedLocations!: GenericObject;
+  @property({type: Array})
+  savedLocations!: any[];
 
-  @property({type: Object})
-  pending!: GenericObject;
+  @property({type: Array})
+  pending!: any[];
 
   @property({type: Boolean})
   isPai: boolean = false;
@@ -440,11 +439,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _lockItems(value: any[]) {
-    if (this.get('valueInitialized')) {
+    if (this.valueInitialized) {
       return;
     }
 
-    this.set('valueInitialized', true);
+    this.valueInitialized = true;
 
     setTimeout(() => {
       this.set('lockedItems', value.slice());
@@ -461,7 +460,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   _add() {
     const initial = 0;
-
     this.push('value', {
       loc_type: initial
     });
@@ -469,8 +467,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this.set('searchLocationType', 0);
     this.set('locationsInitialized', true);
 
-    const newLocations = this.get('locations');
-    const value = this.get('value');
+    const newLocations = this.locations;
+    const value = this.value;
 
     value.forEach((location: GenericObject, index: number) => {
       if (location.location === undefined && newLocations[index] === undefined) {
@@ -480,32 +478,24 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('locations', newLocations);
 
-    const newPendingIndex = Object.keys(this.get('pending')).length;
-    const pending = this.get('pending');
-
-    pending[newPendingIndex] = {
-      initial: false
-    };
-
+    const pending = this.pending;
+    pending.push({initial: false});
     this.set('pending', pending);
 
-    this._fetchLocations(String(initial), undefined, this.get('value').length - 1);
+    this._fetchLocations(String(initial), undefined, this.value.length - 1);
   }
 
   _remove(e: CustomEvent) {
-    const value = this.get('value');
+
     // @ts-ignore
     const toRemove = +e.target!.dataset.index;
-    const pending = this.get('pending');
-    const locations = this.get('locations');
 
-    delete locations[toRemove];
-    delete pending[toRemove];
+    this.locations.splice(toRemove, 1);
+    this.pending.splice(toRemove, 1);
 
-    const newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
-
-    this.set('pending', pending);
-    this.set('value', newValue);
+    const newvalue = this.value.map((x: any) => x);
+    newvalue.splice(toRemove, 1);
+    this.set('value', newvalue);
   }
 
   _validate(e: CustomEvent) {
@@ -555,7 +545,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   _fetchInitialLocations(lockedItems: any[]) {
     this.set('savedLocations', lockedItems);
 
-    const newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = this.locations.map((x: any) => x);
 
     if (lockedItems.length > 0) {
       lockedItems.forEach(function(location, index) {
@@ -581,7 +571,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return pending[index] ? !!pending[index][loc_type] : false;
   }
 
-  _getLocations(locations: any[], loc_type: string, index: number) {
+  _getLocations(locations: any[], loc_type: string, index: number, item: GenericObject) {
     return locations[index] ? locations[index][loc_type] : undefined;
   }
 
@@ -593,15 +583,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     if (!this.value || !this.value[index]) {
       return;
     }
-    let targetLocation = (this.value[index] || []).find(function(loc: GenericObject) {
-      return String(loc.id) === String(locationId);
-    });
-
+    let targetLocation = this.value[index];
     return targetLocation ? targetLocation.title : '';
   }
 
   _setPending(loc_type: string, value: any, index: number) {
-    const newPending = Object.assign({}, this.get('pending'));
+    const newPending = this.pending.map((x: any) => x);
 
     if (newPending[index] === undefined) {
       newPending[index] = {};
@@ -613,7 +600,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _setLocations(loc_type: string, value: any, index: number) {
-    const newLocations = Object.assign({}, this.get('locations'));
+    const newLocations = this.locations.map((x: any) => x);
 
     if (newLocations[index] === undefined) {
       newLocations[index] = {};
@@ -642,8 +629,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   connectedCallback() {
     super.connectedCallback();
-    this.set('locations', {});
-    this.set('pending', {});
+    this.set('locations', []);
+    this.set('pending', []);
 
     this._handleMessageSent = this._handleMessageSent.bind(this);
     this.messageModal = this.shadowRoot!.querySelector('#message-modal') as MessageImoModalEl;
@@ -656,7 +643,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    const locTypeDebouncers = Array(this.get('maxAdminLevel'))
+    const locTypeDebouncers = Array(this.maxAdminLevel)
       .fill('fetch-locations-')
       .map(function(item, index) {
         return item + (++index);
