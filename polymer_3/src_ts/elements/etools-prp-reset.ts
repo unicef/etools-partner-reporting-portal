@@ -3,7 +3,7 @@ import UtilsMixin from '../mixins/utils-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
-
+import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
  * @polymer
@@ -25,19 +25,21 @@ class EtoolsPrpReset extends UtilsMixin(PolymerElement) {
   @property({type: String, observer: '_trigerred'})
   trigger!: string;
 
+  private _debouncer: Debouncer | null = null;
+
   _trigerred() {
+    this._debouncer = Debouncer.debounce(this._debouncer,
+      timeOut.after(10),
+      () => {
+        if (this.get('skipInitial') && this.get('isInitial')) {
+          this.set('isInitial', false);
 
-    Debouncer.debounce(this.trigger, () => {// TODO!!!
-      if (this.get('skipInitial') && this.get('isInitial')) {
-        this.set('isInitial', false);
-
-        return;
-      }
-
-      this.set('reset', undefined);
-    }, 10);
+          return;
+        }
+        this.set('reset', undefined);
+      });
   }
 
 }
 
-export default EtoolsPrpReset;
+window.customElements.define('etools-prp-reset', EtoolsPrpReset);
