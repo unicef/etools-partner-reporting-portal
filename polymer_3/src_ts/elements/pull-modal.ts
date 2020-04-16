@@ -49,6 +49,9 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       :host {
         display: block;
 
+        --header-title: {
+          display: block;
+        }
         --paper-dialog: {
           width: 800px;
         }
@@ -116,9 +119,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           <h3>[[indicatorName]]</h3>
           <h4>For this high frequency indicator data will be pulled from reports matching this time period:</h4>
         </div>
-        <etools-data-table-header
-          no-collapse
-        >
+        <etools-data-table-header no-collapse>
           <etools-data-table-column field="report">
             <div class="table-column">Report #</div>
           </etools-data-table-column>
