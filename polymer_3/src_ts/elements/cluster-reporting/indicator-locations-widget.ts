@@ -237,7 +237,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                 <etools-dropdown
                     class="item item-2-col validate"
                     label="[[localize('location')]]"
-                    options="[[_getLocations(locations, item.loc_type, index, item)]]"
+                    options="[[_getLocations(locations, item.loc_type, index)]]"
                     option-value="id"
                     option-label="title"
                     selected="{{item.location.id}}"
@@ -571,7 +571,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return pending[index] ? !!pending[index][loc_type] : false;
   }
 
-  _getLocations(locations: any[], loc_type: string, index: number, item: GenericObject) {
+  _getLocations(locations: any[], loc_type: string, index: number) {
     return locations[index] ? locations[index][loc_type] : undefined;
   }
 
