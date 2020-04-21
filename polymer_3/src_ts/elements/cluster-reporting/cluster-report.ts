@@ -33,7 +33,7 @@ import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate}
-        from '../../redux/actions/clusterIndicatorReports';
+  from '../../redux/actions/clusterIndicatorReports';
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
@@ -406,7 +406,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   </dd>
                 </template>
                 <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c, 0)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c, 1)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">

@@ -168,7 +168,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
           }
           return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';
         case 'ratio':
-          return _value + ':1';
+          return _value + '/1';
         default:
           return _value;
       }
