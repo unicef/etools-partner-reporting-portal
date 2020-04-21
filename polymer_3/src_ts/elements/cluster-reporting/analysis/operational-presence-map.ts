@@ -2,6 +2,7 @@ import {html} from '@polymer/polymer';
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import 'leaflet/dist/leaflet-src.esm.js';
+import {leafletStyles} from '../../../styles/leaflet-styles';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import './analysis-widget';
@@ -19,7 +20,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
 
   static get template() {
     return html`
-    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+    ${leafletStyles}
     <style>
       :host {
         display: block;
