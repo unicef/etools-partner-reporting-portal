@@ -241,7 +241,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                     if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_formatIndicatorValue(indicator.reportable.blueprint.display_type,
-                                    indicator.reportable.achieved.c, 0)]]</dd>
+                                    indicator.reportable.achieved.c, 1)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -250,7 +250,9 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                  <dd class="flex">
+                    <etools-prp-number value="[[indicator.total.v]]"></etools-prp-number>
+                  </dd>
                 </template>
                 <template
                     is="dom-if"
