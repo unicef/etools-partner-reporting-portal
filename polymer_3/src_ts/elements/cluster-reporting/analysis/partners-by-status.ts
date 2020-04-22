@@ -60,12 +60,12 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
   cols = [
     {
       label: 'Status',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Count',
-      type: 'number',
-    },
+      type: 'number'
+    }
   ];
 
   @property({type: Array, computed: '_computeRowsLocal(data, localize)'})
@@ -80,12 +80,12 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
       chartArea: {
         top: 0,
         left: '30%',
-        width: '50%',
+        width: '50%'
       },
 
       // TODO: tooltips
       enableInteractivity: false,
-      tooltip: null,
+      tooltip: null
     });
   }
 
@@ -94,7 +94,7 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     return Object.keys(data || {}).map(function(key) {
       return [
         self._localizeLowerCased(key, localize),
-        data[key],
+        data[key]
       ];
     });
   }

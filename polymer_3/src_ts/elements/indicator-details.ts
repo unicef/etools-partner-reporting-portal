@@ -34,9 +34,8 @@ import Endpoints from '../endpoints';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {disaggregationsFetch} from '../redux/actions/disaggregations';
-// (dci) make sure Pd is correct without these...
-// import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
-// import {RootState} from '../typings/redux.types';
+import {currentProgrammeDocument} from '../redux/selectors/programmeDocuments';
+import {RootState} from '../typings/redux.types';
 import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
 
 /**
@@ -504,7 +503,7 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Boolean})
   initialized: boolean = false;
 
-  @property({type: Object})
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentPd!: GenericObject;
 
   @property({type: Boolean, computed: '_computeHasPD(currentPd)'})
@@ -545,6 +544,10 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   @property({type: Boolean, computed: '_computeIsHfIndicator(disaggregations)'})
   isHfIndicator!: boolean;
+
+  _currentProgrammeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
 
   _fetchData() {
     const disaggregationsThunk = (this.$.disaggregations as EtoolsPrpAjaxEl).thunk();

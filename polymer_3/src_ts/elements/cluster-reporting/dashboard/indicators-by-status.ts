@@ -80,7 +80,7 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Array})
   chartCols = [
     {label: 'Status', type: 'string'},
-    {label: 'Count', type: 'number'},
+    {label: 'Count', type: 'number'}
   ];
 
   @property({type: Array})
@@ -89,7 +89,7 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
     '#2bb0f2',
     '#d8d8d8',
     '#fecc02',
-    '#273d48',
+    '#273d48'
   ];
 
   @property({type: Array})
@@ -98,7 +98,7 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
     'On Track',
     'No Progress',
     'Constrained',
-    'No Status',
+    'No Status'
   ];
 
   @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_met_indicator_reports)'})
@@ -124,9 +124,9 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
         'on_track_count',
         'no_progress_count',
         'constrained_count',
-        'no_status_count',
+        'no_status_count'
       ].join(', ') +
-      ')',
+      ')'
   })
   chartRows!: any[];
 
@@ -139,12 +139,12 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
         left: 0,
         top: 0,
         width: '90%',
-        height: '90%',
+        height: '90%'
       },
       enableInteractivity: false,
       legend: 'none',
       pieSliceText: 'none',
-      colors: colors,
+      colors: colors
     };
   }
 
@@ -153,16 +153,16 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _computeChartRows(labels: any[]) {
-    var data = [].slice.call(arguments, 1);
+    const data = [].slice.call(arguments, 1);
 
-    var localizedLabels = labels.map(function(label: any) { // convert labels to localized label keys
+    const localizedLabels = labels.map(function(label: any) { // convert labels to localized label keys
       return label.split(' ').join('_').toLowerCase();
     });
 
     return data.map(function(count, index) {
       return [
         localizedLabels[index],
-        count,
+        count
       ];
     });
   }

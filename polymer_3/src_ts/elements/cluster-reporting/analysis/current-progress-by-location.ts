@@ -62,19 +62,19 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
   cols = [
     {
       label: 'Location',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Progress',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
-        html: true,
-      },
-    },
+        html: true
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRows(data)'})
@@ -89,8 +89,8 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
       chartArea: {
         top: 0,
         left: '30%',
-        width: '50%',
-      },
+        width: '50%'
+      }
     });
   }
 
@@ -114,7 +114,7 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
       '</div>',
       '<div>Contributing Partners:</div>',
       '<div>' + this._commaSeparated(data.partners) + '</div>',
-      '</div>',
+      '</div>'
     ].join('\n');
   }
 

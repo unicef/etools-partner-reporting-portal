@@ -8,7 +8,7 @@ import '@polymer/iron-location/iron-query-params';
 
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
-import {tableStyles} from '../../../styles/table-styles'
+import {tableStyles} from '../../../styles/table-styles';
 import '../../etools-prp-progress-bar-alt';
 import '../../list-placeholder';
 import {GenericObject} from '../../../typings/globals.types';
@@ -132,12 +132,12 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
   }
 
   _getReportUrl(baseUrl: string, id: string, query: string) {
-    var queryWithIndicator = Object.assign({}, query, {
-      indicator: id,
+    const queryWithIndicator = Object.assign({}, query, {
+      indicator: id
     });
 
-    var base = this.buildUrl(baseUrl, '/results/submitted');
-    var search;
+    const base = this.buildUrl(baseUrl, '/results/submitted');
+    let search;
 
     try {
       search = '?' + (this.$.queryParams as IronQueryParamsElement)._encodeParams(queryWithIndicator);
@@ -150,7 +150,7 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
 
   _computeResultsQueryParams(partner: GenericObject) {
     return {
-      partner: partner.id,
+      partner: partner.id
     };
   }
 }

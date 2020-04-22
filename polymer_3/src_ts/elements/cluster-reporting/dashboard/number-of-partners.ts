@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-card/paper-card';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles'
+import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
 import '../../etools-prp-number';
