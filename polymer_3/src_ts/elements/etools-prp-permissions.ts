@@ -8,7 +8,7 @@ import {GenericObject} from '../typings/globals.types';
 (function() {
   const checkInResponsePlan = (roles: any[]) => {
     return function(params: GenericObject) {
-      return params.prpRoles.filter(function(role: any) {
+      return (params.prpRoles || []).filter(function(role: any) {
         return params.responsePlan && params.responsePlan.clusters && params.responsePlan.clusters.some(function(cluster: any) {
           return role.cluster && cluster.id === role.cluster.id;
         });
@@ -82,7 +82,7 @@ import {GenericObject} from '../typings/globals.types';
         Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
       ];
 
-      return params.prpRoles.filter(function(role: any) {
+      return (params.prpRoles || []).filter(function(role: any) {
         return params.responsePlan && params.responsePlan.clusters.some(function(cluster: any) {
           return role.cluster && cluster.id === role.cluster.id;
         });
@@ -148,7 +148,7 @@ import {GenericObject} from '../typings/globals.types';
         Constants.PRP_ROLE.CLUSTER_VIEWER
       ];
 
-      return params.partner && params.partner.id && params.prpRoles.some(function(item: any) {
+      return params.partner && params.partner.id && (params.prpRoles || []).some(function(item: any) {
         return allowedRoles.indexOf(item.role) > -1;
       });
     },
