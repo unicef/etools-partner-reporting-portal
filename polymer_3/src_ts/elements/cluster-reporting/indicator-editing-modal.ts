@@ -493,7 +493,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _computeCanEditDetails(permissions: GenericObject, data: GenericObject, isPAI: boolean) {
-    if (!permissions) {
+    if (!permissions || !data) {
       return;
     }
     return (permissions.createClusterEntities && !isPAI) ||
