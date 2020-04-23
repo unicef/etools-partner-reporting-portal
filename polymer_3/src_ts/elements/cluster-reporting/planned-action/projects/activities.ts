@@ -153,11 +153,11 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('modal.activity-added', this._onSuccess as any);
+    this.addEventListener('activity-added', this._onSuccess as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('modal.activity-added', this._onSuccess as any);
+    this.removeEventListener('activity-added', this._onSuccess as any);
   }
 
   connectedCallback() {
