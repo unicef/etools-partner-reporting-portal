@@ -51,14 +51,15 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
-          }
+          width: 700px;
+        }
 
       }
 
       .app-grid {
         margin: 0 -var(--app-grid-gutter);
         padding-bottom: 24px;
+        padding-right: 24px;
       }
 
       .row {
