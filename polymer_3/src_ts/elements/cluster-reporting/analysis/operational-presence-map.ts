@@ -296,7 +296,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     (this.map.features || []).forEach((feature: any) => {
       if (feature.geometry.type === 'MultiPolygon') {
         (feature.geometry.coordinates || []).forEach((coords: any) => {
-          const featurePolygon = polygon(coords, {
+          polygon(coords, {
             'color': '#fff', 'fill-color': this._computePolygonColor(feature.properties, this.legend),
             'fill-opacity': '0.7', 'weight': '2'
           }).bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
@@ -320,10 +320,9 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   getFeatureTooltip(properties: any) {
     const partnersCount = this._getPartnersCount(properties.partners.all);
     const partners = this._commaSeparated(properties.partners.all);
-    return
-    `<div>${properties.title}</div>
-      <div class="number-of-partners">${partnersCount}</div>
-      <div>${partners}</div>`;
+    return `<div>${properties.title}</div>
+            <div class="number-of-partners">${partnersCount}</div>
+            <div>${partners}</div>`;
   }
 
 }
