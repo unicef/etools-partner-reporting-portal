@@ -122,7 +122,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   }
 
   _openModal() {
-    (this.shadowRoot!.querySelector('indicatorModal') as IndicatorModalEl).open();
+    (this.$.indicatorModal as IndicatorModalEl).open();
   }
 
   _onSuccess() {

@@ -14,6 +14,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import '../../project-activity-table';
 import '../activities/add-activity-from-project-modal';
 import '../activities/add-existing-activity-from-project-modal';
+import {buttonsStyles} from '../../../../styles/buttons-styles';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
 import {PlannedActionAddActivityFromProjectModalEl} from '../activities/add-activity-from-project-modal';
@@ -29,7 +30,8 @@ import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/a
 class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-      <style include="button-styles">
+      ${buttonsStyles}
+      <style>
         :host {
           display: block;
         }
@@ -151,11 +153,11 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _addEventListeners() {
     this._onSuccess = this._onSuccess.bind(this);
-    this.addEventListener('modal.activity-added', this._onSuccess as any);
+    this.addEventListener('activity-added', this._onSuccess as any);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('modal.activity-added', this._onSuccess as any);
+    this.removeEventListener('activity-added', this._onSuccess as any);
   }
 
   connectedCallback() {
