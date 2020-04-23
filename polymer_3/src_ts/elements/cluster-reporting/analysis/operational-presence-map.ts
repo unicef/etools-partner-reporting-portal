@@ -162,6 +162,8 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   @property({type: Array})
   currentWorkspaceCoords!: any;
 
+  presenceMap: GenericObject | null = null;
+
   static get observers() {
     return ['_setCurrentWorkspaceCoords(allWorkspaces, currentWorkspaceCode)'];
   }
@@ -264,22 +266,28 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     setTimeout(() => {
       this._setupMap();
     }, 200);
+
   }
 
   _setupMap() {
     const mapCtrl = this.shadowRoot!.querySelector('#map') as Element;
+
     if (!mapCtrl) {
       return;
     }
 
-    let presenceMap = map(mapCtrl, {
+    if (this.presenceMap) {
+      this.presenceMap.remove();
+    }
+
+    this.presenceMap = map(mapCtrl, {
       center: [this.center[0], this.center[1]],
       zoom: this.zoom,
       scrollWheelZoom: false
-    })
+    });
 
     tileLayer(this.tileUrl, {attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="http://mapbox.com">Mapbox</a>'})
-      .addTo(presenceMap);
+      .addTo(this.presenceMap);
 
     const style = document.createElement('style');
     style.innerHTML = this.mapStyles;
@@ -288,11 +296,11 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     (this.map.features || []).forEach((feature: any) => {
       if (feature.geometry.type === 'MultiPolygon') {
         (feature.geometry.coordinates || []).forEach((coords: any) => {
-          const featurePolygon = polygon(coords, {
+          polygon(coords, {
             'color': '#fff', 'fill-color': this._computePolygonColor(feature.properties, this.legend),
             'fill-opacity': '0.7', 'weight': '2'
           }).bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
-            .addTo(presenceMap);
+            .addTo(this.presenceMap);
 
           // (dci) cannot test this but I think the points (in the old app) were polygon coordinates actually, need to be checked
           // (coords || []).forEach((coord: any) => {
@@ -304,7 +312,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
         marker(latLng(feature.geometry.coordinates[0], feature.geometry.coordinates[1]),
           {icon: {'iconUrl': this._computeMarkerIcon(feature.properties, this.legend)}})
           .bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
-          .addTo(presenceMap);
+          .addTo(this.presenceMap);
       }
     })
   }
@@ -312,10 +320,9 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   getFeatureTooltip(properties: any) {
     const partnersCount = this._getPartnersCount(properties.partners.all);
     const partners = this._commaSeparated(properties.partners.all);
-    return
-    `<div>${properties.title}</div>
-      <div class="number-of-partners">${partnersCount}</div>
-      <div>${partners}</div>`;
+    return `<div>${properties.title}</div>
+            <div class="number-of-partners">${partnersCount}</div>
+            <div>${partners}</div>`;
   }
 
 }
