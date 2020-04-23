@@ -17,6 +17,7 @@ import {GenericObject} from './typings/globals.types';
 import {reset, userLogout} from './redux/actions';
 import {getDomainByEnv, BASE_PATH} from './config';
 import {locales} from './locales';
+import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 
 /**
  * @polymer
@@ -117,6 +118,13 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
+
+  constructor() {
+    super();
+    // Gesture events like tap and track generated from touch will not be
+    // preventable, allowing for better scrolling performance.
+    setPassiveTouchGestures(true);
+  }
 
   public static get observers() {
     return [
