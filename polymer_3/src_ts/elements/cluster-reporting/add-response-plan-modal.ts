@@ -53,7 +53,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 980px;
+          width: 800px;
         }
       }
 
@@ -63,7 +63,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
       .fields {
         position: relative;
-        padding: 0px;
+        padding: 0px 30px;
       }
 
       #mode {
@@ -85,6 +85,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       }
       .start-date, .end-date{
           --paper-input-container_-_width: 100%;
+      }
+      .app-grid{
+        padding-right: 90px;
+        padding-left: 30px;
       }
 
     </style>
