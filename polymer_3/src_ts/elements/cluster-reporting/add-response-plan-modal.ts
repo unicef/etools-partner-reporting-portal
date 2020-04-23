@@ -14,7 +14,7 @@ import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-loading/etools-loading';
-import Endpoints from '../../endpoints'
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../mixins/utils-mixin';
 import ModalMixin from '../../mixins/modal-mixin';
 import {buttonsStyles} from '../../styles/buttons-styles';
@@ -51,6 +51,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         --app-grid-gutter: 0px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 3;
+
+        --paper-dialog: {
+          width: 980px;
+        }
       }
 
       .full-width {
@@ -79,6 +83,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       etools-dropdown, etools-dropdown-multi, datepicker-lite {
         width: 100%;
       }
+      .start-date, .end-date{
+          --paper-input-container_-_width: 100%;
+      }
+
     </style>
 
     <etools-prp-permissions
@@ -217,6 +225,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 required>
               </datepicker-lite>
             </div>
+
             <div class="item">
               <datepicker-lite
                 class="end-date"
