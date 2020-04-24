@@ -30,7 +30,7 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
     if ((app === undefined) || (workspace === undefined) || !profile) {
       return;
     }
-    if (!profile.access || !profile.access.length) {
+    if (!profile.access || !profile.access.length || !workspace) {
       location.href = '/unauthorized';
     } else if (profile.access.indexOf(app) === -1) {
       // @ts-ignore
