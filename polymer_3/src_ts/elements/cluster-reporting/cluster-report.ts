@@ -417,7 +417,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   </dd>
                 </template>
                 <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c, 0)]]</dd>
+                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c, 1)]]</dd>
                 </template>
               </dl>
             </div>
