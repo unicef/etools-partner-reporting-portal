@@ -27,7 +27,7 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _redirectIfNeeded(app: string, workspace: string, profile: GenericObject) {
-    if (!app || !workspace || !profile) {
+    if ((app === undefined) || (workspace === undefined) || !profile) {
       return;
     }
     if (!profile.access || !profile.access.length) {
