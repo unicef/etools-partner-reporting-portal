@@ -67,7 +67,7 @@ docker-compose --version
 ## Development
 Run migrations:
 
-  * ssh into backend container and run the commands below (unsing docker exec cmd or Docker Dasboard)
+  * ssh into backend container and run the commands below (using docker exec cmd or Docker Dasboard)
   * `python /code/manage.py makemigrations --merge --noinput`
   * `python /code/manage.py migrate`
 
