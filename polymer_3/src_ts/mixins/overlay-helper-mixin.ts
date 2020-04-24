@@ -9,6 +9,8 @@ import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-ov
 function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class OverlayHelperClass extends baseClass {
 
+    tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT'];
+
     connectedCallback() {
       super.connectedCallback();
 
@@ -21,16 +23,13 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     }
 
     _dialogOpening() {
-      const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
-      if (!dialogOverlay) {return;}
+      const dialogOverlays = document.querySelectorAll('iron-overlay-backdrop[opened]');
+      if (!dialogOverlays.length) {return;}
 
-      // dialogOverlay.classList.remove('opened');
-      // dialogOverlay.removeAttribute('opened');
-      const zIndex = (dialogOverlay as any).style.zIndex;
-      if (dialogOverlay.parentElement) {
-        dialogOverlay.parentElement.removeChild(dialogOverlay);
-      }
-      (this.$.drawer as any).zIndex = '-1';
+      const zIndex = (dialogOverlays[0] as any).style.zIndex;
+      this._closeOverlays(dialogOverlays);
+
+      (this.$.drawer as any).style.zIndex = '0';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       if (!pageOverlay.classList.contains('opened')) {
         pageOverlay.style.zIndex = zIndex;
@@ -39,27 +38,32 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     }
 
     _dialogClosing(event: CustomEvent & any) {
-      // chrome
-      const dialogOverlay = document.querySelector('iron-overlay-backdrop[opened]');
-      if (dialogOverlay && dialogOverlay.parentElement) {
-        dialogOverlay.parentElement.removeChild(dialogOverlay);
-      }
+      this._closeOverlays(document.querySelectorAll('iron-overlay-backdrop[opened]'));
 
       const paths = event.path || [];
       if (paths.length) {
         if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) ||
-          (paths.filter((x: any) => x.tagName === 'CHIP-DISAGG-VALUE' || x.tagName === 'CHIP-DATE-OF-REPORT').length)) {
+          (paths.filter((x: any) => this.tagsToExclude.includes(x.tagName)).length)) {
           return;
         }
       }
       // edge
       if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
 
-      (this.$.drawer as any).style.zIndex = '1';
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
       pageOverlay.classList.remove('opened');
+      (this.$.drawer as any).style.zIndex = '1';
     }
+
+    _closeOverlays(overlays: NodeListOf<Element>) {
+      Array.from(overlays || []).forEach((overlay) => {
+        if (overlay.parentElement) {
+          overlay.parentElement.removeChild(overlay);
+        }
+      });
+    }
+
   }
   return OverlayHelperClass;
 }
