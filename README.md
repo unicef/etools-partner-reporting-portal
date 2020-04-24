@@ -65,6 +65,14 @@ docker-compose --version
 10. TEMP: Go to http://127.0.0.1:8082/api/admin/ login with admin/Passw0rd! and can now go to http://127.0.0.1:8082/app/ to see the frontend interface. Replace 'ip-reporting' or 'cluster-reporting' in the URL's to switch between the two interfaces.
 
 ## Development
+Run migrations:
+
+  * ssh into backend container and run the commands below (using docker exec cmd or Docker Dasboard)
+  * `python /code/manage.py makemigrations --merge --noinput`
+  * `python /code/manage.py migrate`
+
+
+
 Here are some docker tips:
    1. display all containers:
    ```
