@@ -28,6 +28,8 @@ import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button/paper-icon-button';
+import Settings from '../../../../settings';
+declare const moment: any;
 
 /**
 * @polymer
@@ -51,14 +53,15 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
-          }
+          width: 700px;
+        }
 
       }
 
       .app-grid {
         margin: 0 -var(--app-grid-gutter);
         padding-bottom: 24px;
+        padding-right: 24px;
       }
 
       .row {
@@ -380,6 +383,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         label="[[localize('start_date')]]"
                         value="{{item.start_date}}"
                         error-message=""
+                        selected-date-display-format="[[dateFormat]]"
                         required>
                       </datepicker-lite>
                     </div>
@@ -390,6 +394,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         label="[[localize('end_date')]]"
                         value="{{item.end_date}}"
                         error-message=""
+                        selected-date-display-format="[[dateFormat]]"
                         required>
                       </datepicker-lite>
                     </div>
@@ -491,6 +496,9 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   @property({type: Number, computed: '_computePartnerId(partner, editData.partner)'})
   partnerId!: number;
 
+  @property({type: String})
+  dateFormat: string = Settings.dateFormat;
+
   static get observers() {
     return [
       '_fetchProjects(partnerId)',
@@ -519,6 +527,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _setDefaults() {
+    this._formatDate(this.editData.projects);
     this.set('data', Object.assign({},
       {
         id: this.editData.id,
@@ -537,6 +546,17 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     } else {
       this.set('data.cluster_activity', this.editData.cluster_activity.id);
     }
+  }
+
+  _formatDate(data: any[]) {
+    (data || []).forEach(item => {
+      if (item.start_date) {
+        item.start_date = moment(item.start_date).format(Settings.datepickerFormat);
+      }
+      if (item.end_date) {
+        item.end_date = moment(item.end_date).format(Settings.datepickerFormat);
+      }
+    })
   }
 
   open() {

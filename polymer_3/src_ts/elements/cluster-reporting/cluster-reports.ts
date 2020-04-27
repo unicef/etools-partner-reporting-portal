@@ -44,6 +44,10 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
           params="[[params]]">
       </etools-prp-ajax>
 
+      <etools-prp-ajax
+          id="refresh">
+      </etools-prp-ajax>
+
       <cluster-report-toolbar
           submitted="[[submitted]]">
       </cluster-report-toolbar>
@@ -125,11 +129,12 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
     e.stopPropagation();
 
     const reportId = e.detail;
-    const ajax = document.createElement('etools-prp-ajax') as EtoolsPrpAjaxEl;
+    const refreshAjaxEl = this.$.refresh as EtoolsPrpAjaxEl;
+    refreshAjaxEl.url = Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
+    const refreshThunk = refreshAjaxEl.thunk();
+    refreshAjaxEl.abort();
 
-    ajax.url = Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
-
-    this.reduxStore.dispatch(clusterIndicatorReportsFetchSingle(ajax.thunk(), reportId))
+    this.reduxStore.dispatch(clusterIndicatorReportsFetchSingle(refreshThunk, reportId))
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling
