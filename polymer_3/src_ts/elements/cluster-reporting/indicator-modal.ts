@@ -416,6 +416,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                               label="[[localize('start_date_reporting')]]"
                               value="{{data.start_date_of_reporting_period}}"
                               error-message=""
+                              input-date-format="[[dateFormat]]"
                               selected-date-display-format="[[dateFormat]]">
                           </datepicker-lite>
                         </div>
@@ -671,6 +672,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         label="[[localize('start_date_reporting')]]"
                         value="{{data.start_date_of_reporting_period}}"
                         error-message=""
+                        input-date-format="[[dateFormat]]"
                         selected-date-display-format="[[dateFormat]]">
                     </datepicker-lite>
                   </div>

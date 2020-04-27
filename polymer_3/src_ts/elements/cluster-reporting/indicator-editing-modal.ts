@@ -249,6 +249,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   label="[[localize('start_date_reporting')]]"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
+                  input-date-format="[[dateFormat]]"
                   selected-date-display-format="[[dateFormat]]"
                   error-message="">
                 </datepicker-lite>
@@ -550,8 +551,6 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     if (!startDateStr) {
       return;
     }
-
-    this.data.start_date_of_reporting_period = moment(this.data.start_date_of_reporting_period).format(Settings.datepickerFormat);
 
     const dates = this.get('data.cs_dates');
     const startDate = this._normalizeDate(startDateStr);

@@ -383,6 +383,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         label="[[localize('start_date')]]"
                         value="{{item.start_date}}"
                         error-message=""
+                        input-date-format="[[dateFormat]]"
                         selected-date-display-format="[[dateFormat]]"
                         required>
                       </datepicker-lite>
@@ -394,6 +395,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         label="[[localize('end_date')]]"
                         value="{{item.end_date}}"
                         error-message=""
+                        input-date-format="[[dateFormat]]"
                         selected-date-display-format="[[dateFormat]]"
                         required>
                       </datepicker-lite>
@@ -527,7 +529,6 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _setDefaults() {
-    this._formatDate(this.editData.projects);
     this.set('data', Object.assign({},
       {
         id: this.editData.id,
@@ -546,17 +547,6 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     } else {
       this.set('data.cluster_activity', this.editData.cluster_activity.id);
     }
-  }
-
-  _formatDate(data: any[]) {
-    (data || []).forEach(item => {
-      if (item.start_date) {
-        item.start_date = moment(item.start_date).format(Settings.datepickerFormat);
-      }
-      if (item.end_date) {
-        item.end_date = moment(item.end_date).format(Settings.datepickerFormat);
-      }
-    })
   }
 
   open() {
