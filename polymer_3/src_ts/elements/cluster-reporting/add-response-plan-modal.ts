@@ -162,8 +162,10 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 option-label="title"
                 selected="{{selectedPlan}}"
                 disabled="[[plansLoading]]"
-                on-etools-selected-item-changed="_validate"
+                on-etools-selected-item-changed$="_validate"
                 trigger-value-change-event
+                no-dynamic-align
+                auto-validate
                 required>
               </etools-dropdown>
               <response-plan-details
