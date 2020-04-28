@@ -291,6 +291,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                           class="start-date"
                           label="[[localize('start_date')]]"
                           value="{{item.start_date}}"
+                          input-date-format="[[dateFormat]]"
                           selected-date-display-format="[[dateFormat]]"
                           error-message=""
                           required>
@@ -303,6 +304,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                           class="end-date"
                           label="[[localize('end_date')]]"
                           value="{{item.end_date}}"
+                          input-date-format="[[dateFormat]]"
                           selected-date-display-format="[[dateFormat]]"
                           error-message=""
                           required>
@@ -400,6 +402,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                               class="start-date"
                               label="[[localize('start_date')]]"
                               value="{{item.start_date}}"
+                              input-date-format="[[dateFormat]]"
                               selected-date-display-format="[[dateFormat]]"
                               error-message=""
                               required>
@@ -411,6 +414,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                             class="end-date"
                             label="[[localize('end_date')]]"
                             value="{{item.end_date}}"
+                            input-date-format="[[dateFormat]]"
                             selected-date-display-format="[[dateFormat]]"
                             error-message=""
                             required>
@@ -556,8 +560,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
     simpleProjectData.status = this.projectData.status;
-    simpleProjectData.start_date = moment(this.projectData.start_date).format(Settings.datepickerFormat);
-    simpleProjectData.end_date = moment(this.projectData.end_date).format(Settings.datepickerFormat);
 
     this.set('data', {
       cluster: {

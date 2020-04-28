@@ -45,7 +45,7 @@ import Constants from '../../../../constants';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import '../../indicator-locations-widget';
-
+import Settings from '../../../../settings';
 
 /**
  * @polymer
@@ -386,6 +386,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                         class="start-date"
                         label="[[localize('start_date')]] *"
                         value="{{data.start_date}}"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
                         error-message=""
                         required>
                       </datepicker-lite>
@@ -396,6 +398,8 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                         class="end-date"
                         label="[[localize('end_date')]] *"
                         value="{{data.end_date}}"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
                         error-message=""
                         required>
                       </datepicker-lite>
@@ -775,6 +779,9 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
   @property({type: Object})
   permissions!: GenericObject;
+
+  @property({type: String})
+  dateFormat: string = Settings.dateFormat;
 
   private _setModeDebouncer!: Debouncer;
   private _fetchOchaProjectDebouncer!: Debouncer;
