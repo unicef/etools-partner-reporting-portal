@@ -104,8 +104,8 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
       return;
     }
 
-    const today = new Date();
-    this.set('_date', moment(today < this.minDate ? this.minDate : today).format(Settings.datepickerFormat));
+    const dateToUse = moment.utc().isBefore(moment.utc(this.minDate)) ? this.minDate : new Date();
+    this.set('_date', moment(dateToUse).format(Settings.datepickerFormat));
   }
 
   connectedCallback() {
