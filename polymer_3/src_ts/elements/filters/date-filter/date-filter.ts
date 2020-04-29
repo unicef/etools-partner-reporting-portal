@@ -6,7 +6,6 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
-import DatePickerLite from '@unicef-polymer/etools-date-time/datepicker-lite';
 import Settings from '../../../settings';
 declare const moment: any;
 
@@ -23,14 +22,16 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
     <style>
       :host {
         display:block;
+        max-width: 185px;
       };
     </style>
     <datepicker-lite
       id="field"
       label="[[label]]"
       value="[[value]]"
-      input-date-format=[[format]]"
-      selected-date-display-format=[[format]]"
+      input-date-format="[[format]]"
+      selected-date-display-format="[[format]]"
+      class="[[class]]"
       fire-date-has-changed
       on-date-has-changed="_filterDateHasChanged">
     </datepicker-lite>
@@ -39,6 +40,15 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
 
   @property({type: String})
   value!: string;
+
+  @property({type: String})
+  label!: string;
+
+  @property({type: String})
+  class!: string;
+
+  @property({type: String})
+  name!: string;
 
   @property({type: String})
   format = Settings.dateFormat;
@@ -53,7 +63,6 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
 
   connectedCallback() {
     super.connectedCallback();
-
     this._filterReady();
   }
 
