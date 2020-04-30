@@ -783,6 +783,9 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   @property({type: String})
   dateFormat: string = Settings.dateFormat;
 
+  @property({type: Object})
+  editData!: GenericObject;
+
   private _setModeDebouncer!: Debouncer;
   private _fetchOchaProjectDebouncer!: Debouncer;
 
@@ -905,7 +908,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   open() {
     if (this.edit && this.editData) {
       this.set('data', Object.assign({}, this.editData));
-      this.selectedClusters = this.editData.clusters.map((cluster) => {
+      this.selectedClusters = this.editData.clusters.map((cluster: GenericObject) => {
         return cluster.id;
       });
       this.set('mode', 'custom');

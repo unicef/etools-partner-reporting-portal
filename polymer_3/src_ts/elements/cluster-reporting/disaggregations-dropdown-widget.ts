@@ -15,6 +15,7 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button';
 import {GenericObject} from '../../typings/globals.types';
+import {PolymerElement} from "@polymer/polymer/polymer-element";
 
 
 /**
@@ -245,8 +246,8 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     for (let i = 0; i < chosen.length - 1; i++) {
       for (let j = i + 1; j < chosen.length; j++) {
         if (chosen[i] === chosen[j]) {
-          allMenus[i].set('invalid', true);
-          allMenus[j].set('invalid', true);
+          (allMenus[i] as PolymerElement).set('invalid', true);
+          (allMenus[j] as PolymerElement).set('invalid', true);
           self.set('invalid', true);
         }
       }
