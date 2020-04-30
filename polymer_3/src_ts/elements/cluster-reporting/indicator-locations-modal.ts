@@ -106,11 +106,6 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
       </style>
 
       <etools-prp-ajax
-          id="locations"
-          url="[[locationsUrl]]">
-      </etools-prp-ajax>
-
-      <etools-prp-ajax
           id="update"
           url="[[updateUrl]]"
           body="[[data.locations]]"
@@ -191,7 +186,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
                     <tr>
                       <td>Admin [[location.loc_type]]</td>
                       <td>
-                        <div class="text">[[_getLocationName(location.location, locations)]]</div>
+                        <div class="text">[[location.title]]</div>
                       </td>
                       <td>
                         <json-field
@@ -253,9 +248,6 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   @property({type: Object})
   editData!: GenericObject;
 
-  @property({type: Array})
-  locations!: any[];
-
   @property({type: Object})
   errors!: GenericObject;
 
@@ -264,9 +256,6 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
-
-  @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
-  locationsUrl!: string;
 
   @property({type: String, computed: '_computeUpdateUrl(data)'})
   updateUrl!: string;
@@ -283,29 +272,14 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _computeUpdateUrl(data: GenericObject) {
+    setTimeout(() => {
+      fireEvent(self, 'indicator-locations-modal-refit');
+    }, 200);
     return Endpoints.indicatorPerLocationVars(data.id);
-  }
-
-  _computeLocationsUrl(responsePlanId: string) {
-    if (!responsePlanId) {
-      return;
-    }
-    return Endpoints.clusterLocationNames(responsePlanId);
   }
 
   _computeIsNumber(type: any) {
     return type === 'number';
-  }
-
-  _getLocationName(locationId: string, locations: GenericObject) {
-    if (!locations) {
-      return;
-    }
-    const location = (locations.results || []).find((loc: GenericObject) => {
-      return String(loc.id) === String(locationId);
-    });
-
-    return location ? location.title : 'Invalid location';
   }
 
   _setDefaults(opened: boolean) {
@@ -315,24 +289,6 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
 
     this.set('errors', {});
     this.set('data', this._clone(this.get('editData')));
-    this._fetchLocations();
-  }
-
-  _fetchLocations() {
-    const self = this;
-
-    this.set('pending', true);
-
-    const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    locThunk().then((res: GenericObject) => {
-      self.set('pending', false);
-      self.set('locations', res.data);
-
-      fireEvent(self, 'indicator-locations-modal-refit');
-    })
-      .catch(() => {
-        self.set('pending', false);
-      });
   }
 
   _validate(e: CustomEvent) {

@@ -321,7 +321,15 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _normalizeDate(date: any) {
-      return moment(date, Settings.dateFormat).startOf('day').toDate();
+      // date can be in 2 formats: specific 'DD-MMM-YYYY' or the more general 'YYYY-MM-DD'
+      // trying to convert using specific format first
+
+      const formattedDate = moment(date, Settings.dateFormat, true);
+      if (formattedDate.isValid()) {
+        return formattedDate.startOf('day').toDate();
+      }
+
+      return moment(date, Settings.datepickerFormat).startOf('day').toDate();
     }
 
   }
