@@ -274,7 +274,8 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   @property({type: Array})
   selectedClusters!: any[];
 
-  private editData!: GenericObject;
+  @property({type: Object})
+  editData!: GenericObject;
 
 
   _computeUrl(projectID: string) {

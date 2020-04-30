@@ -783,9 +783,11 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   @property({type: String})
   dateFormat: string = Settings.dateFormat;
 
+  @property({type: Object})
+  editData!: GenericObject;
+
   private _setModeDebouncer!: Debouncer;
   private _fetchOchaProjectDebouncer!: Debouncer;
-  private editData!: GenericObject;
 
 
   static get observers() {
