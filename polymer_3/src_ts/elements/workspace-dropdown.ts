@@ -93,7 +93,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   @property({type: Number, computed: '_computeSelected(data, current)'})
   selected = 0;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)', observer: '_currentWorkSpaceChanged'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)', observer: '_currentWorkspaceChanged'})
   current!: string;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
@@ -101,7 +101,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
 
   private prevWorkspace!: string;
 
-  _currentWorkSpaceChanged() {
+  _currentWorkspaceChanged() {
     if (this.current) {
       if (!this.prevWorkspace) {
         this.prevWorkspace = this.current;
