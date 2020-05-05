@@ -86,7 +86,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       color: #212121;
       background-color: #f3f3f3;
     }
-
+    /*
+      Polymer default overlay is added directly to the body and will cover the opened popup, the logic used in PRP
+      is to hide the default overlay with the class below and use as popup overlay our #pageOverlay from <main />
+    */
     iron-overlay-backdrop {
       display: none !important;
       width: 1px;
