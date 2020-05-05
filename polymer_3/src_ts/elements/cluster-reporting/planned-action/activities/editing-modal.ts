@@ -29,7 +29,7 @@ import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button/paper-icon-button';
 import Settings from '../../../../settings';
-declare const moment: any;
+
 
 /**
 * @polymer
@@ -523,7 +523,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _remove(e: CustomEvent) {
-    var currentIndex = +(e.target as PaperIconButtonElement).dataset.index!;
+    let currentIndex = +(e.target as PaperIconButtonElement).dataset.index!;
     this.splice('data.projects', currentIndex, 1);
     fireEvent(this, 'project-details-selection-refit');
   }

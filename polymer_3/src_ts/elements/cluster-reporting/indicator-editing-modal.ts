@@ -32,7 +32,7 @@ import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from '../../utils/fire-custom-event';
-declare const moment: any;
+
 
 /**
  * @polymer

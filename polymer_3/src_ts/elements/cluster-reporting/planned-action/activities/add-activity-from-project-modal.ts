@@ -29,7 +29,7 @@ import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import Settings from '../../../../settings';
-declare const moment: any;
+
 
 /**
  * @polymer
