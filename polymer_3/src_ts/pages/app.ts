@@ -332,14 +332,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.removeEventListener('fetch-profile', this._fetchProfile);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
 
     this._addEventListeners();
-    this.loadInitialData();
-  }
-
-  async loadInitialData() {
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
     await Promise.all([
       this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
