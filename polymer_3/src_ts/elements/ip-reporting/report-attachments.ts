@@ -15,7 +15,7 @@ import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-import 'etools-file/etools-file';
+import '@unicef-polymer/etools-file/etools-file';
 import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
