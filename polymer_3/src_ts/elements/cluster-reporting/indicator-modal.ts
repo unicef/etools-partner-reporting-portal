@@ -300,7 +300,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         is="dom-if"
                         if="[[selectedIndicatorDetailType]]"
                         restamp="true">
-                        <div class="item full-width">
+                        <div class="full-width" id="adoptLocations">
                           <indicator-locations-widget
                             class="validate"
                             indicator-type="[[selectedIndicatorDetailType]]"
@@ -977,7 +977,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     if (!e) {
       return;
     }
-    e.stopPropagation();
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
     // _adjustPositionDebouncer is from ModalMixin
     this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
       timeOut.after(250),
@@ -1301,7 +1303,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           })
           .catch((_err: GenericObject) => {
             // TODO: error handling
-          });
+          })
+          .then(() => {
+            this.adjustPosition({} as any);
+          })
       });
   }
 
