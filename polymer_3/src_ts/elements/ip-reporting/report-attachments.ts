@@ -15,8 +15,8 @@ import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-import 'etools-file/etools-file';
-import {EtoolsFileEl} from 'etools-file/etools-file';
+import '@unicef-polymer/etools-file/etools-file';
+import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
 /**
@@ -218,21 +218,22 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     // @ts-ignore
     return this.reduxStore.dispatch(
       pdReportsAttachmentsSync(deleteThunk, this.reportId)
+      // @ts-ignore
     ).then(() => {
       self._notifyFileDeleted();
       self.set('attachmentDeleteUrl', undefined);
 
       if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-        (self.$.faceAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.faceAttachmentComponent as EtoolsFileEl).set('files', []);
+        (self.$.faceAttachmentComponent as EtoolsFile).fileInput.value = null;
+        (self.$.faceAttachmentComponent as EtoolsFile).set('files', []);
       } else if (self.get('otherOneAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherOneAttachment')[0].id) {
-        (self.$.otherOneAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.otherOneAttachmentComponent as EtoolsFileEl).set('files', []);
+        (self.$.otherOneAttachmentComponent as EtoolsFile).fileInput.value = null;
+        (self.$.otherOneAttachmentComponent as EtoolsFile).set('files', []);
       } else if (self.get('otherTwoAttachment').length !== 0 &&
         e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
-        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).fileInput.value = null;
-        (self.$.otherTwoAttachmentComponent as EtoolsFileEl).set('files', []);
+        (self.$.otherTwoAttachmentComponent as EtoolsFile).fileInput.value = null;
+        (self.$.otherTwoAttachmentComponent as EtoolsFile).set('files', []);
       }
     })
     // @ts-ignore
@@ -304,10 +305,10 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         attachmentPropertyName = attachmentPropertyName.split('.')[0];
       }
 
-      // @ts-ignore
       this.reduxStore.dispatch(
         pdReportsAttachmentsSync(thunk, this.reportId)
       )
+        // @ts-ignore
         .then(() => {
           self._notifyFileUploaded();
 

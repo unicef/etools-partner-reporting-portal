@@ -6,7 +6,6 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
-import DatePickerLite from '@unicef-polymer/etools-date-time/datepicker-lite';
 import Settings from '../../../settings';
 declare const moment: any;
 
