@@ -22,7 +22,7 @@ class NumeralJs extends PolymerElement {
 
   // Formatted manipulated output
   @property({type: String, readOnly: true, notify: true})
-  output: string = '';
+  output: string = ''
 
   // Print output
   @property({type: Boolean})
