@@ -10,7 +10,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/polymer/lib/elements/dom-if';
-import 'etools-file/etools-file.js';
+import '@unicef-polymer/etools-file/etools-file';
 import UtilsMixin from '../mixins/utils-mixin';
 import ModalMixin from '../mixins/modal-mixin';
 import NotificationsMixin from '../mixins/notifications-mixin';

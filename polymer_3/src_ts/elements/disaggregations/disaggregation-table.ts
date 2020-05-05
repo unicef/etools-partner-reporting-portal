@@ -299,6 +299,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
         totals = Object.assign(
           {},
           this.totals,
+          // @ts-ignore
           this['_calculateLevel' + this.formattedData.level_reported](key, this.totals)
         );
         break;
