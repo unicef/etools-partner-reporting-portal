@@ -41,6 +41,10 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
           @apply --app-grid-expandible-item;
         }
 
+        .start-date, .end-date {
+          max-width: 200px;
+        }
+
       </style>
 
       <iron-location
@@ -61,19 +65,9 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
             value="[[queryParams.title]]">
           </text-filter>
 
-          <!-- FIXME: Bug #209 -->
-          <!-- <cluster-location-filter
-            class="item filter-2-col"
-            value="[[_withDefault(queryParams.location, '')]]">
-          </cluster-location-filter> -->
-
-          <!-- <project-status-filter
-            value="[[_withDefault(queryParams.status, '')]]">
-          </project-status-filter> -->
-
           <date-filter
             format="YYYY-MM-DD"
-            class="item"
+            class="item start-date"
             label="[[localize('start_date')]]"
             name="start_date"
             value="[[_withDefault(queryParams.start_date, '')]]">
@@ -81,7 +75,7 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
 
           <date-filter
             format="YYYY-MM-DD"
-            class="item"
+            class="item end-date"
             label="[[localize('end_date')]]"
             name="end_date"
             value="[[_withDefault(queryParams.end_date, '')]]">
