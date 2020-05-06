@@ -146,7 +146,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         }
 
         #adoptLocations{
-          min-height: 350px;
+          min-height: 360px;
         }
       </style>
 
@@ -306,7 +306,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         is="dom-if"
                         if="[[selectedIndicatorDetailType]]"
                         restamp="true">
-                        <div class="full-width" id="adoptLocations">
+                        <div class="item full-width" id="adoptLocations">
                           <indicator-locations-widget
                             class="validate"
                             indicator-type="[[selectedIndicatorDetailType]]"
