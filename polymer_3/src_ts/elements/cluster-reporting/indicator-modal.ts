@@ -144,9 +144,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         .fields{
           margin-bottom: 24px;
         }
+
+        #adoptLocations{
+          min-height: 350px;
+        }
       </style>
 
-      <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+      <template is="dom-if" if="[[opened]]" restamp="true">
+          <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+      </template>
 
       <etools-prp-ajax
         id="disaggregations"
@@ -304,7 +310,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                           <indicator-locations-widget
                             class="validate"
                             indicator-type="[[selectedIndicatorDetailType]]"
-                            value="{{ data.locations }}">
+                            value="{{data.locations}}">
                           </indicator-locations-widget>
                         </div>
                       </template>
