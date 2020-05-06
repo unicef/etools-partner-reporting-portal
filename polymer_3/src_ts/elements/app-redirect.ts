@@ -34,7 +34,7 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
       // user has no workspaces
       location.href = '/unauthorized';
     }
-    if ((app === undefined) || (workspaces === undefined) || (workspace === undefined) || !profile) {
+    if ((app === undefined) || (workspace === undefined) || !profile) {
       return;
     }
 
