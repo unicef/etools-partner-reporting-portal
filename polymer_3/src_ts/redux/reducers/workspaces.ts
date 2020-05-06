@@ -1,8 +1,8 @@
 import Constants from '../../constants';
 
 export class WorkspacesState {
-  all: [] = [];
-  current: string = '';
+  all: [] | undefined = undefined;
+  current: string | undefined = undefined;
 }
 
 const INITIAL_STATE = new WorkspacesState();
