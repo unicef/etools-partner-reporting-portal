@@ -610,6 +610,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   _confirmIntent() {
     const deferred = this._deferred();
     fireEvent(this, 'report-submit-confirm', deferred);
+    this.set('busy', false);
 
     return deferred.promise;
   }
