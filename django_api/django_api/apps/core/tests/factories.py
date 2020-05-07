@@ -202,8 +202,8 @@ class NonPartnerUserFactory(AbstractUserFactory):
 
 class AbstractPRPRoleFactory(factory.django.DjangoModelFactory):
     # We are going to manually fill foreignkeys
-    user = factory.SubFactory('core.tests.factories.UserFactory', prp_role=None)
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory', prp_role=None)
+    user = factory.SubFactory('core.tests.factories.NonPartnerUserFactory')
+    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
     is_active = True
 
     class Meta:
@@ -238,7 +238,7 @@ class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
     Ex) ClusterPRPRoleFactory(user=user, workspace=workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
     """
 
-    cluster = factory.SubFactory('core.tests.factories.ClusterFactory', prp_role=None)
+    cluster = factory.SubFactory('core.tests.factories.ClusterFactory')
     role = fuzzy.FuzzyChoice(CLUSTER_PRP_ROLE_TYPES_LIST)
 
     class Meta:
@@ -262,8 +262,8 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
     Ex) WorkspaceFactory(countries=[country1, country2, ...])
     """
 
-    title = factory.LazyAttribute(lambda o: o.countries[0].name)
-    workspace_code = factory.LazyAttribute(lambda o: o.countries[0].country_short_code)
+    workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
+    title = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.workspace_code])
     business_area_code = factory.LazyFunction(lambda: faker.random_number(4, True))
     latitude = factory.LazyFunction(faker.latitude)
     longitude = factory.LazyFunction(faker.longitude)
@@ -361,14 +361,15 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     """
     title = factory.LazyAttributeSequence(
         lambda o, n: "{} Response Plan {}".format(
-            o.workspace.countries.first().name, n + beginning_of_this_year.year
+            o.workspace.title,
+            n + beginning_of_this_year.year,
         )
     )
     start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1))
     end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1) + datetime.timedelta(days=364))
     plan_type = RESPONSE_PLAN_TYPE.hrp
     plan_custom_type_label = ""
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory', response_plan=None)
+    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
 
     class Meta:
         model = ResponsePlan
@@ -427,7 +428,7 @@ class ClusterFactory(factory.django.DjangoModelFactory):
 
     type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
     imported_type = factory.LazyAttribute(lambda o: o.type)
-    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory', cluster=None)
+    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory')
 
     class Meta:
         model = Cluster
@@ -1096,7 +1097,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     reference_number = factory.LazyFunction(lambda: faker.uuid4()[:255])
     title = factory.LazyFunction(faker.sentence)
     unicef_office = factory.LazyFunction(faker.city)
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory', programme_document=None)
+    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
     partner = factory.SubFactory('core.tests.factories.PartnerFactory', programme_document=None)
     start_date = beginning_of_this_year
     end_date = datetime.date(today.year, 12, 31)
