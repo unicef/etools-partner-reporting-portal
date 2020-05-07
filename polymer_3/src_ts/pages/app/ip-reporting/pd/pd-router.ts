@@ -85,11 +85,9 @@ class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    console.log('pd-router page changed: ' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
-        console.log(resolvedPageUrl);
         this._notFound();
       });
   }
