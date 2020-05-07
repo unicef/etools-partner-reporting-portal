@@ -80,6 +80,9 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
   private _debouncer!: Debouncer;
 
   _computeActivitiesUrl(responsePlanId: string) {
+    if (!responsePlanId) {
+      return;
+    }
     return Endpoints.partnerActivityList(responsePlanId);
   }
 
@@ -88,7 +91,7 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        var self = this;
+        const self = this;
 
         //activities.abort();
         (this.$.activities as EtoolsPrpAjaxEl).abort();

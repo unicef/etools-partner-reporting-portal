@@ -144,9 +144,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         .fields{
           margin-bottom: 24px;
         }
+
+        #adoptLocations{
+          min-height: 360px;
+        }
       </style>
 
-      <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+      <template is="dom-if" if="[[opened]]" restamp="true">
+          <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+      </template>
 
       <etools-prp-ajax
         id="disaggregations"
@@ -300,11 +306,11 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         is="dom-if"
                         if="[[selectedIndicatorDetailType]]"
                         restamp="true">
-                        <div class="item full-width">
+                        <div class="item full-width" id="adoptLocations">
                           <indicator-locations-widget
                             class="validate"
                             indicator-type="[[selectedIndicatorDetailType]]"
-                            value="{{ data.locations }}">
+                            value="{{data.locations}}">
                           </indicator-locations-widget>
                         </div>
                       </template>
@@ -977,7 +983,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     if (!e) {
       return;
     }
-    e.stopPropagation();
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
     // _adjustPositionDebouncer is from ModalMixin
     this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
       timeOut.after(250),
@@ -1301,7 +1309,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           })
           .catch((_err: GenericObject) => {
             // TODO: error handling
-          });
+          })
+          .then(() => {
+            this.adjustPosition({} as any);
+          })
       });
   }
 

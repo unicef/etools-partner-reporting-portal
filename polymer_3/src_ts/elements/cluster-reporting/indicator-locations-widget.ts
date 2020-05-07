@@ -579,11 +579,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     return location.loc_type >= 0 ? location.loc_type : location.admin_level;
   }
 
+  // @ts-ignore
   _getLocationTitle(locationId: string, index: number) {
     if (!this.value || !this.value[index]) {
       return;
     }
-    let targetLocation = this.value[index];
+    const targetLocation = this.value[index];
     return targetLocation ? targetLocation.title : '';
   }
 

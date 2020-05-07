@@ -7,7 +7,8 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import './analysis-widget';
 import {GenericObject} from '../../../typings/globals.types';
-import {map, tileLayer, polygon, point, marker, latLng} from 'leaflet/dist/leaflet-src.esm.js';
+// @ts-ignore
+import {map, tileLayer, polygon, marker, latLng} from 'leaflet/dist/leaflet-src.esm.js';
 
 /**
 * @polymer

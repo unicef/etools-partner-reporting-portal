@@ -6,7 +6,6 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
-import DatePickerLite from '@unicef-polymer/etools-date-time/datepicker-lite';
 import Settings from '../../../settings';
 declare const moment: any;
 
@@ -29,8 +28,8 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
       id="field"
       label="[[label]]"
       value="[[value]]"
-      input-date-format=[[format]]"
-      selected-date-display-format=[[format]]"
+      input-date-format="[[format]]"
+      selected-date-display-format="[[format]]"
       fire-date-has-changed
       on-date-has-changed="_filterDateHasChanged">
     </datepicker-lite>

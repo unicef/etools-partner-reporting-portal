@@ -93,11 +93,23 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   @property({type: Number, computed: '_computeSelected(data, current)'})
   selected = 0;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
+  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)', observer: '_currentWorkspaceChanged'})
   current!: string;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   data!: any[];
+
+  private prevWorkspace!: string;
+
+  _currentWorkspaceChanged() {
+    if (this.current) {
+      if (!this.prevWorkspace) {
+        this.prevWorkspace = this.current;
+      } else if (this.prevWorkspace != this.current) {
+        window.location.href = this.buildUrl(this._baseUrl, '/');
+      }
+    }
+  }
 
   _workspaceSelected(e: CustomEvent) {
     const newCode = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).code;
@@ -106,11 +118,6 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
     }
 
     this.reduxStore.dispatch(setWorkspace(newCode));
-
-    setTimeout(() => {
-      window.location.href = this.buildUrl(this._baseUrl, '/');
-    }, 100);
-
   }
 
   _computeWorkspace(data: any[], code: string) {
@@ -122,6 +129,9 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _computeSelected(data: any[], workspace: string) {
+    if (!data) {
+      return;
+    }
     return data.findIndex(x => x.code === workspace);
   }
 }

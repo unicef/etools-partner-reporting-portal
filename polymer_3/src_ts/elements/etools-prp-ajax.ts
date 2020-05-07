@@ -104,7 +104,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   _getCSRFCookie() {
     // check for a csrftoken cookie and return its value
     const csrfCookieName = 'csrftoken';
-    let csrfToken = null;
+    let csrfToken = '';
     if (document.cookie && document.cookie !== '') {
       const cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {

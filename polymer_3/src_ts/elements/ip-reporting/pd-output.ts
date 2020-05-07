@@ -382,6 +382,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
     e.stopPropagation();
 
     if (data.value) {
+      // @ts-ignore
       const indicatorDetails = e.srcElement!.querySelector('indicator-details');
 
       try {

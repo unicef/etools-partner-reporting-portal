@@ -1,7 +1,7 @@
 import Constants from '../../constants';
 
 export class AppState {
-  current: string = '';
+  current: string | undefined = undefined;
 }
 
 const INITIAL_STATE = new AppState();
