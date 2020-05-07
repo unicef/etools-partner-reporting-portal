@@ -1,5 +1,5 @@
-from core.tests import factories
 from core.helpers import generate_data_combination_entries
+from core.tests import factories
 from indicator.models import Disaggregation, ReportingEntity
 
 unicef_re = ReportingEntity.objects.get(title="UNICEF")

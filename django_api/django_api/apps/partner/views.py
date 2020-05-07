@@ -2,55 +2,52 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-from rest_framework.exceptions import ValidationError, PermissionDenied
-from rest_framework.filters import OrderingFilter
-from rest_framework.views import APIView
-from rest_framework.generics import (
-    RetrieveAPIView,
-    ListCreateAPIView,
-    ListAPIView,
-    UpdateAPIView,
-    CreateAPIView,
-    RetrieveUpdateAPIView
-)
-from rest_framework.response import Response
-from rest_framework import status
-
 import django_filters
-
+from cluster.models import Cluster
 from core.common import PRP_ROLE_TYPES
 from core.paginations import SmallPagination
 from core.permissions import (
-    IsAuthenticated,
     AnyPermission,
+    has_permission_for_clusters_check,
     HasAnyRole,
-    IsIMO,
+    IsAuthenticated,
     IsClusterSystemAdmin,
-    has_permission_for_clusters_check
+    IsIMO,
 )
-
-from cluster.models import Cluster
-
-from .serializers import (
-    PartnerDetailsSerializer,
-    PartnerProjectSerializer,
-    PartnerProjectSimpleSerializer,
-    ClusterActivityPartnersSerializer,
-    PartnerActivitySerializer,
-    PartnerActivityFromClusterActivitySerializer,
-    PartnerActivityFromCustomActivitySerializer,
-    PartnerSimpleSerializer,
-    PartnerActivityUpdateSerializer,
-    PartnerIDManagementSerializer,
-    PartnerSimpleIDManagementSerializer,
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.filters import OrderingFilter
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateAPIView,
+    UpdateAPIView,
 )
-from .models import PartnerProject, PartnerActivity, Partner
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .filters import (
-    PartnerProjectFilter,
     ClusterActivityPartnersFilter,
     PartnerActivityFilter,
     PartnerFilter,
-    PartnerIDManagementFilter
+    PartnerIDManagementFilter,
+    PartnerProjectFilter,
+)
+from .models import Partner, PartnerActivity, PartnerProject
+from .serializers import (
+    ClusterActivityPartnersSerializer,
+    PartnerActivityFromClusterActivitySerializer,
+    PartnerActivityFromCustomActivitySerializer,
+    PartnerActivitySerializer,
+    PartnerActivityUpdateSerializer,
+    PartnerDetailsSerializer,
+    PartnerIDManagementSerializer,
+    PartnerProjectSerializer,
+    PartnerProjectSimpleSerializer,
+    PartnerSimpleIDManagementSerializer,
+    PartnerSimpleSerializer,
 )
 
 

@@ -1,21 +1,16 @@
 from __future__ import unicode_literals
+
 import datetime
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
-from django.contrib.contenttypes.fields import GenericRelation
 
 from account.models import User
-
-from core.common import (
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    PRP_ROLE_TYPES,
-    CLUSTER_TYPES)
-from core.models import TimeStampedExternalSourceModel, PRPRole
-
-from indicator.models import Reportable, IndicatorReport
+from core.common import CLUSTER_TYPES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from core.models import PRPRole, TimeStampedExternalSourceModel
+from indicator.models import IndicatorReport, Reportable
 from partner.models import PartnerActivity
 
 

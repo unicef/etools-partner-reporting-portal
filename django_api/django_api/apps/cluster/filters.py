@@ -1,11 +1,11 @@
 from django.db.models import Q
 
 import django_filters
-from django_filters.filters import CharFilter
-
 from core.common import INDICATOR_REPORT_STATUS
+from django_filters.filters import CharFilter
 from indicator.models import IndicatorReport, Reportable
-from .models import ClusterObjective, ClusterActivity, Cluster
+
+from .models import Cluster, ClusterActivity, ClusterObjective
 
 
 class ClusterFilter(django_filters.FilterSet):

@@ -1,20 +1,18 @@
-import jwt
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
-
+import jwt
 from core.permissions import (
     AnyPermission,
+    IsIMOForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
-    IsPartnerAdminForCurrentWorkspace,
-    IsIMOForCurrentWorkspace,
     IsUNICEFAPIUser,
 )
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
 
 
 class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):

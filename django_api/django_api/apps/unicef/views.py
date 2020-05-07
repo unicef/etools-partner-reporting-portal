@@ -6,86 +6,75 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
-from requests import HTTPError, ConnectionError, ConnectTimeout, ReadTimeout
-
-from rest_framework import status as statuses
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView
-from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 import django_filters.rest_framework
-from easy_pdf.rendering import render_to_pdf_response
-
 from core.api import PMP_API
 from core.api_error_codes import APIErrorCode
 from core.common import (
-    PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
     PR_ATTACHMENT_TYPES,
+    PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
 )
+from core.models import Location
 from core.paginations import SmallPagination
 from core.permissions import (
-    IsAuthenticated,
-    IsPartnerAuthorizedOfficerForCurrentWorkspace,
     AnyPermission,
+    IsAuthenticated,
+    IsPartnerAdminForCurrentWorkspace,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
-    IsPartnerAdminForCurrentWorkspace,
     IsUNICEFAPIUser,
 )
-from core.models import Location
 from core.serializers import ShortLocationSerializer
-
-from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint, IndicatorLocationData
-from indicator.serializers import (
-    IndicatorListSerializer,
-    PDReportContextIndicatorReportSerializer
-)
-from indicator.filters import PDReportsFilter
-from indicator.serializers import IndicatorBlueprintSimpleSerializer
+from easy_pdf.rendering import render_to_pdf_response
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from indicator.filters import PDReportsFilter
+from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from indicator.serializers import (
+    IndicatorBlueprintSimpleSerializer,
+    IndicatorListSerializer,
+    PDReportContextIndicatorReportSerializer,
+)
 from indicator.utilities import convert_string_number_to_float
 from partner.models import Partner
-from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
-
+from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
+from rest_framework import status as statuses
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
-from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
+from unicef.exports.programme_documents import ProgrammeDocumentsPDFExporter, ProgrammeDocumentsXLSXExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter, ProgressReportListPDFExporter
+from unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
-from utils.mixins import ListExportMixin, ObjectExportMixin
 from utils.emails import send_email_from_template
-
-from .serializers import (
-    ProgrammeDocumentSerializer,
-    ProgrammeDocumentDetailSerializer,
-    ProgressReportSimpleSerializer,
-    ProgressReportSerializer,
-    ProgressReportReviewSerializer,
-    LLOutputSerializer,
-    ProgrammeDocumentCalculationMethodsSerializer,
-    ProgrammeDocumentProgressSerializer,
-    ProgressReportUpdateSerializer,
-    ProgressReportAttachmentSerializer,
-    ProgressReportSRUpdateSerializer,
-    ProgressReportPullHFDataSerializer,
-)
-from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput, ProgressReportAttachment
-from .permissions import (
-    CanChangePDCalculationMethod,
-    UnicefPartnershipManagerOrRead
-)
-from .filters import (
-    ProgrammeDocumentFilter, ProgressReportFilter,
-    ProgrammeDocumentIndicatorFilter
-)
+from utils.mixins import ListExportMixin, ObjectExportMixin
 
 from .export_report import ProgressReportXLSXExporter
+from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
+from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
+from .serializers import (
+    LLOutputSerializer,
+    ProgrammeDocumentCalculationMethodsSerializer,
+    ProgrammeDocumentDetailSerializer,
+    ProgrammeDocumentProgressSerializer,
+    ProgrammeDocumentSerializer,
+    ProgressReportAttachmentSerializer,
+    ProgressReportPullHFDataSerializer,
+    ProgressReportReviewSerializer,
+    ProgressReportSerializer,
+    ProgressReportSimpleSerializer,
+    ProgressReportSRUpdateSerializer,
+    ProgressReportUpdateSerializer,
+)
 
 logger = logging.getLogger(__name__)
 

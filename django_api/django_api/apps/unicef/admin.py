@@ -1,13 +1,13 @@
 from django.contrib import admin
 
 from .models import (
-    ProgressReport,
-    ProgrammeDocument,
-    PDResultLink,
     LowerLevelOutput,
-    Section,
+    PDResultLink,
     Person,
+    ProgrammeDocument,
+    ProgressReport,
     ReportingPeriodDates,
+    Section,
 )
 
 

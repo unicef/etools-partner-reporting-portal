@@ -5,14 +5,14 @@ import tempfile
 
 from django.http import HttpResponse
 from django.utils import timezone
+
 from easy_pdf.exceptions import PDFRenderingError
-from easy_pdf.rendering import render_to_pdf, make_response
+from easy_pdf.rendering import make_response, render_to_pdf
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
+from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.styles.numbers import FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
-
-from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell, HTMLTableHeader
+from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader, PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.templatetags.pdf_extras import format_currency
 
 logger = logging.getLogger(__name__)

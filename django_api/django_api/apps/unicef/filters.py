@@ -1,18 +1,16 @@
+from distutils.util import strtobool
 from urllib import parse
 
 from django.conf import settings
 from django.db.models import Q
 
 import django_filters
-from distutils.util import strtobool
-from django_filters.filters import (
-    DateFilter, TypedChoiceFilter, CharFilter
-)
-
-from core.common import PROGRESS_REPORT_STATUS, PD_STATUS
-from utils.filters.fields import CommaSeparatedListFilter
-from utils.filters.constants import Boolean
+from core.common import PD_STATUS, PROGRESS_REPORT_STATUS
+from django_filters.filters import CharFilter, DateFilter, TypedChoiceFilter
 from indicator.models import Reportable
+from utils.filters.constants import Boolean
+from utils.filters.fields import CommaSeparatedListFilter
+
 from .models import ProgrammeDocument, ProgressReport
 
 

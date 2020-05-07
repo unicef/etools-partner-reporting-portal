@@ -1,12 +1,8 @@
-from babel.numbers import format_number, format_percent
-
-from django.utils.translation import to_locale, get_language
 from django.db import transaction
+from django.utils.translation import get_language, to_locale
 
-from core.helpers import (
-    create_ir_and_ilds_for_pr,
-)
-
+from babel.numbers import format_number, format_percent
+from core.helpers import create_ir_and_ilds_for_pr
 from indicator.constants import ValueType
 
 

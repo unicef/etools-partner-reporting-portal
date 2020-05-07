@@ -1,35 +1,15 @@
 from django.db import transaction
+
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from cluster.serializers import ClusterActivitySerializer, ClusterObjectiveSerializer, ClusterSimpleSerializer
+from core.common import CSO_TYPES, PARTNER_ACTIVITY_STATUS, PARTNER_TYPE
+from core.models import Location
+from core.serializers import ShortLocationSerializer
+from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
+from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
 
-from core.serializers import ShortLocationSerializer
-from core.common import PARTNER_TYPE, CSO_TYPES, PARTNER_ACTIVITY_STATUS
-from core.models import Location
-
-from cluster.models import (
-    Cluster,
-    ClusterActivity,
-    ClusterObjective,
-)
-from cluster.serializers import (
-    ClusterSimpleSerializer,
-    ClusterActivitySerializer,
-    ClusterObjectiveSerializer
-)
-
-from indicator.models import (
-    create_pa_reportables_from_ca,
-    get_reportable_data_to_clone,
-    Reportable
-)
-from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
-
-from .models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-    PartnerProjectFunding,
-    PartnerActivityProjectContext
-)
+from .models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject, PartnerProjectFunding
 
 
 class PartnerProjectSimpleSerializer(serializers.ModelSerializer):

@@ -1,11 +1,12 @@
 from django.db import transaction
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from cluster.models import Cluster
-from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE
+from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from utils.serializers import CurrentWorkspaceDefault
-from .models import Workspace, Location, ResponsePlan, Country, GatewayType, PRPRole
+
+from .models import Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
 
 
 class CountrySerializer(serializers.ModelSerializer):

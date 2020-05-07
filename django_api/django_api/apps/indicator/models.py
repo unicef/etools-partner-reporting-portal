@@ -1,39 +1,35 @@
 from __future__ import unicode_literals
 
+from functools import reduce
+
 from django.conf import settings
-from django.utils.functional import cached_property
-from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from model_utils.models import TimeStampedModel
-from model_utils.tracker import FieldTracker
-from requests.compat import urljoin
-from rest_framework import serializers
+from django.utils.functional import cached_property
 
 from core.common import (
-    INDICATOR_REPORT_STATUS,
-    FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
-    PROGRESS_REPORT_STATUS,
-    OVERALL_STATUS,
     FINAL_OVERALL_STATUS,
+    FREQUENCY_LEVEL,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    PROGRESS_REPORT_STATUS,
+    PRP_ROLE_TYPES,
+    REPORTABLE_FREQUENCY_LEVEL,
     REPORTING_TYPES,
-    PRP_ROLE_TYPES)
-from core.models import TimeStampedExternalSourceModel
-from functools import reduce
-
-from partner.models import PartnerActivity
-
-from indicator.disaggregators import (
-    QuantityIndicatorDisaggregator,
-    RatioIndicatorDisaggregator
 )
+from core.models import TimeStampedExternalSourceModel
 from indicator.constants import ValueType
+from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from indicator.utilities import convert_string_number_to_float
+from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from partner.models import PartnerActivity
+from requests.compat import urljoin
+from rest_framework import serializers
 from utils.emails import send_email_from_template
 
 

@@ -1,28 +1,28 @@
 from django.conf.urls import url
 
 from .views import (
+    InterventionPMPDocumentView,
     ProgrammeDocumentAPIView,
-    ProgrammeDocumentDetailsAPIView,
-    ProgrammeDocumentLocationsAPIView,
-    ProgressReportAnnexCPDFView,
-    ProgrammeDocumentIndicatorsAPIView,
-    ProgressReportAPIView,
-    ProgressReportIndicatorsAPIView,
-    ProgressReportDetailsAPIView,
-    ProgressReportSubmitAPIView,
-    ProgressReportReviewAPIView,
-    ProgressReportLocationsAPIView,
     ProgrammeDocumentCalculationMethodsAPIView,
+    ProgrammeDocumentDetailsAPIView,
+    ProgrammeDocumentIndicatorsAPIView,
+    ProgrammeDocumentLocationsAPIView,
     ProgrammeDocumentProgressAPIView,
-    ProgressReportDetailsUpdateAPIView,
-    ProgressReportAttachmentListCreateAPIView,
+    ProgressReportAnnexCPDFView,
+    ProgressReportAPIView,
     ProgressReportAttachmentAPIView,
-    ProgressReportSRSubmitAPIView,
-    ProgressReportPullHFDataAPIView,
+    ProgressReportAttachmentListCreateAPIView,
+    ProgressReportDetailsAPIView,
+    ProgressReportDetailsUpdateAPIView,
     ProgressReportExcelExportView,
     ProgressReportExcelImportView,
-    InterventionPMPDocumentView)
-
+    ProgressReportIndicatorsAPIView,
+    ProgressReportLocationsAPIView,
+    ProgressReportPullHFDataAPIView,
+    ProgressReportReviewAPIView,
+    ProgressReportSRSubmitAPIView,
+    ProgressReportSubmitAPIView,
+)
 
 urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/programme-document/$',

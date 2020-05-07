@@ -2,9 +2,9 @@ import logging
 
 from django.http import HttpResponse
 from django.utils import timezone
-from easy_pdf.exceptions import PDFRenderingError
-from easy_pdf.rendering import render_to_pdf, make_response
 
+from easy_pdf.exceptions import PDFRenderingError
+from easy_pdf.rendering import make_response, render_to_pdf
 from indicator.models import IndicatorBlueprint
 from indicator.utilities import format_total_value_to_string
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output, HTMLTableCell, HTMLTableHeader

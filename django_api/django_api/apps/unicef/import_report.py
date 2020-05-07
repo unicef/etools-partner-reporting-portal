@@ -2,14 +2,12 @@
 import traceback
 from datetime import datetime
 
-from openpyxl.reader.excel import load_workbook
-
 from django.db import transaction
 
 from core import common
-
-from indicator.models import IndicatorLocationData, IndicatorBlueprint, DisaggregationValue
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
+from openpyxl.reader.excel import load_workbook
 
 from .models import ProgressReport
 

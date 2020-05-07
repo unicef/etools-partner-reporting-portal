@@ -1,19 +1,17 @@
-import math
-import random
 import logging
-import sys
+import math
 import os
+import random
+import sys
 from ast import literal_eval
 from calendar import monthrange
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
 from itertools import combinations, product
 
-from core.common import (
-    PD_FREQUENCY_LEVEL,
-)
+from core.common import PD_FREQUENCY_LEVEL
+from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger("django")
 

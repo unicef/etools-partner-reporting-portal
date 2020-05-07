@@ -1,20 +1,18 @@
 from django.contrib.auth import login, logout
-from django.db.models import Prefetch, Q, Count
-
-from rest_framework import status as statuses
-from rest_framework.exceptions import ValidationError, PermissionDenied
-from rest_framework.filters import OrderingFilter
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.db.models import Count, Prefetch, Q
 
 import django_filters
-from drfpasswordless.utils import authenticate_by_token
-
 from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
+from drfpasswordless.utils import authenticate_by_token
+from rest_framework import status as statuses
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.filters import OrderingFilter
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import UserFilter
 from .models import User

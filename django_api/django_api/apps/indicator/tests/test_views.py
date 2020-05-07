@@ -1,6 +1,6 @@
 import copy
-from ast import literal_eval as make_tuple
 import datetime
+from ast import literal_eval as make_tuple
 from unittest.mock import Mock, patch
 
 from django.conf import settings
@@ -8,13 +8,13 @@ from django.urls import reverse
 
 from cluster.models import ClusterActivity, ClusterObjective
 from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, REPORTABLE_FREQUENCY_LEVEL
-from core.tests import factories
 from core.helpers import get_cast_dictionary_keys_as_tuple
 from core.management.commands._generate_disaggregation_fake_data import (
     add_disaggregations_to_reportable,
     generate_3_num_disagg_data,
 )
 from core.models import Location
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import (
