@@ -364,19 +364,6 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
             cp_output__programme_document=self)
 
 
-def find_first_programme_document_id():
-    try:
-        pd_id = ProgrammeDocument.objects.first().id
-    except AttributeError:
-        from core.factories import ProgrammeDocumentFactory
-        pd = ProgrammeDocumentFactory()
-        pd_id = pd.id
-
-        return pd_id
-    else:
-        return pd_id
-
-
 class ProgressReport(TimeStampedModel):
     """
     Represents a report on multiple lower level outputs by a partner
