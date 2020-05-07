@@ -58,6 +58,11 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       url="[[profileUrl]]">
   </etools-prp-ajax>
 
+  <etools-prp-ajax
+      id="workspaces"
+      url="[[workspacesUrl]]">
+  </etools-prp-ajax>
+
   <page-body>
     <div class="item">
       <span class="sign-out-button" on-tap="_logout">
@@ -102,27 +107,41 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
+  @property({type: String})
+  workspacesUrl = Endpoints.interventions();
+
   @property({type: Boolean})
   isAccessError = true;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)', observer: '_workspacesChanged'})
-  workspaces!: any[];
 
   _logout() {
     fireEvent(this, 'sign-out');
   }
 
-  _workspacesChanged() {
-    if (!this.workspaces) {
-      return;
-    }
-    if (!this.workspaces.length) {
-      this.isAccessError = false;
-      this.set('loading', false);
-      return;
-    }
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.checkWorkspaceExistence();
+  }
+
+  checkWorkspaceExistence() {
     const self = this;
-    (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
+    (this.$.workspaces as EtoolsPrpAjaxEl).thunk()()
+      .then((res: any) => {
+        if (res.data && res.data.length) {
+          self.checkAccessRights();
+        } else {
+          self.isAccessError = false;
+          self.set('loading', false);
+        }
+      }).catch(() => {
+        self.isAccessError = false;
+        self.set('loading', false);
+      });
+  }
+
+  checkAccessRights() {
+    const self = this;
+    (self.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
         if (res.data.access.length) {
           window.location.href = `/${BASE_PATH}/`;
