@@ -165,7 +165,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
       componentName = page;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
-    console.log('app-shell loading' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
