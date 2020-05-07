@@ -3,7 +3,6 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
-import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';

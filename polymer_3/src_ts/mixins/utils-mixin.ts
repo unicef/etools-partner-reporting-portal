@@ -313,7 +313,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         .filter((key) => {
           return keys.indexOf(key) === -1;
         })
-        .reduce((acc, key) => {
+        .reduce((acc: any, key) => {
           acc[key] = src[key];
 
           return acc;

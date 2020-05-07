@@ -72,6 +72,7 @@ export const clusterIndicatorReportsFetchSingle = function(reportThunk: any, rep
 };
 
 export const clusterIndicatorReportsSubmit = function(submitThunk: any) {
+  // @ts-ignore
   return function(dispatch: any) {
     return submitThunk();
   };

@@ -11,7 +11,7 @@ import {progressBarStyles} from '../styles/progress-bar-styles';
  * @mixinFunction
  * @appliesMixin UtilsMixin
  */
-class EtoolsPrpProgressBar extends (UtilsMixin(PolymerElement)){
+class EtoolsPrpProgressBar extends (UtilsMixin(PolymerElement)) {
   public static get template() {
     return html`
         ${progressBarStyles}
@@ -23,7 +23,7 @@ class EtoolsPrpProgressBar extends (UtilsMixin(PolymerElement)){
         </style>
         <paper-progress value="[[percentage]]"></paper-progress>
         <span class="percentage">[[percentage]]%</span>
-    
+
     `;
   }
 

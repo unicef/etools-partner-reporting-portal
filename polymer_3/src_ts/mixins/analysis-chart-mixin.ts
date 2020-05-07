@@ -91,7 +91,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     }
 
     _computeRows(data: GenericObject[]) {
-      return Object.keys(data).map((key) => {
+      return Object.keys(data).map((key: any) => {
         return [
           key,
           data[key].length,

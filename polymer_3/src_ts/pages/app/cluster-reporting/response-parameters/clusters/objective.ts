@@ -21,7 +21,6 @@ import RoutingMixin from '../../../../../mixins/routing-mixin';
 import Endpoints from '../../../../../endpoints';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {PaperTabsElement} from "@polymer/paper-tabs/paper-tabs";
 
 /**
 * @polymer
