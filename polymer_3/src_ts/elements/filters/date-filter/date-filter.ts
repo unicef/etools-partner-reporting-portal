@@ -28,8 +28,8 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
       id="field"
       label="[[label]]"
       value="[[value]]"
-      input-date-format=[[format]]"
-      selected-date-display-format=[[format]]"
+      input-date-format="[[format]]"
+      selected-date-display-format="[[format]]"
       fire-date-has-changed
       on-date-has-changed="_filterDateHasChanged">
     </datepicker-lite>

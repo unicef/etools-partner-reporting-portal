@@ -80,8 +80,13 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
         if="[[!loading]]"
         restamp="true">
       <message-box type="warning">
-        <span>
+       <span hidden$="[[isAccessError]]">
+          It looks like you do not have workspace assigned.
+        </span>
+        <span hidden$="[[!isAccessError]]">
           It looks like you do not have the permissions assigned to enter the Partner Reporting Portal.
+        </span>
+        <span>
           Please contact <a href="mailto:support@prphelp.zendesk.com">support@prphelp.zendesk.com</a>
           and include your full name, email and the name of the organization you are from.
         </span>
@@ -97,14 +102,25 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
+  @property({type: Boolean})
+  isAccessError = true;
+
+  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)', observer: '_workspacesChanged'})
+  workspaces!: any[];
 
   _logout() {
     fireEvent(this, 'sign-out');
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-
+  _workspacesChanged() {
+    if (!this.workspaces) {
+      return;
+    }
+    if (!this.workspaces.length) {
+      this.isAccessError = false;
+      this.set('loading', false);
+      return;
+    }
     const self = this;
     (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
@@ -113,7 +129,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
         } else {
           self.set('loading', false);
         }
-      });
+      }).catch(() => {self.set('loading', false);});
   }
 
 }
