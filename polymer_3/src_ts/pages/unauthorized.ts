@@ -130,12 +130,10 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
         if (res.data && res.data.length) {
           self.checkAccessRights();
         } else {
-          self.isAccessError = false;
-          self.set('loading', false);
+          self.showMessage(false);
         }
       }).catch(() => {
-        self.isAccessError = false;
-        self.set('loading', false);
+        self.showMessage(false);
       });
   }
 
@@ -146,9 +144,14 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
         if (res.data.access.length) {
           window.location.href = `/${BASE_PATH}/`;
         } else {
-          self.set('loading', false);
+          self.showMessage(true);
         }
-      }).catch(() => {self.set('loading', false);});
+      }).catch(() => {self.showMessage(true);});
+  }
+
+  showMessage(isAccessError: boolean) {
+    this.isAccessError = isAccessError;
+    this.set('loading', false);
   }
 
 }
