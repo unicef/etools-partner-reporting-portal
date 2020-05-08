@@ -32,7 +32,7 @@ jobs:
           command: |
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
-                pip install -rq django_api/requirements/dev.txt --user
+                pip install -q -r django_api/requirements/dev.txt --user
                 python django_api/manage.py test
       - store_artifacts:
           path: ~build/coverage
