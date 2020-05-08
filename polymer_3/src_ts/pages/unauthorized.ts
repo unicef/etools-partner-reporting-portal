@@ -120,7 +120,19 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   connectedCallback() {
     super.connectedCallback();
 
-    this.checkWorkspaceExistence();
+    this.checkAccessRights();
+  }
+
+  checkAccessRights() {
+    const self = this;
+    (self.$.userProfile as EtoolsPrpAjaxEl).thunk()()
+      .then((res: any) => {
+        if (res.data && res.data.access && res.data.access.length) {
+          self.checkWorkspaceExistence();
+        } else {
+          self.showMessage(true);
+        }
+      }).catch(() => {self.showMessage(true);});
   }
 
   checkWorkspaceExistence() {
@@ -128,25 +140,13 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.workspaces as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
         if (res.data && res.data.length) {
-          self.checkAccessRights();
+          window.location.href = `/${BASE_PATH}/`;
         } else {
           self.showMessage(false);
         }
       }).catch(() => {
         self.showMessage(false);
       });
-  }
-
-  checkAccessRights() {
-    const self = this;
-    (self.$.userProfile as EtoolsPrpAjaxEl).thunk()()
-      .then((res: any) => {
-        if (res.data.access.length) {
-          window.location.href = `/${BASE_PATH}/`;
-        } else {
-          self.showMessage(true);
-        }
-      }).catch(() => {self.showMessage(true);});
   }
 
   showMessage(isAccessError: boolean) {
