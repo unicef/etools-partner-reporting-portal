@@ -3,7 +3,7 @@ jobs:
   build_backend:
     working_directory: ~/code
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.6
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
@@ -32,7 +32,7 @@ jobs:
           command: |
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
-                pip install -r django_api/requirements/dev.txt --user
+                pip install -rq django_api/requirements/dev.txt --user
                 python django_api/manage.py test
       - store_artifacts:
           path: ~build/coverage
