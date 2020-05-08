@@ -31,6 +31,7 @@ steps:
                 only:
                     - develop
                     - master
+                    - polymer3-migration
 
     # deploy_frontend:
     #     image: codefresh/cf-deploy-kubernetes

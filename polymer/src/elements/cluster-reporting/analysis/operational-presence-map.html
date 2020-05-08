@@ -368,7 +368,7 @@
 
             style.innerHTML = this.mapStyles;
 
-            this.$$('leaflet-map').appendChild(style);
+            this.shadowRoot.querySelector('leaflet-map').appendChild(style);
           });
         });
       },

@@ -9,8 +9,8 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
@@ -155,7 +155,7 @@
       }
 
       .iron-collapse-opened {
-        @apply(--cluster-report-content);
+        @apply --cluster-report-content;
 
         background: white;
       }
@@ -174,15 +174,15 @@
         padding: 25px;
       }
 
-      paper-menu {
+      paper-listbox {
         white-space: nowrap;
       }
 
-      paper-menu a {
+      paper-listbox a {
         color: inherit;
       }
 
-      paper-menu iron-icon {
+      paper-listbox iron-icon {
         margin-right: .25em;
       }
 
@@ -366,10 +366,10 @@
 
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-menu
-                    id="viewMenu"
-                    class="dropdown-content"
-                    selected="2">
+                  <paper-listbox
+                      id="viewMenu"
+                      class="dropdown-content"
+                      selected="2">
                     <template
                       is="dom-if"
                       if="[[canSendBack]]">
@@ -390,7 +390,7 @@
                     </a>
 
                     <div></div>
-                  </paper-menu>
+                  </paper-listbox>
                 </paper-menu-button>
               </template>
 
@@ -405,17 +405,17 @@
                 </feedback-modal>
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-menu
-                    id="nonViewMenu"
-                    class="dropdown-content"
-                    selected="1">
+                  <paper-listbox
+                      id="nonViewMenu"
+                      class="dropdown-content"
+                      selected="1">
                     <paper-icon-item on-tap="_viewFeedback">
                       <iron-icon icon="icons:announcement" item-icon></iron-icon>
                       [[localize('view_feedback')]]
                     </paper-icon-item>
 
                     <div></div>
-                  </paper-menu>
+                  </paper-listbox>
                 </paper-menu-button>
               </template>
             </div>
@@ -634,11 +634,6 @@
         },
       },
 
-      listeners: {
-        'report-complete': '_onReportComplete',
-        'reportable-meta-changed': '_updateMeta',
-      },
-
       _calculationFormulaAcrossPeriods: function (indicator) {
         return indicator.reportable.blueprint.display_type === 'ratio'
           ? 'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
@@ -759,9 +754,9 @@
         this.set('busy', false);
       },
 
-      _onReportComplete: function (e, data) {
+      _onReportComplete: function (e) {
         e.stopPropagation();
-
+        const data = e.detail;
         this.dispatch(
           App.Actions.ClusterIndicatorReports.updateSingle(
             data.indicatorId,
@@ -772,12 +767,12 @@
         );
       },
 
-      _updateMeta: function (e, data) {
+      _updateMeta: function (e) {
         var self = this;
         var updateThunk;
 
         e.stopPropagation();
-
+        const data = e.detail;
         this.set('reportMeta', data);
 
         updateThunk = this.$.update.thunk();
@@ -836,18 +831,18 @@
       },
 
       _sendBack: function () {
-        this.$$('#sendBackModal').open();
+        this.shadowRoot.querySelector('#sendBackModal').open();
 
         this.async(function () {
-          this.$$('#viewMenu').select(2);
+          this.shadowRoot.querySelector('#viewMenu').select(2);
         });
       },
 
       _viewFeedback: function () {
-        this.$$('#feedbackModal').open();
+        this.shadowRoot.querySelector('#feedbackModal').open();
 
         this.async(function () {
-          this.$$('#nonViewMenu').select(1);
+          this.shadowRoot.querySelector('#nonViewMenu').select(1);
         });
       },
 
@@ -864,10 +859,27 @@
         }
       },
 
+      _addEventListeners: function () {
+        this._onReportComplete = this._onReportComplete.bind(this);
+        this.addEventListener('report-complete', this._onReportComplete);
+        this._updateMeta = this._updateMeta.bind(this);
+        this.addEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('report-complete', this._onReportComplete);
+        this.removeEventListener('reportable-meta-changed', this._updateMeta);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
         this.$.submit.abort();
         this.$.error.close();
         this.$.update.abort();
+        this._removeEventListeners();
       },
     });
   </script>

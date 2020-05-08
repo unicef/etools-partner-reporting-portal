@@ -15,7 +15,7 @@
       }
 
       h1 {
-        @apply(--paper-font-display1);
+        @apply --paper-font-display1;
       }
     </style>
 
@@ -28,8 +28,13 @@
     Polymer({
       is: 'page-not-found',
 
-      listeners: {
-        'return.tap': '_return',
+      attached: function () {
+        this._return = this._return.bind(this);
+        this.addEventListener('return.tap', this._return);
+      },
+
+      detached: function () {
+        this.removeEventListener('return.tap', this._return);
       },
 
       _return: function () {

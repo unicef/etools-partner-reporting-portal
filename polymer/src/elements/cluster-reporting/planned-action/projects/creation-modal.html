@@ -871,10 +871,6 @@
         },
       },
 
-      listeners: {
-        'details-loaded': 'adjustPosition',
-      },
-
       observers: [
         '_resetOchaProjects(selectedPartner)',
         '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
@@ -1239,7 +1235,21 @@
           });                                           // to what they were before request was sent!
       },
 
+      _addEventListeners: function () {
+        this.adjustPosition = this.adjustPosition.bind(this);
+        this.addEventListener('details-loaded', this.adjustPosition);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('details-loaded', this.adjustPosition);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
+        this._removeEventListeners();
         this._cancelDebouncers([
           'fetch-ocha-projects',
           'set-mode',

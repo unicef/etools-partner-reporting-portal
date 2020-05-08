@@ -1272,8 +1272,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         cs_dates = [
             (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
             (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
             (date.today() + timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
         ]
         ca = ClusterActivity.objects.first()
         self.data['object_id'] = ca.id
@@ -1295,6 +1295,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count + 1)
+
+        # check that cs_dates are ordered correctly
+        self.assertEquals(
+            response.data["cs_dates"],
+            ['12-Apr-2020', '15-Apr-2020', '18-Apr-2020', '21-Apr-2020'],
+        )
 
     def test_create_indicator_partner_project_reporting(self):
         pp = PartnerProject.objects.first()
@@ -1353,6 +1359,14 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
           reportable.reportablelocationgoal_set.all(), many=True
         ).data
 
+        cs_dates = [
+            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+        ]
+        self.data['cs_dates'] = cs_dates
+
         response = self.client.put(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(
@@ -1363,6 +1377,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             response.data['blueprint']['calculation_formula_across_locations'],
             IndicatorBlueprint.AVG)
         self.assertEquals(reportable.locations.count(), 2)
+
+        # check that cs_dates are ordered correctly
+        self.assertEquals(
+            response.data["cs_dates"],
+            ['12-Apr-2020', '15-Apr-2020', '18-Apr-2020', '21-Apr-2020'],
+        )
 
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):

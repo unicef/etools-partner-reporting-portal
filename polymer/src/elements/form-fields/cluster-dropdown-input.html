@@ -107,7 +107,7 @@
       },
 
       validate: function() {
-        return this.$$('#field').validate();
+        return this.shadowRoot.querySelector('#field').validate();
       },
 
       detached: function () {

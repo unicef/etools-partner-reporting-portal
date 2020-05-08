@@ -181,7 +181,7 @@ worker-prp:
 
 ### How to sync locations
 
-* Open up a browser and go \`[http://localhost:8082](http://localhost:8082) api/admin/core/cartodbtable/\` and log in.
+* Open up a browser and go \`[http://localhost:8081](http://localhost:8081) api/admin/core/cartodbtable/\` and log in.
 * In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Consult UNICEF CartoDB expert to get dataset import metadata.
 * Click "ADD CARTO DB TABLE" button in Django admin and fill the following information:
   * Domain: etools

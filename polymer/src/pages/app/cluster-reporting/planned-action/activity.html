@@ -170,10 +170,6 @@
         '_getActivityAjax(projects)',
       ],
 
-      listeners: {
-        'pa-activity-edited': '_onSuccess',
-      },
-
       _onSuccess: function() {
         if (this.projects === undefined) {
           this._getProjects();
@@ -239,8 +235,22 @@
           });
       },
 
+      _addEventListeners: function () {
+        this._onSuccess = this._onSuccess.bind(this);
+        this.addEventListener('pa-activity-edited', this._onSuccess);
+      },
+
       attached: function () {
+        this._addEventListeners();
         this._getProjects();
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('pa-activity-edited', this._onSuccess);
+      },
+
+      detached: function () {
+        this._removeEventListeners();
       },
     });
   </script>

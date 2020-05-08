@@ -1,0 +1,13 @@
+node_modules/
+build/
+bower_components/
+dist/
+yarn-error.log
+.tmp
+.idea
+*.sublime-project
+*.sublime-workspace
+debug/*
+.coverdata
+.coverrun
+src/

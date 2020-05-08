@@ -55,7 +55,7 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
 )
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
@@ -346,7 +346,8 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Sensible settings for celery
-CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_ALWAYS_EAGER = bool(os.environ.get('CELERY_TASK_ALWAYS_EAGER', False))
+CELERY_ALWAYS_EAGER = bool(os.environ.get('CELERY_ALWAYS_EAGER', False))
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_PUBLISH_RETRY = True
 CELERY_WORKER_DISABLE_RATE_LIMITS = False
@@ -454,7 +455,7 @@ SOCIAL_AUTH_PIPELINE = (
 
 
 # PMP API
-PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.19.0.1:8082/api")
+PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.18.0.1:8082/api")
 PMP_API_USER = os.getenv('PMP_API_USER')
 PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
 

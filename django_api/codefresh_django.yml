@@ -59,6 +59,7 @@ steps:
                 only:
                     - develop
                     - master
+                    - polymer3-migration
 
     # deploy_backend:
     #     image: codefresh/cf-deploy-kubernetes
@@ -82,7 +83,7 @@ steps:
     #       branch:
     #         only:
     #           - develop
-              
+
     # deploy_celery:
     #     image: codefresh/cf-deploy-kubernetes
     #     tag: ${{CF_SHORT_REVISION}}
@@ -105,7 +106,7 @@ steps:
     #       branch:
     #         only:
     #           - develop
-              
+
     # delete_jobs:
     #     title: Delete backend jobs with label redeploy
     #     image: codefresh/kube-helm:master
@@ -145,4 +146,4 @@ steps:
     #     when:
     #       branch:
     #         only:
-    #           - develop          
+    #           - develop

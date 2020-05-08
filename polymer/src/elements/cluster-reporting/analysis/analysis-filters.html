@@ -103,11 +103,6 @@
         '_resetNarrowLocType(queryParams.loc_type)',
       ],
 
-      listeners: {
-        'clusters.selected-values-changed': '_resetClusterObjectives',
-        'locationType.iron-select': '_resetLocations',
-      },
-
       _resetClusterObjectives: function () {
         this.debounce('reset-cluster-objectives', function () {
           this.set('queryParams.cluster_objectives', null);
@@ -128,12 +123,29 @@
         });
       },
 
+      _addEventListeners: function () {
+        this._resetClusterObjectives = this._resetClusterObjectives.bind(this);
+        this.addEventListener('clusters.selected-values-changed', this._resetClusterObjectives);
+        this._resetLocations = this._resetLocations.bind(this);
+        this.addEventListener('locationType.iron-select', this._resetLocations);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('clusters.selected-values-changed', this._resetClusterObjectives);
+        this.removeEventListener('locationType.iron-select', this._resetLocations);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
       detached: function () {
         this._cancelDebouncers([
           'reset-narrow-loc-type',
           'reset-cluster-objectives',
           'reset-locations',
         ]);
+        this._removeEventListeners();
       },
     });
   </script>

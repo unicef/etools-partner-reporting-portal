@@ -658,11 +658,6 @@
 
       },
 
-      listeners: {
-        'mode.selected-changed': 'adjustPosition',
-        'project-details-selection-refit': 'adjustPosition',
-      },
-
       observers: [
         '_fetchProjects(partner, mode, data.cluster.cluster)',
         '_fetchProjects(partner, mode, data.custom.cluster)',
@@ -861,6 +856,26 @@
           return;
         }
       },
+
+      _addEventListeners: function () {
+        this.adjustPosition = this.adjustPosition.bind(this);
+        this.addEventListener('mode.selected-changed', this.adjustPosition);
+        this.addEventListener('project-details-selection-refit', this.adjustPosition);
+      },
+
+      _removeEventListeners: function () {
+        this.removeEventListener('mode.selected-changed', this.adjustPosition);
+        this.removeEventListener('project-details-selection-refit', this.adjustPosition);
+      },
+
+      attached: function () {
+        this._addEventListeners();
+      },
+
+      detached: function () {
+        this._removeEventListeners();
+      },
+
     });
   </script>
 </dom-module>
