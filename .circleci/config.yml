@@ -1,0 +1,69 @@
+version: 2
+jobs:
+  build_backend:
+    working_directory: ~/code
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          PGHOST: 127.0.0.1
+          PIPENV_VENV_IN_PROJECT: 1
+          DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/test_prp"
+          RELEASE_MATCH: "release/*"
+      - image: redis:alpine
+      - image: circleci/postgres:9.6-alpine-postgis
+        environment:
+          POSTGRES_USER: postgres
+          PGUSER: postgres
+          POSTGRES_DB: test_prp
+          POSTGRES_PASSWORD: postgres
+
+    steps:
+      - restore_cache:
+          keys:
+            - source-{{ .Branch }}-{{ .Revision }}
+
+      - checkout
+      - restore_cache:
+          keys:
+            - deps-v2-{{ checksum "django_api/requirements/base.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+                export PATH=/home/circleci/.local/bin:$PATH
+                export PYTHONHASHSEED=${RANDOM}
+                pip install django_api/requirements/dev.txt --user
+                python django_api/manage.py test
+      - store_artifacts:
+          path: ~build/coverage
+          destination: coverage
+
+      - save_cache:
+          key: source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - save_cache:
+          key: deps-v2-{{ checksum "django_api/requirements/base.txt" }}
+          paths:
+            - ".venv"
+            - "~/.cache/pip"
+
+      - deploy:
+          name: Check if release candidate
+          command: |
+              if [[ $CIRCLE_BRANCH == $RELEASE_MATCH ]]; then
+                curl --user ${CIRCLE_TOKEN}: \
+                  --fail \
+                  --data build_parameters[CIRCLE_JOB]=tag \
+                  --data revision=$CIRCLE_SHA1 \
+                  https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+              else
+                echo "Skipped as '$CIRCLE_BRANCH' does not match '$RELEASE_MATCH' branch"
+              fi
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build_backend
