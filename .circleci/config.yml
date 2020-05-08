@@ -3,7 +3,7 @@ jobs:
   build_backend:
     working_directory: ~/code
     docker:
-      - image: unicef/etools-base:e88d6b92ca0c
+      - image: unicef/unicef-prp-base:latest
         environment:
           PGHOST: 127.0.0.1
           PIPENV_VENV_IN_PROJECT: 1
