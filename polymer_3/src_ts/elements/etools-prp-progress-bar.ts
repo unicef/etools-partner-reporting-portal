@@ -30,19 +30,19 @@ class EtoolsPrpProgressBar extends (UtilsMixin(PolymerElement)) {
   @property({type: String})
   displayType: string = '';
 
-  @property({type: Number})
-  number: number = 0;
+  @property({type: String})
+  number: string = '0';
 
   @property({type: Number, computed: '_computePercentage(number)'})
   percentage!: number;
 
-  _computePercentage(num: number) {
+  _computePercentage(num: string) {
     if (num === 'N/A') {
       return 'N/A';
     }
 
     // round to two decimal places, more info here: https://stackoverflow.com/a/29494612
-    return this.displayType === 'percentage' ? Math.round(num) : Math.round(num * 100 * 1e2) / 1e2;
+    return this.displayType === 'percentage' ? Math.round(Number(num)) : Math.round(Number(num) * 100 * 1e2) / 1e2;
   }
 
 }

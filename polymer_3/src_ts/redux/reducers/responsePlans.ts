@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import Constants from '../../constants';
+import {GenericObject} from '../../typings/globals.types';
 
 export class ResponsePlansState {
   all = [];
@@ -10,10 +11,10 @@ export class ResponsePlansState {
 export const ResponsePlans = combineReducers({
   all: allResponsePlansReducer,
   current: currentResponsePlanReducer,
-  currentID: currentResponsePlanIdReducer,
+  currentID: currentResponsePlanIdReducer
 });
 
-function allResponsePlansReducer(state = [], action: any) {
+function allResponsePlansReducer(state: GenericObject[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_RESPONSE_PLANS:
       return action.plans;

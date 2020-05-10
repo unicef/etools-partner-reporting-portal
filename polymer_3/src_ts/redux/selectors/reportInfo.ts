@@ -6,7 +6,7 @@ const keys = [
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
   'narrative',
-  'id',
+  'id'
 ];
 
 
@@ -33,6 +33,7 @@ export const reportInfoCurrent = createSelector(
     })[0] || {};
 
     return keys.reduce(function(acc, curr) {
+      // @ts-ignore
       acc[curr] = report[curr];
 
       return acc;

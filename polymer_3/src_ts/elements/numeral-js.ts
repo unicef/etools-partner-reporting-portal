@@ -66,9 +66,9 @@ class NumeralJs extends PolymerElement {
 
   _format() {
     if (this.format) {
-      this._setOutput(numeral(this.number).format(this.format));
+      this.output = numeral(this.number).format(this.format);
     } else {
-      this._setOutput(this.number);
+      this.output = this.number.toString();
     }
   }
 
@@ -78,7 +78,7 @@ class NumeralJs extends PolymerElement {
   }
 
   _unformatChanged() {
-    this._setOutput(numeral().unformat(this.unformat));
+    this.output = numeral().unformat(this.unformat);
   }
 
   _add() {

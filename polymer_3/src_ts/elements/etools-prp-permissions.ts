@@ -248,7 +248,8 @@ import {GenericObject} from '../typings/globals.types';
 
 
     _computePermissions(params: GenericObject) {
-      return Object.keys(permissions).reduce(function(acc: any, key) {
+      return Object.keys(permissions).reduce(function(acc: any, key: string) {
+        // @ts-ignore
         const granted = permissions[key];
 
         acc[key] = (function() {

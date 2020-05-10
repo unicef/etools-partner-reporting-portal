@@ -52,12 +52,12 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        const newValue = '' + this._toNumber((this.$.field as PaperCheckboxElement).checked);
+        const newValue = null + this._toNumber((this.$.field as PaperCheckboxElement).checked);
 
-        if (newValue !== this.lastValue) {
+        if (newValue !== parseInt(this.lastValue)) {
           fireEvent(this, 'filter-changed', {
             name: this.name,
-            value: newValue
+            value: newValue.toString()
           });
         }
       });

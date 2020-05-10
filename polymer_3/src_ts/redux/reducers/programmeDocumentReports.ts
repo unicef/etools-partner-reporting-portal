@@ -39,6 +39,7 @@ function reportsByPDReducer(state = {}, action: any) {
       return (function() {
         const change: GenericObject = {};
 
+        // @ts-ignore
         const reports: GenericObject[] = state[action.pdId] || [];
 
         const index = reports.findIndex(function(report) {
@@ -60,6 +61,7 @@ function reportsByPDReducer(state = {}, action: any) {
       return (function() {
         const change: GenericObject = {};
 
+        // @ts-ignore
         change[action.pdId] = (state[action.pdId] || []).map(function(report: GenericObject) {
           return Number(report.id) === Number(action.reportId) ?
             Object.assign({}, report, action.data) : report;
@@ -76,8 +78,9 @@ function reportsByPDReducer(state = {}, action: any) {
          * of them, to be consistent :(
          */
 
-        const change = {};
+        const change: GenericObject = {};
 
+        // @ts-ignore
         change[action.pdId] = state[action.pdId].map(function(report: GenericObject) {
           if (Number(report.id) !== Number(action.reportId)) {
             return report;
@@ -124,7 +127,7 @@ function reportsCountByPDReducer(state = {}, action: any) {
   }
 }
 
-function pdIdsReducer(state = [], action: any) {
+function pdIdsReducer(state: GenericObject[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
       return (function() {

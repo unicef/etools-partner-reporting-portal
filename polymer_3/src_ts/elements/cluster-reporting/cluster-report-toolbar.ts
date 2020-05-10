@@ -71,20 +71,19 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
   @property({type: String, computed: '_computeImportUrl(responsePlanId)'})
   importUrl!: string;
 
-  // @ts-ignore
   _computeImportTemplateUrl(responsePlanId: string, query: string, submitted: number) {
-    // @ts-ignore
     return this._appendQuery(
       Endpoints.clusterIndicatorReportsImportTemplate(responsePlanId),
+      // @ts-ignore
       query,
       {submitted: submitted}
     );
   }
 
-  // @ts-ignore
   _computeExportUrl(responsePlanId: string, query: string, submitted: number) {
     return this._appendQuery(
       Endpoints.clusterIndicatorReportsExport(responsePlanId),
+      // @ts-ignore
       query,
       {submitted: submitted}
     );
