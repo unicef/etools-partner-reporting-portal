@@ -57,7 +57,7 @@
     "@unicef-polymer/etools-content-panel": "^3.0.2",
     "@unicef-polymer/etools-data-table": "3.0.0",
     "@unicef-polymer/etools-date-time": "1.0.1",
-    "@unicef-polymer/etools-dropdown": "^3.0.15",
+    "@unicef-polymer/etools-dropdown": "^3.1.0-rc.1",
     "@unicef-polymer/etools-loading": "^4.0.1",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "browser-capabilities": "^1.1.3",
