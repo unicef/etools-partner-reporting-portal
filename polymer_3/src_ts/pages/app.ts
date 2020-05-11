@@ -240,7 +240,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
-        console.log('localstorage defaultApp:', app);
         localStorage.setItem('defaultApp', app);
 
         // Render
@@ -267,7 +266,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
-    console.log('app.ts loading...' + resolvedPageUrl);
     import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

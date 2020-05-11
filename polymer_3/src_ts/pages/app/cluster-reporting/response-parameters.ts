@@ -87,7 +87,6 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/${page}/${page}.js`;
-    console.log('cluster response-parameters loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
