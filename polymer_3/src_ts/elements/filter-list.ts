@@ -96,19 +96,19 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
      * here's the place to put the logic for it.
      */
 
-    //setTimeout(() => {
-    const newParams = Object.assign({}, this.queryParams);
+    setTimeout(() => {
+      const newParams = Object.assign({}, this.queryParams);
 
-    if (change.value && change.value.length) {
-      newParams[change.name] = change.value;
-    } else {
-      delete newParams[change.name];
-    }
+      if (change.value && change.value.length) {
+        newParams[change.name] = change.value;
+      } else {
+        delete newParams[change.name];
+      }
 
-    this.set('queryParams', newParams);
+      this.set('queryParams', newParams);
 
-    this._resetPageNumber();
-    //});
+      this._resetPageNumber();
+    });
   }
 
   _registerFilter(e: CustomEvent) {
