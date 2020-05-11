@@ -118,7 +118,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
       }
 
       .indicator-header__target {
-        width: 250px;
+        width: 320px;
         padding-left: 10px;
       }
 
@@ -204,7 +204,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
             </div>
             <div class="indicator-header__target flex-none layout vertical center-justified">
               <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('target')]]:</dt>
+                <dt class="flex-4">[[localize('target')]]:</dt>
                 <dd class="flex">
                   <template
                       is="dom-if"
@@ -227,7 +227,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                 </dd>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('total_cumulative_progress')]]:</dt>
+                <dt class="flex-4">[[localize('total_cumulative_progress_from_qpr')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
@@ -245,7 +245,7 @@ class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(
                 </template>
               </dl>
               <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('achievement_in_reporting_period')]]:</dt>
+                <dt class="flex-4">[[localize('achievement_in_reporting_period')]]:</dt>
                 <template
                     is="dom-if"
                     if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"

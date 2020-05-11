@@ -58,6 +58,11 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       url="[[profileUrl]]">
   </etools-prp-ajax>
 
+  <etools-prp-ajax
+      id="workspaces"
+      url="[[workspacesUrl]]">
+  </etools-prp-ajax>
+
   <page-body>
     <div class="item">
       <span class="sign-out-button" on-tap="_logout">
@@ -102,34 +107,51 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
+  @property({type: String})
+  workspacesUrl = Endpoints.interventions();
+
   @property({type: Boolean})
   isAccessError = true;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)', observer: '_workspacesChanged'})
-  workspaces!: any[];
 
   _logout() {
     fireEvent(this, 'sign-out');
   }
 
-  _workspacesChanged() {
-    if (!this.workspaces) {
-      return;
-    }
-    if (!this.workspaces.length) {
-      this.isAccessError = false;
-      this.set('loading', false);
-      return;
-    }
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.checkAccessRights();
+  }
+
+  checkAccessRights() {
     const self = this;
-    (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
+    (self.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
-        if (res.data.access.length) {
+        if (res.data && res.data.access && res.data.access.length) {
+          self.checkWorkspaceExistence();
+        } else {
+          self.showMessage(true);
+        }
+      }).catch(() => {self.showMessage(true);});
+  }
+
+  checkWorkspaceExistence() {
+    const self = this;
+    (this.$.workspaces as EtoolsPrpAjaxEl).thunk()()
+      .then((res: any) => {
+        if (res.data && res.data.length) {
           window.location.href = `/${BASE_PATH}/`;
         } else {
-          self.set('loading', false);
+          self.showMessage(false);
         }
-      }).catch(() => {self.set('loading', false);});
+      }).catch(() => {
+        self.showMessage(false);
+      });
+  }
+
+  showMessage(isAccessError: boolean) {
+    this.isAccessError = isAccessError;
+    this.set('loading', false);
   }
 
 }
