@@ -43,7 +43,7 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   checked!: boolean;
 
   @property({type: String})
-  value = '';
+  value: string = '';
 
   private _debouncer!: Debouncer;
 
