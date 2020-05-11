@@ -718,7 +718,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         self.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
-      // TODO: error handling
+        // TODO: error handling
       });
   }
 
@@ -735,7 +735,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     }
 
     this.set('updatePending', true);
-
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.partner
     }, this.data[this.mode]);
@@ -743,10 +742,10 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('updatePending', false);
         self.set('errors', {});
-        self.close();
+        self._close('saved');
         setTimeout(() => {
           fireEvent(self, 'activity-added', res.data);
-        });
+        }, 300);
       })
       .catch((err: GenericObject) => {
         self.set('errors', err.data);
@@ -756,10 +755,10 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _close(e: CustomEvent & any) {
-    if (e &&
-      (e.target.nodeName === 'PAPER-DIALOG' ||
-        e.target.nodeName === 'PAPER-BUTTON' ||
-        e.target.nodeName === 'PAPER-ICON-BUTTON')) {
+    if (e && (e === 'saved' ||
+      e.target.nodeName === 'PAPER-DIALOG' ||
+      e.target.nodeName === 'PAPER-BUTTON' ||
+      e.target.nodeName === 'PAPER-ICON-BUTTON')) {
       this.set('mode', '');
       this.set('data', {});
 

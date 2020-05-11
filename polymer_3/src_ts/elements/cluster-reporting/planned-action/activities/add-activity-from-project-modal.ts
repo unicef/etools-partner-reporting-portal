@@ -695,16 +695,17 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     }
 
     this.set('updatePending', true);
-
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.projectData.partner_id
     }, this.data[this.mode]);
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
+        setTimeout(() => {
+          fireEvent(self, 'activity-added', res.data);
+        }, 300);
       })
       .catch((err: any) => {
         self.set('errors', err.data);
