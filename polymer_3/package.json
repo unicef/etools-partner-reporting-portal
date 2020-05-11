@@ -1,6 +1,8 @@
 {
   "name": "etools-partner-reporting-portal",
   "version": "0.0.0",
+  "revision": "revNo",
+  "buildDate": "bDate",
   "description": "Partner Reporting Portal",
   "repository": {
     "type": "git",
