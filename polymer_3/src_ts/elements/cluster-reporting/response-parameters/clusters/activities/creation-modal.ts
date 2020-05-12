@@ -263,7 +263,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
         self.close();
         setTimeout(() => {
           self._redirectToDetail(res.data.id);
-        }, 100);
+        }, 300);
       })
       .catch((err: any) => {
         self.set('errors', err.data);

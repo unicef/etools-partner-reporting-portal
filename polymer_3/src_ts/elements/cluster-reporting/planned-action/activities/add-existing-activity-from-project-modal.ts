@@ -485,7 +485,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         self._close('saved');
         setTimeout(() => {
           window.location.reload();
-        }, 100);
+        }, 300);
       })
       .catch((err: GenericObject) => {
         self.set('errors', err.data);
