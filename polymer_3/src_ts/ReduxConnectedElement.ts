@@ -17,7 +17,6 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   private sDebouncer!: Debouncer;
 
   stateChanged(state: RootState) {
-    //console.log('ARE STATES EQUAL?', this.rootState == state);
     this.sDebouncer = Debouncer.debounce(this.sDebouncer,
       timeOut.after(50),
       () => {
