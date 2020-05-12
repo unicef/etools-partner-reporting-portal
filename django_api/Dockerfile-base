@@ -1,43 +1,50 @@
-FROM python:3.6.6
+FROM python:3.7.5-alpine
 
 ARG env
 ENV ENV ${env:-dev}
 
-# Install dependencies
-RUN apt-get update && \
-    # fix certificates for easy_install "certificate verify failed"
-    apt-get install --assume-yes --reinstall ca-certificates
-RUN apt-get install -y --no-install-recommends \
-    build-essential \
-    libcurl4-openssl-dev \
-    libjpeg-dev \
-    libgif-dev \
-    libffi-dev \
-    libpng-dev \
-    libtiff-dev \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
+RUN apk update
+RUN apk add --upgrade apk-tools
+
+RUN apk add openssl \
+    ca-certificates \
+    libressl2.7-libcrypto
+
+RUN apk add libxslt
+
+RUN apk add --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ \
+    geos \
+    gdal
+
+RUN apk add postgresql-client
+
+#### Build-deps
+RUN apk add --no-cache --virtual .build-deps \
+    --update alpine-sdk
+
+RUN apk add --no-cache --virtual .build-deps1 \
     libxml2-dev \
     libxslt-dev \
-    xmlsec1 \
-    vim \
-    ntp
-RUN apt-get install -y --no-install-recommends \
-    git-core
-RUN apt-get install -y --no-install-recommends \
+    xmlsec-dev \
+    postgresql-dev \
+    libffi-dev \
+    jpeg-dev \
     python-dev \
-    python-setuptools
-RUN apt-get install -y --no-install-recommends \
-    postgresql-client \
-    libpq-dev \
-    python-psycopg2
-RUN apt-get install -y --no-install-recommends \
-    python-gdal \
-    gdal-bin \
-    libgdal-dev \
-    libgdal20
+    git
 
-# http://gis.stackexchange.com/a/74060
-ENV CPLUS_INCLUDE_PATH /usr/include/gdal
-ENV C_INCLUDE_PATH /usr/include/gdal
+RUN apk add --no-cache --virtual .build-deps2 --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ \
+    geos-dev \
+    gdal-dev
+
+RUN apk add --no-cache --virtual .build-deps3 --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+    gcc \
+    g++
+
+# PYTHON
+RUN pip install --no-cache-dir --upgrade \
+    setuptools \
+    pip \
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads
