@@ -96,6 +96,7 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
      * here's the place to put the logic for it.
      */
 
+    // setTimeout is needed because without it, this.queryParams are not updated
     setTimeout(() => {
       const newParams = Object.assign({}, this.queryParams);
 
