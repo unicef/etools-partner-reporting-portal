@@ -74,7 +74,6 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
   _computeImportTemplateUrl(responsePlanId: string, query: string, submitted: number) {
     return this._appendQuery(
       Endpoints.clusterIndicatorReportsImportTemplate(responsePlanId),
-      // @ts-ignore
       query,
       {submitted: submitted}
     );
@@ -83,7 +82,6 @@ class ClusterReportToolbar extends UtilsMixin(LocalizeMixin(ReduxConnectedElemen
   _computeExportUrl(responsePlanId: string, query: string, submitted: number) {
     return this._appendQuery(
       Endpoints.clusterIndicatorReportsExport(responsePlanId),
-      // @ts-ignore
       query,
       {submitted: submitted}
     );

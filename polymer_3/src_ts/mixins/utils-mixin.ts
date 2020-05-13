@@ -267,12 +267,12 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       });
     }
 
-    _appendQuery(url: string) {
+    _appendQuery(url: string, ...theRestOfArgs: any[]) {
       if (url === undefined) {
         return;
       }
 
-      return url + '?' + buildQuery([].slice.call(arguments, 1));
+      return url + '?' + buildQuery(theRestOfArgs);
     }
 
     _cloneNode(node: any) {
