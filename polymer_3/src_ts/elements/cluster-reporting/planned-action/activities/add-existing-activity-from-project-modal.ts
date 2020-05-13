@@ -26,6 +26,7 @@ import '../../../form-fields/cluster-dropdown-content';
 import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
+import {waitForIronOverlayToClose} from '../../../../utils/util';
 import Settings from '../../../../settings';
 
 
@@ -483,9 +484,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
-        setTimeout(() => {
-          window.location.reload();
-        }, 300);
+        waitForIronOverlayToClose(300).then(() => window.location.reload());
       })
       .catch((err: GenericObject) => {
         self.set('errors', err.data);
