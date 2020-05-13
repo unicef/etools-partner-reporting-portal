@@ -215,15 +215,13 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     return Endpoints.programmeDocumentReportUpdate(locationId, reportId);
   }
 
-  _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: any[], reportId: string) {
+  _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: GenericObject, reportId: string) {
     // for some reason method was getting run on detach, so catch that
-    // @ts-ignore
     if (!allPdReports || !allPdReports[pdId]) {
       return;
     }
 
     // get the current progress report's due date
-    // @ts-ignore
     const progressReport = allPdReports[pdId]
       .find((report: GenericObject) => {
         return report.id === parseInt(reportId);

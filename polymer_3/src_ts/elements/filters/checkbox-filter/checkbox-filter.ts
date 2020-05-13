@@ -50,9 +50,9 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        const newValue = this._toNumber((this.$.field as any).checked);
+        const newValue = (this.$.field as HTMLInputElement).checked;
 
-        if (newValue !== parseInt(this.lastValue)) {
+        if (newValue.toString() !== this.lastValue) {
           fireEvent(this, 'filter-changed', {
             name: this.name,
             value: newValue.toString()

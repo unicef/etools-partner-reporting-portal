@@ -56,6 +56,8 @@ class NumeralJs extends PolymerElement {
   @property({type: Number, observer: '_divide'})
   divide!: number;
 
+  _setOutput: any;
+
   _numberChanged() {
     this._format();
   }
@@ -66,9 +68,9 @@ class NumeralJs extends PolymerElement {
 
   _format() {
     if (this.format) {
-      this.output = numeral(this.number).format(this.format);
+      this._setOutput(numeral(this.number).format(this.format));
     } else {
-      this.output = this.number.toString();
+      this._setOutput(this.number);
     }
   }
 
