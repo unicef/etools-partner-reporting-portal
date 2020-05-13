@@ -104,6 +104,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
                 option-label="title"
                 selected="{{data.cluster}}"
                 hide-search
+                with-backdrop
                 required
                 with-backdrop>
               </etools-dropdown>

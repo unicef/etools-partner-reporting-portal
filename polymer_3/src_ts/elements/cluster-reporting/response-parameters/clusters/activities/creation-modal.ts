@@ -116,6 +116,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
               option-label="title"
               selected="{{data.cluster}}"
               hide-search
+              with-backdrop
               required>
             </etools-dropdown>
 
@@ -129,6 +130,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
               selected="{{data.cluster_objective}}"
               disabled="[[isObjectivesDisabled]]"
               hide-search
+              with-backdrop
               required>
             </etools-dropdown>
 

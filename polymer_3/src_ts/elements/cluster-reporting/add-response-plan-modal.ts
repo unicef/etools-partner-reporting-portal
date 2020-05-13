@@ -166,6 +166,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 trigger-value-change-event
                 no-dynamic-align
                 auto-validate
+                with-backdrop
                 required>
               </etools-dropdown>
               <response-plan-details
@@ -205,6 +206,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   selected="{{data.plan_type}}"
                   auto-validate
                   hide-search
+                  with-backdrop
                   required>
               </etools-dropdown>
             </div>

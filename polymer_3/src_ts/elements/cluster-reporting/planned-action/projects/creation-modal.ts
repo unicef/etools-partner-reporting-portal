@@ -287,6 +287,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     option-label="title"
                     selected="{{data.partner_id}}"
                     selected-item="{{selectedPartner}}"
+                    with-backdrop
                     required>
                </etools-dropdown>
               </template>
@@ -326,6 +327,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                         option-label="title"
                         selected="{{selectedProject}}"
                         disabled="[[projectsLoading]]"
+                        with-backdrop
                         required>
                     </etools-dropdown>
                     <template
@@ -379,6 +381,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                         label="[[localize('clusters')]] *"
                         options="[[formattedClusters]]"
                         selected-values="{{selectedClusters}}"
+                        with-backdrop
                         required>
                       </etools-dropdown-multi>
                     </div>
@@ -415,6 +418,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                         option-label="title"
                         selected="{{data.status}}"
                         hide-search
+                        with-backdrop
                         required>
                       </etools-dropdown>
                     </div>
@@ -504,6 +508,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                               option-value="title"
                               option-label="title"
                               selected="{{data.agency_type}}"
+                              with-backdrop
                               hide-search>
                           </etools-dropdown>
                           <paper-input
@@ -533,6 +538,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                               option-value="title"
                               option-label="title"
                               selected="{{data.prioritization}}"
+                              with-backdrop
                               hide-search>
                           </etools-dropdown>
                           <paper-input
