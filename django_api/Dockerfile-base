@@ -1,19 +1,16 @@
-FROM python:3.7.5-alpine
+FROM python:3.7-alpine
 
 ARG env
 ENV ENV ${env:-dev}
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 RUN apk update
 RUN apk add --upgrade apk-tools
 
 RUN apk add openssl \
     ca-certificates \
-    libressl2.7-libcrypto
+    libressl3.0-libcrypto
 
-RUN apk add libxslt
-
-RUN apk add --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ \
+RUN apk add libxslt \
     geos \
     gdal
 
@@ -33,18 +30,18 @@ RUN apk add --no-cache --virtual .build-deps1 \
     python-dev \
     git
 
-RUN apk add --no-cache --virtual .build-deps2 --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ \
+RUN apk add --no-cache --virtual .build-deps2 \
     geos-dev \
     gdal-dev
 
-RUN apk add --no-cache --virtual .build-deps3 --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+RUN apk add --no-cache --virtual .build-deps3 \
     gcc \
     g++
 
 # PYTHON
 RUN pip install --no-cache-dir --upgrade \
     setuptools \
-    pip \
+    pip
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads
