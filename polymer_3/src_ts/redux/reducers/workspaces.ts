@@ -1,8 +1,9 @@
 import Constants from '../../constants';
+import {Workspace} from '../../typings/entities.types';
 
 export class WorkspacesState {
-  all: [] = [];
-  current: string = '';
+  all?: Workspace[];
+  current?: string;
 }
 
 const INITIAL_STATE = new WorkspacesState();

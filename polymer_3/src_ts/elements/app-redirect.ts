@@ -16,17 +16,24 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
 
+  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
+  workspaces!: any[];
+
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
 
   public static get observers() {
     return [
-      '_redirectIfNeeded(app, workspace, profile)'
+      '_redirectIfNeeded(app, workspaces, workspace, profile)'
     ];
   }
 
-  _redirectIfNeeded(app: string, workspace: string, profile: GenericObject) {
+  _redirectIfNeeded(app: string, workspaces: any[], workspace: string, profile: GenericObject) {
+    if (workspaces && !workspaces.length) {
+      // user has no workspaces
+      location.href = '/unauthorized';
+    }
     if ((app === undefined) || (workspace === undefined) || !profile) {
       return;
     }
