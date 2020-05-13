@@ -73,6 +73,9 @@ class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsBehavior(
   showLink!: boolean;
 
   _shouldDisplayLink(displayLink: string, report: GenericObject, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     return shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
   }
 
@@ -88,6 +91,9 @@ class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsBehavior(
   }
 
   _getReportLink(report: GenericObject, permissions: GenericObject) {
+    if (!permissions) {
+      return;
+    }
     const suffix = this._getMode(report, permissions);
     return getReportLink(report, suffix, this.buildUrl, this._baseUrl);
   }

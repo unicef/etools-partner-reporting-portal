@@ -43,9 +43,11 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import Endpoints from '../../../../endpoints';
 import Constants from '../../../../constants';
 import {fireEvent} from '../../../../utils/fire-custom-event';
+import {waitForIronOverlayToClose} from '../../../../utils/util';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import '../../indicator-locations-widget';
 import Settings from '../../../../settings';
+
 
 /**
  * @polymer
@@ -1156,9 +1158,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           self.set('errors', {});
         } else {
           self.close();
-          setTimeout(() => {
-            self._redirectToDetail(res.data.id);
-          }, 100);
+          waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
         }
       })
       .catch((err: GenericObject) => {
