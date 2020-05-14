@@ -302,6 +302,11 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
 
+    def validate_total_budget(self, value):
+        if value == "":
+            value = None
+        return value
+
     def validate(self, attrs):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
@@ -331,7 +336,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     def save_funding(self, instance=None):
         funding_data = self.initial_data.get('funding', None)
-        if funding_data:
+        if funding_data and [d for d in funding_data.values() if d != ""]:
             funding_instance = (instance or self.instance).funding
             serializer = PartnerProjectFundingSerializer(
                 instance=funding_instance,

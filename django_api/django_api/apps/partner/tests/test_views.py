@@ -313,6 +313,44 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
+    def test_create_partner_project_without_total_budget(self):
+        base_count = PartnerProject.objects.all().count()
+
+        self.data.pop("total_budget")
+        url = reverse(
+            'partner-project-list',
+            kwargs={'response_plan_id': self.cluster.response_plan_id},
+       )
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerProject.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
+        self.assertIsNone(created_obj.total_budget)
+
+    def test_create_partner_project_empty_funding(self):
+        base_count = PartnerProject.objects.all().count()
+
+        self.data["funding"] = {
+            "bilateral_funding": "",
+            "cbpf_funding": "",
+            "cerf_funding": "",
+            "funding_gap": "",
+            "internal_funding": "",
+            "required_funding": "",
+            "unicef_funding": "",
+            "wfp_funding": "",
+        }
+        url = reverse(
+            'partner-project-list',
+            kwargs={'response_plan_id': self.cluster.response_plan_id},
+       )
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerProject.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
+
     def test_list_filters_partner_project(self):
         """
         get list unit test for PartnerProjectListCreateAPIView
