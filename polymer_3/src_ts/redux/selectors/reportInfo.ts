@@ -1,12 +1,13 @@
 import {RootState} from '../../typings/redux.types';
 import {createSelector} from 'reselect';
+import {GenericObject} from '../../typings/globals.types';
 
 const keys = [
   'partner_contribution_to_date',
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
   'narrative',
-  'id',
+  'id'
 ];
 
 
@@ -32,7 +33,7 @@ export const reportInfoCurrent = createSelector(
       return Number(report.id) === Number(reportId);
     })[0] || {};
 
-    return keys.reduce(function(acc, curr) {
+    return keys.reduce(function(acc: GenericObject, curr: string) {
       acc[curr] = report[curr];
 
       return acc;

@@ -168,6 +168,7 @@ const Endpoints = {
       + partnerId + '/');
   },
 
+  // @ts-ignore
   plannedActionsIMOEdit(responsePlanId: string, partnerId: string, projectId: string) {
     return this._buildUrl('/partner/partner-project-details/partner/'
       + partnerId + '/' + projectId + '/');

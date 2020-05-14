@@ -69,6 +69,7 @@ export const fetchIndicatorDetails = function(indicatorsThunk: any, id: string) 
     return indicatorsThunk()
       .then(function(res: any) {
         const formattedById = {};
+        // @ts-ignore
         formattedById[id] = res.data;
         dispatch(indicatorDetailsLoadingStop());
         dispatch(setIndicatorDetails(formattedById));
