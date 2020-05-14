@@ -212,7 +212,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
           </etools-dropdown>
         </template>
 
-        <paper-radio-group id="mode" selected="{{mode}}">
+        <paper-radio-group id="mode" class="validate" selected="{{mode}}">
             <paper-radio-button name="cluster">
               <strong>[[localize('add_from_cluster_activities')]]</strong>
             </paper-radio-button>
