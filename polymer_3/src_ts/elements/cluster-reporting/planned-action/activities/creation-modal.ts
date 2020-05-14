@@ -208,6 +208,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
             option-value="id"
             option-label="title"
             selected="{{selectedPartner}}"
+            with-backdrop
             required>
           </etools-dropdown>
         </template>
@@ -237,6 +238,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.cluster.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -249,6 +251,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.cluster.cluster_activity}}"
                     disabled="[[_equals(activities.length, 0)]]"
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -291,6 +294,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           option-label="title"
                           selected="{{item.project_id}}"
                           disabled="[[_equals(projects.length, 0)]]"
+                          with-backdrop
                           required>
                         </etools-dropdown>
                       </div>
@@ -304,6 +308,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           option-label="title"
                           selected="{{item.status}}"
                           hide-search
+                          with-backdrop
                           required>
                         </etools-dropdown>
                       </div>
@@ -360,6 +365,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.custom.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -372,6 +378,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                       option-label="title"
                       selected="{{data.custom.cluster_objective}}"
                       disabled="[[_equals(objectives.length, 0)]]"
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
@@ -417,6 +424,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             option-label="title"
                             selected="{{item.project_id}}"
                             disabled="[[_equals(projects.length, 0)]]"
+                            with-backdrop
                             required>
                           </etools-dropdown>
                         </div>
@@ -430,6 +438,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             option-label="title"
                             selected="{{item.status}}"
                             hide-search
+                            with-backdrop
                             required>
                           </etools-dropdown>
                         </div>
