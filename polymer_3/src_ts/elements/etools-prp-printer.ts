@@ -27,8 +27,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
       return;
     }
 
-    // @ts-ignore
-    let parent = this.shadowRoot!.parentNode;
+    // let parent = this.shadowRoot!.parentNode;
     const toPrint = this.shadowRoot!.querySelectorAll(this.selector);
     const style = document.createElement('style');
 
@@ -45,7 +44,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
       'top=0'
     ].join()));
 
-    (this.printWindow as Window).document.head.appendChild(style);
+    this.printWindow!.document.head.appendChild(style);
 
     toPrint.forEach((node) => {
       this.printWindow.document.body.appendChild(this._cloneNode(node));

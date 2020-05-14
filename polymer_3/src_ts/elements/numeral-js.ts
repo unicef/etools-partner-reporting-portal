@@ -56,8 +56,6 @@ class NumeralJs extends PolymerElement {
   @property({type: Number, observer: '_divide'})
   divide!: number;
 
-  _setOutput: any;
-
   _numberChanged() {
     this._format();
   }
@@ -68,8 +66,10 @@ class NumeralJs extends PolymerElement {
 
   _format() {
     if (this.format) {
+      // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
       this._setOutput(numeral(this.number).format(this.format));
     } else {
+      // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
       this._setOutput(this.number);
     }
   }
@@ -80,6 +80,7 @@ class NumeralJs extends PolymerElement {
   }
 
   _unformatChanged() {
+    // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
     this._setOutput(numeral().unformat(this.unformat));
   }
 
