@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 import Constants from '../../constants';
 
 export class ProgrammeDocumentsState {
-  all = [];
+  all: any[] = [];
   current: string = '';
   count: number = 0;
   loading: boolean = false;
