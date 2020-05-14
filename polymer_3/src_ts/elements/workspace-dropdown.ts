@@ -129,6 +129,9 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   }
 
   _computeSelected(data: any[], workspace: string) {
+    if (!data) {
+      return;
+    }
     return data.findIndex(x => x.code === workspace);
   }
 }

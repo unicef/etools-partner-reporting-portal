@@ -5,7 +5,7 @@ import {GenericObject} from '../../typings/globals.types';
 export class ProgrammeDocumentReportsState {
   byPD: GenericObject = {};
   countByPD: GenericObject = {};
-  allIds = [];
+  allIds: GenericObject[] = [];
   current = {
     id: '',
     mode: '',

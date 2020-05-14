@@ -29,7 +29,7 @@ import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import Settings from '../../../../settings';
-
+import {waitForIronOverlayToClose} from '../../../../utils/util';
 
 /**
  * @polymer
@@ -695,16 +695,15 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     }
 
     this.set('updatePending', true);
-
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.projectData.partner_id
     }, this.data[this.mode]);
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
+        waitForIronOverlayToClose(300).then(() => fireEvent(self, 'activity-added', res.data));
       })
       .catch((err: any) => {
         self.set('errors', err.data);

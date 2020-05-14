@@ -146,9 +146,7 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
   }
 
   async _pageChanged(page: string) {
-    //const resolvedPageUrl = `./ip-reporting/${page}.js`;
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
-    console.log('ipReporting loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

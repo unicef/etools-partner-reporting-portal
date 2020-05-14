@@ -209,16 +209,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeWorkspaceChanged(workspaceCodeFromUrl: any) {
-    let workspace;
-
     if (!workspaceCodeFromUrl) {
       // this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
-
       if (this.workspaces && this.workspaces.length) {
         // Default to first
-        workspace = this.workspaces[0];
-
-        this._redirectToWorkspace(workspace);
+        this._redirectToWorkspace(this.workspaces[0]);
       }
       else {
         // Wait until workspaces are available, then pick one & redirect
@@ -245,7 +240,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
-        console.log('localstorage defaultApp:', app);
         localStorage.setItem('defaultApp', app);
 
         // Render
@@ -272,7 +266,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
-    console.log('app.ts loading...' + resolvedPageUrl);
     import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

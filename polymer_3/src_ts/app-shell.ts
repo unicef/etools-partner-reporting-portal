@@ -4,6 +4,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/iron-pages/iron-pages.js';
+import 'etools-piwik-analytics/etools-piwik-analytics.js';
 
 import LocalizeMixin from './mixins/localize-mixin';
 import UtilsMixin from './mixins/utils-mixin';
@@ -41,6 +42,8 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
         height: 100%;
       }
     </style>
+    <etools-piwik-analytics user="[[profile]]" page="[[route.path]]"></etools-piwik-analytics>
+
     <app-redirect></app-redirect>
 
     <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
@@ -162,7 +165,6 @@ class AppShell extends (LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnecte
       componentName = page;
     }
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
-    console.log('app-shell loading' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);

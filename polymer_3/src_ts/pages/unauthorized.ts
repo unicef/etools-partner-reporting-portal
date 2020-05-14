@@ -58,6 +58,11 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       url="[[profileUrl]]">
   </etools-prp-ajax>
 
+  <etools-prp-ajax
+      id="workspaces"
+      url="[[workspacesUrl]]">
+  </etools-prp-ajax>
+
   <page-body>
     <div class="item">
       <span class="sign-out-button" on-tap="_logout">
@@ -80,8 +85,13 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
         if="[[!loading]]"
         restamp="true">
       <message-box type="warning">
-        <span>
+       <span hidden$="[[isAccessError]]">
+          It looks like you do not have workspace assigned.
+        </span>
+        <span hidden$="[[!isAccessError]]">
           It looks like you do not have the permissions assigned to enter the Partner Reporting Portal.
+        </span>
+        <span>
           Please contact <a href="mailto:support@prphelp.zendesk.com">support@prphelp.zendesk.com</a>
           and include your full name, email and the name of the organization you are from.
         </span>
@@ -97,6 +107,11 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
+  @property({type: String})
+  workspacesUrl = Endpoints.interventions();
+
+  @property({type: Boolean})
+  isAccessError = true;
 
   _logout() {
     fireEvent(this, 'sign-out');
@@ -105,15 +120,38 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   connectedCallback() {
     super.connectedCallback();
 
+    this.checkAccessRights();
+  }
+
+  checkAccessRights() {
     const self = this;
-    (this.$.userProfile as EtoolsPrpAjaxEl).thunk()()
+    (self.$.userProfile as EtoolsPrpAjaxEl).thunk()()
       .then((res: any) => {
-        if (res.data.access.length) {
+        if (res.data && res.data.access && res.data.access.length) {
+          self.checkWorkspaceExistence();
+        } else {
+          self.showMessage(true);
+        }
+      }).catch(() => {self.showMessage(true);});
+  }
+
+  checkWorkspaceExistence() {
+    const self = this;
+    (this.$.workspaces as EtoolsPrpAjaxEl).thunk()()
+      .then((res: any) => {
+        if (res.data && res.data.length) {
           window.location.href = `/${BASE_PATH}/`;
         } else {
-          self.set('loading', false);
+          self.showMessage(false);
         }
+      }).catch(() => {
+        self.showMessage(false);
       });
+  }
+
+  showMessage(isAccessError: boolean) {
+    this.isAccessError = isAccessError;
+    this.set('loading', false);
   }
 
 }
