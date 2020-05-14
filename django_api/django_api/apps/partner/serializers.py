@@ -28,7 +28,8 @@ from .models import (
     PartnerProject,
     PartnerActivity,
     PartnerProjectFunding,
-    PartnerActivityProjectContext
+    PartnerActivityProjectContext,
+    PARTNER_PROJECT_STATUS
 )
 
 
@@ -269,6 +270,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     funding = PartnerProjectFundingSerializer(read_only=True)
     additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
     custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
+    status = serializers.ChoiceField(choices=PARTNER_PROJECT_STATUS, required=True)
 
     class Meta:
         model = PartnerProject
