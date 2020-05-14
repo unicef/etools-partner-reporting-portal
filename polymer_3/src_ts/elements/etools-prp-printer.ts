@@ -1,7 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import UtilsMixin from '../mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
 
 
 /**

@@ -80,7 +80,7 @@ class NumeralJs extends PolymerElement {
   }
 
   _unformatChanged() {
-    this.output = numeral().unformat(this.unformat);
+    this._setOutput(numeral().unformat(this.unformat));
   }
 
   _add() {
