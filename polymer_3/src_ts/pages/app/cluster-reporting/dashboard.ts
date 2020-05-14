@@ -243,9 +243,8 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     return Endpoints.clusterDashboard(responsePlanId, mode);
   }
 
-  _fetchData(dataUrl: string, queryParams: GenericObject) {
-
-    if (!dataUrl || !queryParams || Object.keys(queryParams).length === 0) {
+  _fetchData() {
+    if (!this.dataUrl || !this.queryParams || Object.keys(this.queryParams).length === 0) {
       return;
     }
     const self = this;
