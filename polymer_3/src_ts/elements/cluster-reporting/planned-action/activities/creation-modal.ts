@@ -212,6 +212,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
           </etools-dropdown>
         </template>
 
+
         <paper-radio-group id="mode" selected="{{mode}}">
             <paper-radio-button name="cluster">
               <strong>[[localize('add_from_cluster_activities')]]</strong>
@@ -728,10 +729,10 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
-    if (!valid) {
+    if (!valid || !this.mode) {
       return;
     }
 
