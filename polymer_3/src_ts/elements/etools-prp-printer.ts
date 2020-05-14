@@ -21,7 +21,7 @@ class EtoolsPrpPrinter extends (UtilsMixin(PolymerElement)) {
   selector!: string;
 
   @property({type: Object})
-  printWindow!: GenericObject;
+  printWindow!: Window;
 
   _onTap(e: CustomEvent) {
     if (!(e.target! as HTMLElement).classList.contains('print-btn')) {
