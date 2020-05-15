@@ -565,7 +565,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class TestPartnerActivityAPIView(BaseAPITestCase):
+class TestPartnerActivityBaseAPIView(BaseAPITestCase):
     def setUp(self):
         self.country = CountryFactory()
         self.workspace = WorkspaceFactory(countries=[self.country, ])
@@ -608,9 +608,12 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
             start_date=datetime.date(today.year, 3, 1),
             end_date=datetime.date(today.year, 10, 25),
         )
-
         super().setUp()
 
+
+class TestPartnerActivityCreateAPIView(TestPartnerActivityBaseAPIView):
+    def setUp(self):
+        super().setUp()
         self.data = {
             "cluster": self.cluster.id,
             "partner": self.partner.id,
@@ -669,6 +672,67 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
             PartnerActivity.objects.all().count(),
             base_count + 1
         )
+
+
+class TestPartnerActivityUpdateAPIView(TestPartnerActivityBaseAPIView):
+    def setUp(self):
+        super().setUp()
+        self.partner_activity = ClusterActivityPartnerActivityFactory(
+            title="Factory Title",
+            partner=self.partner,
+            cluster_activity=self.activity,
+        )
+
+    def test_patch_no_projects(self):
+        url = reverse(
+            'partner-activity-update',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'pk': self.partner_activity.pk,
+            }
+        )
+
+        # title updates only allowed with custom activity
+        self.assertFalse(self.partner_activity.is_custom)
+
+        response = self.client.patch(
+            url,
+            data={"title": "New Title"},
+            format='json',
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.partner_activity.refresh_from_db()
+        self.assertNotEquals(self.partner_activity.title, "New Title")
+
+    def test_patch(self):
+        url = reverse(
+            'partner-activity-update',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'pk': self.partner_activity.pk,
+            }
+        )
+
+        self.assertEquals(self.partner_activity.projects.count(), 0)
+
+        response = self.client.patch(
+            url,
+            data={
+                "title": "New Title",
+                "projects": [
+                    {
+                        "project_id": self.project.pk,
+                        "start_date": self.project.start_date + datetime.timedelta(days=2),
+                        "end_date": self.project.start_date + datetime.timedelta(days=12),
+                        "status": "Ong",
+                    },
+                ],
+            },
+            format='json',
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.partner_activity.refresh_from_db()
+        self.assertEquals(self.partner_activity.projects.count(), 1)
 
 
 class TestCustomPartnerProjectAPIView(BaseAPITestCase):
