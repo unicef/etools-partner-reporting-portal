@@ -29,7 +29,7 @@ import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import Settings from '../../../../settings';
-
+import {waitForIronOverlayToClose} from '../../../../utils/util';
 
 /**
  * @polymer
@@ -230,6 +230,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                     option-label="title"
                     selected="{{data.cluster.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -242,6 +243,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                     option-label="title"
                     selected="{{data.cluster.cluster_activity}}"
                     disabled="[[_equals(activities.length, 0)]]"
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -267,6 +269,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                             option-label="title"
                             selected="{{item.project_id}}"
                             disabled="[[_equals(projects.length, 0)]]"
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -280,6 +283,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                           option-label="title"
                           selected="{{item.status}}"
                           hide-search
+                          with-backdrop
                           required
                           disabled>
                         </etools-dropdown>
@@ -332,6 +336,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                       option-label="title"
                       selected="{{data.custom.cluster}}"
                       hide-search
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
@@ -345,6 +350,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                       selected="{{data.custom.cluster_objective}}"
                       disabled="[[_equals(objectives.length, 0)]]"
                       auto-validate
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
@@ -379,6 +385,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                               option-label="title"
                               selected="[[item.project_id]]"
                               disabled="[[_equals(projects.length, 0)]]"
+                              with-backdrop
                               required>
                           </etools-dropdown>
                         </div>
@@ -392,6 +399,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                               option-label="title"
                               selected="{{item.status}}"
                               hide-search
+                              with-backdrop
                               required
                               disabled>
                           </etools-dropdown>
@@ -695,16 +703,15 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     }
 
     this.set('updatePending', true);
-
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.projectData.partner_id
     }, this.data[this.mode]);
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'activity-added', res.data);
         self.set('updatePending', false);
         self.set('errors', {});
         self._close('saved');
+        waitForIronOverlayToClose(300).then(() => fireEvent(self, 'activity-added', res.data));
       })
       .catch((err: any) => {
         self.set('errors', err.data);

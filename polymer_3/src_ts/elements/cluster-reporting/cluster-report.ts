@@ -32,7 +32,7 @@ import {IndicatorDetailsEl} from '../indicator-details';
 import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
-import {clusterIndicatorReportsSubmit, clusterIndicatorReportsUpdateSingle, ClusterIndicatorReportsUpdate}
+import {clusterIndicatorReportsSubmit, ClusterIndicatorReportsUpdate}
   from '../../redux/actions/clusterIndicatorReports';
 
 import {GenericObject} from '../../typings/globals.types';
@@ -640,15 +640,10 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _onReportComplete(e: CustomEvent) {
     e.stopPropagation();
-    const data = e.detail;
-    this.reduxStore.dispatch(
-      clusterIndicatorReportsUpdateSingle(
-        data.indicatorId,
-        {
-          can_submit: true
-        }
-      )
-    );
+    // update `can_submit` property from `data` to enable Submit button,
+    // `data` is coming from `redux clusterDashboardData.overdue_indicator_reports`, this will not be updated because will trigger re-rendering of all
+    // cluster-reports (`List of overdue indicator reports` from dashboard)
+    this.set('data', {...this.data, can_submit: true});
   }
 
   _updateMeta(e: CustomEvent) {

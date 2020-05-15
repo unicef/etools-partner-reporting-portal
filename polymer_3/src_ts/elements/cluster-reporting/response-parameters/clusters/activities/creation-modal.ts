@@ -28,6 +28,7 @@ import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {modalStyles} from '../../../../../styles/modal-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
+import {waitForIronOverlayToClose} from '../../../../../utils/util';
 
 /**
  * @polymer
@@ -115,6 +116,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
               option-label="title"
               selected="{{data.cluster}}"
               hide-search
+              with-backdrop
               required>
             </etools-dropdown>
 
@@ -128,6 +130,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
               selected="{{data.cluster_objective}}"
               disabled="[[isObjectivesDisabled]]"
               hide-search
+              with-backdrop
               required>
             </etools-dropdown>
 
@@ -261,9 +264,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
         self.updatePending = false;
         self.set('errors', {});
         self.close();
-        setTimeout(() => {
-          self._redirectToDetail(res.data.id);
-        }, 100);
+        waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
       })
       .catch((err: any) => {
         self.set('errors', err.data);

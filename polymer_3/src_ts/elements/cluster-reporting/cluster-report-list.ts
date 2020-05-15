@@ -126,6 +126,7 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
     if (rootState) {
       return clusterIndicatorsReportsAll(rootState);
     }
+    return;
   }
 
   _computeIsIMOClusters(profile: GenericObject) {

@@ -134,6 +134,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
                   options="[[formattedClusters]]"
                   selected-values="{{selectedClusters}}"
                   auto-validate
+                  with-backdrop
                   required>
                 </etools-dropdown-multi>
               </div>
@@ -165,6 +166,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
                 option-value="id"
                 option-label="title"
                 selected="{{data.status}}"
+                with-backdrop
                 required>
               </etools-dropdown>
 

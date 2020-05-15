@@ -29,6 +29,7 @@ import '../../../form-fields/cluster-dropdown-content';
 import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
+import {waitForIronOverlayToClose} from '../../../../utils/util';
 
 /**
 * @polymer
@@ -207,9 +208,11 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
             option-value="id"
             option-label="title"
             selected="{{selectedPartner}}"
+            with-backdrop
             required>
           </etools-dropdown>
         </template>
+
 
         <paper-radio-group id="mode" selected="{{mode}}">
             <paper-radio-button name="cluster">
@@ -235,6 +238,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.cluster.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -247,6 +251,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.cluster.cluster_activity}}"
                     disabled="[[_equals(activities.length, 0)]]"
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -289,6 +294,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           option-label="title"
                           selected="{{item.project_id}}"
                           disabled="[[_equals(projects.length, 0)]]"
+                          with-backdrop
                           required>
                         </etools-dropdown>
                       </div>
@@ -302,6 +308,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           option-label="title"
                           selected="{{item.status}}"
                           hide-search
+                          with-backdrop
                           required>
                         </etools-dropdown>
                       </div>
@@ -358,6 +365,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                     option-label="title"
                     selected="{{data.custom.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -370,6 +378,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                       option-label="title"
                       selected="{{data.custom.cluster_objective}}"
                       disabled="[[_equals(objectives.length, 0)]]"
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
@@ -415,6 +424,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             option-label="title"
                             selected="{{item.project_id}}"
                             disabled="[[_equals(projects.length, 0)]]"
+                            with-backdrop
                             required>
                           </etools-dropdown>
                         </div>
@@ -428,6 +438,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             option-label="title"
                             selected="{{item.status}}"
                             hide-search
+                            with-backdrop
                             required>
                           </etools-dropdown>
                         </div>
@@ -718,7 +729,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         self.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
-      // TODO: error handling
+        // TODO: error handling
       });
   }
 
@@ -727,15 +738,14 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [
       this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date'),
+      this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
-    if (!valid) {
+    if (!valid || !this.mode) {
       return;
     }
 
     this.set('updatePending', true);
-
     (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
       partner: this.partner
     }, this.data[this.mode]);
@@ -743,10 +753,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .then(function(res: any) {
         self.set('updatePending', false);
         self.set('errors', {});
-        self.close();
-        setTimeout(() => {
-          fireEvent(self, 'activity-added', res.data);
-        });
+        self._close('saved');
+        waitForIronOverlayToClose(300).then(() => fireEvent(self, 'activity-added', res.data));
       })
       .catch((err: GenericObject) => {
         self.set('errors', err.data);
@@ -756,10 +764,10 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _close(e: CustomEvent & any) {
-    if (e &&
-      (e.target.nodeName === 'PAPER-DIALOG' ||
-        e.target.nodeName === 'PAPER-BUTTON' ||
-        e.target.nodeName === 'PAPER-ICON-BUTTON')) {
+    if (e && (e === 'saved' ||
+      e.target.nodeName === 'PAPER-DIALOG' ||
+      e.target.nodeName === 'PAPER-BUTTON' ||
+      e.target.nodeName === 'PAPER-ICON-BUTTON')) {
       this.set('mode', '');
       this.set('data', {});
 

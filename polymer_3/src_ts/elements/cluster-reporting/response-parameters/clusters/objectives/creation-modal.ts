@@ -24,7 +24,7 @@ import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {modalStyles} from '../../../../../styles/modal-styles';
 import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
-
+import {waitForIronOverlayToClose} from '../../../../../utils/util';
 
 /**
  * @polymer
@@ -104,7 +104,9 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
                 option-label="title"
                 selected="{{data.cluster}}"
                 hide-search
-                required>
+                with-backdrop
+                required
+                with-backdrop>
               </etools-dropdown>
 
           </iron-form>
@@ -187,9 +189,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
       .then((res: any) => {
         self.updatePending = false;
         self.close();
-        setTimeout(() => {
-          self._redirectToDetail(res.data.id);
-        }, 100);
+        waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
       })
       .catch((_err: GenericObject) => {
         self.updatePending = false;

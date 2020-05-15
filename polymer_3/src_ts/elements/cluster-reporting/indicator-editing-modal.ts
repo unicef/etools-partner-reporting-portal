@@ -206,6 +206,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   disabled
                   hide-search
                   auto-validate
+                  with-backdrop
                   required>
                 </etools-dropdown>
               </div>
@@ -223,6 +224,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                     disabled="[[!canEditDetails]]"
                     hide-search
                     auto-validate
+                    with-backdrop
                     required>
                 </etools-dropdown>
                 <template

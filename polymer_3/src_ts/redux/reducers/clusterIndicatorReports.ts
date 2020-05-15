@@ -16,7 +16,7 @@ export const ClusterIndicatorReports = combineReducers({
   loading: loadingReducer
 });
 
-function reportsByIdReducer(state = {}, action: any) {
+function reportsByIdReducer(state: GenericObject = {}, action: any) {
   switch (action.type) {
     case Constants.SET_CLUSTER_INDICATOR_REPORTS:
       return action.data.reduce(function(prev: any, curr: any) {

@@ -23,6 +23,8 @@ import {computePostBody, computeAuthorizedPartners} from './js/authorized-office
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {RootState} from '../../typings/redux.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {waitForIronOverlayToClose} from '../../utils/util';
+
 /**
  * @polymer
  * @customElement
@@ -87,6 +89,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
               option-label="title"
               required
               selected="{{selectedFocalPoint}}"
+              with-backdrop
               hide-search>
             </etools-dropdown>
         </div>
@@ -179,10 +182,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
 
         self.set('busy', false);
         self.close();
-
-        setTimeout(() => {
-          self.set('path', newPath);
-        }, 100);
+        waitForIronOverlayToClose(300).then(() => self.set('path', newPath));
       })
       .catch((res: any) => {
         const errors = res.data.non_field_errors;

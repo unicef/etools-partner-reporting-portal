@@ -248,6 +248,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedCluster}}"
                             disabled="[[_equals(selectedPartner, '')]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -262,6 +263,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedObjective}}"
                             disabled="[[_equals(objectives.length, 0)]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -276,6 +278,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedIndicator}}"
                             disabled="[[_equals(indicators.length, 0)]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -402,6 +405,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                               selected="{{data.frequency}}"
                               auto-validate
                               hide-search
+                              with-backdrop
                               required>
                           </etools-dropdown>
                           <template
@@ -642,6 +646,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         selected="{{data.project_context_id}}"
                         auto-validate
                         hide-search
+                        with-backdrop
                         required>
                     </etools-dropdown>
                   </div>
@@ -658,6 +663,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         selected="{{data.frequency}}"
                         auto-validate
                         hide-search
+                        with-backdrop
                         required>
                     </etools-dropdown>
                     <template

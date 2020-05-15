@@ -130,12 +130,11 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     if (token) {
       this.reduxStore.dispatch(setToken(token));
     }
-
-    fireEvent(this, ['response'].concat(arguments));
+    fireEvent(this, 'response', ['response'].concat(Array.from(arguments)));
   }
 
   _handleRequest() {
-    fireEvent(this, ['request'].concat(arguments));
+    fireEvent(this, 'request', ['request'].concat(Array.from(arguments)));
   }
 
   _handleError() {
@@ -147,22 +146,24 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
       this._notifyServerError();
     }
 
-    fireEvent(this, ['error'].concat(arguments));
+    fireEvent(this, 'error', ['error'].concat(Array.from(arguments)));
   }
 
   _buildResponse(req: GenericObject) {
     return {
       status: req.status,
       data: req.parseResponse(),
-      xhr: req.xhr,
+      xhr: req.xhr
     };
   }
 
   generateRequest() {
+    // @ts-ignore
     return (this.$.ajax as IronAjaxElement).generateRequest.apply(this.$.ajax, arguments);
   }
 
   toRequestOptions() {
+    // @ts-ignore
     return (this.$.ajax as IronAjaxElement).toRequestOptions.apply(this.$.ajax, arguments);
   }
 
