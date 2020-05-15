@@ -5,16 +5,19 @@ jobs:
     docker:
       - image: unicef/etools-prp-base:latest
         environment:
-          PGHOST: 127.0.0.1
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_DB: test_prp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/test_prp"
           RELEASE_MATCH: "release/*"
       - image: redis:alpine
       - image: circleci/postgres:9.6-alpine-postgis
         environment:
-          POSTGRES_USER: postgres
           PGUSER: postgres
           POSTGRES_DB: test_prp
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
 
     steps:
