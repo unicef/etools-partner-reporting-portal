@@ -67,7 +67,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           display: block;
 
           --app-grid-columns: 2;
-          --app-grid-gutter: 15px;
+          --app-grid-gutter: 20px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
 
@@ -187,8 +187,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           display: block;
         }
 
-        etools-dropdown {
+        etools-dropdown, etools-dropdown-multi {
           width: 100%;
+        }
+
+        datepicker-lite {
+          --paper-input-container: {
+            width: 100%;
+          };
         }
 
         iron-icon {
@@ -410,17 +416,19 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                       </datepicker-lite>
                     </div>
                     <div class="row">
-                      <etools-dropdown
-                        class="item validate"
-                        label="[[localize('status')]] *"
-                        options="[[statuses]]"
-                        option-value="id"
-                        option-label="title"
-                        selected="{{data.status}}"
-                        hide-search
-                        with-backdrop
-                        required>
-                      </etools-dropdown>
+                      <div class="item">
+                        <etools-dropdown
+                          class="validate"
+                          label="[[localize('status')]] *"
+                          options="[[statuses]]"
+                          option-value="id"
+                          option-label="title"
+                          selected="{{data.status}}"
+                          hide-search
+                          with-backdrop
+                          required>
+                        </etools-dropdown>
+                      </div>
                     </div>
 
                     <div class="item full-width">
