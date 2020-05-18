@@ -361,7 +361,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                       required>
                   </etools-dropdown>
                 </div>
-                <div class="item item-wide">
+                <div class="item-wide">
                   <paper-input
                       class="validate"
                       label="[[localize('title')]]"
@@ -632,6 +632,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
   }
 
   _fetchActivities(clusterId: string) {
+    debugger;
     if (!clusterId || !this.responsePlanId) {
       return;
     }
