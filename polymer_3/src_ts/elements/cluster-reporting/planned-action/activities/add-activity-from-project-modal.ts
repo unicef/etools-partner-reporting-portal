@@ -53,7 +53,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
+          width: 700px;
         }
       }
 
@@ -141,6 +141,13 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       etools-dropdown {
         width: 100%;
       }
+
+      datepicker-lite {
+        --paper-input-container: {
+          width: 100%;
+        };
+      }
+
       paper-dialog-scrollable {
         padding-bottom: 12px;
       }
