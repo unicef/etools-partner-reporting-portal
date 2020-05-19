@@ -270,8 +270,6 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
     def test_create_partner_project_no_status(self):
-        base_count = PartnerProject.objects.all().count()
-
         self.data.pop("status")
         url = reverse(
             'partner-project-list',
@@ -295,7 +293,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         url = reverse(
             'partner-project-list',
             kwargs={'response_plan_id': self.cluster.response_plan_id},
-       )
+        )
         response = self.client.post(url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
@@ -319,7 +317,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         url = reverse(
             'partner-project-list',
             kwargs={'response_plan_id': self.cluster.response_plan_id},
-       )
+        )
         response = self.client.post(url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
