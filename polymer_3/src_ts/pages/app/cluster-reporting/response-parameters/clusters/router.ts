@@ -108,7 +108,6 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/clusters/${page}.js`;
-    console.log('cluster response-parameters clusters router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);

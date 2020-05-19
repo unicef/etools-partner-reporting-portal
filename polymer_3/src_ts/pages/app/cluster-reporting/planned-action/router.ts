@@ -94,7 +94,6 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/planned-action/${page}.js`;
-    console.log('cluster planned-action router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
