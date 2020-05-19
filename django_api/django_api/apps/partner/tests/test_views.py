@@ -269,6 +269,25 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
+    def test_create_partner_project_duplicate_locations(self):
+        """
+        create unit test for ClusterObjectiveAPIView
+        """
+        self.data["locations"] = [{"id": self.loc1.pk}, {"id": self.loc1.pk}]
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data,
+            {
+                "locations": ["Duplicate locations are not allowed"],
+                "error_codes": {"locations": ["invalid"]},
+            },
+        )
+
     def test_create_partner_project_without_total_budget(self):
         base_count = PartnerProject.objects.all().count()
 
@@ -276,7 +295,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         url = reverse(
             'partner-project-list',
             kwargs={'response_plan_id': self.cluster.response_plan_id},
-       )
+        )
         response = self.client.post(url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
@@ -300,7 +319,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         url = reverse(
             'partner-project-list',
             kwargs={'response_plan_id': self.cluster.response_plan_id},
-       )
+        )
         response = self.client.post(url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
