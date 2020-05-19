@@ -1602,11 +1602,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       }
     });
 
-    if (noLocationSet) {
-      return;
-    }
-
-    if (!this._fieldsAreValid()) {
+    if (noLocationSet || !this.mode || !this._fieldsAreValid()) {
       return;
     }
 
