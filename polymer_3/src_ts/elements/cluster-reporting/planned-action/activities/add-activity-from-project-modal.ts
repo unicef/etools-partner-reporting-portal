@@ -632,7 +632,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
   }
 
   _fetchActivities(clusterId: string) {
-    debugger;
     if (!clusterId || !this.responsePlanId) {
       return;
     }
