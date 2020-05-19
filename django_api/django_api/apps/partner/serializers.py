@@ -313,12 +313,21 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                     'custom_fields': 'Custom Field Names should be unique'
                 })
 
-        if locations and Location.objects.filter(id__in=[l['id'] for l in locations]) \
-                .values_list('gateway__admin_level', flat=True) \
-                .distinct().count() != 1:
-            raise serializers.ValidationError({
-                'locations': 'All locations need to have same admin level'
-            })
+        if locations:
+            location_ids = [l['id'] for l in locations]
+
+            # ensure locations are unique
+            if len(set(location_ids)) != len(location_ids):
+                raise serializers.ValidationError({
+                    'locations': 'Duplicate locations are not allowed',
+                })
+
+            # require locations to have same admin level
+            location_qs = Location.objects.filter(id__in=location_ids)
+            if location_qs.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
+                raise serializers.ValidationError({
+                    'locations': 'All locations need to have same admin level'
+                })
 
         return validated_data
 
