@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
-from rest_framework.exceptions import ValidationError
 
-from cluster.models import ClusterObjective, ClusterActivity
-from partner.models import PartnerProject, PartnerActivity, PartnerActivityProjectContext
+from cluster.models import ClusterActivity, ClusterObjective
+from partner.models import PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from rest_framework.exceptions import ValidationError
 
 
 class AddIndicatorObjectTypeValidator(object):

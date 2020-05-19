@@ -215,7 +215,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     return Endpoints.programmeDocumentReportUpdate(locationId, reportId);
   }
 
-  _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: any[], reportId: string) {
+  _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: GenericObject, reportId: string) {
     // for some reason method was getting run on detach, so catch that
     if (!allPdReports || !allPdReports[pdId]) {
       return;

@@ -22,7 +22,7 @@ class NumeralJs extends PolymerElement {
 
   // Formatted manipulated output
   @property({type: String, readOnly: true, notify: true})
-  output: string = ''
+  output: string = '';
 
   // Print output
   @property({type: Boolean})
@@ -66,8 +66,10 @@ class NumeralJs extends PolymerElement {
 
   _format() {
     if (this.format) {
+      // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
       this._setOutput(numeral(this.number).format(this.format));
     } else {
+      // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
       this._setOutput(this.number);
     }
   }
@@ -78,6 +80,7 @@ class NumeralJs extends PolymerElement {
   }
 
   _unformatChanged() {
+    // @ts-ignore _setOutput defined by polymer / 'output' prop is readonly
     this._setOutput(numeral().unformat(this.unformat));
   }
 

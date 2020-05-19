@@ -1,19 +1,19 @@
+import base64
 import logging
 from time import sleep
 
-import base64
-import requests
-from django.core.cache import cache
 from django.conf import settings
-from requests import RequestException
-from requests.status_codes import codes
+from django.core.cache import cache
 
+import requests
 from cluster.models import Cluster, ClusterObjective
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, GatewayType, Location
-from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue, ReportableLocationGoal
+from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint, Reportable, ReportableLocationGoal
 from ocha.constants import HPC_V2_ROOT_URL
-from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
+from ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
+from requests import RequestException
+from requests.status_codes import codes
 
 logger = logging.getLogger('ocha-sync')
 

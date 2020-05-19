@@ -53,7 +53,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
+          width: 700px;
         }
       }
 
@@ -141,6 +141,13 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       etools-dropdown {
         width: 100%;
       }
+
+      datepicker-lite {
+        --paper-input-container: {
+          width: 100%;
+        };
+      }
+
       paper-dialog-scrollable {
         padding-bottom: 12px;
       }
@@ -230,6 +237,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                     option-label="title"
                     selected="{{data.cluster.cluster}}"
                     hide-search
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -242,6 +250,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                     option-label="title"
                     selected="{{data.cluster.cluster_activity}}"
                     disabled="[[_equals(activities.length, 0)]]"
+                    with-backdrop
                     required>
                   </etools-dropdown>
                 </div>
@@ -267,6 +276,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                             option-label="title"
                             selected="{{item.project_id}}"
                             disabled="[[_equals(projects.length, 0)]]"
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -280,6 +290,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                           option-label="title"
                           selected="{{item.status}}"
                           hide-search
+                          with-backdrop
                           required
                           disabled>
                         </etools-dropdown>
@@ -332,6 +343,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                       option-label="title"
                       selected="{{data.custom.cluster}}"
                       hide-search
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
@@ -345,10 +357,11 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                       selected="{{data.custom.cluster_objective}}"
                       disabled="[[_equals(objectives.length, 0)]]"
                       auto-validate
+                      with-backdrop
                       required>
                   </etools-dropdown>
                 </div>
-                <div class="item item-wide">
+                <div class="item-wide">
                   <paper-input
                       class="validate"
                       label="[[localize('title')]]"
@@ -379,6 +392,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                               option-label="title"
                               selected="[[item.project_id]]"
                               disabled="[[_equals(projects.length, 0)]]"
+                              with-backdrop
                               required>
                           </etools-dropdown>
                         </div>
@@ -392,6 +406,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
                               option-label="title"
                               selected="{{item.status}}"
                               hide-search
+                              with-backdrop
                               required
                               disabled>
                           </etools-dropdown>
@@ -690,7 +705,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
-    if (!valid) {
+    if (!this.mode || !valid) {
       return;
     }
 

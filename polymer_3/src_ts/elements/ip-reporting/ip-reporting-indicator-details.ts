@@ -38,7 +38,6 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
         width: 100%;
 
         --paper-tabs: {
-          padding-left: 12px;
           border-bottom: 1px solid var(--paper-grey-300);
         };
 
@@ -160,8 +159,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
           selected="{{selected}}"
           fallback-selection="location-[[locations.0.current.id]]"
           attr-for-selected="name"
-          scrollable
-          hide-scroll-buttons>
+          scrollable>
         <template
             is="dom-repeat"
             items="[[locations]]"

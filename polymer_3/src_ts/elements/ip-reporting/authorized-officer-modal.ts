@@ -89,6 +89,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
               option-label="title"
               required
               selected="{{selectedFocalPoint}}"
+              with-backdrop
               hide-search>
             </etools-dropdown>
         </div>

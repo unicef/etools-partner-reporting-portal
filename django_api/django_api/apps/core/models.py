@@ -4,34 +4,23 @@ import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import pycountry
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.core.validators import (
-    MinValueValidator,
-    MaxValueValidator
-)
-from django.utils.translation import ugettext as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
-
-from model_utils.models import TimeStampedModel
+from django.utils.translation import ugettext as _
 
 import mptt
-from mptt.models import MPTTModel, TreeForeignKey
-from mptt.managers import TreeManager
-
+import pycountry
 from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
-from .common import (
-    RESPONSE_PLAN_TYPE,
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    EXTERNAL_DATA_SOURCES,
-    PRP_ROLE_TYPES,
-)
+from model_utils.models import TimeStampedModel
+from mptt.managers import TreeManager
+from mptt.models import MPTTModel, TreeForeignKey
 from utils.emails import send_email_from_template
 
+from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 
 logger = logging.getLogger('locations.models')
 

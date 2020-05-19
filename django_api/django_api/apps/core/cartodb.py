@@ -3,17 +3,13 @@ import time
 from django.db import IntegrityError, transaction
 from django.utils.encoding import force_text
 
-from celery import shared_task
-from celery.utils.log import get_task_logger
-
-from carto.sql import SQLClient
 from carto.auth import _BaseUrlChecker
 from carto.exceptions import CartoException
-
+from carto.sql import SQLClient
+from celery import shared_task
+from celery.utils.log import get_task_logger
+from core.models import CartoDBTable, Location
 from pyrestcli.auth import BaseAuthClient
-
-from core.models import Location, CartoDBTable
-
 
 logger = get_task_logger('core.cartodb')
 

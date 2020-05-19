@@ -1,6 +1,5 @@
 from importlib import import_module
 
-# imports defaults
 from .base import *
 
 overrides = import_module('django_api.settings.{}'.format(ENV))

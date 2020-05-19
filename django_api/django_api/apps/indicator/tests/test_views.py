@@ -1,116 +1,74 @@
-from ast import literal_eval as make_tuple
 import copy
-from datetime import date, timedelta
+import datetime
+from ast import literal_eval as make_tuple
 from unittest.mock import Mock, patch
 
-from django.urls import reverse
 from django.conf import settings
+from django.urls import reverse
 
-from rest_framework import status
-from unicef_notification.models import Notification
-
-from core.models import Location
-from core.common import (
-    REPORTABLE_FREQUENCY_LEVEL,
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    PRP_ROLE_TYPES,
-)
-from core.helpers import (
-    get_cast_dictionary_keys_as_tuple,
-)
+from cluster.models import ClusterActivity, ClusterObjective
+from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, REPORTABLE_FREQUENCY_LEVEL
+from core.helpers import get_cast_dictionary_keys_as_tuple
 from core.management.commands._generate_disaggregation_fake_data import (
-    generate_3_num_disagg_data,
     add_disaggregations_to_reportable,
+    generate_3_num_disagg_data,
 )
-from core.factories import (CartoDBTableFactory,
-                            ProgressReportIndicatorReportFactory,
-                            PartnerActivityProjectContextFactory,
-                            IPPRPRoleFactory,
-                            CountryFactory, DisaggregationFactory,
-                            DisaggregationValueFactory, GatewayTypeFactory,
-                            LocationFactory,
-                            LocationWithReportableLocationGoalFactory,
-                            PartnerUserFactory, PartnerFactory,
-                            ProgressReportFactory,
-                            QuantityReportableToLowerLevelOutputFactory,
-                            QuantityReportableToClusterObjectiveFactory,
-                            QuantityTypeIndicatorBlueprintFactory,
-                            WorkspaceFactory,
-                            SectionFactory,
-                            PersonFactory,
-                            IPDisaggregationFactory,
-                            ProgrammeDocumentFactory,
-                            QPRReportingPeriodDatesFactory,
-                            HRReportingPeriodDatesFactory,
-                            PDResultLinkFactory,
-                            LowerLevelOutputFactory,
-                            ClusterPRPRoleFactory,
-                            ResponsePlanFactory,
-                            ClusterFactory,
-                            NonPartnerUserFactory,
-                            ClusterObjectiveFactory,
-                            ClusterActivityFactory,
-                            PartnerProjectFactory,
-                            ClusterActivityPartnerActivityFactory,
-                            QuantityReportableToPartnerActivityProjectContextFactory,
-                            ClusterIndicatorReportFactory)
+from core.models import Location
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-from cluster.models import ClusterObjective, ClusterActivity
-from partner.models import PartnerProject, PartnerActivity
-from unicef.models import (
-    ProgrammeDocument
+from indicator.disaggregators import QuantityIndicatorDisaggregator
+from indicator.models import (
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    IndicatorLocationData,
+    IndicatorReport,
+    Reportable,
 )
 from indicator.serializers import (
     IdDisaggregationSerializer,
-    ReportableLocationGoalSerializer,
     IndicatorLocationDataUpdateSerializer,
+    ReportableLocationGoalSerializer,
 )
-from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import (
-    Reportable,
-    IndicatorReport,
-    Disaggregation,
-    IndicatorBlueprint,
-    DisaggregationValue,
-    IndicatorLocationData,
-)
+from partner.models import PartnerActivity, PartnerProject
+from rest_framework import status
+from unicef.models import ProgrammeDocument
+from unicef_notification.models import Notification
 
-
-today = date.today()
-beginning_of_this_year = date(today.year, 1, 1)
-end_of_this_year = date(today.year, 12, 31)
+today = datetime.date.today()
+beginning_of_this_year = datetime.date(today.year, 1, 1)
+end_of_this_year = datetime.date(today.year, 12, 31)
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = PartnerUserFactory(partner=self.partner)
-        self.prp_role = IPPRPRoleFactory(user=self.user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.PartnerUserFactory(partner=self.partner)
+        self.prp_role = factories.IPPRPRoleFactory(user=self.user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -123,8 +81,8 @@ class TestPDReportsAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -136,11 +94,11 @@ class TestPDReportsAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
 
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
 
@@ -154,14 +112,14 @@ class TestPDReportsAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=IPDisaggregationFactory(name=disagg_name),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.IPDisaggregationFactory(name=disagg_name),
                     value=value
                 )
 
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -174,18 +132,18 @@ class TestPDReportsAPIView(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
@@ -240,18 +198,18 @@ class TestPDReportsAPIView(BaseAPITestCase):
 class TestIndicatorDataAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -259,26 +217,26 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -293,17 +251,17 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -314,18 +272,18 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=self.partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -353,8 +311,8 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             response.data['submission_date'],
-            date.today().strftime(
-                settings.PRINT_DATA_FORMAT))
+            today.strftime(settings.PRINT_DATA_FORMAT),
+        )
         self.assertEquals(
             response.data['report_status'],
             INDICATOR_REPORT_STATUS.accepted)
@@ -363,43 +321,43 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 class TestIndicatorListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -413,17 +371,17 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -434,18 +392,18 @@ class TestIndicatorListAPIView(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=self.partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -456,18 +414,18 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -480,8 +438,8 @@ class TestIndicatorListAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -493,15 +451,15 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -512,26 +470,26 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                disagg = IPDisaggregationFactory(name=disagg_name)
+                disagg = factories.IPDisaggregationFactory(name=disagg_name)
 
                 self.llo_reportable.disaggregations.add(disagg)
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
@@ -586,46 +544,46 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -635,27 +593,27 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=self.partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -666,18 +624,18 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -690,8 +648,8 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -703,15 +661,15 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -724,31 +682,31 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
-                disagg = IPDisaggregationFactory(name=disagg_name)
+                disagg = factories.IPDisaggregationFactory(name=disagg_name)
 
                 self.llo_reportable.disaggregations.add(disagg)
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
@@ -799,46 +757,46 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 class TestIndicatorReportListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -848,28 +806,28 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
         for _ in range(2):
             with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                ClusterIndicatorReportFactory(
+                factories.ClusterIndicatorReportFactory(
                     reportable=self.partneractivity_reportable,
                     report_status=INDICATOR_REPORT_STATUS.submitted,
                 )
@@ -880,18 +838,18 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -904,8 +862,8 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -917,15 +875,15 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -938,31 +896,31 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
-                disagg = IPDisaggregationFactory(name=disagg_name)
+                disagg = factories.IPDisaggregationFactory(name=disagg_name)
 
                 self.llo_reportable.disaggregations.add(disagg)
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.submitted,
@@ -1007,54 +965,54 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 class TestClusterIndicatorAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(
             workspace=self.workspace,
             start=beginning_of_this_year,
             end=end_of_this_year,
         )
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country, admin_level=3)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country, admin_level=3)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
-            start_date=date(today.year, 3, 1),
-            end_date=date(today.year, 10, 25),
+            start_date=datetime.date(today.year, 3, 1),
+            end_date=datetime.date(today.year, 10, 25),
         )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
@@ -1062,28 +1020,28 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
         for _ in range(2):
             with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                ClusterIndicatorReportFactory(
+                factories.ClusterIndicatorReportFactory(
                     reportable=self.partneractivity_reportable,
                     report_status=INDICATOR_REPORT_STATUS.submitted,
                 )
@@ -1094,18 +1052,18 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.partneractivity_reportable):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -1118,8 +1076,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -1131,15 +1089,15 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -1152,31 +1110,31 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
-                disagg = IPDisaggregationFactory(name=disagg_name)
+                disagg = factories.IPDisaggregationFactory(name=disagg_name)
 
                 self.llo_reportable.disaggregations.add(disagg)
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.submitted,
@@ -1203,7 +1161,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             'object_type': 'cluster.clusterobjective',
             'means_of_verification': 'IMO/CC calculation',
             'frequency': REPORTABLE_FREQUENCY_LEVEL.weekly,
-            'start_date_of_reporting_period': date.today().strftime(settings.INPUT_DATA_FORMAT),
+            'start_date_of_reporting_period': today.strftime(settings.INPUT_DATA_FORMAT),
             'locations': [
                 {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(gateway__admin_level=3)[0].id},
                 {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(gateway__admin_level=3)[1].id},
@@ -1269,16 +1227,17 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             IndicatorBlueprint.PERCENTAGE)
 
     def test_create_csdates_indicator_cluster_activities_reporting(self):
+        date = datetime.date(2020, 4, 9)
         cs_dates = [
-            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
         ]
         ca = ClusterActivity.objects.first()
         self.data['object_id'] = ca.id
         self.data['object_type'] = 'cluster.clusteractivity'
-        self.data['start_date_of_reporting_period'] = date.today().strftime(settings.INPUT_DATA_FORMAT)
+        self.data['start_date_of_reporting_period'] = today.strftime(settings.INPUT_DATA_FORMAT)
         self.data['cs_dates'] = cs_dates
         self.data['frequency'] = REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates
         response = self.client.post(self.url, data=self.data, format='json')
@@ -1320,7 +1279,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         pa = PartnerActivity.objects.filter(projects__isnull=False).first()
         self.data['object_id'] = pa.id
         self.data['object_type'] = 'partner.partneractivity'
-        self.data['start_date_of_reporting_period'] = str(date(today.year, 4, 1))
+        self.data['start_date_of_reporting_period'] = str(datetime.date(today.year, 4, 1))
         self.data['project_context_id'] = pa.partneractivityprojectcontext_set.first().id
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
@@ -1359,11 +1318,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
           reportable.reportablelocationgoal_set.all(), many=True
         ).data
 
+        date = datetime.date(2020, 4, 9)
         cs_dates = [
-            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
-            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=12)).strftime(settings.INPUT_DATA_FORMAT),
+            (date + datetime.timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
         ]
         self.data['cs_dates'] = cs_dates
 
@@ -1387,46 +1347,46 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -1436,37 +1396,37 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -1479,8 +1439,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -1492,15 +1452,15 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -1512,35 +1472,35 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         # Create the disaggregations and values in the db for all response plans
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
-            disagg = IPDisaggregationFactory(name=disagg_name)
-            cluster_disagg = DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
+            disagg = factories.IPDisaggregationFactory(name=disagg_name)
+            cluster_disagg = factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
 
             self.llo_reportable.disaggregations.add(disagg)
             self.partneractivity_reportable.disaggregations.add(cluster_disagg)
 
             for value in values:
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=cluster_disagg,
                     value=value
                 )
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for _ in range(2):
             with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                ClusterIndicatorReportFactory(
+                factories.ClusterIndicatorReportFactory(
                     reportable=self.partneractivity_reportable,
                     report_status=INDICATOR_REPORT_STATUS.submitted,
                 )
@@ -1552,7 +1512,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.submitted,
@@ -1938,46 +1898,46 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 class TestReportRefreshAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -1987,37 +1947,37 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
-        self.pd = ProgrammeDocumentFactory(
+        self.pd = factories.ProgrammeDocumentFactory(
             workspace=self.workspace,
             partner=self.partner,
-            sections=[SectionFactory(), ],
+            sections=[factories.SectionFactory(), ],
             unicef_officers=[self.unicef_officer, ],
             unicef_focal_point=[self.unicef_focal_point, ],
             partner_focal_point=[self.partner_focal_point, ]
         )
 
         for idx in range(2):
-            qpr_period = QPRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=qpr_period.start_date,
                 end_date=qpr_period.end_date,
                 due_date=qpr_period.due_date,
@@ -2030,8 +1990,8 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             )
 
         for idx in range(6):
-            hr_period = HRReportingPeriodDatesFactory(programme_document=self.pd)
-            ProgressReportFactory(
+            hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
+            factories.ProgressReportFactory(
                 start_date=hr_period.start_date,
                 end_date=hr_period.end_date,
                 due_date=hr_period.due_date,
@@ -2043,15 +2003,15 @@ class TestReportRefreshAPIView(BaseAPITestCase):
                 submitting_user=self.user,
             )
 
-        self.cp_output = PDResultLinkFactory(
+        self.cp_output = factories.PDResultLinkFactory(
             programme_document=self.pd,
         )
-        self.llo = LowerLevelOutputFactory(
+        self.llo = factories.LowerLevelOutputFactory(
             cp_output=self.cp_output,
         )
-        self.llo_reportable = QuantityReportableToLowerLevelOutputFactory(
+        self.llo_reportable = factories.QuantityReportableToLowerLevelOutputFactory(
             content_object=self.llo,
-            blueprint=QuantityTypeIndicatorBlueprintFactory(
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
                 unit=IndicatorBlueprint.NUMBER,
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
@@ -2063,35 +2023,35 @@ class TestReportRefreshAPIView(BaseAPITestCase):
         # Create the disaggregations and values in the db for all response plans
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
-            disagg = IPDisaggregationFactory(name=disagg_name)
-            cluster_disagg = DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
+            disagg = factories.IPDisaggregationFactory(name=disagg_name)
+            cluster_disagg = factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
 
             self.llo_reportable.disaggregations.add(disagg)
             self.partneractivity_reportable.disaggregations.add(cluster_disagg)
 
             for value in values:
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=cluster_disagg,
                     value=value
                 )
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=disagg,
                     value=value
                 )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.llo_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.llo_reportable,
         )
 
         for _ in range(2):
             with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                ClusterIndicatorReportFactory(
+                factories.ClusterIndicatorReportFactory(
                     reportable=self.partneractivity_reportable,
                     report_status=INDICATOR_REPORT_STATUS.submitted,
                 )
@@ -2103,7 +2063,7 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
         for pr in self.pd.progress_reports.all():
-            ProgressReportIndicatorReportFactory(
+            factories.ProgressReportIndicatorReportFactory(
                 progress_report=pr,
                 reportable=self.llo_reportable,
                 report_status=INDICATOR_REPORT_STATUS.submitted,
@@ -2185,60 +2145,60 @@ class TestReportRefreshAPIView(BaseAPITestCase):
 class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.cluster2 = ClusterFactory(type='education', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.unicef_officer = PersonFactory()
-        self.unicef_focal_point = PersonFactory()
-        self.partner_focal_point = PersonFactory()
-        self.objective = ClusterObjectiveFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.cluster2 = factories.ClusterFactory(type='education', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.unicef_officer = factories.PersonFactory()
+        self.unicef_focal_point = factories.PersonFactory()
+        self.partner_focal_point = factories.PersonFactory()
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.objective2 = ClusterObjectiveFactory(
+        self.objective2 = factories.ClusterObjectiveFactory(
             cluster=self.cluster2,
             locations=[
                 self.loc1,
                 self.loc2,
             ]
         )
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.partner2 = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = NonPartnerUserFactory()
-        self.partner_user = PartnerUserFactory(partner=self.partner)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
-        self.project = PartnerProjectFactory(
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner2 = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.NonPartnerUserFactory()
+        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.project2 = PartnerProjectFactory(
+        self.project2 = factories.PartnerProjectFactory(
             partner=self.partner2,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -2248,50 +2208,50 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
             "gender": ["male", "female", "other"],
         }
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=IndicatorBlueprint.NUMBER,
             calculation_formula_across_locations=IndicatorBlueprint.SUM,
             calculation_formula_across_periods=IndicatorBlueprint.SUM,
         )
 
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.partneractivity_reportable,
         )
 
-        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+        self.clusterobjective_reportable = factories.QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=blueprint
         )
 
-        self.reportable_loc_1 = LocationWithReportableLocationGoalFactory(
+        self.reportable_loc_1 = factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.clusterobjective_reportable,
         )
 
-        self.reportable_loc_2 = LocationWithReportableLocationGoalFactory(
+        self.reportable_loc_2 = factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.clusterobjective_reportable,
         )
 
-        self.clusterobjective_reportable2 = QuantityReportableToClusterObjectiveFactory(
+        self.clusterobjective_reportable2 = factories.QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective2, blueprint=blueprint
         )
 
-        self.reportable_2_loc_1 = LocationWithReportableLocationGoalFactory(
+        self.reportable_2_loc_1 = factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=self.clusterobjective_reportable2,
         )
 
-        self.reportable_2_loc_2 = LocationWithReportableLocationGoalFactory(
+        self.reportable_2_loc_2 = factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=self.clusterobjective_reportable2,
         )
@@ -2303,14 +2263,14 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
         # Create the disaggregations and values in the db for all response plans
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
-            cluster_disagg = DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
+            cluster_disagg = factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan)
 
             self.clusterobjective_reportable.disaggregations.add(cluster_disagg)
             self.clusterobjective_reportable2.disaggregations.add(cluster_disagg)
             self.partneractivity_reportable.disaggregations.add(cluster_disagg)
 
             for value in values:
-                DisaggregationValueFactory(
+                factories.DisaggregationValueFactory(
                     disaggregation=cluster_disagg,
                     value=value
                 )

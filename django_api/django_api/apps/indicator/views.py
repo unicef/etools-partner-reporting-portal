@@ -1,78 +1,68 @@
-from datetime import date, datetime
-import operator
 import logging
+import operator
+from datetime import date, datetime
+from functools import reduce
 
 from django.conf import settings
-from django.db.models import Q
 from django.db import transaction
-from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from django.http import Http404
-
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
-
-from core.permissions import (
-    AnyPermission,
-    IsUNICEFAPIUser,
-    IsAuthenticated,
-    HasAnyRole,
-)
-from core.paginations import SmallPagination
-from core.models import Location
 from core.common import (
     INDICATOR_REPORT_STATUS,
-    REPORTABLE_LLO_CONTENT_OBJECT,
-    REPORTABLE_CO_CONTENT_OBJECT,
-    REPORTABLE_CA_CONTENT_OBJECT,
-    REPORTABLE_PP_CONTENT_OBJECT,
-    REPORTABLE_PA_CONTENT_OBJECT,
     OVERALL_STATUS,
-    REPORTABLE_FREQUENCY_LEVEL,
     PRP_ROLE_TYPES,
+    REPORTABLE_CA_CONTENT_OBJECT,
+    REPORTABLE_CO_CONTENT_OBJECT,
+    REPORTABLE_FREQUENCY_LEVEL,
+    REPORTABLE_LLO_CONTENT_OBJECT,
+    REPORTABLE_PA_CONTENT_OBJECT,
+    REPORTABLE_PP_CONTENT_OBJECT,
 )
+from core.models import Location
+from core.paginations import SmallPagination
+from core.permissions import AnyPermission, HasAnyRole, IsAuthenticated, IsUNICEFAPIUser
 from core.serializers import ShortLocationSerializer
-from partner.models import PartnerProject, PartnerActivityProjectContext
+from partner.models import PartnerActivityProjectContext, PartnerProject
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
 
-from .disaggregators import (
-    QuantityIndicatorDisaggregator,
-    RatioIndicatorDisaggregator,
-)
-from .serializers import (
-    IndicatorListSerializer,
-    IndicatorReportListSerializer,
-    PDReportContextIndicatorReportSerializer,
-    IndicatorLocationDataUpdateSerializer,
-    OverallNarrativeSerializer,
-    ClusterIndicatorSerializer,
-    DisaggregationListSerializer,
-    IndicatorReportReviewSerializer,
-    IndicatorReportSimpleSerializer,
-    ReportRefreshSerializer,
-    ClusterObjectiveIndicatorAdoptSerializer,
-    ReportableLocationGoalBaselineInNeedSerializer,
-    ClusterIndicatorIMOMessageSerializer,
-    ReportableReportingFrequencyIdSerializer,
-)
+from .disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
+    create_reportable_for_pp_from_co_reportable,
+    Disaggregation,
     IndicatorBlueprint,
+    IndicatorLocationData,
     IndicatorReport,
     Reportable,
-    IndicatorLocationData,
-    Disaggregation,
     ReportableLocationGoal,
-    create_reportable_for_pp_from_co_reportable,
+)
+from .serializers import (
+    ClusterIndicatorIMOMessageSerializer,
+    ClusterIndicatorSerializer,
+    ClusterObjectiveIndicatorAdoptSerializer,
+    DisaggregationListSerializer,
+    IndicatorListSerializer,
+    IndicatorLocationDataUpdateSerializer,
+    IndicatorReportListSerializer,
+    IndicatorReportReviewSerializer,
+    IndicatorReportSimpleSerializer,
+    OverallNarrativeSerializer,
+    PDReportContextIndicatorReportSerializer,
+    ReportableLocationGoalBaselineInNeedSerializer,
+    ReportableReportingFrequencyIdSerializer,
+    ReportRefreshSerializer,
 )
 from .utilities import reset_indicator_report_data, reset_progress_report_data
-from functools import reduce
 
 logger = logging.getLogger(__name__)
 

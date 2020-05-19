@@ -6,7 +6,6 @@ from django.utils.html import escape
 
 from unicef.models import LowerLevelOutput
 
-
 PARTNER_PORTAL_DATE_FORMAT_EXCEL = 'dd-mmm-yyyy'
 
 

@@ -1,15 +1,15 @@
+from distutils.util import strtobool
+
 from django.db.models import Q
 
 import django_filters
-from django_filters import rest_framework as filters
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
-from distutils.util import strtobool
-
 from core.common import PARTNER_PROJECT_STATUS
+from django_filters import rest_framework as filters
+from django_filters.filters import CharFilter, ChoiceFilter, DateFilter, TypedChoiceFilter
 from utils.filters.constants import Boolean
 from utils.filters.fields import CommaSeparatedListFilter
 
-from .models import PartnerProject, Partner, PartnerActivity
+from .models import Partner, PartnerActivity, PartnerProject
 
 
 class PartnerProjectFilter(filters.FilterSet):

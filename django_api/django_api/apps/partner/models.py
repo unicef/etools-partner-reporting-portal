@@ -3,20 +3,21 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models.signals import pre_save, m2m_changed
+from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 
-from model_utils.models import TimeStampedModel
-
 from core.common import (
-    PARTNER_TYPE,
-    SHARED_PARTNER_TYPE,
     CSO_TYPES,
+    EXTERNAL_DATA_SOURCES,
     PARTNER_PROJECT_STATUS,
-    RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES)
-from core.models import TimeStampedExternalSourceModel
+    PARTNER_TYPE,
+    RESPONSE_PLAN_TYPE,
+    SHARED_PARTNER_TYPE,
+)
+from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
 from core.fields import UniqueNullCharField
-from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
+from core.models import TimeStampedExternalSourceModel
+from model_utils.models import TimeStampedModel
 
 
 class Partner(TimeStampedExternalSourceModel):

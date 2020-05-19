@@ -1,17 +1,17 @@
 from django.conf.urls import url
 
 from .views import (
-    PartnerSimpleListAPIView,
+    ClusterActivityPartnersAPIView,
+    PartnerActivityAPIView,
+    PartnerActivityCreateAPIView,
+    PartnerActivityListAPIView,
+    PartnerActivityUpdateAPIView,
     PartnerDetailsAPIView,
+    PartnerProjectAPIView,
     PartnerProjectListCreateAPIView,
     PartnerProjectSimpleListAPIView,
-    PartnerProjectAPIView,
-    ClusterActivityPartnersAPIView,
-    PartnerActivityListAPIView,
-    PartnerActivityCreateAPIView,
-    PartnerActivityAPIView,
-    PartnerActivityUpdateAPIView)
-
+    PartnerSimpleListAPIView,
+)
 
 urlpatterns = [
     url(r'^partner-details/$',

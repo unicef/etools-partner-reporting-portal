@@ -18,7 +18,7 @@ import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {PaperTabsElement} from '@polymer/paper-tabs/paper-tabs';
+
 
 /**
 * @polymer

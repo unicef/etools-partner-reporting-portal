@@ -1,5 +1,5 @@
-from ast import literal_eval as make_tuple
 import copy
+from ast import literal_eval as make_tuple
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
@@ -7,33 +7,34 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
-from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
-from unicef.models import LowerLevelOutput, ProgressReport
-from partner.models import PartnerProject, PartnerActivity, Partner, PartnerActivityProjectContext
-from cluster.models import ClusterObjective, ClusterActivity, Cluster
-
-from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
-from core.serializers import LocationSerializer, IdLocationSerializer
-from core.models import Location
-from core.validators import add_indicator_object_type_validator
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from core.common import FINAL_OVERALL_STATUS, INDICATOR_REPORT_STATUS, OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.helpers import (
     generate_data_combination_entries,
-    get_sorted_ordered_dict_by_keys,
-    get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
+    get_cast_dictionary_keys_as_tuple,
+    get_sorted_ordered_dict_by_keys,
 )
+from core.models import Location
+from core.serializers import IdLocationSerializer, LocationSerializer
+from core.validators import add_indicator_object_type_validator
+from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
+from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
 from .models import (
-    Reportable, IndicatorBlueprint,
-    IndicatorReport, IndicatorLocationData,
-    Disaggregation, DisaggregationValue,
+    create_pa_reportables_for_new_ca_reportable,
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    IndicatorLocationData,
+    IndicatorReport,
+    Reportable,
     ReportableLocationGoal,
     ReportingEntity,
-    create_pa_reportables_for_new_ca_reportable,
 )
 from .utilities import convert_string_number_to_float
 

@@ -27,23 +27,23 @@ import {GenericObject} from '../typings/globals.types';
     editProgressReport: [
       Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
       Constants.PRP_ROLE.IP_EDITOR,
-      Constants.PRP_ROLE.IP_ADMIN,
+      Constants.PRP_ROLE.IP_ADMIN
     ],
 
     exportSubmittedProgressReport: [
       Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-      Constants.PRP_ROLE.IP_EDITOR,
+      Constants.PRP_ROLE.IP_EDITOR
     ],
 
     savePdReport: [
       Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
       Constants.PRP_ROLE.IP_EDITOR,
-      Constants.PRP_ROLE.IP_ADMIN,
+      Constants.PRP_ROLE.IP_ADMIN
     ],
 
     changeProgrammeDocumentCalculationMethod: [
       Constants.PRP_ROLE.IP_AUTHORIZED_OFFICER,
-      Constants.PRP_ROLE.IP_EDITOR,
+      Constants.PRP_ROLE.IP_EDITOR
     ],
 
     createClusterEntities: checkInResponsePlan(createClusterEntitiesUsers),
@@ -154,43 +154,43 @@ import {GenericObject} from '../typings/globals.types';
     },
 
     addPlannedActionProject: [
-      Constants.PRP_ROLE.CLUSTER_MEMBER,
+      Constants.PRP_ROLE.CLUSTER_MEMBER
     ],
 
     editPlannedActionEntities: [
-      Constants.PRP_ROLE.CLUSTER_MEMBER,
+      Constants.PRP_ROLE.CLUSTER_MEMBER
     ],
 
     createPartnerProject: [
       Constants.PRP_ROLE.CLUSTER_MEMBER,
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     adminResponsePlan: [
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     addPartnerToProject: checkInResponsePlan([
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ]),
 
     createPartnerEntitiesAsImo: [
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     addPartnerToActivity: [
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     editIndicatorDetails: [
       Constants.PRP_ROLE.CLUSTER_IMO,
       Constants.PRP_ROLE.CLUSTER_MEMBER,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     onlyEditOwnIndicatorDetails: [
@@ -200,7 +200,7 @@ import {GenericObject} from '../typings/globals.types';
 
     editIndicatorLocations: [
       Constants.PRP_ROLE.CLUSTER_IMO,
-      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+      Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN
     ],
 
     accessIpIdManagement: [
@@ -248,7 +248,8 @@ import {GenericObject} from '../typings/globals.types';
 
 
     _computePermissions(params: GenericObject) {
-      return Object.keys(permissions).reduce(function(acc: any, key) {
+      return Object.keys(permissions).reduce(function(acc: any, key: string) {
+        // @ts-ignore
         const granted = permissions[key];
 
         acc[key] = (function() {

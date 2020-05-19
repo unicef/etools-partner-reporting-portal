@@ -1,9 +1,7 @@
+from core.common import PROGRESS_REPORT_STATUS
 from django_filters import rest_framework as filters
 from django_filters.filters import ChoiceFilter, NumberFilter
-
-from core.common import PROGRESS_REPORT_STATUS
-
-from indicator.models import Reportable, IndicatorReport
+from indicator.models import IndicatorReport, Reportable
 
 
 class IndicatorFilter(filters.FilterSet):

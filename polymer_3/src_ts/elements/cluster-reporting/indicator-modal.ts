@@ -133,8 +133,14 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           margin: 2em 0;
         }
 
+        etools-dropdown, etools-dropdown-multi {
+          width: 100%;
+        }
+
         datepicker-lite {
-          --paper-input-container_-_width: 100%;
+          --paper-input-container: {
+            width: 100%;
+          };
         }
 
         .app-grid > * {
@@ -248,6 +254,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedCluster}}"
                             disabled="[[_equals(selectedPartner, '')]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -262,6 +269,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedObjective}}"
                             disabled="[[_equals(objectives.length, 0)]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
@@ -276,31 +284,36 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                             selected="{{selectedIndicator}}"
                             disabled="[[_equals(indicators.length, 0)]]"
                             auto-validate
+                            with-backdrop
                             required>
                         </etools-dropdown>
                       </div>
 
-                      <json-field
-                        class="item validate"
-                        id="target"
-                        label="[[localize('baseline')]]"
-                        value="{{ data.baseline }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\\-\\d.]"
-                        on-input="_validate"
-                        required>
-                      </json-field>
+                      <div class="item">
+                        <json-field
+                          class="item validate"
+                          id="target"
+                          label="[[localize('baseline')]]"
+                          value="{{ data.baseline }}"
+                          type="[[selectedIndicatorDetailType]]"
+                          allowed-pattern="[+\\-\\d.]"
+                          on-input="_validate"
+                          required>
+                        </json-field>
+                      </div>
 
-                      <json-field
-                        class="item validate"
-                        id="total"
-                        label="[[localize('target')]]"
-                        value="{{ data.target }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\\-\\d.]"
-                        on-input="_validate"
-                        required>
-                      </json-field>
+                      <div class="item">
+                        <json-field
+                          class="item validate"
+                          id="total"
+                          label="[[localize('target')]]"
+                          value="{{ data.target }}"
+                          type="[[selectedIndicatorDetailType]]"
+                          allowed-pattern="[+\\-\\d.]"
+                          on-input="_validate"
+                          required>
+                        </json-field>
+                      </div>
 
                       <template
                         is="dom-if"
@@ -402,6 +415,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                               selected="{{data.frequency}}"
                               auto-validate
                               hide-search
+                              with-backdrop
                               required>
                           </etools-dropdown>
                           <template
@@ -642,6 +656,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         selected="{{data.project_context_id}}"
                         auto-validate
                         hide-search
+                        with-backdrop
                         required>
                     </etools-dropdown>
                   </div>
@@ -658,6 +673,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         selected="{{data.frequency}}"
                         auto-validate
                         hide-search
+                        with-backdrop
                         required>
                     </etools-dropdown>
                     <template
@@ -1596,11 +1612,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       }
     });
 
-    if (noLocationSet) {
-      return;
-    }
-
-    if (!this._fieldsAreValid()) {
+    if (noLocationSet || !this.mode || !this._fieldsAreValid()) {
       return;
     }
 

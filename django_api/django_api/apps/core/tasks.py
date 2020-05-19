@@ -1,27 +1,24 @@
 import logging
 from datetime import datetime, timedelta
 
-from celery import shared_task
 from django.db import transaction
 
+from celery import shared_task
 from core.api import PMP_API
-from core.celery import cache_lock, app as celery_app
-from core.serializers import PMPWorkspaceSerializer
-from core.models import Country
-from core.common import (
-    PD_FREQUENCY_LEVEL,
-    PD_STATUS,
-)
+from core.celery import app as celery_app, cache_lock
+from core.common import PD_FREQUENCY_LEVEL, PD_STATUS
 from core.helpers import (
     calculate_end_date_given_start_date,
-    find_missing_frequency_period_dates_for_indicator_report,
-    get_latest_pr_by_type,
-    create_pr_for_report_type,
     create_ir_and_ilds_for_pr,
     create_ir_for_cluster,
+    create_pr_for_report_type,
+    find_missing_frequency_period_dates_for_indicator_report,
+    get_latest_pr_by_type,
 )
-from unicef.models import ProgrammeDocument
+from core.models import Country
+from core.serializers import PMPWorkspaceSerializer
 from indicator.models import Reportable
+from unicef.models import ProgrammeDocument
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15

@@ -1,38 +1,37 @@
 from __future__ import unicode_literals
-from datetime import date
+
 import logging
 import os
+from datetime import date
 
-from django.contrib.auth import get_user_model
-from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
-from django.utils.functional import cached_property
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from model_utils.models import TimeStampedModel
-from model_utils.tracker import FieldTracker
-from requests.compat import urljoin
+from django.utils.functional import cached_property
 
 from core.common import (
-    PD_FREQUENCY_LEVEL,
-    INDICATOR_REPORT_STATUS,
-    PD_LIST_REPORT_STATUS,
-    PD_DOCUMENT_TYPE,
-    PROGRESS_REPORT_STATUS,
-    PD_STATUS,
     CURRENCIES,
+    INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    REPORTING_TYPES,
+    PD_DOCUMENT_TYPE,
+    PD_FREQUENCY_LEVEL,
+    PD_LIST_REPORT_STATUS,
+    PD_STATUS,
     PR_ATTACHMENT_TYPES,
+    PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
+    REPORTING_TYPES,
 )
 from core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
+from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
 from utils.emails import send_email_from_template
-
 
 logger = logging.getLogger(__name__)
 
@@ -362,19 +361,6 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     def lower_level_outputs(self):
         return LowerLevelOutput.objects.filter(
             cp_output__programme_document=self)
-
-
-def find_first_programme_document_id():
-    try:
-        pd_id = ProgrammeDocument.objects.first().id
-    except AttributeError:
-        from core.factories import ProgrammeDocumentFactory
-        pd = ProgrammeDocumentFactory()
-        pd_id = pd.id
-
-        return pd_id
-    else:
-        return pd_id
 
 
 class ProgressReport(TimeStampedModel):
