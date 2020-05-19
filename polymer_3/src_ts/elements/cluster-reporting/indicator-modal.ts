@@ -133,8 +133,14 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
           margin: 2em 0;
         }
 
+        etools-dropdown, etools-dropdown-multi {
+          width: 100%;
+        }
+
         datepicker-lite {
-          --paper-input-container_-_width: 100%;
+          --paper-input-container: {
+            width: 100%;
+          };
         }
 
         .app-grid > * {
@@ -283,27 +289,31 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
                         </etools-dropdown>
                       </div>
 
-                      <json-field
-                        class="item validate"
-                        id="target"
-                        label="[[localize('baseline')]]"
-                        value="{{ data.baseline }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\\-\\d.]"
-                        on-input="_validate"
-                        required>
-                      </json-field>
+                      <div class="item">
+                        <json-field
+                          class="item validate"
+                          id="target"
+                          label="[[localize('baseline')]]"
+                          value="{{ data.baseline }}"
+                          type="[[selectedIndicatorDetailType]]"
+                          allowed-pattern="[+\\-\\d.]"
+                          on-input="_validate"
+                          required>
+                        </json-field>
+                      </div>
 
-                      <json-field
-                        class="item validate"
-                        id="total"
-                        label="[[localize('target')]]"
-                        value="{{ data.target }}"
-                        type="[[selectedIndicatorDetailType]]"
-                        allowed-pattern="[+\\-\\d.]"
-                        on-input="_validate"
-                        required>
-                      </json-field>
+                      <div class="item">
+                        <json-field
+                          class="item validate"
+                          id="total"
+                          label="[[localize('target')]]"
+                          value="{{ data.target }}"
+                          type="[[selectedIndicatorDetailType]]"
+                          allowed-pattern="[+\\-\\d.]"
+                          on-input="_validate"
+                          required>
+                        </json-field>
+                      </div>
 
                       <template
                         is="dom-if"

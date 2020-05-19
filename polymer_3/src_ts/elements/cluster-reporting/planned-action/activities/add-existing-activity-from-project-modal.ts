@@ -52,7 +52,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
+          width: 700px;
           margin: 0;
           }
       }
@@ -110,6 +110,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
       etools-dropdown {
         width: 100%;
+      }
+
+      datepicker-lite {
+        --paper-input-container: {
+          width: 100%;
+        };
       }
     </style>
 
