@@ -129,7 +129,6 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
 
   async _pageChanged(page: string) {
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/${page}.js`;
-    console.log('cluster reporting... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();

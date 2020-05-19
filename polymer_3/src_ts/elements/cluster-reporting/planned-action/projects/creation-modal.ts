@@ -67,7 +67,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
           display: block;
 
           --app-grid-columns: 2;
-          --app-grid-gutter: 15px;
+          --app-grid-gutter: 20px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
 
@@ -418,7 +418,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
                     <div class="row">
                       <div class="item">
                         <etools-dropdown
-                          class="item validate"
+                          class="validate"
                           label="[[localize('status')]] *"
                           options="[[statuses]]"
                           option-value="id"

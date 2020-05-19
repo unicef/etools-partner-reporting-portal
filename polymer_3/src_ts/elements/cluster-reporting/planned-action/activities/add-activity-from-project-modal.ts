@@ -705,7 +705,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       this._dateRangeValid('.start-date', '.end-date')
     ].every(Boolean);
 
-    if (!valid) {
+    if (!this.mode || !valid) {
       return;
     }
 

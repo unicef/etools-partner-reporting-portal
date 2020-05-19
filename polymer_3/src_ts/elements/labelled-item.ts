@@ -23,7 +23,7 @@ class LabelledItem extends PolymerElement {
         .labelled-item__label {
             font-size: 12px;
             color: #737373;
-
+            display: block;
             @apply --labelled-item-label;
             @apply --truncate;
         }
