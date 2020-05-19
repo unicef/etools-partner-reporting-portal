@@ -12,7 +12,7 @@ from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData
-from partner.models import PartnerActivity, PartnerProject
+from partner.models import PARTNER_PROJECT_STATUS, PartnerActivity, PartnerProject
 from rest_framework import status
 
 today = datetime.date.today()
@@ -269,16 +269,35 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
-    def test_create_partner_project_duplicate_locations(self):
-        """
-        create unit test for ClusterObjectiveAPIView
-        """
-        self.data["locations"] = [{"id": self.loc1.pk}, {"id": self.loc1.pk}]
+    def test_create_partner_project_no_status(self):
+        self.data.pop("status")
         url = reverse(
             'partner-project-list',
             kwargs={
                 'response_plan_id': self.cluster.response_plan_id})
         response = self.client.post(url, data=self.data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data,
+            {
+                "status": ["This field is required."],
+                "error_codes": {"status": ["required"]},
+            },
+        )
+
+    def test_create_partner_project_duplicate_locations(self):
+        """
+        create unit test for ClusterObjectiveAPIView
+        """
+        self.data["locations"] = [{"id": self.loc1.pk}, {"id": self.loc1.pk}]
+
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
+        response = self.client.post(url, data=self.data, format='json')
+
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(
             response.data,
@@ -878,6 +897,7 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
             'start_date': str(beginning_of_this_year),
             'end_date': str(end_of_this_year),
             'partner_id': self.response_plan.clusters.first().partners.first().id,
+            'status': PARTNER_PROJECT_STATUS.ongoing,
         }
 
         url = reverse("partner-project-list", kwargs={'response_plan_id': self.response_plan.pk})
@@ -895,7 +915,8 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
             'start_date': '2018-01-01',
             'end_date': '2013-01-01',
             'partner_id': self.response_plan.clusters.first().partners.first().id,
-            'clusters': ClusterSimpleSerializer(self.response_plan.clusters.all(), many=True).data
+            'clusters': ClusterSimpleSerializer(self.response_plan.clusters.all(), many=True).data,
+            'status': PARTNER_PROJECT_STATUS.ongoing,
         }
 
         url = reverse("partner-project-list", kwargs={'response_plan_id': self.response_plan.pk})
@@ -909,6 +930,7 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
             'start_date': str(beginning_of_this_year),
             'end_date': str(end_of_this_year),
             'partner_id': self.response_plan.clusters.first().partners.first().id,
+            'status': PARTNER_PROJECT_STATUS.ongoing,
             'custom_fields': [{
                 'name': 'Test Field 1',
                 'value': '1',
