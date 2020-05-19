@@ -1,16 +1,15 @@
 import logging
 
 from celery import shared_task
-
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, PRP_ROLE_TYPES
-from core.models import ResponsePlan, PRPRole
+from core.common import CLUSTER_TYPES, EXTERNAL_DATA_SOURCES, PRP_ROLE_TYPES
+from core.models import PRPRole, ResponsePlan
 from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
+from ocha.imports.project import import_project_details
+from ocha.imports.response_plan import import_response_plan, save_activities_and_objectives_for_response_plan
 from ocha.imports.serializers import V1FundingSourceImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list
-from ocha.imports.response_plan import import_response_plan, save_activities_and_objectives_for_response_plan
-from ocha.imports.project import import_project_details
-from partner.models import PartnerProject, Partner
+from partner.models import Partner, PartnerProject
 
 logger = logging.getLogger('ocha-sync')
 

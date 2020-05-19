@@ -7,11 +7,11 @@ indicator location data being saved for any disaggregation types.
 
 
 from core.helpers import (
-    get_all_subkeys,
     calculate_sum,
-    get_zero_dict,
-    get_cast_dictionary_keys_as_tuple,
+    get_all_subkeys,
     get_cast_dictionary_keys_as_string,
+    get_cast_dictionary_keys_as_tuple,
+    get_zero_dict,
 )
 from indicator.constants import ValueType
 
@@ -47,7 +47,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         # copy of idl.disaggregation with the keys converted tuples from the original string type
         disagg = get_cast_dictionary_keys_as_tuple(indicator_location_data.disaggregation)
 
-        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure 
+        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure
         # therefore calculating it:
         level_reported = 0
         for k in disagg.keys():
@@ -114,7 +114,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_report.save()
 
 
-
 class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Ratio indicator type disaggregation processing.
@@ -132,7 +131,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         ct = ValueType.CALCULATED
 
         disagg = get_cast_dictionary_keys_as_tuple(indicator_location_data.disaggregation)
-        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure 
+        # indicator_location_data.level_reported cannot be trusted to reflect correctly the structure
         # therefore calculating it:
         level_reported = 0
         for k in disagg.keys():

@@ -1,5 +1,6 @@
-from django_nose import NoseTestSuiteRunner
 from django.core.management import call_command
+
+from django_nose import NoseTestSuiteRunner
 
 
 class CustomNoseTestSuiteRunner(NoseTestSuiteRunner):

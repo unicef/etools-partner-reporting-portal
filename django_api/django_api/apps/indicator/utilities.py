@@ -1,12 +1,8 @@
-from babel.numbers import format_number, format_percent
-
-from django.utils.translation import to_locale, get_language
 from django.db import transaction
+from django.utils.translation import get_language, to_locale
 
-from core.helpers import (
-    create_ir_and_ilds_for_pr,
-)
-
+from babel.numbers import format_number, format_percent
+from core.helpers import create_ir_and_ilds_for_pr
 from indicator.constants import ValueType
 
 
@@ -15,24 +11,18 @@ def convert_string_number_to_float(num):
 
 
 def format_total_value_to_string(total, is_percentage=False, percentage_display_type=None):
+    value = total.get(ValueType.VALUE, 0)
+    locale = to_locale(get_language())
+
     if is_percentage:
+        denominator = total.get(ValueType.DENOMINATOR, 1)
         if percentage_display_type and percentage_display_type == 'ratio':
-            return f"{total.get(ValueType.VALUE, 0)}/{total.get(ValueType.DENOMINATOR, 1)}"
+            return f"{value}/{denominator}"
         else:
-            numerator = total.get(ValueType.VALUE, 0)
-            denominator = total.get(ValueType.DENOMINATOR, 1)
-
-            if numerator == 0 and denominator == 0:
-                value = 0
-            else:
-                value = total.get(ValueType.VALUE, 0) / total.get(ValueType.DENOMINATOR, 1)
-
+            value = 0 if denominator == 0 else value / denominator
             formatter = format_percent
     else:
-        value = total.get(ValueType.VALUE, 0)
         formatter = format_number
-
-    locale = to_locale(get_language())
     return formatter(value, locale=locale)
 
 

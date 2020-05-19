@@ -1,17 +1,13 @@
 from datetime import datetime, timedelta
 
-from django.utils.deconstruct import deconstructible
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
-from social_core.backends.azuread_b2c import AzureADB2COAuth2
-from social_core.pipeline import social_auth
-from social_core.pipeline import user as social_core_user
-
-from social_django.middleware import SocialAuthExceptionMiddleware
+from django.utils.deconstruct import deconstructible
 
 from azure.storage import AccessPolicy, SharedAccessPolicy
-
+from social_core.backends.azuread_b2c import AzureADB2COAuth2
+from social_core.pipeline import social_auth, user as social_core_user
+from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
 from storages.utils import setting
 

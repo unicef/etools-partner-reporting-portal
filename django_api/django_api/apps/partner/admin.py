@@ -1,12 +1,6 @@
 from django.contrib import admin
 
-from .models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-    PartnerProjectFunding,
-    PartnerActivityProjectContext,
-)
+from .models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject, PartnerProjectFunding
 
 
 class PartnerAdmin(admin.ModelAdmin):

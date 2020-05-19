@@ -1,52 +1,32 @@
 import copy
 
-from faker import Faker
-
-from core.common import INDICATOR_REPORT_STATUS, PRP_ROLE_TYPES, OVERALL_STATUS
-from core.helpers import (
-    get_cast_dictionary_keys_as_tuple,
+from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from core.helpers import get_cast_dictionary_keys_as_tuple
+from core.management.commands._generate_disaggregation_fake_data import (
+    add_disaggregations_to_reportable,
+    generate_3_num_disagg_data,
 )
-from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
-                            ClusterActivityPartnerActivityFactory,
-                            PartnerActivityProjectContextFactory,
-                            ClusterFactory, ClusterIndicatorReportFactory,
-                            ClusterObjectiveFactory, ClusterPRPRoleFactory,
-                            CountryFactory, DisaggregationFactory,
-                            DisaggregationValueFactory, GatewayTypeFactory,
-                            LocationFactory,
-                            LocationWithReportableLocationGoalFactory,
-                            NonPartnerUserFactory, PartnerFactory,
-                            PartnerProjectFactory,
-                            QuantityReportableToPartnerActivityProjectContextFactory,
-                            QuantityTypeIndicatorBlueprintFactory,
-                            RatioReportableToPartnerActivityProjectContextFactory,
-                            RatioTypeIndicatorBlueprintFactory,
-                            ResponsePlanFactory, WorkspaceFactory)
-from core.management.commands._generate_disaggregation_fake_data import (add_disaggregations_to_reportable,
-                                                                         generate_3_num_disagg_data)
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-from indicator.disaggregators import (QuantityIndicatorDisaggregator,
-                                      RatioIndicatorDisaggregator)
+from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData
-
-faker = Faker()
 
 
 class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -54,26 +34,26 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -88,8 +68,8 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
                     value=value
                 )
 
@@ -99,11 +79,11 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.SUM
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -114,17 +94,17 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
             overall_status=OVERALL_STATUS.met,
@@ -145,11 +125,11 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.MAX
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -160,17 +140,17 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
         )
@@ -192,11 +172,11 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.AVG
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -207,17 +187,17 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
         )
@@ -239,12 +219,12 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.SUM
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -255,18 +235,18 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -291,12 +271,12 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.MAX
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -307,18 +287,18 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -345,12 +325,12 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.AVG
 
-        blueprint = QuantityTypeIndicatorBlueprintFactory(
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
         )
-        partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -361,18 +341,18 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -396,18 +376,18 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -415,26 +395,26 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
@@ -449,8 +429,11 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         # including one for no response plan as well
         for disagg_name, values in self.sample_disaggregation_value_map.items():
             for value in values:
-                DisaggregationValueFactory(
-                    disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                factories.DisaggregationValueFactory(
+                    disaggregation=factories.DisaggregationFactory(
+                        name=disagg_name,
+                        response_plan=self.response_plan,
+                    ),
                     value=value
                 )
 
@@ -461,13 +444,13 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         calc_type = IndicatorBlueprint.SUM
         display_type = IndicatorBlueprint.RATIO
 
-        blueprint = RatioTypeIndicatorBlueprintFactory(
+        blueprint = factories.RatioTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.RatioReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -478,17 +461,17 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
         )
@@ -513,13 +496,13 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         calc_type = IndicatorBlueprint.SUM
         display_type = IndicatorBlueprint.PERCENTAGE
 
-        blueprint = RatioTypeIndicatorBlueprintFactory(
+        blueprint = factories.RatioTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.RatioReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -530,17 +513,17 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
         )
@@ -565,13 +548,13 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         calc_type = IndicatorBlueprint.SUM
         display_type = IndicatorBlueprint.RATIO
 
-        blueprint = RatioTypeIndicatorBlueprintFactory(
+        blueprint = factories.RatioTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.RatioReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -582,12 +565,12 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        ir = ClusterIndicatorReportFactory(
+        ir = factories.ClusterIndicatorReportFactory(
             reportable=partneractivity_reportable,
             report_status=INDICATOR_REPORT_STATUS.due,
         )
@@ -623,13 +606,13 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         calc_type = IndicatorBlueprint.SUM
         display_type = IndicatorBlueprint.RATIO
 
-        blueprint = RatioTypeIndicatorBlueprintFactory(
+        blueprint = factories.RatioTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.RatioReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -640,18 +623,18 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )
@@ -676,13 +659,13 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         calc_type = IndicatorBlueprint.SUM
         display_type = IndicatorBlueprint.RATIO
 
-        blueprint = RatioTypeIndicatorBlueprintFactory(
+        blueprint = factories.RatioTypeIndicatorBlueprintFactory(
             unit=unit_type,
             calculation_formula_across_locations=calc_type,
             calculation_formula_across_periods=calc_type,
             display_type=display_type,
         )
-        partneractivity_reportable = RatioReportableToPartnerActivityProjectContextFactory(
+        partneractivity_reportable = factories.RatioReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=blueprint
         )
 
@@ -693,18 +676,18 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             disaggregation_targets=["age", "gender", "height"]
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc1,
             reportable=partneractivity_reportable,
         )
 
-        LocationWithReportableLocationGoalFactory(
+        factories.LocationWithReportableLocationGoalFactory(
             location=self.loc2,
             reportable=partneractivity_reportable,
         )
 
         for _ in range(2):
-            ClusterIndicatorReportFactory(
+            factories.ClusterIndicatorReportFactory(
                 reportable=partneractivity_reportable,
                 report_status=INDICATOR_REPORT_STATUS.due,
             )

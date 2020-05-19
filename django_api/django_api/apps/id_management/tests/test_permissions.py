@@ -1,6 +1,4 @@
 from django.urls import reverse
-from rest_framework.test import APIRequestFactory
-from rest_framework.test import APITestCase
 
 from account.models import User
 from cluster.models import Cluster
@@ -8,6 +6,7 @@ from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole, Workspace
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from partner.models import Partner
+from rest_framework.test import APIRequestFactory, APITestCase
 
 
 class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):

@@ -4,7 +4,6 @@ import os
 
 from .base import *
 
-
 # dev overrides
 DEBUG = True
 IS_DEV = True

@@ -1,8 +1,7 @@
-from rest_framework import serializers
-
 from cluster.serializers import ClusterIDManagementSerializer
 from core.models import PRPRole
 from core.serializers import WorkspaceSimpleSerializer
+from rest_framework import serializers
 
 
 class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):

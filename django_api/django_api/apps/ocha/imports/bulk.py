@@ -1,8 +1,8 @@
-import requests
-
 import itertools
 
+import requests
 from ocha.constants import HPC_V1_ROOT_URL
+
 from . import utilities
 
 

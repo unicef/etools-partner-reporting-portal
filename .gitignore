@@ -29,3 +29,4 @@ polymer_3/index_dev.html
 kubernetes/base/secrets.yml
 
 Pipfile
+build/

@@ -1,61 +1,47 @@
 import logging
 
-from django.db.models import Q
 from django.contrib.gis.db.models.functions import AsGeoJSON
+from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status as statuses
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
-from rest_framework.mixins import ListModelMixin
-from rest_framework.exceptions import ValidationError, PermissionDenied
-
 import django_filters
-
-from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
-from core.permissions import IsAuthenticated
-from core.paginations import SmallPagination
-from core.serializers import ShortLocationSerializer
-from core.models import Location, ResponsePlan
-from indicator.serializers import (
-    ClusterIndicatorReportSerializer,
-    ReportableIdSerializer,
-    ClusterPartnerAnalysisIndicatorResultSerializer,
-)
-from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
-from indicator.serializers import (
-    ClusterAnalysisIndicatorsListSerializer,
-    ClusterAnalysisIndicatorDetailSerializer,
-)
-from partner.models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-)
-
 from cluster.export_indicators import IndicatorsXLSXExporter
+from cluster.filters import ClusterActivityFilter, ClusterFilter, ClusterIndicatorsFilter, ClusterObjectiveFilter
 from cluster.import_indicators import IndicatorsXLSXReader
-from cluster.models import ClusterObjective, ClusterActivity, Cluster
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
 from cluster.serializers import (
-    ClusterSimpleSerializer,
-    ClusterObjectiveSerializer,
-    ClusterObjectivePatchSerializer,
-    ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
+    ClusterActivitySerializer,
+    ClusterIDManagementSerializer,
+    ClusterObjectivePatchSerializer,
+    ClusterObjectiveSerializer,
+    ClusterSimpleSerializer,
+    OperationalPresenceLocationListSerializer,
+    PartnerAnalysisSummarySerializer,
     ResponsePlanClusterDashboardSerializer,
     ResponsePlanPartnerDashboardSerializer,
-    PartnerAnalysisSummarySerializer,
-    OperationalPresenceLocationListSerializer,
-    ClusterIDManagementSerializer,
 )
-from cluster.filters import (
-    ClusterObjectiveFilter,
-    ClusterActivityFilter,
-    ClusterIndicatorsFilter,
-    ClusterFilter,
+from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
+from core.models import Location, ResponsePlan
+from core.paginations import SmallPagination
+from core.permissions import IsAuthenticated
+from core.serializers import ShortLocationSerializer
+from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
+from indicator.serializers import (
+    ClusterAnalysisIndicatorDetailSerializer,
+    ClusterAnalysisIndicatorsListSerializer,
+    ClusterIndicatorReportSerializer,
+    ClusterPartnerAnalysisIndicatorResultSerializer,
+    ReportableIdSerializer,
 )
+from partner.models import Partner, PartnerActivity, PartnerProject
+from rest_framework import status as statuses
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.mixins import ListModelMixin
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 

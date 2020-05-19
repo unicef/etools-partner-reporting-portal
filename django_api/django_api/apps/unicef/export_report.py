@@ -1,17 +1,15 @@
 import itertools
 
-from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle, PatternFill
-from openpyxl.utils import get_column_letter
-
 from django.conf import settings
 from django.db.models import Count
 
 from core import common
-
-from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
+from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.utilities import convert_string_number_to_float
+from openpyxl.reader.excel import load_workbook
+from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
+from openpyxl.utils import get_column_letter
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'

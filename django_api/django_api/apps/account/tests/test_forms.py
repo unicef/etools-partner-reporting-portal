@@ -1,31 +1,17 @@
-from faker import Faker
-
-from core.factories import (
-    PartnerUserFactory,
-    PartnerFactory,
-)
+from account.forms import CustomUserCreationForm, UserAdminForm
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-
-from account.forms import (
-    CustomUserCreationForm,
-    UserAdminForm,
-)
 
 
 class CustomUserCreationFormTestcase(BaseAPITestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.faker = Faker()
-
     def test_valid_submission(self):
         """Test if the form is filled correctly
         """
         form = CustomUserCreationForm(data={
-            'username': self.faker.user_name(),
-            'first_name': self.faker.first_name(),
-            'last_name': self.faker.last_name(),
-            'email': self.faker.ascii_safe_email(),
+            'username': factories.faker.user_name(),
+            'first_name': factories.faker.first_name(),
+            'last_name': factories.faker.last_name(),
+            'email': factories.faker.ascii_safe_email(),
             'password1': 'testpassword',
             'password2': 'testpassword',
         })
@@ -35,8 +21,8 @@ class CustomUserCreationFormTestcase(BaseAPITestCase):
         """Test if the form throws an error by requiring username and email fields.
         """
         form = CustomUserCreationForm(data={
-            'first_name': self.faker.first_name(),
-            'last_name': self.faker.last_name(),
+            'first_name': factories.faker.first_name(),
+            'last_name': factories.faker.last_name(),
         })
         self.assertFalse(form.is_valid())
 
@@ -44,18 +30,16 @@ class CustomUserCreationFormTestcase(BaseAPITestCase):
 class UserAdminFormTestcase(BaseAPITestCase):
 
     def setUp(self):
-        self.partner = PartnerFactory()
-        self.user = PartnerUserFactory(partner=self.partner)
-
+        self.partner = factories.PartnerFactory()
+        self.user = factories.PartnerUserFactory(partner=self.partner)
         super().setUp()
-        self.faker = Faker()
 
     def test_valid_submission(self):
         """Test if the form is filled correctly
         """
         form = UserAdminForm(data={
-            'first_name': self.faker.first_name(),
-            'last_name': self.faker.last_name(),
+            'first_name': factories.faker.first_name(),
+            'last_name': factories.faker.last_name(),
             'username': self.user.username,
             'email': self.user.email,
             'password1': 'testpassword',
@@ -69,8 +53,8 @@ class UserAdminFormTestcase(BaseAPITestCase):
         """Test if the form throws an error if the form has no partner or no organization
         """
         form = UserAdminForm(data={
-            'first_name': self.faker.first_name(),
-            'last_name': self.faker.last_name(),
+            'first_name': factories.faker.first_name(),
+            'last_name': factories.faker.last_name(),
             'username': self.user.username,
             'email': self.user.email,
             'password1': 'testpassword',

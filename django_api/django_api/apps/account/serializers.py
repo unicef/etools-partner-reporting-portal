@@ -1,13 +1,13 @@
 from django.db import transaction
+
+from cluster.models import Cluster
+from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
+from core.models import PRPRole
+from id_management.serializers import PRPRoleWithRelationsSerializer
+from partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
-from core.models import PRPRole
-
-from cluster.models import Cluster
-from id_management.serializers import PRPRoleWithRelationsSerializer
-from partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 from .models import User
 
 

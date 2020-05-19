@@ -1,9 +1,8 @@
 from celery import shared_task
 from core.api import PMP_API
 from core.models import Workspace
-
-from partner.serializers import PMPPartnerSerializer
 from partner.models import Partner
+from partner.serializers import PMPPartnerSerializer
 
 MAX_RETRIES = 6
 

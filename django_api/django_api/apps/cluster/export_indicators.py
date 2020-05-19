@@ -1,14 +1,13 @@
-from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle
-from openpyxl.utils import get_column_letter
+import itertools
+import uuid
 
 from django.conf import settings
 from django.db.models import Count
 
-import itertools
-import uuid
-
 from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorReport
+from openpyxl.reader.excel import load_workbook
+from openpyxl.styles import Alignment, Font, NamedStyle
+from openpyxl.utils import get_column_letter
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
 SAVE_PATH = '/tmp/'

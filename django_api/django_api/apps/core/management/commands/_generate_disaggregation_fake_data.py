@@ -1,15 +1,6 @@
-from indicator.models import (
-    Disaggregation,
-    ReportingEntity,
-)
-from core.helpers import (
-    generate_data_combination_entries,
-)
-
-from core.factories import (
-    IndicatorLocationDataFactory,
-)
-
+from core.helpers import generate_data_combination_entries
+from core.tests import factories
+from indicator.models import Disaggregation, ReportingEntity
 
 unicef_re = ReportingEntity.objects.get(title="UNICEF")
 cluster_re = ReportingEntity.objects.get(title="Cluster")
@@ -52,7 +43,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #             }
 
 #         # 0 num_disaggregation & 0 level_reported
-#         IndicatorLocationDataFactory(
+#         factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=0,
@@ -91,7 +82,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #                 }
 #             }
 
-#         location_data = IndicatorLocationDataFactory(
+#         location_data = factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=1,
@@ -115,7 +106,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_1_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=1,
@@ -165,7 +156,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #                 }
 #             }
 
-#         location_data = IndicatorLocationDataFactory(
+#         location_data = factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=2,
@@ -189,7 +180,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_1_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=2,
@@ -216,7 +207,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_2_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=2,
@@ -244,7 +235,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
     for indicator_report_from_reportable in reportable.indicator_reports.all():
         for location in reportable.locations.all():
             # 3 num_disaggregation & 3 level_reported
-            IndicatorLocationDataFactory(
+            factories.IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
                 location=location,
                 num_disaggregation=3,
