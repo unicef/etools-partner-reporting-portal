@@ -1,25 +1,24 @@
 from django.conf.urls import url
 
 from .views import (
+    ClusterIndicatorAPIView,
+    ClusterIndicatorSendIMOMessageAPIView,
+    ClusterObjectiveIndicatorAdoptAPIView,
+    DisaggregationListCreateAPIView,
+    IndicatorDataAPIView,
+    IndicatorDataLocationAPIView,
+    IndicatorListAPIView,
+    IndicatorLocationDataUpdateAPIView,
+    IndicatorReportListAPIView,
+    IndicatorReportReviewAPIView,
+    PDLowerLevelOutputStatusAPIView,
     PDReportsAPIView,
     PDReportsDetailAPIView,
-    IndicatorListAPIView,
-    IndicatorReportListAPIView,
-    IndicatorLocationDataUpdateAPIView,
-    IndicatorDataAPIView,
-    ClusterIndicatorAPIView,
-    PDLowerLevelOutputStatusAPIView,
-    IndicatorDataLocationAPIView,
-    DisaggregationListCreateAPIView,
     ReportableDetailAPIView,
-    IndicatorReportReviewAPIView,
     ReportableLocationGoalBaselineInNeedAPIView,
-    ClusterIndicatorSendIMOMessageAPIView,
     ReportableReportingFrequencyListAPIView,
     ReportRefreshAPIView,
-    ClusterObjectiveIndicatorAdoptAPIView,
 )
-
 
 urlpatterns = [
     url(r'^(?P<reportable_id>\d+)/$',

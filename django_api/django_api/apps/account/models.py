@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
-from model_utils.models import TimeStampedModel
-
 from core.common import PRP_ROLE_TYPES, USER_TYPES
+from model_utils.models import TimeStampedModel
 from utils.emails import send_email_from_template
 
 

@@ -1,25 +1,24 @@
 from django.conf import settings
 
-from rest_framework import serializers
-
+from core.common import CURRENCIES, INTERVENTION_TYPES, OVERALL_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
+from core.models import Location, Workspace
 from core.serializers import ShortLocationSerializer
-from utils.filters.constants import Boolean
-from .models import (
-    ProgrammeDocument, Section, ProgressReport, Person,
-    LowerLevelOutput, PDResultLink, ReportingPeriodDates,
-    ProgressReportAttachment,
-)
-
-from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS, INTERVENTION_TYPES
-from core.models import Workspace, Location
-
 from indicator.models import IndicatorBlueprint
-from indicator.serializers import (
-    PDReportContextIndicatorReportSerializer,
-    IndicatorBlueprintSimpleSerializer,
-)
-
+from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportContextIndicatorReportSerializer
 from partner.models import Partner
+from rest_framework import serializers
+from utils.filters.constants import Boolean
+
+from .models import (
+    LowerLevelOutput,
+    PDResultLink,
+    Person,
+    ProgrammeDocument,
+    ProgressReport,
+    ProgressReportAttachment,
+    ReportingPeriodDates,
+    Section,
+)
 
 
 class PersonSerializer(serializers.ModelSerializer):

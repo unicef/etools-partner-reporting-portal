@@ -1,28 +1,27 @@
 from django.conf.urls import url
 
 from .views import (
+    ClusterActivityAPIView,
+    ClusterActivityListAPIView,
+    ClusterAnalysisIndicatorDetailsAPIView,
+    ClusterAnalysisIndicatorsListAPIView,
+    ClusterIndicatorsListExcelExportForAnalysisView,
+    ClusterIndicatorsListExcelExportView,
+    ClusterIndicatorsListExcelImportView,
+    ClusterIndicatorsLocationListAPIView,
     ClusterListAPIView,
     ClusterObjectiveAPIView,
     ClusterObjectiveListCreateAPIView,
-    ClusterActivityAPIView,
-    ClusterActivityListAPIView,
-    IndicatorReportsListAPIView,
     ClusterReportablesIdListAPIView,
-    ClusterIndicatorsListExcelExportView,
-    ClusterIndicatorsLocationListAPIView,
-    ClusterIndicatorsListExcelExportForAnalysisView,
-    ClusterIndicatorsListExcelImportView,
+    IndicatorReportDetailAPIView,
+    IndicatorReportsListAPIView,
+    OperationalPresenceAggregationDataAPIView,
+    OperationalPresenceLocationListAPIView,
+    PartnerAnalysisIndicatorResultAPIView,
+    PartnerAnalysisSummaryAPIView,
     ResponsePlanClusterDashboardAPIView,
     ResponsePlanPartnerDashboardAPIView,
-    PartnerAnalysisSummaryAPIView,
-    PartnerAnalysisIndicatorResultAPIView,
-    OperationalPresenceLocationListAPIView,
-    OperationalPresenceAggregationDataAPIView,
-    ClusterAnalysisIndicatorsListAPIView,
-    ClusterAnalysisIndicatorDetailsAPIView,
-    IndicatorReportDetailAPIView,
 )
-
 
 urlpatterns = [
     url(r'^cluster-list/(?P<response_plan_id>\d+)/$', ClusterListAPIView.as_view(),

@@ -2,9 +2,9 @@ import logging
 
 from django.conf import settings
 from django.template.loader import get_template
+
 from post_office.models import EmailTemplate
 from unicef_notification.models import Notification
-
 
 logger = logging.getLogger(__name__)
 

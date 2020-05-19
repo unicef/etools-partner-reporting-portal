@@ -2,15 +2,14 @@ import logging
 from collections import defaultdict
 
 from django.utils import timezone
-from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
-from core.models import Country, ResponsePlan, Workspace, Location
+from core.common import CLUSTER_TYPES, EXTERNAL_DATA_SOURCES, PARTNER_PROJECT_STATUS, RESPONSE_PLAN_TYPE
+from core.models import Country, Location, ResponsePlan, Workspace
 from ocha.constants import RefCode
 from ocha.imports.utilities import save_location_list
-from partner.models import PartnerProject, Partner
-
+from partner.models import Partner, PartnerProject
+from rest_framework import serializers
 
 logger = logging.getLogger('ocha-sync')
 

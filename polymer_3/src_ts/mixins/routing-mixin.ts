@@ -36,8 +36,8 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
       return this._$computeBaseUrl(workspace, app) + '/plan/' + planId;
     }
 
-    public buildBaseUrl() {
-      return this._$computeBaseUrl.apply(this, arguments);
+    public buildBaseUrl(workspace: string, item: string) {
+      return this._$computeBaseUrl(workspace, item);
     }
 
     /**

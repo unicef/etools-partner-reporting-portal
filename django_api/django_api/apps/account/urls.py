@@ -2,12 +2,7 @@ from django.conf.urls import url
 
 from drfpasswordless.views import ObtainEmailCallbackToken
 
-from .views import (
-    UserProfileAPIView,
-    UserLogoutAPIView,
-    LoginUserWithTokenAPIView,
-)
-
+from .views import LoginUserWithTokenAPIView, UserLogoutAPIView, UserProfileAPIView
 
 urlpatterns = [
     url(r'^user-profile/$', UserProfileAPIView.as_view(), name="user-profile"),

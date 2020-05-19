@@ -1,49 +1,43 @@
-import logging
 import datetime
+import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from celery import shared_task
-
-from rest_framework.exceptions import ValidationError
-
 from core.api import PMP_API
-from core.models import Workspace, GatewayType, Location, PRPRole
+from core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
+from core.models import GatewayType, Location, PRPRole, Workspace
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES, EXTERNAL_DATA_SOURCES
-
-from partner.models import PartnerActivity
-from partner.serializers import (
-    PMPPartnerSerializer,
-)
-
-from unicef.serializers import (
-    PMPProgrammeDocumentSerializer,
-    PMPPDPersonSerializer,
-    PMPLLOSerializer,
-    PMPPDResultLinkSerializer,
-    PMPSectionSerializer,
-    PMPReportingPeriodDatesSerializer,
-    PMPReportingPeriodDatesSRSerializer,
-)
-from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink, Section, ReportingPeriodDates
-
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, \
-    PMPDisaggregationValueSerializer, PMPReportableSerializer
 from indicator.models import (
-    IndicatorBlueprint,
-    Disaggregation,
-    Reportable,
-    DisaggregationValue,
-    ReportableLocationGoal,
     create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    Reportable,
+    ReportableLocationGoal,
 )
-
-from partner.models import Partner, PartnerProject, PartnerActivityProjectContext
-
+from indicator.serializers import (
+    PMPDisaggregationSerializer,
+    PMPDisaggregationValueSerializer,
+    PMPIndicatorBlueprintSerializer,
+    PMPReportableSerializer,
+)
+from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from partner.serializers import PMPPartnerSerializer
+from rest_framework.exceptions import ValidationError
+from unicef.models import LowerLevelOutput, PDResultLink, Person, ProgrammeDocument, ReportingPeriodDates, Section
+from unicef.serializers import (
+    PMPLLOSerializer,
+    PMPPDPersonSerializer,
+    PMPPDResultLinkSerializer,
+    PMPProgrammeDocumentSerializer,
+    PMPReportingPeriodDatesSerializer,
+    PMPReportingPeriodDatesSRSerializer,
+    PMPSectionSerializer,
+)
 
 logger = logging.getLogger(__name__)
 

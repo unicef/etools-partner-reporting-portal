@@ -1,35 +1,25 @@
 from django.urls import reverse
 
-from rest_framework import status
-
 from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES
-from core.factories import (CartoDBTableFactory, ClusterActivityFactory,
-                            ClusterFactory,
-                            ClusterObjectiveFactory, ClusterPRPRoleFactory,
-                            CountryFactory, DisaggregationFactory,
-                            DisaggregationValueFactory, GatewayTypeFactory,
-                            LocationFactory,
-                            LocationWithReportableLocationGoalFactory,
-                            NonPartnerUserFactory,
-                            QuantityTypeIndicatorBlueprintFactory,
-                            ResponsePlanFactory, WorkspaceFactory, QuantityReportableToClusterActivityFactory)
 from core.management.commands._generate_disaggregation_fake_data import add_disaggregations_to_reportable
+from core.models import Location, ResponsePlan, Workspace
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-from core.models import Workspace, Location, ResponsePlan
+from rest_framework import status
 
 
 class TestWorkspaceListAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.user = NonPartnerUserFactory()
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.user = factories.NonPartnerUserFactory()
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
         super().setUp()
 
@@ -45,8 +35,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         )
 
         # Cluster system admin should also be able to query workspaces
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         url = reverse('workspace')
@@ -76,19 +66,19 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
 
 class TestLocationListAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.user = NonPartnerUserFactory()
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.user = factories.NonPartnerUserFactory()
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
         for _ in range(2):
-            obj = ClusterObjectiveFactory(
+            obj = factories.ClusterObjectiveFactory(
                 cluster=self.cluster,
                 locations=[
                     self.loc1,
@@ -96,15 +86,15 @@ class TestLocationListAPIView(BaseAPITestCase):
                 ]
             )
 
-            activity = ClusterActivityFactory(
+            activity = factories.ClusterActivityFactory(
                 cluster_objective=obj,
                 locations=[
                     self.loc1, self.loc2
                 ]
             )
 
-            blueprint = QuantityTypeIndicatorBlueprintFactory()
-            clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+            blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+            clusteractivity_reportable = factories.QuantityReportableToClusterActivityFactory(
                 content_object=activity, blueprint=blueprint
             )
 
@@ -120,8 +110,11 @@ class TestLocationListAPIView(BaseAPITestCase):
             # including one for no response plan as well
             for disagg_name, values in self.sample_disaggregation_value_map.items():
                 for value in values:
-                    DisaggregationValueFactory(
-                        disaggregation=DisaggregationFactory(name=disagg_name, response_plan=self.response_plan),
+                    factories.DisaggregationValueFactory(
+                        disaggregation=factories.DisaggregationFactory(
+                            name=disagg_name,
+                            response_plan=self.response_plan,
+                        ),
                         value=value
                     )
 
@@ -130,12 +123,12 @@ class TestLocationListAPIView(BaseAPITestCase):
                 disaggregation_targets=["age", "gender", "height"]
             )
 
-            LocationWithReportableLocationGoalFactory(
+            factories.LocationWithReportableLocationGoalFactory(
                 location=self.loc1,
                 reportable=clusteractivity_reportable,
             )
 
-            LocationWithReportableLocationGoalFactory(
+            factories.LocationWithReportableLocationGoalFactory(
                 location=self.loc2,
                 reportable=clusteractivity_reportable,
             )
@@ -189,12 +182,12 @@ class TestLocationListAPIView(BaseAPITestCase):
 class TestResponsePlanAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.user = NonPartnerUserFactory()
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.user = factories.NonPartnerUserFactory()
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
         super().setUp()
 
@@ -206,8 +199,8 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data), self.workspace.response_plans.count())
 
         # Cluster system admin should also be able to query response plans
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -230,8 +223,8 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
         # Cluster system admin should also be able to create response plan
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         rp_data['title'] += ' 2'
@@ -255,8 +248,8 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
 
         # Cluster system admin should also be able to create response plan
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         rp_data['title'] += ' 2'

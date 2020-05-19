@@ -1,35 +1,15 @@
 from django.db import transaction
+
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from cluster.serializers import ClusterActivitySerializer, ClusterObjectiveSerializer, ClusterSimpleSerializer
+from core.common import CSO_TYPES, PARTNER_ACTIVITY_STATUS, PARTNER_TYPE
+from core.models import Location
+from core.serializers import ShortLocationSerializer
+from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
+from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
 
-from core.serializers import ShortLocationSerializer
-from core.common import PARTNER_TYPE, CSO_TYPES, PARTNER_ACTIVITY_STATUS
-from core.models import Location
-
-from cluster.models import (
-    Cluster,
-    ClusterActivity,
-    ClusterObjective,
-)
-from cluster.serializers import (
-    ClusterSimpleSerializer,
-    ClusterActivitySerializer,
-    ClusterObjectiveSerializer
-)
-
-from indicator.models import (
-    create_pa_reportables_from_ca,
-    get_reportable_data_to_clone,
-    Reportable
-)
-from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
-
-from .models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-    PartnerProjectFunding,
-    PartnerActivityProjectContext
-)
+from .models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject, PartnerProjectFunding
 
 
 class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
@@ -302,6 +282,11 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
 
+    def validate_total_budget(self, value):
+        if value == "":
+            value = None
+        return value
+
     def validate(self, attrs):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
@@ -340,7 +325,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     def save_funding(self, instance=None):
         funding_data = self.initial_data.get('funding', None)
-        if funding_data:
+        if funding_data and [d for d in funding_data.values() if d != ""]:
             funding_instance = (instance or self.instance).funding
             serializer = PartnerProjectFundingSerializer(
                 instance=funding_instance,

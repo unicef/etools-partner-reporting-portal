@@ -52,7 +52,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
         --app-grid-expandible-item-columns: 2;
 
         --paper-dialog: {
-          width: 600px;
+          width: 700px;
           margin: 0;
           }
       }
@@ -110,6 +110,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
       etools-dropdown {
         width: 100%;
+      }
+
+      datepicker-lite {
+        --paper-input-container: {
+          width: 100%;
+        };
       }
     </style>
 
@@ -170,6 +176,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
               options="[[clusters]]"
               option-value="id"
               option-label="title"
+              with-backdrop
               required>
             </etools-dropdown>
           </div>
@@ -183,6 +190,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                 selected="{{data.partner_activity}}"
                 disabled="[[_equals(partnerActivities.length, 0)]]"
                 auto-validate
+                with-backdrop
                 required>
              </etools-dropdown>
           </div>
@@ -208,6 +216,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                       selected="[[item.project_id]]"
                       data-index$="[[index]]"
                       auto-validate
+                      with-backdrop
                       disabled
                       required>
                     </etools-dropdown>
@@ -222,6 +231,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                       option-label="title"
                       selected="{{item.status}}"
                       disabled
+                      with-backdrop
                       required>
                     </etools-dropdown>
                   </div>

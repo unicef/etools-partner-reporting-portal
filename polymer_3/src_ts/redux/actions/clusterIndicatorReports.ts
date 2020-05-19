@@ -72,7 +72,7 @@ export const clusterIndicatorReportsFetchSingle = function(reportThunk: any, rep
 };
 
 export const clusterIndicatorReportsSubmit = function(submitThunk: any) {
-  return function(dispatch: any) {
+  return function(_dispatch: any) {
     return submitThunk();
   };
 };

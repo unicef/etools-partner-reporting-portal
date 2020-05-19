@@ -476,6 +476,9 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Number})
   indicatorId!: number;
 
+  @property({type: Number})
+  updatedIndicatorId: number | undefined;
+
   @property({type: String})
   indicatorName!: string;
 
@@ -605,10 +608,16 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
     return params;
   }
 
-  _computeDisaggregations(data: GenericObject, key: string) {
-    if (data && key) {
-      return this._clone(data[key]);
+  _computeDisaggregations(data: GenericObject, key: number) {
+    if (!data || !key) {
+      return;
     }
+    const disaggregations = this._clone(data[key]);
+    if (this.updatedIndicatorId && this.updatedIndicatorId === key) {
+      this.checkReportIsComplete(disaggregations);
+      this.updatedIndicatorId = undefined;
+    }
+    return disaggregations;
   }
 
   _computeIsHfIndicator(disaggregations: GenericObject) {
@@ -656,24 +665,26 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
 
   _onLocationsUpdated(e: CustomEvent) {
     e.stopPropagation();
-
     this._fetchData();
-
+    this.updatedIndicatorId = this.indicatorId;
     fireEvent(this, 'refresh-report', String(this.indicatorId));
+  }
 
-    const allComplete = this.disaggregations.indicator_location_data
+  checkReportIsComplete(disaggregations: GenericObject) {
+    if (!disaggregations) {
+      return;
+    }
+    const allComplete = (disaggregations.indicator_location_data || [])
       .every(function(location: GenericObject) {
         return location.is_complete;
       });
 
-    if (!allComplete) {
-      return;
+    if (allComplete) {
+      fireEvent(this, 'report-complete', {
+        indicatorId: this.updatedIndicatorId,
+        reportableId: this.reportableId
+      });
     }
-
-    fireEvent(this, 'report-complete', {
-      indicatorId: this.indicatorId,
-      reportableId: this.reportableId
-    });
   }
 
   _computeLocationData(rawLocationData: any[]) {

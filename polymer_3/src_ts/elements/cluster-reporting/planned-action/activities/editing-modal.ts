@@ -193,6 +193,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                 option-label="title"
                 selected="{{data.cluster}}"
                 disabled
+                with-backdrop
                 required>
               </etools-dropdown>
             </div>
@@ -205,6 +206,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                   option-label="title"
                   selected="{{data.cluster_activity}}"
                   disabled
+                  with-backdrop
                   required>
               </etools-dropdown>
             </div>
@@ -240,6 +242,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                           selected="{{item.project_id}}"
                           disabled="[[_equals(projects.length, 0)]]"
                           auto-validate
+                          with-backdrop
                           required>
                       </etools-dropdown>
                     </div>
@@ -252,6 +255,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         option-value="id"
                         option-label="title"
                         selected="{{item.status}}"
+                        with-backdrop
                         required>
                       </etools-dropdown>
                     </div>
@@ -302,6 +306,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                 option-value="id"
                 option-label="title"
                 selected="{{data.cluster}}"
+                with-backdrop
                 required>
               </etools-dropdown>
             </div>
@@ -315,6 +320,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                   option-label="title"
                   selected="{{data.cluster_objective}}"
                   disabled="[[_equals(objectives.length, 0)]]"
+                  with-backdrop
                   required>
               </etools-dropdown>
             </div>
@@ -361,6 +367,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                           selected="{{item.project_id}}"
                           disabled="[[_equals(projects.length, 0)]]"
                           auto-validate
+                          with-backdrop
                           required>
                       </etools-dropdown>
                     </div>
@@ -373,6 +380,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                         option-value="id"
                         option-label="title"
                         selected="{{item.status}}"
+                        with-backdrop
                         required>
                       </etools-dropdown>
                     </div>

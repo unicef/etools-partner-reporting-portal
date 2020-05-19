@@ -1,10 +1,10 @@
 from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
-from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
+from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
 from ocha.imports.serializers import V2PartnerProjectImportSerializer
-from ocha.imports.utilities import get_json_from_url, save_location_list, logger, save_disaggregations
-from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
+from ocha.imports.utilities import get_json_from_url, logger, save_disaggregations, save_location_list
+from ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
 from partner.models import PartnerActivity, PartnerActivityProjectContext
 
 

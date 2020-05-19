@@ -191,12 +191,9 @@ class PageClusterReportingRouter extends OverlayHelperMixin(UtilsMixin(ReduxConn
     ];
   }
 
-
   async _pageChanged(page: string) {
-
     this.set('loading', true);
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/${page}.js`;
-    console.log('cluster router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl)
       .catch((err: any) => {
         console.log(err);
