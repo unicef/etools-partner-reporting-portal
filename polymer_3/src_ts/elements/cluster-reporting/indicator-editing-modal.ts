@@ -49,32 +49,93 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         :host {
           display: block;
 
-          --app-grid-columns: 3;
+          --app-grid-columns: 2;
           --app-grid-gutter: 24px;
           --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 3;
+          --app-grid-expandible-item-columns: 2;
+
+          --paper-radio-group-item-padding: 12px;
 
           --paper-dialog: {
             width: 800px;
           }
-
         }
 
         .row {
-          margin: 16px 0;
-        }
-
-        .full-width {
+          margin: 16px 24px 0px 24px;
           @apply --app-grid-expandible-item;
         }
 
         .app-grid {
-           padding-top: 0;
-           margin: 0 -var(--app-grid-gutter);
+          padding-top: 0;
+        }
+
+        .double {
+          padding-left: 0;
+          justify-content: space-between;
+        }
+
+        .title {
+          padding-top: 0;
+        }
+
+        .pair {
+          margin-right: 0;
+        }
+
+        .app-grid-triple {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-direction: row;
+        }
+
+        .app-grid-triple .item {
+          width: 210px;
         }
 
         .item {
-          margin-bottom: 0;
+          margin-bottom: 0 !important;
+          padding-right: 0;
+        }
+
+        #mode {
+          margin-bottom: 24px;
+        }
+
+        #mode paper-radio-button {
+          padding-top: 24px;
+          display: block;
+        }
+
+        #custom-form-only {
+          padding-top: 20px;
+        }
+
+        .calculation-method:not(:first-child) {
+          margin-left: 50px;
+        }
+
+        paper-radio-group {
+          margin-left: -12px;
+        }
+
+        indicator-locations-widget {
+          margin: 2em 0;
+        }
+
+        etools-dropdown, etools-dropdown-multi {
+          width: 100%;
+        }
+
+        datepicker-lite {
+          --paper-input-container: {
+            width: 100%;
+          };
+        }
+
+        .app-grid > * {
+          margin-bottom: 0px;
         }
 
         .indicator-type {
@@ -88,6 +149,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         indicator-locations-widget {
           margin: 2em 0;
         }
+
       </style>
 
       <etools-prp-permissions
@@ -212,50 +274,50 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
               </div>
             </template>
 
-            <div class="row">
-              <div class="app-grid">
-                <etools-dropdown
-                    class="item validate"
-                    label="[[localize('frequency_of_reporting')]]"
-                    options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.frequency}}"
-                    disabled="[[!canEditDetails]]"
-                    hide-search
-                    auto-validate
-                    with-backdrop
-                    required>
-                </etools-dropdown>
-                <template
-                    is="dom-if"
-                    if="[[_showCSD(data.frequency)]]"
-                    restamp="true">
-                  <etools-prp-chips
-                      class="item validate"
-                      value="{{data.cs_dates}}"
-                      label="[[localize('due_date_of_report')]]"
-                      on-selected-chips-updated="_validate"
+            <div class="item row">
+                <div class="app-grid double">
+                  <etools-dropdown
+                      class="item validate pair"
+                      label="[[localize('frequency_of_reporting')]]"
+                      options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.frequency}}"
                       disabled="[[!canEditDetails]]"
+                      hide-search
+                      auto-validate
+                      with-backdrop
                       required>
-                    <template
-                        is="dom-if"
-                        if="[[canEditDetails]]"
-                        restamp="true">
-                      <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
-                    </template>
-                  </etools-prp-chips>
-                </template>
-                <datepicker-lite
-                  class="item validate"
-                  label="[[localize('start_date_reporting')]]"
-                  value="{{data.start_date_of_reporting_period}}"
-                  disabled="[[!canEditDetails]]"
-                  input-date-format="[[dateFormat]]"
-                  selected-date-display-format="[[dateFormat]]"
-                  error-message="">
-                </datepicker-lite>
-              </div>
+                  </etools-dropdown>
+                  <template
+                      is="dom-if"
+                      if="[[_showCSD(data.frequency)]]"
+                      restamp="true">
+                      <etools-prp-chips
+                          class="item validate"
+                          value="{{data.cs_dates}}"
+                          label="[[localize('due_date_of_report')]]"
+                          on-selected-chips-updated="_validate"
+                          disabled="[[!canEditDetails]]"
+                          required>
+                        <template
+                            is="dom-if"
+                            if="[[canEditDetails]]"
+                            restamp="true">
+                          <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                        </template>
+                      </etools-prp-chips>
+                  </template>
+                  <datepicker-lite
+                    class="item validate pair"
+                    label="[[localize('start_date_reporting')]]"
+                    value="{{data.start_date_of_reporting_period}}"
+                    disabled="[[!canEditDetails]]"
+                    input-date-format="[[dateFormat]]"
+                    selected-date-display-format="[[dateFormat]]"
+                    error-message="">
+                  </datepicker-lite>
+                </div>
             </div>
 
             <div class="row">
@@ -300,7 +362,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
             </div>
 
             <div class="row">
-              <div class="app-grid">
+              <div class="app-grid-triple">
                 <json-field
                     class="item validate"
                     type="[[data.blueprint.display_type]]"
