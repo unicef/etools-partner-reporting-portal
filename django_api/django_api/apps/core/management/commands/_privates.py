@@ -754,8 +754,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 reportable_location_goals = [
                     ReportableLocationGoal(
                         reportable=indicator,
-                        location=l,
-                    ) for l in loc_diff
+                        location=loc,
+                    ) for loc in loc_diff
                 ]
 
                 ReportableLocationGoal.objects.bulk_create(reportable_location_goals)

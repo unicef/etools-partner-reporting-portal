@@ -63,8 +63,11 @@ class PartnerActivityFilter(django_filters.FilterSet):
     cluster_id = CharFilter(method='get_cluster_id')
     activity = CharFilter(method='get_activity')
     custom = TypedChoiceFilter(
-        name='custom', choices=Boolean.CHOICES, coerce=strtobool,
-        method='get_custom', label='Show only custom activities'
+        field_name='custom',
+        choices=Boolean.CHOICES,
+        coerce=strtobool,
+        method='get_custom',
+        label='Show only custom activities',
     )
     status = ChoiceFilter(choices=PARTNER_PROJECT_STATUS)
     location = CharFilter(method='get_location')
@@ -100,7 +103,7 @@ class PartnerActivityFilter(django_filters.FilterSet):
 
 class PartnerFilter(django_filters.FilterSet):
 
-    clusters = CommaSeparatedListFilter(name='clusters__id')
+    clusters = CommaSeparatedListFilter(field_name='clusters__id')
 
     class Meta:
         model = Partner
@@ -108,8 +111,8 @@ class PartnerFilter(django_filters.FilterSet):
 
 
 class PartnerIDManagementFilter(django_filters.FilterSet):
-    partner_type = CharFilter(name='partner_type')
-    clusters = CommaSeparatedListFilter(name='clusters__id')
+    partner_type = CharFilter(field_name='partner_type')
+    clusters = CommaSeparatedListFilter(field_name='clusters__id')
     title = CharFilter(method='get_title')
 
     class Meta:

@@ -1283,9 +1283,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         if 'baseline' not in validated_data:
             if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivityProjectContext):
-                    raise ValidationError(
-                        {"baseline": "baseline is required for IMO to create Indicator"}
-                    )
+                raise ValidationError(
+                    {"baseline": "baseline is required for IMO to create Indicator"}
+                )
             else:
                 validated_data['baseline'] = {'v': 0, 'd': 1}
 
@@ -1498,7 +1498,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
             reportable_object_content_model = PartnerActivityProjectContext
         else:
-            raise NotImplemented()
+            raise NotImplementedError()
 
         validated_data['content_type'] = reportable_object_content_type
 
@@ -1506,7 +1506,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
-        location_ids = [l['location'].id for l in locations]
+        location_ids = [loc['location'].id for loc in locations]
 
         # Duplicated location safeguard
         if len(location_ids) != len(set(location_ids)):
@@ -1694,7 +1694,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
 
-        location_ids = [l['location'].id for l in locations]
+        location_ids = [loc['location'].id for loc in locations]
 
         # Duplicated location safeguard
         if len(location_ids) != len(set(location_ids)):

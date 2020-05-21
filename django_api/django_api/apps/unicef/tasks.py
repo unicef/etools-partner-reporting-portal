@@ -403,45 +403,45 @@ def process_programme_documents(fast=False, area=False):
                                         )
 
                                     locations = list()
-                                    for l in i['locations']:
+                                    for loc in i['locations']:
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
                                         country = workspace.countries.first()
-                                        l['gateway_country'] = country.id
+                                        loc['gateway_country'] = country.id
 
-                                        if l['admin_level'] is None:
+                                        if loc['admin_level'] is None:
                                             logger.warning("Admin level empty! Skipping!")
                                             continue
 
-                                        if l['pcode'] is None or not l['pcode']:
+                                        if loc['pcode'] is None or not loc['pcode']:
                                             logger.warning("Location code empty! Skipping!")
                                             continue
 
-                                        l['location_type'] = '{}-Admin Level {}'.format(
+                                        loc['location_type'] = '{}-Admin Level {}'.format(
                                             country.country_short_code,
-                                            l['admin_level']
+                                            loc['admin_level']
                                         )
 
                                         gateway = process_model(
                                             GatewayType,
                                             PMPGatewayTypeSerializer,
-                                            l,
+                                            loc,
                                             {
-                                                'admin_level': l['admin_level'],
-                                                'country': l['gateway_country'],
+                                                'admin_level': loc['admin_level'],
+                                                'country': loc['gateway_country'],
                                             },
                                         )
 
                                         # Create location
-                                        l['gateway'] = gateway.id
+                                        loc['gateway'] = gateway.id
                                         location = process_model(
                                             Location,
                                             PMPLocationSerializer,
-                                            l,
+                                            loc,
                                             {
-                                                'gateway': l['gateway'],
-                                                'p_code': l['pcode'],
+                                                'gateway': loc['gateway'],
+                                                'p_code': loc['pcode'],
                                             }
                                         )
                                         locations.append(location)
@@ -638,9 +638,9 @@ def process_programme_documents(fast=False, area=False):
                                         reportable_location_goals = [
                                             ReportableLocationGoal(
                                                 reportable=reportable,
-                                                location=l,
+                                                location=loc,
                                                 is_active=True,
-                                            ) for l in Location.objects.filter(id__in=new_locs)
+                                            ) for loc in Location.objects.filter(id__in=new_locs)
                                         ]
 
                                     else:
@@ -648,9 +648,9 @@ def process_programme_documents(fast=False, area=False):
                                         reportable_location_goals = [
                                             ReportableLocationGoal(
                                                 reportable=reportable,
-                                                location=l,
+                                                location=loc,
                                                 is_active=True,
-                                            ) for l in locations
+                                            ) for loc in locations
                                         ]
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
@@ -670,9 +670,9 @@ def process_programme_documents(fast=False, area=False):
                                                 reportable_location_goals = [
                                                     ReportableLocationGoal(
                                                         reportable=reportable,
-                                                        location=l,
+                                                        location=loc,
                                                         is_active=True,
-                                                    ) for l in loc_diff
+                                                    ) for loc in loc_diff
                                                 ]
 
                                                 ReportableLocationGoal.objects.bulk_create(reportable_location_goals)

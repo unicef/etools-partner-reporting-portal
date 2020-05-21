@@ -135,7 +135,7 @@ def create_location(pcode,
         try:
             location.save()
 
-        except IntegrityError as e:
+        except IntegrityError:
             logger.exception(
                 'Error whilst saving location: {}'.format(site_name))
             return False, sites_not_added, sites_created, sites_updated

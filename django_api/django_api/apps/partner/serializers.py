@@ -317,7 +317,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 })
 
         if locations:
-            location_ids = [l['id'] for l in locations]
+            location_ids = [loc['id'] for loc in locations]
 
             # ensure locations are unique
             if len(set(location_ids)) != len(location_ids):
@@ -388,7 +388,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         locations = self.initial_data.get('locations')
 
         if locations:
-            project.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+            project.locations.add(*Location.objects.filter(id__in=[loc['id'] for loc in locations]))
 
         self.save_funding(instance=project)
         return project
@@ -439,7 +439,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         locations = self.initial_data.get('locations')
 
         if locations:
-            location_ids = [l['id'] for l in locations]
+            location_ids = [loc['id'] for loc in locations]
             project.locations.clear()
             project.locations.add(*Location.objects.filter(id__in=location_ids))
 

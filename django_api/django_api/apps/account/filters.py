@@ -16,10 +16,10 @@ from .models import User
 class UserFilter(django_filters.FilterSet):
     name_email = CharFilter(method='get_name_email')
     status = CharFilter(method='get_status')
-    roles = CommaSeparatedListFilter(name='prp_roles__role')
-    partners = CommaSeparatedListFilter(name='partner_id')
-    clusters = CommaSeparatedListFilter(name='prp_roles__cluster_id')
-    workspaces = CommaSeparatedListFilter(name='prp_roles__workspace_id')
+    roles = CommaSeparatedListFilter(field_name='prp_roles__role')
+    partners = CommaSeparatedListFilter(field_name='partner_id')
+    clusters = CommaSeparatedListFilter(field_name='prp_roles__cluster_id')
+    workspaces = CommaSeparatedListFilter(field_name='prp_roles__workspace_id')
 
     class Meta:
         model = User

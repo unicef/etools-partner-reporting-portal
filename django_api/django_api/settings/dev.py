@@ -28,9 +28,9 @@ INSTALLED_APPS += [
     'django_extensions',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-] + MIDDLEWARE_CLASSES
+] + MIDDLEWARE
 
 # No SAML for local dev
 AUTHENTICATION_BACKENDS = (
@@ -40,6 +40,6 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-CORS_ORIGIN_WHITELIST += ('localhost:8082', 'localhost:8081')
+CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
 
 FIXTURE_DIRS += ["fixtures"]

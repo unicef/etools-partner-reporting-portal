@@ -35,8 +35,8 @@ def suppress_stdout():
 
 def get_zero_dict(indicator_type):
     v = 0
-    d = 1 if indicator_type is "SUM" else 0
-    c = v / d if indicator_type is "SUM" else 0
+    d = 1 if indicator_type == "SUM" else 0
+    c = v / d if indicator_type == "SUM" else 0
     return {
         "c": c,
         "v": v,

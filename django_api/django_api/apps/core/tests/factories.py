@@ -574,7 +574,7 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
         )
     """
 
-    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Custom".format(o.partner.title, n))
+    title = factory.LazyAttributeSequence(lambda o, n: "{} -- Custom".format(o.partner.title))
     cluster_activity = None
     cluster_objective = factory.SubFactory('core.tests.factories.ClusterObjectiveFactory', partner_activity=None)
 
