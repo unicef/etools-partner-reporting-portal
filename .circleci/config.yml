@@ -69,6 +69,7 @@ jobs:
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
+                pip install pipenv
                 cd django_api/ && pipenv install -d --user
                 python django_api/manage.py test
       - save_cache:
