@@ -22,7 +22,11 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=64)
 
     partner = models.ForeignKey(
-        'partner.Partner', related_name="users", null=True, blank=True
+        'partner.Partner',
+        related_name="users",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     organization = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(
@@ -110,7 +114,11 @@ class UserProfile(TimeStampedModel):
     related models:
         account.User (OneToOne): "user"
     """
-    user = models.OneToOneField(User, related_name="profile")
+    user = models.OneToOneField(
+        User,
+        related_name="profile",
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return "{} - Profile".format(self.user.get_fullname())

@@ -30,7 +30,10 @@ class Cluster(TimeStampedExternalSourceModel):
         max_length=1024, null=True, blank=True, help_text='Type as specified in the external system'
     )
     response_plan = models.ForeignKey(
-        'core.ResponsePlan', null=True, related_name="clusters"
+        'core.ResponsePlan',
+        related_name="clusters",
+        on_delete=models.CASCADE,
+        null=True,
     )
 
     class Meta:
@@ -245,7 +248,11 @@ class ClusterObjective(TimeStampedExternalSourceModel):
     title = models.TextField(
         max_length=2048, verbose_name='Cluster Objective Title'
     )
-    cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
+    cluster = models.ForeignKey(
+        Cluster,
+        related_name="cluster_objectives",
+        on_delete=models.CASCADE,
+    )
     locations = models.ManyToManyField(
         'core.Location', related_name="cluster_objectives"
     )
@@ -280,7 +287,9 @@ class ClusterActivity(TimeStampedExternalSourceModel):
     """
     title = models.TextField(max_length=2048)
     cluster_objective = models.ForeignKey(
-        ClusterObjective, related_name="cluster_activities"
+        ClusterObjective,
+        related_name="cluster_activities",
+        on_delete=models.CASCADE,
     )
     locations = models.ManyToManyField(
         'core.Location', related_name="cluster_activities"

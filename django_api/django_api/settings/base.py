@@ -108,9 +108,7 @@ INSTALLED_APPS = [
     'suit',
     'easy_pdf',
     'django_cron',
-    'fixture_magic',
     'social_django',
-    'django_nose',
 
     'account',
     'cluster',
@@ -124,8 +122,7 @@ INSTALLED_APPS = [
     'unicef_notification',
 ]
 
-MIDDLEWARE_CLASSES = [
-    # 'elasticapm.contrib.django.middleware.TracingMiddleware',
+MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -133,17 +130,16 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').replace(' ', '').strip().split(',') or [
-    'etools.unicef.org',
-    'etools-demo.unicef.org',
-    'etools-test.unicef.org',
-    'etools-staging.unicef.org',
-    'etools-dev.unicef.org',
+CORS_ORIGIN_WHITELIST = [
+    'https://etools.unicef.org',
+    'https://etools-demo.unicef.org',
+    'https://etools-test.unicef.org',
+    'https://etools-staging.unicef.org',
+    'https://etools-dev.unicef.org',
 ]
 
 ROOT_URLCONF = 'django_api.urls'
@@ -183,10 +179,10 @@ WSGI_APPLICATION = 'django_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': '%s' % os.getenv('POSTGRES_DB'),
-        'USER': '%s' % os.getenv('POSTGRES_USER'),
-        'PASSWORD': '%s' % os.getenv('POSTGRES_PASSWORD'),
-        'HOST': '%s' % os.getenv('POSTGRES_HOST'),
+        'NAME': os.getenv('POSTGRES_DB', 'unicef_prp'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
         'PORT': 5432,
     }
 }
@@ -493,9 +489,6 @@ if not DISABLE_JWT_AUTH:
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
 )
-
-TEST_RUNNER = 'utils.test_runner.CustomNoseTestSuiteRunner'
-NOSE_ARGS = ['--with-timer', '--nocapture', '--nologcapture']
 
 # apm related - it's enough to set those as env variables, here just for documentation
 # by default logging and apm is off, so below envs needs to be set per environment

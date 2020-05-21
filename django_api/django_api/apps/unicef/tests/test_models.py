@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from django.db.models import Q
 
@@ -171,11 +171,10 @@ class TestProgressReportModel(BaseAPITestCase):
         )
 
         for _ in range(2):
-            with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                factories.ClusterIndicatorReportFactory(
-                    reportable=self.partneractivity_reportable,
-                    report_status=INDICATOR_REPORT_STATUS.submitted,
-                )
+            factories.ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -227,6 +226,7 @@ class TestProgressReportModel(BaseAPITestCase):
             mock_clean,
             mock_send,
     ):
+        notification_count = Notification.objects.count()
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -234,7 +234,7 @@ class TestProgressReportModel(BaseAPITestCase):
         report.status = PROGRESS_REPORT_STATUS.submitted
         report.save()
 
-        self.assertEqual(Notification.objects.count(), 2)
+        self.assertEqual(Notification.objects.count(), notification_count + 2)
 
         self.assertTrue(mock_create.called)
 
@@ -247,6 +247,7 @@ class TestProgressReportModel(BaseAPITestCase):
             mock_clean,
             mock_send,
     ):
+        notification_count = Notification.objects.count()
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -255,7 +256,7 @@ class TestProgressReportModel(BaseAPITestCase):
         report.save()
 
         # Match # of emails sent by submitting_user (also identical to submitted_by), and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 2)
+        self.assertEqual(Notification.objects.count(), notification_count + 2)
 
         self.assertTrue(mock_create.called)
 
@@ -268,6 +269,7 @@ class TestProgressReportModel(BaseAPITestCase):
             mock_clean,
             mock_send,
     ):
+        notification_count = Notification.objects.count()
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.save()
@@ -276,7 +278,7 @@ class TestProgressReportModel(BaseAPITestCase):
         report.save()
 
         # Match # of emails sent by submitting_user (also identical to submitted_by), and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 2)
+        self.assertEqual(Notification.objects.count(), notification_count + 2)
 
         self.assertTrue(mock_create.called)
 
@@ -286,6 +288,7 @@ class TestProgressReportModel(BaseAPITestCase):
     def test_send_due_progress_report_email(self, mock_create, mock_clean, mock_send):
         today = date.today()
 
+        notification_count = Notification.objects.count()
         report = ProgressReport.objects.get(report_type="QPR", report_number=1)
         report.status = PROGRESS_REPORT_STATUS.due
         report.due_date = today + relativedelta(days=7)
@@ -295,7 +298,7 @@ class TestProgressReportModel(BaseAPITestCase):
         send_due_progress_report_email()
 
         # Match # of emails sent by unicef_officer and unicef_focal_point
-        self.assertEqual(Notification.objects.count(), 2)
+        self.assertEqual(Notification.objects.count(), notification_count + 2)
 
         self.assertTrue(mock_create.called)
 

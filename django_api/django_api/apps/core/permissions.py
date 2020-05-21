@@ -43,14 +43,14 @@ class IsAuthenticated(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated()
+        return request.user.is_authenticated
 
 
 def IsIMOForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_imo,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -64,7 +64,7 @@ def IsIMOForCurrentWorkspaceCheck(request):
 
 def IsIMOCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists(),
     ]
     return all(rules)
@@ -74,7 +74,7 @@ def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                 workspace__id=workspace_id,
@@ -91,7 +91,7 @@ def IsPartnerEditorForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_editor,
                 workspace__id=workspace_id,
@@ -107,7 +107,7 @@ def IsPartnerViewerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_viewer,
                 workspace__id=workspace_id,
@@ -123,7 +123,7 @@ def IsPartnerAdminForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_admin,
                 workspace__id=workspace_id,
@@ -137,7 +137,7 @@ def IsPartnerAdminForCurrentWorkspaceCheck(request):
 
 def IsClusterSystemAdminCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists(),
     ]
     return all(rules)
@@ -147,7 +147,7 @@ def IsClusterViewerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_viewer,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -163,7 +163,7 @@ def IsClusterCoordinatorForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_coordinator,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -179,7 +179,7 @@ def IsClusterMemberForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
         rules = [
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_member,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -193,7 +193,7 @@ def IsClusterMemberForCurrentWorkspaceCheck(request):
 
 def IsIPAuthorizedOfficerCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer, is_active=True).exists(),
     ]
     return all(rules)
@@ -201,7 +201,7 @@ def IsIPAuthorizedOfficerCheck(request):
 
 def IsIPAdminCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_admin).exists(),
     ]
     return all(rules)
@@ -209,7 +209,7 @@ def IsIPAdminCheck(request):
 
 def IsIPEditorCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_editor).exists(),
     ]
     return all(rules)
@@ -217,7 +217,7 @@ def IsIPEditorCheck(request):
 
 def IsIPViewerCheck(request):
     rules = [
-        request.user.is_authenticated(),
+        request.user.is_authenticated,
         request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
     ]
     return all(rules)
@@ -269,45 +269,45 @@ class IsSuperuser(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated() and user.is_superuser
+        return user.is_authenticated and user.is_superuser
 
 
 class IsClusterSystemAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsClusterSystemAdminCheck(request)
+        return request.user.is_authenticated and IsClusterSystemAdminCheck(request)
 
 
 class IsIMO(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsIMOCheck(request)
+        return request.user.is_authenticated and IsIMOCheck(request)
 
 
 class IsIPAuthorizedOfficer(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsIPAuthorizedOfficerCheck(request)
+        return request.user.is_authenticated and IsIPAuthorizedOfficerCheck(request)
 
 
 class IsIPAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsIPAdminCheck(request)
+        return request.user.is_authenticated and IsIPAdminCheck(request)
 
 
 class IsIPEditor(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsIPEditorCheck(request)
+        return request.user.is_authenticated and IsIPEditorCheck(request)
 
 
 class IsIPViewer(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and IsIPViewerCheck(request)
+        return request.user.is_authenticated and IsIPViewerCheck(request)
 
 
 class IsUNICEFAPIUser(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated() and request.user.is_unicef
+        return request.user.is_authenticated and request.user.is_unicef

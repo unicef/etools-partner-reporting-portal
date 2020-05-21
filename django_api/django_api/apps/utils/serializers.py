@@ -1,6 +1,3 @@
-from rest_framework.compat import unicode_to_repr
-
-
 class CurrentWorkspaceDefault(object):
 
     workspace = None
@@ -12,8 +9,8 @@ class CurrentWorkspaceDefault(object):
     def __call__(self):
         return self.workspace
 
-    def __repr__(self):
-        return unicode_to_repr('%s()' % self.__class__.__name__)
+    def __str__(self):
+        return '{}()'.format(self.__class__.__name__)
 
 
 def serialize_choices(choices):

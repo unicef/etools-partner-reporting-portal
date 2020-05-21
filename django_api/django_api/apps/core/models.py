@@ -197,16 +197,24 @@ class PRPRole(TimeStampedExternalSourceModel):
         account.User (ForeignKey): "user"
     """
     user = models.ForeignKey(
-        'account.User', related_name="prp_roles"
+        'account.User',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
     )
     role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
     workspace = models.ForeignKey(
-        'core.Workspace', related_name="prp_roles",
-        null=True, blank=True
+        'core.Workspace',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     cluster = models.ForeignKey(
-        'cluster.Cluster', related_name="prp_roles",
-        blank=True, null=True
+        'cluster.Cluster',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(default=True)
 
@@ -292,7 +300,9 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         verbose_name='End date'
     )
     workspace = models.ForeignKey(
-        'core.Workspace', related_name="response_plans"
+        'core.Workspace',
+        related_name="response_plans",
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -500,7 +510,11 @@ class GatewayType(TimeStampedModel):
     display_name = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Display Name'))
     admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
-    country = models.ForeignKey(Country, related_name="gateway_types")
+    country = models.ForeignKey(
+        Country,
+        related_name="gateway_types",
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         ordering = ['name']
@@ -549,6 +563,7 @@ class Location(MPTTModel):
     carto_db_table = models.ForeignKey(
         'core.CartoDBTable',
         related_name="locations",
+        on_delete=models.CASCADE,
         blank=True,
         null=True
     )
@@ -640,7 +655,11 @@ class CartoDBTable(MPTTModel):
         on_delete=models.CASCADE,
     )
 
-    country = models.ForeignKey(Country, related_name="carto_db_tables")
+    country = models.ForeignKey(
+        Country,
+        related_name="carto_db_tables",
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name_plural = 'CartoDB tables'

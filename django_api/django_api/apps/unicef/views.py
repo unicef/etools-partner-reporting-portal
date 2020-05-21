@@ -1259,7 +1259,7 @@ class InterventionPMPDocumentView(APIView):
             document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
         except HTTPError as e:
             return Response(e.response)
-        except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        except (ConnectionError, ConnectTimeout, ReadTimeout):
             return Response("eTools API seems to have a problem, please try again later")
 
         return Response(document_url)
