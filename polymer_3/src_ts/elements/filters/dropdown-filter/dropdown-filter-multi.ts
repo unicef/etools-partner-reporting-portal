@@ -32,7 +32,8 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
       trigger-value-change-event
       on-etools-selected-items-changed="_handleChange"
       hide-search="[[hideSearch]]"
-      disabled="[[disabled]]">
+      disabled="[[disabled]]"
+      with-backdrop>
     </etools-dropdown-multi>
   `;
   }

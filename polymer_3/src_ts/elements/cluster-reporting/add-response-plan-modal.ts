@@ -256,6 +256,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 trigger-value-change-event
                 hide-close
                 error-message=""
+                with-backdrop
                 required>
               </etools-dropdown-multi>
             </div>
