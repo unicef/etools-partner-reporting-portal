@@ -1314,6 +1314,12 @@ class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):
         model = ProgressReportAttachment
 
 
+class ReportingEntityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ReportingEntity
+        django_get_or_create = ("title", )
+
+
 class AbstractIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.LazyAttribute(lambda o: o.reportable.blueprint.title)
     time_period_start = factory.LazyAttribute(lambda o: o.time_period[0])
@@ -1353,7 +1359,10 @@ class ClusterIndicatorReportFactory(AbstractIndicatorReportFactory):
         )
     """
     progress_report = None
-    reporting_entity = ReportingEntity.objects.get(title="Cluster")
+    reporting_entity = factory.SubFactory(
+        ReportingEntityFactory,
+        title="Cluster",
+    )
 
     class Meta:
         model = IndicatorReport
@@ -1372,7 +1381,10 @@ class ProgressReportIndicatorReportFactory(AbstractIndicatorReportFactory):
         )
     """
     progress_report = factory.SubFactory('core.tests.factories.ProgressReportFactory', indicator_report=None)
-    reporting_entity = ReportingEntity.objects.get(title="UNICEF")
+    reporting_entity = factory.SubFactory(
+        ReportingEntityFactory,
+        title="UNICEF",
+    )
 
     class Meta:
         model = IndicatorReport
