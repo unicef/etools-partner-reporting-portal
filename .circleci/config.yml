@@ -43,7 +43,7 @@ jobs:
   test_backend:
     working_directory: ~/code
     docker:
-      - image: unicef/etools-prp:latest
+      - image: unicef/etools-prp:$BASE_TAG
         environment:
           POSTGRES_HOST: 127.0.0.1
           POSTGRES_DB: test_prp
@@ -69,7 +69,6 @@ jobs:
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
-                pip install pipenv
                 cd django_api/ && pipenv install -d --user
                 python django_api/manage.py test
       - save_cache:
