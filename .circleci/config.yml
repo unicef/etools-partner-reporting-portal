@@ -70,7 +70,7 @@ jobs:
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
                 cd django_api/ && pipenv install -d
-                python django_api/manage.py test
+                python manage.py test
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
