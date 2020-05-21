@@ -694,7 +694,7 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
     active = True
     name = factory.LazyFunction(faker.word)
-    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory', disaggregation=None)
+    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory')
 
     class Meta:
         model = Disaggregation
