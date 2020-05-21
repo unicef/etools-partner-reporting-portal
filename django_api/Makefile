@@ -1,9 +1,5 @@
 ENV_VARS=SECRET_KEY=123 \
 	ENV=dev \
-	POSTGRES_DB=unicef_prp \
-	POSTGRES_USER=postgres \
-	POSTGRES_PASSWORD= \
-	POSTGRES_HOST=localhost \
 	DATA_VOLUME=/tmp \
 	REDIS_URL=redis://localhost:6379/0
 
@@ -19,7 +15,7 @@ help:
 
 
 test:
-	${ENV_VARS} python manage.py test --keepdb --failfast
+	${ENV_VARS} python manage.py test --keepdb
 
 migrate:
 	${ENV_VARS} python manage.py migrate
