@@ -102,18 +102,23 @@ class LanguageDropdown extends ReduxConnectedElement {
   @property({type: Array, computed: '_computeLanguages(availableLanguages)'})
   data!: any[];
 
+  private defaultLanguage = 'en';
+
   _languageSelected(e: CustomEvent) {
     const allLanguages = Object.keys(this.availableLanguages);
-
-    if (allLanguages.includes(this.current) === false) {
-      this.reduxStore.dispatch(localizeSet('en'));
+    if (!allLanguages.includes(this.current)) {
+      this._storeSelectedLanguage(this.defaultLanguage);
     }
     const newLanguage = (this.$.repeat as DomRepeat).itemForElement(e.detail.item);
     if (newLanguage === this.current) {
       return;
     }
+    this._storeSelectedLanguage(newLanguage);
+  }
 
-    this.reduxStore.dispatch(localizeSet(newLanguage));
+  _storeSelectedLanguage(language: string) {
+    localStorage.setItem('defaultLanguage', language);
+    this.reduxStore.dispatch(localizeSet(language));
   }
 
   _computeLanguage(data: any[], current: string) {
