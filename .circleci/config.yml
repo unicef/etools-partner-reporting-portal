@@ -69,7 +69,7 @@ jobs:
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
-                cd django_api/ && pipenv install -d --user
+                cd django_api/ && pipenv install -d
                 python django_api/manage.py test
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
