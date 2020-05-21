@@ -14,7 +14,7 @@ jobs:
           name: Make sure base is up to date and remote
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            BASE_TAG="$(md5sum django_api/requirements/base.txt | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
+            BASE_TAG="$(md5sum django_api/Pipfile.lock | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
             TAG=${CIRCLE_BRANCH}
             if (curl --silent -f -lSL https://index.docker.io/v1/repositories/unicef/etools-prp/tags/$BASE_TAG > /dev/null); then
               echo "Up to date!"
@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Triggering test workflow
           command: |
-            BASE_TAG="$(md5sum django_api/requirements/base.txt | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
+            BASE_TAG="$(md5sum django_api/Pipfile.lock | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
             curl --user ${CIRCLE_TOKEN}: \
                 --data build_parameters[CIRCLE_JOB]=test_backend \
                 --data build_parameters[BASE_TAG]=$BASE_TAG \
@@ -62,17 +62,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: source-{{ .Branch }}--{{ checksum "django_api/requirements/base.txt" }}-{{ checksum ".circleci/config.yml" }}
+          key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
           name: run tests
           command: |
                 export PATH=/home/circleci/.local/bin:$PATH
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
-                pip install -q -r django_api/requirements/dev.txt --user
+                cd django_api/ && pipenv install -d --user
                 python django_api/manage.py test
       - save_cache:
-          key: source-{{ .Branch }}--{{ checksum "django_api/requirements/base.txt" }}-{{ checksum ".circleci/config.yml" }}
+          key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
           paths:
             - ".venv"
             - "~/.cache/pip"
@@ -100,7 +100,7 @@ jobs:
           name: Building the image
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            BASE_TAG="$(md5sum django_api/requirements/base.txt | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
+            BASE_TAG="$(md5sum django_api/Pipfile.lock | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
             TAG=${CIRCLE_BRANCH}
             (docker pull unicef/etools-prp:$BASE_TAG) ||
             (docker build -t unicef/etools-prp:$BASE_TAG -f django_api/Dockerfile-installed django_api/ && docker push unicef/etools-prp:$BASE_TAG)
@@ -109,7 +109,7 @@ jobs:
           name: Pushing to Docker Hub
           command: |
             TAG=${CIRCLE_BRANCH}
-            BASE_TAG="$(md5sum django_api/requirements/base.txt | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
+            BASE_TAG="$(md5sum django_api/Pipfile.lock | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push unicef/etools-prp:$TAG
             if (echo "develop" | grep -q "$CIRCLE_BRANCH"); then
