@@ -1,8 +1,8 @@
 from core.helpers import generate_data_combination_entries
 from core.tests import factories
 
-unicef_re = factories.ReportingEntityFactory(title="UNICEF")
-cluster_re = factories.ReportingEntityFactory(title="Cluster")
+# unicef_re = factories.ReportingEntityFactory(title="UNICEF")
+# cluster_re = factories.ReportingEntityFactory(title="Cluster")
 
 
 # def generate_0_num_disagg_data(reportable, indicator_type="quantity"):

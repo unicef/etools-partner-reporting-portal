@@ -153,7 +153,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     factories.SectionFactory.create_batch(workspace_quantity)
     print("{} Section objects created".format(workspace_quantity))
 
-    unicef_re = ReportingEntity.objects.get(title="UNICEF")
+    unicef_re = factories.ReportingEntityFactory(title="UNICEF")
     # cluster_re = ReportingEntity.objects.get(title="Cluster")
 
     ws_list = list()
