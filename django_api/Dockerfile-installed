@@ -13,7 +13,6 @@ WORKDIR /etools/
 ADD Pipfile .
 ADD Pipfile.lock .
 RUN pipenv install --dev --system  --ignore-pipfile
-RUN apk add bash
 
 RUN pip install greenlet==0.4.14
 RUN CFLAGS="-I/usr/local/include/python3.7" UWSGI_PROFILE="asyncio" pip install uwsgi==2.0.15
