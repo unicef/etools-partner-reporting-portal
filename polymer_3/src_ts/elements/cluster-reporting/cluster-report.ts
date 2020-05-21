@@ -651,13 +651,15 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
     e.stopPropagation();
-    const data = e.detail;
-    this.set('reportMeta', data);
+    const reportMetaData = e.detail;
+    this.set('reportMeta', reportMetaData);
 
     (this.$.update as EtoolsPrpAjaxEl).abort();
     this.reduxStore.dispatch(ClusterIndicatorReportsUpdate(updateThunk, this.data.id))
       // @ts-ignore
       .then(() => {
+        // update `data` property with changes from `reportable-meta`
+        this.set('data', {...this.data, ...reportMetaData});
         self._notifyChangesSaved();
       })
       .catch((_err: GenericObject) => {
