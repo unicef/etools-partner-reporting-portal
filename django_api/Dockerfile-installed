@@ -5,6 +5,10 @@ FROM unicef/etools-prp-base:latest
 ARG env
 ENV ENV ${env:-dev}
 
+# TODO remove this line once useing etools-prp
+# See https://github.com/unicef/etools/pull/2716
+RUN pip install --no-cache-dir --upgrade pipenv
+
 WORKDIR /etools/
 ADD Pipfile .
 ADD Pipfile.lock .
