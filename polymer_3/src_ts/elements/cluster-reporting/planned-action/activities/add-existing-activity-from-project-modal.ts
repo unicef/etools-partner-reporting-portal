@@ -374,6 +374,8 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
     simpleProjectData.status = this.projectData.status;
+    simpleProjectData.start_date = this.projectData.start_date;
+    simpleProjectData.end_date = this.projectData.end_date;
 
     this.set('data', {
       projects: [simpleProjectData]
