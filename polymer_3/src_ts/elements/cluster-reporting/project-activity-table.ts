@@ -16,6 +16,7 @@ import LocalizeMixin from '../../mixins/localize-mixin';
 import '../etools-prp-ajax';
 import '../project-status';
 import '../page-body';
+import '../../elements/list-placeholder';
 import {tableStyles} from '../../styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
@@ -120,6 +121,8 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
             </etools-data-table-row>
           </template>
 
+          <list-placeholder data="[[data]]"></list-placeholder>
+
           <etools-data-table-footer
               page-size="[[pageSize]]"
               page-number="[[pageNumber]]"
@@ -182,7 +185,7 @@ class ProjectActivityTable extends DataTableMixin(PaginationMixin(RoutingMixin(
     if (!projectId || !activitiesDict) {
       return;
     }
-    return activitiesDict[projectId];
+    return activitiesDict[projectId] || [];
   }
 
   _detailUrl(activity: GenericObject, query: string) {
