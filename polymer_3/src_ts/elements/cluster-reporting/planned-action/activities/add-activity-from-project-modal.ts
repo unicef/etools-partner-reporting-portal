@@ -657,10 +657,13 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
         return (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk()();
       })
       .then((res: any) => {
+        // logic below will exclude activities already adopted for the current Project
+        const currentProjId = Number(self.projectData.id);
         const adoptedClusterActivities = new Set();
         res.data.results.forEach(function(item: any) {
           if (item.cluster_activity !== null) {
-            adoptedClusterActivities.add(item.cluster_activity.id);
+            if ((item.projects || []).filter((proj: GenericObject) => Number(proj.project_id) === currentProjId).length > 0)
+              adoptedClusterActivities.add(item.cluster_activity.id);
           }
         });
 
