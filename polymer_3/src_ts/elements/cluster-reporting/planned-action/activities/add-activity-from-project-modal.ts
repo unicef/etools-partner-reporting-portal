@@ -559,7 +559,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
 
   _remove(e: CustomEvent) {
     const currentIndex = +(e.target as any).dataset.index;
-
     if (this.mode === 'cluster') {
       this.splice('data.cluster.projects', currentIndex, 1);
     } else {
@@ -575,6 +574,8 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     simpleProjectData.project_id = this.projectData.id;
     simpleProjectData.title = this.projectData.title;
     simpleProjectData.status = this.projectData.status;
+    simpleProjectData.start_date = this.projectData.start_date;
+    simpleProjectData.end_date = this.projectData.end_date;
 
     this.set('data', {
       cluster: {
@@ -653,7 +654,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     thunk()
       .then(function(res: any) {
         self.set('activities', res.data.results);
-
         return (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk()();
       })
       .then((res: any) => {

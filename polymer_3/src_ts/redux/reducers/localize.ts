@@ -3,9 +3,10 @@ import Constants from '../../constants';
 import {combineReducers} from 'redux';
 
 let availableLangs: GenericObject;
+const defaultLanguage = 'en';
 
 export class LocaLizeState {
-  language: string = 'en';
+  language: string = defaultLanguage;
   resources = [];
 }
 
@@ -16,13 +17,16 @@ export const Localize = combineReducers({
 
 
 function languageReducer(state: string, action: any) {
-  const currentLanguage = navigator.language.split('-')[0];
   if (typeof state === 'undefined') {
+    let currentLanguage = localStorage.getItem('defaultLanguage');
+    if (!currentLanguage) {
+      currentLanguage = navigator.language.split('-')[0];
+    }
     state = currentLanguage;
   }
 
   if (availableLangs !== undefined && !availableLangs.includes(state)) {
-    state = 'en';
+    state = defaultLanguage;
   }
 
   switch (action.type) {

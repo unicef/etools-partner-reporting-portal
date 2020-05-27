@@ -259,7 +259,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
                     is="dom-if"
                     if="[[_showLocationsWarning(indicator, type)]]"
                     restamp="true">
-                  <iron-icon class="locations-warning" icon="icons:error"></iron-icon>
+                  <iron-icon class="locations-warning" data-modal-type="edit" icon="icons:error"></iron-icon>
                 </template>
               </paper-button>
             </span>
@@ -366,7 +366,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
       case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
         return 'cluster';
 
-        // TODO: other cases
+      // TODO: other cases
 
       default:
         return 'default';
