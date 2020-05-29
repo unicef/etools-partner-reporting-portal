@@ -230,15 +230,19 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     const progressReportDueDate = progressReport && progressReport.due_date ? progressReport.due_date : null;
 
     // get the current programme document
-    const currentPdReport = programmeDocuments.find((report) => {
+    const currentPdReport = (programmeDocuments || []).find((report) => {
       return report.id === pdId;
     });
 
+    if (!progressReportDueDate || !currentPdReport) {
+      return '...';
+    }
+
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = progressReportDueDate ? currentPdReport.reporting_periods.find((reporting_period: GenericObject) => {
+    const currentSrReport = (currentPdReport.reporting_periods || []).find((reporting_period: GenericObject) => {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
-    }) : undefined;
+    });
 
     if (currentSrReport !== undefined && currentSrReport.description !== undefined) {
       return currentSrReport.description;
