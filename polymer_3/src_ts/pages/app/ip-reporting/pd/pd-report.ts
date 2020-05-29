@@ -143,11 +143,13 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         report="[[currentReport]]">
       </pd-reports-report-title>
 
-      <a
-          href="#"
+      <paper-button
+          class="btn-primary"
           slot="in-title"
-          class="pd-details-link"
-          on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
+          role="button"
+          on-tap="_showPdDetails">
+        [[currentReport.programme_document.reference_number]]
+      </paper-button>
 
       <template
           is="dom-if"
