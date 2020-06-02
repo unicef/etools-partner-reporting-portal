@@ -356,7 +356,10 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
-    return programmeDocumentReportsCurrent(rootState);
+    const currentReport = programmeDocumentReportsCurrent(rootState);
+    if (currentReport && Object.keys(currentReport).length) {
+      return currentReport;
+    }
   }
 
   _onReportChanged(reportId: string, mode: any) {
@@ -450,6 +453,9 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _computeSubmittedOnBehalf(currentReport: GenericObject) {
+    if (currentReport.submitted_by === undefined) {
+      return;
+    }
     return currentReport.submitted_by !== currentReport.submitting_user;
   }
 
