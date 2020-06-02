@@ -17,6 +17,7 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
+import '@polymer/paper-input/paper-input';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';

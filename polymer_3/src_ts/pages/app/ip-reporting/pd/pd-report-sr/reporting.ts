@@ -99,13 +99,14 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-              <paper-input-container no-label-float>
+              <paper-input-container no-label-float auto-validate>
                 <input
                     slot="input"
                     id="narrative"
                     on-input="_handleInput"
                     value="[[data.narrative]]"
-                    maxlength="2000">
+                    maxlength="2000"
+                    required>
                 <paper-input-char-counter slot="suffix"></paper-input-char-counter>
               </paper-input-container>
             </template>
@@ -197,6 +198,9 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     this.updateDataDebouncer = Debouncer.debounce(this.updateDataDebouncer,
       timeOut.after(2000),
       () => {
+        if (!this.localData.narrative) {
+          return;
+        }
         const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
 
         (self.$.update as EtoolsPrpAjaxEl).abort();
