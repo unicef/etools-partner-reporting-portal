@@ -2,8 +2,7 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@polymer/paper-input/paper-input-container';
-import '@polymer/paper-input/paper-input-char-counter';
+import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../labelled-item';
 import '../etools-prp-permissions';
@@ -23,6 +22,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -238,8 +238,10 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     const self = this;
     const textInputs = this.shadowRoot!.querySelectorAll('paper-input');
 
-    textInputs.forEach((input) => {
-      self.set(['localData', input.id], (input as any).$.input.value.trim());
+    textInputs.forEach((input: PaperInputElement) => {
+      if (input.value && input.value.trim()) {
+        self.set(['localData', input.id], input.value.trim());
+      }
     });
   }
 
@@ -268,10 +270,11 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
           // @ts-ignore
           .then(() => {
             self._notifyChangesSaved();
+          })
+          // @ts-ignore
+          .catch(function(err) {
+            console.log(err);
           });
-          // .catch(function(err) {
-          //   // TODO: error handling
-          // });
       });
   }
 
