@@ -143,11 +143,13 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
         report="[[currentReport]]">
       </pd-reports-report-title>
 
-      <a
-          href="#"
+      <paper-button
+          class="btn-primary"
           slot="in-title"
-          class="pd-details-link"
-          on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
+          role="button"
+          on-tap="_showPdDetails">
+        [[currentReport.programme_document.reference_number]]
+      </paper-button>
 
       <template
           is="dom-if"
@@ -356,7 +358,10 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
-    return programmeDocumentReportsCurrent(rootState);
+    const currentReport = programmeDocumentReportsCurrent(rootState);
+    if (currentReport && Object.keys(currentReport).length) {
+      return currentReport;
+    }
   }
 
   _onReportChanged(reportId: string, mode: any) {
@@ -421,6 +426,9 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _canExport(report: GenericObject, mode: string, permissions: GenericObject) {
+    if (!report || !permissions) {
+      return false;
+    }
     switch (true) {
       case report.status === 'Sub' && (!permissions || !permissions.exportSubmittedProgressReport):
       case mode === 'edit':
@@ -450,6 +458,9 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _computeSubmittedOnBehalf(currentReport: GenericObject) {
+    if (currentReport.submitted_by === undefined) {
+      return;
+    }
     return currentReport.submitted_by !== currentReport.submitting_user;
   }
 

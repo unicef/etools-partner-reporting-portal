@@ -2,8 +2,7 @@ import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@polymer/paper-input/paper-input-container';
-import '@polymer/paper-input/paper-input-char-counter';
+import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../../../../../elements/labelled-item';
 import '../../../../../elements/etools-prp-ajax';
@@ -24,6 +23,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
 import {RootState} from '../../../../../typings/redux.types';
+import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -57,10 +57,18 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         word-wrap: break-word;
       }
 
-      paper-input-char-counter {
-        margin-top: 20px;
-        margin-bottom: -40px;
-        font-size: 12px;
+      .toggle-button-container {
+        max-width: calc((100% - 0.1px) / 8 * 7 - 25px) ;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      #toggle-button {
+        background-color: #0099ff;
+        color: #fff;
+        font-size: 14px;
       }
     </style>
 
@@ -99,18 +107,28 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]"
                 restamp="true">
-              <paper-input-container no-label-float>
-                <input
-                    slot="input"
-                    id="narrative"
-                    on-input="_handleInput"
-                    value="[[data.narrative]]"
-                    maxlength="2000">
-                <paper-input-char-counter slot="suffix"></paper-input-char-counter>
-              </paper-input-container>
+              <paper-input
+                  id="narrative"
+                  value="[[data.narrative]]"
+                  no-label-float
+                  char-counter
+                  maxlength="2000">
+              </paper-input>
             </template>
+
           </labelled-item>
         </div>
+
+        <div class="toggle-button-container row">
+          <template
+              is="dom-if"
+              if="[[!_equals(computedMode, 'view')]]">
+            <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+              [[localize('save')]]
+            </paper-button>
+          </template>
+        </div>
+
 
         <div class="row">
           <report-attachments
@@ -180,11 +198,11 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     return currentProgrammeDocument(rootState);
   }
 
-  _handleInput(event: CustomEvent) {
-    const field = event.composedPath()[0] as GenericObject;
-    const id = field.id;
-
-    this.set(['localData', id], field.value.trim());
+  _handleInput() {
+    const textInput = this.shadowRoot!.querySelector('#narrative') as PaperInputElement;
+    if (textInput && textInput.value && textInput.value.trim()) {
+      this.set(['localData', textInput.id], textInput.value.trim());
+    }
   }
 
   _updateData(change: GenericObject) {
@@ -195,8 +213,11 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     }
 
     this.updateDataDebouncer = Debouncer.debounce(this.updateDataDebouncer,
-      timeOut.after(2000),
+      timeOut.after(250),
       () => {
+        if (!this.localData.narrative) {
+          return;
+        }
         const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
 
         (self.$.update as EtoolsPrpAjaxEl).abort();
@@ -204,7 +225,15 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         self.reduxStore.dispatch(pdReportsUpdate(updateThunk,
           this.pdId,
           this.reportId)
-        );
+        )
+          // @ts-ignore
+          .then(() => {
+            self._notifyChangesSaved();
+          })
+          // @ts-ignore
+          .catch(function(err) {
+            console.log(err);
+          });
       });
   }
 
@@ -230,15 +259,19 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
     const progressReportDueDate = progressReport && progressReport.due_date ? progressReport.due_date : null;
 
     // get the current programme document
-    const currentPdReport = programmeDocuments.find((report) => {
+    const currentPdReport = (programmeDocuments || []).find((report) => {
       return report.id === pdId;
     });
 
+    if (!progressReportDueDate || !currentPdReport) {
+      return '...';
+    }
+
     // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = progressReportDueDate ? currentPdReport.reporting_periods.find((reporting_period: GenericObject) => {
+    const currentSrReport = (currentPdReport.reporting_periods || []).find((reporting_period: GenericObject) => {
       return reporting_period.report_type === 'SR' &&
         new Date(reporting_period.due_date) <= new Date(progressReportDueDate);
-    }) : undefined;
+    });
 
     if (currentSrReport !== undefined && currentSrReport.description !== undefined) {
       return currentSrReport.description;
