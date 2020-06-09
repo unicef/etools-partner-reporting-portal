@@ -859,5 +859,8 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
             "city",
             "basis_for_risk_rating",
             "last_assessment_date",
-            "core_values_assessment_date"
+            "core_values_assessment_date",
+            "sea_risk_rating_name",
+            "psea_assessment_date",
+            "overall_risk_rating",
         )
