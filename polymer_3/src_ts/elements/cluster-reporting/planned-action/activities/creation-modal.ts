@@ -30,6 +30,7 @@ import '../../../error-box-errors';
 import {GenericObject} from '../../../../typings/globals.types';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../utils/util';
+import Settings from '../../../../settings';
 
 /**
 * @polymer
@@ -53,7 +54,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         --app-grid-gutter: 10px;
 
         --paper-dialog: {
-          width: 600px;
+          width: 700px;
+          margin: 0;
         }
 
       }
@@ -75,6 +77,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
       .fields {
         margin-left: 24px;
+        margin-right: 48px;
       }
 
       .add-project-btn {
@@ -134,8 +137,13 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       .full-width {
         @apply --app-grid-expandible-item;
       }
-      etools-dropdown{
+      etools-dropdown {
         width: 100%;
+      }
+      datepicker-lite {
+        --paper-input-container: {
+          width: 100%;
+        };
       }
     </style>
 
@@ -318,6 +326,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           class="start-date"
                           label="[[localize('start_date')]]"
                           value="{{item.start_date}}"
+                          selected-date-display-format="[[dateFormat]]"
                           error-message=""
                           required>
                         </datepicker-lite>
@@ -328,6 +337,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                           class="end-date"
                           label="[[localize('end_date')]]"
                           value="{{item.end_date}}"
+                          selected-date-display-format="[[dateFormat]]"
                           error-message=""
                           required>
                         </datepicker-lite>
@@ -448,6 +458,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             class="start-date"
                             label="[[localize('start_date')]]"
                             value="{{item.start_date}}"
+                            selected-date-display-format="[[dateFormat]]"
                             error-message=""
                             required>
                           </datepicker-lite>
@@ -458,6 +469,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
                             class="end-date"
                             label="[[localize('end_date')]]"
                             value="{{item.end_date}}"
+                            selected-date-display-format="[[dateFormat]]"
                             error-message=""
                             required>
                           </datepicker-lite>
@@ -567,6 +579,9 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
+
+  @property({type: String})
+  dateFormat = Settings.dateFormat;
 
   static get observers() {
     return [

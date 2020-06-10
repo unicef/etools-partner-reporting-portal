@@ -264,6 +264,8 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                       <datepicker-lite
                         class="start-date"
                         label="[[localize('start_date')]]"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
                         value="{{item.start_date}}"
                         error-message=""
                         required>
@@ -274,6 +276,8 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
                       <datepicker-lite
                         class="end-date"
                         label="[[localize('end_date')]]"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
                         value="{{item.end_date}}"
                         error-message=""
                         required>
