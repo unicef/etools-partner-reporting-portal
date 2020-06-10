@@ -454,7 +454,7 @@ export const locales = {
     "to_learn_more": "To learn more about or to change calculation methods, click the link above",
     "enter_data_by_disaggregation": "Enter data by disaggregation",
     "are_you_sure": "Are you sure",
-    "you_are_about_to_delete": "You are about to delete all of the draft data entered in this report. The report will be regenerated and any changes to the indicator/locations made by your UNICEF counterpart will be visible. This action is irreversible. Please click 'Refresh' if you wish to continue.",
+    "you_are_about_to_delete": "You are about to delete all of the draft data entered in this report and the data entered for any future reports. The report will be regenerated and any changes to the indicator/locations made by your UNICEF counterpart will be visible. This action is irreversible. Please click 'Refresh' if you wish to continue.",
     "not_completed_indicator_location": "You have not completed all indicator location data across all indicator reports for this progress report.",
     "report_submitted": "Report submitted",
     "please_make_sure_indicators": "Please make sure indicators have locations set for reports to be generated.",
