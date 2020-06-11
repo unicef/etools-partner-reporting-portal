@@ -130,7 +130,11 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'last_assessment_date',
             'rating',
             'basis_for_risk_rating',
-            'ocha_external_id'
+            'ocha_external_id',
+            'core_values_assessment_date',
+            'sea_risk_rating_name',
+            'psea_assessment_date',
+            'overall_risk_rating',
         )
 
     def get_partner_type_display(self, obj):
