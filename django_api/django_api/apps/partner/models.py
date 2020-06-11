@@ -150,17 +150,17 @@ class Partner(TimeStampedExternalSourceModel):
         verbose_name=_("PSEA Risk Rating"),
         blank=True,
         default='',
-    ),
+    )
     psea_assessment_date = models.DateTimeField(
         verbose_name=_("Last PSEA Assess. Date"),
         null=True,
         blank=True,
-    ),
+    )
     overall_risk_rating = models.CharField(
         max_length=50,
         blank=True,
         default='',
-    ),
+    )
 
     class Meta:
         ordering = ['title']
