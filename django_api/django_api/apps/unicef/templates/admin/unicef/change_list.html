@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_static %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  {% if cl.opts.model_name == "programmedocument" %}
+    <li>
+      {% with request.GET.workspace__id__exact as pk %}
+        <a href="{% url 'admin:sync-process-pds' %}{% if pk %}?workspace__id__exact={{ pk }}{% endif %}">
+          Sync and Process PDs
+        </a>
+      {% endwith %}
+    </li>
+  {% endif %}
+{% endblock %}
