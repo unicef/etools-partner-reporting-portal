@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.contrib import admin
-from django.db import connection
 from django.shortcuts import redirect
 
 from core.models import Workspace
