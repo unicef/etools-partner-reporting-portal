@@ -49,22 +49,25 @@ class ProgrammeDocumentAdmin(admin.ModelAdmin):
                 pk=request.GET.get("workspace__id__exact"),
             )
         except Workspace.DoesNotExist:
-            fast = area = False
+            self.message_user(
+                request,
+                "Need to select a Country, use the Country filters",
+            )
         else:
             fast = True
             area = workspace.business_area_code
-        s = process_programme_documents.s(
-            fast=fast,
-            area=area,
-        )
-        s.link(process_workspaces.si())
-        s.link(process_period_reports.si())
-        self.message_user(
-            request,
-            "Initiated the syncing and processing of PDs for {}".format(
-                workspace if area else "All Countries",
-            ),
-        )
+            s = process_programme_documents.s(
+                fast=fast,
+                area=area,
+            )
+            s.link(process_workspaces.si())
+            s.link(process_period_reports.si())
+            self.message_user(
+                request,
+                "Initiated the syncing and processing of PDs for {}".format(
+                    workspace if area else "All Countries",
+                ),
+            )
         return redirect("admin:unicef_programmedocument_changelist")
 
 
