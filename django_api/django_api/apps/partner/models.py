@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext as _
 
 from core.common import (
     CSO_TYPES,
@@ -143,8 +144,23 @@ class Partner(TimeStampedExternalSourceModel):
     clusters = models.ManyToManyField(
         'cluster.Cluster', related_name="partners"
     )
-
     ocha_external_id = UniqueNullCharField(max_length=128, blank=True, null=True, unique=True)
+    sea_risk_rating_name = models.CharField(
+        max_length=150,
+        verbose_name=_("PSEA Risk Rating"),
+        blank=True,
+        default='',
+    )
+    psea_assessment_date = models.DateTimeField(
+        verbose_name=_("Last PSEA Assess. Date"),
+        null=True,
+        blank=True,
+    )
+    overall_risk_rating = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+    )
 
     class Meta:
         ordering = ['title']

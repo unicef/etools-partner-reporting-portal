@@ -68,7 +68,7 @@ import {GenericObject} from '../typings/globals.types';
           (item.role === Constants.PRP_ROLE.CLUSTER_SYSTEM_ADMIN ||
             ((Constants.PARTNER_ROLES.indexOf(item.role) > -1 ?
               report.partner_id === (params.partner && params.partner.id) :
-              String(item.cluster.id) === String(report.cluster_id)) &&
+              String(item.cluster ? item.cluster.id : '') === String(report.cluster_id)) &&
               (item.role === Constants.PRP_ROLE.CLUSTER_COORDINATOR ?
                 !report.cluster_activity : true))
           );
