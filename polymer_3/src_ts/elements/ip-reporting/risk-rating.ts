@@ -66,7 +66,7 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('psea_risk_rating')]]">
+            <labelled-item label="[[localize('sea_risk_rating')]]">
               <span class="field-value">[[_withDefault(partner.sea_risk_rating_name)]]</span>
             </labelled-item>
           </li>
