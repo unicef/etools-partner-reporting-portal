@@ -60,7 +60,6 @@ jobs:
           POSTGRES_DB: test_prp
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          REDIS_URL: redis://localhost:6379/0
     steps:
       - checkout
       - restore_cache:
