@@ -64,7 +64,7 @@ class ProfileDropdown extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         background: var(--medium-theme-background-color, #EEEEEE);
       }
     </style>
-    
+
     <user-profile-dialog id="userProfileDialog"></user-profile-dialog>
     <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap" aria-disabled="false"></paper-icon-button>
     <iron-collapse id="userDropdown" opened="[[dropdownOpened]]">
@@ -95,7 +95,6 @@ class ProfileDropdown extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _openModal() {
     this._handleTap();
-    document.querySelector('body')!.appendChild(this.$.userProfileDialog);
     (this.$.userProfileDialog as UserProfileDialogEl).open();
   }
 

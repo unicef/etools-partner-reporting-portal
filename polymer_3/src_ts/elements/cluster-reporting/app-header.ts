@@ -24,7 +24,7 @@ class AppHeader extends PolymerElement {
       :host {
         display: block;
         position: relative;
-        z-index: 100;
+        z-index: 200;
       }
 
       app-header {

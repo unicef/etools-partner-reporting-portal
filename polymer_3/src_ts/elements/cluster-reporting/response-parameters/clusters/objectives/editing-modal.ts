@@ -95,7 +95,7 @@ class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixi
 
     <paper-dialog
         id="dialog"
-        with-backdrop no-cancel-on-outside-click
+        modal
         opened="[[opened]]">
       <div class="header layout horizontal justified">
         <h2>[[localize('edit_cluster_objective')]]</h2>

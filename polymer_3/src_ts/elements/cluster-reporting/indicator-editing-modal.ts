@@ -171,7 +171,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
       <paper-dialog
           id="dialog"
-          with-backdrop no-cancel-on-outside-click
+          modal
           opened="{{opened}}">
 
         <div class="header layout horizontal justified">

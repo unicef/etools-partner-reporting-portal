@@ -43,7 +43,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
     <paper-dialog
         id="dialog"
-        with-backdrop no-cancel-on-outside-click
+        modal
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[localize('enter_data')]]</h2>

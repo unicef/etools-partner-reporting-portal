@@ -165,7 +165,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
     <paper-dialog
         id="dialog"
-        with-backdrop no-cancel-on-outside-click
+        modal
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[localize('edit_activity')]]</h2>
