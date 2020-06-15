@@ -66,8 +66,8 @@ class WorkspaceAdmin(admin.ModelAdmin):
 
 
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country_short_code')
-    search_fields = ('name', 'country_short_code')
+    list_display = ('name', 'iso3_code', 'country_short_code')
+    search_fields = ('name', 'iso3_code', 'country_short_code')
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):

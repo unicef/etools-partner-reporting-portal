@@ -40,9 +40,17 @@ def process_workspaces():
             serializer = PMPWorkspaceSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             workspace = serializer.save()
-            logger.info("Create Country for Workspace: {}".format(data['country_short_code']))
+            logger.info("Create Country for Workspace: {}".format(
+                data['iso3_code'],
+            ))
+            # NOTE if would be better to get_or_create on iso3_code
+            # initially though we need to pull that information first
+            # and update current records.
+            # So in subsequent releases we may change this, once data is sync'd
             country, created = Country.objects.get_or_create(
-                name=workspace.title, country_short_code=data['country_short_code']
+                name=workspace.title,
+                country_short_code=data['country_short_code'],
+                **{"iso3_code": data['iso3_code']}
             )
             workspace.countries.add(country)
     except Exception as e:
