@@ -7,6 +7,7 @@ ENV ENV ${env:-dev}
 ADD . /code/
 
 WORKDIR /code/
+RUN apk add bash
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH /code
