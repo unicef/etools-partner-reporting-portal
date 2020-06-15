@@ -5,16 +5,13 @@ FROM unicef/etools-prp-base:latest
 ARG env
 ENV ENV ${env:-dev}
 
-ARG requirement_file
-ENV REQUIREMENT_FILE ${requirement_file:-dev.txt}
+WORKDIR /etools/
+ADD Pipfile .
+ADD Pipfile.lock .
+RUN pipenv install --dev --system  --ignore-pipfile
 
 RUN pip install greenlet==0.4.14
 RUN CFLAGS="-I/usr/local/include/python3.7" UWSGI_PROFILE="asyncio" pip install uwsgi==2.0.15
-
-ADD ./requirements/* /tmp/
-
-WORKDIR /tmp
-RUN pip install -r $REQUIREMENT_FILE --trusted-host pypi.python.org
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads

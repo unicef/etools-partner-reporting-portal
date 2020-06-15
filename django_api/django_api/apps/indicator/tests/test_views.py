@@ -1,7 +1,7 @@
 import copy
 import datetime
 from ast import literal_eval as make_tuple
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
@@ -826,11 +826,10 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                factories.ClusterIndicatorReportFactory(
-                    reportable=self.partneractivity_reportable,
-                    report_status=INDICATOR_REPORT_STATUS.submitted,
-                )
+            factories.ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -1040,11 +1039,10 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                factories.ClusterIndicatorReportFactory(
-                    reportable=self.partneractivity_reportable,
-                    report_status=INDICATOR_REPORT_STATUS.submitted,
-                )
+            factories.ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -1499,11 +1497,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                factories.ClusterIndicatorReportFactory(
-                    reportable=self.partneractivity_reportable,
-                    report_status=INDICATOR_REPORT_STATUS.submitted,
-                )
+            factories.ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")
@@ -2050,11 +2047,10 @@ class TestReportRefreshAPIView(BaseAPITestCase):
         )
 
         for _ in range(2):
-            with patch("django.db.models.signals.ModelSignal.send", Mock()):
-                factories.ClusterIndicatorReportFactory(
-                    reportable=self.partneractivity_reportable,
-                    report_status=INDICATOR_REPORT_STATUS.submitted,
-                )
+            factories.ClusterIndicatorReportFactory(
+                reportable=self.partneractivity_reportable,
+                report_status=INDICATOR_REPORT_STATUS.submitted,
+            )
 
         # Creating Level-3 disaggregation location data for all locations
         generate_3_num_disagg_data(self.partneractivity_reportable, indicator_type="quantity")

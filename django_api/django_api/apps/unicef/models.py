@@ -116,10 +116,16 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     partner_focal_point = models.ManyToManyField(Person,
                                                  verbose_name='Partner Focal Point(s)',
                                                  related_name="partner_focal_programme_documents")
-    workspace = models.ForeignKey('core.Workspace',
-                                  related_name="partner_focal_programme_documents")
+    workspace = models.ForeignKey(
+        'core.Workspace',
+        related_name="partner_focal_programme_documents",
+        on_delete=models.CASCADE,
+    )
 
-    partner = models.ForeignKey('partner.Partner')
+    partner = models.ForeignKey(
+        'partner.Partner',
+        on_delete=models.CASCADE,
+    )
 
     start_date = models.DateField(
         verbose_name='Start Programme Date',
@@ -226,7 +232,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         verbose_name='Funds received %'
     )
 
-    amendments = JSONField(default=list())
+    amendments = JSONField(default=list)
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -355,7 +361,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         elif self.frequency == PD_FREQUENCY_LEVEL.quarterly:
             return 90
         else:
-            raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
+            raise NotImplementedError("Not recognized PD_FREQUENCY_LEVEL.")
 
     @property
     def lower_level_outputs(self):
@@ -372,18 +378,32 @@ class ProgressReport(TimeStampedModel):
     challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
     proposed_way_forward = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    programme_document = models.ForeignKey(ProgrammeDocument,
-                                           related_name="progress_reports",
-                                           default=-1)
+    programme_document = models.ForeignKey(
+        ProgrammeDocument,
+        related_name="progress_reports",
+        on_delete=models.CASCADE,
+        default=-1,
+    )
     start_date = models.DateField(verbose_name='Start Date', blank=True, null=True)
     end_date = models.DateField(verbose_name='End Date', blank=True, null=True)
     due_date = models.DateField(verbose_name='Due Date')
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
     # User should match by email to Person in programme_document.partner_focal_point list
-    submitted_by = models.ForeignKey('account.User', verbose_name='Submitted by / on behalf on', blank=True, null=True)
+    submitted_by = models.ForeignKey(
+        'account.User',
+        verbose_name='Submitted by / on behalf on',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     # Keep track of the user that triggered the submission
     submitting_user = models.ForeignKey(
-        'account.User', verbose_name='Submitted by', blank=True, null=True, related_name='submitted_reports'
+        'account.User',
+        verbose_name='Submitted by',
+        related_name='submitted_reports',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
 
     # Fields set by PO in PMP when reviewing the progress report
@@ -523,7 +543,11 @@ class ProgressReportAttachment(TimeStampedModel):
     related models:
         unicef.ProgressReport (ForeignKey): "progress_report"
     """
-    progress_report = models.ForeignKey('unicef.ProgressReport', related_name="attachments")
+    progress_report = models.ForeignKey(
+        'unicef.ProgressReport',
+        related_name="attachments",
+        on_delete=models.CASCADE,
+    )
     file = models.FileField(
         upload_to=get_pr_attachment_upload_to,
         max_length=500
@@ -549,7 +573,11 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
     start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
     end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
+    programme_document = models.ForeignKey(
+        ProgrammeDocument,
+        related_name='reporting_periods',
+        on_delete=models.CASCADE,
+    )
     description = models.CharField(max_length=512, blank=True, null=True)
 
     class Meta:
@@ -572,8 +600,11 @@ class PDResultLink(TimeStampedExternalBusinessAreaModel):
     """
     title = models.CharField(max_length=512,
                              verbose_name='CP output title/name')
-    programme_document = models.ForeignKey(ProgrammeDocument,
-                                           related_name="cp_outputs")
+    programme_document = models.ForeignKey(
+        ProgrammeDocument,
+        related_name="cp_outputs",
+        on_delete=models.CASCADE,
+    )
     external_cp_output_id = models.IntegerField()
 
     class Meta:
@@ -596,8 +627,11 @@ class LowerLevelOutput(TimeStampedExternalBusinessAreaModel):
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=512)
-    cp_output = models.ForeignKey(PDResultLink,
-                                  related_name="ll_outputs")
+    cp_output = models.ForeignKey(
+        PDResultLink,
+        related_name="ll_outputs",
+        on_delete=models.CASCADE,
+    )
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='lower_level_outputs')
 

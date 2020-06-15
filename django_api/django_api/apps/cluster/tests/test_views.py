@@ -1,5 +1,4 @@
 import datetime
-from unittest.mock import Mock, patch
 
 from django.urls import reverse
 
@@ -702,21 +701,20 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         )
 
         # Create 4 indicator reports across generic relation
-        with patch("django.db.models.signals.ModelSignal.send", Mock()):
-            self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.clusteractivity_reportable,
-            )
-            self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.clusterobjective_reportable,
-                report_status=INDICATOR_REPORT_STATUS.overdue,
-            )
-            self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.partnerproject_reportable,
-            )
+        self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusteractivity_reportable,
+        )
+        self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusterobjective_reportable,
+            report_status=INDICATOR_REPORT_STATUS.overdue,
+        )
+        self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partnerproject_reportable,
+        )
 
         self.loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.partnerproject_indicator_report,
@@ -879,25 +877,24 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
 
         # Create 4 indicator reports across generic relation
-        with patch("django.db.models.signals.ModelSignal.send", Mock()):
-            self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.clusteractivity_reportable,
-            )
-            self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.custom_partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.custom_partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.clusterobjective_reportable,
-                report_status=INDICATOR_REPORT_STATUS.overdue,
-            )
-            self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
-                reportable=self.partnerproject_reportable,
-            )
+        self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusteractivity_reportable,
+        )
+        self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.custom_partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.custom_partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusterobjective_reportable,
+            report_status=INDICATOR_REPORT_STATUS.overdue,
+        )
+        self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partnerproject_reportable,
+        )
 
         self.clusteractivity_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.clusteractivity_indicator_report,

@@ -216,7 +216,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = JSONField(default=[], blank=True, null=True)
+    custom_fields = JSONField(default=list, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(
@@ -241,7 +241,9 @@ class PartnerProject(TimeStampedExternalSourceModel):
         'core.Location', related_name="partner_projects"
     )
     partner = models.ForeignKey(
-        Partner, related_name="partner_projects"
+        Partner,
+        related_name="partner_projects",
+        on_delete=models.CASCADE,
     )
     additional_partners = models.ManyToManyField(
         Partner, blank=True, verbose_name='Additional implementing partners'
@@ -306,7 +308,10 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
 
 
 class PartnerProjectFunding(TimeStampedModel):
-    project = models.OneToOneField(PartnerProject)
+    project = models.OneToOneField(
+        PartnerProject,
+        on_delete=models.CASCADE,
+    )
 
     # All fields below stored in USD
     required_funding = models.DecimalField(decimal_places=2, max_digits=32, null=True, blank=True)
@@ -368,13 +373,25 @@ class PartnerActivity(TimeStampedModel):
         related_name="partner_activities",
         through="PartnerActivityProjectContext",
     )
-    partner = models.ForeignKey(Partner, related_name="partner_activities")
-    cluster_activity = models.ForeignKey('cluster.ClusterActivity',
-                                         related_name="partner_activities",
-                                         null=True, blank=True)
-    cluster_objective = models.ForeignKey('cluster.ClusterObjective',
-                                          related_name="partner_activities",
-                                          null=True, blank=True)
+    partner = models.ForeignKey(
+        Partner,
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+    )
+    cluster_activity = models.ForeignKey(
+        'cluster.ClusterActivity',
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    cluster_objective = models.ForeignKey(
+        'cluster.ClusterObjective',
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_activities')
     locations = models.ManyToManyField('core.Location',

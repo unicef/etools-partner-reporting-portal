@@ -1,9 +1,8 @@
 from core.helpers import generate_data_combination_entries
 from core.tests import factories
-from indicator.models import Disaggregation, ReportingEntity
 
-unicef_re = ReportingEntity.objects.get(title="UNICEF")
-cluster_re = ReportingEntity.objects.get(title="Cluster")
+# unicef_re = factories.ReportingEntityFactory(title="UNICEF")
+# cluster_re = factories.ReportingEntityFactory(title="Cluster")
 
 
 # def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
@@ -259,6 +258,8 @@ def add_disaggregations_to_reportable(reportable, disaggregation_targets):
 
     # Disaggregation generation
     for target in disaggregation_targets:
-        disaggregation = Disaggregation.objects.get(name=target,
-                                                    response_plan=response_plan)
+        disaggregation = factories.DisaggregationFactory(
+            name=target,
+            response_plan=response_plan,
+        )
         reportable.disaggregations.add(disaggregation)
