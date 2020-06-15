@@ -139,7 +139,7 @@ def save_location_list(location_list, source_type):
             elif 'adminLevel' in location_data \
                     and location_data['adminLevel'] == 0:
                 country, _ = Country.objects.update_or_create(
-                    country_short_code=location_data['iso3'],
+                    iso3_code=location_data['iso3'],
                     defaults={
                         'name': location_data['name']
                     }
@@ -157,7 +157,7 @@ def save_location_list(location_list, source_type):
                 ))
                 continue
 
-            gateway_name = '{}-Admin Level {}'.format(country.country_short_code, location_data['adminLevel'])
+            gateway_name = '{}-Admin Level {}'.format(country.iso3_code, location_data['adminLevel'])
             logger.debug('Saving gateway type with name {}'.format(gateway_name))
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
