@@ -99,7 +99,7 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
     <paper-dialog
       id="dialog"
-      with-backdrop
+      with-backdrop no-cancel-on-outside-click
       opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Pull data</h2>

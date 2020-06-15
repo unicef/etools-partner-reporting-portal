@@ -94,7 +94,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        with-backdrop no-cancel-on-outside-click
         opened="[[opened]]">
       <div class="header layout horizontal justified">
         <h2>[[localize('edit_cluster_activity')]]</h2>

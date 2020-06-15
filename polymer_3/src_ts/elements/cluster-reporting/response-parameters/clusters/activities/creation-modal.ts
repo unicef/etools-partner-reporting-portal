@@ -78,7 +78,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        with-backdrop no-cancel-on-outside-click
         opened="{{opened}}">
       <div id="header" class="header layout horizontal justified">
         <h2>[[localize('add_cluster_activity')]]</h2>

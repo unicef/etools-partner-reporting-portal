@@ -99,7 +99,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
       <paper-dialog
           id="dialog"
-          with-backdrop
+          with-backdrop no-cancel-on-outside-click
           opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>Edit Project</h2>

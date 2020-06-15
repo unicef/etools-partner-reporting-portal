@@ -13,11 +13,10 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
     connectedCallback() {
       super.connectedCallback();
-
-      this._addEventListeners();
+      this._addOverlayEventListeners();
     }
 
-    _addEventListeners() {
+    _addOverlayEventListeners() {
       this.addEventListener('iron-overlay-opened', this._dialogOpening as any);
       this.addEventListener('iron-overlay-closed', this._dialogClosing as any);
     }
@@ -29,7 +28,9 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       const zIndex = (dialogOverlays[0] as any).style.zIndex;
       this._closeOverlays(dialogOverlays);
 
-      (this.$.drawer as any).style.zIndex = '0';
+      if (this.$.drawer) {
+        (this.$.drawer as any).style.zIndex = '0';
+      }
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       if (!pageOverlay.classList.contains('opened')) {
         pageOverlay.style.zIndex = zIndex;
@@ -53,7 +54,9 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
       pageOverlay.classList.remove('opened');
-      (this.$.drawer as any).style.zIndex = '1';
+      if (this.$.drawer) {
+        (this.$.drawer as any).style.zIndex = '1';
+      }
     }
 
     _closeOverlays(overlays: NodeListOf<Element>) {

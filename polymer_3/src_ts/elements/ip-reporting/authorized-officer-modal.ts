@@ -69,7 +69,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog with-backdrop opened=[[opened]]>
+    <paper-dialog with-backdrop no-cancel-on-outside-click opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('select_authorized_officer')]]</h2>
 

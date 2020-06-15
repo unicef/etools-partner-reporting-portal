@@ -196,7 +196,7 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        with-backdrop no-cancel-on-outside-click
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">

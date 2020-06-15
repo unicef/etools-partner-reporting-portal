@@ -201,7 +201,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
       <paper-dialog
         id="dialog"
-        with-backdrop
+        with-backdrop no-cancel-on-outside-click
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
 
