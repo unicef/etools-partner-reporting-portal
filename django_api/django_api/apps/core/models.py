@@ -69,6 +69,12 @@ class Country(TimeStampedModel):
     on Sep. 14, 2017.
     """
     name = models.CharField(max_length=100)
+    iso3_code = models.CharField(
+        max_length=10,
+        blank=True,
+        default='',
+        verbose_name=_("ISO3 Code"),
+    )
     country_short_code = models.CharField(
         max_length=10,
         null=True,
