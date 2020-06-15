@@ -185,7 +185,7 @@ class V1FundingSourceImportSerializer(serializers.Serializer):
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     name = serializers.CharField()
-    iso3 = serializers.CharField(source='country_short_code', allow_null=True)
+    iso3_code = serializers.CharField(source='iso3_code', allow_null=True)
 
     class Meta:
         model = Country
@@ -195,10 +195,10 @@ class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixi
         )
 
     def create(self, validated_data):
-        country_short_code = validated_data.pop('country_short_code')
+        iso3_code = validated_data.pop('iso3_code')
 
         return Country.objects.update_or_create(
-            country_short_code=country_short_code,  defaults=validated_data,
+            iso3_code=iso3_code,  defaults=validated_data,
         )[0]
 
 
@@ -243,7 +243,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
         elif len(locations) == 1:
             workspace_id = None
             workspace_title = locations[0]['name']
-            workspace_code = locations[0]['country_short_code']
+            workspace_code = locations[0]['iso3_code']
         else:
             raise serializers.ValidationError('No overall emergency named for multi country plan')
         # TODO: Handling of duplicate workspace codes
