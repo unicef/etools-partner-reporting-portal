@@ -509,7 +509,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _calculationFormulaAcrossPeriods(indicator: any) {
     return indicator.reportable.blueprint.display_type === 'ratio' ?
-      'latest' : indicator.reportable.blueprint.calculation_formula_across_periods;
+      this.localize('latest') : indicator.reportable.blueprint.calculation_formula_across_periods;
   }
 
   _computeIcon(opened: string) {
