@@ -24,7 +24,7 @@ class IpReportingAppHeader extends PolymerElement {
       :host {
         display: block;
         position: relative;
-        z-index: 200;
+        z-index: 100;
         height: 65px;
       }
 
