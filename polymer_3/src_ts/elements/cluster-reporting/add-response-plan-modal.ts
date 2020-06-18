@@ -53,7 +53,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 800px;
+          width: 820px;
         }
       }
 
@@ -124,7 +124,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
     <paper-dialog
       id="dialog"
-      with-backdrop
+      modal
       opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add Response Plan</h2>

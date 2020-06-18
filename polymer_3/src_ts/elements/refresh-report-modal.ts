@@ -58,7 +58,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
         content-type="application/json">
     </etools-prp-ajax>
 
-    <paper-dialog opened=[[opened]]>
+    <paper-dialog modal opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>[[localize('are_you_sure')]]?</h2>
 

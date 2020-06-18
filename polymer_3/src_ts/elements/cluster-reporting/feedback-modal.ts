@@ -82,7 +82,7 @@ class FeedbackModal extends ModalMixin(PolymerElement) {
 
         <paper-dialog
             id="dialog"
-            with-backdrop
+            modal
             opened="{{opened}}">
 
           <div class="header layout horizontal justified">

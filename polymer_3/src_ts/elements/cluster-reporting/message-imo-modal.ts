@@ -61,7 +61,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
 
       <paper-dialog
           id="dialog"
-          with-backdrop
+          modal
           opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>Send a message to IMO</h2>

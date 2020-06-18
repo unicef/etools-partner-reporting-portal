@@ -61,7 +61,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[localize('add_disaggregation')]]</h2>

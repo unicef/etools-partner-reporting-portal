@@ -54,7 +54,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
         --app-grid-gutter: 10px;
 
         --paper-dialog: {
-          width: 700px;
+          width: 740px;
           margin: 0;
         }
 
@@ -190,7 +190,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">

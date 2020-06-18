@@ -29,7 +29,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       </style>
 
       <paper-dialog
-          with-backdrop
+          modal
           opened="{{opened}}">
         <div>
           <ul>

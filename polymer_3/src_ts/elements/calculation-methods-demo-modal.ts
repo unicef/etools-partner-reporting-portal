@@ -67,7 +67,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
       }
     </style>
 
-    <paper-dialog id="calculation-methods-demo-modal-dialog" with-backdrop opened="{{opened}}">
+    <paper-dialog id="calculation-methods-demo-modal-dialog" modal opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Calculation method across [[domain]]</h2>
 
