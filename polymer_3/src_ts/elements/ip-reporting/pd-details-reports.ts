@@ -60,6 +60,12 @@ class PdDetailsReport extends ReduxConnectedElement {
   `;
   }
 
+  @property({type: String})
+  query!: string;
+
+  @property({type: Object})
+  queryParams!: GenericObject;
+
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
@@ -103,24 +109,25 @@ class PdDetailsReport extends ReduxConnectedElement {
   }
 
   _handleInputChange(url: string) {
+    if (!url || (!this.queryParams || !Object.keys(this.queryParams).length)) {
+      return;
+    }
+
     const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer,
       timeOut.after(250),
       () => {
-        if (!url) {
-          return;
-        }
 
         const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
 
         // Cancel the pending request, if any
         (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId));
+        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
           // @ts-ignore
-          // .catch(function(err) {
-          //   // TODO: error handling
-          // });
+          .catch(function(err) {
+            console.log(err);
+          });
       });
   }
 
@@ -143,10 +150,10 @@ class PdDetailsReport extends ReduxConnectedElement {
           // Cancel the pending request, if any
           (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
           self.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
-            // @ts-ignore
-            // .catch(function(err) {
-            //   // TODO: error handling
-            // });
+          // @ts-ignore
+          // .catch(function(err) {
+          //   // TODO: error handling
+          // });
         });
     }
   }
