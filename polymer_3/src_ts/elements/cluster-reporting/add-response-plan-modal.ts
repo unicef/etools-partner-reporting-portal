@@ -80,7 +80,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
         padding-bottom: 20px;
       }
 
-      etools-dropdown, etools-dropdown-multi, datepicker-lite {
+      etools-dropdown, etools-dropdown-multi, datepicker-lite, paper-input {
         width: 100%;
       }
       .start-date, .end-date{
@@ -196,6 +196,22 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 required>
               </paper-input>
             </div>
+            <div class="item full-width">
+              <etools-dropdown-multi
+                class="validate"
+                label="Clusters"
+                options="[[clusters]]"
+                option-value="value"
+                option-label="label"
+                selected-values="{{data.clusters}}"
+                on-etools-selected-items-changed="_validate"
+                trigger-value-change-event
+                hide-close
+                error-message=""
+                with-backdrop
+                required>
+              </etools-dropdown-multi>
+            </div>
             <div class="item">
               <etools-dropdown
                   class="validate"
@@ -223,6 +239,12 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 </paper-input>
               </div>
             </template>
+            <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
+              <div class="item">
+                  <div class="full-width">
+                  </div>
+              </div>
+            </template>
             <div class="item">
               <datepicker-lite
                 class="start-date"
@@ -233,7 +255,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 required>
               </datepicker-lite>
             </div>
-
             <div class="item">
               <datepicker-lite
                 class="end-date"
@@ -243,22 +264,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 selected-date-display-format="D MMM YYYY"
                 required>
               </datepicker-lite>
-            </div>
-            <div class="item full-width">
-              <etools-dropdown-multi
-                class="validate"
-                label="Clusters"
-                options="[[clusters]]"
-                option-value="value"
-                option-label="label"
-                selected-values="{{data.clusters}}"
-                on-etools-selected-items-changed="_validate"
-                trigger-value-change-event
-                hide-close
-                error-message=""
-                with-backdrop
-                required>
-              </etools-dropdown-multi>
             </div>
           </div>
         </template>
