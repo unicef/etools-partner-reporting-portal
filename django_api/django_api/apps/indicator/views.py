@@ -897,9 +897,9 @@ class ReportRefreshAPIView(APIView):
             # then do not perform reset
             future_reports_qs = IndicatorReport.objects.exclude(
                 pk=report.pk,
-                reportable=report.reportable,
-            ).filter(due_date__gt=report.due_date).exclude(
-                indicator_location_data__disaggregation={},
+            ).filter(
+                progress_report=report.progress_report,
+                due_date__gt=report.due_date,
             )
             if future_reports_qs.exists():
                 msg = {
