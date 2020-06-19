@@ -496,3 +496,13 @@ AUTHENTICATION_BACKENDS = (
 # ELASTIC_APM_SERVICE_NAME=<app-name> # set app name visible on dashboard
 # ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
 # ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
+
+# raven (Sentry): https://github.com/getsentry/raven-python
+SENTRY_DSN = os.getenv('SENTRY_DSN', default=False)
+if SENTRY_DSN:
+    RAVEN_CONFIG = {
+        'dsn': SENTRY_DSN,  # noqa: F405
+    }
+    INSTALLED_APPS += (  # noqa: F405
+        'raven.contrib.django.raven_compat',
+    )

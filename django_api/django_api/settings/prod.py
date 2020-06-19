@@ -5,14 +5,6 @@ import sys
 
 from .base import *
 
-# raven (Sentry): https://github.com/getsentry/raven-python
-RAVEN_CONFIG = {
-    'dsn': os.getenv('SENTRY_DSN'),  # noqa: F405
-}
-INSTALLED_APPS += (  # noqa: F405
-    'raven.contrib.django.raven_compat',
-)
-
 DEBUG = False
 IS_DEV = False
 IS_STAGING = False
