@@ -259,7 +259,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
       <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         on-iron-overlay-closed="_close"
         opened="{{ opened }}">
         <div class="header layout horizontal justified">

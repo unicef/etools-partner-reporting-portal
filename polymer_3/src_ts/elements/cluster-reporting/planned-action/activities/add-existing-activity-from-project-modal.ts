@@ -151,7 +151,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         on-iron-overlay-closed="_close"
         opened="{{opened}}">
       <div class="header layout horizontal justified">

@@ -61,7 +61,7 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[pd.title]]</h2>

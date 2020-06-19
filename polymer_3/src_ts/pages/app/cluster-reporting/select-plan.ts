@@ -1,6 +1,7 @@
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
+import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
@@ -15,6 +16,7 @@ import '../../../elements/workspace-dropdown';
 import '../../../elements/etools-prp-workspaces';
 import '../../../elements/cluster-reporting/add-plan-panel';
 import RoutingMixin from '../../../mixins/routing-mixin';
+import OverlayHelperMixin from '../../../mixins/overlay-helper-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {tableStyles} from '../../../styles/table-styles';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
@@ -24,7 +26,7 @@ import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
  * @customElement
  * @appliesMixin RoutingMixin
  */
-class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement) {
+class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(ReduxConnectedElement)) {
 
   public static get template() {
     return html`
@@ -173,6 +175,7 @@ class PageClusterReportingSelectPlan extends RoutingMixin(ReduxConnectedElement)
     </etools-prp-workspaces>
 
     <div class="container">
+      <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
       <div class="container-inner">
           <h2>Select Workspace</h2>
           <workspace-dropdown

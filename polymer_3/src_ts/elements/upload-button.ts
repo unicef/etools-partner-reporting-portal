@@ -66,7 +66,7 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
 
       <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         opened="{{opened}}">
 
         <div class="header layout horizontal justified">
