@@ -868,7 +868,8 @@ class ReportRefreshAPIView(APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """
-        Removes all IndicatorReport instances for given ProgressReport, including underlying IndicatorLocationData instances
+        Removes all IndicatorReport instances for given ProgressReport,
+        including underlying IndicatorLocationData instances
         """
         serializer = ReportRefreshSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -887,7 +888,30 @@ class ReportRefreshAPIView(APIView):
             report = get_object_or_404(IndicatorReport, id=serializer.validated_data['report_id'])
 
             if report.progress_report:
-                raise ValidationError("This indicator report is linked to a progress report. Use the progress report ID instead.")
+                raise ValidationError(
+                    "This indicator report is linked to a progress report. "
+                    "Use the progress report ID instead.",
+                )
+
+            # if future report and indicator location data exists,
+            # then do not perform reset
+            future_reports_qs = IndicatorReport.objects.exclude(
+                pk=report.pk,
+                reportable=report.reportable,
+            ).filter(due_date__gt=report.due_date).exclude(
+                indicator_location_data__disaggregation={},
+            )
+            if future_reports_qs.exists():
+                msg = {
+                    "response": "Data has already been submitted for "
+                    "reports that follow the current report you are "
+                    "trying to refresh. To avoid data loss, please "
+                    "contact the PRP help desk "
+                    "[https://prphelp.zendesk.com/hc/en-us/requests/new] "
+                    "to request assistance in refreshing your reporting "
+                    "data.",
+                }
+                return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
             reset_indicator_report_data(report)
 
