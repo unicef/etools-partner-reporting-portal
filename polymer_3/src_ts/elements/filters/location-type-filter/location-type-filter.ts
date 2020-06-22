@@ -34,7 +34,11 @@ class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
   value!: string;
 
   _computeData(maxLocType: number) {
-    return Array(maxLocType + 1).fill(0).map((_, index) => {return {id: String(index), title: 'Admin' + index};})
+    return Array(maxLocType + 1)
+      .fill(0)
+      .map((_, index) => {
+        return {id: String(index), title: 'Admin' + index};
+      });
   }
 }
 

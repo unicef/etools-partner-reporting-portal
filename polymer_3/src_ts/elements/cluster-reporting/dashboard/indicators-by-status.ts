@@ -143,8 +143,8 @@ class IndicatorsByStatus extends LocalizeMixin(ReduxConnectedElement) {
     return colors[index];
   }
 
-  _computeChartRows(labels: any[]) {
-    const data = [].slice.call(arguments, 1);
+  _computeChartRows(labels: any[], ...args: any[]) {
+    const data = [].slice.call(args, 1);
 
     const localizedLabels = labels.map(function (label: any) {
       // convert labels to localized label keys

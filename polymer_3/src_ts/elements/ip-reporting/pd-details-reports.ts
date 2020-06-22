@@ -111,7 +111,7 @@ class PdDetailsReport extends ReduxConnectedElement {
       self.reduxStore
         .dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
         // @ts-ignore
-        .catch(function(err) {
+        .catch(function (err) {
           console.log(err);
         });
     });
@@ -132,9 +132,10 @@ class PdDetailsReport extends ReduxConnectedElement {
 
         // Cancel the pending request, if any
         (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-        this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
+        this.reduxStore
+          .dispatch(pdFetch(pdThunk.thunk()))
           // @ts-ignore
-          .catch(function(err) {
+          .catch(function (err) {
             console.log(err);
           });
       });

@@ -352,18 +352,24 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeLocationTypes(maxAdminLevel: number) {
-    return Array(maxAdminLevel + 1).fill(0).map((_, index) => {return {id: String(index), title: 'Admin' + index};})
+    return Array(maxAdminLevel + 1)
+      .fill(0)
+      .map((_, index) => {
+        return {id: String(index), title: 'Admin' + index};
+      });
   }
 
   _computeAjaxData(maxAdminLevel: number) {
-    return Array(maxAdminLevel + 1).fill(0).map((_, index) => {
-      return {
-        id: 'locations' + index,
-        params: {
-          loc_type: String(index)
-        }
-      };
-    });
+    return Array(maxAdminLevel + 1)
+      .fill(0)
+      .map((_, index) => {
+        return {
+          id: 'locations' + index,
+          params: {
+            loc_type: String(index)
+          }
+        };
+      });
   }
 
   _computeCanEditDetails(editing: boolean, parentIndicatorId: number, isPAI: boolean, permissions: GenericObject) {
@@ -479,7 +485,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           self._setPending(loc_type, false, index);
           self._setLocations(loc_type, res.data.results, index);
         })
-        .catch(function() {
+        .catch(function () {
           self._setPending(loc_type, false, index);
         });
     });
@@ -491,7 +497,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     const newLocations = this.locations.map((x: any) => x);
 
     if (lockedItems.length > 0) {
-      lockedItems.forEach(function(location, index) {
+      lockedItems.forEach(function (location, index) {
         if (location.admin_level === undefined) {
           newLocations[index] = {};
           newLocations[index][location.loc_type] = [location];
@@ -589,7 +595,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     super.disconnectedCallback();
     const locTypeDebouncers = Array(this.maxAdminLevel)
       .fill('fetch-locations-')
-      .map(function(item, index) {
+      .map(function (item, index) {
         return item + ++index;
       });
 

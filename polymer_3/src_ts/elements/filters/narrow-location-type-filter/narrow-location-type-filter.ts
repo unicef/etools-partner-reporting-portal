@@ -61,7 +61,8 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
     if (!params) {
       return;
     }
-    const validData = Array(maxLocType + 1).fill(0)
+    const validData = Array(maxLocType + 1)
+      .fill(0)
       .map((_, index) => {
         return {
           id: String(index),

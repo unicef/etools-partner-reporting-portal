@@ -1099,14 +1099,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computePartnerForClusters() {
-    let partnerId = null;
+    let partnerId;
     if (this.selectedPartner !== undefined) {
       partnerId = this.selectedPartner;
     } else {
       partnerId = this.partnerID;
     }
 
-    return partnerId;
+    return partnerId ? partnerId : null;
   }
 
   _setDefaults(edit: boolean) {

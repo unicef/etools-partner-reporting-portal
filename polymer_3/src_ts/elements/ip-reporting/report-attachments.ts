@@ -17,7 +17,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-file/etools-file';
-import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
+// import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
 /**
@@ -210,20 +210,20 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           self.set('attachmentDeleteUrl', undefined);
 
           if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-            (self.$.faceAttachmentComponent as EtoolsFile).fileInput.value = null;
-            (self.$.faceAttachmentComponent as EtoolsFile).set('files', []);
+            (self.$.faceAttachmentComponent as any).fileInput.value = null;
+            (self.$.faceAttachmentComponent as any).set('files', []);
           } else if (
             self.get('otherOneAttachment').length !== 0 &&
             e.detail.file.id === self.get('otherOneAttachment')[0].id
           ) {
-            (self.$.otherOneAttachmentComponent as EtoolsFile).fileInput.value = null;
-            (self.$.otherOneAttachmentComponent as EtoolsFile).set('files', []);
+            (self.$.otherOneAttachmentComponent as any).fileInput.value = null;
+            (self.$.otherOneAttachmentComponent as any).set('files', []);
           } else if (
             self.get('otherTwoAttachment').length !== 0 &&
             e.detail.file.id === self.get('otherTwoAttachment')[0].id
           ) {
-            (self.$.otherTwoAttachmentComponent as EtoolsFile).fileInput.value = null;
-            (self.$.otherTwoAttachmentComponent as EtoolsFile).set('files', []);
+            (self.$.otherTwoAttachmentComponent as any).fileInput.value = null;
+            (self.$.otherTwoAttachmentComponent as any).set('files', []);
           }
         })
         // @ts-ignore
@@ -246,8 +246,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     const files = isEmpty ? [] : change.base;
 
     files.findIndex((file: GenericObject) => {
-      if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
-        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
+      if (/[^a-zA-Z0-9-_]+/.test(file.file_name)) {
+        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_]+/g, '_');
       }
     });
 

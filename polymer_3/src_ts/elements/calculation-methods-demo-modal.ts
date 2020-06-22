@@ -88,7 +88,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
           <labelled-item
             label="Guidance on measurement (for each reporting period)">
             <span>
-              Quality standard: requires agreed treatment protocol and duration
+              Quality standard: requires agreed treatment protocol and duration
               (usually 2 mo); Measurement/reporting clarification: measures
               newly admitted cases for an ongoing service, therefore requires
               agreement to consistently report NEW admissions for an agreed
@@ -227,9 +227,8 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
       case 'sum':
         return this._totalSum(totals);
       case 'max':
-        return Math.max.apply(
-          Math,
-          totals.map(function (total) {
+        return Math.max(
+          ...totals.map(function (total) {
             return total.value;
           })
         );

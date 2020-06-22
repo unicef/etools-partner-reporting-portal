@@ -171,7 +171,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
     }
     const self = this;
     const thunk = (this.$.createDisaggregation as EtoolsPrpAjaxEl).thunk();
-    const newChoices = [];
+    const newChoices: GenericObject[] = [];
     for (let i = 0; i < this.data.choices.length; i++) {
       newChoices.push({value: this.data.choices[i], active: true});
     }

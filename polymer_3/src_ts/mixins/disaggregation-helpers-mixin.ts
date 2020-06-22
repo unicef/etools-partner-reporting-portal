@@ -98,8 +98,8 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
         });
     }
 
-    private formatKey() {
-      const chunks = [].slice.call(arguments);
+    private formatKey(...args: any[]) {
+      const chunks = [].slice.call(args);
       const formatted = '(' + chunks.join(', ') + ')';
 
       // Normalizes whitespace inconsistencies across keys

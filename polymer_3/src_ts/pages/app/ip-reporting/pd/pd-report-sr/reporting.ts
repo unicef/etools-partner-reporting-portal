@@ -206,7 +206,7 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
           self._notifyChangesSaved();
         })
         // @ts-ignore
-        .catch(function(err) {
+        .catch(function (err) {
           console.log(err);
         });
     });

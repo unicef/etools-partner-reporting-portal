@@ -216,9 +216,7 @@ import {GenericObject} from '../typings/globals.types';
 
     _computePermissions(params: GenericObject) {
       return Object.keys(permissions).reduce(function (acc: any, key: string) {
-        // @ts-ignore
         const granted = permissions[key];
-
         acc[key] = (function () {
           switch (true) {
             case Array.isArray(granted):
@@ -233,10 +231,9 @@ import {GenericObject} from '../typings/globals.types';
 
             case typeof granted === 'function':
               if (granted.length > 1) {
-                return function () {
-                  const args = [].slice.call(arguments);
-
-                  return granted.apply(null, [params].concat(args));
+                return function (...args: any[]) {
+                  const arg = [].slice.call(args);
+                  return granted(...[params].concat(arg));
                 };
               }
 

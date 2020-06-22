@@ -102,5 +102,15 @@
     "prpl-server": "^1.3.0",
     "puppeteer": "^1.5.0",
     "typescript": "^3.7.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && tsc --skipLibCheck"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
   }
 }

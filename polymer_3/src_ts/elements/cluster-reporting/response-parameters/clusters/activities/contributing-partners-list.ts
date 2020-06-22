@@ -273,7 +273,7 @@ class ContributingPartnersList extends LocalizeMixin(
       return;
     }
     const id = (
-      partner_activities.filter(function(activity: GenericObject) {
+      partner_activities.filter(function (activity: GenericObject) {
         return Number(activity.cluster_activity) === Number(activityId);
       })[0] || {}
     ).id;

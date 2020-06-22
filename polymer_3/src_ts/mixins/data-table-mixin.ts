@@ -36,12 +36,7 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._colapseExpandedDetails();
 
       // @ts-ignore
-      this.set(
-        'queryParams',
-        Object.assign({}, this.queryParams, {
-          page: e.detail.value
-        })
-      );
+      this.set('queryParams', Object.assign({}, this.queryParams, {page: e.detail.value}));
 
       setTimeout(() => {
         this.set('_pageNumberInitialized', true);

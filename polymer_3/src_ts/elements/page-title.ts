@@ -19,8 +19,8 @@ class PageTitle extends PolymerElement {
     return ['_setDocumentTitle(title, divider, baseTitle)'];
   }
 
-  _setDocumentTitle() {
-    document.title = [].slice.call(arguments).join(' ');
+  _setDocumentTitle(...args: any[]) {
+    document.title = [].slice.call(args).join(' ');
   }
 }
 

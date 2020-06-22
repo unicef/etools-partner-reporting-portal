@@ -5,7 +5,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '../etools-prp-permissions';
 import {GenericObject} from '../../typings/globals.types';
 import RoutingMixin from '../../mixins/routing-mixin';
-import ProgressReportUtilsBehavior from '../../mixins/progress-report-utils-mixin';
+import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 import {
@@ -23,7 +23,7 @@ import {
  * @appliesMixin LocalizeMixin
  */
 class PdReportsReportTitle extends LocalizeMixin(
-  ProgressReportUtilsBehavior(UtilsMixin(RoutingMixin(ReduxConnectedElement)))
+  ProgressReportUtilsMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement)))
 ) {
   public static get template() {
     return html`

@@ -122,21 +122,21 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     return (method || '').toUpperCase();
   }
 
-  _handleResponse(e: CustomEvent) {
+  _handleResponse(e: CustomEvent, ...args: any[]) {
     const request = e.detail;
     const token = request.xhr.getResponseHeader('token');
 
     if (token) {
       this.reduxStore.dispatch(setToken(token));
     }
-    fireEvent(this, 'response', ['response'].concat(Array.from(arguments)));
+    fireEvent(this, 'response', ['response'].concat(Array.from(args)));
   }
 
-  _handleRequest() {
-    fireEvent(this, 'request', ['request'].concat(Array.from(arguments)));
+  _handleRequest(...args: any[]) {
+    fireEvent(this, 'request', ['request'].concat(Array.from(args)));
   }
 
-  _handleError() {
+  _handleError(...args: any[]) {
     if (this.lastError && this.lastError.status === 401) {
       this.reduxStore.dispatch(resetToken());
     }
@@ -144,8 +144,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     if (this.lastError && this.lastError.status === 500) {
       this._notifyServerError();
     }
-
-    fireEvent(this, 'error', ['error'].concat(Array.from(arguments)));
+    fireEvent(this, 'error', ['error'].concat(Array.from(args)));
   }
 
   _buildResponse(req: GenericObject) {
@@ -156,14 +155,12 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
     };
   }
 
-  generateRequest() {
-    // @ts-ignore
-    return (this.$.ajax as IronAjaxElement).generateRequest.apply(this.$.ajax, arguments);
+  generateRequest(...args: []) {
+    return (this.$.ajax as IronAjaxElement).generateRequest.apply(this.$.ajax, args);
   }
 
-  toRequestOptions() {
-    // @ts-ignore
-    return (this.$.ajax as IronAjaxElement).toRequestOptions.apply(this.$.ajax, arguments);
+  toRequestOptions(...args: []) {
+    return (this.$.ajax as IronAjaxElement).toRequestOptions.apply(this.$.ajax, args);
   }
 
   thunk() {
