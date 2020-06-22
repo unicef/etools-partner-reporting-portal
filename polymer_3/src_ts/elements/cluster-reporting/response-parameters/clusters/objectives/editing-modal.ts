@@ -25,7 +25,6 @@ import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
 import {fireEvent} from '../../../../../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @customElement

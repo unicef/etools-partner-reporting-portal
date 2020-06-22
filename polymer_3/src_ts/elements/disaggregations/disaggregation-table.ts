@@ -18,7 +18,6 @@ import {fireEvent} from '../../utils/fire-custom-event';
 import {disaggregationsUpdateForLocation} from '../../redux/actions/disaggregations';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 
-
 /**
  * @polymer
  * @customElement
@@ -34,7 +33,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
         :host {
           --paper-input-container: {
             padding: 0;
-          };
+          }
         }
 
         disaggregation-switches {
@@ -85,108 +84,69 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
           display: inline-block;
           padding: 3px 10px;
           white-space: nowrap;
-          background-color: var(--paper-grey-100)
+          background-color: var(--paper-grey-100);
         }
       </style>
 
       <etools-prp-ajax
-          id="update"
-          url="[[updateUrl]]"
-          body="[[localData]]"
-          content-type="application/json"
-          method="put">
+        id="update"
+        url="[[updateUrl]]"
+        body="[[localData]]"
+        content-type="application/json"
+        method="put"
+      >
       </etools-prp-ajax>
 
       <div>
         <disaggregation-switches
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]"
-            formatted-data="{{formattedData}}"
-            on-formatted-data-changed="_triggerModalRefit">
+          data="[[data]]"
+          mapping="[[mapping]]"
+          editable="[[editable]]"
+          formatted-data="{{formattedData}}"
+          on-formatted-data-changed="_triggerModalRefit"
+        >
         </disaggregation-switches>
 
-        <template
-            is="dom-if"
-            if="[[viewLabel]]"
-            restamp="true">
-            <template
-                is="dom-if"
-                if="[[labels]]"
-                restamp="true">
-                <dl class="data-key">
-                  <dt>[[localize('label')]] -</dt>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(data.display_type, 'number')]]"
-                      restamp="true">
-                    <dd>[[_withDefault(labels.label)]]</dd>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[!_equals(data.display_type, 'number')]]"
-                      restamp="true">
-                    <dd>
-                      [[_withDefault(labels.numerator_label)]]
-                      /
-                      [[_withDefault(labels.denominator_label)]]
-                    </dd>
-                  </template>
-                </dl>
-            </template>
+        <template is="dom-if" if="[[viewLabel]]" restamp="true">
+          <template is="dom-if" if="[[labels]]" restamp="true">
+            <dl class="data-key">
+              <dt>[[localize('label')]] -</dt>
+              <template is="dom-if" if="[[_equals(data.display_type, 'number')]]" restamp="true">
+                <dd>[[_withDefault(labels.label)]]</dd>
+              </template>
+              <template is="dom-if" if="[[!_equals(data.display_type, 'number')]]" restamp="true">
+                <dd>
+                  [[_withDefault(labels.numerator_label)]] / [[_withDefault(labels.denominator_label)]]
+                </dd>
+              </template>
+            </dl>
+          </template>
         </template>
 
         <div class="layout horizontal justified">
           <div class="flex">
-            <template
-                is="dom-if"
-                if="[[dualReportingEnabled]]"
-                restamp="true">
+            <template is="dom-if" if="[[dualReportingEnabled]]" restamp="true">
               <h4>[[localize('progress_against_cluster_target')]]:</h4>
             </template>
 
             <table class="vertical layout">
-              <template
-                  is="dom-if"
-                  if="[[_equals(formattedMapping.length, 0)]]"
-                  restamp="true">
-                <zero-disaggregations
-                    data="[[viewData]]"
-                    mapping="[[formattedMapping]]"
-                    editable="[[editable]]">
+              <template is="dom-if" if="[[_equals(formattedMapping.length, 0)]]" restamp="true">
+                <zero-disaggregations data="[[viewData]]" mapping="[[formattedMapping]]" editable="[[editable]]">
                 </zero-disaggregations>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[_equals(formattedMapping.length, 1)]]"
-                  restamp="true">
-                <one-disaggregation
-                    data="[[viewData]]"
-                    mapping="[[formattedMapping]]"
-                    editable="[[editable]]">
+              <template is="dom-if" if="[[_equals(formattedMapping.length, 1)]]" restamp="true">
+                <one-disaggregation data="[[viewData]]" mapping="[[formattedMapping]]" editable="[[editable]]">
                 </one-disaggregation>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[_equals(formattedMapping.length, 2)]]"
-                  restamp="true">
-                <two-disaggregations
-                    data="[[viewData]]"
-                    mapping="[[formattedMapping]]"
-                    editable="[[editable]]">
+              <template is="dom-if" if="[[_equals(formattedMapping.length, 2)]]" restamp="true">
+                <two-disaggregations data="[[viewData]]" mapping="[[formattedMapping]]" editable="[[editable]]">
                 </two-disaggregations>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[_equals(formattedMapping.length, 3)]]"
-                  restamp="true">
-                <three-disaggregations
-                    data="[[viewData]]"
-                    mapping="[[formattedMapping]]"
-                    editable="[[editable]]">
+              <template is="dom-if" if="[[_equals(formattedMapping.length, 3)]]" restamp="true">
+                <three-disaggregations data="[[viewData]]" mapping="[[formattedMapping]]" editable="[[editable]]">
                 </three-disaggregations>
               </template>
             </table>
@@ -209,7 +169,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   byEntity: any[] = [];
 
   @property({type: Number})
-  editable: number = 0;
+  editable = 0;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
@@ -254,8 +214,10 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   indicatorId!: number;
 
   static get observers() {
-    return ['_resetFields(formattedData.disaggregation_reported_on)',
-      '_initPercentageMap(localData, reportingEntityPercentageMap)']
+    return [
+      '_resetFields(formattedData.disaggregation_reported_on)',
+      '_initPercentageMap(localData, reportingEntityPercentageMap)'
+    ];
   }
 
   _registerField(e: CustomEvent) {
@@ -269,7 +231,6 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   }
 
   _fieldValueChanged(e: CustomEvent) {
-
     const key = e.detail.key;
     if (!key) {
       return;
@@ -342,10 +303,11 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
   }
 
   _computeLabelVisibility(app: string, indicatorType: string) {
-    if ((String(app) === 'ip-reporting') &&
-      (String(indicatorType) === 'number')) {
+    if (String(app) === 'ip-reporting' && String(indicatorType) === 'number') {
       return false;
-    } else {return true;}
+    } else {
+      return true;
+    }
   }
 
   save() {
@@ -353,11 +315,11 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
       return Promise.reject();
     }
 
-    this.fields.forEach(function(field) {
+    this.fields.forEach(function (field) {
       field.validate();
     });
 
-    const cellsValid = this.fields.every(function(field) {
+    const cellsValid = this.fields.every(function (field) {
       return !field.invalid;
     });
 
@@ -371,18 +333,17 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
     const updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).abort();
 
-    return this.reduxStore.dispatch(
-      disaggregationsUpdateForLocation(
-        updateThunk,
-        String(self.indicatorId),
-        self.formattedData.location.id
-      )
-    )
-      // @ts-ignore
-      .then(function(value) {
-        fireEvent(self, 'locations-updated');
-        return value;
-      });
+    return (
+      this.reduxStore
+        .dispatch(
+          disaggregationsUpdateForLocation(updateThunk, String(self.indicatorId), self.formattedData.location.id)
+        )
+        // @ts-ignore
+        .then(function (value) {
+          fireEvent(self, 'locations-updated');
+          return value;
+        })
+    );
   }
 
   _triggerModalRefit(e: CustomEvent) {
@@ -402,9 +363,11 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
     const reportedOn = formattedData.disaggregation_reported_on;
 
-    return editableBool ? mapping.filter(function(disagg) {
-      return reportedOn.indexOf(disagg.id) !== -1;
-    }) : mapping;
+    return editableBool
+      ? mapping.filter(function (disagg) {
+          return reportedOn.indexOf(disagg.id) !== -1;
+        })
+      : mapping;
   }
 
   _computeIndicatorType(data: GenericObject) {
@@ -413,7 +376,7 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
   _computeViewData(data: GenericObject, totals: GenericObject) {
     return Object.assign({}, data, {
-      disaggregation: Object.assign({}, data.disaggregation, totals),
+      disaggregation: Object.assign({}, data.disaggregation, totals)
     });
   }
 
@@ -423,10 +386,10 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
   _computeReportingEntityPercentageMap(byEntity: any[]) {
     return byEntity
-      .filter(function(location) {
+      .filter(function (location) {
         return !location.is_master_location_data;
       })
-      .map(function(location) {
+      .map(function (location) {
         return {
           title: location.reporting_entity.title,
           percentage: 1
@@ -456,11 +419,10 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
 
     input.validate();
 
-    this.set([
-      'localData.reporting_entity_percentage_map',
-      input.dataset.index,
-      'percentage'
-    ], this._parsePercentage(input.value));
+    this.set(
+      ['localData.reporting_entity_percentage_map', input.dataset.index, 'percentage'],
+      this._parsePercentage(input.value)
+    );
   }
 
   connectedCallback() {
@@ -491,7 +453,6 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('disaggregation-table', DisaggregationTable);

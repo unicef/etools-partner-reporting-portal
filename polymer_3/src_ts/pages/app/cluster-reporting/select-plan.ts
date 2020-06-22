@@ -27,231 +27,207 @@ import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
  * @appliesMixin RoutingMixin
  */
 class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${tableStyles} ${appThemeClusterStyles}
-    <style include="data-table-styles">
-      :host {
-        display: block;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        max-width: 1200px;
-
-        --container-inner-layout: {
-          @apply --layout-vertical;
-          @apply --layout-center-justified;
-        };
-
-        --underline-shown: {
+      ${tableStyles} ${appThemeClusterStyles}
+      <style include="data-table-styles">
+        :host {
           display: block;
-        };
+          position: absolute;
+          height: 100%;
+          width: 100%;
+          max-width: 1200px;
 
-        --workspace-dropdown-input: {
-          color: black;
-        };
+          --container-inner-layout: {
+            @apply --layout-vertical;
+            @apply --layout-center-justified;
+          }
 
-        --select-plan-workspaces-offset: {
-          transform: translate(0px, -12px);
-        };
+          --underline-shown: {
+            display: block;
+          }
 
-        --workspaces-dropdown-width: {
-          width: 240px;
-        };
-      }
+          --workspace-dropdown-input: {
+            color: black;
+          }
 
-      a {
-        color: var(--theme-primary-color-b);
-        font-size: 12px;
-      }
+          --select-plan-workspaces-offset: {
+            transform: translate(0px, -12px);
+          }
 
-      /*Center-aligns the radio button.*/
-      .table-cell:first-of-type {
-        text-align: center;
-      }
+          --workspaces-dropdown-width: {
+            width: 240px;
+          }
+        }
 
-      paper-button#confirm {
-        background-color: var(--theme-primary-color);
-        color: white;
-      }
+        a {
+          color: var(--theme-primary-color-b);
+          font-size: 12px;
+        }
 
-      paper-button#confirm[disabled] {
-        background-color: var(--paper-grey-400);
-      }
+        /*Center-aligns the radio button.*/
+        .table-cell:first-of-type {
+          text-align: center;
+        }
 
-      paper-button#admin {
-        background-color: var(--theme-primary-color);
-        color: white;
-        float: right;
-      }
+        paper-button#confirm {
+          background-color: var(--theme-primary-color);
+          color: white;
+        }
 
-      paper-card {
-        z-index: 1;
-      }
+        paper-button#confirm[disabled] {
+          background-color: var(--paper-grey-400);
+        }
 
-      workspace-dropdown {
-        z-index: 2;
-      }
+        paper-button#admin {
+          background-color: var(--theme-primary-color);
+          color: white;
+          float: right;
+        }
 
-      paper-radio-button {
-        --paper-radio-button-unchecked-color: var(--theme-primary-text-color-medium);
-        --paper-radio-button-checked-color: var(--theme-primary-color);
-        --paper-radio-button-checked-ink-color: var(--theme-primary-text-color-medium);
-        --paper-radio-button-unchecked-ink-color: var(--theme-primary-color);
-      }
+        paper-card {
+          z-index: 1;
+        }
 
-      .container {
-        @apply --layout-horizontal;
-        @apply --layout-center-justified;
-        @apply --layout-vertical;
+        workspace-dropdown {
+          z-index: 2;
+        }
 
-        box-sizing: border-box;
-        min-height: 100%;
-        padding: 3em;
-      }
+        paper-radio-button {
+          --paper-radio-button-unchecked-color: var(--theme-primary-text-color-medium);
+          --paper-radio-button-checked-color: var(--theme-primary-color);
+          --paper-radio-button-checked-ink-color: var(--theme-primary-text-color-medium);
+          --paper-radio-button-unchecked-ink-color: var(--theme-primary-color);
+        }
 
-      .container-inner {
-        @apply --container-inner-layout;
-      }
+        .container {
+          @apply --layout-horizontal;
+          @apply --layout-center-justified;
+          @apply --layout-vertical;
 
-      .actions {
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-        margin-top: 3em;
-      }
+          box-sizing: border-box;
+          min-height: 100%;
+          padding: 3em;
+        }
 
-      .documents, .documents h5 {
-        color: var(--paper-grey-600);
-        font-size: 12px;
-        font-weight: 400;
-        margin: 0;
-      }
+        .container-inner {
+          @apply --container-inner-layout;
+        }
 
-      ul {
-        margin: 0;
-        list-style-type: none;
-        padding: 0;
-      }
+        .actions {
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+          margin-top: 3em;
+        }
 
-      li {
-        padding: 3px 0;
-      }
+        .documents,
+        .documents h5 {
+          color: var(--paper-grey-600);
+          font-size: 12px;
+          font-weight: 400;
+          margin: 0;
+        }
 
-      iron-icon {
-        width: 22px;
-        height: 22px;
-        margin-right: 5px;
-      }
+        ul {
+          margin: 0;
+          list-style-type: none;
+          padding: 0;
+        }
 
-      .response-header {
-        display: inline-block;
-      }
+        li {
+          padding: 3px 0;
+        }
 
-      h2 {
-        display: inline-block;
-        float: left;
-      }
+        iron-icon {
+          width: 22px;
+          height: 22px;
+          margin-right: 5px;
+        }
 
-    </style>
+        .response-header {
+          display: inline-block;
+        }
 
-    <iron-location
-        query="{{query}}"
-        path="{{path}}">
-    </iron-location>
+        h2 {
+          display: inline-block;
+          float: left;
+        }
+      </style>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-location query="{{query}}" path="{{path}}"> </iron-location>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-workspaces
-        all="{{workspaces}}"
-        current="{{workspace}}">
-    </etools-prp-workspaces>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <div class="container">
-      <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
-      <div class="container-inner">
+      <etools-prp-workspaces all="{{workspaces}}" current="{{workspace}}"> </etools-prp-workspaces>
+
+      <div class="container">
+        <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
+        <div class="container-inner">
           <h2>Select Workspace</h2>
-          <workspace-dropdown
-              data="[[workspaces]]"
-              current="[[workspace]]">
-          </workspace-dropdown>
-        <div class="response-header">
-          <h2> Select Response Plan [[workspace]]</h2>
-        </div>
-        <template is="dom-if" if="[[permissions.adminResponsePlan]]">
-          <add-plan-panel></add-plan-panel>
-        </template>
-        <paper-card>
-          <etools-data-table-header label="">
-            <etools-data-table-column field="selected" flex-1>
-            </etools-data-table-column>
-            <etools-data-table-column field="response" flex-2>
-              <div class="table-column">Response Plan</div>
-            </etools-data-table-column>
-            <etools-data-table-column field="type" flex-2>
-              <div class="table-column">Plan Type</div>
-            </etools-data-table-column>
-            <etools-data-table-column field="start" flex-2>
-              <div class="table-column">Start Date</div>
-            </etools-data-table-column>
-            <etools-data-table-column field="end" flex-2>
-              <div class="table-column">End Date</div>
-            </etools-data-table-column>
-          </etools-data-table-header>
-
-          <template id="list"
-                    is="dom-repeat"
-                    items="[[responsePlans]]"
-                    as="plan">
-            <etools-data-table-row no-collapse>
-
-              <div slot="row-data">
-                <div class="table-cell" flex-1>
-                  <paper-radio-button
-                    checked="[[_determineIfChecked(selected, plan.id)]]"
-                    name="[[plan.id]]"
-                    on-tap="_handleRadioButtonChange">
-                  </paper-radio-button>
-                </div>
-                <div class="table-cell" flex-2>
-                  [[plan.title]]
-                </div>
-                <div class="table-cell" flex-2>
-                  [[_planType(plan)]]
-                </div>
-                <div class="table-cell" flex-2>
-                  [[plan.start]]
-                </div>
-                <div class="table-cell" flex-2>
-                  [[plan.end]]
-                </div>
-              </div>
-
-            </etools-data-table-row>
+          <workspace-dropdown data="[[workspaces]]" current="[[workspace]]"> </workspace-dropdown>
+          <div class="response-header">
+            <h2>Select Response Plan [[workspace]]</h2>
+          </div>
+          <template is="dom-if" if="[[permissions.adminResponsePlan]]">
+            <add-plan-panel></add-plan-panel>
           </template>
+          <paper-card>
+            <etools-data-table-header label="">
+              <etools-data-table-column field="selected" flex-1> </etools-data-table-column>
+              <etools-data-table-column field="response" flex-2>
+                <div class="table-column">Response Plan</div>
+              </etools-data-table-column>
+              <etools-data-table-column field="type" flex-2>
+                <div class="table-column">Plan Type</div>
+              </etools-data-table-column>
+              <etools-data-table-column field="start" flex-2>
+                <div class="table-column">Start Date</div>
+              </etools-data-table-column>
+              <etools-data-table-column field="end" flex-2>
+                <div class="table-column">End Date</div>
+              </etools-data-table-column>
+            </etools-data-table-header>
 
-        </paper-card>
+            <template id="list" is="dom-repeat" items="[[responsePlans]]" as="plan">
+              <etools-data-table-row no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell" flex-1>
+                    <paper-radio-button
+                      checked="[[_determineIfChecked(selected, plan.id)]]"
+                      name="[[plan.id]]"
+                      on-tap="_handleRadioButtonChange"
+                    >
+                    </paper-radio-button>
+                  </div>
+                  <div class="table-cell" flex-2>
+                    [[plan.title]]
+                  </div>
+                  <div class="table-cell" flex-2>
+                    [[_planType(plan)]]
+                  </div>
+                  <div class="table-cell" flex-2>
+                    [[plan.start]]
+                  </div>
+                  <div class="table-cell" flex-2>
+                    [[plan.end]]
+                  </div>
+                </div>
+              </etools-data-table-row>
+            </template>
+          </paper-card>
+        </div>
+        <div class="actions">
+          <template is="dom-if" if="[[queryParams.previous]]">
+            <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
+          </template>
+          <paper-button id="confirm" on-tap="_confirm" raised disabled="[[!selected]]">
+            Confirm
+          </paper-button>
+        </div>
       </div>
-      <div class="actions">
-        <template is="dom-if" if="[[queryParams.previous]]">
-          <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
-        </template>
-        <paper-button id="confirm"
-                      on-tap="_confirm"
-                      raised
-                      disabled="[[!selected]]">
-          Confirm
-        </paper-button>
-      </div>
-    </div>
-  `;
+    `;
   }
 
   @property({type: String})
@@ -271,7 +247,6 @@ class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(Red
 
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   workspace!: string;
-
 
   // @ts-ignore
   _determineIfChecked(selected: number, id: number) {
@@ -325,6 +300,5 @@ class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(Red
     return plan.plan_type === 'OTHER' ? plan.plan_custom_type_label : plan.plan_type;
   }
 }
-
 
 window.customElements.define('page-cluster-reporting-select-plan', PageClusterReportingSelectPlan);

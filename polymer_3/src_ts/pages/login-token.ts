@@ -14,33 +14,31 @@ import {BASE_PATH} from '../config';
  * @customElement
  */
 class PageLoginToken extends PolymerElement {
-
   static get template() {
     return html`
-    <style>
-    :host {
-      display: block;
-      padding: 25px;
-    }
+      <style>
+        :host {
+          display: block;
+          padding: 25px;
+        }
 
-    h3 {
-      @apply --paper-font-display1;
-    }
-    </style>
+        h3 {
+          @apply --paper-font-display1;
+        }
+      </style>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <etools-prp-ajax
-      id="validateToken"
-      url="[[tokenUrl]]"
-      body="[[data]]"
-      content-type="application/json"
-      method="post">
-    </etools-prp-ajax>
+      <etools-prp-ajax
+        id="validateToken"
+        url="[[tokenUrl]]"
+        body="[[data]]"
+        content-type="application/json"
+        method="post"
+      >
+      </etools-prp-ajax>
 
-    <h3>The page is loading...</h3>
+      <h3>The page is loading...</h3>
     `;
   }
 
@@ -53,11 +51,10 @@ class PageLoginToken extends PolymerElement {
   @property({type: String})
   tokenUrl: string = Endpoints.userLoginToken();
 
-
   connectedCallback() {
     super.connectedCallback();
     const token = this.query.split('=')[1];
-    this.set('data', {'token': token});
+    this.set('data', {token: token});
     const self = this;
     const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
     thunk()
@@ -70,6 +67,5 @@ class PageLoginToken extends PolymerElement {
         fireEvent(self, 'token-error');
       });
   }
-
 }
 window.customElements.define('page-login-token', PageLoginToken);

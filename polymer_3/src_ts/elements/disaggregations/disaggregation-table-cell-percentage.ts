@@ -22,7 +22,7 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
   public static get template() {
     // language=HTML
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style include="app-grid-style">
         :host {
           display: block;
@@ -57,39 +57,26 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
-          <div slot="editable" class="app-grid">
-            <div class="item">
-              <disaggregation-field
-                id="v"
-                key="v"
-                min="0"
-                value="[[data.v]]"
-                coords="[[coords]]">
-              </disaggregation-field>
-            </div>
-            <div class="item">
-              <disaggregation-field
-                id="d"
-                key="d"
-                min="0"
-                value="[[data.d]]"
-                coords="[[coords]]"
-                validator="[[vName]]">
-              </disaggregation-field>
-            </div>
-            <div class="computed-value">[[_toPercentage(localData.c)]]</div>
+        <div slot="editable" class="app-grid">
+          <div class="item">
+            <disaggregation-field id="v" key="v" min="0" value="[[data.v]]" coords="[[coords]]"> </disaggregation-field>
           </div>
-          <div slot="non-editable" class="app-grid">
-            <div class="item">
-              <etools-prp-number value="[[data.v]]"></etools-prp-number>
-            </div>
-            <div class="item">
-              <etools-prp-number value="[[data.d]]"></etools-prp-number>
-            </div>
-            <div class="computed-value">[[_toPercentage(data.c)]]</div>
+          <div class="item">
+            <disaggregation-field id="d" key="d" min="0" value="[[data.d]]" coords="[[coords]]" validator="[[vName]]">
+            </disaggregation-field>
           </div>
+          <div class="computed-value">[[_toPercentage(localData.c)]]</div>
+        </div>
+        <div slot="non-editable" class="app-grid">
+          <div class="item">
+            <etools-prp-number value="[[data.v]]"></etools-prp-number>
+          </div>
+          <div class="item">
+            <etools-prp-number value="[[data.d]]"></etools-prp-number>
+          </div>
+          <div class="computed-value">[[_toPercentage(data.c)]]</div>
+        </div>
       </disaggregation-table-cell>
-
     `;
   }
 
@@ -108,7 +95,6 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
   @property({type: String, observer: '_bindValidation'})
   coords!: string;
 
-
   _handleInput(e: CustomEvent) {
     const key = e.detail.key;
     const value = e.detail.value;
@@ -120,8 +106,8 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
 
     e.stopPropagation();
 
-    const v = (this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl);
-    const d = (this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl);
+    const v = this.shadowRoot!.querySelector('#v') as DisaggregationFieldEl;
+    const d = this.shadowRoot!.querySelector('#d') as DisaggregationFieldEl;
 
     const change = Object.assign({}, this.get('localData'), value);
 
@@ -146,10 +132,14 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
     const validator = {
       validatorName: vName,
       validatorType: 'validator',
-      validate: function(value: string) {
-        return Number(value) !== 0 ||
-          Number(((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value) === 0;
-      }.bind(self)
+      validate: function (value: string) {
+        return (
+          Number(value) !== 0 ||
+          Number(
+            ((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value
+          ) === 0
+        );
+      }
     };
 
     new IronMeta({
@@ -193,7 +183,6 @@ class DisaggregationTableCellPercentage extends UtilsMixin(PolymerElement) {
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('disaggregation-table-cell-percentage', DisaggregationTableCellPercentage);

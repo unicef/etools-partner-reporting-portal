@@ -19,45 +19,34 @@ import {GenericObject} from '../../../typings/globals.types';
 class ReportsList extends ReduxConnectedElement {
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
+      <style>
+        :host {
+          display: block;
 
-        --ecp-content: {
-          min-height: 110px;
-          padding: 1px 0 0;
-        };
-      }
+          --ecp-content: {
+            min-height: 110px;
+            padding: 1px 0 0;
+          }
+        }
 
-      cluster-report:not(:last-of-type) {
-        margin-bottom: 2px;
-      }
-    </style>
+        cluster-report:not(:last-of-type) {
+          margin-bottom: 2px;
+        }
+      </style>
 
-    <confirm-box id="confirm"></confirm-box>
+      <confirm-box id="confirm"></confirm-box>
 
-    <etools-content-panel panel-title="[[label]]">
-      <template
-        is="dom-if"
-        if="[[active]]"
-        restamp="true">
-        <template
-          is="dom-repeat"
-          items="[[data]]">
-          <cluster-report
-            data="[[item]]"
-            mode="edit">
-          </cluster-report>
+      <etools-content-panel panel-title="[[label]]">
+        <template is="dom-if" if="[[active]]" restamp="true">
+          <template is="dom-repeat" items="[[data]]">
+            <cluster-report data="[[item]]" mode="edit"> </cluster-report>
+          </template>
         </template>
-      </template>
 
-      <list-placeholder
-        data="[[data]]"
-        loading="[[loading]]">
-      </list-placeholder>
+        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
 
-      <etools-loading active="[[loading]]"></etools-loading>
-    </etools-content-panel>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </etools-content-panel>
     `;
   }
 
@@ -101,9 +90,11 @@ class ReportsList extends ReduxConnectedElement {
   }
 
   _computeIsIMOClusters(profile: GenericObject) {
-    return profile.prp_roles ? profile.prp_roles.some(function(role: any) {
-      return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
-    }) : false;
+    return profile.prp_roles
+      ? profile.prp_roles.some(function (role: any) {
+          return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
+        })
+      : false;
   }
 
   _onConfirm(e: CustomEvent) {

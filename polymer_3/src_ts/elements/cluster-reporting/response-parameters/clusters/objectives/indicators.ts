@@ -30,62 +30,48 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles} ${tableStyles}
-    <style include="iron-flex data-table-styles">
-    :host {
-      display: block;
-    }
+      ${buttonsStyles} ${tableStyles}
+      <style include="iron-flex data-table-styles">
+        :host {
+          display: block;
+        }
 
-    div#action {
-      margin: 25px 0;
-      @apply --layout-horizontal;
-      @apply --layout-end-justified;
-    }
-  </style>
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-  <etools-prp-permissions
-      permissions="{{permissions}}">
-  </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-  <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-  <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
-  </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-  <etools-prp-ajax
-      id="indicators"
-      url="[[url]]"
-      params="[[queryParams]]">
-  </etools-prp-ajax>
+      <etools-prp-ajax id="indicators" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-  <page-body>
-    <template
-        is="dom-if"
-        if="[[canAddIndicator]]"
-        restamp="true">
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          [[localize('add_cluster_objective_indicator')]]
-        </paper-button>
-      </div>
-    </template>
+      <page-body>
+        <template is="dom-if" if="[[canAddIndicator]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_cluster_objective_indicator')]]
+            </paper-button>
+          </div>
+        </template>
 
-    <indicator-modal
-      id="indicatorModal"
-      object-id=[[objectiveId]]
-      activity-data=[[activityData]]
-      object-type="cluster.clusterobjective"
-      modal-title="Add Cluster Objective Indicator">
-    </indicator-modal>
+        <indicator-modal
+          id="indicatorModal"
+          object-id="[[objectiveId]]"
+          activity-data="[[activityData]]"
+          object-type="cluster.clusterobjective"
+          modal-title="Add Cluster Objective Indicator"
+        >
+        </indicator-modal>
 
-    <list-view-indicators
-        data="[[data]]"
-        total-results="[[totalResults]]"
-        can-edit="[[canAddIndicator]]">
-    </list-view-indicators>
-  </page-body>
+        <list-view-indicators data="[[data]]" total-results="[[totalResults]]" can-edit="[[canAddIndicator]]">
+        </list-view-indicators>
+      </page-body>
     `;
   }
 
@@ -120,9 +106,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   canAddIndicator!: boolean;
 
   static get observers() {
-    return [
-      '_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)'
-    ];
+    return ['_clusterObjectiveIndicatorsAjax(queryParams, objectiveId)'];
   }
 
   _openModal() {
@@ -161,7 +145,8 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterObjectivesIndicatorsFetch(thunk, String(this.objectiveId)))
+    this.reduxStore
+      .dispatch(clusterObjectivesIndicatorsFetch(thunk, String(this.objectiveId)))
       // @ts-ignore
       .catch((_err: any) => {
         // TODO: error handling.
@@ -169,8 +154,7 @@ class Indicators extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeCanAddIndicator(permissions: GenericObject, clusterId: number) {
-    return permissions && permissions.createClusterEntities &&
-      permissions.createClusterEntitiesForCluster(clusterId);
+    return permissions && permissions.createClusterEntities && permissions.createClusterEntitiesForCluster(clusterId);
   }
 
   _addEventListeners() {

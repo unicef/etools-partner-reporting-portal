@@ -18,26 +18,23 @@ import {GenericObject} from '../../../typings/globals.types';
 class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="partnerNames"
-        url="[[partnerNamesUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="partnerNames" url="[[partnerNamesUrl]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-      label="[[localize('partner')]]"
-      name="partner"
-      value="[[computedValue]]"
-      data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter
+        label="[[localize('partner')]]"
+        name="partner"
+        value="[[computedValue]]"
+        data="[[data]]"
+      >
+      </searchable-dropdown-filter>
+    `;
   }
-
 
   @property({type: String, computed: '_computeUrl(responsePlanId)', observer: '_fetchPartnerNames'})
   partnerNamesUrl!: string;
@@ -56,7 +53,6 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   @property({type: Boolean})
   required!: boolean;
-
 
   private _debouncer!: Debouncer;
 
@@ -80,15 +76,13 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeValue(data: any, value: string) {
     const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
-        const index = data.findIndex((item: GenericObject) => {
-          return value === String(item.id);
-        });
-        const item = data[index === -1 ? 0 : index];
-        self.set('computedValue', item ? item.id : '');
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const index = data.findIndex((item: GenericObject) => {
+        return value === String(item.id);
       });
+      const item = data[index === -1 ? 0 : index];
+      self.set('computedValue', item ? item.id : '');
+    });
   }
 
   _fetchPartnerNames() {
@@ -96,12 +90,18 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     // this.$.partnerNames.abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-    (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.partnerNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        const data = (self.required ? [] : [{
-          id: '',
-          title: 'All'
-        }]).concat(res.data || []);
+        const data = (self.required
+          ? []
+          : [
+              {
+                id: '',
+                title: 'All'
+              }
+            ]
+        ).concat(res.data || []);
 
         self.set('data', data);
       })
@@ -119,7 +119,6 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       this._debouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('partner-filter', PartnerFilter);

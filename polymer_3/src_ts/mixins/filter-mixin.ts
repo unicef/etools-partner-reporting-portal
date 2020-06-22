@@ -9,7 +9,6 @@ import {fireEvent} from '../utils/fire-custom-event';
  */
 function FilterMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class FilterClass extends baseClass {
-
     @property({type: String})
     label!: string;
 

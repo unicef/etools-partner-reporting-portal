@@ -21,7 +21,6 @@ import {sharedStyles} from '../../../../styles/shared-styles';
 import {GenericObject} from '../../../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 
-
 /**
  * @polymer
  * @customElement
@@ -30,99 +29,73 @@ import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
  * @appliesMixin LocalizeMixin
  */
 class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
-
   public static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-    :host {
-      display: block;
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
 
-      --page-header-above-title: {
-        position: absolute;
-        display: block;
-        left: 0;
-        top: -23px;
-      };
-    }
+          --page-header-above-title: {
+            position: absolute;
+            display: block;
+            left: 0;
+            top: -23px;
+          }
+        }
 
-    .toolbar report-status {
-      margin-right: 1em;
-    }
+        .toolbar report-status {
+          margin-right: 1em;
+        }
 
-    .toolbar a {
-      color: var(--theme-primary-color);
-      text-decoration: none;
-    }
+        .toolbar a {
+          color: var(--theme-primary-color);
+          text-decoration: none;
+        }
 
-    .tabs paper-tab {
-      text-transform: uppercase;
-    }
-  </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-      id="overview"
-      url="[[overviewUrl]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="overview" url="[[overviewUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="projects"
-      url="[[projectsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="projects" url="[[projectsUrl]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      subroute="{{subroute}}"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" subroute="{{subroute}}" data="{{routeData}}"> </app-route>
 
-    <page-header
-        title="[[activityData.title]]"
-        back="[[backLink]]">
+      <page-header title="[[activityData.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('activity')]]"> </page-badge>
 
-      <page-badge
-        slot="above-title" name="[[localize('activity')]]">
-      </page-badge>
+        <div class="toolbar">
+          <project-status status="[[activityData.status]]"></project-status>
+        </div>
 
-      <div class="toolbar">
-        <project-status status="[[activityData.status]]"></project-status>
-      </div>
+        <div slot="tabs">
+          <paper-tabs selected="{{ routeData.tab }}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{ routeData.tab }}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <pa-activity-details-overview activity-data="[[activityData]]"></pa-activity-details-overview>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <pa-activity-details-overview activity-data="[[activityData]]"></pa-activity-details-overview>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <pa-activity-details-indicators
-        activity-id="[[activityId]]"
-        activity-data="[[activityData]]"
-        is-custom="[[activityData.is_custom]]">
-      </pa-activity-details-indicators>
-    </template>
-`;
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <pa-activity-details-indicators
+          activity-id="[[activityId]]"
+          activity-data="[[activityData]]"
+          is-custom="[[activityData.is_custom]]"
+        >
+        </pa-activity-details-indicators>
+      </template>
+    `;
   }
 
   @property({type: String})
@@ -158,13 +131,8 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
-
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)',
-      '_getActivityAjax(projects)',
-      '_getProjects(responsePlanID)'
-    ];
+    return ['_updateUrlTab(routeData.tab)', '_getActivityAjax(projects)', '_getProjects(responsePlanID)'];
   }
 
   _onSuccess() {
@@ -204,7 +172,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
       // @ts-ignore
       .then((res: GenericObject) => {
         self.updatePending = false;
-        res.data.projects.forEach(function(project: GenericObject) {
+        res.data.projects.forEach(function (project: GenericObject) {
           project.title = self.projects[project.project_id].title;
         });
         self.activityData = res.data;
@@ -224,15 +192,14 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
 
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
-    projectsThunk()
-      .then((res: GenericObject) => {
-        const allProjects: GenericObject = {};
-        res.data.results.forEach((project: GenericObject) => {
-          allProjects[project.id] = project;
-        });
-
-        self.set('projects', allProjects);
+    projectsThunk().then((res: GenericObject) => {
+      const allProjects: GenericObject = {};
+      res.data.results.forEach((project: GenericObject) => {
+        allProjects[project.id] = project;
       });
+
+      self.set('projects', allProjects);
+    });
   }
 
   _addEventListeners() {
@@ -254,7 +221,6 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('planned-action-activities-details', PlannedActionActivitiesDetails);

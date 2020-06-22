@@ -189,9 +189,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
   refresh = false;
 
   static get observers() {
-    return [
-      '_getObjectivesByClusterID(data.cluster, objectivesUrl)'
-    ];
+    return ['_getObjectivesByClusterID(data.cluster, objectivesUrl)'];
   }
 
   _computeUrl(responsePlanID: string) {
@@ -217,7 +215,8 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
     if (clusterID && objectivesUrl) {
       this.objectivesParams = {cluster_id: this.data.cluster};
 
-      (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk()()
+      (this.$.objectivesByClusterID as EtoolsPrpAjaxEl)
+        .thunk()()
         .then((res: any) => {
           self.set('objectives', res.data.results);
         })
@@ -259,7 +258,8 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
 
     const self = this;
     self.updatePending = true;
-    (this.$.createActivity as EtoolsPrpAjaxEl).thunk()()
+    (this.$.createActivity as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
         self.updatePending = false;
         self.set('errors', {});

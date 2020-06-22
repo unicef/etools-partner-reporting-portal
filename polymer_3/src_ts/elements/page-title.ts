@@ -16,15 +16,12 @@ class PageTitle extends PolymerElement {
   title!: string;
 
   static get observers() {
-    return [
-      '_setDocumentTitle(title, divider, baseTitle)'
-    ];
+    return ['_setDocumentTitle(title, divider, baseTitle)'];
   }
 
   _setDocumentTitle() {
     document.title = [].slice.call(arguments).join(' ');
   }
-
 }
 
 window.customElements.define('page-title', PageTitle);

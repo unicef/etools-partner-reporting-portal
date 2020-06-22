@@ -15,24 +15,17 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="locationNames"
-        url="[[locationNamesUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="locationNames" url="[[locationNamesUrl]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="[[localize('location')]]"
-        name="location"
-        value="[[value]]"
-        data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="[[localize('location')]]" name="location" value="[[value]]" data="[[data]]">
+      </searchable-dropdown-filter>
+    `;
   }
 
   @property({type: String, computed: '_computeLocationNamesUrl(responsePlanId)', observer: '_fetchLocationNames'})
@@ -60,12 +53,18 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     }
     const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
-    (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.locationNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.set('data', [{
-          id: '',
-          title: 'All'
-        }].concat(res.data || []));
+        self.set(
+          'data',
+          [
+            {
+              id: '',
+              title: 'All'
+            }
+          ].concat(res.data || [])
+        );
       })
       // @ts-ignore
       .catch((_err) => {
@@ -77,7 +76,6 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.disconnectedCallback();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('indicator-location-filter', IndicatorLocationFilter);

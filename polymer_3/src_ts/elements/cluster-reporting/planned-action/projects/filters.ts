@@ -16,7 +16,6 @@ import '../../../filters/cluster-location-filter/cluster-location-filter';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -41,20 +40,15 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
           @apply --app-grid-expandible-item;
         }
 
-        .start-date, .end-date {
+        .start-date,
+        .end-date {
           max-width: 200px;
         }
-
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
       <filter-list filters="{{filters}}">
         <div class="app-grid">
@@ -62,7 +56,8 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
             class="item filter-2-col"
             label="[[localize('project')]]"
             name="title"
-            value="[[queryParams.title]]">
+            value="[[queryParams.title]]"
+          >
           </text-filter>
 
           <date-filter
@@ -70,7 +65,8 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
             class="item start-date"
             label="[[localize('start_date')]]"
             name="start_date"
-            value="[[_withDefault(queryParams.start_date, '')]]">
+            value="[[_withDefault(queryParams.start_date, '')]]"
+          >
           </date-filter>
 
           <date-filter
@@ -78,7 +74,8 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
             class="item end-date"
             label="[[localize('end_date')]]"
             name="end_date"
-            value="[[_withDefault(queryParams.end_date, '')]]">
+            value="[[_withDefault(queryParams.end_date, '')]]"
+          >
           </date-filter>
         </div>
       </filter-list>
@@ -90,7 +87,6 @@ class PlannedActionProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnect
 
   @property({type: Object, notify: true})
   filters!: GenericObject;
-
 }
 
 window.customElements.define('planned-action-projects-filters', PlannedActionProjectsFilters);

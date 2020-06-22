@@ -89,7 +89,6 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   _partnerLoading(rootState: RootState) {
     return partnerLoading(rootState);
   }
-
 }
 
 window.customElements.define('risk-rating', RiskRating);

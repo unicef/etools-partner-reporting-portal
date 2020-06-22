@@ -9,35 +9,35 @@ import {sharedStyles} from '../styles/shared-styles';
 class LabelledItem extends PolymerElement {
   public static get template() {
     return html`
-        ${sharedStyles}
+      ${sharedStyles}
       <style>
         :host {
-            display: block;
-            position: relative;
+          display: block;
+          position: relative;
         }
 
         .labelled-item {
-            margin: 0;
+          margin: 0;
         }
 
         .labelled-item__label {
-            font-size: 12px;
-            color: #737373;
-            display: block;
-            @apply --labelled-item-label;
-            @apply --truncate;
+          font-size: 12px;
+          color: #737373;
+          display: block;
+          @apply --labelled-item-label;
+          @apply --truncate;
         }
 
         .labelled-item__content {
-            margin: 0;
+          margin: 0;
         }
 
         .error {
-            color: var(--paper-deep-orange-a700);
+          color: var(--paper-deep-orange-a700);
         }
 
         ::slotted(.field-value) {
-            font-size: 16px;
+          font-size: 16px;
         }
       </style>
 
@@ -47,7 +47,7 @@ class LabelledItem extends PolymerElement {
           <slot></slot>
         </dd>
       </dl>
-      `;
+    `;
   }
 
   @property({type: String})

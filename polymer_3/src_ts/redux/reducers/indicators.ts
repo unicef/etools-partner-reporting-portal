@@ -6,17 +6,16 @@ export class IndicatorsState {
   all = [];
   loading = false;
   loadingDetails = false;
-  count: number = 0;
+  count = 0;
   details: GenericObject = {};
 }
-
 
 export const Indicators = combineReducers({
   all: allIndicatorsReducer,
   loading: loadingIndicatorsReducer,
   loadingDetails: loadingDetailsReducer,
   count: indicatorsCountReducer,
-  details: indicatorDetailsReducer,
+  details: indicatorDetailsReducer
 });
 
 function allIndicatorsReducer(state = [], action: any) {
@@ -76,7 +75,7 @@ function indicatorDetailsReducer(state = {}, action: any) {
       // // Make a copy of the existing details state.
       const copy = Object.assign({}, (state as any).details);
 
-      //Override any prior data at this key.
+      // Override any prior data at this key.
       copy[indicatorKey] = action.details[indicatorKey];
 
       // Add the updated disaggregations state to the full state.

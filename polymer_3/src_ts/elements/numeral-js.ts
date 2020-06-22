@@ -10,10 +10,10 @@ declare const numeral: any;
 class NumeralJs extends PolymerElement {
   static get template() {
     return html`
-    <template is="dom-if" if="[[print]]">
-      [[output]]
-    </template>
-  `;
+      <template is="dom-if" if="[[print]]">
+        [[output]]
+      </template>
+    `;
   }
 
   // Input number
@@ -22,11 +22,11 @@ class NumeralJs extends PolymerElement {
 
   // Formatted manipulated output
   @property({type: String, readOnly: true, notify: true})
-  output: string = '';
+  output = '';
 
   // Print output
   @property({type: Boolean})
-  print: boolean = false;
+  print = false;
 
   // Format of output.
   @property({type: String, observer: '_formatChanged'})

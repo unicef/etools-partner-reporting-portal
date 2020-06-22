@@ -8,11 +8,8 @@ import './etools-prp-number';
  * @customElement
  */
 class EtoolsPrpCurrency extends PolymerElement {
-
   static get template() {
-    return html`
-      [[meta.prefix]]<etools-prp-number value="[[value]]"></etools-prp-number>[[meta.suffix]]
-    `;
+    return html` [[meta.prefix]]<etools-prp-number value="[[value]]"></etools-prp-number>[[meta.suffix]] `;
   }
 
   private currencies: GenericObject = {
@@ -33,13 +30,13 @@ class EtoolsPrpCurrency extends PolymerElement {
   @property({type: Object, computed: '_computeMeta(currency)'})
   meta!: string;
 
-
   _computeMeta(currency: string) {
-    return this.currencies[currency] || {
-      suffix: ' ' + currency
-    };
+    return (
+      this.currencies[currency] || {
+        suffix: ' ' + currency
+      }
+    );
   }
-
 }
 window.customElements.define('etools-prp-currency', EtoolsPrpCurrency);
 

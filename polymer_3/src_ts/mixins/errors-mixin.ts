@@ -8,7 +8,6 @@ import {userLogout} from '../redux/actions';
  */
 function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class ErrorHandlerClass extends baseClass {
-
     _handleError(e: CustomEvent) {
       let xhr;
 
@@ -23,7 +22,8 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
           case 403: // FIXME: 401?
             // (dci)
             // @ts-ignore
-            this.reduxStore.dispatch(userLogout())
+            this.reduxStore
+              .dispatch(userLogout())
               // @ts-ignore
               .then(() => {
                 location.pathname = '/landing';
@@ -35,7 +35,6 @@ function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseCla
         }
       } catch (err) {}
     }
-
   }
   return ErrorHandlerClass;
 }

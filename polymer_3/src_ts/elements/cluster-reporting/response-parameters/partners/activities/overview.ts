@@ -19,39 +19,32 @@ import {GenericObject} from '../../../../../typings/globals.types';
 class RpPartnerActivityDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
   public static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <page-body>
-      <template
-        is="dom-if"
-        if="[[_canEditActivity(permissions, activityData)]]"
-        restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('edit_activity')]]
-          </paper-button>
-        </div>
-        <planned-action-activity-editing-modal
-          id="modal"
-          edit-data=[[activityData]]>
-        </planned-action-activity-editing-modal>
-      </template>
-      <activity-details-display activity-data=[[activityData]]></activity-details-display>
-    </page-body>
+      <page-body>
+        <template is="dom-if" if="[[_canEditActivity(permissions, activityData)]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('edit_activity')]]
+            </paper-button>
+          </div>
+          <planned-action-activity-editing-modal id="modal" edit-data="[[activityData]]">
+          </planned-action-activity-editing-modal>
+        </template>
+        <activity-details-display activity-data="[[activityData]]"></activity-details-display>
+      </page-body>
     `;
   }
 

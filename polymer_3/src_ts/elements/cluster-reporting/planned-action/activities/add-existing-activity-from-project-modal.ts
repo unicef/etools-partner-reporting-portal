@@ -29,159 +29,139 @@ import {fireEvent} from '../../../../utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../utils/util';
 import Settings from '../../../../settings';
 
-
 /**
-* @polymer
-* @customElement
-* @appliesMixin ModalMixin
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin ModalMixin
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ */
 class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    ${buttonsStyles} ${modalStyles}
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${modalStyles}
+      <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
 
-        --app-grid-columns: 2;
-        --app-grid-gutter: 24px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
+          --app-grid-columns: 2;
+          --app-grid-gutter: 24px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
 
-        --paper-dialog: {
-          width: 700px;
-          margin: 0;
+          --paper-dialog: {
+            width: 700px;
+            margin: 0;
           }
-      }
+        }
 
-      .app-grid {
-        margin: 0 -var(--app-grid-gutter);
-        padding-bottom: 24px;
-      }
+        .app-grid {
+          margin: 0 -var(--app-grid-gutter);
+          padding-bottom: 24px;
+        }
 
-      .row {
-        margin-bottom: 1em;
-      }
+        .row {
+          margin-bottom: 1em;
+        }
 
-      .remove-btn {
-        width: 34px;
-        height: 34px;
-        color: var(--paper-deep-orange-a700);
-      }
+        .remove-btn {
+          width: 34px;
+          height: 34px;
+          color: var(--paper-deep-orange-a700);
+        }
 
-      .fields {
-        margin-left: 24px;
-      }
+        .fields {
+          margin-left: 24px;
+        }
 
-      .add-project-btn {
-        margin: 0;
-        text-align: start;
+        .add-project-btn {
+          margin: 0;
+          text-align: start;
 
-        justify-content: flex-start;
-      }
+          justify-content: flex-start;
+        }
 
-      h3 {
-        font-size: 14px;
-      }
+        h3 {
+          font-size: 14px;
+        }
 
-      header.item-wide {
-        background-color: var(--paper-grey-200);
-        padding: 2px 10px;
-        margin: 0 0 1em;
-        height: 24px;
+        header.item-wide {
+          background-color: var(--paper-grey-200);
+          padding: 2px 10px;
+          margin: 0 0 1em;
+          height: 24px;
 
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-      }
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+        }
 
-      .item-wide {
-        @apply --app-grid-expandible-item;
-      }
+        .item-wide {
+          @apply --app-grid-expandible-item;
+        }
 
-      .col-actions {
-        width: 40px;
-        margin-right: 24px;
-        border-right: 1px solid var(--paper-grey-400);
-      }
+        .col-actions {
+          width: 40px;
+          margin-right: 24px;
+          border-right: 1px solid var(--paper-grey-400);
+        }
 
-      etools-dropdown {
-        width: 100%;
-      }
-
-      datepicker-lite {
-        --paper-input-container: {
+        etools-dropdown {
           width: 100%;
-        };
-      }
-    </style>
+        }
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+        datepicker-lite {
+          --paper-input-container: {
+            width: 100%;
+          }
+        }
+      </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
 
-    <etools-prp-ajax
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
+
+      <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
         method="patch"
         body="[[data]]"
-        content-type="application/json">
-    </etools-prp-ajax>
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="activities"
-        params="[[activitiesParams]]"
-        url="[[activitiesUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activities" params="[[activitiesParams]]" url="[[activitiesUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="objectives"
-        params="[[objectivesParams]]"
-        url="[[objectivesUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="objectives" params="[[objectivesParams]]" url="[[objectivesUrl]]"> </etools-prp-ajax>
 
-    <partner-dropdown-content
-        partners="{{partners}}">
-    </partner-dropdown-content>
+      <partner-dropdown-content partners="{{partners}}"> </partner-dropdown-content>
 
-    <paper-dialog
-        id="dialog"
-        modal
-        on-iron-overlay-closed="_close"
-        opened="{{opened}}">
-      <div class="header layout horizontal justified">
-        <h2>[[localize('add_existing_project_activity')]]</h2>
+      <paper-dialog id="dialog" modal on-iron-overlay-closed="_close" opened="{{opened}}">
+        <div class="header layout horizontal justified">
+          <h2>[[localize('add_existing_project_activity')]]</h2>
 
-        <paper-icon-button
-            class="self-center"
-            on-tap="_close"
-            icon="icons:close">
-        </paper-icon-button>
-      </div>
+          <paper-icon-button class="self-center" on-tap="_close" icon="icons:close"> </paper-icon-button>
+        </div>
 
-      <paper-dialog-scrollable>
-        <error-box errors="[[errors]]"></error-box>
+        <paper-dialog-scrollable>
+          <error-box errors="[[errors]]"></error-box>
 
-        <div class="app-grid">
-          <div class="item">
-            <etools-dropdown
-              class="validate"
-              label="[[localize('cluster')]]"
-              selected="{{data.cluster}}"
-              options="[[clusters]]"
-              option-value="id"
-              option-label="title"
-              with-backdrop
-              required>
-            </etools-dropdown>
-          </div>
-          <div class="item">
-            <etools-dropdown
+          <div class="app-grid">
+            <div class="item">
+              <etools-dropdown
+                class="validate"
+                label="[[localize('cluster')]]"
+                selected="{{data.cluster}}"
+                options="[[clusters]]"
+                option-value="id"
+                option-label="title"
+                with-backdrop
+                required
+              >
+              </etools-dropdown>
+            </div>
+            <div class="item">
+              <etools-dropdown
                 class="validate"
                 label="[[localize('partner_activity')]]"
                 options="[[partnerActivities]]"
@@ -191,96 +171,95 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
                 disabled="[[_equals(partnerActivities.length, 0)]]"
                 auto-validate
                 with-backdrop
-                required>
-             </etools-dropdown>
-          </div>
+                required
+              >
+              </etools-dropdown>
+            </div>
 
-          <header class="item-wide">
-            <h3>[[localize('projects')]] ([[data.projects.length]])</h3>
-          </header>
+            <header class="item-wide">
+              <h3>[[localize('projects')]] ([[data.projects.length]])</h3>
+            </header>
 
-          <template
-            is="dom-repeat"
-            items="{{data.projects}}">
+            <template is="dom-repeat" items="{{data.projects}}">
+              <div class="row layout horizontal item-wide">
+                <div class="flex">
+                  <div class="app-grid">
+                    <div class="item">
+                      <etools-dropdown
+                        class="validate"
+                        label="[[localize('partner_project')]]"
+                        options="[[data.projects]]"
+                        option-value="project_id"
+                        option-label="title"
+                        selected="[[item.project_id]]"
+                        data-index$="[[index]]"
+                        auto-validate
+                        with-backdrop
+                        disabled
+                        required
+                      >
+                      </etools-dropdown>
+                    </div>
 
-            <div class="row layout horizontal item-wide">
-              <div class="flex">
-                <div class="app-grid">
-                  <div class="item">
-                    <etools-dropdown
-                      class="validate"
-                      label="[[localize('partner_project')]]"
-                      options="[[data.projects]]"
-                      option-value="project_id"
-                      option-label="title"
-                      selected="[[item.project_id]]"
-                      data-index$="[[index]]"
-                      auto-validate
-                      with-backdrop
-                      disabled
-                      required>
-                    </etools-dropdown>
-                  </div>
+                    <div class="item">
+                      <etools-dropdown
+                        class="validate"
+                        label="[[localize('status')]]"
+                        options="[[statuses]]"
+                        option-value="id"
+                        option-label="title"
+                        selected="{{item.status}}"
+                        disabled
+                        with-backdrop
+                        required
+                      >
+                      </etools-dropdown>
+                    </div>
 
-                  <div class="item">
-                    <etools-dropdown
-                      class="validate"
-                      label="[[localize('status')]]"
-                      options="[[statuses]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{item.status}}"
-                      disabled
-                      with-backdrop
-                      required>
-                    </etools-dropdown>
-                  </div>
+                    <div class="item">
+                      <datepicker-lite
+                        class="start-date"
+                        label="[[localize('start_date')]]"
+                        value="{{item.start_date}}"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
+                        error-message=""
+                        required
+                      >
+                      </datepicker-lite>
+                    </div>
 
-                  <div class="item">
-                    <datepicker-lite
-                      class="start-date"
-                      label="[[localize('start_date')]]"
-                      value="{{item.start_date}}"
-                      input-date-format="[[dateFormat]]"
-                      selected-date-display-format="[[dateFormat]]"
-                      error-message=""
-                      required>
-                    </datepicker-lite>
-                  </div>
-
-                  <div class="item">
-                    <datepicker-lite
-                      class="end-date"
-                      label="[[localize('end_date')]]"
-                      value="{{item.end_date}}"
-                      input-date-format="[[dateFormat]]"
-                      selected-date-display-format="[[dateFormat]]"
-                      error-message=""
-                      required>
-                    </datepicker-lite>
+                    <div class="item">
+                      <datepicker-lite
+                        class="end-date"
+                        label="[[localize('end_date')]]"
+                        value="{{item.end_date}}"
+                        input-date-format="[[dateFormat]]"
+                        selected-date-display-format="[[dateFormat]]"
+                        error-message=""
+                        required
+                      >
+                      </datepicker-lite>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </template>
+            </template>
+          </div>
+        </paper-dialog-scrollable>
+
+        <div class="buttons layout horizontal-reverse">
+          <paper-button on-tap="_save" class="btn-primary" raised>
+            [[localize('add_activity')]]
+          </paper-button>
+
+          <paper-button class="btn-cancel" on-tap="_close">
+            [[localize('cancel')]]
+          </paper-button>
         </div>
-      </paper-dialog-scrollable>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-            on-tap="_save"
-            class="btn-primary"
-            raised>
-          [[localize('add_activity')]]
-        </paper-button>
-
-        <paper-button class="btn-cancel" on-tap="_close">
-          [[localize('cancel')]]
-        </paper-button>
-      </div>
-
-      <etools-loading active="[[updatePending]]"></etools-loading>
-    </paper-dialog>
+        <etools-loading active="[[updatePending]]"></etools-loading>
+      </paper-dialog>
     `;
   }
 
@@ -355,17 +334,14 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   dateFormat = Settings.dateFormat;
 
   static get observers() {
-    return [
-      '_fetchPartnerActivities(data.cluster)',
-      '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)',
-    ];
+    return ['_fetchPartnerActivities(data.cluster)', '_fetchActivityUpdateUrl(responsePlanId, data.partner_activity)'];
   }
 
   _computeLocalizedStatuses() {
     return [
       {title: this.localize('ongoing'), id: 'Ong'},
       {title: this.localize('planned'), id: 'Pla'},
-      {title: this.localize('completed'), id: 'Com'},
+      {title: this.localize('completed'), id: 'Com'}
     ];
   }
 
@@ -422,17 +398,17 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.set('partnerActivities', []);
     this.set('data.partner_activity', undefined);
     this.set('activitiesParams.cluster_id', clusterId);
-    this.set('activitiesUrl',
-      Endpoints.partnerActivityList(this.responsePlanId)
-      + '?cluster_id=' + clusterId);
+    this.set('activitiesUrl', Endpoints.partnerActivityList(this.responsePlanId) + '?cluster_id=' + clusterId);
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then((res: any) => {
         const filteredActivities = res.data.results.filter((item: any) => {
-          return item.projects.find(function(element: any) {
-            return element.project_id === parseInt(self.projectData.id);
-          }) === undefined;
+          return (
+            item.projects.find(function (element: any) {
+              return element.project_id === parseInt(self.projectData.id);
+            }) === undefined
+          );
         });
         self.set('partnerActivities', filteredActivities);
       })
@@ -466,10 +442,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   _save() {
     const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    const valid = [
-      this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date')
-    ].every(Boolean);
+    const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
     if (!valid) {
       return;
@@ -478,7 +451,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.set('updatePending', true);
 
     const clonedData = this._clone(this.data); // make copy of data
-    const selectedPartnerActivity: GenericObject | undefined = this.partnerActivities.find(function(item: any) {
+    const selectedPartnerActivity: GenericObject | undefined = this.partnerActivities.find(function (item: any) {
       return item.id === self.data.partner_activity;
     });
     if (selectedPartnerActivity && selectedPartnerActivity.projects) {
@@ -487,9 +460,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     }
 
     // save cloned data and not regular data, since cloned data has the combined projects
-    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({
-      partner: this.partner
-    }, clonedData);
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign(
+      {
+        partner: this.partner
+      },
+      clonedData
+    );
 
     thunk()
       .then(() => {
@@ -506,10 +482,13 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _close(e: CustomEvent & any) {
-    if (e && (e === 'saved' ||
-      e.target.nodeName === 'PAPER-DIALOG' ||
-      e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON')) {
+    if (
+      e &&
+      (e === 'saved' ||
+        e.target.nodeName === 'PAPER-DIALOG' ||
+        e.target.nodeName === 'PAPER-BUTTON' ||
+        e.target.nodeName === 'PAPER-ICON-BUTTON')
+    ) {
       this.set('data', {});
 
       this.set('objectives', []);
@@ -531,7 +510,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.removeEventListener('project-details-selection-refit', this.adjustPosition as any);
   }
 
-
   connectedCallback() {
     super.connectedCallback();
     this._addEventListeners();
@@ -542,6 +520,9 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this._removeEventListeners();
   }
 }
-window.customElements.define('planned-action-add-existing-activity-from-project-modal', AddExistingActivityFromProjectModal);
+window.customElements.define(
+  'planned-action-add-existing-activity-from-project-modal',
+  AddExistingActivityFromProjectModal
+);
 
 export {AddExistingActivityFromProjectModal as PlannedActioAddExistingActivityFromProjectModalEl};

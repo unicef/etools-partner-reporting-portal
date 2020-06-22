@@ -9,7 +9,6 @@ import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -19,29 +18,25 @@ import {GenericObject} from '../../../typings/globals.types';
 class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <dropdown-filter
+      <dropdown-filter
         label="[[localize('narrow_location_type')]]"
         name="narrow_loc_type"
         value="[[fieldValue]]"
         data="[[data]]"
-        disabled="[[disabled]]">
-    </dropdown-filter>
-  `;
+        disabled="[[disabled]]"
+      >
+      </dropdown-filter>
+    `;
   }
 
   @property({type: Object})
@@ -66,8 +61,7 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
     if (!params) {
       return;
     }
-
-    const validData = Array.apply(null, Array(maxLocType + 1))
+    const validData = Array(maxLocType + 1).fill(0)
       .map((_, index) => {
         return {
           id: String(index),
@@ -102,7 +96,6 @@ class NarrowLocationTypeFilter extends LocalizeMixin(FilterDependenciesMixin(Red
         return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
     }
   }
-
 }
 
 window.customElements.define('narrow-location-type-filter', NarrowLocationTypeFilter);

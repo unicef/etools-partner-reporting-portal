@@ -11,48 +11,40 @@ import {sharedStyles} from '../../../styles/shared-styles';
 import {GenericObject} from '../../../typings/globals.types';
 
 /**
-* @polymer
-* @customElement
-* @mixinFunction
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin AnalysisChartMixin
-*/
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin AnalysisChartMixin
+ */
 class CurrentProgressByProject extends UtilsMixin(LocalizeMixin(AnalysisChartMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-      :host {
-        display: block;
-      }
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
+        }
 
-      google-chart {
-        width: 100%;
-        height: 100%;
-      }
+        google-chart {
+          width: 100%;
+          height: 100%;
+        }
 
-      .custom-tooltip {
-        background-color: red;
-      }
-    </style>
+        .custom-tooltip {
+          background-color: red;
+        }
+      </style>
 
-    <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
-      <div hidden$="[[!rows.length]]">
-        <google-chart
-            type="bar"
-            options="[[options]]"
-            cols="[[cols]]"
-            rows="[[rows]]">
-        </google-chart>
-      </div>
+      <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
+        <div hidden$="[[!rows.length]]">
+          <google-chart type="bar" options="[[options]]" cols="[[cols]]" rows="[[rows]]"> </google-chart>
+        </div>
 
-      <list-placeholder
-          data="[[rows]]"
-          message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
-      </list-placeholder>
-    </analysis-widget>
+        <list-placeholder data="[[rows]]" message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
+        </list-placeholder>
+      </analysis-widget>
     `;
   }
 
@@ -69,19 +61,19 @@ class CurrentProgressByProject extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   cols = [
     {
       label: 'Project',
-      type: 'string',
+      type: 'string'
     },
     {
       label: 'Count',
-      type: 'number',
+      type: 'number'
     },
     {
       type: 'string',
       role: 'tooltip',
       p: {
         html: true
-      },
-    },
+      }
+    }
   ];
 
   @property({type: Array, computed: '_computeRows(data)'})
@@ -90,25 +82,21 @@ class CurrentProgressByProject extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   _computeOptions(rows: any) {
     return Object.assign({}, this._baseOptions, {
       height: rows.length * 45 + 30,
-      colors: rows.map(function() {
+      colors: rows.map(function () {
         return '#88c245';
       }),
       chartArea: {
         top: 0,
         left: '30%',
-        width: '50%',
-      },
+        width: '50%'
+      }
     });
   }
 
   _computeRows(data: GenericObject) {
     const self = this;
-    return Object.keys(data || {}).map(function(key) {
-      return [
-        key,
-        data[key],
-        self._buildTooltip(key, data[key])
-      ];
+    return Object.keys(data || {}).map(function (key) {
+      return [key, data[key], self._buildTooltip(key, data[key])];
     }, self);
   }
 
@@ -118,10 +106,9 @@ class CurrentProgressByProject extends UtilsMixin(LocalizeMixin(AnalysisChartMix
       '<p>' + title + '</p>',
       '<div class="project-value">' + data + '</div>',
       '<div class="partner-value">Partners: ' + this.partnerNumData + '</div>',
-      '</div>',
+      '</div>'
     ].join('\n');
   }
-
 }
 
 window.customElements.define('current-progress-by-project', CurrentProgressByProject);

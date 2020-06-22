@@ -13,25 +13,18 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  */
 class PartnerDropdownContent extends ReduxConnectedElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="partnerNames"
-        url="[[partnerNamesUrl]]"
-        params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="partnerNames" url="[[partnerNamesUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
-`;
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
+    `;
   }
 
   @property({type: String, computed: '_computePartnerNamesUrl(responsePlanID)', observer: '_fetchPartnerNames'})
@@ -43,14 +36,11 @@ class PartnerDropdownContent extends ReduxConnectedElement {
   @property({type: Array, notify: true})
   partners = [];
 
-
   @property({type: Object, computed: '_computeParams(clusters)'})
   params!: GenericObject;
 
   public static get observers() {
-    return [
-      '_fetchPartnerNames(partnerNamesUrl, params)'
-    ];
+    return ['_fetchPartnerNames(partnerNamesUrl, params)'];
   }
 
   _computePartnerNamesUrl(responsePlanID: string) {
@@ -74,7 +64,8 @@ class PartnerDropdownContent extends ReduxConnectedElement {
 
     const self = this;
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
-    (this.$.partnerNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.partnerNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
         self.set('partners', res.data);
       })
@@ -88,7 +79,6 @@ class PartnerDropdownContent extends ReduxConnectedElement {
     super.disconnectedCallback();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('partner-dropdown-content', PartnerDropdownContent);

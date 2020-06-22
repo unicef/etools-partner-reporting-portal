@@ -5,35 +5,28 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import './indicator-bucket';
 
 /**
-* @polymer
-* @customElement
-* @mixinFunction
-*/
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ */
 class Indicators extends ReduxConnectedElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-        min-height: 100px;
-        position: relative;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+          min-height: 100px;
+          position: relative;
+        }
+      </style>
 
-    <template
-        is="dom-if"
-        if="[[render]]"
-        restamp="true">
-      <template
-          is="dom-repeat"
-          items="[[data]]"
-          as="bucket">
-        <analysis-indicator-bucket data="[[bucket]]"></analysis-indicator-bucket>
+      <template is="dom-if" if="[[render]]" restamp="true">
+        <template is="dom-repeat" items="[[data]]" as="bucket">
+          <analysis-indicator-bucket data="[[bucket]]"></analysis-indicator-bucket>
+        </template>
       </template>
-    </template>
 
-    <etools-loading active="[[loading]]"></etools-loading>
+      <etools-loading active="[[loading]]"></etools-loading>
     `;
   }
 
@@ -58,15 +51,15 @@ class Indicators extends ReduxConnectedElement {
   }
 
   _computeData(rawData: any) {
-    return rawData.reduce(function(acc: any, curr: any) {
-      var bucket = acc.find(function(_bucket: any) {
+    return rawData.reduce(function (acc: any, curr: any) {
+      var bucket = acc.find(function (_bucket: any) {
         return _bucket.id === curr.content_object.id;
       });
 
       if (!bucket) {
         bucket = Object.assign({}, curr.content_object, {
           type: curr.content_type,
-          indicators: [],
+          indicators: []
         });
 
         acc.push(bucket);
@@ -77,7 +70,7 @@ class Indicators extends ReduxConnectedElement {
         title: curr.blueprint.title,
         display_type: curr.blueprint.display_type,
         total_against_in_need: curr.total_against_in_need,
-        total_against_target: curr.total_against_target,
+        total_against_target: curr.total_against_target
       });
 
       return acc;

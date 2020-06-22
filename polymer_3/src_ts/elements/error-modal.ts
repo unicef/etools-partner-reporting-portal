@@ -17,7 +17,7 @@ import {buttonsStyles} from '../styles/buttons-styles';
 class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-        ${buttonsStyles}
+      ${buttonsStyles}
       <style include="iron-flex iron-flex-reverse iron-flex-alignment">
         :host {
           --paper-dialog: {
@@ -28,22 +28,15 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         }
       </style>
 
-      <paper-dialog
-          modal
-          opened="{{opened}}">
+      <paper-dialog modal opened="{{opened}}">
         <div>
           <ul>
-            <template
-                is="dom-repeat"
-                items="[[localizedErrors]]"
-                as="localizedError">
+            <template is="dom-repeat" items="[[localizedErrors]]" as="localizedError">
               <li>[[localizedError]]</li>
             </template>
           </ul>
           <div class="layout horizontal-reverse">
-            <paper-button
-                class="btn-primary"
-                dialog-dismiss>
+            <paper-button class="btn-primary" dialog-dismiss>
               Close
             </paper-button>
           </div>
@@ -59,25 +52,27 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   localizedErrors!: string[];
 
   @property({type: Boolean})
-  opened: boolean = false;
+  opened = false;
 
   @property({type: Object})
   _result!: GenericObject;
 
-
   open(errors: GenericObject[]) {
-    let self = this;
+    const self = this;
 
     this.set('errors', errors);
     this.set('opened', true);
 
-    this.set('_result', new Promise(function(resolve) {
-      self.addEventListener('opened-changed', function onOpenedChanged() {
-        self.removeEventListener('opened-changed', onOpenedChanged);
+    this.set(
+      '_result',
+      new Promise(function (resolve) {
+        self.addEventListener('opened-changed', function onOpenedChanged() {
+          self.removeEventListener('opened-changed', onOpenedChanged);
 
-        resolve();
-      });
-    }));
+          resolve();
+        });
+      })
+    );
 
     return this._result;
   }
@@ -87,7 +82,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    let localizedErrors = errors.map(function(error) {
+    const localizedErrors = errors.map(function (error) {
       switch (error) {
         case 'You have not selected overall status for one of Outputs':
           return localize('not_selected_overall_status');
@@ -112,7 +107,6 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     this.set('errors', []);
     this.set('opened', false);
   }
-
 }
 
 window.customElements.define('error-modal', ErrorModal);

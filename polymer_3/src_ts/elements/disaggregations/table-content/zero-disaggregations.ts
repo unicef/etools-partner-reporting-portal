@@ -4,7 +4,6 @@ import {property} from '@polymer/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 
-
 /**
  * @polymer
  * @customElement
@@ -13,15 +12,16 @@ class ZeroDisaggregations extends PolymerElement {
   public static get template() {
     // language=HTML
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style></style>
 
       <disaggregation-table-row
-          data="[[totalRow]]"
-          level-reported="[[data.level_reported]]"
-          indicator-type="[[data.display_type]]"
-          row-type="totalsRow"
-          editable="[[editable]]">
+        data="[[totalRow]]"
+        level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
+        row-type="totalsRow"
+        editable="[[editable]]"
+      >
       </disaggregation-table-row>
     `;
   }
@@ -44,7 +44,6 @@ class ZeroDisaggregations extends PolymerElement {
       }
     };
   }
-
 }
 
 window.customElements.define('zero-disaggregations', ZeroDisaggregations);

@@ -21,7 +21,6 @@ import '../elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
 import {BASE_PATH} from '../config';
 
-
 /**
  * @polymer
  * @customElement
@@ -29,163 +28,155 @@ import {BASE_PATH} from '../config';
  * @appliesMixin LocalizeMixin
  */
 class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${appThemeIpStyles}
-    <style>
-      :host {
-        display: block;
-        height: 100%;
-
-        --login-container-inner-layout: {}
-
-        --paper-button: {
-          width: 220px;
-          padding: 1em;
-          background: #fff;
-        };
-        --paper-input-container-color: #fff;
-        --paper-input-container-input-color: #fff;
-        --paper-input-container-focus-underline-color: #fff;
-      }
-
-      @media (min-width: 600px) {
+      ${appThemeIpStyles}
+      <style>
         :host {
+          display: block;
+          height: 100%;
+
           --login-container-inner-layout: {
-            @apply --layout-vertical;
-            @apply --layout-center-justified;
-          };
+          }
+
+          --paper-button: {
+            width: 220px;
+            padding: 1em;
+            background: #fff;
+          }
+          --paper-input-container-color: #fff;
+          --paper-input-container-input-color: #fff;
+          --paper-input-container-focus-underline-color: #fff;
         }
-      }
 
-      .login-container {
-        @apply --layout-horizontal;
-        @apply --layout-center-justified;
+        @media (min-width: 600px) {
+          :host {
+            --login-container-inner-layout: {
+              @apply --layout-vertical;
+              @apply --layout-center-justified;
+            }
+          }
+        }
 
-        box-sizing: border-box;
-        min-height: 100%;
-        padding: 1em;
-        background: linear-gradient(#44b4ff, #0099ff);
-      }
+        .login-container {
+          @apply --layout-horizontal;
+          @apply --layout-center-justified;
 
-      .login-container-inner {
-        @apply --login-container-inner-layout;
-      }
+          box-sizing: border-box;
+          min-height: 100%;
+          padding: 1em;
+          background: linear-gradient(#44b4ff, #0099ff);
+        }
 
-      paper-card {
-        width: 290px;
-      }
+        .login-container-inner {
+          @apply --login-container-inner-layout;
+        }
 
-      @media (min-width: 600px) {
         paper-card {
-          width: 480px;
+          width: 290px;
         }
-      }
 
-      .header {
-        padding: 2em 0;
-        text-align: center;
-      }
+        @media (min-width: 600px) {
+          paper-card {
+            width: 480px;
+          }
+        }
 
-      .header h1 {
-        @apply --paper-font-subhead;
+        .header {
+          padding: 2em 0;
+          text-align: center;
+        }
 
-        margin: 0;
-      }
+        .header h1 {
+          @apply --paper-font-subhead;
 
-      .login-buttons {
-        padding: 3em 1em;
-        background: var(--theme-primary-color);
-      }
+          margin: 0;
+        }
 
-      .login-buttons-label {
-        @apply --paper-font-headline;
+        .login-buttons {
+          padding: 3em 1em;
+          background: var(--theme-primary-color);
+        }
 
-        margin: 0 0 .75em;
-        color: var(--theme-primary-text-color-light);
-        text-align: center;
-      }
+        .login-buttons-label {
+          @apply --paper-font-headline;
 
-      .login-buttons ul {
-        @apply --layout-vertical;
+          margin: 0 0 0.75em;
+          color: var(--theme-primary-text-color-light);
+          text-align: center;
+        }
 
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
+        .login-buttons ul {
+          @apply --layout-vertical;
 
-      .login-buttons li {
-        @apply --layout-horizontal;
-        @apply --layout-center-justified;
-      }
+          padding: 0;
+          margin: 0;
+          list-style: none;
+        }
 
-      .login-buttons li:not(:last-child) {
-        margin-bottom: 1em;
-      }
+        .login-buttons li {
+          @apply --layout-horizontal;
+          @apply --layout-center-justified;
+        }
 
-      .login-buttons a {
-        text-decoration: none;
-        color: inherit;
-      }
+        .login-buttons li:not(:last-child) {
+          margin-bottom: 1em;
+        }
 
-      p {
-        color: #fff;
-      }
-      p.error-token {
-        color: var(--paper-deep-orange-a700);
-        font-size: 1.2em;
-      }
+        .login-buttons a {
+          text-decoration: none;
+          color: inherit;
+        }
 
-    </style>
+        p {
+          color: #fff;
+        }
+        p.error-token {
+          color: var(--paper-deep-orange-a700);
+          font-size: 1.2em;
+        }
+      </style>
 
-    <page-title title="[[localize('sign_in')]]"></page-title>
+      <page-title title="[[localize('sign_in')]]"></page-title>
 
-    <iron-media-query
-        query="[[desktopLayoutQuery]]"
-        query-matches="{{isDesktop}}">
-    </iron-media-query>
+      <iron-media-query query="[[desktopLayoutQuery]]" query-matches="{{isDesktop}}"> </iron-media-query>
 
-    <etools-prp-ajax
-      id="login"
-      url="[[loginUrl]]"
-      body="[[data]]"
-      content-type="application/json"
-      method="post">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="login" url="[[loginUrl]]" body="[[data]]" content-type="application/json" method="post">
+      </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="getProfile"
-      url="[[profileUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="getProfile" url="[[profileUrl]]"> </etools-prp-ajax>
 
-    <div class="login-container">
-      <div class="login-container-inner">
-        <paper-card>
-          <div class="header">
-            <etools-logo size="[[logoSize]]" text-color="#233944"></etools-logo>
+      <div class="login-container">
+        <div class="login-container-inner">
+          <paper-card>
+            <div class="header">
+              <etools-logo size="[[logoSize]]" text-color="#233944"></etools-logo>
 
-            <h1>Partner Reporting Portal</h1>
-          </div>
-          <div class="login-buttons">
-            <p class="login-buttons-label">Login via Active Directory</p>
+              <h1>Partner Reporting Portal</h1>
+            </div>
+            <div class="login-buttons">
+              <p class="login-buttons-label">Login via Active Directory</p>
 
-            <ul>
-              <template is="dom-if" if="{{emailSubmitted}}">
-                <li><p>If this is a valid email address, please check your email for instructions to Sign In.<br>
-                You can also try another email.</p></li>
-              </template>
+              <ul>
+                <template is="dom-if" if="{{emailSubmitted}}">
+                  <li>
+                    <p>
+                      If this is a valid email address, please check your email for instructions to Sign In.<br />
+                      You can also try another email.
+                    </p>
+                  </li>
+                </template>
 
                 <template is="dom-if" if="{{value}}">
                   <li><p class="error-token">Unable to login, invalid token, please try again.</p></li>
                 </template>
-              <li>
-              <paper-button id="login-button" on-tap="_redirectAuth" class="btn-primary" raised>
-                Sign in
-              </paper-button>
-          </li>
+                <li>
+                  <paper-button id="login-button" on-tap="_redirectAuth" class="btn-primary" raised>
+                    Sign in
+                  </paper-button>
+                </li>
 
-              <!-- <li>
+                <!-- <li>
                 <a href="/todo">
                   <paper-button raised>
                     <img src="../../images/google.png" alt="Google" height="20">
@@ -206,12 +197,12 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
                   </paper-button>
                 </a>
               </li> -->
-            </ul>
-          </div>
-        </paper-card>
+              </ul>
+            </div>
+          </paper-card>
+        </div>
       </div>
-    </div>
-  `;
+    `;
   }
 
   @property({type: Number, computed: '_computeLogoSize(isDesktop)'})
@@ -235,7 +226,7 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
   @property({type: Object})
   keyEventTarget = () => document.body;
 
-  keyBindings = {'enter': 'submit'}
+  keyBindings = {enter: 'submit'};
 
   _computeLogoSize(isDesktop: boolean) {
     return isDesktop ? 180 : 120;
@@ -277,6 +268,5 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
         self.set('data.email', '');
       });
   }
-
 }
 window.customElements.define('page-login', PageLogin);

@@ -2,9 +2,10 @@ import {GenericObject} from '../../../typings/globals.types';
 import Endpoints from '../../../endpoints';
 
 export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: Function) {
-  const localized = indicator.reportable.blueprint.display_type === 'ratio' ?
-    localize('latest') :
-    localize(indicator.reportable.blueprint.calculation_formula_across_periods);
+  const localized =
+    indicator.reportable.blueprint.display_type === 'ratio'
+      ? localize('latest')
+      : localize(indicator.reportable.blueprint.calculation_formula_across_periods);
   if (localized) {
     return localized.toLowerCase();
   }

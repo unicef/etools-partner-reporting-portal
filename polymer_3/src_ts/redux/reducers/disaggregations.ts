@@ -13,16 +13,16 @@ export const Disaggregations = combineReducers({
 function disaggregationsByIndicatorReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_DISAGGREGATIONS:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.indicatorId] = action.data;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.SET_DISAGGREGATIONS_FOR_LOCATION:
-      return (function() {
+      return (function () {
         const newState: GenericObject = Object.assign({}, state);
         let locations;
         let index;
@@ -30,7 +30,7 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
         try {
           locations = newState[action.indicatorId].indicator_location_data;
 
-          index = locations.findIndex(function(item: any) {
+          index = locations.findIndex(function (item: any) {
             return item.location.id === action.locationId;
           });
 
@@ -39,10 +39,10 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
         } catch (err) {}
 
         return newState;
-      }());
+      })();
 
     case Constants.SET_PROGRESS_FOR_LOCATION:
-      return (function() {
+      return (function () {
         const newState: GenericObject = Object.assign({}, state);
         let locations;
         let index;
@@ -50,16 +50,17 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
         try {
           locations = newState[action.indicatorId].indicator_location_data;
 
-          index = locations.findIndex(function(item: GenericObject) {
+          index = locations.findIndex(function (item: GenericObject) {
             return item.location.id === action.locationId;
           });
 
           locations[index].location_progress = action.value;
-
-        } catch (err) {}
+        } catch (err) {
+          console.log(err);
+        }
 
         return newState;
-      }());
+      })();
 
     case Constants.RESET:
       return {};

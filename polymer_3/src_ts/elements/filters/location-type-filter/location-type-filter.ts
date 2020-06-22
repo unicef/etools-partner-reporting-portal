@@ -13,21 +13,16 @@ import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <dropdown-filter
-      label="[[localize('location_type')]]"
-      name="loc_type"
-      value="[[value]]"
-      data="[[data]]">
-    </dropdown-filter>
-  `;
+      <dropdown-filter label="[[localize('location_type')]]" name="loc_type" value="[[value]]" data="[[data]]">
+      </dropdown-filter>
+    `;
   }
-
 
   @property({type: Number})
   maxLocType = Settings.cluster.maxLocType;
@@ -39,13 +34,7 @@ class LocationTypeFilter extends LocalizeMixin(ReduxConnectedElement) {
   value!: string;
 
   _computeData(maxLocType: number) {
-    return Array.apply(null, Array(maxLocType + 1))
-      .map((_, index) => {
-        return {
-          id: String(index),
-          title: 'Admin' + index
-        };
-      });
+    return Array(maxLocType + 1).fill(0).map((_, index) => {return {id: String(index), title: 'Admin' + index};})
   }
 }
 

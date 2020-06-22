@@ -14,7 +14,6 @@ import UtilsMixin from '../mixins/utils-mixin';
  * @appliesMixin UtilsBehavior
  */
 class CalculationMethod extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
       <style>
@@ -39,38 +38,27 @@ class CalculationMethod extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         }
       </style>
 
-      <template
-          is="dom-if"
-          if="[[!readonly]]"
-          restamp="true">
-        <paper-radio-group
-            selected="{{value}}">
-          <template
-              is="dom-repeat"
-              items="[[choices]]">
-            <paper-radio-button
-                name="[[item.id]]"
-                disabled="[[disabled]]">
+      <template is="dom-if" if="[[!readonly]]" restamp="true">
+        <paper-radio-group selected="{{value}}">
+          <template is="dom-repeat" items="[[choices]]">
+            <paper-radio-button name="[[item.id]]" disabled="[[disabled]]">
               [[_localizeLowerCased(item.title, localize)]]
             </paper-radio-button>
           </template>
         </paper-radio-group>
       </template>
 
-      <template
-          is="dom-if"
-          if="[[readonly]]"
-          restamp="true">
+      <template is="dom-if" if="[[readonly]]" restamp="true">
         <span class="read-only-label">[[_localizeLowerCased(readOnlyLabel, localize)]]</span>
       </template>
     `;
   }
 
   @property({type: Boolean})
-  disabled: boolean = false;
+  disabled = false;
 
   @property({type: Boolean})
-  readonly: boolean = false;
+  readonly = false;
 
   @property({type: String, notify: true})
   value!: string;
@@ -79,23 +67,23 @@ class CalculationMethod extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   choices = [
     {
       id: 'sum',
-      title: 'Sum',
+      title: 'Sum'
     },
     {
       id: 'max',
-      title: 'Max',
+      title: 'Max'
     },
     {
       id: 'avg',
-      title: 'Avg',
-    },
+      title: 'Avg'
+    }
   ];
 
   @property({type: String, computed: '_computeReadonlyLabel(value, choices)'})
   readOnlyLabel!: string;
 
   _computeReadonlyLabel(value: any, choices: any[]) {
-    const method = choices.find(function(choice) {
+    const method = choices.find(function (choice) {
       return choice.id === value;
     });
 

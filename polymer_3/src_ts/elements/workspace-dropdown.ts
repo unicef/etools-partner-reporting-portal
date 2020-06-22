@@ -18,51 +18,49 @@ import {GenericObject} from '../typings/globals.types';
  */
 class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
-            display: block;
-            position: relative;
-            cursor: pointer;
-            @apply --select-plan-workspaces-offset;
+          display: block;
+          position: relative;
+          cursor: pointer;
+          @apply --select-plan-workspaces-offset;
         }
 
         paper-dropdown-menu {
-            width: 160px;
-            @apply --workspaces-dropdown-width;
+          width: 160px;
+          @apply --workspaces-dropdown-width;
 
-
-            --paper-input-container-underline: {
+          --paper-input-container-underline: {
             display: none;
             @apply --underline-shown;
-            };
+          }
 
-            --paper-input-container-underline-focus: {
+          --paper-input-container-underline-focus: {
             display: none;
-            };
+          }
 
-            --paper-input-container-underline-disabled: {
+          --paper-input-container-underline-disabled: {
             display: none;
-            };
+          }
 
-            --paper-input-container-input: {
+          --paper-input-container-input: {
             color: var(--theme-primary-text-color-medium);
-            };
+          }
 
-            --paper-dropdown-menu-icon: {
+          --paper-dropdown-menu-icon: {
             color: var(--theme-primary-text-color-medium);
-            };
+          }
 
-            --paper-input-container-label: {
+          --paper-input-container-label: {
             top: 4px;
             color: var(--theme-primary-text-color-medium);
-            };
+          }
 
-            --paper-input-container-input: {
+          --paper-input-container-input: {
             margin-bottom: 2px;
             color: var(--theme-primary-text-color-medium);
             @apply --workspace-dropdown-input;
-            }
+          }
         }
 
         paper-item {
@@ -75,16 +73,17 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
       </style>
 
       <paper-dropdown-menu label="[[workspace.name]]" noink no-label-float>
-        <paper-listbox slot="dropdown-content"
+        <paper-listbox
+          slot="dropdown-content"
           class="dropdown-content"
           on-iron-select="_workspaceSelected"
-          selected="[[selected]]">
+          selected="[[selected]]"
+        >
           <template id="repeat" is="dom-repeat" items="[[data]]">
             <paper-item>[[item.name]]</paper-item>
           </template>
         </paper-listbox>
-      </paper-dropdown-menu>`
-      ;
+      </paper-dropdown-menu>`;
   }
 
   @property({type: Object, computed: '_computeWorkspace(data, current)'})
@@ -93,7 +92,11 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
   @property({type: Number, computed: '_computeSelected(data, current)'})
   selected = 0;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)', observer: '_currentWorkspaceChanged'})
+  @property({
+    type: String,
+    computed: 'getReduxStateValue(rootState.workspaces.current)',
+    observer: '_currentWorkspaceChanged'
+  })
   current!: string;
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
@@ -122,7 +125,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
 
   _computeWorkspace(data: any[], code: string) {
     if (data) {
-      return data.filter(function(workspace) {
+      return data.filter(function (workspace) {
         return workspace.code === code;
       })[0];
     }
@@ -132,7 +135,7 @@ class WorkspaceDropdown extends RoutingMixin(ReduxConnectedElement) {
     if (!data) {
       return;
     }
-    return data.findIndex(x => x.code === workspace);
+    return data.findIndex((x) => x.code === workspace);
   }
 }
 

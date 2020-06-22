@@ -5,4 +5,3 @@ export interface Workspace {
   latitude: string;
   longitude: string;
 }
-

@@ -12,20 +12,21 @@ import {property} from '@polymer/decorators';
 class PartnerTypeFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <dropdown-filter-multi
+      <dropdown-filter-multi
         label="[[localize('partner_type')]]"
         name="partner_types"
         value="[[value]]"
         data="[[data]]"
-        hide-search>
-    </dropdown-filter-multi>
-  `;
+        hide-search
+      >
+      </dropdown-filter-multi>
+    `;
   }
   @property({type: String})
   value!: string;

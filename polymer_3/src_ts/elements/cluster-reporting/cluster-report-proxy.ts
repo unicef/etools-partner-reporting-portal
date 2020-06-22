@@ -17,14 +17,8 @@ class ClusterReportProxy extends PolymerElement {
         }
       </style>
 
-      <template
-          is="dom-if"
-          if="[[active]]"
-          restamp="true">
-        <cluster-report
-            data="[[data]]"
-            mode="[[mode]]">
-        </cluster-report>
+      <template is="dom-if" if="[[active]]" restamp="true">
+        <cluster-report data="[[data]]" mode="[[mode]]"> </cluster-report>
       </template>
     `;
   }
@@ -39,8 +33,7 @@ class ClusterReportProxy extends PolymerElement {
   currentId!: number;
 
   @property({type: Boolean})
-  active: boolean = false;
-
+  active = false;
 
   static get observers() {
     return ['_render(data.id)'];

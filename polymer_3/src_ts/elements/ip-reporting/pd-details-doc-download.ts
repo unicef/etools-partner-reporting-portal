@@ -21,31 +21,26 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin NotificationsMixin
  */
 class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    <style>
-      .spinner-size {
-        width: 19px;
-        height: 19px;
-      }
-      [hidden] {
-        display: none !important;
-      }
-    </style>
+      <style>
+        .spinner-size {
+          width: 19px;
+          height: 19px;
+        }
+        [hidden] {
+          display: none !important;
+        }
+      </style>
 
-    <div>
-      <!--Text-->
-      <paper-spinner hidden="[[!spinnerActive]]" class="spinner-size" active="[[spinnerActive]]"></paper-spinner>
-      <a href="" on-click="_openDoc">Download Document</a>
-    </div>
-    <etools-prp-ajax
-        id="pddoc"
-        url="[[pdDocumentUrl]]">
-    </etools-prp-ajax>
-  `;
+      <div>
+        <!--Text-->
+        <paper-spinner hidden="[[!spinnerActive]]" class="spinner-size" active="[[spinnerActive]]"></paper-spinner>
+        <a href="" on-click="_openDoc">Download Document</a>
+      </div>
+      <etools-prp-ajax id="pddoc" url="[[pdDocumentUrl]]"> </etools-prp-ajax>
+    `;
   }
-
 
   @property({type: Boolean})
   spinnerActive!: boolean;
@@ -76,25 +71,21 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
     this.set('spinnerActive', true);
     const thunk = (this.$.pddoc as EtoolsPrpAjaxEl).thunk();
 
-    thunk()
-      .then(function(res: any) {
-        self.set('spinnerActive', false);
-        if (res.status !== 200 || !res.data.signed_pd_document_file) {
-          // Fire Toast with error
-          self._notifyServerError();
-          console.error(res);
-        } else {
-          const anchor = document.createElement('a');
-          anchor.setAttribute('href', res.data.signed_pd_document_file);
-          anchor.setAttribute('target', '_blank');
-          anchor.dispatchEvent(new MouseEvent('click',
-            {bubbles: true, cancelable: true, view: window})
-          );
-          anchor.remove();
-        }
-      });
+    thunk().then(function (res: any) {
+      self.set('spinnerActive', false);
+      if (res.status !== 200 || !res.data.signed_pd_document_file) {
+        // Fire Toast with error
+        self._notifyServerError();
+        console.error(res);
+      } else {
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', res.data.signed_pd_document_file);
+        anchor.setAttribute('target', '_blank');
+        anchor.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+        anchor.remove();
+      }
+    });
   }
-
 }
 
 window.customElements.define('pd-details-doc-download', PdDetailsDocDownload);

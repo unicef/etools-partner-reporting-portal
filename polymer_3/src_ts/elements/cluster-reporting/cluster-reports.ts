@@ -10,10 +10,12 @@ import '../etools-prp-ajax';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {clusterIndicatorReportsFetch, clusterIndicatorReportsFetchSingle} from '../../redux/actions/clusterIndicatorReports';
+import {
+  clusterIndicatorReportsFetch,
+  clusterIndicatorReportsFetchSingle
+} from '../../redux/actions/clusterIndicatorReports';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-
 
 /**
  * @polymer
@@ -29,28 +31,15 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <etools-prp-ajax
-          id="reports"
-          url="[[reportsUrl]]"
-          params="[[params]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="reports" url="[[reportsUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="refresh">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="refresh"> </etools-prp-ajax>
 
-      <cluster-report-toolbar
-          submitted="[[submitted]]">
-      </cluster-report-toolbar>
+      <cluster-report-toolbar submitted="[[submitted]]"> </cluster-report-toolbar>
 
       <cluster-report-list mode="[[mode]]"></cluster-report-list>
     `;
@@ -75,7 +64,6 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   params!: GenericObject;
 
   private _debouncer!: Debouncer;
-
 
   static get observers() {
     return ['_onParamsChanged(reportsUrl, params)'];
@@ -103,7 +91,8 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
     const reportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
     (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(clusterIndicatorReportsFetch(reportsThunk, reset))
+    this.reduxStore
+      .dispatch(clusterIndicatorReportsFetch(reportsThunk, reset))
       // @ts-ignore
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -112,11 +101,9 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
 
   _onParamsChanged() {
     const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(100),
-      () => {
-        self._fetchData();
-      });
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
+      self._fetchData();
+    });
   }
 
   _onContentsChanged(e: CustomEvent) {
@@ -134,7 +121,8 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
     const refreshThunk = refreshAjaxEl.thunk();
     refreshAjaxEl.abort();
 
-    this.reduxStore.dispatch(clusterIndicatorReportsFetchSingle(refreshThunk, reportId))
+    this.reduxStore
+      .dispatch(clusterIndicatorReportsFetchSingle(refreshThunk, reportId))
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling
@@ -177,7 +165,6 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
       this._debouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('cluster-reports', ClusterReports);

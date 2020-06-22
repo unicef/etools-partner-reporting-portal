@@ -13,7 +13,6 @@ import {property} from '@polymer/decorators';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -23,36 +22,28 @@ import {GenericObject} from '../../../typings/globals.types';
 class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]"
-        params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="locations" url="[[locationsUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
+      <dropdown-filter-multi
         label="[[localize('location')]]"
         name="locs"
         value="[[value]]"
         on-value-changed="_onValueChanged"
         data="[[data]]"
-        disabled="[[pending]]">
-    </dropdown-filter-multi>
-  `;
+        disabled="[[pending]]"
+      >
+      </dropdown-filter-multi>
+    `;
   }
 
   @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
@@ -91,28 +82,25 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
       return;
     }
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
-        const self = this;
-        this.set('pending', true);
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const self = this;
+      this.set('pending', true);
 
-        (this.$.locations as EtoolsPrpAjaxEl).abort();
-        (this.$.locations as EtoolsPrpAjaxEl).thunk()()
-          .then((res: any) => {
-            self.set('pending', false);
-            self.set('data', res.data.results);
-          })
-          .catch((_err: GenericObject) => {
-            // TODO: error handling
-            self.set('pending', false);
-          });
-
-      });
+      (this.$.locations as EtoolsPrpAjaxEl).abort();
+      (this.$.locations as EtoolsPrpAjaxEl)
+        .thunk()()
+        .then((res: any) => {
+          self.set('pending', false);
+          self.set('data', res.data.results);
+        })
+        .catch((_err: GenericObject) => {
+          // TODO: error handling
+          self.set('pending', false);
+        });
+    });
   }
 
   _onValueChanged(e: CustomEvent) {
-
     if (e.detail.value === '') {
       return;
     }

@@ -7,7 +7,6 @@ import {Constructor, GenericObject} from '../typings/globals.types';
  */
 function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DataTableClass extends baseClass {
-
     _pageSizeChanged(e: CustomEvent) {
       const change: GenericObject = {
         page_size: e.detail.value
@@ -28,7 +27,7 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         const openedDetails = (this.openedDetails as any[]) || [];
         if (openedDetails.length > 0) {
           const tempList = openedDetails.slice();
-          tempList.forEach((detail: any) => detail.detailsOpened = false);
+          tempList.forEach((detail: any) => (detail.detailsOpened = false));
         }
       }, 100);
     }
@@ -37,15 +36,17 @@ function DataTableMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       this._colapseExpandedDetails();
 
       // @ts-ignore
-      this.set('queryParams', Object.assign({}, this.queryParams, {
-        page: e.detail.value
-      }));
+      this.set(
+        'queryParams',
+        Object.assign({}, this.queryParams, {
+          page: e.detail.value
+        })
+      );
 
       setTimeout(() => {
         this.set('_pageNumberInitialized', true);
       });
     }
-
   }
   return DataTableClass;
 }

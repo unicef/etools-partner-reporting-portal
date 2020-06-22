@@ -174,9 +174,11 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   @property({type: Array})
   detailsOpened = [];
 
-  @property({type: Array,
-                    computed: 'getReduxStateArray(rootState.clusterDashboardData.data.my_project_activities)',
-                    observer: '_collapseAll'})
+  @property({
+    type: Array,
+    computed: 'getReduxStateArray(rootState.clusterDashboardData.data.my_project_activities)',
+    observer: '_collapseAll'
+  })
   data!: any[];
 
   @property({type: String, computed: '_computeActivitiesUrl(_baseUrlCluster)'})
@@ -186,7 +188,7 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
   loading!: boolean;
 
   _collapseAll() {
-    this.detailsOpened.slice().forEach(function(row: any) {
+    this.detailsOpened.slice().forEach(function (row: any) {
       row.detailsOpened = false;
     });
   }

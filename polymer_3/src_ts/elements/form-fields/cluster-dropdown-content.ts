@@ -12,21 +12,16 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  */
 class ClusterDropdownContent extends ReduxConnectedElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-      id="clusterNames"
-      url="[[clusterNamesUrl]]"
-      params="[[params]]">
-    </etools-prp-ajax>
-  `;
+      <etools-prp-ajax id="clusterNames" url="[[clusterNamesUrl]]" params="[[params]]"> </etools-prp-ajax>
+    `;
   }
 
   @property({type: String})
@@ -48,9 +43,7 @@ class ClusterDropdownContent extends ReduxConnectedElement {
   clusters = [];
 
   public static get observers() {
-    return [
-      '_fetchClusterNames(clusterNamesUrl, params)'
-    ];
+    return ['_fetchClusterNames(clusterNamesUrl, params)'];
   }
 
   _computeClusterNamesUrl(responsePlanId: string) {
@@ -75,7 +68,8 @@ class ClusterDropdownContent extends ReduxConnectedElement {
     const self = this;
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
-    (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.clusterNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: GenericObject) => {
         self.set('clusters', res.data);
       })
@@ -89,7 +83,6 @@ class ClusterDropdownContent extends ReduxConnectedElement {
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-dropdown-content', ClusterDropdownContent);

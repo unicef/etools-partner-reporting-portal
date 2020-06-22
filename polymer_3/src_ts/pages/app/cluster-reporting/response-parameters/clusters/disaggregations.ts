@@ -7,8 +7,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import UtilsMixin from '../../../../../mixins/utils-mixin';
 import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
-import {CreationModalDisaggregationEl} from
-  '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
+import {CreationModalDisaggregationEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
@@ -23,14 +22,13 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fetchClusterDisaggregationsList} from '../../../../../redux/actions/clusterDisaggregations';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ */
 class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
     ${tableStyles} ${buttonsStyles}
@@ -98,9 +96,7 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
   disaggregationsUrl!: string;
 
   static get observers() {
-    return [
-      '_clusterDisaggregationsAjax(queryParams, disaggregationsUrl)'
-    ]
+    return ['_clusterDisaggregationsAjax(queryParams, disaggregationsUrl)'];
   }
 
   private _clusterDisaggregationsAjaxDebouncer!: Debouncer;
@@ -126,7 +122,8 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
       return;
     }
 
-    this._clusterDisaggregationsAjaxDebouncer = Debouncer.debounce(this._clusterDisaggregationsAjaxDebouncer,
+    this._clusterDisaggregationsAjaxDebouncer = Debouncer.debounce(
+      this._clusterDisaggregationsAjaxDebouncer,
       timeOut.after(300),
       () => {
         const thunk = (this.$.disaggregations as EtoolsPrpAjaxEl).thunk();
@@ -134,12 +131,14 @@ class Disaggregations extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnect
           return;
         }
         (this.$.disaggregations as EtoolsPrpAjaxEl).abort();
-        this.reduxStore.dispatch(fetchClusterDisaggregationsList(thunk))
+        this.reduxStore
+          .dispatch(fetchClusterDisaggregationsList(thunk))
           // @ts-ignore
           .catch((_err: GenericObject) => {
             //   // TODO: error handling.
           });
-      });
+      }
+    );
   }
 
   _canAddDisaggregation(permissions: GenericObject) {

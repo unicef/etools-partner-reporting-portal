@@ -33,60 +33,51 @@ import {PlannedActioAddExistingActivityFromProjectModalEl} from '../../../planne
 class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <iron-location query="{{query}}" path="{{path}}"></iron-location>
+      <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-      id="activities"
-      url="[[url]]"
-      params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activities" url="[[url]]" params="[[params]]"> </etools-prp-ajax>
 
-    <page-body>
-      <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
-      <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
+      <page-body>
+        <planned-action-add-activity-from-project-modal
+          id="modal"
+          project-data="[[projectData]]"
+        ></planned-action-add-activity-from-project-modal>
+        <planned-action-add-existing-activity-from-project-modal
+          id="existing-modal"
+          project-data="[[projectData]]"
+        ></planned-action-add-existing-activity-from-project-modal>
 
-      <template
-          is="dom-if"
-          if="[[_displayButtons(permissions)]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_new_project_activity')]]
-          </paper-button>
+        <template is="dom-if" if="[[_displayButtons(permissions)]]" restamp="true">
+          <div id="action">
+            <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_new_project_activity')]]
+            </paper-button>
 
-          <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
-            [[localize('add_existing_project_activity')]]
-          </paper-button>
-        </div>
-      </template>
+            <paper-button id="add_existing_pa" on-tap="_openExistingModal" class="btn-primary" raised>
+              [[localize('add_existing_project_activity')]]
+            </paper-button>
+          </div>
+        </template>
 
-      <project-activity-table
-        page="response-parameters"
-        project-id="[[projectId]]">
-      </project-activity-table>
-    </page-body>
+        <project-activity-table page="response-parameters" project-id="[[projectId]]"> </project-activity-table>
+      </page-body>
     `;
   }
 
@@ -109,9 +100,7 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
   params!: GenericObject;
 
   static get observers() {
-    return [
-      '_activitiesByPartnerProjectIdAjax(queryParams)'
-    ];
+    return ['_activitiesByPartnerProjectIdAjax(queryParams)'];
   }
 
   private ActivitiesByPartnerDebouncer!: Debouncer;
@@ -128,19 +117,22 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
   }
 
   _activitiesByPartnerProjectIdAjax() {
-    this.ActivitiesByPartnerDebouncer = Debouncer.debounce(this.ActivitiesByPartnerDebouncer,
+    this.ActivitiesByPartnerDebouncer = Debouncer.debounce(
+      this.ActivitiesByPartnerDebouncer,
       timeOut.after(100),
       () => {
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
+        this.reduxStore
+          .dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
           // @ts-ignore
           .catch((_err: any) => {
             // TODO: error handling.
           });
-      });
+      }
+    );
   }
 
   _computeParams(queryParams: string, projectId: number) {

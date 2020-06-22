@@ -15,26 +15,18 @@ import {GenericObject} from '../../../typings/globals.types';
 class FilterListByCluster extends UtilsMixin(PolymerElement) {
   static get template() {
     return html`
-    <style>
-    : host {
-      display: block;
-    }
-    </style>
+      <style>
+        : host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}" >
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <cluster-filter
-      name="cluster_id"
-      value="[[_withDefault(queryParams.cluster_id, '')]]">
-    </cluster-filter>
-  `;
+      <cluster-filter name="cluster_id" value="[[_withDefault(queryParams.cluster_id, '')]]"> </cluster-filter>
+    `;
   }
 
   @property({type: String})
@@ -45,7 +37,7 @@ class FilterListByCluster extends UtilsMixin(PolymerElement) {
 
   _onFilterChanged(e: CustomEvent) {
     const change: GenericObject = {
-      page: 1,
+      page: 1
     };
     const data = e.detail;
     change[data.name] = data.value;

@@ -7,14 +7,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "outDir": "src"
+    "outDir": "src",
+    "rootDir": "src_ts"
   },
-  "include": [
-    "src_ts/**/*.ts"
-  ],
+  "include": ["src_ts/**/*.ts"],
   "exclude": []
 }

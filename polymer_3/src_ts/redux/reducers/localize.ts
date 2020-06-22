@@ -15,7 +15,6 @@ export const Localize = combineReducers({
   resources: resourcesReducer
 });
 
-
 function languageReducer(state: string, action: any) {
   if (typeof state === 'undefined') {
     let currentLanguage = localStorage.getItem('defaultLanguage');

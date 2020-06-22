@@ -16,16 +16,12 @@ import {setToken, resetToken} from '../redux/actions';
  * @appliesMixin NotificationsMixin
  */
 class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-
-    <iron-ajax
+      <iron-ajax
         id="ajax"
         bubbles
-
         auto$="[[auto]]"
-
         method="[[formattedMethod]]"
         content-type="[[contentType]]"
         url="[[url]]"
@@ -37,15 +33,15 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
         json-prefix="[[jsonPrefix]]"
         sync="[[sync]]"
         withCredentials="[[withCredentials]]"
-
         loading="{{loading}}"
         active-requests="{{activeRequests}}"
         debounce-duration="{{debounceDuration}}"
         last-error="{{lastError}}"
         last-request="{{lastRequest}}"
-        last-response="{{lastResponse}}">
-    </iron-ajax>
-  `;
+        last-response="{{lastResponse}}"
+      >
+      </iron-ajax>
+    `;
   }
 
   @property({type: String})
@@ -76,7 +72,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   customHeaders!: GenericObject;
 
   @property({type: String, computed: '_computeFormattedMethod(method)'})
-  formattedMethod: string = 'GET';
+  formattedMethod = 'GET';
 
   @property({type: Object, notify: true})
   lastRequest!: GenericObject;
@@ -93,12 +89,15 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   @property({type: Array, notify: true})
   activeRequests!: GenericObject[];
 
-
   _computeHeaders(headers: GenericObject, token: string) {
-    return Object.assign({}, {
-      Authorization: 'Bearer ' + token,
-      'X-CSRFToken': this._getCSRFCookie()
-    }, headers);
+    return Object.assign(
+      {},
+      {
+        Authorization: 'Bearer ' + token,
+        'X-CSRFToken': this._getCSRFCookie()
+      },
+      headers
+    );
   }
 
   _getCSRFCookie() {
@@ -110,7 +109,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
         // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
+        if (cookie.substring(0, csrfCookieName.length + 1) === csrfCookieName + '=') {
           csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
           break;
         }
@@ -169,17 +168,17 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
 
   thunk() {
     const self = this;
-    return (function() {
+    return function () {
       const req = self.generateRequest();
 
-      return req.completes
-        .then(() => {
+      return req
+        .completes!.then(() => {
           return self._buildResponse(req);
         })
         .catch(() => {
           return Promise.reject(self._buildResponse(req));
         });
-    }.bind(this));
+    };
   }
 
   abort() {
@@ -215,9 +214,7 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
 
     this._removeEventListeners();
   }
-
 }
 window.customElements.define('etools-prp-ajax', EtoolsPrpAjax);
 
 export {EtoolsPrpAjax as EtoolsPrpAjaxEl};
-

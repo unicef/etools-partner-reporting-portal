@@ -8,7 +8,6 @@ declare const moment: any;
  */
 function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DateClass extends baseClass {
-
     prettyDate(dateString: string, format?: string) {
       if (!format) {
         format = 'D MMM YYYY';
@@ -55,8 +54,12 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       if (!unit) {
         unit = 'days';
       }
-      if (typeof firstDateString === 'string' && firstDateString !== '' &&
-        typeof secondDateString === 'string' && secondDateString !== '') {
+      if (
+        typeof firstDateString === 'string' &&
+        firstDateString !== '' &&
+        typeof secondDateString === 'string' &&
+        secondDateString !== ''
+      ) {
         const firstDate = this.getUTCDate(firstDateString);
         const secondDate = this.getUTCDate(secondDateString);
         if (firstDate.toString() !== 'Invalid Date' && secondDate.toString() !== 'Invalid Date') {
@@ -94,7 +97,6 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     getUTCDate(dateStr: string) {
       return new Date(dateStr + ' UTC');
     }
-
   }
   return DateClass;
 }

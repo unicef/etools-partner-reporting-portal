@@ -6,7 +6,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../typings/globals.types';
 import './error-box-errors';
 
-
 /**
  * @polymer
  * @customElement
@@ -32,19 +31,14 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
         }
       </style>
 
-      <div
-          id="box"
-          hidden$="[[_hidden]]">
+      <div id="box" hidden$="[[_hidden]]">
         <div class="header layout horizontal center">
           <iron-icon icon="icons:error"></iron-icon>
           <span>Error(s) occurred. Please check the list to save the form.</span>
         </div>
 
-        <error-box-errors
-            errors="[[mappedErrors]]">
-        </error-box-errors>
+        <error-box-errors errors="[[mappedErrors]]"> </error-box-errors>
       </div>
-
     `;
   }
 
@@ -55,8 +49,7 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
   mappedErrors: GenericObject[] = [];
 
   @property({type: Boolean, computed: '_computeHidden(mappedErrors)'})
-  _hidden: boolean = true;
-
+  _hidden = true;
 
   _computeMappedErrors(errors: GenericObject[]) {
     return this.errorMapper(errors);
@@ -100,8 +93,6 @@ class ErrorBox extends UtilsMixin(PolymerElement) {
           });
     }
   }
-
-
 }
 
 window.customElements.define('error-box', ErrorBox);

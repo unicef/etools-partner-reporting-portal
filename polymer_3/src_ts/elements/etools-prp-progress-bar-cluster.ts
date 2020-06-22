@@ -2,15 +2,13 @@ import {PolymerElement, html} from '@polymer/polymer';
 import './etools-prp-progress-bar';
 import {property} from '@polymer/decorators/lib/decorators';
 
-
 /**
  * @polymer
  * @customElement
  */
-class EtoolsPrpProgressBarCluster extends PolymerElement{
-  public static get template(){
+class EtoolsPrpProgressBarCluster extends PolymerElement {
+  public static get template() {
     return html`
-
       <style>
         :host {
           display: block;
@@ -25,7 +23,6 @@ class EtoolsPrpProgressBarCluster extends PolymerElement{
       </style>
 
       <etools-prp-progress-bar display-type="[[displayType]]" number="[[number]]"></etools-prp-progress-bar>
-
     `;
   }
 
@@ -34,7 +31,6 @@ class EtoolsPrpProgressBarCluster extends PolymerElement{
 
   @property({type: Number})
   number!: number;
-
 }
 
 window.customElements.define('etools-prp-progress-bar-cluster', EtoolsPrpProgressBarCluster);

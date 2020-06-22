@@ -32,155 +32,133 @@ import {PaperInputElement} from '@polymer/paper-input/paper-input';
  * @appliesMixin LocalizeMixin
  */
 class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
-
   public static get template() {
     return html`
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        margin-bottom: 25px;
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          margin-bottom: 25px;
 
-        --app-grid-columns: 8;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 7;
-      }
+          --app-grid-columns: 8;
+          --app-grid-gutter: 25px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 7;
+        }
 
-      .app-grid {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-      }
+        .app-grid {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+        }
 
-      .toggle-button-container {
-        max-width: calc((100% - 0.1px) / 8 * 7 - 25px) ;
+        .toggle-button-container {
+          max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
 
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-      }
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
 
-      #toggle-button {
-        background-color: #0099ff;
-        color: #fff;
-        font-size: 14px;
-      }
+        #toggle-button {
+          background-color: #0099ff;
+          color: #fff;
+          font-size: 14px;
+        }
 
-      .row {
-        @apply --app-grid-expandible-item;
-      }
+        .row {
+          @apply --app-grid-expandible-item;
+        }
 
-      .value {
-        font-size: 16px;
-      }
-    </style>
+        .value {
+          font-size: 16px;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <etools-prp-ajax
+      <etools-prp-ajax
         id="update"
         url="[[updateUrl]]"
         body="[[localData]]"
         content-type="application/json"
-        method="put">
-    </etools-prp-ajax>
+        method="put"
+      >
+      </etools-prp-ajax>
 
-    <etools-content-panel panel-title="Other info" no-header="[[noHeader]]">
-      <div class="app-grid">
-        <div class="row">
-          <labelled-item label="[[localize('partner_contribution')]]">
-            <template
-                is="dom-if"
-                if="[[_equals(computedMode, 'view')]]"
-                restamp="true">
-              <span class="value">[[_withDefault(data.partner_contribution_to_date)]]</span>
-            </template>
+      <etools-content-panel panel-title="Other info" no-header="[[noHeader]]">
+        <div class="app-grid">
+          <div class="row">
+            <labelled-item label="[[localize('partner_contribution')]]">
+              <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                <span class="value">[[_withDefault(data.partner_contribution_to_date)]]</span>
+              </template>
 
-            <template
-                is="dom-if"
-                if="[[!_equals(computedMode, 'view')]]"
-                restamp="true">
-              <paper-input
+              <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                <paper-input
                   id="partner_contribution_to_date"
                   value="[[data.partner_contribution_to_date]]"
                   no-label-float
                   char-counter
-                  maxlength="2000">
-              </paper-input>
-            </template>
-          </labelled-item>
-        </div>
+                  maxlength="2000"
+                >
+                </paper-input>
+              </template>
+            </labelled-item>
+          </div>
 
-        <div class="row">
-          <labelled-item label="[[localize('challenges_bottlenecks')]]">
-            <template
-                is="dom-if"
-                if="[[_equals(computedMode, 'view')]]"
-                restamp="true">
-              <span class="value">[[_withDefault(data.challenges_in_the_reporting_period)]]</span>
-            </template>
+          <div class="row">
+            <labelled-item label="[[localize('challenges_bottlenecks')]]">
+              <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                <span class="value">[[_withDefault(data.challenges_in_the_reporting_period)]]</span>
+              </template>
 
-            <template
-                is="dom-if"
-                if="[[!_equals(computedMode, 'view')]]"
-                restamp="true">
-              <paper-input
+              <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                <paper-input
                   id="challenges_in_the_reporting_period"
                   value="[[data.challenges_in_the_reporting_period]]"
                   no-label-float
                   char-counter
-                  maxlength="2000">
-              </paper-input>
-            </template>
-          </labelled-item>
-        </div>
+                  maxlength="2000"
+                >
+                </paper-input>
+              </template>
+            </labelled-item>
+          </div>
 
-        <div class="row">
-          <labelled-item label="[[localize('proposed_way_forward')]]">
-            <template
-                is="dom-if"
-                if="[[_equals(computedMode, 'view')]]"
-                restamp="true">
-              <span class="value">[[_withDefault(data.proposed_way_forward)]]</span>
-            </template>
+          <div class="row">
+            <labelled-item label="[[localize('proposed_way_forward')]]">
+              <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                <span class="value">[[_withDefault(data.proposed_way_forward)]]</span>
+              </template>
 
-            <template
-                is="dom-if"
-                if="[[!_equals(computedMode, 'view')]]"
-                restamp="true">
-              <paper-input
+              <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                <paper-input
                   id="proposed_way_forward"
                   value="[[data.proposed_way_forward]]"
                   no-label-float
                   char-counter
-                  maxlength="2000">
-              </paper-input>
+                  maxlength="2000"
+                >
+                </paper-input>
+              </template>
+            </labelled-item>
+          </div>
+
+          <div class="toggle-button-container row">
+            <template is="dom-if" if="[[!_equals(computedMode, 'view')]]">
+              <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+                [[localize('save')]]
+              </paper-button>
             </template>
-          </labelled-item>
-        </div>
+          </div>
 
-        <div class="toggle-button-container row">
-          <template
-              is="dom-if"
-              if="[[!_equals(computedMode, 'view')]]">
-            <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-              [[localize('save')]]
-            </paper-button>
-          </template>
+          <div class="row">
+            <report-attachments readonly="[[_equals(computedMode, 'view')]]"> </report-attachments>
+          </div>
         </div>
-
-        <div class="row">
-          <report-attachments
-              readonly="[[_equals(computedMode, 'view')]]">
-          </report-attachments>
-        </div>
-      </div>
-    </etools-content-panel>
-`;
+      </etools-content-panel>
+    `;
   }
-
 
   @property({type: Object})
   localData!: GenericObject;
@@ -221,9 +199,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
   updateDebouncer!: Debouncer | null;
 
   public static get observers() {
-    return [
-      '_updateData(localData.*)'
-    ];
+    return ['_updateData(localData.*)'];
   }
 
   _reportInfoCurrent(rootState: RootState) {
@@ -253,29 +229,22 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
       return;
     }
 
-    this.updateDebouncer = Debouncer.debounce(this.updateDebouncer,
-      timeOut.after(250),
-      () => {
-        const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
+    this.updateDebouncer = Debouncer.debounce(this.updateDebouncer, timeOut.after(250), () => {
+      const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
-        (self.$.update as EtoolsPrpAjaxEl).abort();
+      (self.$.update as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(
-          pdReportsUpdate(
-            updateThunk,
-            this.pdId,
-            this.reportId
-          )
-        )
-          // @ts-ignore
-          .then(() => {
-            self._notifyChangesSaved();
-          })
-          // @ts-ignore
-          .catch(function(err) {
-            console.log(err);
-          });
-      });
+      self.reduxStore
+        .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
+        // @ts-ignore
+        .then(() => {
+          self._notifyChangesSaved();
+        })
+        // @ts-ignore
+        .catch(function (err) {
+          console.log(err);
+        });
+    });
   }
 
   _computeUpdateUrl(locationId: string, reportId: string) {
@@ -299,7 +268,6 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
       this.updateDebouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('pd-report-info', PdReportInfo);

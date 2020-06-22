@@ -19,7 +19,6 @@ import {tableStyles} from '../../styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -156,11 +155,10 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
   totalResults!: number;
 
   @property({type: Boolean})
-  detailsOpened: boolean = false;
+  detailsOpened = false;
 
   @property({type: Array})
   openedDetails: any[] = [];
-
 
   _addEventListeners() {
     this._tableContentChanged = this._tableContentChanged.bind(this);
@@ -184,7 +182,6 @@ class ContactsTable extends DataTableMixin(PaginationMixin(RoutingMixin(UtilsMix
     this._removeEventListeners();
     this.openedDetails.length = 0;
   }
-
 }
 
 window.customElements.define('contacts-table', ContactsTable);

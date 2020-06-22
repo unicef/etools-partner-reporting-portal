@@ -11,7 +11,6 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -262,7 +261,7 @@ class ProjectDetailsDisplay extends UtilsMixin(LocalizeMixin(ReduxConnectedEleme
   projectData!: GenericObject;
 
   @property({type: Boolean})
-  detailsOpened: boolean = false;
+  detailsOpened = false;
 
   _handleDetailsChange() {
     this.detailsOpened = !this.detailsOpened;
@@ -274,7 +273,6 @@ class ProjectDetailsDisplay extends UtilsMixin(LocalizeMixin(ReduxConnectedEleme
     }
     return localize('show_more_details');
   }
-
 }
 
 window.customElements.define('project-details-display', ProjectDetailsDisplay);

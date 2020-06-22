@@ -8,7 +8,6 @@ import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-ov
  */
 function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class OverlayHelperClass extends baseClass {
-
     tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT'];
 
     connectedCallback() {
@@ -23,7 +22,9 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
     _dialogOpening(event: CustomEvent & any) {
       const dialogOverlays = document.querySelectorAll('iron-overlay-backdrop[opened]');
-      if (!dialogOverlays.length) {return;}
+      if (!dialogOverlays.length) {
+        return;
+      }
 
       // in order to see correctly the profile dialog, must set zIndex to 100 (as in app-header elements)
       const paths = event.path || [{id: ''}];
@@ -45,13 +46,17 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
       const paths = event.path || [];
       if (paths.length) {
-        if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) ||
-          (paths.filter((x: any) => this.tagsToExclude.includes(x.tagName)).length)) {
+        if (
+          paths[0].tagName.toLowerCase().indexOf('dropdown') > -1 ||
+          paths.filter((x: any) => this.tagsToExclude.includes(x.tagName)).length
+        ) {
           return;
         }
       }
       // edge
-      if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
+      if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {
+        return;
+      }
 
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
@@ -68,7 +73,6 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         }
       });
     }
-
   }
   return OverlayHelperClass;
 }

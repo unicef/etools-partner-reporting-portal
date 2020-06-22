@@ -8,7 +8,12 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import ProgressReportUtilsBehavior from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
-import {shouldDisplayLink, getReportTitleFull, getReportTitle, getReportLink} from './js/pd-reports-report-title-functions';
+import {
+  shouldDisplayLink,
+  getReportTitleFull,
+  getReportTitle,
+  getReportLink
+} from './js/pd-reports-report-title-functions';
 
 /**
  * @polymer
@@ -17,47 +22,36 @@ import {shouldDisplayLink, getReportTitleFull, getReportTitle, getReportLink} fr
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsBehavior(
-  UtilsMixin(RoutingMixin(ReduxConnectedElement)))) {
-
+class PdReportsReportTitle extends LocalizeMixin(
+  ProgressReportUtilsBehavior(UtilsMixin(RoutingMixin(ReduxConnectedElement)))
+) {
   public static get template() {
     return html`
-    <style>
-      .final-badge {
-        display: inline-block;
-        border-radius: 1px;
-        padding: 1px 6px;
-        font-size: 10px;
-        text-transform: uppercase;
-        background-color: var(--paper-grey-300);
-        margin-left: 5px;
-        font-weight: bold;
-      }
-    </style>
+      <style>
+        .final-badge {
+          display: inline-block;
+          border-radius: 1px;
+          padding: 1px 6px;
+          font-size: 10px;
+          text-transform: uppercase;
+          background-color: var(--paper-grey-300);
+          margin-left: 5px;
+          font-weight: bold;
+        }
+      </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <template
-      is="dom-if"
-      if="[[showLink]]"
-      restamp="true">
-      <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report, localize)]]</a>
-    </template>
-    <template
-      is="dom-if"
-      if="[[!showLink]]"
-      restamp="true">
-      [[_getReportTitleFull(report, localize)]]
-    </template>
-    <template
-      is="dom-if"
-      if="[[_isFinalReport(report)]]"
-      restamp="true">
-      <div class="final-badge">final</div>
-    </template>
-  `;
+      <template is="dom-if" if="[[showLink]]" restamp="true">
+        <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report, localize)]]</a>
+      </template>
+      <template is="dom-if" if="[[!showLink]]" restamp="true">
+        [[_getReportTitleFull(report, localize)]]
+      </template>
+      <template is="dom-if" if="[[_isFinalReport(report)]]" restamp="true">
+        <div class="final-badge">final</div>
+      </template>
+    `;
   }
 
   @property({type: Object})

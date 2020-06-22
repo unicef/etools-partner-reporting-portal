@@ -31,63 +31,48 @@ import {PlannedActionActivityModalEl} from '../../../../elements/cluster-reporti
  * @appliesMixin LocalizeMixin
  */
 class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
-
   public static get template() {
     return html`
-    ${sharedStyles} ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+      ${sharedStyles} ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}" path="{{path}}"></iron-location>
+      <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="plannedActionsActivities"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="plannedActionsActivities" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <planned-action-activities-filters></planned-action-activities-filters>
+      <page-body>
+        <planned-action-activities-filters></planned-action-activities-filters>
 
-      <template
-          is="dom-if"
-          if="[[permissions.editPlannedActionEntities]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_activity')]]
-          </paper-button>
-        </div>
-      </template>
+        <template is="dom-if" if="[[permissions.editPlannedActionEntities]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_activity')]]
+            </paper-button>
+          </div>
+        </template>
 
-      <planned-action-activity-modal id="modal"></planned-action-activity-modal>
+        <planned-action-activity-modal id="modal"></planned-action-activity-modal>
 
-      <activity-list-table page="planned-action"></activity-list-table>
-    </page-body>
-`;
+        <activity-list-table page="planned-action"></activity-list-table>
+      </page-body>
+    `;
   }
 
   static get observers() {
-    return [
-      '_activitiesAjax(queryParams, url)'
-    ];
+    return ['_activitiesAjax(queryParams, url)'];
   }
 
   @property({type: Object})
@@ -133,25 +118,23 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
     }
 
     const self = this;
-    this.activitiesDebouncer = Debouncer.debounce(this.activitiesDebouncer,
-      timeOut.after(300),
-      () => {
+    this.activitiesDebouncer = Debouncer.debounce(this.activitiesDebouncer, timeOut.after(300), () => {
+      queryParams.partner = self.partnerID;
+      if (!Object.keys(queryParams).length) {
+        return;
+      }
 
-        queryParams.partner = self.partnerID;
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
+      const dataThunk = (this.$.plannedActionsActivities as EtoolsPrpAjaxEl).thunk();
 
-        const dataThunk = (this.$.plannedActionsActivities as EtoolsPrpAjaxEl).thunk();
+      (self.$.plannedActionsActivities as EtoolsPrpAjaxEl).abort();
 
-        (self.$.plannedActionsActivities as EtoolsPrpAjaxEl).abort();
-
-        self.reduxStore.dispatch(fetchPartnerActivitiesList(dataThunk))
-          // @ts-ignore
-          .catch((_err: any) => {
-            // TODO: error handling
-          });
-      });
+      self.reduxStore
+        .dispatch(fetchPartnerActivitiesList(dataThunk))
+        // @ts-ignore
+        .catch((_err: any) => {
+          // TODO: error handling
+        });
+    });
   }
 
   _addEventListeners() {
@@ -174,6 +157,5 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
       this.activitiesDebouncer.cancel();
     }
   }
-
 }
 window.customElements.define('planned-action-activities-list', PlannedActionActivitiesList);

@@ -1,11 +1,8 @@
 import {html} from '@polymer/polymer';
 import '@polymer/paper-styles/color';
 
-
 export const appThemeClusterStyles = html`
-
   <style>
-  
     :host {
       --theme-primary-color: #009d55;
       --theme-secondary-color-a: #ceffcc;
@@ -42,14 +39,12 @@ export const appThemeClusterStyles = html`
 
       --paper-tab-content: {
         color: var(--theme-primary-color);
-      };
+      }
       --paper-tab-content-unselected: {
         color: var(--theme-secondary-text-color);
-      };
+      }
 
       --paper-radio-button-checked-color: var(--theme-primary-color);
     }
-  
   </style>
-
 `;

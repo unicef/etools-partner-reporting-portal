@@ -42,7 +42,7 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
           --paper-dialog: {
             width: 400px;
             margin: 0;
-            }
+          }
         }
 
         .row {
@@ -50,74 +50,45 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
         }
       </style>
 
-      <etools-prp-ajax
-          id="upload"
-          method="post"
-          url="[[url]]"
-          body="[[payload]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="upload" method="post" url="[[url]]" body="[[payload]]"> </etools-prp-ajax>
 
-      <paper-button
-          class="btn-primary"
-          on-tap="_openModal">
+      <paper-button class="btn-primary" on-tap="_openModal">
         <iron-icon icon="icons:file-upload"></iron-icon>
         <slot></slot>
       </paper-button>
 
-      <paper-dialog
-        id="dialog"
-        modal
-        opened="{{opened}}">
-
+      <paper-dialog id="dialog" modal opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>
             <slot>[[modalTitle]]</slot>
           </h2>
 
-          <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
-          </paper-icon-button>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
         </div>
 
         <paper-dialog-scrollable>
-          <template
-              is="dom-if"
-              if="[[opened]]"
-              restamp="true">
+          <template is="dom-if" if="[[opened]]" restamp="true">
             <error-box errors="[[errors]]"></error-box>
 
             <div class="row">
-              <etools-file
-                  files="{{files}}"
-                  label="Template file"
-                  disabled="[[pending]]"
-                  accept=".xlsx, .xls"
-                  required>
+              <etools-file files="{{files}}" label="Template file" disabled="[[pending]]" accept=".xlsx, .xls" required>
               </etools-file>
             </div>
           </template>
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button
-              on-tap="_save"
-              class="btn-primary"
-              raised>
+          <paper-button on-tap="_save" class="btn-primary" raised>
             Save
           </paper-button>
 
-          <paper-button
-              on-tap="close">
+          <paper-button on-tap="close">
             Cancel
           </paper-button>
         </div>
 
         <etools-loading active="[[pending]]"></etools-loading>
       </paper-dialog>
-
-
     `;
   }
 
@@ -157,7 +128,8 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
 
     this.set('pending', true);
 
-    upload!.thunk()()
+    upload!
+      .thunk()()
       .then(() => {
         self.set('pending', false);
         self.close();
@@ -179,7 +151,6 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
     this.set('errors', {});
     this.set('pending', false);
   }
-
 }
 
 window.customElements.define('upload-button', UploadButton);

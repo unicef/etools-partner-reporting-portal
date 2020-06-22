@@ -17,46 +17,40 @@ import '../../../../../elements/etools-prp-ajax';
 // import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin RoutingMixin
+ */
 class Contacts extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    ${sharedStyles}
-    <style>
+      ${sharedStyles}
+      <style>
         :host {
           display: block;
         }
       </style>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-<!--     <etools-prp-ajax
+      <!--     <etools-prp-ajax
         id="partnerContacts"
         url="[[url]]"
         params="[[queryParams]]">
     </etools-prp-ajax> -->
 
-    <page-body>
+      <page-body>
+        <partner-contacts-filters></partner-contacts-filters>
 
-      <partner-contacts-filters></partner-contacts-filters>
-
-      <contacts-table></contacts-table>
-
-    </page-body>
+        <contacts-table></contacts-table>
+      </page-body>
     `;
   }
 
-  //Whole file commented
+  // Whole file commented
   @property({type: String})
   query!: string;
 

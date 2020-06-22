@@ -33,7 +33,6 @@ import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from '../../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @customElement
@@ -124,14 +123,15 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
           margin: 2em 0;
         }
 
-        etools-dropdown, etools-dropdown-multi {
+        etools-dropdown,
+        etools-dropdown-multi {
           width: 100%;
         }
 
         datepicker-lite {
           --paper-input-container: {
             width: 100%;
-          };
+          }
         }
 
         .app-grid > * {
@@ -149,57 +149,42 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         indicator-locations-widget {
           margin: 2em 0;
         }
-
       </style>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
+
+      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax
-          id="locations"
-          url="[[locationsUrl]]">
+        id="editIndicator"
+        url="[[indicatorsUrl]]"
+        method="put"
+        body="[[data]]"
+        content-type="application/json"
+      >
       </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="editIndicator"
-          url="[[indicatorsUrl]]"
-          method="put"
-          body="[[data]]"
-          content-type="application/json">
-      </etools-prp-ajax>
-
-      <paper-dialog
-          id="dialog"
-          modal
-          opened="{{opened}}">
-
+      <paper-dialog id="dialog" modal opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>[[localize('edit_indicator')]]</h2>
 
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
         </div>
 
         <paper-dialog-scrollable>
-          <template
-              is="dom-if"
-              if="[[opened]]"
-              restamp="true">
+          <template is="dom-if" if="[[opened]]" restamp="true">
             <error-box errors="[[errors]]"></error-box>
 
             <div class="row">
               <paper-input
-                  class="validate"
-                  label="[[localize('title')]]"
-                  on-input="_validate"
-                  value="{{data.blueprint.title}}"
-                  always-float-label
-                  disabled="[[!canEditDetails]]"
-                  required>
+                class="validate"
+                label="[[localize('title')]]"
+                on-input="_validate"
+                value="{{data.blueprint.title}}"
+                always-float-label
+                disabled="[[!canEditDetails]]"
+                required
+              >
               </paper-input>
             </div>
 
@@ -211,21 +196,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
             <div class="row">
               <div class="layout horizontal">
-                <labelled-item
-                    class="calculation-method"
-                    label="[[localize('calculation_method_across_locations')]]">
-                  <calculation-method
-                      value="{{data.blueprint.calculation_formula_across_locations}}"
-                      readonly>
+                <labelled-item class="calculation-method" label="[[localize('calculation_method_across_locations')]]">
+                  <calculation-method value="{{data.blueprint.calculation_formula_across_locations}}" readonly>
                   </calculation-method>
                 </labelled-item>
 
-                <labelled-item
-                    class="calculation-method"
-                    label="[[localize('calculation_method_across_reporting')]]">
-                  <calculation-method
-                      value="{{data.blueprint.calculation_formula_across_periods}}"
-                      readonly>
+                <labelled-item class="calculation-method" label="[[localize('calculation_method_across_reporting')]]">
+                  <calculation-method value="{{data.blueprint.calculation_formula_across_periods}}" readonly>
                   </calculation-method>
                 </labelled-item>
               </div>
@@ -233,30 +210,29 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
 
             <div class="row">
               <paper-input
-                  class="validate"
-                  label="[[localize('comments')]]"
-                  on-input="_validate"
-                  value="{{data.comments}}"
-                  disabled="[[!canEditDetails]]"
-                  always-float-label>
+                class="validate"
+                label="[[localize('comments')]]"
+                on-input="_validate"
+                value="{{data.comments}}"
+                disabled="[[!canEditDetails]]"
+                always-float-label
+              >
               </paper-input>
             </div>
 
             <div class="row">
               <paper-input
-                  class="validate"
-                  label="[[localize('measurement_specifications')]]"
-                  on-input="_validate"
-                  value="{{data.measurement_specifications}}"
-                  disabled="[[!canEditDetails]]"
-                  always-float-label>
+                class="validate"
+                label="[[localize('measurement_specifications')]]"
+                on-input="_validate"
+                value="{{data.measurement_specifications}}"
+                disabled="[[!canEditDetails]]"
+                always-float-label
+              >
               </paper-input>
             </div>
 
-            <template
-                is="dom-if"
-                if="[[isPAI]]"
-                restamp="true">
+            <template is="dom-if" if="[[isPAI]]" restamp="true">
               <div class="row">
                 <etools-dropdown
                   class="item validate pair"
@@ -269,93 +245,88 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                   hide-search
                   auto-validate
                   with-backdrop
-                  required>
+                  required
+                >
                 </etools-dropdown>
               </div>
             </template>
 
             <div class="item row">
-                <div class="app-grid double">
-                  <etools-dropdown
-                      class="item validate pair"
-                      label="[[localize('frequency_of_reporting')]]"
-                      options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.frequency}}"
-                      disabled="[[!canEditDetails]]"
-                      hide-search
-                      auto-validate
-                      with-backdrop
-                      required>
-                  </etools-dropdown>
-                  <template
-                      is="dom-if"
-                      if="[[_showCSD(data.frequency)]]"
-                      restamp="true">
-                      <etools-prp-chips
-                          class="item validate"
-                          value="{{data.cs_dates}}"
-                          label="[[localize('due_date_of_report')]]"
-                          on-selected-chips-updated="_validate"
-                          disabled="[[!canEditDetails]]"
-                          required>
-                        <template
-                            is="dom-if"
-                            if="[[canEditDetails]]"
-                            restamp="true">
-                          <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
-                        </template>
-                      </etools-prp-chips>
-                  </template>
-                  <datepicker-lite
-                    class="item validate pair"
-                    label="[[localize('start_date_reporting')]]"
-                    value="{{data.start_date_of_reporting_period}}"
+              <div class="app-grid double">
+                <etools-dropdown
+                  class="item validate pair"
+                  label="[[localize('frequency_of_reporting')]]"
+                  options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.frequency}}"
+                  disabled="[[!canEditDetails]]"
+                  hide-search
+                  auto-validate
+                  with-backdrop
+                  required
+                >
+                </etools-dropdown>
+                <template is="dom-if" if="[[_showCSD(data.frequency)]]" restamp="true">
+                  <etools-prp-chips
+                    class="item validate"
+                    value="{{data.cs_dates}}"
+                    label="[[localize('due_date_of_report')]]"
+                    on-selected-chips-updated="_validate"
                     disabled="[[!canEditDetails]]"
-                    input-date-format="[[dateFormat]]"
-                    selected-date-display-format="[[dateFormat]]"
-                    error-message="">
-                  </datepicker-lite>
-                </div>
+                    required
+                  >
+                    <template is="dom-if" if="[[canEditDetails]]" restamp="true">
+                      <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
+                    </template>
+                  </etools-prp-chips>
+                </template>
+                <datepicker-lite
+                  class="item validate pair"
+                  label="[[localize('start_date_reporting')]]"
+                  value="{{data.start_date_of_reporting_period}}"
+                  disabled="[[!canEditDetails]]"
+                  input-date-format="[[dateFormat]]"
+                  selected-date-display-format="[[dateFormat]]"
+                  error-message=""
+                >
+                </datepicker-lite>
+              </div>
             </div>
 
             <div class="row">
-              <template
-                  is="dom-if"
-                  if="[[isNumber]]"
-                  restamp="true">
+              <template is="dom-if" if="[[isNumber]]" restamp="true">
                 <paper-input
-                    class="validate"
-                    label="[[localize('label')]]"
-                    on-input="_validate"
-                    value="{{data.label}}"
-                    disabled="[[!canEditDetails]]"
-                    always-float-label>
+                  class="validate"
+                  label="[[localize('label')]]"
+                  on-input="_validate"
+                  value="{{data.label}}"
+                  disabled="[[!canEditDetails]]"
+                  always-float-label
+                >
                 </paper-input>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[!isNumber]]"
-                  restamp="true">
+              <template is="dom-if" if="[[!isNumber]]" restamp="true">
                 <div class="app-grid">
                   <paper-input
-                      class="item validate"
-                      label="[[localize('numerator_label')]]"
-                      on-input="_validate"
-                      value="{{data.numerator_label}}"
-                      disabled="[[!canEditDetails]]"
-                      always-float-label>
+                    class="item validate"
+                    label="[[localize('numerator_label')]]"
+                    on-input="_validate"
+                    value="{{data.numerator_label}}"
+                    disabled="[[!canEditDetails]]"
+                    always-float-label
+                  >
                   </paper-input>
 
                   <paper-input
-                      class="item validate"
-                      label="[[localize('denominator_label')]]"
-                      on-input="_validate"
-                      value="{{data.denominator_label}}"
-                      disabled="[[!canEditDetails]]"
-                      always-float-label>
+                    class="item validate"
+                    label="[[localize('denominator_label')]]"
+                    on-input="_validate"
+                    value="{{data.denominator_label}}"
+                    disabled="[[!canEditDetails]]"
+                    always-float-label
+                  >
                   </paper-input>
                 </div>
               </template>
@@ -364,40 +335,40 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
             <div class="row">
               <div class="app-grid-triple">
                 <json-field
-                    class="item validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="[[localize('baseline')]]"
-                    on-input="_validate"
-                    value="{{data.baseline}}"
-                    allowed-pattern="[+\\-\\d]"
-                    disabled="[[!canEditDetails]]">
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
+                  label="[[localize('baseline')]]"
+                  on-input="_validate"
+                  value="{{data.baseline}}"
+                  allowed-pattern="[+\\-\\d]"
+                  disabled="[[!canEditDetails]]"
+                >
                 </json-field>
 
-                <template
-                    is="dom-if"
-                    if="[[isNumber]]"
-                    restamp="true">
+                <template is="dom-if" if="[[isNumber]]" restamp="true">
                   <json-field
-                      class="item validate"
-                      type="[[data.blueprint.display_type]]"
-                      label="[[localize('in_need')]]"
-                      on-input="_validate"
-                      value="{{data.in_need}}"
-                      allowed-pattern="[+\\-\\d]"
-                      disabled="[[!canEditDetails]]">
+                    class="item validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="[[localize('in_need')]]"
+                    on-input="_validate"
+                    value="{{data.in_need}}"
+                    allowed-pattern="[+\\-\\d]"
+                    disabled="[[!canEditDetails]]"
+                  >
                   </json-field>
                 </template>
 
                 <json-field
-                    class="item validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="[[localize('target')]]"
-                    on-input="_validate"
-                    value="{{data.target}}"
-                    allowed-pattern="[+\\-\\d]"
-                    disabled="[[!canEditDetails]]"
-                    disable-denominator
-                    required>
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
+                  label="[[localize('target')]]"
+                  on-input="_validate"
+                  value="{{data.target}}"
+                  allowed-pattern="[+\\-\\d]"
+                  disabled="[[!canEditDetails]]"
+                  disable-denominator
+                  required
+                >
                 </json-field>
               </div>
             </div>
@@ -405,32 +376,28 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
             <div class="row">
               <div class="row">
                 <indicator-locations-widget
-                    class="validate"
-                    cluster-id="[[data.cluster]]"
-                    indicator-id="[[data.id]]"
-                    indicator-type="[[data.blueprint.display_type]]"
-                    parent-indicator-id="[[data.parent_indicator]]"
-                    is-pai="[[isPAI]]"
-                    value="{{data.locations}}"
-                    editing>
+                  class="validate"
+                  cluster-id="[[data.cluster]]"
+                  indicator-id="[[data.id]]"
+                  indicator-type="[[data.blueprint.display_type]]"
+                  parent-indicator-id="[[data.parent_indicator]]"
+                  is-pai="[[isPAI]]"
+                  value="{{data.locations}}"
+                  editing
+                >
                 </indicator-locations-widget>
               </div>
             </div>
 
             <div class="row">
-              <disaggregations-dropdown-widget
-                  value="{{data.disaggregations}}"
-                  readonly>
+              <disaggregations-dropdown-widget value="{{data.disaggregations}}" readonly>
               </disaggregations-dropdown-widget>
             </div>
           </template>
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button
-              on-tap="_save"
-              class="btn-primary"
-              raised>
+          <paper-button on-tap="_save" class="btn-primary" raised>
             [[localize('save')]]
           </paper-button>
 
@@ -469,7 +436,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   indicatorsUrl: string = Endpoints.clusterIndicators();
 
   @property({type: Boolean})
-  updatePending: boolean = false;
+  updatePending = false;
 
   @property({type: Array})
   locations: any[] = [];
@@ -512,16 +479,14 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   @property({type: Object, computed: '_computeMinDate(data.start_date_of_reporting_period)'})
   _minDate!: GenericObject;
 
-
   static get observers() {
-    return ['_setDefaults(opened)',
-      '_updateCSDates(data.start_date_of_reporting_period)'];
+    return ['_setDefaults(opened)', '_updateCSDates(data.start_date_of_reporting_period)'];
   }
 
   _computeLocalizedFrequencies(frequencies: GenericObject[], localize: Function) {
     const self = this;
 
-    return frequencies.map(function(frequency) {
+    return frequencies.map(function (frequency) {
       frequency.title = self._localizeLowerCased(frequency.title, localize);
       return frequency;
     });
@@ -561,8 +526,10 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     if (!permissions || !data) {
       return;
     }
-    return (permissions.createClusterEntities && !isPAI) ||
-      (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
+    return (
+      (permissions.createClusterEntities && !isPAI) ||
+      (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator)
+    );
   }
 
   _computeIsPAI(data: GenericObject) {
@@ -578,9 +545,15 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
       return;
     }
 
-    this.set('data', Object.assign({
-      cs_dates: []
-    }, this._clone(this.get('editData'))));
+    this.set(
+      'data',
+      Object.assign(
+        {
+          cs_dates: []
+        },
+        this._clone(this.get('editData'))
+      )
+    );
 
     this.set('errors', {});
 
@@ -619,9 +592,13 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     const dates = this.get('data.cs_dates');
     const startDate = this._normalizeDate(startDateStr);
 
-    this.set('data.cs_dates', dates && dates.filter((d: string) => {
-      return this._normalizeDate(d) >= startDate;
-    }, this));
+    this.set(
+      'data.cs_dates',
+      dates &&
+        dates.filter((d: string) => {
+          return this._normalizeDate(d) >= startDate;
+        }, this)
+    );
   }
 
   _save() {
@@ -630,7 +607,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     let noLocationSet = false;
     const rawLocations = this.get('data.locations') || [];
 
-    const changedLocations = rawLocations.map(function(location: GenericObject) {
+    const changedLocations = rawLocations.map(function (location: GenericObject) {
       if (location.location && location.location.id) {
         const id = location.location.id;
         location.location = id;

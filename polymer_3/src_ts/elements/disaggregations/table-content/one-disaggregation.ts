@@ -7,7 +7,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 
-
 /**
  * @polymer
  * @customElement
@@ -21,28 +20,28 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
       ${disaggregationTableStyles}
       <style></style>
 
-      <tr class='horizontal layout headerRow'>
+      <tr class="horizontal layout headerRow">
         <th></th>
         <th>Total</th>
       </tr>
 
-      <template is="dom-repeat"
-                items="[[rows]]"
-                as="row">
+      <template is="dom-repeat" items="[[rows]]" as="row">
         <disaggregation-table-row
-            data="[[row]]"
-            level-reported="[[data.level_reported]]"
-            indicator-type="[[data.display_type]]"
-            row-type="middleRow"
-            editable="[[editable]]">
+          data="[[row]]"
+          level-reported="[[data.level_reported]]"
+          indicator-type="[[data.display_type]]"
+          row-type="middleRow"
+          editable="[[editable]]"
+        >
         </disaggregation-table-row>
       </template>
 
       <disaggregation-table-row
-          data="[[totalRow]]"
-          level-reported="[[data.level_reported]]"
-          indicator-type="[[data.display_type]]"
-          row-type="totalsRow">
+        data="[[totalRow]]"
+        level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
+        row-type="totalsRow"
+      >
       </disaggregation-table-row>
     `;
   }
@@ -81,20 +80,20 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
 
   _determineRows(columns: any[], data: GenericObject) {
     const self = this;
-    return columns.map(function(z) {
+    return columns.map(function (z) {
       const formatted = self._formatDisaggregationIds([z.id]);
 
       return {
         title: z.value,
-        data: [{
-          key: formatted,
-          data: data.disaggregation[formatted]
-        }]
+        data: [
+          {
+            key: formatted,
+            data: data.disaggregation[formatted]
+          }
+        ]
       };
     }, this);
   }
-
-
 }
 
 window.customElements.define('one-disaggregation', OneDisaggregation);

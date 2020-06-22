@@ -17,13 +17,11 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
   private sDebouncer!: Debouncer;
 
   stateChanged(state: RootState) {
-    this.sDebouncer = Debouncer.debounce(this.sDebouncer,
-      timeOut.after(50),
-      () => {
-        //if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
-        this.rootState = state; // Assign by reference to reduce memory, clone before actual use
-        //}
-      });
+    this.sDebouncer = Debouncer.debounce(this.sDebouncer, timeOut.after(50), () => {
+      // if (JSON.stringify(this.rootState) != JSON.stringify(state)) {
+      this.rootState = state; // Assign by reference to reduce memory, clone before actual use
+      // }
+    });
   }
 
   constructor() {
@@ -40,7 +38,7 @@ export class ReduxConnectedElement extends connect(store)(PolymerElement) {
     if (pathValue === undefined) {
       return undefined;
     }
-    //console.log(pathValue);
+    // console.log(pathValue);
     return [...pathValue];
   }
 

@@ -13,43 +13,35 @@ import {GenericObject} from '../../../typings/globals.types';
 declare const numeral: any;
 
 /**
-* @polymer
-* @customElement
-* @mixinFunction
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin AnalysisChartMixin
-*/
+ * @polymer
+ * @customElement
+ * @mixinFunction
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin AnalysisChartMixin
+ */
 class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      google-chart {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
+        google-chart {
+          width: 100%;
+          height: 100%;
+        }
+      </style>
 
-    <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
-      <div hidden$="[[!rows.length]]">
-        <google-chart
-            type="line"
-            options="[[options]]"
-            cols="[[cols]]"
-            rows="[[rows]]">
-        </google-chart>
-      </div>
+      <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
+        <div hidden$="[[!rows.length]]">
+          <google-chart type="line" options="[[options]]" cols="[[cols]]" rows="[[rows]]"> </google-chart>
+        </div>
 
-      <list-placeholder
-          data="[[rows]]"
-          message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
-      </list-placeholder>
-    </analysis-widget>
+        <list-placeholder data="[[rows]]" message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
+        </list-placeholder>
+      </analysis-widget>
     `;
   }
 
@@ -129,7 +121,7 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
 
   _computeRowsLocal(data: any, target: number, inNeed: number) {
     const self = this;
-    return data.map(function(tick: any) {
+    return data.map(function (tick: any) {
       return [
         tick[0],
         self._fromJSON(tick[1]),

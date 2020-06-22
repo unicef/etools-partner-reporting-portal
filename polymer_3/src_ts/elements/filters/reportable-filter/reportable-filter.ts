@@ -15,22 +15,22 @@ import {RootState} from '../../../typings/redux.types';
 class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <searchable-dropdown-filter
+      <searchable-dropdown-filter
         class="item"
         label="[[localize('pd_output')]]"
         name="llo"
         value="[[value]]"
-        data="[[options]]">
-    </searchable-dropdown-filter>
-  `;
+        data="[[options]]"
+      >
+      </searchable-dropdown-filter>
+    `;
   }
-
 
   @property({type: Array, computed: '_computeOptions(data)'})
   options!: any;
@@ -53,12 +53,13 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
       };
     });
 
-    return [{
-      id: '',
-      title: 'All'
-    }].concat(other);
+    return [
+      {
+        id: '',
+        title: 'All'
+      }
+    ].concat(other);
   }
-
 }
 
 window.customElements.define('reportable-filter', ReportableFilters);

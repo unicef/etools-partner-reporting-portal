@@ -41,11 +41,7 @@
     "src/pages/app/cluster-reporting/results.js",
     "src/pages/app/cluster-reporting/analysis.js"
   ],
-  "sources": [
-    "src/**/*",
-    "images/**/*",
-    "package.json"
-  ],
+  "sources": ["src/**/*", "images/**/*", "package.json"],
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/**",
@@ -57,10 +53,7 @@
   "builds": [
     {
       "name": "esm-bundled",
-      "browserCapabilities": [
-        "es2015",
-        "modules"
-      ],
+      "browserCapabilities": ["es2015", "modules"],
       "js": {
         "minify": true
       },
@@ -84,6 +77,10 @@
       "addServiceWorker": true
     }
   ],
+  "lint": {
+    "rules": ["polymer-3"],
+    "ignoreWarnings": []
+  },
   "moduleResolution": "node",
   "npm": true
 }

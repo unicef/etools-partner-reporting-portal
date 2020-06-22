@@ -17,24 +17,17 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
 class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="clusters"
-        url="[[clustersUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="clusters" url="[[clustersUrl]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
-        label="[[localize('clusters')]]"
-        name="clusters"
-        value="[[value]]"
-        data="[[data]]">
-    </dropdown-filter-multi>
-  `;
+      <dropdown-filter-multi label="[[localize('clusters')]]" name="clusters" value="[[value]]" data="[[data]]">
+      </dropdown-filter-multi>
+    `;
   }
 
   @property({type: String, computed: '_computeClustersUrl(responsePlanId)', observer: '_fetchClusters'})
@@ -77,7 +70,6 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
     super.disconnectedCallback();
     (this.$.clusters as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-filter-multi', ClusterFilterMulti);

@@ -1,7 +1,7 @@
 import Constants from '../../constants';
 
 export class LocationState {
-  id: string = '';
+  id = '';
 }
 
 const INITIAL_STATE = new LocationState();

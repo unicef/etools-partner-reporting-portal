@@ -360,7 +360,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     }
 
     return types
-      .map(function(type: string) {
+      .map(function (type: string) {
         return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
       })
       .join(', ');
@@ -372,32 +372,30 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     // check by seeing if this.pdReportsCount is present), just get the reports again
     if (this.pdReportsCount[this.pdId] === undefined) {
       const self = this;
-      this._debouncer = Debouncer.debounce(this._debouncer,
-        timeOut.after(250),
-        () => {
-          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-          pdThunk.params = {
-            page: 1,
-            page_size: 10,
-            programme_document: this.pdId
-          };
+      this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
+        pdThunk.params = {
+          page: 1,
+          page_size: 10,
+          programme_document: this.pdId
+        };
 
-          // Cancel the pending request, if any
-          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+        // Cancel the pending request, if any
+        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
-            // @ts-ignore
-            .catch((_err: GenericObject) => {
-              //   // TODO: error handling
-            });
-        });
+        self.reduxStore
+          .dispatch(pdFetch(pdThunk.thunk()))
+          // @ts-ignore
+          .catch((_err: GenericObject) => {
+            //   // TODO: error handling
+          });
+      });
     }
   }
 
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
   }
-
 }
 
 window.customElements.define('pd-details-overview', PdDetailsOverview);

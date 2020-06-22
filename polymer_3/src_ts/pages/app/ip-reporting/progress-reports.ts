@@ -15,7 +15,6 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
 import {GenericObject} from '../../../typings/globals.types';
 import {progressReportsFetch} from '../../../redux/actions/progressReports';
 
-
 /**
  * @polymer
  * @customElement
@@ -23,38 +22,28 @@ import {progressReportsFetch} from '../../../redux/actions/progressReports';
  * @appliesMixin LocalizeMixin
  */
 class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display:block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-     <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-      id="reports"
-      url="[[reportsUrl]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="reports" url="[[reportsUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-header title="[[localize('progress_reports')]]"></page-header>
+      <page-header title="[[localize('progress_reports')]]"></page-header>
 
-    <page-body>
-      <progress-reports-filters></progress-reports-filters>
-      <progress-reports-toolbar></progress-reports-toolbar>
-      <progress-reports-list></progress-reports-list>
-    </page-body>
-`;
+      <page-body>
+        <progress-reports-filters></progress-reports-filters>
+        <progress-reports-toolbar></progress-reports-toolbar>
+        <progress-reports-list></progress-reports-list>
+      </page-body>
+    `;
   }
 
   @property({type: String, computed: '_computeProgressReportsUrl(locationId)'})
@@ -67,9 +56,7 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
   queryParams!: GenericObject;
 
   public static get observers() {
-    return [
-      '_handleInputChange(reportsUrl, queryParams)'
-    ];
+    return ['_handleInputChange(reportsUrl, queryParams)'];
   }
 
   _computeProgressReportsUrl(locationId: string) {
@@ -86,13 +73,13 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     // Cancel the pending request, if any
     (this.$.reports as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(progressReportsFetch(progressReportsThunk))
+    this.reduxStore
+      .dispatch(progressReportsFetch(progressReportsThunk))
       // @ts-ignore
       .catch((_err: GenericObject) => {
         // TODO: error handling
       });
   }
-
 }
 
 window.customElements.define('page-ip-progress-reports', PageIpProgressReports);

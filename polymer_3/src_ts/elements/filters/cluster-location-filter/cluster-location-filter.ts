@@ -67,10 +67,15 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
     thunk()
       .then((res: any) => {
-        self.set('data', [{
-          id: '',
-          title: 'All'
-        }].concat(res.data.results || []));
+        self.set(
+          'data',
+          [
+            {
+              id: '',
+              title: 'All'
+            }
+          ].concat(res.data.results || [])
+        );
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -81,7 +86,6 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.disconnectedCallback();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-location-filter', ClusterLocationFilter);

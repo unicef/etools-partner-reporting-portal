@@ -25,31 +25,24 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
   public static get template() {
     // language=HTML
     return html`
-    ${tableStyles}
-    <style include="data-table-styles">
-      :host {
-        display: block;
-      }
-    </style>
+      ${tableStyles}
+      <style include="data-table-styles">
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activities" url="[[activitiesUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <cluster-activities-filters class="filters"></cluster-activities-filters>
+      <page-body>
+        <cluster-activities-filters class="filters"></cluster-activities-filters>
 
-      <clusters-activities-list is-minimal-list></clusters-activities-list>
-    </page-body>
+        <clusters-activities-list is-minimal-list></clusters-activities-list>
+      </page-body>
     `;
   }
 
@@ -67,7 +60,6 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
 
   private _clusterActivityDebouncer!: Debouncer;
 
-
   _updateParams(objectiveId: string) {
     setTimeout(() => {
       this.set('queryParams.cluster_objective_id', objectiveId);
@@ -75,22 +67,21 @@ class Activitites extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _clusterActivitiesAjax(queryParams: GenericObject) {
-    this._clusterActivityDebouncer = Debouncer.debounce(this._clusterActivityDebouncer,
-      timeOut.after(100),
-      () => {
-        const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
-        if (typeof queryParams.cluster_objective_id === 'undefined') {
-          return;
-        }
+    this._clusterActivityDebouncer = Debouncer.debounce(this._clusterActivityDebouncer, timeOut.after(100), () => {
+      const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
+      if (typeof queryParams.cluster_objective_id === 'undefined') {
+        return;
+      }
 
-        (this.$.activities as EtoolsPrpAjaxEl).abort();
+      (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
-          // @ts-ignore
-          .catch((_err) => {
-            // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(fetchClusterActivitiesList(thunk))
+        // @ts-ignore
+        .catch((_err) => {
+          // TODO: error handling.
+        });
+    });
   }
 
   _computeActivitiesUrl() {

@@ -29,8 +29,13 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import Endpoints from '../../endpoints';
 import {
-  computeIndicatorsUrl, computeFormattedData, computeSelected, computeDisabled,
-  onValueChanged, canEdit, canSave
+  computeIndicatorsUrl,
+  computeFormattedData,
+  computeSelected,
+  computeDisabled,
+  onValueChanged,
+  canEdit,
+  canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
 
@@ -44,204 +49,159 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin NotificationsMixin
  */
 class PdDetailsCalculationMethods extends LocalizeMixin(
-  NotificationsMixin(
-    DataTableMixin(
-      UtilsMixin(ReduxConnectedElement)))) {
-
+  NotificationsMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))
+) {
   static get template() {
     return html`
-    ${buttonsStyles} ${tableStyles}
-    <style include="data-table-styles iron-flex iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${tableStyles}
+      <style include="data-table-styles iron-flex iron-flex-reverse">
+        :host {
+          display: block;
 
-        --data-table-header: {
-          height: auto;
-        };
+          --data-table-header: {
+            height: auto;
+          }
 
-        --header-title: {
-          display: none;
-        };
-      }
+          --header-title: {
+            display: none;
+          }
+        }
 
-      .wrapper {
-        min-height: 80px;
-        position: relative;
-      }
+        .wrapper {
+          min-height: 80px;
+          position: relative;
+        }
 
-      .pd-output {
-        --list-bg-color: var(--paper-grey-200);
+        .pd-output {
+          --list-bg-color: var(--paper-grey-200);
 
-        font-weight: bold;
-      }
+          font-weight: bold;
+        }
 
-      paper-radio-button {
-        padding: 0 !important;
-      }
+        paper-radio-button {
+          padding: 0 !important;
+        }
 
-      paper-radio-button:not(:first-child) {
-        margin-left: 12px;
-      }
+        paper-radio-button:not(:first-child) {
+          margin-left: 12px;
+        }
 
-      .buttons {
-        margin: 1em 0;
-      }
-    </style>
+        .buttons {
+          margin: 1em 0;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="indicators"
-        url="[[indicatorsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="indicators" url="[[indicatorsUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
+      <etools-prp-ajax
         id="update"
         method="post"
         url="[[indicatorsUrl]]"
         body="[[localData]]"
-        content-type="application/json">
-    </etools-prp-ajax>
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-    <page-body>
-      <calculation-methods-info-bar></calculation-methods-info-bar>
-      <etools-data-table-header no-collapse>
-        <etools-data-table-column>
-          <div class="table-column">[[localize('indicators_for_pd')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column>
-          <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column>
-          <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
+      <page-body>
+        <calculation-methods-info-bar></calculation-methods-info-bar>
+        <etools-data-table-header no-collapse>
+          <etools-data-table-column>
+            <div class="table-column">[[localize('indicators_for_pd')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column>
+            <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column>
+            <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
+          </etools-data-table-column>
+        </etools-data-table-header>
 
-      <div class="wrapper">
-        <template
-            is="dom-repeat"
-            items="[[formattedData]]"
-            initial-count="[[pageSize]]">
-          <template
-              is="dom-if"
-              if="[[_equals(item.type, 'label')]]"
-              restamp="true">
-            <etools-data-table-row
-                class="pd-output"
-                no-collapse>
-              <div slot="row-data">
-                <div class="table-cell table-cell--text">[[item.text]]</div>
-              </div>
-            </etools-data-table-row>
-          </template>
+        <div class="wrapper">
+          <template is="dom-repeat" items="[[formattedData]]" initial-count="[[pageSize]]">
+            <template is="dom-if" if="[[_equals(item.type, 'label')]]" restamp="true">
+              <etools-data-table-row class="pd-output" no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell table-cell--text">[[item.text]]</div>
+                </div>
+              </etools-data-table-row>
+            </template>
 
-          <template
-              is="dom-if"
-              if="[[_equals(item.type, 'data')]]"
-              restamp="true">
-            <etools-data-table-row no-collapse>
-              <div slot="row-data">
-                <div class="table-cell">[[item.data.title]]</div>
-                <div class="table-cell">
-                  <template
-                      is="dom-if"
-                      if="[[_canEdit(item, permissions)]]">
-                    <paper-radio-group
+            <template is="dom-if" if="[[_equals(item.type, 'data')]]" restamp="true">
+              <etools-data-table-row no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell">[[item.data.title]]</div>
+                  <div class="table-cell">
+                    <template is="dom-if" if="[[_canEdit(item, permissions)]]">
+                      <paper-radio-group
                         data-id$="[[item.data.id]]"
                         data-llo-id$="[[item.llo_id]]"
                         data-scope="calculation_formula_across_locations"
                         on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                      <paper-radio-button
-                          name="sum"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('sum')]]
-                      </paper-radio-button>
-                      <paper-radio-button
-                          name="max"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('max')]]
-                      </paper-radio-button>
-                      <paper-radio-button
-                          name="avg"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('avg')]]
-                      </paper-radio-button>
-                    </paper-radio-group>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[!_canEdit(item, permissions)]]">
-                    [[item.data.calculation_formula_across_locations]]
-                  </template>
-                </div>
-                <div class="table-cell">
-                  <template
-                      is="dom-if"
-                      if="[[_canEdit(item, permissions)]]">
-                    <paper-radio-group
+                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]"
+                      >
+                        <paper-radio-button name="sum" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('sum')]]
+                        </paper-radio-button>
+                        <paper-radio-button name="max" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('max')]]
+                        </paper-radio-button>
+                        <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('avg')]]
+                        </paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
+                      [[item.data.calculation_formula_across_locations]]
+                    </template>
+                  </div>
+                  <div class="table-cell">
+                    <template is="dom-if" if="[[_canEdit(item, permissions)]]">
+                      <paper-radio-group
                         data-id$="[[item.data.id]]"
                         data-llo-id$="[[item.llo_id]]"
                         data-scope="calculation_formula_across_periods"
                         on-paper-radio-group-changed="_onValueChanged"
                         selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]"
-                        disabled="[[_computeDisabled(item.data)]]">
-                      <paper-radio-button
-                          name="sum"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('sum')]]
-                      </paper-radio-button>
-                      <paper-radio-button
-                          name="max"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('max')]]
-                      </paper-radio-button>
-                      <paper-radio-button
-                          name="avg"
-                          disabled="[[_computeDisabled(item.data.display_type)]]">
-                        [[localize('avg')]]
-                      </paper-radio-button>
-                    </paper-radio-group>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[!_canEdit(item, permissions)]]">
-                    [[item.data.calculation_formula_across_periods]]
-                  </template>
+                        disabled="[[_computeDisabled(item.data)]]"
+                      >
+                        <paper-radio-button name="sum" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('sum')]]
+                        </paper-radio-button>
+                        <paper-radio-button name="max" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('max')]]
+                        </paper-radio-button>
+                        <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
+                          [[localize('avg')]]
+                        </paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
+                      [[item.data.calculation_formula_across_periods]]
+                    </template>
+                  </div>
                 </div>
-              </div>
-            </etools-data-table-row>
+              </etools-data-table-row>
+            </template>
           </template>
-        </template>
 
-        <etools-loading active="[[loading]]"></etools-loading>
-      </div>
-
-      <template
-          is="dom-if"
-          if="[[_canSave(permissions)]]"
-          restamp="true">
-        <div class="buttons layout horizontal-reverse">
-          <paper-button
-              on-tap="_save"
-              class="btn-primary"
-              disabled="[[loading]]"
-              raised>
-            [[localize('save')]]
-          </paper-button>
+          <etools-loading active="[[loading]]"></etools-loading>
         </div>
-      </template>
-    </page-body>
 
-    <confirm-box id="confirm"></confirm-box>
-  `;
+        <template is="dom-if" if="[[_canSave(permissions)]]" restamp="true">
+          <div class="buttons layout horizontal-reverse">
+            <paper-button on-tap="_save" class="btn-primary" disabled="[[loading]]" raised>
+              [[localize('save')]]
+            </paper-button>
+          </div>
+        </template>
+      </page-body>
+
+      <confirm-box id="confirm"></confirm-box>
+    `;
   }
 
   @property({type: Object})
@@ -269,7 +229,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   programmeDocumentsUrl!: string;
 
   @property({
-    type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
+    type: Object,
+    computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
     observer: '_getPdReports'
   })
   pdReportsCount!: GenericObject;
@@ -313,19 +274,18 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     if (!url || !this.pdId) {
       return;
     }
-    this._fetchDataDebouncer = Debouncer.debounce(this._fetchDataDebouncer,
-      timeOut.after(250),
-      () => {
-        var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+    this._fetchDataDebouncer = Debouncer.debounce(this._fetchDataDebouncer, timeOut.after(250), () => {
+      var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
-        (this.$.indicators as EtoolsPrpAjaxEl).abort();
+      (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
-          // @ts-ignore
-          .catch(function(err) {
-            //   // TODO: error handling
-          });
-      });
+      this.reduxStore
+        .dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
+        // @ts-ignore
+        .catch(function (err) {
+          console.log(err);
+        });
+    });
   }
 
   _onValueChanged(e: CustomEvent) {
@@ -333,26 +293,25 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     const data = (e.target as any).dataset;
     const indices = onValueChanged(data, this.localData);
 
-    this.set([
-      'localData.ll_outputs_and_indicators',
-      indices.lloIndex,
-      'indicators',
-      indices.indicatorIndex,
-      data.scope
-    ], newValue);
+    this.set(
+      ['localData.ll_outputs_and_indicators', indices.lloIndex, 'indicators', indices.indicatorIndex, data.scope],
+      newValue
+    );
   }
 
   _save() {
     const self = this;
 
     this._confirmIntent()
-      .then(function() {
+      .then(function () {
         const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
 
         return self.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
       })
       .then(self._notifyChangesSaved.bind(self))
-      .catch((_err: any) => {});
+      .catch((_err: any) => {
+        console.log(_err);
+      });
   }
 
   _confirmIntent() {
@@ -394,27 +353,25 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     // preventing pd-details title from rendering. In that case (which we
     // check by seeing if this.pdReportsCount is present), just get the reports again
     if (this.pdReportsCount[this.pdId] === undefined) {
-      this._debouncer = Debouncer.debounce(this._debouncer,
-        timeOut.after(250),
-        () => {
-          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-          pdThunk.params = {
-            page: 1,
-            page_size: 10,
-            programme_document: this.pdId
-          };
-          // Cancel the pending request, if any
-          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+      this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
+        pdThunk.params = {
+          page: 1,
+          page_size: 10,
+          programme_document: this.pdId
+        };
+        // Cancel the pending request, if any
+        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-          this.reduxStore.dispatch(pdFetch(pdThunk.thunk()))
-            // @ts-ignore
-            .catch((_err: GenericObject) => {
-              //   // TODO: error handling
-            });
-        });
+        this.reduxStore
+          .dispatch(pdFetch(pdThunk.thunk()))
+          // @ts-ignore
+          .catch((_err: GenericObject) => {
+            //   // TODO: error handling
+          });
+      });
     }
   }
-
 }
 
 window.customElements.define('pd-details-calculation-methods', PdDetailsCalculationMethods);
