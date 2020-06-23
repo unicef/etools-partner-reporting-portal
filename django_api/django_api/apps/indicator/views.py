@@ -902,16 +902,24 @@ class ReportRefreshAPIView(APIView):
                 due_date__gt=report.due_date,
             )
             if future_reports_qs.exists():
-                msg = {
-                    "response": "Data has already been submitted for "
-                    "reports that follow the current report you are "
-                    "trying to refresh. To avoid data loss, please "
-                    "contact the PRP help desk "
-                    "[https://prphelp.zendesk.com/hc/en-us/requests/new] "
-                    "to request assistance in refreshing your reporting "
-                    "data.",
-                }
-                return Response(msg, status=status.HTTP_400_BAD_REQUEST)
+                # make sure the future reports have data
+                data = [
+                    d for d in IndicatorLocationData.objects.filter(
+                        indicator_report__in=future_reports_qs.all()
+                    )
+                    if d.disaggregation.get("()") != {"c": 0, "d": 0, "v": 0}
+                ]
+                if data:
+                    msg = {
+                        "response": "Data has already been submitted for "
+                        "reports that follow the current report you are "
+                        "trying to refresh. To avoid data loss, please "
+                        "contact the PRP help desk "
+                        "[https://prphelp.zendesk.com/hc/en-us/requests/new] "
+                        "to request assistance in refreshing your reporting "
+                        "data.",
+                    }
+                    return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
             reset_indicator_report_data(report)
 
