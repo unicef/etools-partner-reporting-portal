@@ -585,7 +585,9 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
 
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
-
+    disaggregation_reported_on = serializers.ListField(
+        child=serializers.IntegerField()
+    )
     disaggregation = serializers.JSONField()
     reporting_entity_percentage_map = serializers.JSONField(
         required=False,
