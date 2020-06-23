@@ -315,8 +315,6 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   }
 
   _save() {
-    const self = this;
-
     const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
     if (!valid) {
@@ -333,12 +331,12 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
     const thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        fireEvent(self, 'project-edited', res.data);
-        self.close();
+        this.updatePending = false;
+        fireEvent(this, 'project-edited', res.data);
+        this.close();
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

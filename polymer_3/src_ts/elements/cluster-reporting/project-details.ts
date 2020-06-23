@@ -267,7 +267,7 @@ class ProjectDetailsDisplay extends UtilsMixin(LocalizeMixin(ReduxConnectedEleme
     this.detailsOpened = !this.detailsOpened;
   }
 
-  _computeDetailsButtonMsg(detailsOpened: boolean, localize: Function) {
+  _computeDetailsButtonMsg(detailsOpened: boolean, localize: (x: string) => string) {
     if (detailsOpened) {
       return localize('show_less_details');
     }

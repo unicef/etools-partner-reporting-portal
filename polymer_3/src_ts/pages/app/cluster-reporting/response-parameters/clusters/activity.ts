@@ -151,17 +151,14 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
     if (!this.url) {
       return;
     }
-
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    const self = this;
-
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        self.data = res.data;
+        this.updatePending = false;
+        this.data = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

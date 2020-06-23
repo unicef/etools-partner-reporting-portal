@@ -75,35 +75,22 @@ class PartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _computeValue(data: any, value: string) {
-    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
       const index = data.findIndex((item: GenericObject) => {
         return value === String(item.id);
       });
       const item = data[index === -1 ? 0 : index];
-      self.set('computedValue', item ? item.id : '');
+      this.set('computedValue', item ? item.id : '');
     });
   }
 
   _fetchPartnerNames() {
-    const self = this;
-
-    // this.$.partnerNames.abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        const data = (self.required
-          ? []
-          : [
-              {
-                id: '',
-                title: 'All'
-              }
-            ]
-        ).concat(res.data || []);
-
-        self.set('data', data);
+        const data = (this.required ? [] : [{id: '', title: 'All'}]).concat(res.data || []);
+        this.set('data', data);
       })
       // @ts-ignore
       .catch((_err: GenericObject) => {

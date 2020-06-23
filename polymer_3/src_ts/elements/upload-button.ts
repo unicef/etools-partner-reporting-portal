@@ -114,7 +114,6 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
 
   _save() {
     const file = this.get('files.0');
-    const self = this;
 
     if (!file) {
       return;
@@ -131,14 +130,14 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
     upload!
       .thunk()()
       .then(() => {
-        self.set('pending', false);
-        self.close();
-        self._notifyFileUploaded();
+        this.set('pending', false);
+        this.close();
+        this._notifyFileUploaded();
         fireEvent(this, 'file-uploaded');
       })
       .catch((res: any) => {
-        self.set('pending', false);
-        self.set('errors', res.data);
+        this.set('pending', false);
+        this.set('errors', res.data);
       });
   }
 

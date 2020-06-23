@@ -45,12 +45,11 @@ class ClusterLocationContent extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
     (this.$.locationNames as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        self.set('locations', res.data);
+        this.set('locations', res.data);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

@@ -55,13 +55,12 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
       return;
     }
 
-    const self = this;
     const thunk = (this.$.indicatorNames as EtoolsPrpAjaxEl).thunk();
     (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function (res: any) {
-        self.set(
+      .then((res: any) => {
+        this.set(
           'data',
           [
             {

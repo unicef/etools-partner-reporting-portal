@@ -66,16 +66,15 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
   }
 
   _openDoc(e: CustomEvent) {
-    var self = this;
     e.preventDefault();
     this.set('spinnerActive', true);
     const thunk = (this.$.pddoc as EtoolsPrpAjaxEl).thunk();
 
-    thunk().then(function (res: any) {
-      self.set('spinnerActive', false);
+    thunk().then((res: any) => {
+      this.set('spinnerActive', false);
       if (res.status !== 200 || !res.data.signed_pd_document_file) {
         // Fire Toast with error
-        self._notifyServerError();
+        this._notifyServerError();
         console.error(res);
       } else {
         const anchor = document.createElement('a');

@@ -83,19 +83,18 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
     }
 
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const self = this;
       this.set('pending', true);
 
       (this.$.locations as EtoolsPrpAjaxEl).abort();
       (this.$.locations as EtoolsPrpAjaxEl)
         .thunk()()
         .then((res: any) => {
-          self.set('pending', false);
-          self.set('data', res.data.results);
+          this.set('pending', false);
+          this.set('data', res.data.results);
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
-          self.set('pending', false);
+          this.set('pending', false);
         });
     });
   }

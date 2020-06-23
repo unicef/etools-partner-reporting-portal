@@ -58,6 +58,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _result!: GenericObject;
 
   open(errors: GenericObject[]) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     this.set('errors', errors);
@@ -65,10 +66,9 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this.set(
       '_result',
-      new Promise(function (resolve) {
+      new Promise((resolve) => {
         self.addEventListener('opened-changed', function onOpenedChanged() {
           self.removeEventListener('opened-changed', onOpenedChanged);
-
           resolve();
         });
       })

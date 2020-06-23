@@ -114,15 +114,14 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
     if (!this.url || !queryParams) {
       return;
     }
-    const self = this;
     this._activitiesAjaxDebouncer = Debouncer.debounce(this._activitiesAjaxDebouncer, timeOut.after(300), () => {
-      const thunk = (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
+      const thunk = (this.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
       if (!Object.keys(queryParams).length) {
         return;
       }
-      (self.$.partnerActivities as EtoolsPrpAjaxEl).abort();
+      (this.$.partnerActivities as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(fetchPartnerActivitiesList(thunk))
         // @ts-ignore
         .catch((_err: GenericObject) => {

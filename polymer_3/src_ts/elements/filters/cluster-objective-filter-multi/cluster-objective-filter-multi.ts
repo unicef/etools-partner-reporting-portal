@@ -92,21 +92,20 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
       return;
     }
 
-    const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), function () {
-      const thunk = (self.$.objectives as EtoolsPrpAjaxEl).thunk();
-      self.set('pending', true);
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
+      this.set('pending', true);
 
-      (self.$.objectives as EtoolsPrpAjaxEl).abort();
+      (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
       thunk()
         .then((res: any) => {
-          self.set('pending', false);
-          self.set('data', res.data.results);
+          this.set('pending', false);
+          this.set('data', res.data.results);
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
-          self.set('pending', false);
+          this.set('pending', false);
         });
     });
   }

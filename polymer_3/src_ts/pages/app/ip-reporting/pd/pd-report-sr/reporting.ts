@@ -185,7 +185,6 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
   }
 
   _updateData(change: GenericObject) {
-    const self = this;
     if (change.path.split('.').length < 2) {
       // Skip the initial assignment
       return;
@@ -195,15 +194,13 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
       if (!this.localData.narrative) {
         return;
       }
-      const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
-
-      (self.$.update as EtoolsPrpAjaxEl).abort();
-
-      self.reduxStore
+      const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
+      (this.$.update as EtoolsPrpAjaxEl).abort();
+      this.reduxStore
         .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
         // @ts-ignore
         .then(() => {
-          self._notifyChangesSaved();
+          this._notifyChangesSaved();
         })
         // @ts-ignore
         .catch(function (err) {

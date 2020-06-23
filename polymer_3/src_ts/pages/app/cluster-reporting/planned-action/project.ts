@@ -118,6 +118,9 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
+  @property({type: Boolean})
+  updatePending = false;
+
   static get observers() {
     return ['_updateUrlTab(routeData.tab)', '_getProjectAjax(overviewUrl)'];
   }
@@ -148,15 +151,14 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
       return;
     }
 
-    const self: any = this;
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        self.projectData = res.data;
+        this.updatePending = false;
+        this.projectData = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

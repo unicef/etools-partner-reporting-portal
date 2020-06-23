@@ -141,10 +141,9 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _clearFilters() {
-    const self = this;
-    const clearParams = Object.keys(this.queryParams).reduce(function (prev: any, curr) {
-      if (self.filters.indexOf(curr) === -1) {
-        prev[curr] = self.queryParams[curr];
+    const clearParams = Object.keys(this.queryParams).reduce((prev: any, curr) => {
+      if (this.filters.indexOf(curr) === -1) {
+        prev[curr] = this.queryParams[curr];
       } else {
         prev[curr] = ''; // Can't set to undefined (does not trigger observers)
       }

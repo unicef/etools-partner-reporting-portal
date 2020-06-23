@@ -156,26 +156,25 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
       return;
     }
 
-    const self = this;
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl)
       .thunk()()
-      .then(function (res: any) {
-        const newPath = self.buildUrl(self._baseUrl, 'pd/' + self.pdId + '/view/reports');
+      .then((res: any) => {
+        const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
 
-        self.reduxStore.dispatch(pdReportsUpdateSingle(self.pdId, self.reportId, res.data));
+        this.reduxStore.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res.data));
 
-        self.set('busy', false);
-        self.close();
-        waitForIronOverlayToClose(300).then(() => self.set('path', newPath));
+        this.set('busy', false);
+        this.close();
+        waitForIronOverlayToClose(300).then(() => this.set('path', newPath));
       })
       .catch((res: any) => {
         const errors = res.data.non_field_errors;
-        self.close();
-        return (self.$.error as ErrorModalEl).open(errors);
+        this.close();
+        return (this.$.error as ErrorModalEl).open(errors);
       })
       .then(() => {
-        self.set('busy', false);
+        this.set('busy', false);
       });
   }
 

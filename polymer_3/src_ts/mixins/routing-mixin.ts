@@ -53,11 +53,10 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
     connectedCallback() {
       super.connectedCallback();
 
-      const self = this;
       setTimeout(() => {
         if (typeof this.reduxStore.dispatch !== 'function') {
           // Duck typing
-          throw new Error(self.BEHAVIOR_NAME + ' requires ReduxBehavior');
+          throw new Error(this.BEHAVIOR_NAME + ' requires ReduxBehavior');
         }
       });
     }

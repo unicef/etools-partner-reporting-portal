@@ -93,7 +93,6 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
   busy = false;
 
   _refresh() {
-    const self = this;
     this.set('busy', true);
 
     const refreshThunk = (this.$.refreshReport as EtoolsPrpAjaxEl).thunk();
@@ -103,7 +102,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
       })
       .catch((res: any) => {
         console.log(res);
-        self.set('busy', false);
+        this.set('busy', false);
       });
   }
 

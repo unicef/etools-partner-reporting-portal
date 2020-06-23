@@ -81,10 +81,9 @@ class PartnersByStatus extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
     });
   }
 
-  _computeRowsLocal(data: GenericObject, localize: string) {
-    var self = this;
-    return Object.keys(data || {}).map(function (key) {
-      return [self._localizeLowerCased(key, localize), data[key]];
+  _computeRowsLocal(data: GenericObject, localize: (x: string) => string) {
+    return Object.keys(data || {}).map((key) => {
+      return [this._localizeLowerCased(key, localize), data[key]];
     });
   }
 }

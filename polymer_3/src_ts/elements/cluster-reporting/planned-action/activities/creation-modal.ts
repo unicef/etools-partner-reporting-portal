@@ -641,7 +641,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _fetchActivities(clusterId: string) {
-    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -654,7 +653,7 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     thunk()
       .then((res: any) => {
-        self.set('activities', res.data.results);
+        this.set('activities', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -663,8 +662,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
   // @ts-ignore
   _fetchProjects(partnerId: string, mode: string, clusterId: string) {
-    const self = this;
-
     if (this.data === undefined || !partnerId || !clusterId) {
       return;
     }
@@ -674,8 +671,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     (this.$.projects as EtoolsPrpAjaxEl)
       .thunk()()
-      .then(function (res: any) {
-        self.set('projects', res.data.results);
+      .then((res: any) => {
+        this.set('projects', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -687,8 +684,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       return;
     }
 
-    const self = this;
-
     this.set('objectivesParams.cluster_id', clusterId);
     this.set('objectives', []);
     this.set('data.custom.cluster_objective', undefined);
@@ -697,8 +692,8 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
 
     (this.$.objectives as EtoolsPrpAjaxEl)
       .thunk()()
-      .then(function (res: any) {
-        self.set('objectives', res.data.results);
+      .then((res: any) => {
+        this.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -706,7 +701,6 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
   }
 
   _save() {
-    const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
@@ -722,16 +716,16 @@ class PlannedActionActivityModal extends UtilsMixin(ModalMixin(LocalizeMixin(Red
       this.data[this.mode]
     );
     thunk()
-      .then(function (res: any) {
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self._close('saved');
-        waitForIronOverlayToClose(300).then(() => fireEvent(self, 'activity-added', res.data));
+      .then((res: any) => {
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this._close('saved');
+        waitForIronOverlayToClose(300).then(() => fireEvent(this, 'activity-added', res.data));
       })
       .catch((err: GenericObject) => {
-        self.set('errors', err.data);
-        self.set('updatePending', false);
-        fireEvent(self, 'project-details-selection-refit');
+        this.set('errors', err.data);
+        this.set('updatePending', false);
+        fireEvent(this, 'project-details-selection-refit');
       });
   }
 

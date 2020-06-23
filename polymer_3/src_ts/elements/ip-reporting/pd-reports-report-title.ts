@@ -73,14 +73,11 @@ class PdReportsReportTitle extends LocalizeMixin(
     return shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
   }
 
-  _getReportTitleFull(report: GenericObject, localize: Function) {
-    if (report) {
-      return getReportTitleFull(report, localize);
-    }
-    return '';
+  _getReportTitleFull(report: GenericObject, localize: (x: string) => string) {
+    return report ? getReportTitleFull(report, localize) : '';
   }
 
-  _getReportTitle(report: GenericObject, localize: Function) {
+  _getReportTitle(report: GenericObject, localize: (x: string) => string) {
     return getReportTitle(report, localize);
   }
 

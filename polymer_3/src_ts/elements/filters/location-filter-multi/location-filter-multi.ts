@@ -55,8 +55,6 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
   }
 
   _fetchLocations(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
@@ -66,7 +64,7 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
     (this.$.locations as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set('data', res.data);
+        this.set('data', res.data);
       })
       // @ts-ignore
       .catch((_err: GenericObject) => {

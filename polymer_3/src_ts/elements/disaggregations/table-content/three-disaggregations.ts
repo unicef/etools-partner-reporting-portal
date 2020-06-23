@@ -125,20 +125,19 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
     if (!columns || !middleRows) {
       return [];
     }
-    const self = this;
-    return middleRows.map(function (y) {
+    return middleRows.map((y) => {
       let formatted;
 
-      const columnData = columns.map(function (z) {
-        formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
+      const columnData = columns.map((z) => {
+        formatted = this._formatDisaggregationIds([outerRowID, y.id, z.id]);
 
         return {
           key: formatted,
           data: data.disaggregation[formatted]
         };
-      }, self);
+      }, this);
 
-      formatted = self._formatDisaggregationIds([outerRowID, y.id]);
+      formatted = this._formatDisaggregationIds([outerRowID, y.id]);
 
       return {
         title: y.value,
@@ -153,15 +152,14 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
   }
 
   _determineTotals(columns: any[], middleRows: any[], data: GenericObject) {
-    const self = this;
-    const columnData = columns.map(function (z) {
-      const formatted = self._formatDisaggregationIds([z.id]);
+    const columnData = columns.map((z) => {
+      const formatted = this._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,
         data: data.disaggregation[formatted]
       };
-    }, self);
+    }, this);
 
     const columnTotalRow = {
       title: 'total',

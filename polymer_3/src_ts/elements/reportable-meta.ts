@@ -206,21 +206,21 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
   }
 
-  _computeMetLabel(completed: boolean, localize: Function) {
+  _computeMetLabel(completed: boolean, localize: (x: string) => string) {
     if (completed) {
       return localize('met_results');
     }
     return localize('met');
   }
 
-  _computeConstrainedLabel(completed: boolean, localize: Function) {
+  _computeConstrainedLabel(completed: boolean, localize: (x: string) => string) {
     if (completed) {
       return localize('constrained_partially');
     }
     return localize('constrained');
   }
 
-  _localizeToggle(toggle: string, localize: Function) {
+  _localizeToggle(toggle: string, localize: (x: string) => string) {
     return localize(toggle.toLowerCase());
   }
 

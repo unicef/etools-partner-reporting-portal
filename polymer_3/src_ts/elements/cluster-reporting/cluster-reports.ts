@@ -100,9 +100,8 @@ class ClusterReports extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _onParamsChanged() {
-    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
-      self._fetchData();
+      this._fetchData();
     });
   }
 

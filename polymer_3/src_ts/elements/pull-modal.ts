@@ -192,15 +192,14 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _save() {
-    const self = this;
     (this.$.pull as EtoolsPrpAjaxEl)
       .thunk()()
       .then(() => {
-        self.close();
-        fireEvent(self, 'locations-updated');
+        this.close();
+        fireEvent(this, 'locations-updated');
       })
       .catch((err: any) => {
-        self._notifyErrorMessage({text: err.data.non_field_errors[0]});
+        this._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
 
@@ -210,17 +209,16 @@ class PullModal extends NotificationsMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   open() {
-    const self = this;
     (this.$.reports as EtoolsPrpAjaxEl).abort();
 
     const thunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.set('data', {reports: res.data});
-        self.set('opened', true);
+        this.set('data', {reports: res.data});
+        this.set('opened', true);
       })
       .catch((err: any) => {
-        self._notifyErrorMessage({text: err.data.non_field_errors[0]});
+        this._notifyErrorMessage({text: err.data.non_field_errors[0]});
       });
   }
 }

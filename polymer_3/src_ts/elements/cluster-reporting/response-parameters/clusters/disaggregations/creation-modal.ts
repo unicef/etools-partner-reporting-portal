@@ -169,7 +169,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
       (this.shadowRoot!.querySelector('#name') as PaperInputElement).set('invalid', true);
       return;
     }
-    const self = this;
+
     const thunk = (this.$.createDisaggregation as EtoolsPrpAjaxEl).thunk();
     const newChoices: GenericObject[] = [];
     for (let i = 0; i < this.data.choices.length; i++) {
@@ -178,13 +178,13 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
     this.data.choices = newChoices;
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'disaggregation-added', res.data);
-        self.updatePending = false;
-        self.close();
+        fireEvent(this, 'disaggregation-added', res.data);
+        this.updatePending = false;
+        this.close();
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
-        self.updatePending = false;
+        this.updatePending = false;
       });
   }
 

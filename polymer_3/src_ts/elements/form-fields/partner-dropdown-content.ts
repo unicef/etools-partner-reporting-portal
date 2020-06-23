@@ -62,12 +62,11 @@ class PartnerDropdownContent extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
     (this.$.partnerNames as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set('partners', res.data);
+        this.set('partners', res.data);
       })
       // @ts-ignore
       .catch((_err: GenericObject) => {

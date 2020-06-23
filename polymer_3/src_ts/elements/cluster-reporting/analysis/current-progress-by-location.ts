@@ -87,9 +87,8 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
   }
 
   _computeRows(data: GenericObject) {
-    const self = this;
-    return Object.keys(data || {}).map(function (key) {
-      return [key, data[key].progress, self._buildTooltipContent(key, data[key])];
+    return Object.keys(data || {}).map((key) => {
+      return [key, data[key].progress, this._buildTooltipContent(key, data[key])];
     }, this);
   }
 

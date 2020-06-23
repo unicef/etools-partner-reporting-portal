@@ -222,10 +222,9 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     let maxLon = -180;
     let minLat = 90;
     let maxLat = -90;
-    const self = this;
 
-    function traverse(node: any) {
-      if (self._isPoint(node)) {
+    const traverse = (node: any) => {
+      if (this._isPoint(node)) {
         minLon = Math.min(node[0], minLon);
         maxLon = Math.max(node[0], maxLon);
         minLat = Math.min(node[1], minLat);
@@ -233,7 +232,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
       } else {
         node.forEach(traverse);
       }
-    }
+    };
 
     map.features
       .filter(function (feature: any) {

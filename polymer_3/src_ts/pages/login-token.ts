@@ -55,7 +55,6 @@ class PageLoginToken extends PolymerElement {
     super.connectedCallback();
     const token = this.query.split('=')[1];
     this.set('data', {token: token});
-    const self = this;
     const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: any) => {
@@ -64,7 +63,7 @@ class PageLoginToken extends PolymerElement {
         }
       })
       .catch(() => {
-        fireEvent(self, 'token-error');
+        fireEvent(this, 'token-error');
       });
   }
 }

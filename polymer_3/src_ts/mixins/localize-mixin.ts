@@ -31,7 +31,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
     useKeyIfMissing = false;
 
     @property({type: Object, computed: '__computeLocalize(language, resources, formats)'})
-    localize!: Function;
+    localize!: (x: string) => string;
 
     @property({type: Boolean})
     bubbleEvent = false;
@@ -47,9 +47,8 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
         proto['__localizationCache'] = {messages: {}};
       }
       proto.__localizationCache.messages = {};
-      const self = this;
 
-      return function (...args: any[]) {
+      return (...args: any[]) => {
         const key = args[0];
         if (!key || !resources || !language || !resources[language]) {
           return;
@@ -60,7 +59,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
         const translatedValue = resources[language][key];
 
         if (!translatedValue) {
-          return self.useKeyIfMissing ? key : '';
+          return this.useKeyIfMissing ? key : '';
         }
 
         const messageKey = key + translatedValue;

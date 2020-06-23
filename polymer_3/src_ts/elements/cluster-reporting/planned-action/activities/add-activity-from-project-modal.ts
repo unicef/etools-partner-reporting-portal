@@ -604,7 +604,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       return;
     }
 
-    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     this.set('partnerActivitiesUrl', Endpoints.partnerActivityList(this.responsePlanId) + '?cluster_id=' + clusterId);
 
@@ -619,13 +618,13 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     (this.$.activities as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function (res: any) {
-        self.set('activities', res.data.results);
-        return (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk()();
+      .then((res: any) => {
+        this.set('activities', res.data.results);
+        return (this.$.partnerActivities as EtoolsPrpAjaxEl).thunk()();
       })
       .then((res: any) => {
         // logic below will exclude activities already adopted for the current Project
-        const currentProjId = Number(self.projectData.id);
+        const currentProjId = Number(this.projectData.id);
         const adoptedClusterActivities = new Set();
         res.data.results.forEach(function (item: any) {
           if (item.cluster_activity !== null) {
@@ -637,9 +636,9 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
           }
         });
 
-        self.set(
+        this.set(
           'activities',
-          self.activities.filter((item: any) => {
+          this.activities.filter((item: any) => {
             return adoptedClusterActivities.has(item.id) !== true;
           })
         );
@@ -654,7 +653,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
       return;
     }
 
-    const self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
 
     this.set('objectivesParams.cluster_id', clusterId);
@@ -664,8 +662,8 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function (res: any) {
-        self.set('objectives', res.data.results);
+      .then((res: any) => {
+        this.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -673,7 +671,6 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
   }
 
   _save() {
-    const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
@@ -690,15 +687,15 @@ class AddActivityFromProjectModal extends LocalizeMixin(UtilsMixin(ModalMixin(Re
     );
     thunk()
       .then((res: any) => {
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self._close('saved');
-        waitForIronOverlayToClose(300).then(() => fireEvent(self, 'activity-added', res.data));
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this._close('saved');
+        waitForIronOverlayToClose(300).then(() => fireEvent(this, 'activity-added', res.data));
       })
       .catch((err: any) => {
-        self.set('errors', err.data);
-        self.set('updatePending', false);
-        fireEvent(self, 'project-details-selection-refit');
+        this.set('errors', err.data);
+        this.set('updatePending', false);
+        fireEvent(this, 'project-details-selection-refit');
       });
   }
 

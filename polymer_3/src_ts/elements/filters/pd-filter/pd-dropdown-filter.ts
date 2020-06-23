@@ -49,8 +49,6 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchPDs(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
@@ -59,7 +57,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.programmeDocuments as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set('data', res.data.results);
+        this.set('data', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

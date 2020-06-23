@@ -13,14 +13,13 @@ function SortingMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
     _sortOrderChanged(e: CustomEvent) {
       const data = e.detail;
-      const self = this;
       this._sortOrderDebouncer = Debouncer.debounce(this._sortOrderDebouncer, timeOut.after(100), () => {
-        const newParams = Object.assign({}, (self as any).queryParams, {
+        const newParams = Object.assign({}, (this as any).queryParams, {
           sort: data.field + '.' + data.direction
         });
 
         e.stopPropagation();
-        self.set('queryParams', newParams);
+        this.set('queryParams', newParams);
       });
     }
 

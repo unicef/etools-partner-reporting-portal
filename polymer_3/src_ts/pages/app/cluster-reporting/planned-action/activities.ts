@@ -117,18 +117,17 @@ class PlannedActionActivitiesList extends LocalizeMixin(SortingMixin(RoutingMixi
       return;
     }
 
-    const self = this;
     this.activitiesDebouncer = Debouncer.debounce(this.activitiesDebouncer, timeOut.after(300), () => {
-      queryParams.partner = self.partnerID;
+      queryParams.partner = this.partnerID;
       if (!Object.keys(queryParams).length) {
         return;
       }
 
       const dataThunk = (this.$.plannedActionsActivities as EtoolsPrpAjaxEl).thunk();
 
-      (self.$.plannedActionsActivities as EtoolsPrpAjaxEl).abort();
+      (this.$.plannedActionsActivities as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(fetchPartnerActivitiesList(dataThunk))
         // @ts-ignore
         .catch((_err: any) => {

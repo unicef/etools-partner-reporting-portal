@@ -120,16 +120,15 @@ class ProgressOverTime extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Redux
   }
 
   _computeRowsLocal(data: any, target: number, inNeed: number) {
-    const self = this;
-    return data.map(function (tick: any) {
+    return data.map((tick: any) => {
       return [
         tick[0],
-        self._fromJSON(tick[1]),
-        self._buildProgressTooltipContent(tick, target, inNeed),
+        this._fromJSON(tick[1]),
+        this._buildProgressTooltipContent(tick, target, inNeed),
         target,
-        self._buildDefaultTooltipContent('Target', target),
+        this._buildDefaultTooltipContent('Target', target),
         inNeed,
-        self._buildDefaultTooltipContent('In Need', inNeed)
+        this._buildDefaultTooltipContent('In Need', inNeed)
       ];
     }, this);
   }

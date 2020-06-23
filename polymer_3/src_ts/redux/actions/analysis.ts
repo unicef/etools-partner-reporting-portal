@@ -92,7 +92,7 @@ const analysis_indicators_setData = function (data: any) {
   };
 };
 
-export const analysis_indicators_fetchData = function (dataThunk: Function) {
+export const analysis_indicators_fetchData = function (dataThunk: any) {
   return function (dispatch: ReduxDispatch) {
     dispatch(analysis_indicators_dataLoadingStart());
 
@@ -131,7 +131,7 @@ const analysis_indicators_setSingle = function (indicatorId: string, data: any) 
   };
 };
 
-export const analysis_indicators_fetchSingle = function (indicatorThunk: Function, indicatorId: string) {
+export const analysis_indicators_fetchSingle = function (indicatorThunk: any, indicatorId: string) {
   return function (dispatch: ReduxDispatch) {
     dispatch(analysis_indicators_singleLoadingStart(indicatorId));
 

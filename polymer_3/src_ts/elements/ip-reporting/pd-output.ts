@@ -349,7 +349,7 @@ class PdOutput extends LocalizeMixin(
   @property({type: Object})
   currentPd!: GenericObject;
 
-  _calculationFormulaAcrossPeriods(indicator: GenericObject, localize: Function) {
+  _calculationFormulaAcrossPeriods(indicator: GenericObject, localize: (x: string) => string) {
     return calculationFormulaAcrossPeriods(indicator, localize);
   }
 
@@ -410,8 +410,6 @@ class PdOutput extends LocalizeMixin(
   }
 
   _updateMeta(e: CustomEvent) {
-    const self = this;
-
     e.stopPropagation();
     const data = e.detail;
     this.set('reportableMeta', data);
@@ -424,7 +422,7 @@ class PdOutput extends LocalizeMixin(
       .dispatch(pdReportsUpdateReportable(updateThunk, this.pdId, this.reportId, this.data.id))
       // @ts-ignore
       .then(() => {
-        self._notifyChangesSaved();
+        this._notifyChangesSaved();
       })
       .catch((_err: GenericObject) => {
         //   // TODO: error handling

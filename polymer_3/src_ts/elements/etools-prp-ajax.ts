@@ -164,16 +164,15 @@ class EtoolsPrpAjax extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)
   }
 
   thunk() {
-    const self = this;
-    return function () {
-      const req = self.generateRequest();
+    return () => {
+      const req = this.generateRequest();
 
       return req
         .completes!.then(() => {
-          return self._buildResponse(req);
+          return this._buildResponse(req);
         })
         .catch(() => {
-          return Promise.reject(self._buildResponse(req));
+          return Promise.reject(this._buildResponse(req));
         });
     };
   }

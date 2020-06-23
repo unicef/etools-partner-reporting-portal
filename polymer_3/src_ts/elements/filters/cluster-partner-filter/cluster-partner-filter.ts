@@ -52,21 +52,12 @@ class ClusterPartnerFilter extends LocalizeMixin(ReduxConnectedElement) {
       return;
     }
 
-    const self = this;
     const thunk = (this.$.partnerNames as EtoolsPrpAjaxEl).thunk();
     (this.$.partnerNames as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then((res: any) => {
-        self.set(
-          'data',
-          [
-            {
-              id: '',
-              title: 'All'
-            }
-          ].concat(res.data || [])
-        );
+        this.set('data', [{id: '', title: 'All'}].concat(res.data || []));
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

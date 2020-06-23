@@ -949,7 +949,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     this.detailsOpened = !this.detailsOpened;
   }
 
-  _computeLocalizedTitle(edit: boolean, localize: Function) {
+  _computeLocalizedTitle(edit: boolean, localize: (x: string) => string) {
     return edit ? localize('edit_project') : localize('add_project');
   }
 
@@ -969,7 +969,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       : [];
   }
 
-  _computeLocalizedDetailsButtonMsg(detailsOpened: boolean, localize: Function) {
+  _computeLocalizedDetailsButtonMsg(detailsOpened: boolean, localize: (x: string) => string) {
     if (detailsOpened) {
       return localize('show_less_funding_details');
     }
@@ -994,16 +994,15 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       }
 
       this.set('projectsLoading', true);
-      const self = this;
 
       const projectThunk = this.$.projects as EtoolsPrpAjaxEl;
       projectThunk.abort();
       projectThunk
         .thunk()()
-        .then(function (res: GenericObject) {
-          self.set('projectsLoading', false);
+        .then((res: GenericObject) => {
+          this.set('projectsLoading', false);
 
-          const filteredPartnerProjects = self.partnerProjects.filter((item) => {
+          const filteredPartnerProjects = this.partnerProjects.filter((item) => {
             return item.is_ocha_imported === true;
           });
 
@@ -1015,15 +1014,15 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
             );
           });
 
-          self.set('projects', filteredResData);
-          fireEvent(self, 'details-loaded');
+          this.set('projects', filteredResData);
+          fireEvent(this, 'details-loaded');
         })
         .catch((err: GenericObject) => {
           if (err.code === 504) {
-            fireEvent(self, 'notify', {type: 'ocha-timeout'});
+            fireEvent(this, 'notify', {type: 'ocha-timeout'});
           }
-          self.set('projectsLoading', false);
-          self.set('errors', err.data);
+          this.set('projectsLoading', false);
+          this.set('errors', err.data);
         });
     });
   }
@@ -1039,21 +1038,20 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       return;
     }
     this.set('projectDetailsLoading', true);
-    const self = this;
     (this.$.projectDetails as EtoolsPrpAjaxEl).abort();
     (this.$.projectDetails as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        self.set('projectDetailsLoading', false);
-        self.set('projectDetails', res.data);
-        fireEvent(self, 'details-loaded');
+        this.set('projectDetailsLoading', false);
+        this.set('projectDetails', res.data);
+        fireEvent(this, 'details-loaded');
       })
       .catch((err: GenericObject) => {
         if (err.code === 504) {
-          fireEvent(self, 'notify', {type: 'ocha-timeout'});
+          fireEvent(this, 'notify', {type: 'ocha-timeout'});
         }
-        self.set('projectDetailsLoading', false);
-        self.set('errors', err.data);
+        this.set('projectDetailsLoading', false);
+        this.set('errors', err.data);
       });
   }
 
@@ -1127,8 +1125,6 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _save() {
-    const self = this;
-
     let locationError = false;
     const rawLocations = this.get('data.locations') || [];
 
@@ -1142,10 +1138,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
     changedLocations.forEach((location: GenericObject) => {
       if (!location || !location.title) {
-        self.set('errors', 'No location set - please set a location.');
+        this.set('errors', 'No location set - please set a location.');
         locationError = true;
       } else if (changedLocations[0].admin_level !== location.admin_level) {
-        self.set('errors', 'All locations need to have the same admin level.');
+        this.set('errors', 'All locations need to have the same admin level.');
         locationError = true;
       }
     });
@@ -1173,20 +1169,20 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     const thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        if (self.edit) {
-          fireEvent(self, 'project-edited', res.data);
-          self.close();
-          self.set('errors', {});
+        this.updatePending = false;
+        if (this.edit) {
+          fireEvent(this, 'project-edited', res.data);
+          this.close();
+          this.set('errors', {});
         } else {
-          self.close();
-          waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
+          this.close();
+          waitForIronOverlayToClose(300).then(() => this._redirectToDetail(res.data.id));
         }
       })
       .catch((err: GenericObject) => {
-        self.updatePending = false;
-        self.set('errors', err.data);
-        self.set('data.locations', rawLocations); // If there are backend validation errors, reset locations
+        this.updatePending = false;
+        this.set('errors', err.data);
+        this.set('data.locations', rawLocations); // If there are backend validation errors, reset locations
       }); // to what they were before request was sent!
   }
 

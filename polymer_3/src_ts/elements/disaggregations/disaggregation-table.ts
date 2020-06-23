@@ -329,18 +329,17 @@ class DisaggregationTable extends LocalizeMixin(DisaggregationHelpersMixin(Utils
       return Promise.reject();
     }
 
-    const self = this;
     const updateThunk = (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#update') as EtoolsPrpAjaxEl).abort();
 
     return (
       this.reduxStore
         .dispatch(
-          disaggregationsUpdateForLocation(updateThunk, String(self.indicatorId), self.formattedData.location.id)
+          disaggregationsUpdateForLocation(updateThunk, String(this.indicatorId), this.formattedData.location.id)
         )
         // @ts-ignore
-        .then(function (value) {
-          fireEvent(self, 'locations-updated');
+        .then((value) => {
+          fireEvent(this, 'locations-updated');
           return value;
         })
     );

@@ -590,7 +590,6 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     if (!clusterId) {
       return;
     }
-    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
     this.set('activities', []);
@@ -603,7 +602,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
     thunk()
       .then((res: any) => {
-        self.set('activities', res.data.results);
+        this.set('activities', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -614,7 +613,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     if (!clusterId) {
       return;
     }
-    const self = this;
+
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
 
     this.set('objectivesParams.cluster_id', clusterId);
@@ -624,7 +623,7 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
     thunk()
       .then((res: any) => {
-        self.set('objectives', res.data.results);
+        this.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -635,14 +634,13 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
     if (!partnerId) {
       return;
     }
-    const self = this;
     const thunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
 
     this.set('projectsParams.partner', partnerId);
 
     thunk()
       .then((res: any) => {
-        self.set('projects', res.data.results);
+        this.set('projects', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -650,7 +648,6 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
   }
 
   _save() {
-    const self = this;
     const thunk = (this.$.editActivity as EtoolsPrpAjaxEl).thunk();
     const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
@@ -662,14 +659,14 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
 
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'pa-activity-edited', res.data);
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self.close();
+        fireEvent(this, 'pa-activity-edited', res.data);
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('errors', err.data);
-        self.set('updatePending', false);
+        this.set('errors', err.data);
+        this.set('updatePending', false);
       });
   }
 

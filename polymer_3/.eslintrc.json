@@ -11,8 +11,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "env": {
     "browser": true,
@@ -62,13 +61,6 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
     "@typescript-eslint/ban-types": ["warn"],
-    "@typescript-eslint/no-this-alias": [
-      "error",
-      {
-        "allowDestructuring": true, // Allow `const { props, state } = this`; false by default
-        "allowedNames": ["self"] // Allow `const self = this`; `[]` by default
-      }
-    ],
     "@typescript-eslint/no-use-before-define": [
       "error",
       {

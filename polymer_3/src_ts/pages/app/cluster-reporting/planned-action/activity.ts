@@ -131,6 +131,9 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
+  @property({type: Boolean})
+  updatePending = false;
+
   static get observers() {
     return ['_updateUrlTab(routeData.tab)', '_getActivityAjax(projects)', '_getProjects(responsePlanID)'];
   }
@@ -166,19 +169,19 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     if (this.projects === undefined || this.queryParams === undefined) {
       return;
     }
-    const self: any = this;
+
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
       // @ts-ignore
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        res.data.projects.forEach(function (project: GenericObject) {
-          project.title = self.projects[project.project_id].title;
+        this.updatePending = false;
+        res.data.projects.forEach((project: GenericObject) => {
+          project.title = this.projects[project.project_id].title;
         });
-        self.activityData = res.data;
+        this.activityData = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }
@@ -187,9 +190,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
     if (!this.responsePlanID) {
       return;
     }
-    const self = this;
     const projectsThunk = (this.$.projects as EtoolsPrpAjaxEl).thunk();
-
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     projectsThunk().then((res: GenericObject) => {
@@ -198,7 +199,7 @@ class PlannedActionActivitiesDetails extends LocalizeMixin(RoutingMixin(UtilsMix
         allProjects[project.id] = project;
       });
 
-      self.set('projects', allProjects);
+      this.set('projects', allProjects);
     });
   }
 

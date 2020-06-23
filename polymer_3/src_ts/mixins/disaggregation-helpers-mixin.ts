@@ -51,7 +51,7 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
       };
     }
 
-    private sumDisaggValues(fields: any[], transform?: Function) {
+    private sumDisaggValues(fields: any[], transform?: (x: number) => number) {
       if (typeof transform === 'undefined') {
         transform = this.identity;
       }

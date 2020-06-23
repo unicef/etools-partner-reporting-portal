@@ -217,7 +217,6 @@ class ActivityListTable extends DataTableMixin(
       return;
     }
 
-    var self = this;
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
     (this.$.projects as EtoolsPrpAjaxEl)
@@ -228,7 +227,7 @@ class ActivityListTable extends DataTableMixin(
           allProjects[project.id] = project;
         });
 
-        self.set('projects', allProjects);
+        this.set('projects', allProjects);
       });
   }
 

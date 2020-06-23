@@ -188,16 +188,15 @@ class ClusterObjectivesEditingModal extends LocalizeMixin(UtilsMixin(RoutingMixi
       return;
     }
 
-    const self = this;
     const thunk = (this.$.editObjective as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        fireEvent(self, 'objective-edited', res.data);
-        self.close();
+        this.updatePending = false;
+        fireEvent(this, 'objective-edited', res.data);
+        this.close();
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

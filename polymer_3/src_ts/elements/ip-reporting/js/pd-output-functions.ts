@@ -1,7 +1,7 @@
 import {GenericObject} from '../../../typings/globals.types';
 import Endpoints from '../../../endpoints';
 
-export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: Function) {
+export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: (x: string) => string) {
   const localized =
     indicator.reportable.blueprint.display_type === 'ratio'
       ? localize('latest')

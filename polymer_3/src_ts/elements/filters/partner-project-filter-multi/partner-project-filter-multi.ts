@@ -51,12 +51,11 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
     (this.$.partnerProjects as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set('data', res.data.results);
+        this.set('data', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

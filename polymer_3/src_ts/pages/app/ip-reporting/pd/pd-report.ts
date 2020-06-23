@@ -309,15 +309,14 @@ class PageIpReportingPdReport extends LocalizeMixin(
       return;
     }
 
-    const self = this;
     this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer, timeOut.after(300), () => {
-      const reportThunk = (self.$.report as EtoolsPrpAjaxEl).thunk();
-      (self.$.report as EtoolsPrpAjaxEl).abort();
-      self.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
+      const reportThunk = (this.$.report as EtoolsPrpAjaxEl).thunk();
+      (this.$.report as EtoolsPrpAjaxEl).abort();
+      this.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
     });
   }
 
-  _computeHeadingPrefix(mode: string, localize: Function) {
+  _computeHeadingPrefix(mode: string, localize: (x: string) => string) {
     switch (mode) {
       case 'view':
         return localize('report_for');
@@ -388,30 +387,28 @@ class PageIpReportingPdReport extends LocalizeMixin(
   }
 
   _submit() {
-    const self = this;
-
     this.set('busy', true);
     (this.$.submit as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        const newPath = self.buildUrl(self._baseUrl, 'pd/' + self.pdId + '/view/reports');
+        const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
 
-        self.reduxStore.dispatch(pdReportsUpdateSingle(self.pdId, self.reportId, res.data));
+        this.reduxStore.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res.data));
 
-        self.set('busy', false);
-        self.set('path', newPath);
+        this.set('busy', false);
+        this.set('path', newPath);
       })
       .catch((res: GenericObject) => {
         const authorizedError = res.data.error_codes.filter((error: string) => {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
-        self.set('busy', false);
+        this.set('busy', false);
 
         if (authorizedError.length > 0) {
-          return (self.$.officer as AuthorizedOfficerModalEl).open();
+          return (this.$.officer as AuthorizedOfficerModalEl).open();
         }
-        return (self.$.error as ErrorModalEl).open(res.data.non_field_errors);
+        return (this.$.error as ErrorModalEl).open(res.data.non_field_errors);
       });
   }
 

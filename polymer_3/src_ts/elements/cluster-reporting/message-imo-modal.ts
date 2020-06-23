@@ -141,8 +141,6 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _save() {
-    const self = this;
-
     if (!this._fieldsAreValid()) {
       return;
     }
@@ -152,13 +150,13 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
     (this.$.message as EtoolsPrpAjaxEl)
       .thunk()()
       .then(() => {
-        self.set('pending', false);
-        fireEvent(self, 'imo-message-sent');
-        self.close();
+        this.set('pending', false);
+        fireEvent(this, 'imo-message-sent');
+        this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('pending', false);
-        self.set('errors', err.data);
+        this.set('pending', false);
+        this.set('errors', err.data);
       });
   }
 }

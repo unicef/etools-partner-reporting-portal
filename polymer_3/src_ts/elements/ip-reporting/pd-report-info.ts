@@ -211,19 +211,16 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
   }
 
   _handleInput() {
-    const self = this;
     const textInputs = this.shadowRoot!.querySelectorAll('paper-input');
 
     textInputs.forEach((input: PaperInputElement) => {
       if (input.value && input.value.trim()) {
-        self.set(['localData', input.id], input.value.trim());
+        this.set(['localData', input.id], input.value.trim());
       }
     });
   }
 
   _updateData(change: GenericObject) {
-    const self = this;
-
     if (change.path.split('.').length < 2) {
       // Skip the initial assignment
       return;
@@ -232,13 +229,13 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     this.updateDebouncer = Debouncer.debounce(this.updateDebouncer, timeOut.after(250), () => {
       const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
-      (self.$.update as EtoolsPrpAjaxEl).abort();
+      (this.$.update as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
         // @ts-ignore
         .then(() => {
-          self._notifyChangesSaved();
+          this._notifyChangesSaved();
         })
         // @ts-ignore
         .catch(function (err) {

@@ -49,20 +49,11 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocations() {
-    const self = this;
     const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     thunk()
       .then((res: GenericObject) => {
-        self.set(
-          'options',
-          [
-            {
-              id: '',
-              title: 'All'
-            }
-          ].concat(res.data || [])
-        );
+        this.set('options', [{id: '', title: 'All'}].concat(res.data || []));
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

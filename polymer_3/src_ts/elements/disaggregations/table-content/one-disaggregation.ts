@@ -79,9 +79,8 @@ class OneDisaggregation extends DisaggregationMixin(UtilsMixin(PolymerElement)) 
   }
 
   _determineRows(columns: any[], data: GenericObject) {
-    const self = this;
-    return columns.map(function (z) {
-      const formatted = self._formatDisaggregationIds([z.id]);
+    return columns.map((z) => {
+      const formatted = this._formatDisaggregationIds([z.id]);
 
       return {
         title: z.value,

@@ -51,12 +51,12 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     if (!this.locationNamesUrl) {
       return;
     }
-    const self = this;
+
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
     (this.$.locationNames as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set(
+        this.set(
           'data',
           [
             {

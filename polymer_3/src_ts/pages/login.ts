@@ -252,7 +252,6 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
   }
 
   submit() {
-    const self = this;
     (this.shadowRoot!.querySelector('#email') as any).validate();
     if ((this.shadowRoot!.querySelector('#email') as any).invalid) {
       return;
@@ -260,12 +259,12 @@ class PageLogin extends LocalizeMixin(ResponsiveMixin(ReduxConnectedElement)) {
     const thunk = (this.$.login as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then(() => {
-        self.set('emailSubmitted', true);
-        self.set('data.email', '');
+        this.set('emailSubmitted', true);
+        this.set('data.email', '');
       })
       .catch(() => {
-        self.set('emailSubmitted', true);
-        self.set('data.email', '');
+        this.set('emailSubmitted', true);
+        this.set('data.email', '');
       });
   }
 }

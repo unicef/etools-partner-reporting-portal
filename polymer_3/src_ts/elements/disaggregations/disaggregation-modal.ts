@@ -91,20 +91,18 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
       });
     }
     if (tableElem) {
-      const self = this;
-
       this.set('updatePending', true);
 
       (tableElem as DisaggregationTableEl)
         .save()
         .then(() => {
-          self.set('updatePending', false);
-          self.close();
+          this.set('updatePending', false);
+          this.close();
         })
         // @ts-ignore
         .catch((_err: GenericObject) => {
-          // TODO: error handling
-          self.set('updatePending', false);
+          console.log(_err);
+          this.set('updatePending', false);
         });
     }
   }

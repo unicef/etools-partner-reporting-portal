@@ -168,18 +168,17 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _setFiles() {
-    const self = this;
     this.set('faceAttachment', []);
     this.set('otherOneAttachment', []);
     this.set('otherTwoAttachment', []);
 
     setFiles(this.attachments).forEach((attachment: GenericObject) => {
-      if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
-        self.set('otherTwoAttachment', [attachment]);
+      if (attachment.type === 'Other' && this.get('otherOneAttachment').length === 1) {
+        this.set('otherTwoAttachment', [attachment]);
       } else if (attachment.type === 'Other') {
-        self.set('otherOneAttachment', [attachment]);
+        this.set('otherOneAttachment', [attachment]);
       } else {
-        self.set('faceAttachment', [attachment]);
+        this.set('faceAttachment', [attachment]);
       }
     });
   }
@@ -189,8 +188,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _onDeleteFile(e: CustomEvent) {
-    const self = this;
-    const deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
+    const deleteUrl = this._getDeleteUrl(this.locationId, this.reportId, e.detail.file.id);
 
     this.set('attachmentDeleteUrl', deleteUrl);
 
@@ -206,24 +204,24 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         .dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
         // @ts-ignore
         .then(() => {
-          self._notifyFileDeleted();
-          self.set('attachmentDeleteUrl', undefined);
+          this._notifyFileDeleted();
+          this.set('attachmentDeleteUrl', undefined);
 
-          if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-            (self.$.faceAttachmentComponent as any).fileInput.value = null;
-            (self.$.faceAttachmentComponent as any).set('files', []);
+          if (this.get('faceAttachment').length !== 0 && e.detail.file.id === this.get('faceAttachment')[0].id) {
+            (this.$.faceAttachmentComponent as any).fileInput.value = null;
+            (this.$.faceAttachmentComponent as any).set('files', []);
           } else if (
-            self.get('otherOneAttachment').length !== 0 &&
-            e.detail.file.id === self.get('otherOneAttachment')[0].id
+            this.get('otherOneAttachment').length !== 0 &&
+            e.detail.file.id === this.get('otherOneAttachment')[0].id
           ) {
-            (self.$.otherOneAttachmentComponent as any).fileInput.value = null;
-            (self.$.otherOneAttachmentComponent as any).set('files', []);
+            (this.$.otherOneAttachmentComponent as any).fileInput.value = null;
+            (this.$.otherOneAttachmentComponent as any).set('files', []);
           } else if (
-            self.get('otherTwoAttachment').length !== 0 &&
-            e.detail.file.id === self.get('otherTwoAttachment')[0].id
+            this.get('otherTwoAttachment').length !== 0 &&
+            e.detail.file.id === this.get('otherTwoAttachment')[0].id
           ) {
-            (self.$.otherTwoAttachmentComponent as any).fileInput.value = null;
-            (self.$.otherTwoAttachmentComponent as any).set('files', []);
+            (this.$.otherTwoAttachmentComponent as any).fileInput.value = null;
+            (this.$.otherTwoAttachmentComponent as any).set('files', []);
           }
         })
         // @ts-ignore
@@ -237,7 +235,6 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     let attachmentPropertyName = change.path.replace('.length', '');
     const isEmpty = change.value === 0 ? true : false;
     const attachment = isEmpty ? undefined : change.base[0];
-    const self = this;
 
     if (attachment === undefined) {
       return;
@@ -284,7 +281,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           this.set('otherTwoLoading', true);
         }
       } else {
-        const replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
+        const replaceUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
         this.set('attachmentDeleteUrl', replaceUrl);
 
         thunk = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl).thunk();
@@ -299,17 +296,17 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         .dispatch(pdReportsAttachmentsSync(thunk, this.reportId))
         // @ts-ignore
         .then(() => {
-          self._notifyFileUploaded();
+          this._notifyFileUploaded();
 
-          self.set('faceLoading', false);
-          self.set('otherOneLoading', false);
-          self.set('otherTwoLoading', false);
+          this.set('faceLoading', false);
+          this.set('otherOneLoading', false);
+          this.set('otherTwoLoading', false);
 
-          const attachments = self.get('attachments');
+          const attachments = this.get('attachments');
 
           attachments.forEach((item: GenericObject) => {
             if (attachment.id !== null && item.id === attachment.id) {
-              self.set(attachmentPropertyName, [item]);
+              this.set(attachmentPropertyName, [item]);
               return;
             }
           });
@@ -325,7 +322,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
             });
 
             if (duplicates.length === 1) {
-              self.set(attachmentPropertyName, [duplicates[0]]);
+              this.set(attachmentPropertyName, [duplicates[0]]);
             } else {
               let correctedItem;
 
@@ -336,11 +333,11 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
                 }
               });
 
-              self.set(attachmentPropertyName, [correctedItem]);
+              this.set(attachmentPropertyName, [correctedItem]);
             }
           }
 
-          self.set('attachmentDeleteUrl', undefined);
+          this.set('attachmentDeleteUrl', undefined);
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling

@@ -300,15 +300,12 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   }
 
   _save() {
-    const self = this;
-
     this._confirmIntent()
-      .then(function () {
-        const updateThunk = (self.$.update as EtoolsPrpAjaxEl).thunk();
-
-        return self.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, self.pdId));
+      .then(() => {
+        const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
+        return this.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, this.pdId));
       })
-      .then(self._notifyChangesSaved.bind(self))
+      .then(this._notifyChangesSaved.bind(this))
       .catch((_err: any) => {
         console.log(_err);
       });

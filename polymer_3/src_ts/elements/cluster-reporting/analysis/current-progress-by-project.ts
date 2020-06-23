@@ -94,10 +94,9 @@ class CurrentProgressByProject extends UtilsMixin(LocalizeMixin(AnalysisChartMix
   }
 
   _computeRows(data: GenericObject) {
-    const self = this;
-    return Object.keys(data || {}).map(function (key) {
-      return [key, data[key], self._buildTooltip(key, data[key])];
-    }, self);
+    return Object.keys(data || {}).map((key) => {
+      return [key, data[key], this._buildTooltip(key, data[key])];
+    }, this);
   }
 
   _buildTooltip(title: string, data: GenericObject) {

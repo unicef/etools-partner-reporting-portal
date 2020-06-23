@@ -142,15 +142,14 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
   _bindValidation(coords: string) {
     const vName = 'v-' + coords;
-    const self = this;
     const validator = {
       validatorName: vName,
       validatorType: 'validator',
-      validate: function (value: string) {
+      validate: (value: string) => {
         return (
           Number(value) !== 0 ||
           Number(
-            ((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value
+            ((this!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value
           ) === 0
         );
       }

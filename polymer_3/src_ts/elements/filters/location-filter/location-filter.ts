@@ -46,8 +46,6 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocations(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
@@ -56,7 +54,7 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.locations as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        self.set(
+        this.set(
           'data',
           [
             {
@@ -66,9 +64,8 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           ].concat(res.data || [])
         );
       })
-      // @ts-ignore
-      .catch((_err: GenericObject) => {
-        // TODO: error handling
+      .catch((err: GenericObject) => {
+        console.log(err);
       });
   }
 

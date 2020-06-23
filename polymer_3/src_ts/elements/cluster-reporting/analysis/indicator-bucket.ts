@@ -189,7 +189,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Object})
   data!: GenericObject;
 
-  @property({type: String, computed: '_computePrefix(data, localize)'})
+  @property({type: String, computed: '_computePrefix(data)'})
   prefix!: string;
 
   _computeIcon(opened: string) {
@@ -220,13 +220,13 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
     return data.type === 'partneractivityprojectcontext' ? data.activity_name : data.title;
   }
 
-  _computePrefix(data: GenericObject, localize: Function) {
+  _computePrefix(data: GenericObject) {
     const localizations: GenericObject = {
-      partneractivity: localize('partner_activity'),
-      partnerproject: localize('partner_project'),
-      clusterobjective: localize('cluster_objective'),
-      clusteractivity: localize('cluster_activity'),
-      partneractivityprojectcontext: localize('partner_activity_project_context')
+      partneractivity: this.localize('partner_activity'),
+      partnerproject: this.localize('partner_project'),
+      clusterobjective: this.localize('cluster_objective'),
+      clusteractivity: this.localize('cluster_activity'),
+      partneractivityprojectcontext: this.localize('partner_activity_project_context')
     };
 
     return localizations[data.type] ? localizations[data.type] + ':' : '';

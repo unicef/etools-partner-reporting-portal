@@ -1115,12 +1115,10 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _fetchDisaggregations() {
-    const self = this;
-
     (this.$.disaggregations as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        self.set('disaggregations', res.data.results);
+        this.set('disaggregations', res.data.results);
       });
   }
 
@@ -1135,7 +1133,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _fetchActivities(clusterId: string) {
-    const self = this;
     if (typeof clusterId === 'undefined' || typeof this.responsePlanId === 'undefined') {
       return;
     }
@@ -1150,7 +1147,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     (this.$.activities as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        self.set('activities', res.data.results);
+        this.set('activities', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -1165,8 +1162,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('indicatorsListParams', {object_id: selectedId, page_size: 9999, page: 1});
 
     this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer, timeOut.after(250), () => {
-      const self = this;
-
       this.set('indicators', []);
 
       (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
@@ -1182,8 +1177,8 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             simpleIndicatorsList.push(simpleIndicator);
           });
 
-          self.set('indicators', simpleIndicatorsList);
-          fireEvent(self, 'details-loaded');
+          this.set('indicators', simpleIndicatorsList);
+          fireEvent(this, 'details-loaded');
         });
     });
   }
@@ -1199,8 +1194,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     }
 
     this._fetchObjectivesDebouncer = Debouncer.debounce(this._fetchObjectivesDebouncer, timeOut.after(250), () => {
-      const self = this;
-
       this.set('objectives', []);
       this.set('objectivesParams.cluster_id', selectedClusterId);
 
@@ -1208,8 +1201,8 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       (this.$.objectives as EtoolsPrpAjaxEl)
         .thunk()()
         .then((res: GenericObject) => {
-          self.set('objectives', res.data.results);
-          fireEvent(self, 'details-loaded');
+          this.set('objectives', res.data.results);
+          fireEvent(this, 'details-loaded');
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
@@ -1225,8 +1218,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     this.set('indicatorsListParams', {object_id: selectedObjectiveId});
 
     this._fetchIndDebouncer = Debouncer.debounce(this._fetchIndDebouncer, timeOut.after(250), () => {
-      const self = this;
-
       this.set('indicators', []);
 
       (this.$.indicatorsList as EtoolsPrpAjaxEl).abort();
@@ -1243,8 +1234,8 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
             simpleIndicatorsList.push(simpleIndicator);
           });
 
-          self.set('indicators', simpleIndicatorsList);
-          fireEvent(self, 'details-loaded');
+          this.set('indicators', simpleIndicatorsList);
+          fireEvent(this, 'details-loaded');
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
@@ -1258,8 +1249,6 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     }
 
     this._fetchSelectedIndDebouncer = Debouncer.debounce(this._fetchSelectedIndDebouncer, timeOut.after(250), () => {
-      const self = this;
-
       if (this.mode === 'objectives') {
         this.set('data.reportable_id', selectedIndicator);
       }
@@ -1281,7 +1270,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
       (this.$.indicatorDetail as EtoolsPrpAjaxEl)
         .thunk()()
         .then((res: GenericObject) => {
-          self.set('selectedIndicatorDetailType', res.data.display_type);
+          this.set('selectedIndicatorDetailType', res.data.display_type);
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
@@ -1538,13 +1527,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
   }
 
   _save() {
-    const self = this;
     const dataCopy = this._clone(this.data);
 
     let noLocationSet = false;
     const rawLocations = this.get('data.locations') || [];
 
-    const changedLocations = rawLocations.map(function (location: GenericObject) {
+    const changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location && location.location.id) {
         const id = location.location.id;
         const title = location.location.title;
@@ -1552,7 +1540,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         location.title = title;
         return location;
       } else if (location.loc_type && !location.location) {
-        self.set('errors', 'No location set - please set a location.');
+        this.set('errors', 'No location set - please set a location.');
         noLocationSet = true;
         return location;
       } else {
@@ -1582,29 +1570,29 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     (this.$.indicators as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        fireEvent(self, 'indicator-added', res.data);
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self.set('data', {});
-        self.set('clusters', []);
-        self.set('selectedCluster', '');
-        self.set('objectives', []);
-        self.set('selectedObjective', '');
-        self.set('activities', []);
-        self.set('selectedActivity', '');
-        self.set('indicators', []);
-        self.set('selectedIndicator', '');
-        self.set('selectedIndicatorDetailType', undefined);
+        fireEvent(this, 'indicator-added', res.data);
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this.set('data', {});
+        this.set('clusters', []);
+        this.set('selectedCluster', '');
+        this.set('objectives', []);
+        this.set('selectedObjective', '');
+        this.set('activities', []);
+        this.set('selectedActivity', '');
+        this.set('indicators', []);
+        this.set('selectedIndicator', '');
+        this.set('selectedIndicatorDetailType', undefined);
 
         if (this.modalTitle === 'Add Project Indicator') {
-          self.set('mode', '');
+          this.set('mode', '');
         }
-        self.close();
+        this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('errors', err.data);
-        self.set('data.locations', dataCopy.locations);
-        self.set('updatePending', false);
+        this.set('errors', err.data);
+        this.set('data.locations', dataCopy.locations);
+        this.set('updatePending', false);
       })
       .finally();
   }

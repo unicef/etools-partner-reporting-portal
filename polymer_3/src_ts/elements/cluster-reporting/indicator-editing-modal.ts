@@ -256,7 +256,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
                 <etools-dropdown
                   class="item validate pair"
                   label="[[localize('frequency_of_reporting')]]"
-                  options="[[_computeLocalizedFrequencies(frequencies, localize)]]"
+                  options="[[_computeLocalizedFrequencies(frequencies)]]"
                   option-value="id"
                   option-label="title"
                   selected="{{data.frequency}}"
@@ -426,7 +426,7 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
   responsePlanId!: string;
 
-  @property({type: String, computed: '_computeIndicatorType(data, localize)'})
+  @property({type: String, computed: '_computeIndicatorType(data)'})
   indicatorType!: string;
 
   @property({type: String, computed: '_computeLocationsUrl(responsePlanId)'})
@@ -483,29 +483,27 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     return ['_setDefaults(opened)', '_updateCSDates(data.start_date_of_reporting_period)'];
   }
 
-  _computeLocalizedFrequencies(frequencies: GenericObject[], localize: Function) {
-    const self = this;
-
-    return frequencies.map(function (frequency) {
-      frequency.title = self._localizeLowerCased(frequency.title, localize);
+  _computeLocalizedFrequencies(frequencies: GenericObject[]) {
+    return frequencies.map((frequency) => {
+      frequency.title = this._localizeLowerCased(frequency.title, this.localize);
       return frequency;
     });
   }
 
-  _computeIndicatorType(data: GenericObject, localize: Function) {
+  _computeIndicatorType(data: GenericObject) {
     if (!data) {
       return;
     }
 
     switch (data.blueprint.display_type) {
       case 'number':
-        return localize('quantity');
+        return this.localize('quantity');
 
       case 'percentage':
-        return localize('percent');
+        return this.localize('percent');
 
       case 'ratio':
-        return localize('ratio');
+        return this.localize('ratio');
     }
   }
 
@@ -576,11 +574,9 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _fetchLocations() {
-    const self = this;
-
     const locThunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     locThunk().then((res: GenericObject) => {
-      self.set('locations', res.data);
+      this.set('locations', res.data);
     });
   }
 
@@ -602,18 +598,16 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
   }
 
   _save() {
-    const self = this;
-
     let noLocationSet = false;
     const rawLocations = this.get('data.locations') || [];
 
-    const changedLocations = rawLocations.map(function (location: GenericObject) {
+    const changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location && location.location.id) {
         const id = location.location.id;
         location.location = id;
         return location;
       } else if (location.loc_type && !location.location) {
-        self.set('errors', 'No location set - please set a location.');
+        this.set('errors', 'No location set - please set a location.');
         noLocationSet = true;
         return location;
       } else {
@@ -642,15 +636,15 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
     const editIndThunk = (this.$.editIndicator as EtoolsPrpAjaxEl).thunk();
     editIndThunk()
       .then((res: GenericObject) => {
-        fireEvent(self, 'indicator-edited', res.data);
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self.close();
+        fireEvent(this, 'indicator-edited', res.data);
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('errors', err.data);
-        self.set('data.locations', rawLocations);
-        self.set('updatePending', false);
+        this.set('errors', err.data);
+        this.set('data.locations', rawLocations);
+        this.set('updatePending', false);
       });
   }
 }

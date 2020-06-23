@@ -207,7 +207,6 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   validate() {
-    const self = this;
     this.set('invalid', false);
     const allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
     allMenus.forEach((menu: any) => {
@@ -216,7 +215,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     allMenus.forEach((menu: any) => {
       if (!menu.selected) {
         menu.set('invalid', true);
-        self.set('invalid', true);
+        this.set('invalid', true);
       }
     });
     if (allMenus.length < 2) {
@@ -231,7 +230,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
         if (chosen[i] === chosen[j]) {
           (allMenus[i] as PolymerElement).set('invalid', true);
           (allMenus[j] as PolymerElement).set('invalid', true);
-          self.set('invalid', true);
+          this.set('invalid', true);
         }
       }
     }

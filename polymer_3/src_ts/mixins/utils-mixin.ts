@@ -29,7 +29,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
 
           case 'object':
             return buildQuery(
-              Object.keys(chunk).map(function (key) {
+              Object.keys(chunk).map((key) => {
                 return [encodeURIComponent(key), encodeURIComponent(chunk[key])].join('=');
               })
             );
@@ -55,20 +55,20 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return text;
     }
 
-    _localizeLowerCased(text: string, localize: any) {
+    _localizeLowerCased(text: string, localize: (x: string) => string) {
       return text ? localize(text.split(' ').join('_').toLowerCase()) : '';
     }
 
-    _singularLocalized(text: string, localize: any) {
+    _singularLocalized(text: string, localize: (x: string) => string) {
       return localize(text).substring(0, text.length - 1);
     }
 
-    _withDefault(value: any, defaultValue?: any, localize?: any) {
+    _withDefault(value: any, defaultValue?: any, localize?: (x: string) => string) {
       if (typeof defaultValue === 'undefined') {
         defaultValue = '...';
       }
 
-      if (pdListStatuses[value] !== undefined) {
+      if (pdListStatuses[value] !== undefined && localize) {
         return localize(pdListStatuses[value]);
       }
 
@@ -97,7 +97,7 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       return Number(val);
     }
 
-    _capitalizeFirstLetter(text: string, localize?: Function) {
+    _capitalizeFirstLetter(text: string, localize?: (x: string) => string) {
       if (localize !== undefined) {
         return localize(text);
       }
@@ -276,10 +276,12 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       const newNode = node.cloneNode(true);
 
       for (const prop in node.properties) {
-        try {
-          newNode[prop] = node[prop];
-          // eslint-disable-next-line no-empty
-        } catch (err) {}
+        if (Object.prototype.hasOwnProperty.call(node, prop)) {
+          try {
+            newNode[prop] = node[prop];
+            // eslint-disable-next-line no-empty
+          } catch (err) {}
+        }
       }
 
       return newNode;

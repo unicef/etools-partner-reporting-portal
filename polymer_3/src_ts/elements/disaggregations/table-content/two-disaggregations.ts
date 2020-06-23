@@ -85,9 +85,8 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
   }
 
   _determineTotals(columns: any[], data: GenericObject) {
-    const self = this;
-    const columnData = columns.map(function (z) {
-      const formatted = self._formatDisaggregationIds([z.id]);
+    const columnData = columns.map((z) => {
+      const formatted = this._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,

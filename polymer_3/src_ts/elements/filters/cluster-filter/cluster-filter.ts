@@ -77,21 +77,13 @@ class ClusterFilter extends LocalizeMixin(FilterDependenciesMixin(UtilsMixin(Red
     if (!this.clusterNamesUrl || !this.params) {
       return;
     }
-    const self = this;
+
     this.clusterNamesDebouncer = Debouncer.debounce(this.clusterNamesDebouncer, timeOut.after(250), () => {
-      (self.$.clusterNames as EtoolsPrpAjaxEl).abort();
+      (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
       (this.$.clusterNames as EtoolsPrpAjaxEl)
         .thunk()()
         .then((res: any) => {
-          self.set(
-            'data',
-            [
-              {
-                id: '',
-                title: 'All'
-              }
-            ].concat(res.data || [])
-          );
+          this.set('data', [{id: '', title: 'All'}].concat(res.data || []));
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling

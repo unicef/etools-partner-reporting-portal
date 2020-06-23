@@ -142,15 +142,14 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
     this._activityAjaxDebouncer = Debouncer.debounce(this._activityAjaxDebouncer, timeOut.after(100), () => {
       const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-      const self = this;
 
       thunk()
         .then((res: any) => {
-          self.updatePending = false;
-          self.activityData = res.data;
+          this.updatePending = false;
+          this.activityData = res.data;
         })
         .catch((_err: GenericObject) => {
-          self.updatePending = false;
+          this.updatePending = false;
           // TODO: error handling
         });
     });

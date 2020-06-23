@@ -160,7 +160,6 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
     if (!this._fieldsAreValid()) {
       return;
     }
-    const self = this;
     this.set('pending', true);
 
     (this.$.sendBack as EtoolsPrpAjaxEl).abort();
@@ -168,12 +167,12 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
     (this.$.sendBack as EtoolsPrpAjaxEl)
       .thunk()()
       .then(() => {
-        self.set('pending', false);
-        self.close();
-        fireEvent(self, 'report-reviewed');
+        this.set('pending', false);
+        this.close();
+        fireEvent(this, 'report-reviewed');
       })
       .catch(() => {
-        self.set('pending', false);
+        this.set('pending', false);
       });
   }
 }

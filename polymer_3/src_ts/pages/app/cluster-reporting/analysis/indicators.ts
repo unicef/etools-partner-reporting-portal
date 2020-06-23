@@ -63,13 +63,12 @@ class PageAnalysisIndicators extends UtilsMixin(ReduxConnectedElement) {
       return;
     }
 
-    const self = this;
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer, timeOut.after(300), () => {
       const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
 
-      (self.$.data as EtoolsPrpAjaxEl).abort();
+      (this.$.data as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(analysis_indicators_fetchData(dataThunk))
         // @ts-ignore
         .catch((_err: any) => {

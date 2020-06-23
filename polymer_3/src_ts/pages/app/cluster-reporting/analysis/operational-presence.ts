@@ -200,13 +200,13 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
     if (!this.dataUrl) {
       return;
     }
-    const self = this;
+
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer, timeOut.after(300), () => {
       const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
 
-      (self.$.data as EtoolsPrpAjaxEl).abort();
+      (this.$.data as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(analysis_operationalPresence_fetchData(dataThunk))
         // @ts-ignore
         .catch((_err: any) => {
@@ -220,13 +220,12 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
       return;
     }
 
-    const self = this;
     this.fetchMapDebouncer = Debouncer.debounce(this.fetchMapDebouncer, timeOut.after(300), () => {
       const mapThunk = (this.$.map as EtoolsPrpAjaxEl).thunk();
 
-      (self.$.map as EtoolsPrpAjaxEl).abort();
+      (this.$.map as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(analysis_operationalPresence_fetchMap(mapThunk))
         // @ts-ignore
         .catch((_err: any) => {

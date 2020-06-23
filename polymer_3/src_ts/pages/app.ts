@@ -175,24 +175,23 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeAppChanged(app: string) {
-    const self = this;
     setTimeout(() => {
       let defaultApp = localStorage.getItem('defaultApp');
       defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
 
-      if (!self.routeData.workspace_code) {
+      if (!this.routeData.workspace_code) {
         return;
       }
       if (!app) {
-        self._redirectToApp(defaultApp!);
-      } else if (!self._app) {
+        this._redirectToApp(defaultApp!);
+      } else if (!this._app) {
         this.reduxStore.dispatch(setApp(app));
 
         // Store selected app
         localStorage.setItem('defaultApp', app);
 
         // Render
-        self.page = app;
+        this.page = app;
       } else {
         localStorage.setItem('defaultApp', app);
       }

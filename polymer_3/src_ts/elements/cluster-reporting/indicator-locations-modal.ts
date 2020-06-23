@@ -264,8 +264,6 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
   }
 
   _save() {
-    const self = this;
-
     if (!this._fieldsAreValid()) {
       return;
     }
@@ -275,13 +273,13 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
     updateThunk()
       .then(() => {
-        self.set('pending', false);
-        self.set('editData.locations', self.get('data.locations'));
-        self.close();
+        this.set('pending', false);
+        this.set('editData.locations', this.get('data.locations'));
+        this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('pending', false);
-        self.set('errors', err.data);
+        this.set('pending', false);
+        this.set('errors', err.data);
       });
   }
 

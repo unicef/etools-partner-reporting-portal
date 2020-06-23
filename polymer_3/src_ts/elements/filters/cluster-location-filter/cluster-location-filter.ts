@@ -61,13 +61,13 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     if (!this.locationNamesUrl) {
       return;
     }
-    const self = this;
+
     const thunk = (this.$.locationNames as EtoolsPrpAjaxEl).thunk();
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then((res: any) => {
-        self.set(
+        this.set(
           'data',
           [
             {

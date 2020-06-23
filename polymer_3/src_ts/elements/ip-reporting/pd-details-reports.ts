@@ -101,14 +101,13 @@ class PdDetailsReport extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
       const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
 
       // Cancel the pending request, if any
       (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-      self.reduxStore
+      this.reduxStore
         .dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
         // @ts-ignore
         .catch(function (err) {

@@ -196,7 +196,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     }
   }
 
-  _computePageTitle(mode: string, localize: Function) {
+  _computePageTitle(mode: string, localize: (x: string) => string) {
     if (!mode) {
       return undefined;
     }
@@ -221,11 +221,10 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     if (!this.dataUrl || !this.queryParams || Object.keys(this.queryParams).length === 0) {
       return;
     }
-    const self = this;
     this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer, timeOut.after(300), () => {
-      const dataThunk = (self.$.data as EtoolsPrpAjaxEl).thunk();
+      const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
       (this.$.data as EtoolsPrpAjaxEl).abort();
-      self.reduxStore.dispatch(clusterDashboardDataFetch(dataThunk));
+      this.reduxStore.dispatch(clusterDashboardDataFetch(dataThunk));
     });
   }
 

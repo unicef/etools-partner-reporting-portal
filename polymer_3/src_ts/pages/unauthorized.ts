@@ -111,34 +111,32 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   checkAccessRights() {
-    const self = this;
-    (self.$.userProfile as EtoolsPrpAjaxEl)
+    (this.$.userProfile as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
         if (res.data && res.data.access && res.data.access.length) {
-          self.checkWorkspaceExistence();
+          this.checkWorkspaceExistence();
         } else {
-          self.showMessage(true);
+          this.showMessage(true);
         }
       })
       .catch(() => {
-        self.showMessage(true);
+        this.showMessage(true);
       });
   }
 
   checkWorkspaceExistence() {
-    const self = this;
     (this.$.workspaces as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
         if (res.data && res.data.length) {
           window.location.href = `/${BASE_PATH}/`;
         } else {
-          self.showMessage(false);
+          this.showMessage(false);
         }
       })
       .catch(() => {
-        self.showMessage(false);
+        this.showMessage(false);
       });
   }
 

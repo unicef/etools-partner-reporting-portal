@@ -390,7 +390,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _fetchPartnerActivities(clusterId: string) {
-    const self = this;
     const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -405,12 +404,12 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
       .then((res: any) => {
         const filteredActivities = res.data.results.filter((item: any) => {
           return (
-            item.projects.find(function (element: any) {
-              return element.project_id === parseInt(self.projectData.id);
+            item.projects.find((element: any) => {
+              return element.project_id === parseInt(this.projectData.id);
             }) === undefined
           );
         });
-        self.set('partnerActivities', filteredActivities);
+        this.set('partnerActivities', filteredActivities);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -418,7 +417,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _fetchObjectives(clusterId: string) {
-    const self = this;
     const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
     if (typeof clusterId === 'undefined') {
       return;
@@ -432,7 +430,7 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
 
     thunk()
       .then((res: any) => {
-        self.set('objectives', res.data.results);
+        this.set('objectives', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -440,7 +438,6 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
   }
 
   _save() {
-    const self = this;
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
     const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
@@ -451,8 +448,8 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     this.set('updatePending', true);
 
     const clonedData = this._clone(this.data); // make copy of data
-    const selectedPartnerActivity: GenericObject | undefined = this.partnerActivities.find(function (item: any) {
-      return item.id === self.data.partner_activity;
+    const selectedPartnerActivity: GenericObject | undefined = this.partnerActivities.find((item: any) => {
+      return item.id === this.data.partner_activity;
     });
     if (selectedPartnerActivity && selectedPartnerActivity.projects) {
       // assign combined projects to cloned data instead of data directly to fix visual glitch
@@ -460,24 +457,19 @@ class AddExistingActivityFromProjectModal extends UtilsMixin(ModalMixin(Localize
     }
 
     // save cloned data and not regular data, since cloned data has the combined projects
-    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign(
-      {
-        partner: this.partner
-      },
-      clonedData
-    );
+    (this.$.activity as EtoolsPrpAjaxEl).body = Object.assign({partner: this.partner}, clonedData);
 
     thunk()
       .then(() => {
-        self.set('updatePending', false);
-        self.set('errors', {});
-        self._close('saved');
+        this.set('updatePending', false);
+        this.set('errors', {});
+        this._close('saved');
         waitForIronOverlayToClose(300).then(() => window.location.reload());
       })
       .catch((err: GenericObject) => {
-        self.set('errors', err.data);
-        self.set('updatePending', false);
-        fireEvent(self, 'project-details-selection-refit');
+        this.set('errors', err.data);
+        this.set('updatePending', false);
+        fireEvent(this, 'project-details-selection-refit');
       });
   }
 

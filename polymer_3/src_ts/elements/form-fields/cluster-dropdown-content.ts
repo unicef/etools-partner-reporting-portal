@@ -65,13 +65,11 @@ class ClusterDropdownContent extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
-
     (this.$.clusterNames as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: GenericObject) => {
-        self.set('clusters', res.data);
+        this.set('clusters', res.data);
       })
       .catch((_err: any) => {
         // TODO: error handling

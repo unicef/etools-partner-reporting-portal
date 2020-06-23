@@ -74,14 +74,12 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
 
   _fetchActivities() {
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const self = this;
-
       // activities.abort();
       (this.$.activities as EtoolsPrpAjaxEl).abort();
       (this.$.activities as EtoolsPrpAjaxEl)
         .thunk()()
-        .then(function (res: any) {
-          self.set(
+        .then((res: any) => {
+          this.set(
             'data',
             [
               {

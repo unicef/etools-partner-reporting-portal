@@ -621,20 +621,19 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _commit() {
     const submitThunk = (this.$.submit as EtoolsPrpAjaxEl).thunk();
-    const self = this;
 
     return (
       this.reduxStore
         .dispatch(clusterIndicatorReportsSubmit(submitThunk))
         // @ts-ignore
-        .then(function () {
-          self.set('busy', false);
-          fireEvent(self, 'report-submitted', self.data.id);
+        .then(() => {
+          this.set('busy', false);
+          fireEvent(this, 'report-submitted', this.data.id);
         })
         .catch((res: any) => {
           const errors = res.data.non_field_errors;
 
-          return (self.$.error as ErrorModalEl).open(errors).then(() => {
+          return (this.$.error as ErrorModalEl).open(errors).then(() => {
             return Promise.reject(); // Revert
           });
         })
@@ -655,7 +654,6 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   }
 
   _updateMeta(e: CustomEvent) {
-    const self = this;
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
     e.stopPropagation();
@@ -669,7 +667,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       .then(() => {
         // update `data` property with changes from `reportable-meta`
         this.set('data', {...this.data, ...reportMetaData});
-        self._notifyChangesSaved();
+        this._notifyChangesSaved();
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

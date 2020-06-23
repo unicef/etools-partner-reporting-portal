@@ -547,12 +547,11 @@ class IndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) 
       if (this.initialized) {
         return;
       }
-      const self = this;
       this.set('initialized', true);
       this._fetchData()
         // @ts-ignore
         .then(() => {
-          self.set('dataLoaded', true);
+          this.set('dataLoaded', true);
         })
         // @ts-ignore
         .catch((_err) => {

@@ -75,22 +75,13 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
       return;
     }
 
-    const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), function () {
-      const thunk = (self.$.projectNames as EtoolsPrpAjaxEl).thunk();
-      (self.$.projectNames as EtoolsPrpAjaxEl).abort();
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const thunk = (this.$.projectNames as EtoolsPrpAjaxEl).thunk();
+      (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
       thunk()
-        .then(function (res: any) {
-          self.set(
-            'data',
-            [
-              {
-                id: '',
-                title: 'All'
-              }
-            ].concat(res.data || [])
-          );
+        .then((res: any) => {
+          this.set('data', [{id: '', title: 'All'}].concat(res.data || []));
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling

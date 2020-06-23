@@ -469,8 +469,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this.set('searchLocationType', loc_type);
 
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
-      const self = this;
-
       this._setPending(loc_type, true, index);
 
       if (title !== undefined) {
@@ -481,12 +479,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
       thunk()
         .then((res: GenericObject) => {
-          self.set('url', res.xhr.responseURL);
-          self._setPending(loc_type, false, index);
-          self._setLocations(loc_type, res.data.results, index);
+          this.set('url', res.xhr.responseURL);
+          this._setPending(loc_type, false, index);
+          this._setLocations(loc_type, res.data.results, index);
         })
-        .catch(function () {
-          self._setPending(loc_type, false, index);
+        .catch(() => {
+          this._setPending(loc_type, false, index);
         });
     });
   }

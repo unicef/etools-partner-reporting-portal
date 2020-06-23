@@ -130,15 +130,14 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this._projectAjaxDebouncer = Debouncer.debounce(this._projectAjaxDebouncer, timeOut.after(100), () => {
       const thunk = (this.$.project as EtoolsPrpAjaxEl).thunk();
-      const self = this;
 
       thunk()
         .then((res: GenericObject) => {
-          self.updatePending = false;
-          self.projectData = res.data;
+          this.updatePending = false;
+          this.projectData = res.data;
         })
         .catch((_err: GenericObject) => {
-          self.updatePending = false;
+          this.updatePending = false;
           // TODO: error handling
         });
     });

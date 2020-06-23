@@ -153,14 +153,13 @@ class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnected
   }
 
   _onSignOut() {
-    const self = this;
     const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
     this.reduxStore
       .dispatch(userLogout(thunk))
       // @ts-ignore
       .then(() => {
-        self._goToLanding();
-        self.reduxStore.dispatch(reset());
+        this._goToLanding();
+        this.reduxStore.dispatch(reset());
       })
       .catch((_err: any) => {
         // TODO: error handling

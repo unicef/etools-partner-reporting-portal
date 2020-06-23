@@ -53,13 +53,13 @@ class ClusterFilterMulti extends LocalizeMixin(ReduxConnectedElement) {
     if (!this.clustersUrl) {
       return;
     }
-    const self = this;
+
     const thunk = (this.$.clusters as EtoolsPrpAjaxEl).thunk();
     (this.$.clusters as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then((res: any) => {
-        self.set('data', res.data);
+        this.set('data', res.data);
       })
       .catch((_err: any) => {
         // TODO: error handling

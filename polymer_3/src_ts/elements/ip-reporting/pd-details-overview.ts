@@ -25,7 +25,6 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import Settings from '../../settings';
-declare const moment: any;
 import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 import {RootState} from '../../typings/redux.types';
@@ -345,7 +344,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   }
 
   _computeReportingRequirements(reportingPeriods: any) {
-    return computeReportingRequirements(reportingPeriods, moment, Settings.dateFormat);
+    return computeReportingRequirements(reportingPeriods, Settings.dateFormat);
   }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
@@ -353,15 +352,13 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   }
 
   _displayFullName(types: any[]) {
-    const self = this;
-
     if (!types) {
       return '';
     }
 
     return types
-      .map(function (type: string) {
-        return self.amendmentTypes[type] ? self.amendmentTypes[type] : type;
+      .map((type: string) => {
+        return this.amendmentTypes[type] ? this.amendmentTypes[type] : type;
       })
       .join(', ');
   }
@@ -371,7 +368,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     // preventing pd-details title from rendering. In that case (which we
     // check by seeing if this.pdReportsCount is present), just get the reports again
     if (this.pdReportsCount[this.pdId] === undefined) {
-      const self = this;
       this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
         const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
         pdThunk.params = {
@@ -383,7 +379,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         // Cancel the pending request, if any
         (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore
+        this.reduxStore
           .dispatch(pdFetch(pdThunk.thunk()))
           // @ts-ignore
           .catch((_err: GenericObject) => {
