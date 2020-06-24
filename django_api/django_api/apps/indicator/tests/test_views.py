@@ -2137,6 +2137,48 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             self.assertEquals(ild.disaggregation['()']['d'], 0)
             self.assertEquals(ild.disaggregation['()']['v'], 0)
 
+    def test_refresh_future_reports(self):
+        report = self.partneractivity_reportable.indicator_reports.first()
+        progress_report = factories.ProgressReportIndicatorReportFactory(
+            progress_report=report.progress_report,
+            reportable=self.llo_reportable,
+            due_date=report.due_date + datetime.timedelta(days=1),
+        )
+        self.assertTrue(IndicatorReport.objects.exclude(
+                pk=report.pk,
+            ).filter(
+                progress_report=report.progress_report,
+                due_date__gt=report.due_date,
+            ).exists()
+        )
+
+        # test with no data
+        response = self.client.post(
+            reverse('report-refresh-api'),
+            data={
+                "report_type": "IR",
+                "report_id": report.pk,
+            },
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # test with data
+        factories.IndicatorLocationDataFactory(
+            indicator_report=progress_report,
+            disaggregation={"()": {"c": 10, "d": 10, "v": 10}},
+            location=self.loc1,
+        )
+        response = self.client.post(
+            reverse('report-refresh-api'),
+            data={
+                "report_type": "IR",
+                "report_id": report.pk,
+            },
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
 
