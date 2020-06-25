@@ -706,7 +706,7 @@ class TestPartnerActivityCreateAPIView(TestPartnerActivityBaseAPIView):
 class TestPartnerActivityUpdateAPIView(TestPartnerActivityBaseAPIView):
     def setUp(self):
         super().setUp()
-        self.partner_activity = ClusterActivityPartnerActivityFactory(
+        self.partner_activity = factories.ClusterActivityPartnerActivityFactory(
             title="Factory Title",
             partner=self.partner,
             cluster_activity=self.activity,
