@@ -1,7 +1,9 @@
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-
 from partner.models import Partner
 from partner.serializers import PMPPartnerSerializer
+from unicef.models import ProgrammeDocument
+from unicef.serializers import PMPProgrammeDocumentSerializer
 from unicef.tasks import process_model
 
 
@@ -41,3 +43,50 @@ class TestProcessModel(BaseAPITestCase):
             filter_dict=filter_dict,
         )
         self.assertTrue(partner_qs.exists())
+
+    def test_programme_document(self):
+        country = factories.CountryFactory()
+        workspace = factories.WorkspaceFactory(countries=[country, ])
+        partner = factories.PartnerFactory()
+        data = {
+            "id": 101,
+            'status': 'Act',
+            'agreement': 'BGD/PCA20182',
+            'title': 'Executive Director',
+            'offices': "Cox's Bazar",
+            'number': 'BGD/PCA20182/PD2018101-1',
+            'partner': partner.pk,
+            'cso_budget': '6403972.00',
+            'cso_budget_currency': 'BDT',
+            'unicef_budget': '70634975.00',
+            'unicef_budget_currency': 'BDT',
+            'unicef_budget_cash':
+            '60143475.00',
+            'unicef_budget_supplies': '10491500.00',
+            'workspace': workspace.pk,
+            'external_business_area_code': workspace.business_area_code,
+            'start_date': '2018-05-07',
+            'end_date': '2020-12-31',
+            'amendments': [
+                {
+                    'types': ['budget_gt_20'],
+                    'other_description': None,
+                    'signed_date': '24-Jul-2019',
+                    'amendment_number': '1',
+                }
+            ]
+        }
+        filter_dict = {
+            'external_id': data['id'],
+            'workspace': workspace,
+            'external_business_area_code': workspace.business_area_code,
+        }
+        pd_qs = ProgrammeDocument.objects.filter(**filter_dict)
+        self.assertFalse(pd_qs.exists())
+        process_model(
+            ProgrammeDocument,
+            PMPProgrammeDocumentSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertTrue(pd_qs.exists())
