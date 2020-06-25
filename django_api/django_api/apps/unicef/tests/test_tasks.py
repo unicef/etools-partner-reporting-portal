@@ -2,8 +2,8 @@ from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from partner.models import Partner
 from partner.serializers import PMPPartnerSerializer
-from unicef.models import ProgrammeDocument
-from unicef.serializers import PMPProgrammeDocumentSerializer
+from unicef.models import ProgrammeDocument, Section
+from unicef.serializers import PMPProgrammeDocumentSerializer, PMPSectionSerializer
 from unicef.tasks import process_model
 
 
@@ -90,3 +90,41 @@ class TestProcessModel(BaseAPITestCase):
             filter_dict=filter_dict,
         )
         self.assertTrue(pd_qs.exists())
+
+    def test_section(self):
+        data = {
+            'address': 'SEBRATHA',
+            'alternate_name': None,
+            'basis_for_risk_rating': '',
+            'city': 'SEBRATHA',
+            'core_values_assessment_date': '2017-10-30',
+            'country': '258',
+            'cso_type': 'National',
+            'email': 'test@example.com',
+            'external_id': 80,
+            'id': 80,
+            'last_assessment_date': '2020-02-21',
+            'name': 'AFAQ FOUNDATION FOR RIGHTS AND DEVELOPMENT',
+            'partner_type': 'Civil Society Organization',
+            'phone_number': '918528496',
+            'postal_code': '',
+            'rating': 'Medium',
+            'short_name': 'AFAQ FOUND',
+            'street_address': None,
+            'total_ct_cp': '118250.00',
+            'total_ct_cy': '72200.00',
+            'type_of_assessment': 'Micro Assessment',
+            'unicef_vendor_number': '2500238136',
+        }
+        filter_dict = {
+            'external_id': data['id'],
+        }
+        section_qs = Section.objects.filter(**filter_dict)
+        self.assertFalse(section_qs.exists())
+        process_model(
+            Section,
+            PMPSectionSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertTrue(section_qs.exists())
