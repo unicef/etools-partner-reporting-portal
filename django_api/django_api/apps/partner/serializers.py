@@ -8,6 +8,7 @@ from core.serializers import ShortLocationSerializer
 from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (
     Partner,
@@ -867,3 +868,9 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
             "psea_assessment_date",
             "overall_risk_rating",
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Partner.objects.all(),
+                fields=["name", "unicef_vendor_number"],
+            )
+        ]
