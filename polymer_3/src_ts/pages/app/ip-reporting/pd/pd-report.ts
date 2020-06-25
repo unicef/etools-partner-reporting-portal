@@ -458,7 +458,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _computeSubmittedOnBehalf(currentReport: GenericObject) {
-    if (currentReport.submitted_by === undefined) {
+    if (!currentReport || currentReport.submitted_by === undefined) {
       return;
     }
     return currentReport.submitted_by !== currentReport.submitting_user;
