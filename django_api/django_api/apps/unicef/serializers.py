@@ -7,6 +7,7 @@ from indicator.models import IndicatorBlueprint
 from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportContextIndicatorReportSerializer
 from partner.models import Partner
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from utils.filters.constants import Boolean
 
 from .models import (
@@ -723,6 +724,16 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "disbursement_percent",
             "document_type",
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ProgrammeDocument.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "workspace",
+                ],
+            )
+        ]
 
 
 class PMPLLOSerializer(serializers.ModelSerializer):
