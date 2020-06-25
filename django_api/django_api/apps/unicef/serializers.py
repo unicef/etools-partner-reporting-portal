@@ -749,6 +749,16 @@ class PMPLLOSerializer(serializers.ModelSerializer):
             'cp_output',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=LowerLevelOutput.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "cp_output",
+                ],
+            )
+        ]
 
 
 class PMPSectionSerializer(serializers.ModelSerializer):
@@ -760,15 +770,39 @@ class PMPSectionSerializer(serializers.ModelSerializer):
             'id',
             'name',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Section.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                ],
+            ),
+        ]
 
 
-class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+class BasePMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportingPeriodDates
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ReportingPeriodDates.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "report_type",
+                    "programme_document",
+                ],
+            ),
+        ]
+
+
+class PMPReportingPeriodDatesSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'start_date',
@@ -780,13 +814,12 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPReportingPeriodDatesSRSerializer(serializers.ModelSerializer):
+class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'due_date',
@@ -813,6 +846,16 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'programme_document',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=PDResultLink.objects.all(),
+                fields=[
+                    "result_link",
+                    "external_business_area_code",
+                    "id",
+                ],
+            ),
+        ]
 
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
