@@ -17,7 +17,7 @@ class TestProcessModel(BaseAPITestCase):
             'core_values_assessment_date': '2017-08-08',
             'country': '626',
             'cso_type': 'International',
-            'email': 'VJOHNSON@CAFOD.ORG.UK',
+            'email': 'someone@example.com',
             'external_id': 379,
             'id': 379,
             'last_assessment_date': '2019-12-16',
