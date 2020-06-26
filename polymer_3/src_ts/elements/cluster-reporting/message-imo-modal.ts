@@ -33,17 +33,14 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
       <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-
           --paper-dialog: {
             width: 600px;
             margin: 0;
           }
         }
-
         .row {
           margin: 16px 0;
         }
-
         .sender-note {
           color: var(--theme-primary-text-color-medium);
         }
@@ -88,7 +85,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
             Save
           </paper-button>
 
-          <paper-button on-tap="close">
+          <paper-button class="btn-cancel" on-tap="close">
             Cancel
           </paper-button>
         </div>
@@ -157,6 +154,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
       .catch((err: GenericObject) => {
         this.set('pending', false);
         this.set('errors', err.data);
+        this.adjustPosition({} as any);
       });
   }
 }

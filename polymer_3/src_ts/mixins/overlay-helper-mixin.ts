@@ -8,7 +8,7 @@ import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-ov
  */
 function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class OverlayHelperClass extends baseClass {
-    tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT'];
+    tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT', 'MESSAGE-IMO-MODAL'];
 
     connectedCallback() {
       super.connectedCallback();

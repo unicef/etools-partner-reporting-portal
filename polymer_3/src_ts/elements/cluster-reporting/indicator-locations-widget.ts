@@ -121,7 +121,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       <etools-prp-ajax id="search"> </etools-prp-ajax>
 
       <template is="dom-if" if="[[canMessageIMO]]" restamp="true">
-        <message-imo-modal id="message-modal" cluster-id="[[clusterId]]" indicator-id="[[indicatorId]]">
+        <message-imo-modal id="messageModal" cluster-id="[[clusterId]]" indicator-id="[[indicatorId]]">
         </message-imo-modal>
       </template>
 
@@ -560,6 +560,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _msgIMO() {
+    if (!this.messageModal) {
+      this.messageModal = this.shadowRoot!.querySelector('#messageModal') as MessageImoModalEl;
+      if (this.messageModal) {
+        this._handleMessageSent = this._handleMessageSent.bind(this);
+        this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent as any);
+      }
+    }
     if (this.messageModal) {
       this.messageModal.open();
     }
@@ -579,14 +586,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     super.connectedCallback();
     this.set('locations', []);
     this.set('pending', []);
-
-    this._handleMessageSent = this._handleMessageSent.bind(this);
-    this.messageModal = this.shadowRoot!.querySelector('#message-modal') as MessageImoModalEl;
-
-    if (this.messageModal) {
-      this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent as any);
-      document.body.appendChild(this.messageModal);
-    }
   }
 
   disconnectedCallback() {
@@ -600,8 +599,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
 
     if (this.messageModal) {
-      document.body.removeChild(this.messageModal);
-
       this.messageModal.removeEventListener('imo-message-sent', this._handleMessageSent as any);
       this.messageModal = null;
     }
