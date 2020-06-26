@@ -54,7 +54,6 @@ django-cron = "*"
 requests = "*"
 newrelic = "*"
 raven = "*"
-django-allauth = "*"
 social-auth-app-django = "*"
 python-social-auth = "*"
 
