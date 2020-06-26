@@ -2,13 +2,11 @@ import {PolymerElement} from '@polymer/polymer';
 import Constants from '../constants';
 import {property} from '@polymer/decorators/lib/decorators';
 
-
 /**
  * @polymer
  * @customElement
  */
 class EtoolsPrpTheme extends PolymerElement {
-
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   _app!: string;
 
@@ -24,7 +22,6 @@ class EtoolsPrpTheme extends PolymerElement {
         return Constants.THEME_PRIMARY_COLOR_IP;
     }
   }
-
 }
 
 export default EtoolsPrpTheme;

@@ -8,9 +8,8 @@ import {property} from '@polymer/decorators';
  */
 function ChipMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class ChipClass extends baseClass {
-
     @property({type: Boolean, observer: '_setDefaults'})
-    _adding: boolean = false;
+    _adding = false;
 
     _open(e: CustomEvent) {
       e.preventDefault();
@@ -21,7 +20,6 @@ function ChipMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _close() {
       this.set('_adding', false);
     }
-
   }
   return ChipClass;
 }

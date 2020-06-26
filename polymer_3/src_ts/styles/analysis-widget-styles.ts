@@ -1,11 +1,8 @@
 import {html} from '@polymer/polymer';
 import '@polymer/paper-styles/color';
 
-
 export const analysisWidgetStyles = html`
-
   <style>
-  
     :host {
       display: block;
     }
@@ -15,7 +12,7 @@ export const analysisWidgetStyles = html`
     }
 
     .analysis-widget__header {
-      padding-left: .5em;
+      padding-left: 0.5em;
       margin: 0 0 1em;
       border-left: 4px solid var(--theme-primary-color);
       font-size: 18px;
@@ -31,7 +28,5 @@ export const analysisWidgetStyles = html`
     etools-loading {
       margin: -8px;
     }
-      
   </style>
-
 `;

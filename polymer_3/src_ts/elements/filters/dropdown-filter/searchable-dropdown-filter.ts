@@ -13,28 +13,29 @@ import {GenericObject} from '../../../typings/globals.types';
 class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-      #field {
-        width: 100%;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+        #field {
+          width: 100%;
+        }
+      </style>
 
-    <etools-dropdown
-      id="field"
-      label="[[label]]"
-      options="[[data]]"
-      option-value="id"
-      option-label="title"
-      selected="[[value]]"
-      disabled="[[disabled]]"
-      selected-item="{{selectedItem}}"
-      trigger-value-change-event
-      on-etools-selected-item-changed="_handleDropdownChange">
-    </etools-dropdown>
-  `;
+      <etools-dropdown
+        id="field"
+        label="[[label]]"
+        options="[[data]]"
+        option-value="id"
+        option-label="title"
+        selected="[[value]]"
+        disabled="[[disabled]]"
+        selected-item="{{selectedItem}}"
+        trigger-value-change-event
+        on-etools-selected-item-changed="_handleDropdownChange"
+      >
+      </etools-dropdown>
+    `;
   }
 
   @property({type: Object})
@@ -60,7 +61,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       setTimeout(() => {
         fireEvent(this, 'filter-changed', {
           name: this.name,
-          value: String(event.detail.selectedItem.id),
+          value: String(event.detail.selectedItem.id)
         });
       });
     }
@@ -71,7 +72,6 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       this._filterReady();
     }
   }
-
 }
 
 window.customElements.define('searchable-dropdown-filter', SearchableDropdownFilter);

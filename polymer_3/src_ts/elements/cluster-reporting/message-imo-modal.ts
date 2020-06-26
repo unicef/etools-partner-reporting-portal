@@ -20,7 +20,6 @@ import {GenericObject} from '../../typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {fireEvent} from '../../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @customElement
@@ -47,57 +46,42 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
         }
       </style>
 
-      <etools-prp-ajax
-          id="message"
-          url="[[messageUrl]]"
-          method="post"
-          body="[[data]]"
-          content-type="application/json">
+      <etools-prp-ajax id="message" url="[[messageUrl]]" method="post" body="[[data]]" content-type="application/json">
       </etools-prp-ajax>
 
-      <paper-dialog
-          id="dialog"
-          modal
-          opened="{{opened}}">
+      <paper-dialog id="dialog" modal opened="{{opened}}">
         <div class="header layout horizontal justified">
           <h2>Send a message to IMO</h2>
 
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
         </div>
 
         <paper-dialog-scrollable>
-          <template
-              is="dom-if"
-              if="[[opened]]"
-              restamp="true">
+          <template is="dom-if" if="[[opened]]" restamp="true">
             <error-box errors="[[errors]]"></error-box>
 
             <div class="row">
               <paper-textarea
-                  class="validate"
-                  label="Message content"
-                  value="{{data.message}}"
-                  on-input="_validate"
-                  always-float-label
-                  required>
+                class="validate"
+                label="Message content"
+                value="{{data.message}}"
+                on-input="_validate"
+                always-float-label
+                required
+              >
               </paper-textarea>
             </div>
 
             <div class="row">
-              <small class="sender-note">Message will be sent from partner: [[partner.title]] ([[partner.email]])</small>
+              <small class="sender-note"
+                >Message will be sent from partner: [[partner.title]] ([[partner.email]])</small
+              >
             </div>
           </template>
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button
-              on-tap="_save"
-              class="btn-primary"
-              raised>
+          <paper-button on-tap="_save" class="btn-primary" raised>
             Save
           </paper-button>
 
@@ -126,14 +110,13 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
   indicatorId!: number;
 
   @property({type: Boolean})
-  pending: boolean = false;
+  pending = false;
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
   partner!: GenericObject;
 
   @property({type: String})
   messageUrl: string = Endpoints.indicatorIMOMessage();
-
 
   static get observers() {
     return ['_setDefaults(opened, indicatorId, clusterId)'];
@@ -157,19 +140,18 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _save() {
-    const self = this;
-
     if (!this._fieldsAreValid()) {
       return;
     }
 
     this.set('pending', true);
 
-    (this.$.message as EtoolsPrpAjaxEl).thunk()()
+    (this.$.message as EtoolsPrpAjaxEl)
+      .thunk()()
       .then(() => {
-        self.set('pending', false);
-        fireEvent(self, 'imo-message-sent');
-        self.close();
+        this.set('pending', false);
+        fireEvent(this, 'imo-message-sent');
+        this.close();
       })
       .catch((err: GenericObject) => {
         self.set('pending', false);
@@ -177,7 +159,6 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
         this.adjustPosition({} as any);
       });
   }
-
 }
 
 window.customElements.define('message-imo-modal', MessageImoModal);

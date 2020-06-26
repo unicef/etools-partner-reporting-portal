@@ -29,55 +29,33 @@ import {RootState} from '../../../typings/redux.types';
  * @appliesMixin UtilsMixin
  */
 class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]" params="[[queryParams]]">
+      </etools-prp-ajax>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:pd_id"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:pd_id" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-        selected="[[page]]"
-        attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'pd-index')]]" restamp="true">
-        <page-ip-reporting-pd-index
-            name="pd-index"
-            route="{{subroute}}">
-        </page-ip-reporting-pd-index>
-      </template>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'pd-index')]]" restamp="true">
+          <page-ip-reporting-pd-index name="pd-index" route="{{subroute}}"> </page-ip-reporting-pd-index>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'pd-router')]]" restamp="true">
-        <page-ip-reporting-pd-router
-            name="pd-router"
-            route="{{subroute}}">
-        </page-ip-reporting-pd-router>
-      </template>
-    </iron-pages>
-  `;
+        <template is="dom-if" if="[[_equals(page, 'pd-router')]]" restamp="true">
+          <page-ip-reporting-pd-router name="pd-router" route="{{subroute}}"> </page-ip-reporting-pd-router>
+        </template>
+      </iron-pages>
+    `;
   }
 
   @property({type: Object})
@@ -104,7 +82,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Number})
   pdId!: number;
 
-  fetchPdsDebouncer !: Debouncer | null;
+  fetchPdsDebouncer!: Debouncer | null;
 
   public static get observers() {
     return [
@@ -142,11 +120,10 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    await import(resolvedPageUrl)
-      .catch((err: any) => {
-        console.log(err);
-        this._notFound();
-      });
+    await import(resolvedPageUrl).catch((err: any) => {
+      console.log(err);
+      this._notFound();
+    });
   }
 
   _computeProgrammeDocumentsUrl(locationId: string) {
@@ -158,28 +135,24 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    if (
-      this.subroute.path &&
-      (this.currentPD && typeof this.currentPD.id !== 'undefined')
-    ) {
+    if (this.subroute.path && this.currentPD && typeof this.currentPD.id !== 'undefined') {
       // Don't refetch on child routes, unless navigated to directly.
       return;
     }
 
-    this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer,
-      timeOut.after(100),
-      () => {
-        const pdThunk = (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk();
+    this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer, timeOut.after(100), () => {
+      const pdThunk = (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk();
 
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+      // Cancel the pending request, if any
+      (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(pdFetch(pdThunk))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            // TODO: error handling
-          });
-      });
+      this.reduxStore
+        .dispatch(pdFetch(pdThunk))
+        // @ts-ignore
+        .catch((_err: GenericObject) => {
+          // TODO: error handling
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -189,7 +162,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       this.fetchPdsDebouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('page-ip-reporting-pd', PageIpReportingPd);

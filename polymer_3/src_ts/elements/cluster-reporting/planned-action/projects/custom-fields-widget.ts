@@ -11,15 +11,14 @@ import LocalizeMixin from '../../../../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
-  public static get template(){
+class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement) {
+  public static get template() {
     return html`
       ${buttonsStyles} ${sharedStyles}
       <style include="iron-flex iron-flex-alignment app-grid-style">
@@ -62,7 +61,6 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
           margin-bottom: 1em;
         }
 
-
         .remove-btn {
           width: 34px;
           height: 34px;
@@ -72,13 +70,9 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
         labelled-item {
           padding: 8px 0;
         }
-
       </style>
 
-      <template
-        is="dom-repeat"
-        items="[[customFields]]"
-        as="field">
+      <template is="dom-repeat" items="[[customFields]]" as="field">
         <div class="row layout horizontal">
           <div class="flex-none layout vertical center-center col-actions">
             <paper-icon-button
@@ -86,54 +80,53 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
               class="remove-btn"
               data-id$="[[field.id]]"
               on-tap="_remove"
-              icon="icons:cancel">
+              icon="icons:cancel"
+            >
             </paper-icon-button>
           </div>
           <div class="flex">
             <div class="app-grid">
-
               <paper-input
                 class="item"
                 nameid="[[field.id]]"
                 name="customFieldTitle[[index]]"
-                value=[[field.name]]
+                value="[[field.name]]"
                 label="[[localize('fields_title')]]"
-                on-input="_updateCustomFieldTitle">
+                on-input="_updateCustomFieldTitle"
+              >
               </paper-input>
 
               <paper-input
                 class="item-2-col"
                 valueid="[[field.id]]"
                 name="customFieldDescription[[index]]"
-                value=[[field.value]]
+                value="[[field.value]]"
                 label="[[localize('fields_value')]]"
-                on-input="_updateCustomFieldDescription">
+                on-input="_updateCustomFieldDescription"
+              >
               </paper-input>
             </div>
           </div>
         </div>
       </template>
 
-      <paper-button
-        class="btn-primary"
-        on-tap="_add">
-          [[localize('add_custom_field')]]
+      <paper-button class="btn-primary" on-tap="_add">
+        [[localize('add_custom_field')]]
       </paper-button>
     `;
   }
 
   @property({type: Number})
-  fieldId: number = 0;
+  fieldId = 0;
 
   @property({type: Number})
-  editFieldId: number = 0;
+  editFieldId = 0;
 
   @property({type: Array, notify: true})
   customFields: any[] = [];
 
   @property({type: Boolean, observer: '_setCustomFields'})
-  edit: boolean = false;
-
+  edit = false;
 
   _add() {
     this.set('fieldId', this.get('fieldId') + 1);
@@ -146,14 +139,14 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
 
   _remove(e: CustomEvent) {
     const value = this.get('customFields');
-    const toRemove = value.findIndex( (field: GenericObject) => {
+    const toRemove = value.findIndex((field: GenericObject) => {
       return String(field.id) === String((e.target as any).id);
     });
     this.splice('customFields', toRemove, 1);
   }
 
   _updateCustomFieldTitle(e: CustomEvent) {
-    const field = this.customFields.find( (field) => {
+    const field = this.customFields.find((field) => {
       return Number(field.id) === Number((e.target as any).nameid);
     });
     field.name = (e.target as any).value;
@@ -196,7 +189,6 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement){
       this.set('fieldId', 0);
     }
   }
-
 }
 
 window.customElements.define('custom-fields-widget', CustomFieldsWidget);

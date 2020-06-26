@@ -13,7 +13,6 @@ import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-
 /**
  * @polymer
  * @customElement
@@ -23,34 +22,21 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="projectNames"
-        url="[[projectNamesUrl]]"
-        params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="projectNames" url="[[projectNamesUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="[[localize('project')]]"
-        name="project"
-        value="[[value]]"
-        data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="[[localize('project')]]" name="project" value="[[value]]" data="[[data]]">
+      </searchable-dropdown-filter>
+    `;
   }
 
   @property({type: Object})
@@ -89,24 +75,18 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
       return;
     }
 
-    const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      function() {
-        const thunk = (self.$.projectNames as EtoolsPrpAjaxEl).thunk();
-        (self.$.projectNames as EtoolsPrpAjaxEl).abort();
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const thunk = (this.$.projectNames as EtoolsPrpAjaxEl).thunk();
+      (this.$.projectNames as EtoolsPrpAjaxEl).abort();
 
-        thunk()
-          .then(function(res: any) {
-            self.set('data', [{
-              id: '',
-              title: 'All'
-            }].concat(res.data || []));
-          })
-          .catch((_err: GenericObject) => {
-            // TODO: error handling
-          });
-      });
+      thunk()
+        .then((res: any) => {
+          this.set('data', [{id: '', title: 'All'}].concat(res.data || []));
+        })
+        .catch((_err: GenericObject) => {
+          // TODO: error handling
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -117,7 +97,6 @@ class ClusterProjectFilter extends LocalizeMixin(FilterDependenciesMixin(ReduxCo
       this._debouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('cluster-project-filter', ClusterProjectFilter);

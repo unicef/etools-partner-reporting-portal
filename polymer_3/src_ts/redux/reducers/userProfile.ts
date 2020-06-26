@@ -1,7 +1,7 @@
 import Constants from '../../constants';
 
 export class UserProfileState {
-  profile = undefined
+  profile = undefined;
 }
 
 export const UserProfile = (state = {profile: undefined}, action: any) => {

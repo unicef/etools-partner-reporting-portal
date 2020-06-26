@@ -11,7 +11,6 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -22,36 +21,32 @@ class ClusterObjectivesFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedEl
   public static get template() {
     // language=HTML
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 1;
-        --app-grid-item-height: auto;
-      }
-    </style>
+          --app-grid-columns: 1;
+          --app-grid-item-height: auto;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <text-filter
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <text-filter
             class="item"
             label="[[localize('search_cluster_objective')]]"
             name="ref_title"
-            value="[[queryParams.ref_title]]">
-        </text-filter>
-      </div>
-    </filter-list>
+            value="[[queryParams.ref_title]]"
+          >
+          </text-filter>
+        </div>
+      </filter-list>
     `;
   }
 

@@ -28,7 +28,6 @@ import Endpoints from '../../../../endpoints';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {fireEvent} from '../../../../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @customElement
@@ -236,16 +235,16 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   reportingPeriod!: string;
 
   @property({type: Boolean})
-  opened: boolean = false;
+  opened = false;
 
   @property({type: Boolean})
-  updatePending: boolean = false;
+  updatePending = false;
 
   @property({type: Object})
   data: GenericObject = {};
 
   @property({type: Boolean})
-  refresh: boolean = false;
+  refresh = false;
 
   @property({type: String, computed: '_computeUrl(data.id)'})
   url!: string;
@@ -278,7 +277,6 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
 
   @property({type: Object})
   editData!: GenericObject;
-
 
   _computeUrl(projectID: string) {
     if (!projectID) {
@@ -317,12 +315,7 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
   }
 
   _save() {
-    const self = this;
-
-    const valid = [
-      this._fieldsAreValid(),
-      this._dateRangeValid('.start-date', '.end-date')
-    ].every(Boolean);
+    const valid = [this._fieldsAreValid(), this._dateRangeValid('.start-date', '.end-date')].every(Boolean);
 
     if (!valid) {
       return;
@@ -338,18 +331,17 @@ class PlannedActionProjectsEditingModal extends RoutingMixin(UtilsMixin(ReduxCon
     const thunk = (this.$.editProject as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        fireEvent(self, 'project-edited', res.data);
-        self.close();
+        this.updatePending = false;
+        fireEvent(this, 'project-edited', res.data);
+        this.close();
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }
-
 }
 
 window.customElements.define('planned-action-projects-editing-modal', PlannedActionProjectsEditingModal);
 
-export {PlannedActionProjectsEditingModal as PlannedActionProjectsEditingModalEl}
+export {PlannedActionProjectsEditingModal as PlannedActionProjectsEditingModalEl};

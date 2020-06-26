@@ -13,53 +13,49 @@ import UtilsMixin from '../mixins/utils-mixin';
  * @appliesMixin UtilsMixin
  */
 class JsonField extends UtilsMixin(PolymerElement) {
-
   static get template() {
     return html`
-    <style include="app-grid-style">
-      :host {
-        display: block;
+      <style include="app-grid-style">
+        :host {
+          display: block;
 
-        --app-grid-columns: 2;
-        --app-grid-gutter: 16px;
-        --app-grid-item-height: auto;
+          --app-grid-columns: 2;
+          --app-grid-gutter: 16px;
+          --app-grid-item-height: auto;
 
-        --labelled-item-label: {
+          --labelled-item-label: {
+            position: relative;
+            top: 1px;
+
+            @apply --json-field-label;
+          }
+        }
+
+        .app-grid {
+          margin: -var(--app-grid-gutter);
           position: relative;
-          top: 1px;
+        }
 
-          @apply --json-field-label;
-        };
-      }
+        .app-grid::before {
+          content: '/';
+          position: absolute;
+          left: 50%;
+          top: 27px;
+          color: var(--theme-secondary-text-color);
+          transform: translateX(-50%);
+        }
 
-      .app-grid {
-        margin: -var(--app-grid-gutter);
-        position: relative;
-      }
+        labelled-item {
+          padding-top: 8px;
+        }
 
-      .app-grid::before {
-        content: "/";
-        position: absolute;
-        left: 50%;
-        top: 27px;
-        color: var(--theme-secondary-text-color);
-        transform: translateX(-50%);
-      }
+        paper-input.item {
+          margin-top: -8px;
+        }
+      </style>
 
-      labelled-item {
-        padding-top: 8px;
-      }
-
-      paper-input.item {
-        margin-top: -8px;
-      }
-    </style>
-
-    <template
-        is="dom-if"
-        if="[[!isRatio]]"
-        restamp="true">
-      <paper-input
+      <template is="dom-if" if="[[!isRatio]]" restamp="true">
+        <paper-input
           class="validate"
           label="[[label]]"
           value="[[value.v]]"
@@ -70,17 +66,15 @@ class JsonField extends UtilsMixin(PolymerElement) {
           required="[[required]]"
           disabled="[[disabled]]"
           no-label-float="[[hideLabel]]"
-          always-float-label="[[!hideLabel]]">
-      </paper-input>
-    </template>
+          always-float-label="[[!hideLabel]]"
+        >
+        </paper-input>
+      </template>
 
-    <template
-        is="dom-if"
-        if="[[isRatio]]"
-        restamp="true">
-      <labelled-item label="[[label]]">
-        <div class="app-grid">
-          <paper-input
+      <template is="dom-if" if="[[isRatio]]" restamp="true">
+        <labelled-item label="[[label]]">
+          <div class="app-grid">
+            <paper-input
               class="item validate"
               value="[[value.v]]"
               on-input="_onInput"
@@ -90,10 +84,11 @@ class JsonField extends UtilsMixin(PolymerElement) {
               required="[[_computeRequired(required, value, 'd')]]"
               disabled="[[disabled]]"
               placeholder="Numerator"
-              no-label-float>
-          </paper-input>
+              no-label-float
+            >
+            </paper-input>
 
-          <paper-input
+            <paper-input
               class="item validate"
               value="[[value.d]]"
               on-input="_onInput"
@@ -103,12 +98,13 @@ class JsonField extends UtilsMixin(PolymerElement) {
               required="[[_computeRequired(required, value, 'v')]]"
               disabled="[[_computeDisabled(disabled, disableDenominator)]]"
               placeholder="Denominator"
-              no-label-float>
-          </paper-input>
-        </div>
-      </labelled-item>
-    </template>
-  `;
+              no-label-float
+            >
+            </paper-input>
+          </div>
+        </labelled-item>
+      </template>
+    `;
   }
 
   @property({type: String})
@@ -121,26 +117,25 @@ class JsonField extends UtilsMixin(PolymerElement) {
   type!: string;
 
   @property({type: Boolean})
-  disableDenominator: boolean = false;
+  disableDenominator = false;
 
   @property({type: Boolean})
-  required: boolean = false;
+  required = false;
 
   @property({type: Boolean})
-  disabled: boolean = false;
+  disabled = false;
 
   @property({type: Boolean})
-  hideLabel: boolean = false;
+  hideLabel = false;
 
   @property({type: Object, notify: true})
   value!: GenericObject;
 
   @property({type: Boolean, computed: '_computeIsRatio(type)', observer: '_resetDenominator'})
-  isRatio: boolean = false;
+  isRatio = false;
 
   @property({type: Boolean, notify: true, computed: '_computeInvalid(required, isRatio, value)'})
-  invalid: boolean = false;
-
+  invalid = false;
 
   _computeDisabled(disabled: boolean, disableDenominator: boolean) {
     return disabled || disableDenominator;
@@ -175,9 +170,7 @@ class JsonField extends UtilsMixin(PolymerElement) {
       }
     } else {
       if (isRatio) {
-        return typeof value.v !== 'undefined' ?
-          typeof value.d === 'undefined' :
-          typeof value.d !== 'undefined'; // xor
+        return typeof value.v !== 'undefined' ? typeof value.d === 'undefined' : typeof value.d !== 'undefined'; // xor
       } else {
         return false;
       }

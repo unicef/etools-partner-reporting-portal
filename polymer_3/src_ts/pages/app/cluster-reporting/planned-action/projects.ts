@@ -31,7 +31,6 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
  * @appliesMixin LocalizeMixin
  */
 class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement)))) {
-
   public static get template() {
     return html`
       ${sharedStyles} ${buttonsStyles}
@@ -46,31 +45,18 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
         }
       </style>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
       <iron-location query="{{query}}"></iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <etools-prp-ajax
-          id="plannedActionsProjects"
-          url="[[url]]"
-          params="[[queryParams]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="plannedActionsProjects" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
       <page-body>
         <planned-action-projects-filters></planned-action-projects-filters>
 
-
-        <template
-            is="dom-if"
-            if="[[_canAddProject(permissions, responsePlanCurrent)]]"
-            restamp="true">
+        <template is="dom-if" if="[[_canAddProject(permissions, responsePlanCurrent)]]" restamp="true">
           <div id="action">
             <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
               [[localize('add_project')]]
@@ -82,13 +68,11 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
 
         <project-list-table page="planned-action"></project-list-table>
       </page-body>
-  `;
+    `;
   }
 
   static get observers() {
-    return [
-      '_projectsAjax(queryParams, url)'
-    ];
+    return ['_projectsAjax(queryParams, url)'];
   }
 
   @property({type: Object})
@@ -134,24 +118,22 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
       return;
     }
 
-    this.projectsDebouncer = Debouncer.debounce(this.projectsDebouncer,
-      timeOut.after(300),
-      () => {
+    this.projectsDebouncer = Debouncer.debounce(this.projectsDebouncer, timeOut.after(300), () => {
+      queryParams.partner = this.partnerID;
+      if (!Object.keys(queryParams).length) {
+        return;
+      }
 
-        queryParams.partner = this.partnerID;
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
+      const thunk = (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).thunk();
+      (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).abort();
 
-        const thunk = (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).thunk();
-        (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore.dispatch(fetchPartnerProjectsList(thunk))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(fetchPartnerProjectsList(thunk))
+        // @ts-ignore
+        .catch((_err: GenericObject) => {
+          // TODO: error handling.
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -161,7 +143,6 @@ class PlannedActionProjectsList extends LocalizeMixin(SortingMixin(RoutingMixin(
       this.projectsDebouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('planned-action-projects-list', PlannedActionProjectsList);

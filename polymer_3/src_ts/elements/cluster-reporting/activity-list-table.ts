@@ -2,7 +2,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import '@polymer/app-route/app-route';
-import '@unicef-polymer/etools-data-table/etools-data-table'
+import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-location/iron-location';
@@ -23,17 +23,18 @@ import '../../redux/actions';
 import {tableStyles} from '../../styles/table-styles';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
-* @polymer
-* @customElement
-* @appliesMixin DataTableMixin
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin PaginationMixin
-* @appliesMixin RoutingMixin
-*/
-class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(PaginationMixin(RoutingMixin(ReduxConnectedElement))))) {
+ * @polymer
+ * @customElement
+ * @appliesMixin DataTableMixin
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin PaginationMixin
+ * @appliesMixin RoutingMixin
+ */
+class ActivityListTable extends DataTableMixin(
+  UtilsMixin(LocalizeMixin(PaginationMixin(RoutingMixin(ReduxConnectedElement))))
+) {
   public static get template() {
     // language=HTML
     return html`
@@ -169,7 +170,11 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   @property({type: String})
   page!: string;
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.partnerActivities.all)', observer: '_tableContentChanged'})
+  @property({
+    type: Array,
+    computed: 'getReduxStateArray(rootState.partnerActivities.all)',
+    observer: '_tableContentChanged'
+  })
   activities!: any[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerActivities.loading)'})
@@ -191,9 +196,7 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
   projects: GenericObject = {};
 
   static get observers() {
-    return [
-      '_getProjects(responsePlanID)'
-    ];
+    return ['_getProjects(responsePlanID)'];
   }
 
   _openModal() {
@@ -214,17 +217,17 @@ class ActivityListTable extends DataTableMixin(UtilsMixin(LocalizeMixin(Paginati
       return;
     }
 
-    var self = this;
     this.set('projectsUrl', Endpoints.plannedActions(this.responsePlanID));
 
-    (this.$.projects as EtoolsPrpAjaxEl).thunk()()
+    (this.$.projects as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
         const allProjects: GenericObject = {};
         res.data.results.forEach((project: GenericObject) => {
           allProjects[project.id] = project;
         });
 
-        self.set('projects', allProjects);
+        this.set('projects', allProjects);
       });
   }
 

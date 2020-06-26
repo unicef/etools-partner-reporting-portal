@@ -22,7 +22,6 @@ import './etools-prp-permissions';
 import {GenericObject} from '../typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
 
-
 /**
  * @polymer
  * @customElement
@@ -32,16 +31,15 @@ import {tableStyles} from '../styles/table-styles';
  * @appliesMixin PaginationMixin
  * @appliesMixin LocalizeMixin
  */
-class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(ReduxConnectedElement))))) {
-
+class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
-        ${tableStyles}
+      ${tableStyles}
       <style include="iron-flex iron-flex-factors data-table-styles">
         :host {
           --ecp-content: {
             padding: 1px 0 0;
-          };
+          }
         }
 
         message-box {
@@ -49,41 +47,28 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
       <etools-content-panel panel-title="[[localize('list_of_indicators')]]">
-      <template
-          is="dom-if"
-          if="[[showLocationsWarning]]"
-          restamp="[[true]]">
-        <message-box type="warning">
-          [[localize('please_make_sure_indicators')]]
-        </message-box>
-      </template>
+        <template is="dom-if" if="[[showLocationsWarning]]" restamp="[[true]]">
+          <message-box type="warning">
+            [[localize('please_make_sure_indicators')]]
+          </message-box>
+        </template>
 
-      <etools-data-table-header
+        <etools-data-table-header
           id="listHeader"
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
-
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+        >
           <etools-data-table-column field="indicator">
             <div class="table-column">[[localize('indicator')]]</div>
           </etools-data-table-column>
 
-          <template
-            is="dom-if"
-            if="[[showProjectContextColumn]]"
-            restamp="[[true]]">
+          <template is="dom-if" if="[[showProjectContextColumn]]" restamp="[[true]]">
             <etools-data-table-column field="content_object_title">
               <div class="table-column">[[localize('project_context')]]</div>
             </etools-data-table-column>
@@ -110,31 +95,22 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
           </etools-data-table-column>
 
           <etools-data-table-column field="progress_percentage" sortable flex-2>
-              <div class="table-column">[[localize('current_progress')]]</div>
+            <div class="table-column">[[localize('current_progress')]]</div>
           </etools-data-table-column>
 
-          <template
-            is="dom-if"
-            if="[[haveReports]]"
-            restamp="true">
+          <template is="dom-if" if="[[haveReports]]" restamp="true">
             <etools-data-table-column field="">
               <div class="table-column">&nbsp;</div>
             </etools-data-table-column>
           </template>
 
-          <template
-              is="dom-if"
-              if="[[canEdit]]"
-              restamp="true">
+          <template is="dom-if" if="[[canEdit]]" restamp="true">
             <etools-data-table-column field="">
               <div class="table-column">&nbsp;</div>
             </etools-data-table-column>
           </template>
 
-          <template
-              is="dom-if"
-              if="[[canEditLocations]]"
-              restamp="true">
+          <template is="dom-if" if="[[canEditLocations]]" restamp="true">
             <etools-data-table-column field="">
               <div class="table-column">&nbsp;</div>
             </etools-data-table-column>
@@ -142,38 +118,36 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
         </etools-data-table-header>
 
         <etools-data-table-footer
-            page-size="[[pageSize]]"
-            page-number="[[pageNumber]]"
-            total-results="[[totalResults]]"
-            visible-range="{{visibleRange}}"
-            on-page-size-changed="_pageSizeChanged"
-            on-page-number-changed="_pageNumberChanged">
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged"
+        >
         </etools-data-table-footer>
 
-        <template id="list"
-                  is="dom-repeat"
-                  items="[[data]]"
-                  initial-count="[[pageSize]]"
-                  as="indicator">
+        <template id="list" is="dom-repeat" items="[[data]]" initial-count="[[pageSize]]" as="indicator">
           <list-view-single-indicator
-              indicator="{{indicator}}"
-              is-custom="[[isCustom]]"
-              can-edit="[[canEdit]]"
-              type="[[type]]">
+            indicator="{{indicator}}"
+            is-custom="[[isCustom]]"
+            can-edit="[[canEdit]]"
+            type="[[type]]"
+          >
           </list-view-single-indicator>
         </template>
 
         <list-placeholder data="[[data]]"></list-placeholder>
 
         <etools-data-table-footer
-            page-size="[[pageSize]]"
-            page-number="[[pageNumber]]"
-            total-results="[[totalResults]]"
-            visible-range="{{visibleRange}}"
-            on-page-size-changed="_pageSizeChanged"
-            on-page-number-changed="_pageNumberChanged">
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged"
+        >
         </etools-data-table-footer>
-
       </etools-content-panel>
     `;
   }
@@ -229,7 +203,6 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
   @property({type: Boolean, computed: '_computeShowProjectContextColumn(type)'})
   showProjectContextColumn!: boolean;
 
-
   @property({type: Boolean, computed: '_computeShowLocationsWarning(isClusterApp, type, canEdit, data)'})
   showLocationsWarning!: boolean;
 
@@ -263,9 +236,12 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
     }
     const baseConditionsMet = isClusterApp && type !== 'ca' && canEdit;
 
-    return baseConditionsMet && data.some((indicator: GenericObject) => {
-      return !indicator.locations.length;
-    });
+    return (
+      baseConditionsMet &&
+      data.some((indicator: GenericObject) => {
+        return !indicator.locations.length;
+      })
+    );
   }
 
   _computeShowProjectContextColumn(type: string) {
@@ -281,7 +257,6 @@ class ListViewIndicators extends (UtilsMixin(DataTableMixin(PaginationMixin(Loca
     this._removeEventListeners();
     this.openedDetails.length = 0;
   }
-
 }
 
 window.customElements.define('list-view-indicators', ListViewIndicators);

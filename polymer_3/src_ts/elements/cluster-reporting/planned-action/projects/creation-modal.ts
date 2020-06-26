@@ -48,7 +48,6 @@ import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import '../../indicator-locations-widget';
 import Settings from '../../../../settings';
 
-
 /**
  * @polymer
  * @customElement
@@ -700,10 +699,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   opened!: boolean;
 
   @property({type: Boolean})
-  detailsOpened: boolean = false;
+  detailsOpened = false;
 
   @property({type: Boolean})
-  updatePending: boolean = false;
+  updatePending = false;
 
   @property({type: String, observer: '_setDefaults'})
   mode!: string;
@@ -712,7 +711,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   data!: GenericObject;
 
   @property({type: Boolean})
-  refresh: boolean = false;
+  refresh = false;
 
   @property({type: String, computed: '_computeUrl(responsePlanID, mode, edit, data)'})
   url!: string;
@@ -745,7 +744,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   formattedClusters!: any[];
 
   @property({type: String})
-  partnerForClusters: string = '';
+  partnerForClusters = '';
 
   @property({type: Array, computed: '_computeLocalizedStatuses(resources)'})
   statuses!: any[];
@@ -782,7 +781,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   selectedClusters!: any[];
 
   @property({type: Boolean})
-  edit: boolean = false;
+  edit = false;
 
   @property({type: Object})
   selectedPartner: GenericObject = {};
@@ -805,16 +804,17 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   private _setModeDebouncer!: Debouncer;
   private _fetchOchaProjectDebouncer!: Debouncer;
 
-
   static get observers() {
-    return ['_resetOchaProjects(selectedPartner)',
+    return [
+      '_resetOchaProjects(selectedPartner)',
       '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
       '_computeOchaProjectDetailsUrl(selectedProject)',
       '_fetchOchaProjectDetails(selectedProject)',
       '_saveClusters(selectedClusters.splices)',
       '_updateMode(fromOchaDisabled, customDisabled)',
       '_updatePartnerForClusters(selectedPartner.id)',
-      '_updatePartnerForClusters(partnerID)'];
+      '_updatePartnerForClusters(partnerID)'
+    ];
   }
 
   _computeLocalizedStatuses() {
@@ -845,8 +845,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeFromOchaDisabled(partner: GenericObject, selectedPartner: GenericObject) {
-    return (!partner || !partner.ocha_external_id) &&
-      (!selectedPartner || !selectedPartner.ocha_external_id);
+    return (!partner || !partner.ocha_external_id) && (!selectedPartner || !selectedPartner.ocha_external_id);
   }
 
   _computeCustomDisabled(selectedPartner: GenericObject) {
@@ -854,13 +853,11 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _updateMode(fromOchaDisabled: boolean, customDisabled: boolean) {
-    this._setModeDebouncer = Debouncer.debounce(this._setModeDebouncer,
-      timeOut.after(100),
-      () => {
-        if (fromOchaDisabled && !customDisabled) {
-          this.set('mode', 'custom');
-        }
-      });
+    this._setModeDebouncer = Debouncer.debounce(this._setModeDebouncer, timeOut.after(100), () => {
+      if (fromOchaDisabled && !customDisabled) {
+        this.set('mode', 'custom');
+      }
+    });
   }
 
   _updatePartnerForClusters(partner: string) {
@@ -869,7 +866,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeUrl(responsePlanID: string, mode: string, edit: boolean, data: GenericObject) {
-    if ((edit && !data) || (!mode || !responsePlanID)) {
+    if ((edit && !data) || !mode || !responsePlanID) {
       return;
     }
 
@@ -892,12 +889,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeOchaProjectsParams(partner: GenericObject, selectedPartner: GenericObject) {
-    const ocha_external_id = (partner && partner.ocha_external_id) ||
-      (selectedPartner && selectedPartner.ocha_external_id);
+    const ocha_external_id =
+      (partner && partner.ocha_external_id) || (selectedPartner && selectedPartner.ocha_external_id);
 
-    return ocha_external_id ? {
-      ocha_external_id: ocha_external_id
-    } : {};
+    return ocha_external_id
+      ? {
+          ocha_external_id: ocha_external_id
+        }
+      : {};
   }
 
   _computeOchaProjectDetailsUrl(selectedProject: string) {
@@ -905,9 +904,11 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _close(e: CustomEvent & any) {
-    if (e.target.nodeName === 'PAPER-DIALOG' ||
+    if (
+      e.target.nodeName === 'PAPER-DIALOG' ||
       e.target.nodeName === 'PAPER-BUTTON' ||
-      e.target.nodeName === 'PAPER-ICON-BUTTON') {
+      e.target.nodeName === 'PAPER-ICON-BUTTON'
+    ) {
       this.set('data', {});
       this.set('opened', false);
       this.set('refresh', false);
@@ -933,10 +934,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
         this.set('mode', 'custom');
       }
       this.data = {
-        'custom_fields': [],
-        'funding': {},
-        'locations': [],
-        'description': ''
+        custom_fields: [],
+        funding: {},
+        locations: [],
+        description: ''
       };
       this.selectedClusters = [];
     }
@@ -948,7 +949,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     this.detailsOpened = !this.detailsOpened;
   }
 
-  _computeLocalizedTitle(edit: boolean, localize: Function) {
+  _computeLocalizedTitle(edit: boolean, localize: (x: string) => string) {
     return edit ? localize('edit_project') : localize('add_project');
   }
 
@@ -957,13 +958,18 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computeImoClusters(profile: GenericObject) {
-    return profile.prp_roles ?
-      profile.prp_roles.filter(function(item: GenericObject) {
-        return item.role === Constants.PRP_ROLE.CLUSTER_IMO && item.cluster;
-      }).map(function(item: GenericObject) {return item.cluster.id;}) : [];
+    return profile.prp_roles
+      ? profile.prp_roles
+          .filter(function (item: GenericObject) {
+            return item.role === Constants.PRP_ROLE.CLUSTER_IMO && item.cluster;
+          })
+          .map(function (item: GenericObject) {
+            return item.cluster.id;
+          })
+      : [];
   }
 
-  _computeLocalizedDetailsButtonMsg(detailsOpened: boolean, localize: Function) {
+  _computeLocalizedDetailsButtonMsg(detailsOpened: boolean, localize: (x: string) => string) {
     if (detailsOpened) {
       return localize('show_less_funding_details');
     }
@@ -982,51 +988,48 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _fetchOchaProjectsList(partner: GenericObject, selectedPartner: GenericObject) {
-    this._fetchOchaProjectDebouncer = Debouncer.debounce(this._fetchOchaProjectDebouncer,
-      timeOut.after(100),
-      () => {
-        if (
-          (!partner || !partner.ocha_external_id) &&
-          (!selectedPartner || !selectedPartner.ocha_external_id)
-        ) {
-          return;
-        }
+    this._fetchOchaProjectDebouncer = Debouncer.debounce(this._fetchOchaProjectDebouncer, timeOut.after(100), () => {
+      if ((!partner || !partner.ocha_external_id) && (!selectedPartner || !selectedPartner.ocha_external_id)) {
+        return;
+      }
 
-        this.set('projectsLoading', true);
-        const self = this;
+      this.set('projectsLoading', true);
 
-        const projectThunk = (this.$.projects as EtoolsPrpAjaxEl);
-        projectThunk.abort();
-        projectThunk.thunk()()
-          .then(function(res: GenericObject) {
-            self.set('projectsLoading', false);
+      const projectThunk = this.$.projects as EtoolsPrpAjaxEl;
+      projectThunk.abort();
+      projectThunk
+        .thunk()()
+        .then((res: GenericObject) => {
+          this.set('projectsLoading', false);
 
-            const filteredPartnerProjects = self.partnerProjects.filter((item) => {
-              return item.is_ocha_imported === true;
-            });
-
-            const filteredResData = res.data.filter((item: GenericObject) => {
-              return filteredPartnerProjects.find((element) => {
-                return element.title.trim() === item.name.trim();
-              }) === undefined;
-            });
-
-            self.set('projects', filteredResData);
-            fireEvent(self, 'details-loaded');
-          })
-          .catch((err: GenericObject) => {
-            if (err.code === 504) {
-              fireEvent(self, 'notify', {type: 'ocha-timeout'});
-            }
-            self.set('projectsLoading', false);
-            self.set('errors', err.data);
+          const filteredPartnerProjects = this.partnerProjects.filter((item) => {
+            return item.is_ocha_imported === true;
           });
-      });
+
+          const filteredResData = res.data.filter((item: GenericObject) => {
+            return (
+              filteredPartnerProjects.find((element) => {
+                return element.title.trim() === item.name.trim();
+              }) === undefined
+            );
+          });
+
+          this.set('projects', filteredResData);
+          fireEvent(this, 'details-loaded');
+        })
+        .catch((err: GenericObject) => {
+          if (err.code === 504) {
+            fireEvent(this, 'notify', {type: 'ocha-timeout'});
+          }
+          this.set('projectsLoading', false);
+          this.set('errors', err.data);
+        });
+    });
   }
 
   _computeOchaProjectRequestId(selectedProject: string) {
-    const ob = Object.assign({}, {'project': selectedProject});
-    const obb = Object.assign(ob, {'partner_id': this.data.partner_id});
+    const ob = Object.assign({}, {project: selectedProject});
+    const obb = Object.assign(ob, {partner_id: this.data.partner_id});
     return obb;
   }
 
@@ -1035,20 +1038,20 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
       return;
     }
     this.set('projectDetailsLoading', true);
-    const self = this;
     (this.$.projectDetails as EtoolsPrpAjaxEl).abort();
-    (this.$.projectDetails as EtoolsPrpAjaxEl).thunk()()
+    (this.$.projectDetails as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: GenericObject) => {
-        self.set('projectDetailsLoading', false);
-        self.set('projectDetails', res.data);
-        fireEvent(self, 'details-loaded');
+        this.set('projectDetailsLoading', false);
+        this.set('projectDetails', res.data);
+        fireEvent(this, 'details-loaded');
       })
       .catch((err: GenericObject) => {
         if (err.code === 504) {
-          fireEvent(self, 'notify', {type: 'ocha-timeout'});
+          fireEvent(this, 'notify', {type: 'ocha-timeout'});
         }
-        self.set('projectDetailsLoading', false);
-        self.set('errors', err.data);
+        this.set('projectDetailsLoading', false);
+        this.set('errors', err.data);
       });
   }
 
@@ -1059,9 +1062,12 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _saveClusters() {
-    this.set('data.clusters', this.selectedClusters.map(function(cluster) {
-      return {'id': cluster};
-    }));
+    this.set(
+      'data.clusters',
+      this.selectedClusters.map(function (cluster) {
+        return {id: cluster};
+      })
+    );
   }
 
   _displayPartnerReadOnly(permissions: GenericObject, edit: boolean) {
@@ -1073,9 +1079,9 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _redirectToDetail(id: number) {
-    const path = this.permissions.addPartnerToProject ?
-      'response-parameters/partners/project/' + String(id) :
-      '/planned-action/project/' + String(id);
+    const path = this.permissions.addPartnerToProject
+      ? 'response-parameters/partners/project/' + String(id)
+      : '/planned-action/project/' + String(id);
     const url = this.buildUrl(this._baseUrlCluster, path);
     this.set('path', url);
   }
@@ -1091,14 +1097,14 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
   }
 
   _computePartnerForClusters() {
-    let partnerId = null;
+    let partnerId;
     if (this.selectedPartner !== undefined) {
       partnerId = this.selectedPartner;
     } else {
       partnerId = this.partnerID;
     }
 
-    return partnerId;
+    return partnerId ? partnerId : null;
   }
 
   _setDefaults(edit: boolean) {
@@ -1109,18 +1115,16 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     this.set('projectLoading', false);
     this.set('selectedPartner', {});
     this.set('data', {
-      'custom_fields': [],
-      'funding': {},
-      'locations': [],
-      'description': ''
+      custom_fields: [],
+      funding: {},
+      locations: [],
+      description: ''
     });
     this.set('projectDetails', {});
     this.set('errors', {});
   }
 
   _save() {
-    const self = this;
-
     let locationError = false;
     const rawLocations = this.get('data.locations') || [];
 
@@ -1134,10 +1138,10 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
 
     changedLocations.forEach((location: GenericObject) => {
       if (!location || !location.title) {
-        self.set('errors', 'No location set - please set a location.');
+        this.set('errors', 'No location set - please set a location.');
         locationError = true;
       } else if (changedLocations[0].admin_level !== location.admin_level) {
-        self.set('errors', 'All locations need to have the same admin level.');
+        this.set('errors', 'All locations need to have the same admin level.');
         locationError = true;
       }
     });
@@ -1165,20 +1169,20 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     const thunk = (this.$.projectAjax as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        if (self.edit) {
-          fireEvent(self, 'project-edited', res.data);
-          self.close();
-          self.set('errors', {});
+        this.updatePending = false;
+        if (this.edit) {
+          fireEvent(this, 'project-edited', res.data);
+          this.close();
+          this.set('errors', {});
         } else {
-          self.close();
-          waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
+          this.close();
+          waitForIronOverlayToClose(300).then(() => this._redirectToDetail(res.data.id));
         }
       })
       .catch((err: GenericObject) => {
-        self.updatePending = false;
-        self.set('errors', err.data);
-        self.set('data.locations', rawLocations); // If there are backend validation errors, reset locations
+        this.updatePending = false;
+        this.set('errors', err.data);
+        this.set('data.locations', rawLocations); // If there are backend validation errors, reset locations
       }); // to what they were before request was sent!
   }
 

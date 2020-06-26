@@ -10,7 +10,6 @@ declare const numeral: any;
  */
 function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class AnalysisChartClass extends baseClass {
-
     private tooltipStyles = [
       '.google-visualization-tooltip {',
       'padding: 10px;',
@@ -92,11 +91,7 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
     _computeRows(data: GenericObject[]) {
       return Object.keys(data).map((key: any) => {
-        return [
-          key,
-          data[key].length,
-          this._buildTooltipContent(key, data[key])
-        ];
+        return [key, data[key].length, this._buildTooltipContent(key, data[key])];
       }, this);
     }
 
@@ -119,7 +114,6 @@ function AnalysisChartMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         googleChart.shadowRoot!.appendChild(style);
       }
     }
-
   }
   return AnalysisChartClass;
 }

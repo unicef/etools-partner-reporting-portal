@@ -21,43 +21,29 @@ import {pdFetch} from '../../redux/actions/pd';
  * @customElement
  */
 class PdDetailsReport extends ReduxConnectedElement {
-
   static get template() {
     return html`
-    ${tableStyles}
-    <style include="data-table-styles">
-      :host {
-        display: block;
-      }
-    </style>
+      ${tableStyles}
+      <style include="data-table-styles">
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="pdReports"
-        url="[[pdReportsUrl]]"
-        params="[[pdReportsParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="pdReports" url="[[pdReportsUrl]]" params="[[pdReportsParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <pd-report-filters></pd-report-filters>
-      <pd-reports-toolbar></pd-reports-toolbar>
-      <pd-reports-list></pd-reports-list>
-    </page-body>
-
-  `;
+      <page-body>
+        <pd-report-filters></pd-report-filters>
+        <pd-reports-toolbar></pd-reports-toolbar>
+        <pd-reports-list></pd-reports-list>
+      </page-body>
+    `;
   }
 
   @property({type: String})
@@ -81,7 +67,11 @@ class PdDetailsReport extends ReduxConnectedElement {
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
   programmeDocumentsUrl!: string;
 
-  @property({type: Object, computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)', observer: '_getPdReports'})
+  @property({
+    type: Object,
+    computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
+    observer: '_getPdReports'
+  })
   pdReportsCount!: GenericObject;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
@@ -91,9 +81,7 @@ class PdDetailsReport extends ReduxConnectedElement {
   private fetchPdsDebouncer!: Debouncer;
 
   public static get observers() {
-    return [
-      '_handleInputChange(pdReportsUrl, pdReportsParams)'
-    ];
+    return ['_handleInputChange(pdReportsUrl, pdReportsParams)'];
   }
 
   _computePDReportsUrl(locationId: string) {
@@ -109,26 +97,23 @@ class PdDetailsReport extends ReduxConnectedElement {
   }
 
   _handleInputChange(url: string) {
-    if (!url || (!this.queryParams || !Object.keys(this.queryParams).length)) {
+    if (!url || !this.queryParams || !Object.keys(this.queryParams).length) {
       return;
     }
 
-    const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
 
-        const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
+      // Cancel the pending request, if any
+      (this.$.pdReports as EtoolsPrpAjaxEl).abort();
 
-        // Cancel the pending request, if any
-        (this.$.pdReports as EtoolsPrpAjaxEl).abort();
-
-        self.reduxStore.dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
-          // @ts-ignore
-          .catch(function(err) {
-            console.log(err);
-          });
-      });
+      this.reduxStore
+        .dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
+        // @ts-ignore
+        .catch(function (err) {
+          console.log(err);
+        });
+    });
   }
 
   _getPdReports() {
@@ -136,29 +121,25 @@ class PdDetailsReport extends ReduxConnectedElement {
     // preventing pd-details title from rendering. Deleting the status
     // can resolve this issue, and filter will still work
     if (this.pdReportsCount[this.pdId] > 0 && this.pdReportsId === '') {
-      const self = this;
-      this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer,
-        timeOut.after(100),
-        () => {
-          const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-          pdThunk.params = {
-            page: 1,
-            page_size: 10,
-            programme_document: this.pdId
-          };
+      this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer, timeOut.after(100), () => {
+        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
+        pdThunk.params = {
+          page: 1,
+          page_size: 10,
+          programme_document: this.pdId
+        };
 
-          // Cancel the pending request, if any
-          (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-          self.reduxStore.dispatch(pdFetch(pdThunk.thunk()));
+        // Cancel the pending request, if any
+        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+        this.reduxStore
+          .dispatch(pdFetch(pdThunk.thunk()))
           // @ts-ignore
-          // .catch(function(err) {
-          //   // TODO: error handling
-          // });
-        });
+          .catch(function (err) {
+            console.log(err);
+          });
+      });
     }
   }
-
-
 }
 
 window.customElements.define('pd-details-reports', PdDetailsReport);

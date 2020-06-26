@@ -41,8 +41,7 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId);
   },
   programmeDocumentDocDownload(locationId: string, pdId: string) {
-    return this._buildUrl('/unicef/' + locationId +
-      '/programme-document/' + pdId + '/pmp-document/');
+    return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId + '/pmp-document/');
   },
 
   programmeDocumentReports(workspaceId: string) {
@@ -78,13 +77,7 @@ const Endpoints = {
   },
 
   calculationMethods(workspaceId: string, pdId: string) {
-    return this._buildUrl(
-      '/unicef/' +
-      workspaceId +
-      '/programme-document/' +
-      pdId +
-      '/calculation-methods/'
-    );
+    return this._buildUrl('/unicef/' + workspaceId + '/programme-document/' + pdId + '/calculation-methods/');
   },
 
   progressReports(locationId: string) {
@@ -108,22 +101,12 @@ const Endpoints = {
   },
 
   indicatorDataLocation(workspaceId: string, reportId: string) {
-    return this._buildUrl(
-      '/unicef/' +
-      workspaceId +
-      '/progress-reports/' +
-      reportId +
-      '/locations/'
-    );
+    return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/' + reportId + '/locations/');
   },
 
   reportable(programmeDocumentProgressReportId: string, lowerLevelOutputId: string) {
     return this._buildUrl(
-      '/indicator/pd-progress-report/' +
-      programmeDocumentProgressReportId +
-      '/llo/' +
-      lowerLevelOutputId +
-      '/'
+      '/indicator/pd-progress-report/' + programmeDocumentProgressReportId + '/llo/' + lowerLevelOutputId + '/'
     );
   },
 
@@ -133,13 +116,7 @@ const Endpoints = {
 
   indicatorPullData(workspaceId: string, reportId: string, indicatorId: string) {
     return this._buildUrl(
-      '/unicef/' +
-      workspaceId +
-      '/progress-reports/' +
-      reportId +
-      '/indicators/' +
-      indicatorId +
-      '/pull/'
+      '/unicef/' + workspaceId + '/progress-reports/' + reportId + '/indicators/' + indicatorId + '/pull/'
     );
   },
 
@@ -164,14 +141,12 @@ const Endpoints = {
   },
 
   plannedActionsIMO(responsePlanId: string, partnerId: string) {
-    return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/partner/'
-      + partnerId + '/');
+    return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/partner/' + partnerId + '/');
   },
 
   // @ts-ignore
   plannedActionsIMOEdit(responsePlanId: string, partnerId: string, projectId: string) {
-    return this._buildUrl('/partner/partner-project-details/partner/'
-      + partnerId + '/' + projectId + '/');
+    return this._buildUrl('/partner/partner-project-details/partner/' + partnerId + '/' + projectId + '/');
   },
 
   plannedActionsProjectOverview(projectId: string) {
@@ -179,8 +154,7 @@ const Endpoints = {
   },
 
   plannedActionsActivityOverview(responsePlanId: string, activityId: string) {
-    return this._buildUrl('/partner/' + responsePlanId
-      + '/partner-activity/' + activityId + '/');
+    return this._buildUrl('/partner/' + responsePlanId + '/partner-activity/' + activityId + '/');
   },
 
   responseParametersClustersObjectiveDetail(objectiveId: string) {
@@ -212,11 +186,7 @@ const Endpoints = {
   },
 
   clusterIndicatorNames(responsePlanId: string) {
-    return this._buildUrl(
-      '/cluster/' +
-      responsePlanId +
-      '/cluster-reportable-simple-list/'
-    );
+    return this._buildUrl('/cluster/' + responsePlanId + '/cluster-reportable-simple-list/');
   },
 
   clusterNames(responsePlanId: string) {
@@ -248,9 +218,7 @@ const Endpoints = {
   },
 
   partnerActivityUpdate(responsePlanId: string, activityId: string) {
-    return this._buildUrl(
-      '/partner/' + responsePlanId + '/update-partner-activity/' + activityId + '/'
-    );
+    return this._buildUrl('/partner/' + responsePlanId + '/update-partner-activity/' + activityId + '/');
   },
 
   partnersByClusterActivityId(clusterActivityId: string) {
@@ -262,18 +230,11 @@ const Endpoints = {
   },
 
   reportExport(locationId: string, reportId: string) {
-    return this._buildUrl('/unicef/' + locationId + '/progress-reports/' +
-      reportId + '/annex-C-export-PDF/');
+    return this._buildUrl('/unicef/' + locationId + '/progress-reports/' + reportId + '/annex-C-export-PDF/');
   },
 
   clusterDashboard(responsePlanId: string, mode: string) {
-    return this._buildUrl(
-      '/cluster/' +
-      responsePlanId +
-      '/' +
-      mode +
-      '-dashboard/'
-    );
+    return this._buildUrl('/cluster/' + responsePlanId + '/' + mode + '-dashboard/');
   },
 
   clusterIndicatorLocations(responsePlanId: string) {
@@ -305,9 +266,7 @@ const Endpoints = {
   },
 
   analysisOperationalPresence(responsePlanId: string, type: string) {
-    return this._buildUrl(
-      '/cluster/cluster-analysis/' + responsePlanId + '/operational-presence/' + type
-    );
+    return this._buildUrl('/cluster/cluster-analysis/' + responsePlanId + '/operational-presence/' + type);
   },
 
   analysisIndicators(responsePlanId: string) {
@@ -345,6 +304,6 @@ const Endpoints = {
   ochaProjectDetails(projectId: string) {
     return this._buildUrl('/ocha/projects/' + projectId + '/');
   }
-}
+};
 
 export default Endpoints;

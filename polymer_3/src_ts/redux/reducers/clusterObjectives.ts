@@ -59,12 +59,12 @@ function loadingClusterObjectivesReducer(state = false, action: any) {
 function indicatorsByClusterObjectiveIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.clusterObjectiveId] = action.data;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -77,12 +77,12 @@ function indicatorsByClusterObjectiveIdReducer(state = {}, action: any) {
 function indicatorsByClusterObjectiveIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.clusterObjectiveId] = action.count;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;

@@ -16,26 +16,18 @@ import {GenericObject} from '../../../typings/globals.types';
 class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="[[localize('location')]]"
-        name="location"
-        value="[[value]]"
-        data="[[options]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="[[localize('location')]]" name="location" value="[[value]]" data="[[options]]">
+      </searchable-dropdown-filter>
+    `;
   }
-
 
   @property({type: String, computed: '_computeLocationsUrl(locationId, reportId)', observer: '_fetchLocations'})
   locationsUrl!: string;
@@ -57,15 +49,11 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocations() {
-    const self = this;
     const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     thunk()
       .then((res: GenericObject) => {
-        self.set('options', [{
-          id: '',
-          title: 'All'
-        }].concat(res.data || []));
+        this.set('options', [{id: '', title: 'All'}].concat(res.data || []));
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -76,7 +64,6 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.connectedCallback();
     (this.$.locations as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('report-location-filter', ReportLocationFilter);

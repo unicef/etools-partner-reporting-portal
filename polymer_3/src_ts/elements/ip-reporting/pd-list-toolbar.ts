@@ -6,24 +6,20 @@ import '../download-button';
 import {computePdUrl} from './js/pd-list-toolbar-functions';
 
 class PdListToolbar extends UtilsMixin(PolymerElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-toolbar
-      query="{{query}}"
-      location-id="{{locationId}}"
-    >
-      <!-- TODO: Possibly use https://www.webcomponents.org/element/Collaborne/iron-file-icons for different files? -->
-      <download-button url="[[pdfExportUrl]]">PDF</download-button>
-      <download-button url="[[xlsxExportUrl]]">XLS</download-button>
-    </etools-prp-toolbar>
-  `;
+      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
+        <!-- TODO: Possibly use https://www.webcomponents.org/element/Collaborne/iron-file-icons for different files? -->
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
+        <download-button url="[[xlsxExportUrl]]">XLS</download-button>
+      </etools-prp-toolbar>
+    `;
   }
 
   @property({type: String})
@@ -35,10 +31,10 @@ class PdListToolbar extends UtilsMixin(PolymerElement) {
   @property({type: String, computed: '_computePdUrl(locationId)'})
   pdUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdUrl, query, \'export=xlsx\')'})
+  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=xlsx')"})
   xlsxExportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdUrl, query, \'export=pdf\')'})
+  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=pdf')"})
   pdfExportUrl!: string;
 
   _computePdUrl(locationId: string) {

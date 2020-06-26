@@ -7,7 +7,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 
-
 /**
  * @polymer
  * @customElement
@@ -15,45 +14,40 @@ import '../disaggregation-table-row';
  * @appliesMixin UtilsMixin
  */
 class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement)) {
-
   public static get template() {
     // language=HTML
     return html`
       ${disaggregationTableStyles}
       <style></style>
 
-      <tr class='horizontal layout headerRow'>
+      <tr class="horizontal layout headerRow">
         <th></th>
 
-        <template is="dom-repeat"
-                  items="[[columns]]"
-                  as="column">
+        <template is="dom-repeat" items="[[columns]]" as="column">
           <th>[[_capitalizeFirstLetter(column.value)]]</th>
         </template>
 
         <th>Total</th>
       </tr>
 
-      <template
-          is="dom-repeat"
-          items="[[rowsForDisplay]]"
-          as="row">
+      <template is="dom-repeat" items="[[rowsForDisplay]]" as="row">
         <disaggregation-table-row
-            data="[[row]]"
-            level-reported="[[data.level_reported]]"
-            indicator-type="[[data.display_type]]"
-            row-type="middleRow"
-            editable="[[editable]]">
+          data="[[row]]"
+          level-reported="[[data.level_reported]]"
+          indicator-type="[[data.display_type]]"
+          row-type="middleRow"
+          editable="[[editable]]"
+        >
         </disaggregation-table-row>
       </template>
 
       <disaggregation-table-row
-          data="[[totalsForDisplay]]"
-          level-reported="[[data.level_reported]]"
-          indicator-type="[[data.display_type]]"
-          row-type="totalsRow">
+        data="[[totalsForDisplay]]"
+        level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
+        row-type="totalsRow"
+      >
       </disaggregation-table-row>
-
     `;
   }
 
@@ -78,7 +72,6 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
   @property({type: Object, computed: '_determineRowsForDisplay(columns, rows, data)'})
   rowsForDisplay!: GenericObject;
 
-
   _getColumns(mapping: any[]) {
     return (mapping[0] || []).choices;
   }
@@ -92,9 +85,8 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
   }
 
   _determineTotals(columns: any[], data: GenericObject) {
-    const self = this;
-    const columnData = columns.map(function(z) {
-      const formatted = self._formatDisaggregationIds([z.id]);
+    const columnData = columns.map((z) => {
+      const formatted = this._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,
@@ -111,7 +103,6 @@ class TwoDisaggregations extends UtilsMixin(DisaggregationMixin(PolymerElement))
       }
     };
   }
-
 }
 
 window.customElements.define('two-disaggregations', TwoDisaggregations);

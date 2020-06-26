@@ -16,25 +16,25 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
   public static get template() {
     // language=HTML
     return html`
-     <style>
-      :host {
-        display: block;
+      <style>
+        :host {
+          display: block;
 
-        --paper-input-container: {
-          padding: 0;
-        };
+          --paper-input-container: {
+            padding: 0;
+          }
 
-        --paper-input-container-input: {
-          font-size: 13px;
-        };
+          --paper-input-container-input: {
+            font-size: 13px;
+          }
 
-        --paper-input-container-input-webkit-spinner: {
-          display: none;
-        };
-      }
-    </style>
+          --paper-input-container-input-webkit-spinner: {
+            display: none;
+          }
+        }
+      </style>
 
-    <paper-input
+      <paper-input
         id="field"
         value="[[value]]"
         allowed-pattern="^\\d*\\.?\\d*$"
@@ -43,8 +43,9 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
         min="[[min]]"
         on-value-changed="_inputValueChanged"
         no-label-float
-        required>
-    </paper-input>
+        required
+      >
+      </paper-input>
     `;
   }
 
@@ -65,7 +66,6 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
 
   @property({type: Boolean, notify: true})
   invalid!: boolean;
-
 
   connectedCallback() {
     super.connectedCallback();
@@ -92,7 +92,6 @@ class DisaggregationField extends DisaggregationFieldMixin(ReduxConnectedElement
       value: this._toNumericValues(change)
     });
   }
-
 }
 
 window.customElements.define('disaggregation-field', DisaggregationField);

@@ -16,7 +16,6 @@ import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter/location-filter';
 import '../../elements/filters/date-filter/date-filter';
 
-
 /**
  * @polymer
  * @customElement
@@ -46,14 +45,9 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
       <filter-list filters="{{filters}}">
         <div class="app-grid">
@@ -61,22 +55,21 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
             class="item"
             label="[[localize('pd_ref_and_title')]]"
             name="pd_ref_title"
-            value="[[queryParams.pd_ref_title]]">
+            value="[[queryParams.pd_ref_title]]"
+          >
           </text-filter>
 
-          <location-filter
-            class="item"
-            value="[[_withDefault(queryParams.location, '')]]">
-          </location-filter>
+          <location-filter class="item" value="[[_withDefault(queryParams.location, '')]]"> </location-filter>
 
           <dropdown-filter-multi
-              class="item item-2-col"
-              label="[[localize('report_status')]]"
-              name="status"
-              value="[[_withDefault(queryParams.status, '')]]"
-              data="[[statuses]]"
-              disabled="[[_equals(queryParams.due, '1')]]"
-              hide-search>
+            class="item item-2-col"
+            label="[[localize('report_status')]]"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]"
+            disabled="[[_equals(queryParams.due, '1')]]"
+            hide-search
+          >
           </dropdown-filter-multi>
 
           <dropdown-filter-multi
@@ -85,7 +78,8 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
             name="report_type"
             value="[[_withDefault(queryParams.report_type, '')]]"
             data="[[types]]"
-            hide-search>
+            hide-search
+          >
           </dropdown-filter-multi>
         </div>
       </filter-list>
@@ -124,7 +118,6 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
       {title: this.localize('sr'), id: 'SR'}
     ];
   }
-
 }
 
 window.customElements.define('progress-reports-filters', ProgressReportsFilters);

@@ -3,8 +3,8 @@ import Constants from '../../constants';
 
 export class ProgressReportsState {
   all = [];
-  count: number = 0;
-  loading = false
+  count = 0;
+  loading = false;
 }
 
 export const ProgressReports = combineReducers({

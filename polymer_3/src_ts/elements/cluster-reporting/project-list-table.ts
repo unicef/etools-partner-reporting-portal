@@ -22,7 +22,6 @@ import {tableStyles} from '../../styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -32,9 +31,9 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
-  UtilsMixin(LocalizeMixin(ReduxConnectedElement))))) {
-
+class ProjectListTable extends DataTableMixin(
+  PaginationMixin(RoutingMixin(UtilsMixin(LocalizeMixin(ReduxConnectedElement))))
+) {
   public static get template() {
     return html`
       ${tableStyles}
@@ -72,24 +71,17 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
         }
       </style>
 
-      <iron-location
-        query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <iron-query-params
-          params-string="{{anchorQuery}}"
-          params-object="{{anchorQueryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{anchorQuery}}" params-object="{{anchorQueryParams}}"> </iron-query-params>
 
       <div class="wrapper">
         <etools-content-panel no-header>
           <etools-data-table-header
-              label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+          >
             <etools-data-table-column field="title" sortable>
               <div class="table-column">[[localize('project')]]</div>
             </etools-data-table-column>
@@ -113,20 +105,16 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
           </etools-data-table-header>
 
           <etools-data-table-footer
-              page-size="[[pageSize]]"
-              page-number="[[pageNumber]]"
-              total-results="[[totalResults]]"
-              visible-range="{{visibleRange}}"
-              on-page-size-changed="_pageSizeChanged"
-              on-page-number-changed="_pageNumberChanged">
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged"
+          >
           </etools-data-table-footer>
 
-          <template
-              id="list"
-              is="dom-repeat"
-              items="[[projects]]"
-              as="project"
-              initial-count="[[pageSize]]">
+          <template id="list" is="dom-repeat" items="[[projects]]" as="project" initial-count="[[pageSize]]">
             <etools-data-table-row>
               <div slot="row-data">
                 <div class="table-cell table-cell--text">
@@ -148,9 +136,7 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
                   [[_commaSeparatedDictValues(project.locations, 'title')]]
                 </div>
                 <div class="table-cell table-cell--text">
-                  <template
-                      is="dom-if"
-                      if="[[project.is_ocha_imported]]">
+                  <template is="dom-if" if="[[project.is_ocha_imported]]">
                     <iron-icon icon="icons:check"></iron-icon>
                   </template>
                 </div>
@@ -178,18 +164,16 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
             </etools-data-table-row>
           </template>
 
-          <list-placeholder
-              data="[[projects]]"
-              loading="[[loading]]">
-          </list-placeholder>
+          <list-placeholder data="[[projects]]" loading="[[loading]]"> </list-placeholder>
 
           <etools-data-table-footer
-              page-size="[[pageSize]]"
-              page-number="[[pageNumber]]"
-              total-results="[[totalResults]]"
-              visible-range="{{visibleRange}}"
-              on-page-size-changed="_pageSizeChanged"
-              on-page-number-changed="_pageNumberChanged">
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged"
+          >
           </etools-data-table-footer>
 
           <etools-loading active="[[loading]]"></etools-loading>
@@ -207,7 +191,11 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
   @property({type: Object})
   queryParams!: GenericObject;
 
-  @property({type: Array, observer: '_tableContentChanged', computed: 'getReduxStateArray(rootState.partnerProjects.all)'})
+  @property({
+    type: Array,
+    observer: '_tableContentChanged',
+    computed: 'getReduxStateArray(rootState.partnerProjects.all)'
+  })
   projects!: GenericObject[];
 
   @property({type: Boolean, computed: 'getReduxStateValue(rootState.partnerProjects.loading)'})
@@ -227,7 +215,6 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
 
   @property({type: Object, computed: '_withDefaultParams(queryParams)'})
   anchorQueryParams!: GenericObject;
-
 
   _openModal() {
     (this.shadowRoot!.querySelector('#modal') as any).open();
@@ -264,7 +251,6 @@ class ProjectListTable extends DataTableMixin(PaginationMixin(RoutingMixin(
     this._removeEventListeners();
     this.openedDetails.length = 0;
   }
-
 }
 
 window.customElements.define('project-list-table', ProjectListTable);

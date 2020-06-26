@@ -6,7 +6,6 @@ import '../download-button';
 import {property} from '@polymer/decorators/lib/decorators';
 import {computePdReportsUrl, canExport} from './js/progress-reports-toolbar-functions';
 
-
 /**
  * @polymer
  * @customElement
@@ -21,9 +20,7 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <etools-prp-toolbar
-        query="{{query}}"
-        location-id="{{locationId}}">
+      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
           <download-button url="[[pdfExportUrl]]">PDF</download-button>
           <download-button url="[[xlsExportUrl]]">XLS</download-button>
@@ -47,10 +44,10 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_computePdReportsUrl(locationId)'})
   pdReportsUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdReportsUrl, query, \'export=xlsx\')'})
+  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, 'export=xlsx')"})
   xlsExportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdReportsUrl, query, \'export=pdf\')'})
+  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, 'export=pdf')"})
   pdfExportUrl!: string;
 
   _computePdReportsUrl(locationId: string) {
@@ -60,7 +57,6 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
   _canExport(totalResults: number) {
     return canExport(totalResults);
   }
-
 }
 
 window.customElements.define('progress-reports-toolbar', ProgressReportsToolbar);

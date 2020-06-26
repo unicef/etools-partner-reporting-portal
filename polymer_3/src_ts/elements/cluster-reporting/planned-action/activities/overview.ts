@@ -11,47 +11,44 @@ import {PlannedActionActivityEditingModalEl} from './editing-modal';
 import {GenericObject} from '../../../../typings/globals.types';
 
 /**
-* @polymer
-* @appliesMixin LocalizeMixin
-*/
+ * @polymer
+ * @appliesMixin LocalizeMixin
+ */
 class PaActivityDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
-
   static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <page-body>
+      <page-body>
+        <template is="dom-if" if="[[permissions.createPartnerEntities]]" restamp="true">
+          <planned-action-activity-editing-modal
+            id="modal"
+            edit-data="[[activityData]]"
+          ></planned-action-activity-editing-modal>
 
-      <template is="dom-if"
-        if="[[permissions.createPartnerEntities]]"
-        restamp="true">
-        <planned-action-activity-editing-modal id="modal" edit-data="[[activityData]]"></planned-action-activity-editing-modal>
+          <div id="action">
+            <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('edit_activity')]]
+            </paper-button>
+          </div>
+        </template>
 
-        <div id="action">
-          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('edit_activity')]]
-          </paper-button>
-        </div>
-      </template>
-
-      <activity-details-display activity-data=[[activityData]]></activity-details-display>
-    </page-body>
-  `;
+        <activity-details-display activity-data="[[activityData]]"></activity-details-display>
+      </page-body>
+    `;
   }
 
   @property({type: Object})

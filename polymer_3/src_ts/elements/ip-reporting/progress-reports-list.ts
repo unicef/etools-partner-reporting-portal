@@ -23,7 +23,6 @@ import {tableStyles} from '../../styles/table-styles';
 import {GenericObject} from '../../typings/globals.types';
 import {getReportTitle} from './js/progress-reports-list-functions';
 
-
 /**
  * @polymer
  * @customElement
@@ -35,9 +34,11 @@ import {getReportTitle} from './js/progress-reports-list-functions';
  * @appliesMixin SortingMixin
  * @appliesMixin LocalizeMixin
  */
-class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtilsMixin(
-  RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement))))))) {
-
+class ProgressReportsList extends LocalizeMixin(
+  SortingMixin(
+    ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))))
+  )
+) {
   public static get template() {
     return html`
       ${tableStyles}
@@ -47,23 +48,19 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
 
           --ecp-content: {
             padding: 0;
-          };
+          }
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
       <etools-content-panel panel-title="[[localize('list_of_reports')]]">
         <etools-data-table-header
-            no-collapse
-            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]">
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+        >
           <etools-data-table-column field="programme_document__reference_number" sortable>
             <div class="table-column">[[localize('pd_ref_number')]]</div>
           </etools-data-table-column>
@@ -85,20 +82,16 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
         </etools-data-table-header>
 
         <etools-data-table-footer
-            page-size="[[pageSize]]"
-            page-number="[[pageNumber]]"
-            total-results="[[totalResults]]"
-            visible-range="{{visibleRange}}"
-            on-page-size-changed="_pageSizeChanged"
-            on-page-number-changed="_pageNumberChanged">
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged"
+        >
         </etools-data-table-footer>
 
-        <template
-          id="list"
-          is="dom-repeat"
-          items="[[data]]"
-          as="report"
-          initial-count="[[pageSize]]">
+        <template id="list" is="dom-repeat" items="[[data]]" as="report" initial-count="[[pageSize]]">
           <etools-data-table-row no-collapse>
             <div slot="row-data">
               <div class="table-cell table-cell--text">
@@ -111,10 +104,7 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
                 <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
               </div>
               <div class="table-cell table-cell--text">
-                <report-status
-                    status="[[report.status]]"
-                    report-type="[[report.report_type]]">
-                </report-status>
+                <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>
               </div>
               <div class="table-cell table-cell--text">
                 [[_withDefault(report.due_date, '-')]]
@@ -129,18 +119,16 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
           </etools-data-table-row>
         </template>
 
-        <list-placeholder
-            data="[[data]]"
-            loading="[[loading]]">
-        </list-placeholder>
+        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
 
         <etools-data-table-footer
-            page-size="[[pageSize]]"
-            page-number="[[pageNumber]]"
-            total-results="[[totalResults]]"
-            visible-range="{{visibleRange}}"
-            on-page-size-changed="_pageSizeChanged"
-            on-page-number-changed="_pageNumberChanged">
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged"
+        >
         </etools-data-table-footer>
 
         <etools-loading active="[[loading]]"></etools-loading>
@@ -160,7 +148,6 @@ class ProgressReportsList extends LocalizeMixin(SortingMixin(ProgressReportUtils
   _getReportTitle(report: GenericObject) {
     return getReportTitle(report);
   }
-
 }
 
 window.customElements.define('progress-reports-list', ProgressReportsList);
