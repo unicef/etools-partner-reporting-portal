@@ -22,7 +22,6 @@ from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.validators import UniqueTogetherValidator
 from unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
@@ -2007,15 +2006,6 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'unit',
             'display_type',
         )
-        validators = [
-            UniqueTogetherValidator(
-                queryset=IndicatorBlueprint.objects.all(),
-                fields=[
-                    "blueprint_id",
-                    "external_business_area_code",
-                ],
-            )
-        ]
 
 
 class PMPDisaggregationSerializer(serializers.ModelSerializer):
@@ -2070,15 +2060,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'numerator_label',
             'denominator_label',
         )
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Reportable.objects.all(),
-                fields=[
-                    "id",
-                    "external_business_area_code",
-                ],
-            )
-        ]
 
 
 class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
