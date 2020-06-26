@@ -1,5 +1,9 @@
+from core.models import GatewayType, Location
+from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 from core.tests import factories
 from core.tests.base import BaseAPITestCase
+from indicator.models import IndicatorBlueprint, Reportable
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPReportableSerializer
 from partner.models import Partner
 from partner.serializers import PMPPartnerSerializer
 from unicef.models import ProgrammeDocument, Section
@@ -128,3 +132,98 @@ class TestProcessModel(BaseAPITestCase):
             filter_dict=filter_dict,
         )
         self.assertTrue(section_qs.exists())
+
+    def test_blueprint(self):
+        pd = factories.ProgrammeDocumentFactory()
+        data = {
+            'id': 34,
+            'blueprint_id': 34,
+            'title': '# of children reached',
+        }
+        filter_dict = {
+            'external_id': data['blueprint_id'],
+            'reportables__lower_level_outputs__cp_output__programme_document': pd.pk
+        }
+        blueprint_qs = IndicatorBlueprint.objects.filter(**filter_dict)
+        self.assertFalse(blueprint_qs.exists())
+        process_model(
+            IndicatorBlueprint,
+            PMPIndicatorBlueprintSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        # self.assertTrue(blueprint_qs.exists())
+
+    def test_reportable(self):
+        blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+        pd = factories.ProgrammeDocumentFactory()
+        data = {
+            'id': 34,
+            'blueprint_id': blueprint.pk,
+            'disaggregation_ids': [],
+            'content_type': 47,
+            'object_id': 1,
+        }
+        filter_dict = {
+            'external_id': data['blueprint_id'],
+            'lower_level_outputs__cp_output__programme_document': pd.pk
+        }
+        reportable_qs = Reportable.objects.filter(**filter_dict)
+        self.assertFalse(reportable_qs.exists())
+        process_model(
+            Reportable,
+            PMPReportableSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        # self.assertTrue(reportable_qs.exists())
+
+    def test_gateway_type(self):
+        country = factories.CountryFactory()
+        data = {
+            'id': 8136,
+            'name': 'Abaipur',
+            'pcode': '40448010',
+            'location_type': 'BGD-Admin Level 4',
+            'admin_level': 4,
+            'gateway_country': country.pk,
+        }
+        filter_dict = {
+            'admin_level': data['admin_level'],
+            'country': data['gateway_country'],
+        }
+        gateway_type_qs = GatewayType.objects.filter(**filter_dict)
+        self.assertFalse(gateway_type_qs.exists())
+        process_model(
+            GatewayType,
+            PMPGatewayTypeSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertTrue(gateway_type_qs.exists())
+
+    def test_location(self):
+        country = factories.CountryFactory()
+        gateway = factories.GatewayTypeFactory(country=country)
+        data = {
+            'id': 8136,
+            'name': 'Abaipur',
+            'pcode': '40448010',
+            'location_type': 'BGD-Admin Level 4',
+            'admin_level': 4,
+            'gateway_country': country.pk,
+            'gateway': gateway.pk,
+        }
+        filter_dict = {
+            'gateway': data['gateway'],
+            'p_code': data['pcode'],
+        }
+        location_qs = Location.objects.filter(**filter_dict)
+        self.assertFalse(location_qs.exists())
+        process_model(
+            Location,
+            PMPLocationSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertTrue(location_qs.exists())

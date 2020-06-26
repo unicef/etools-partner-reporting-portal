@@ -4,6 +4,7 @@ from cluster.models import Cluster
 from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 from utils.serializers import CurrentWorkspaceDefault
 
 from .models import Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
@@ -231,6 +232,15 @@ class PMPGatewayTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = GatewayType
         fields = ('location_type', 'admin_level', 'gateway_country')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=GatewayType.objects.all(),
+                fields=[
+                    "gateway_country",
+                    "admin_level",
+                ],
+            )
+        ]
 
 
 class PMPLocationSerializer(serializers.ModelSerializer):
@@ -242,6 +252,15 @@ class PMPLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('name', 'pcode', 'gateway')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Location.objects.all(),
+                fields=[
+                    "name",
+                    "pcode",
+                ],
+            )
+        ]
 
 
 class PRPRoleUpdateSerializer(serializers.ModelSerializer):
