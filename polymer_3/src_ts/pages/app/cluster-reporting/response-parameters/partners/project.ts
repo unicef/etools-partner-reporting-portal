@@ -20,92 +20,61 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../../../typings/globals.types';
 
-
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ */
 class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-      .tabs paper-tab {
-        text-transform: uppercase;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <etools-prp-ajax
-      id="project"
-      url="[[overviewUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="project" url="[[overviewUrl]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{parentRoute}}"
-      pattern="/:id"
-      data="{{parentRouteData}}"
-      tail="{{route}}">
-    </app-route>
+      <app-route route="{{parentRoute}}" pattern="/:id" data="{{parentRouteData}}" tail="{{route}}"> </app-route>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" data="{{routeData}}"> </app-route>
 
-    <page-header
-        title="[[projectData.title]]"
-        back="[[backLink]]">
+      <page-header title="[[projectData.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('project')]]"> </page-badge>
 
-      <page-badge
-        slot="above-title" name="[[localize('project')]]">
-      </page-badge>
+        <div slot="toolbar">
+          <project-status status="[[projectData.status]]"></project-status>
+        </div>
 
-      <div slot="toolbar">
-        <project-status status="[[projectData.status]]"></project-status>
-      </div>
+        <div slot="tabs">
+          <paper-tabs selected="{{routeData.tab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('project_indicators')]]</paper-tab>
+            <paper-tab name="activities">[[localize('activities')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('project_indicators')]]</paper-tab>
-          <paper-tab name="activities">[[localize('activities')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <rp-partner-project-details-overview project-data="[[projectData]]"> </rp-partner-project-details-overview>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-partner-project-details-overview
-          project-data="[[projectData]]">
-      </rp-partner-project-details-overview>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <rp-partner-project-details-indicators project-id="[[parentRouteData.id]]" project-data="[[projectData]]">
+        </rp-partner-project-details-indicators>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-partner-project-details-indicators
-          project-id="[[parentRouteData.id]]"
-          project-data="[[projectData]]">
-      </rp-partner-project-details-indicators>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <rp-partner-project-details-activities
-          project-data="[[projectData]]"
-          project-id="[[parentRouteData.id]]">
-      </rp-partner-project-details-activities>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+        <rp-partner-project-details-activities project-data="[[projectData]]" project-id="[[parentRouteData.id]]">
+        </rp-partner-project-details-activities>
+      </template>
     `;
   }
 
@@ -128,9 +97,7 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   updatePending = false;
 
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)'
-    ];
+    return ['_updateUrlTab(routeData.tab)'];
   }
 
   private _projectAjaxDebouncer!: Debouncer;
@@ -161,22 +128,19 @@ class Project extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       return;
     }
 
-    this._projectAjaxDebouncer = Debouncer.debounce(this._projectAjaxDebouncer,
-      timeOut.after(100),
-      () => {
-        const thunk = (this.$.project as EtoolsPrpAjaxEl).thunk();
-        const self = this;
+    this._projectAjaxDebouncer = Debouncer.debounce(this._projectAjaxDebouncer, timeOut.after(100), () => {
+      const thunk = (this.$.project as EtoolsPrpAjaxEl).thunk();
 
-        thunk()
-          .then((res: GenericObject) => {
-            self.updatePending = false;
-            self.projectData = res.data;
-          })
-          .catch((_err: GenericObject) => {
-            self.updatePending = false;
-            // TODO: error handling
-          });
-      });
+      thunk()
+        .then((res: GenericObject) => {
+          this.updatePending = false;
+          this.projectData = res.data;
+        })
+        .catch((_err: GenericObject) => {
+          this.updatePending = false;
+          // TODO: error handling
+        });
+    });
   }
 
   _addEventListeners() {

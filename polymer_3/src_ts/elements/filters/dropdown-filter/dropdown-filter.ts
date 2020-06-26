@@ -11,7 +11,6 @@ import {fireEvent} from '../../../utils/fire-custom-event';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
-
 /**
  * @polymer
  * @customElement
@@ -21,44 +20,37 @@ import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      paper-dropdown-menu {
-        width: 100%;
-      }
+        paper-dropdown-menu {
+          width: 100%;
+        }
 
-      paper-listbox paper-item {
-        height: 48px;
-        cursor: pointer;
-        padding: 0 16px;
-        white-space: nowrap;
-      }
-    </style>
+        paper-listbox paper-item {
+          height: 48px;
+          cursor: pointer;
+          padding: 0 16px;
+          white-space: nowrap;
+        }
+      </style>
 
-    <paper-dropdown-menu
-        id="field"
-        label="[[label]]"
-        disabled="[[disabled]]"
-        always-float-label>
-      <paper-listbox
+      <paper-dropdown-menu id="field" label="[[label]]" disabled="[[disabled]]" always-float-label>
+        <paper-listbox
           slot="dropdown-content"
           selected="{{value}}"
           attr-for-selected="item-value"
-          on-iron-select="_handleFilterChange">
-        <template
-            id="repeat"
-            is="dom-repeat"
-            items="[[data]]">
-          <paper-item item-value="[[item.id]]">[[item.title]]</paper-item>
-        </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-  `;
+          on-iron-select="_handleFilterChange"
+        >
+          <template id="repeat" is="dom-repeat" items="[[data]]">
+            <paper-item item-value="[[item.id]]">[[item.title]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+    `;
   }
-
 
   @property({type: Boolean})
   disabled!: boolean;
@@ -83,7 +75,6 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
       this._filterReady();
     }
   }
-
 }
 
 window.customElements.define('dropdown-filter', DropdownFilter);

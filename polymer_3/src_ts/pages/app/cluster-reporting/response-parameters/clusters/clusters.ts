@@ -18,84 +18,70 @@ import './router';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ */
 class Clusters extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    ${sharedStyles}
-    <style include="iron-flex iron-flex-alignment">
-      :host {
-        display: block;
-      }
+      ${sharedStyles}
+      <style include="iron-flex iron-flex-alignment">
+        :host {
+          display: block;
+        }
 
-      page-header {
-        padding-top: 0;
-      }
+        page-header {
+          padding-top: 0;
+        }
 
-      .tabs paper-tab {
-        text-transform: uppercase;
-      }
-    </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:subpage"
-      data="{{routeData}}"
-      tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
-      <div class="page-top-content">
-        <page-header title="[[localize('clusters')]]">
+      <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+        <div class="page-top-content">
+          <page-header title="[[localize('clusters')]]">
+            <div slot="toolbar" class="toolbar horizontal end-justified layout">
+              <filter-list-by-cluster></filter-list-by-cluster>
+            </div>
 
-          <div slot="toolbar" class="toolbar horizontal end-justified layout">
-            <filter-list-by-cluster></filter-list-by-cluster>
-          </div>
+            <div slot="tabs">
+              <paper-tabs
+                selected="{{routeData.subpage}}"
+                attr-for-selected="name"
+                on-iron-activate="_resetPage"
+                scrollable
+                hide-scroll-buttons
+              >
+                <paper-tab name="objectives">
+                  <span class="tab-content">[[localize('objectives')]]</span>
+                </paper-tab>
 
-          <div slot="tabs">
-            <paper-tabs
-              selected="{{routeData.subpage}}"
-              attr-for-selected="name"
-              on-iron-activate="_resetPage"
-              scrollable
-              hide-scroll-buttons>
+                <paper-tab name="activities">
+                  <span class="tab-content">[[localize('cluster_activities')]]</span>
+                </paper-tab>
 
-              <paper-tab name="objectives">
-                <span class="tab-content">[[localize('objectives')]]</span>
-              </paper-tab>
+                <paper-tab name="disaggregations">
+                  <span class="tab-content">[[localize('disaggregations')]]</span>
+                </paper-tab>
+              </paper-tabs>
+            </div>
+          </page-header>
+        </div>
+      </template>
 
-              <paper-tab name="activities">
-                <span class="tab-content">[[localize('cluster_activities')]]</span>
-              </paper-tab>
-
-              <paper-tab name="disaggregations">
-                <span class="tab-content">[[localize('disaggregations')]]</span>
-              </paper-tab>
-            </paper-tabs>
-          </div>
-        </page-header>
-      </div>
-    </template>
-
-    <response-parameters-clusters-router
-      route="{{subroute}}"
-      page="{{subpage}}">
-    </response-parameters-clusters-router>
+      <response-parameters-clusters-router route="{{subroute}}" page="{{subpage}}">
+      </response-parameters-clusters-router>
     `;
   }
 
@@ -109,9 +95,7 @@ class Clusters extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
   subpage!: string;
 
   static get observers() {
-    return [
-      '_routeChanged(routeData.subpage)'
-    ];
+    return ['_routeChanged(routeData.subpage)'];
   }
 
   _routeChanged(subpage: string) {

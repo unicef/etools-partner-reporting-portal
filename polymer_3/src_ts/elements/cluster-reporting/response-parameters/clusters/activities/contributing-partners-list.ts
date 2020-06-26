@@ -34,7 +34,9 @@ import {GenericObject} from '../../../../../typings/globals.types';
  * @appliesMixin RoutingMixin
  * @appliesMixin PaginationMixin
  */
-class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))) {
+class ContributingPartnersList extends LocalizeMixin(
+  UtilsMixin(DataTableMixin(RoutingMixin(PaginationMixin(ReduxConnectedElement))))
+) {
   public static get template() {
     // language=HTML
     return html`
@@ -158,7 +160,9 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
                 [[_withDefault(item.phone_number)]]
               </div>
               <div class="table-cell table-cell--text cell-activity">
-                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">[[localize('see_activity')]]</a>
+                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">
+                  [[localize('see_activity')]]
+                </a>
               </div>
             </div>
             <div slot="row-data-details">
@@ -268,21 +272,17 @@ class ContributingPartnersList extends LocalizeMixin(UtilsMixin(DataTableMixin(R
     if (!partner_activities) {
       return;
     }
-    const id = (partner_activities.filter(function(activity: GenericObject) {
-      return Number(activity.cluster_activity) === Number(activityId);
-    })[0] || {}).id;
+    const id = (
+      partner_activities.filter(function (activity: GenericObject) {
+        return Number(activity.cluster_activity) === Number(activityId);
+      })[0] || {}
+    ).id;
 
-    return this.buildUrl(
-      _baseUrlCluster,
-      '/response-parameters/clusters/activity/' + id + '/overview'
-    );
+    return this.buildUrl(_baseUrlCluster, '/response-parameters/clusters/activity/' + id + '/overview');
   }
 
   _getProjectUrl(_baseUrlCluster: string, projectId: string) {
-    return this.buildUrl(
-      _baseUrlCluster,
-      '/response-parameters/partners/project/' + projectId + '/overview'
-    );
+    return this.buildUrl(_baseUrlCluster, '/response-parameters/partners/project/' + projectId + '/overview');
   }
 
   _addEventListeners() {

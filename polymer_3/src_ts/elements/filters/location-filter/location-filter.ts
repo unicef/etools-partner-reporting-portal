@@ -16,26 +16,18 @@ import {GenericObject} from '../../../typings/globals.types';
 class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="[[localize('location')]]"
-        name="location"
-        value="[[value]]"
-        data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="[[localize('location')]]" name="location" value="[[value]]" data="[[data]]">
+      </searchable-dropdown-filter>
+    `;
   }
-
 
   @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
   locationsUrl!: string;
@@ -54,23 +46,26 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchLocations(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
 
     (this.$.locations as EtoolsPrpAjaxEl).abort();
-    (this.$.locations as EtoolsPrpAjaxEl).thunk()()
+    (this.$.locations as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.set('data', [{
-          id: '',
-          title: 'All'
-        }].concat(res.data || []));
+        this.set(
+          'data',
+          [
+            {
+              id: '',
+              title: 'All'
+            }
+          ].concat(res.data || [])
+        );
       })
-      // @ts-ignore
-      .catch((_err: GenericObject) => {
-        // TODO: error handling
+      .catch((err: GenericObject) => {
+        console.log(err);
       });
   }
 

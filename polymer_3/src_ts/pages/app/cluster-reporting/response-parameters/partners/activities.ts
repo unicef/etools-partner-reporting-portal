@@ -22,64 +22,49 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-* @appliesMixin SortingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ * @appliesMixin SortingMixin
+ */
 class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(ReduxConnectedElement)))) {
-
   static get template() {
     return html`
-    ${sharedStyles} ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+      ${sharedStyles} ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}" path="{{path}}"></iron-location>
+      <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="partnerActivities"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="partnerActivities" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
+      <page-body>
+        <partner-activities-filters></partner-activities-filters>
+        <template is="dom-if" if="[[_canAddActivity(permissions, responsePlanCurrent)]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_activity')]]
+            </paper-button>
+          </div>
+          <planned-action-activity-modal id="modal"></planned-action-activity-modal>
+        </template>
 
-      <partner-activities-filters></partner-activities-filters>
-      <template
-        is="dom-if"
-        if="[[_canAddActivity(permissions, responsePlanCurrent)]]"
-        restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_activity')]]
-          </paper-button>
-        </div>
-        <planned-action-activity-modal id="modal"></planned-action-activity-modal>
-      </template>
-
-      <activity-list-table page="response-parameters"></activity-list-table>
-
-    </page-body>
+        <activity-list-table page="response-parameters"></activity-list-table>
+      </page-body>
     `;
   }
 
@@ -96,9 +81,7 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
   responsePlanCurrent!: GenericObject;
 
   static get observers() {
-    return [
-      '_activitiesAjax(queryParams, url)'
-    ];
+    return ['_activitiesAjax(queryParams, url)'];
   }
 
   private _activitiesAjaxDebouncer!: Debouncer;
@@ -131,22 +114,20 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
     if (!this.url || !queryParams) {
       return;
     }
-    const self = this;
-    this._activitiesAjaxDebouncer = Debouncer.debounce(this._activitiesAjaxDebouncer,
-      timeOut.after(300),
-      () => {
-        const thunk = (self.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
-        (self.$.partnerActivities as EtoolsPrpAjaxEl).abort();
+    this._activitiesAjaxDebouncer = Debouncer.debounce(this._activitiesAjaxDebouncer, timeOut.after(300), () => {
+      const thunk = (this.$.partnerActivities as EtoolsPrpAjaxEl).thunk();
+      if (!Object.keys(queryParams).length) {
+        return;
+      }
+      (this.$.partnerActivities as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(fetchPartnerActivitiesList(thunk))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            //   // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(fetchPartnerActivitiesList(thunk))
+        // @ts-ignore
+        .catch((_err: GenericObject) => {
+          //   // TODO: error handling.
+        });
+    });
   }
 
   _addEventListeners() {
@@ -170,7 +151,6 @@ class RpPartnersActivities extends LocalizeMixin(RoutingMixin(SortingMixin(Utils
       this._activitiesAjaxDebouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('rp-partners-activities', RpPartnersActivities);

@@ -15,8 +15,7 @@ import {buttonsStyles} from '../../styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button';
 import {GenericObject} from '../../typings/globals.types';
-import {PolymerElement} from "@polymer/polymer/polymer-element";
-
+import {PolymerElement} from '@polymer/polymer/polymer-element';
 
 /**
  * @polymer
@@ -77,17 +76,10 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
 
       <template is="dom-repeat" items="[[value]]" as="dataDisagg">
         <div class="row layout horizontal">
-          <template
-              is="dom-if"
-              if="[[!readonly]]"
-              restamp="true">
+          <template is="dom-if" if="[[!readonly]]" restamp="true">
             <div class="flex-none layout vertical center-center col-actions">
               <div>
-                <paper-icon-button
-                    data-index$="[[index]]"
-                    class="remove-btn"
-                    on-tap="_remove"
-                    icon="icons:cancel">
+                <paper-icon-button data-index$="[[index]]" class="remove-btn" on-tap="_remove" icon="icons:cancel">
                 </paper-icon-button>
                 <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
               </div>
@@ -95,37 +87,33 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
           </template>
 
           <div class="col-name flex">
-            <template
-                is="dom-if"
-                if="[[readonly]]"
-                restamp="true">
+            <template is="dom-if" if="[[readonly]]" restamp="true">
               <paper-input
-                  label="[[localize('disaggregation_by')]]"
-                  value="[[dataDisagg.name]]"
-                  always-float-label
-                  disabled>
+                label="[[localize('disaggregation_by')]]"
+                value="[[dataDisagg.name]]"
+                always-float-label
+                disabled
+              >
               </paper-input>
             </template>
 
-            <template
-                is="dom-if"
-                if="[[!readonly]]"
-                restamp="true">
-                  <etools-dropdown
-                    class="dis-menu validate"
-                    id="disaggregationsDrop"
-                    data-index$="[[index]]"
-                    label="[[localize('disaggregation_by')]]"
-                    options="[[disaggregations]]"
-                    option-value="id"
-                    option-label="name"
-                    trigger-value-change-event
-                    on-etools-selected-item-changed="_setDisaggregation"
-                    disabled="[[readonly]]"
-                    hide-search
-                    always-float-label
-                    required>
-                  </etools-dropdown>
+            <template is="dom-if" if="[[!readonly]]" restamp="true">
+              <etools-dropdown
+                class="dis-menu validate"
+                id="disaggregationsDrop"
+                data-index$="[[index]]"
+                label="[[localize('disaggregation_by')]]"
+                options="[[disaggregations]]"
+                option-value="id"
+                option-label="name"
+                trigger-value-change-event
+                on-etools-selected-item-changed="_setDisaggregation"
+                disabled="[[readonly]]"
+                hide-search
+                always-float-label
+                required
+              >
+              </etools-dropdown>
             </template>
           </div>
 
@@ -135,21 +123,15 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
               label="[[localize('disaggregation_groups')]]"
               value="[[_formatChoices(dataDisagg)]]"
               always-float-label
-              disabled>
+              disabled
+            >
             </paper-input>
           </div>
-
         </div>
       </template>
 
-      <template
-          is="dom-if"
-          if="[[!readonly]]"
-          restamp="true">
-        <paper-button
-            class="btn-primary add-disaggregation-btn"
-            on-tap="_add"
-            disabled="[[!_canAddMore]]">
+      <template is="dom-if" if="[[!readonly]]" restamp="true">
+        <paper-button class="btn-primary add-disaggregation-btn" on-tap="_add" disabled="[[!_canAddMore]]">
           [[localize('add_disaggregation')]]
         </paper-button>
       </template>
@@ -157,7 +139,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   @property({type: Number})
-  threshold: number = 3;
+  threshold = 3;
 
   @property({type: Array, notify: true})
   value: any[] = [];
@@ -166,14 +148,13 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   disaggregations: any[] = [];
 
   @property({type: Boolean, notify: true})
-  invalid: boolean = false;
+  invalid = false;
 
   @property({type: Boolean})
-  _canAddMore: boolean = true;
+  _canAddMore = true;
 
   @property({type: Boolean})
-  readonly: boolean = false;
-
+  readonly = false;
 
   static get observers() {
     return ['_setCanAddMore(value.splices)'];
@@ -202,7 +183,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     const index = +(e.target as EtoolsDropdownEl).dataset.index!;
     const id = e.detail.selectedItem.id;
 
-    const selected = this.disaggregations.find(function(dis) {
+    const selected = this.disaggregations.find(function (dis) {
       return dis.id === id;
     });
 
@@ -214,9 +195,11 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   _formatChoices(selected: GenericObject) {
-    return selected.choices.map( (choice: GenericObject) => {
-      return choice.value;
-    }).join(', ');
+    return selected.choices
+      .map((choice: GenericObject) => {
+        return choice.value;
+      })
+      .join(', ');
   }
 
   _validate(e: CustomEvent) {
@@ -224,7 +207,6 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
   }
 
   validate() {
-    const self = this;
     this.set('invalid', false);
     const allMenus = this.shadowRoot!.querySelectorAll('.dis-menu');
     allMenus.forEach((menu: any) => {
@@ -233,7 +215,7 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
     allMenus.forEach((menu: any) => {
       if (!menu.selected) {
         menu.set('invalid', true);
-        self.set('invalid', true);
+        this.set('invalid', true);
       }
     });
     if (allMenus.length < 2) {
@@ -248,12 +230,11 @@ class DisaggregationsDropdownWidget extends UtilsMixin(LocalizeMixin(ReduxConnec
         if (chosen[i] === chosen[j]) {
           (allMenus[i] as PolymerElement).set('invalid', true);
           (allMenus[j] as PolymerElement).set('invalid', true);
-          self.set('invalid', true);
+          this.set('invalid', true);
         }
       }
     }
   }
-
 }
 
 window.customElements.define('disaggregations-dropdown-widget', DisaggregationsDropdownWidget);

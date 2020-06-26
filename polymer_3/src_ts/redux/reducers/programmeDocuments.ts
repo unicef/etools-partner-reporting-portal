@@ -3,9 +3,9 @@ import Constants from '../../constants';
 
 export class ProgrammeDocumentsState {
   all: any[] = [];
-  current: string = '';
-  count: number = 0;
-  loading: boolean = false;
+  current = '';
+  count = 0;
+  loading = false;
 }
 
 export const ProgrammeDocuments = combineReducers({

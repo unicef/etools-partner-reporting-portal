@@ -21,102 +21,81 @@ import RoutingMixin from '../../../../../mixins/routing-mixin';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ */
 class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-    :host {
-      display: block;
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
 
-      --page-header-above-title: {
-        position: absolute;
-        display: block;
-        left: 0;
-        top: -23px;
-      };
-    }
+          --page-header-above-title: {
+            position: absolute;
+            display: block;
+            left: 0;
+            top: -23px;
+          }
+        }
 
-    .toolbar report-status {
-      margin-right: 1em;
-    }
+        .toolbar report-status {
+          margin-right: 1em;
+        }
 
-    .toolbar a {
-      color: var(--theme-primary-color);
-      text-decoration: none;
-    }
+        .toolbar a {
+          color: var(--theme-primary-color);
+          text-decoration: none;
+        }
 
-    .tabs paper-tab {
-      text-transform: uppercase;
-    }
-  </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <etools-prp-ajax
-      id="activity"
-      url="[[url]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activity" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      subroute="{{subroute}}"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" subroute="{{subroute}}" data="{{routeData}}"> </app-route>
 
-    <page-header
-        title="[[data.title]]"
-        back="[[backLink]]">
+      <page-header title="[[data.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('cluster_activity')]]"> </page-badge>
 
-      <page-badge
-        slot="above-title" name="[[localize('cluster_activity')]]">
-      </page-badge>
+        <div slot="toolbar">
+          <project-status status="[[data.status]]"></project-status>
+        </div>
 
-      <div slot="toolbar">
-        <project-status status="[[data.status]]"></project-status>
-      </div>
+        <div slot="tabs">
+          <paper-tabs selected="{{routeData.tab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
+            <paper-tab name="contributing-partners">[[localize('contributing_partners')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
-          <paper-tab name="contributing-partners">[[localize('contributing_partners')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <rp-clusters-activity-overview data="[[data]]"></rp-clusters-activity-overview>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-clusters-activity-overview data=[[data]]></rp-clusters-activity-overview>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <rp-clusters-activity-indicators
+          activity-data="[[data]]"
+          activity-id="[[activityId]]"
+          cluster-id="[[data.cluster]]"
+        >
+        </rp-clusters-activity-indicators>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-clusters-activity-indicators
-        activity-data="[[data]]"
-        activity-id="[[activityId]]"
-        cluster-id="[[data.cluster]]">
-      </rp-clusters-activity-indicators>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">
-      <rp-clusters-activity-contributing-partners
-        activity-id=[[activityId]]>
-      </rp-clusters-activity-contributing-partners>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">
+        <rp-clusters-activity-contributing-partners activity-id="[[activityId]]">
+        </rp-clusters-activity-contributing-partners>
+      </template>
     `;
   }
 
@@ -142,10 +121,7 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
   updatePending = false;
 
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)',
-      '_getActivityAjax(url)'
-    ];
+    return ['_updateUrlTab(routeData.tab)', '_getActivityAjax(url)'];
   }
 
   _onSuccess() {
@@ -175,17 +151,14 @@ class Activity extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEleme
     if (!this.url) {
       return;
     }
-
     const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-    const self = this;
-
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        self.data = res.data;
+        this.updatePending = false;
+        this.data = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

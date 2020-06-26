@@ -19,7 +19,6 @@ import {sharedStyles} from '../../../styles/shared-styles';
 // to display the Planned Action page header and tabs.  It passes the page name to
 // planned-action-projects-router.
 
-
 /**
  * @polymer
  * @customElement
@@ -27,72 +26,58 @@ import {sharedStyles} from '../../../styles/shared-styles';
  * @appliesMixin LocalizeMixin
  */
 class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${sharedStyles}
-    <style include="iron-flex iron-flex-alignment">
-      :host {
-        display: block;
-      }
+      ${sharedStyles}
+      <style include="iron-flex iron-flex-alignment">
+        :host {
+          display: block;
+        }
 
-      page-header {
-        padding-top: 0;
-      }
+        page-header {
+          padding-top: 0;
+        }
 
-      .tabs paper-tab {
-        text-transform: uppercase;
-      }
-    </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:subpage"
-      data="{{routeData}}"
-      tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
-      <div class="page-top-content">
-        <page-header title="[[localize('my_planned_action')]]">
-          <div class="toolbar horizontal end-justified layout">
-            <filter-list-by-cluster></filter-list-by-cluster>
-          </div>
-          <div slot="tabs">
-            <paper-tabs
-              selected="{{routeData.subpage}}"
-              attr-for-selected="name"
-              on-iron-activate="_resetPage"
-              scrollable
-              hide-scroll-buttons>
+      <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+        <div class="page-top-content">
+          <page-header title="[[localize('my_planned_action')]]">
+            <div class="toolbar horizontal end-justified layout">
+              <filter-list-by-cluster></filter-list-by-cluster>
+            </div>
+            <div slot="tabs">
+              <paper-tabs
+                selected="{{routeData.subpage}}"
+                attr-for-selected="name"
+                on-iron-activate="_resetPage"
+                scrollable
+                hide-scroll-buttons
+              >
+                <paper-tab name="projects">
+                  <span class="tab-content">[[localize('projects')]]</span>
+                </paper-tab>
 
-              <paper-tab name="projects">
-                <span class="tab-content">[[localize('projects')]]</span>
-              </paper-tab>
+                <paper-tab name="activities">
+                  <span class="tab-content">[[localize('activities')]]</span>
+                </paper-tab>
+              </paper-tabs>
+            </div>
+          </page-header>
+        </div>
+      </template>
 
-              <paper-tab name="activities">
-                <span class="tab-content">[[localize('activities')]]</span>
-              </paper-tab>
-            </paper-tabs>
-          </div>
-        </page-header>
-      </div>
-    </template>
-
-    <planned-action-projects-router
-      route="{{subroute}}"
-      page="{{subpage}}">
-    </planned-action-projects-router>
-  `;
+      <planned-action-projects-router route="{{subroute}}" page="{{subpage}}"> </planned-action-projects-router>
+    `;
   }
 
   @property({type: Object})
@@ -102,9 +87,7 @@ class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxCo
   subpage!: string;
 
   static get observers() {
-    return [
-      '_routeChanged(routeData.subpage)'
-    ];
+    return ['_routeChanged(routeData.subpage)'];
   }
 
   _routeChanged(subpage: string) {
@@ -141,8 +124,6 @@ class PageClusterReportingPlannedAction extends LocalizeMixin(UtilsMixin(ReduxCo
     }
     this.set('queryParams', queryParams);
   }
-
 }
 
 window.customElements.define('page-cluster-reporting-planned-action', PageClusterReportingPlannedAction);
-

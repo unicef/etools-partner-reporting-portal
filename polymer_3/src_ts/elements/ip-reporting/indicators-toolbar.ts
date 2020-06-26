@@ -12,23 +12,19 @@ import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
  * @appliesMixin UtilsMixin
  */
 class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-toolbar
-      query="{{query}}"
-      location-id="{{locationId}}">
-
-      <download-button url="[[xlsExportUrl]]">XLS</download-button>
-      <download-button url="[[pdfExportUrl]]">PDF</download-button>
-    </etools-prp-toolbar>
-  `;
+      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
+        <download-button url="[[xlsExportUrl]]">XLS</download-button>
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
+      </etools-prp-toolbar>
+    `;
   }
 
   @property({type: String})
@@ -40,10 +36,10 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
   @property({type: String, computed: '_computeIndicatorsUrl(locationId)'})
   indicatorsUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(indicatorsUrl, query, \'export=xlsx\')'})
+  @property({type: String, computed: "_appendQuery(indicatorsUrl, query, 'export=xlsx')"})
   xlsExportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(indicatorsUrl, query, \'export=pdf\')'})
+  @property({type: String, computed: "_appendQuery(indicatorsUrl, query, 'export=pdf')"})
   pdfExportUrl!: string;
 
   _computeIndicatorsUrl(locationId: string) {

@@ -1,14 +1,12 @@
 import {property} from '@polymer/decorators/lib/decorators';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
 
-
 /**
  * Why the f$%& is this component needed?
  * @polymer
  * @customElement
  */
 class EtoolsPrpWorkspaces extends ReduxConnectedElement {
-
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _current!: string;
 
@@ -28,7 +26,6 @@ class EtoolsPrpWorkspaces extends ReduxConnectedElement {
   _computeAll(_all: any[]) {
     return _all.slice();
   }
-
 }
 
 window.customElements.define('etools-prp-workspaces', EtoolsPrpWorkspaces);

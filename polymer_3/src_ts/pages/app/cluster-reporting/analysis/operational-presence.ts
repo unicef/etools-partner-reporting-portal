@@ -18,7 +18,10 @@ import Endpoints from '../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
-import {analysis_operationalPresence_fetchData, analysis_operationalPresence_fetchMap} from '../../../../redux/actions/analysis';
+import {
+  analysis_operationalPresence_fetchData,
+  analysis_operationalPresence_fetchMap
+} from '../../../../redux/actions/analysis';
 
 /**
  * @polymer
@@ -27,161 +30,144 @@ import {analysis_operationalPresence_fetchData, analysis_operationalPresence_fet
  * @appliesMixin LocalizeMixin
  */
 class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    <style include="iron-flex iron-flex-alignment app-grid-style">
-      :host {
-        display: block;
+      <style include="iron-flex iron-flex-alignment app-grid-style">
+        :host {
+          display: block;
 
-        --app-grid-columns: 2;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
+          --app-grid-columns: 2;
+          --app-grid-gutter: 25px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
 
-        --ecp-content: {
+          --ecp-content: {
+            padding: 0;
+            background: #fff;
+          }
+        }
+
+        .full-width {
+          @apply --app-grid-expandible-item;
+        }
+
+        .header {
+          padding: 0 25px;
+          background: var(--paper-grey-300);
+        }
+
+        .header h2,
+        .header dl {
+          margin: 0;
+          font-size: 18px;
+          line-height: 48px;
+          font-weight: normal;
+          color: var(--paper-grey-600);
+        }
+
+        .header dt,
+        .header dd {
+          display: inline;
+        }
+
+        .header dd {
+          margin-left: 0.5em;
+          color: var(--theme-primary-color);
+        }
+
+        .clusters {
           padding: 0;
-          background: #fff;
-        };
-      }
+          margin: 0;
+          list-style: none;
+        }
 
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
+        .clusters li:not(:first-child) {
+          padding-left: 0.75em;
+          margin-left: 0.75em;
+          border-left: 1px solid var(--paper-grey-300);
+        }
 
-      .header {
-        padding: 0 25px;
-        background: var(--paper-grey-300);
-      }
+        hr {
+          border-top: 0;
+          border-bottom: 1px solid var(--paper-grey-200);
+        }
+      </style>
 
-      .header h2,
-      .header dl {
-        margin: 0;
-        font-size: 18px;
-        line-height: 48px;
-        font-weight: normal;
-        color: var(--paper-grey-600);
-      }
+      <iron-location query="{{query}}"> </iron-location>
 
-      .header dt,
-      .header dd {
-        display: inline;
-      }
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      .header dd {
-        margin-left: .5em;
-        color: var(--theme-primary-color);
-      }
+      <etools-prp-ajax id="data" url="[[dataUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-      .clusters {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
+      <etools-prp-ajax id="map" url="[[mapUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-      .clusters li:not(:first-child) {
-        padding-left: .75em;
-        margin-left: .75em;
-        border-left: 1px solid var(--paper-grey-300);
-      }
+      <etools-content-panel no-header>
+        <header class="header layout horizontal justified">
+          <h2>[[localize('clusters')]]</h2>
+          <dl>
+            <dt>[[localize('number_of_clusters')]]:</dt>
+            <dd>[[numberOfClusters]]</dd>
+          </dl>
+        </header>
 
-      hr {
-        border-top: 0;
-        border-bottom: 1px solid var(--paper-grey-200);
-      }
-    </style>
-
-    <iron-location
-        query="{{query}}">
-    </iron-location>
-
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
-
-    <etools-prp-ajax
-        id="data"
-        url="[[dataUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-        id="map"
-        url="[[mapUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
-
-    <etools-content-panel no-header>
-      <header class="header layout horizontal justified">
-        <h2>[[localize('clusters')]]</h2>
-        <dl>
-          <dt>[[localize('number_of_clusters')]]:</dt>
-          <dd>[[numberOfClusters]]</dd>
-        </dl>
-      </header>
-
-      <div class="app-grid">
-        <div class="item full-width">
-          <ul class="clusters layout horizontal wrap">
-            <template
-                is="dom-repeat"
-                items="[[clusters]]"
-                as="cluster">
-              <li>[[cluster.title]]</li>
-            </template>
-          </ul>
+        <div class="app-grid">
+          <div class="item full-width">
+            <ul class="clusters layout horizontal wrap">
+              <template is="dom-repeat" items="[[clusters]]" as="cluster">
+                <li>[[cluster.title]]</li>
+              </template>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <header class="header layout horizontal justified">
-        <h2>[[localize('partners')]]</h2>
-        <dl>
-          <dt>[[localize('number_of_partners')]]:</dt>
-          <dd>[[numberOfPartners]]</dd>
-        </dl>
-      </header>
+        <header class="header layout horizontal justified">
+          <h2>[[localize('partners')]]</h2>
+          <dl>
+            <dt>[[localize('number_of_partners')]]:</dt>
+            <dd>[[numberOfPartners]]</dd>
+          </dl>
+        </header>
 
-      <div class="app-grid">
-        <div class="item">
-          <partners-per-type></partners-per-type>
+        <div class="app-grid">
+          <div class="item">
+            <partners-per-type></partners-per-type>
+          </div>
+          <div class="item">
+            <partners-per-cluster></partners-per-cluster>
+          </div>
         </div>
-        <div class="item">
-          <partners-per-cluster></partners-per-cluster>
+
+        <hr />
+
+        <div class="app-grid">
+          <div class="item full-width">
+            <partners-per-cluster-objective></partners-per-cluster-objective>
+          </div>
         </div>
-      </div>
 
-      <hr>
+        <hr />
 
-      <div class="app-grid">
-        <div class="item full-width">
-          <partners-per-cluster-objective></partners-per-cluster-objective>
+        <div class="app-grid">
+          <div class="item full-width">
+            <operational-presence-map></operational-presence-map>
+          </div>
         </div>
-      </div>
 
-      <hr>
+        <hr />
 
-      <div class="app-grid">
-        <div class="item full-width">
-          <operational-presence-map></operational-presence-map>
+        <div class="app-grid">
+          <div class="item full-width">
+            <operational-presence-table></operational-presence-table>
+          </div>
         </div>
-      </div>
-
-      <hr>
-
-      <div class="app-grid">
-        <div class="item full-width">
-          <operational-presence-table></operational-presence-table>
-        </div>
-      </div>
-    </etools-content-panel>
-  `;
+      </etools-content-panel>
+    `;
   }
 
-  @property({type: String, computed: '_computeApiUrl(responsePlanId, \'data\')'})
+  @property({type: String, computed: "_computeApiUrl(responsePlanId, 'data')"})
   dataUrl!: string;
 
-  @property({type: String, computed: '_computeApiUrl(responsePlanId, \'map\')'})
+  @property({type: String, computed: "_computeApiUrl(responsePlanId, 'map')"})
   mapUrl!: string;
 
   @property({type: String, computed: 'getReduxStateValue(rootState.responsePlans.currentID)'})
@@ -200,10 +186,7 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
   private fetchMapDebouncer!: Debouncer;
 
   static get observers() {
-    return [
-      '_fetchData(dataUrl, queryParams)',
-      '_fetchMap(mapUrl, queryParams)'
-    ];
+    return ['_fetchData(dataUrl, queryParams)', '_fetchMap(mapUrl, queryParams)'];
   }
 
   _computeApiUrl(responsePlanId: string, type: string) {
@@ -217,20 +200,19 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
     if (!this.dataUrl) {
       return;
     }
-    const self = this;
-    this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer,
-      timeOut.after(300),
-      () => {
-        const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
 
-        (self.$.data as EtoolsPrpAjaxEl).abort();
+    this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer, timeOut.after(300), () => {
+      const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
 
-        self.reduxStore.dispatch(analysis_operationalPresence_fetchData(dataThunk))
-          // @ts-ignore
-          .catch((_err: any) => {
-            // TODO: error handling
-          });
-      });
+      (this.$.data as EtoolsPrpAjaxEl).abort();
+
+      this.reduxStore
+        .dispatch(analysis_operationalPresence_fetchData(dataThunk))
+        // @ts-ignore
+        .catch((_err: any) => {
+          // TODO: error handling
+        });
+    });
   }
 
   _fetchMap() {
@@ -238,31 +220,25 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
       return;
     }
 
-    const self = this;
-    this.fetchMapDebouncer = Debouncer.debounce(this.fetchMapDebouncer,
-      timeOut.after(300),
-      () => {
-        const mapThunk = (this.$.map as EtoolsPrpAjaxEl).thunk();
+    this.fetchMapDebouncer = Debouncer.debounce(this.fetchMapDebouncer, timeOut.after(300), () => {
+      const mapThunk = (this.$.map as EtoolsPrpAjaxEl).thunk();
 
-        (self.$.map as EtoolsPrpAjaxEl).abort();
+      (this.$.map as EtoolsPrpAjaxEl).abort();
 
-        self.reduxStore.dispatch(analysis_operationalPresence_fetchMap(mapThunk))
-          // @ts-ignore
-          .catch((_err: any) => {
-            // TODO: error handling
-          });
-      });
+      this.reduxStore
+        .dispatch(analysis_operationalPresence_fetchMap(mapThunk))
+        // @ts-ignore
+        .catch((_err: any) => {
+          // TODO: error handling
+        });
+    });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    this._cancelDebouncers([
-      this.fetchDataDebouncer,
-      this.fetchMapDebouncer
-    ]);
+    this._cancelDebouncers([this.fetchDataDebouncer, this.fetchMapDebouncer]);
   }
-
 }
 
 window.customElements.define('page-analysis-operational-presence', PageAnalysisOperationalPresence);

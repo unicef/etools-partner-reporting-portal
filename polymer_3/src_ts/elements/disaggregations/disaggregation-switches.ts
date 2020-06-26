@@ -14,7 +14,6 @@ import {fireEvent} from '../../utils/fire-custom-event';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-
 /**
  * @polymer
  * @customElement
@@ -51,31 +50,19 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
         }
       </style>
 
-      <template
-          is="dom-if"
-          if="[[editableBool]]"
-          restamp>
+      <template is="dom-if" if="[[editableBool]]" restamp>
         <div class="container">
           <h4>[[localize('enter_data_by_disaggregation')]]</h4>
-          <template
-              is="dom-repeat"
-              items="[[mapping]]"
-              as="field">
-            <paper-checkbox
-                id="[[field.id]]"
-                checked="[[_computeChecked(field.id)]]"
-                on-change="_fieldValueChanged">
+          <template is="dom-repeat" items="[[mapping]]" as="field">
+            <paper-checkbox id="[[field.id]]" checked="[[_computeChecked(field.id)]]" on-change="_fieldValueChanged">
               [[_formatFieldName(field.name)]]
             </paper-checkbox>
           </template>
 
-          <template
-              is="dom-if"
-              if="[[warning]]"
-              restamp="true">
-            <message-box
-                type="warning">
-              If one or more disaggregation box is unchecked, the reporting table will be simplified however the report will not be in line with the disaggregation agreed in the PD/SSFA.
+          <template is="dom-if" if="[[warning]]" restamp="true">
+            <message-box type="warning">
+              If one or more disaggregation box is unchecked, the reporting table will be simplified however the report
+              will not be in line with the disaggregation agreed in the PD/SSFA.
             </message-box>
           </template>
         </div>
@@ -90,7 +77,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   editable!: number;
 
   @property({type: Boolean})
-  warning: boolean = true;
+  warning = true;
 
   @property({type: Array})
   reportedOn: number[] = [];
@@ -104,7 +91,7 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   @property({type: Boolean, computed: '_computeEditableBool(editable)'})
   editableBool!: boolean;
 
-  fieldValueChanged !: Debouncer | null;
+  fieldValueChanged!: Debouncer | null;
 
   static get observers() {
     return ['_computeWarning(data.num_disaggregation, reportedOn.length)'];
@@ -131,15 +118,15 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
   _fieldValueChanged(e: CustomEvent) {
     const field = <GenericObject>e.target;
 
-    this.fieldValueChanged = Debouncer.debounce(this.fieldValueChanged,
-      timeOut.after(100),
-      () => {
-        this._recordField(field);
+    this.fieldValueChanged = Debouncer.debounce(this.fieldValueChanged, timeOut.after(100), () => {
+      this._recordField(field);
 
-        this._confirmIntent(field)
-          .then(this._commit.bind(this))
-          .catch((_err: GenericObject) => {this._revert.bind(this);});
-      });
+      this._confirmIntent(field)
+        .then(this._commit.bind(this))
+        .catch((_err: GenericObject) => {
+          this._revert.bind(this);
+        });
+    });
   }
 
   _confirmIntent(field: GenericObject) {
@@ -147,17 +134,20 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
 
     fireEvent(this, 'disaggregation-modal-confirm', deferred);
 
-    return deferred.promise.catch(function() {
+    return deferred.promise.catch(function () {
       return Promise.reject(field);
     });
   }
 
   _commit() {
-    this.set('formattedData', Object.assign({}, this.formattedData, {
-      disaggregation: {},
-      level_reported: this.reportedOn.length,
-      disaggregation_reported_on: this.reportedOn
-    }));
+    this.set(
+      'formattedData',
+      Object.assign({}, this.formattedData, {
+        disaggregation: {},
+        level_reported: this.reportedOn.length,
+        disaggregation_reported_on: this.reportedOn
+      })
+    );
   }
 
   _revert(field: GenericObject) {
@@ -193,7 +183,6 @@ class DisaggregationSwitches extends UtilsMixin(LocalizeMixin(DisaggregationMixi
       this.fieldValueChanged.cancel();
     }
   }
-
 }
 
 window.customElements.define('disaggregation-switches', DisaggregationSwitches);

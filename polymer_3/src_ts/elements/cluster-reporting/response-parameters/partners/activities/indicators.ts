@@ -29,64 +29,54 @@ import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/par
 class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-    ${tableStyles} ${buttonsStyles}
-    <style include="iron-flex data-table-styles">
-      :host {
-        display: block;
-      }
+      ${tableStyles} ${buttonsStyles}
+      <style include="iron-flex data-table-styles">
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="indicators"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="indicators" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <template
-          is="dom-if"
-          if="[[canEdit]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_activity_indicator')]]
-          </paper-button>
-        </div>
-      </template>
+      <page-body>
+        <template is="dom-if" if="[[canEdit]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_activity_indicator')]]
+            </paper-button>
+          </div>
+        </template>
 
-      <indicator-modal
+        <indicator-modal
           id="indicatorModal"
           object-id="[[activityId]]"
           activity-data="[[activityData]]"
           object-type="partner.partneractivity"
-          modal-title="Add Activity Indicator">
-      </indicator-modal>
+          modal-title="Add Activity Indicator"
+        >
+        </indicator-modal>
 
-      <list-view-indicators
+        <list-view-indicators
           data="[[data]]"
           type="pa"
           total-results="[[totalResults]]"
           is-custom="[[isCustom]]"
-          can-edit="[[canEdit]]">
-      </list-view-indicators>
-    </page-body>
+          can-edit="[[canEdit]]"
+        >
+        </list-view-indicators>
+      </page-body>
     `;
   }
 
@@ -149,9 +139,7 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     if (!permissions || !activityData) {
       return;
     }
-    return activityData.cluster ?
-      permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) :
-      false;
+    return activityData.cluster ? permissions.createPartnerEntitiesByResponsePlan([activityData.cluster]) : false;
   }
 
   _onSuccess() {
@@ -169,7 +157,8 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
+    this.reduxStore
+      .dispatch(partnerActivitiesIndicatorsFetch(thunk, String(this.activityId)))
       // @ts-ignore
       .catch((_err: any) => {
         // TODO: error handling.
@@ -196,7 +185,6 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('rp-partner-activity-details-indicators', Indicators);

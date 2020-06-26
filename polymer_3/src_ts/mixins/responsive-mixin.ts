@@ -9,7 +9,6 @@ import Settings from '../settings';
  */
 function ResponsiveMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class ResponsiveClass extends baseClass {
-
     @property({type: String, readOnly: true})
     desktopLayoutQuery: string = Settings.layout.threshold;
 
@@ -19,15 +18,12 @@ function ResponsiveMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     };
 
     static get observers() {
-      return [
-        '_isDesktopChanged(isDesktop)'
-      ];
+      return ['_isDesktopChanged(isDesktop)'];
     }
 
     _isDesktopChanged() {
       this.updateStyles();
     }
-
   }
   return ResponsiveClass;
 }

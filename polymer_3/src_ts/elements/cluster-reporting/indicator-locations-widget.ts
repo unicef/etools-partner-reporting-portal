@@ -28,7 +28,6 @@ import Endpoints from '../../endpoints';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown';
 
-
 /**
  * @polymer
  * @customElement
@@ -50,7 +49,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           --app-grid-expandible-item-columns: 2;
           --esmm-list-wrapper: {
             height: 350px;
-          };
+          }
         }
 
         .app-grid {
@@ -113,48 +112,26 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         }
       </style>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-      <template
-          is="dom-repeat"
-          items="[[ajaxData]]">
-        <etools-prp-ajax
-            id="[[item.id]]"
-            url="[[locationsUrl]]"
-            params="[[item.params]]">
-        </etools-prp-ajax>
+      <template is="dom-repeat" items="[[ajaxData]]">
+        <etools-prp-ajax id="[[item.id]]" url="[[locationsUrl]]" params="[[item.params]]"> </etools-prp-ajax>
       </template>
 
-      <etools-prp-ajax
-        id="search">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="search"> </etools-prp-ajax>
 
-      <template
-          is="dom-if"
-          if="[[canMessageIMO]]"
-          restamp="true">
-        <message-imo-modal
-            id="message-modal"
-            cluster-id="[[clusterId]]"
-            indicator-id="[[indicatorId]]">
+      <template is="dom-if" if="[[canMessageIMO]]" restamp="true">
+        <message-imo-modal id="message-modal" cluster-id="[[clusterId]]" indicator-id="[[indicatorId]]">
         </message-imo-modal>
       </template>
 
       <header>
         <h3>[[localize('locations_plural')]] ([[value.length]])</h3>
-        <template
-            is="dom-if"
-            if="[[canMessageIMO]]"
-            restamp="true">
+        <template is="dom-if" if="[[canMessageIMO]]" restamp="true">
           <div class="layout horizontal justified">
             <div class="imo-msg-label self-end">[[localize('to_propose_baseline')]]</div>
             <div>
-              <paper-button
-                  class="imo-msg-btn btn-primary"
-                  on-tap="_msgIMO"
-                  noink>
+              <paper-button class="imo-msg-btn btn-primary" on-tap="_msgIMO" noink>
                 [[localize('send_message_imo')]]
               </paper-button>
             </div>
@@ -164,24 +141,18 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
       <template is="dom-repeat" items="[[value]]">
         <div class="row layout horizontal">
-          <template
-              is="dom-if"
-              if="[[!_isLocked(item, lockedItems)]]"
-              restamp="true">
-            <etools-prp-reset
-                trigger="[[item.loc_type]]"
-                reset="{{item.location}}"
-                skip-initial>
-            </etools-prp-reset>
+          <template is="dom-if" if="[[!_isLocked(item, lockedItems)]]" restamp="true">
+            <etools-prp-reset trigger="[[item.loc_type]]" reset="{{item.location}}" skip-initial> </etools-prp-reset>
 
             <div class="flex-none layout vertical center-center col-actions">
               <div>
                 <paper-icon-button
-                    index="[[index]]"
-                    class="remove-btn"
-                    data-index$="[[index]]"
-                    on-tap="_remove"
-                    icon="icons:cancel">
+                  index="[[index]]"
+                  class="remove-btn"
+                  data-index$="[[index]]"
+                  on-tap="_remove"
+                  icon="icons:cancel"
+                >
                 </paper-icon-button>
                 <paper-tooltip offset="5">[[localize('remove')]]</paper-tooltip>
               </div>
@@ -190,102 +161,85 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
           <div class="flex">
             <div class="app-grid">
-              <template
-                  is="dom-if"
-                  if="[[_isLocked(item, lockedItems)]]"
-                  restamp="true">
-                <labelled-item
-                    class="item"
-                    label="Location - administrative level">
+              <template is="dom-if" if="[[_isLocked(item, lockedItems)]]" restamp="true">
+                <labelled-item class="item" label="Location - administrative level">
                   <span class="readonly">Admin [[_getLocationAdminLevel(item)]]</span>
                 </labelled-item>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[!_isLocked(item, lockedItems)]]"
-                  restamp="true">
-                  <etools-dropdown
-                      class="item"
-                      label="[[localize('location_administrative_level')]]"
-                      options="[[locationTypes]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{item.loc_type}}"
-                      trigger-value-change-event
-                      on-etools-selected-item-changed="_onLocTypeChanged"
-                      data-index$="[[index]]"
-                      required>
-                  </etools-dropdown>
+              <template is="dom-if" if="[[!_isLocked(item, lockedItems)]]" restamp="true">
+                <etools-dropdown
+                  class="item"
+                  label="[[localize('location_administrative_level')]]"
+                  options="[[locationTypes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{item.loc_type}}"
+                  trigger-value-change-event
+                  on-etools-selected-item-changed="_onLocTypeChanged"
+                  data-index$="[[index]]"
+                  required
+                >
+                </etools-dropdown>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[_isLocked(item, lockedItems)]]"
-                  restamp="true">
-                <labelled-item
-                    class="item item-2-col"
-                    label="[[localize('location')]]">
+              <template is="dom-if" if="[[_isLocked(item, lockedItems)]]" restamp="true">
+                <labelled-item class="item item-2-col" label="[[localize('location')]]">
                   <span class="readonly">[[_getLocationTitle(item.id, index)]]</span>
                 </labelled-item>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[!_isLocked(item, lockedItems)]]"
-                  restamp="true">
+              <template is="dom-if" if="[[!_isLocked(item, lockedItems)]]" restamp="true">
                 <etools-dropdown
-                    class="item item-2-col validate"
-                    label="[[localize('location')]]"
-                    options="[[_getLocations(locations, item.loc_type, index)]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{item.location.id}}"
-                    selected-item="{{item.location}}"
-                    disabled$="[[_getPending(pending, item.loc_type, index)]]"
-                    data-index$="[[index]]"
-                    required>
+                  class="item item-2-col validate"
+                  label="[[localize('location')]]"
+                  options="[[_getLocations(locations, item.loc_type, index)]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{item.location.id}}"
+                  selected-item="{{item.location}}"
+                  disabled$="[[_getPending(pending, item.loc_type, index)]]"
+                  data-index$="[[index]]"
+                  required
+                >
                 </etools-dropdown>
               </template>
 
-              <template
-                  is="dom-if"
-                  if="[[indicatorType]]"
-                  restamp="true">
+              <template is="dom-if" if="[[indicatorType]]" restamp="true">
                 <json-field
-                    class="item validate"
-                    type="[[indicatorType]]"
-                    label="[[localize('baseline')]]"
-                    on-input="_validate"
-                    value="{{item.baseline}}"
-                    allowed-pattern="[+\\-\\d]"
-                    disabled="[[!canEditDetails]]"
-                    required="[[baselineRequirement]]">
+                  class="item validate"
+                  type="[[indicatorType]]"
+                  label="[[localize('baseline')]]"
+                  on-input="_validate"
+                  value="{{item.baseline}}"
+                  allowed-pattern="[+\\-\\d]"
+                  disabled="[[!canEditDetails]]"
+                  required="[[baselineRequirement]]"
+                >
                 </json-field>
 
-                <template
-                    is="dom-if"
-                    if="[[isNumber]]"
-                    restamp="true">
+                <template is="dom-if" if="[[isNumber]]" restamp="true">
                   <json-field
-                      class="item validate"
-                      type="[[indicatorType]]"
-                      label="[[localize('in_need')]]"
-                      on-input="_validate"
-                      value="{{item.in_need}}"
-                      allowed-pattern="[+\\-\\d]"
-                      disabled="[[!canEditDetails]]">
+                    class="item validate"
+                    type="[[indicatorType]]"
+                    label="[[localize('in_need')]]"
+                    on-input="_validate"
+                    value="{{item.in_need}}"
+                    allowed-pattern="[+\\-\\d]"
+                    disabled="[[!canEditDetails]]"
+                  >
                   </json-field>
                 </template>
 
                 <json-field
-                    class="item validate"
-                    type="[[indicatorType]]"
-                    label="[[localize('target')]]"
-                    on-input="_validate"
-                    value="{{item.target}}"
-                    allowed-pattern="[+\\-\\d]"
-                    required>
+                  class="item validate"
+                  type="[[indicatorType]]"
+                  label="[[localize('target')]]"
+                  on-input="_validate"
+                  value="{{item.target}}"
+                  allowed-pattern="[+\\-\\d]"
+                  required
+                >
                 </json-field>
               </template>
             </div>
@@ -293,9 +247,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         </div>
       </template>
 
-      <paper-button
-          class="btn-primary"
-          on-tap="_add">
+      <paper-button class="btn-primary" on-tap="_add">
         [[localize('add_location')]]
       </paper-button>
     `;
@@ -326,13 +278,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   pending!: any[];
 
   @property({type: Boolean})
-  isPai: boolean = false;
+  isPai = false;
 
   @property({type: String})
   searchLocationType!: string;
 
   @property({type: Boolean})
-  editing: boolean = false;
+  editing = false;
 
   @property({type: Boolean, computed: '_computeBaselineRequirement(isPai, editing)'})
   baselineRequirement!: boolean;
@@ -350,13 +302,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   value!: any[];
 
   @property({type: Boolean})
-  valueInitialized: boolean = false;
+  valueInitialized = false;
 
   @property({type: Boolean, notify: true})
-  invalid: boolean = false;
+  invalid = false;
 
   @property({type: Boolean})
-  locationsInitialized: boolean = false;
+  locationsInitialized = false;
 
   @property({type: Number})
   maxAdminLevel: number = Settings.cluster.maxLocType;
@@ -371,7 +323,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   locationsUrl!: string;
 
   @property({type: String})
-  locationTitle: string = '';
+  locationTitle = '';
 
   @property({type: Array, computed: '_computeAjaxData(maxAdminLevel)'})
   ajaxData!: any[];
@@ -381,7 +333,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   @property({type: Boolean, computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)'})
   canMessageIMO!: boolean;
-
 
   private _debouncer!: Debouncer;
 
@@ -401,23 +352,22 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _computeLocationTypes(maxAdminLevel: number) {
-    return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function(_, index) {
-        return {
-          id: String(index),
-          title: 'Admin' + index,
-        };
+    return Array(maxAdminLevel + 1)
+      .fill(0)
+      .map((_, index) => {
+        return {id: String(index), title: 'Admin' + index};
       });
   }
 
   _computeAjaxData(maxAdminLevel: number) {
-    return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function(_, index) {
+    return Array(maxAdminLevel + 1)
+      .fill(0)
+      .map((_, index) => {
         return {
           id: 'locations' + index,
           params: {
-            loc_type: String(index),
-          },
+            loc_type: String(index)
+          }
         };
       });
   }
@@ -426,9 +376,11 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     if (!permissions) {
       return;
     }
-    return !editing ||
+    return (
+      !editing ||
       (permissions.createClusterEntities && !isPAI) ||
-      (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
+      (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId)
+    );
   }
 
   _computeCanMessageIMO(editing: boolean, parentIndicatorId: number, permissions: GenericObject) {
@@ -449,7 +401,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       this.set('lockedItems', value.slice());
     });
   }
-
 
   _isLocked(item: any, locked: any[]) {
     if (!locked) {
@@ -486,7 +437,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _remove(e: CustomEvent) {
-
     // @ts-ignore
     const toRemove = +e.target!.dataset.index;
 
@@ -518,28 +468,25 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
     this.set('searchLocationType', loc_type);
 
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(100),
-      () => {
-        const self = this;
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
+      this._setPending(loc_type, true, index);
 
-        this._setPending(loc_type, true, index);
+      if (title !== undefined) {
+        // @ts-ignore
+        this.shadowRoot!.querySelector('#locations' + loc_type)!.params.title = title;
+      }
 
-        if (title !== undefined) {
-          // @ts-ignore
-          this.shadowRoot!.querySelector('#locations' + loc_type)!.params.title = title;
-        }
-
-        const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
-        thunk().then((res: GenericObject) => {
-          self.set('url', res.xhr.responseURL);
-          self._setPending(loc_type, false, index);
-          self._setLocations(loc_type, res.data.results, index);
+      const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
+      thunk()
+        .then((res: GenericObject) => {
+          this.set('url', res.xhr.responseURL);
+          this._setPending(loc_type, false, index);
+          this._setLocations(loc_type, res.data.results, index);
         })
-          .catch(function() {
-            self._setPending(loc_type, false, index);
-          });
-      });
+        .catch(() => {
+          this._setPending(loc_type, false, index);
+        });
+    });
   }
 
   _fetchInitialLocations(lockedItems: any[]) {
@@ -548,7 +495,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     const newLocations = this.locations.map((x: any) => x);
 
     if (lockedItems.length > 0) {
-      lockedItems.forEach(function(location, index) {
+      lockedItems.forEach(function (location, index) {
         if (location.admin_level === undefined) {
           newLocations[index] = {};
           newLocations[index][location.loc_type] = [location];
@@ -646,8 +593,8 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     super.disconnectedCallback();
     const locTypeDebouncers = Array(this.maxAdminLevel)
       .fill('fetch-locations-')
-      .map(function(item, index) {
-        return item + (++index);
+      .map(function (item, index) {
+        return item + ++index;
       });
 
     this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
@@ -659,7 +606,6 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
       this.messageModal = null;
     }
   }
-
 }
 
 window.customElements.define('indicator-locations-widget', IndicatorLocationsWidget);

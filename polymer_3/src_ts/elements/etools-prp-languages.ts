@@ -8,7 +8,6 @@ import {GenericObject} from '../typings/globals.types';
  * @customElement
  */
 class EtoolsPrpLanguages extends ReduxConnectedElement {
-
   static get template() {
     return html``;
   }
@@ -32,7 +31,6 @@ class EtoolsPrpLanguages extends ReduxConnectedElement {
   _computeAll(_all: GenericObject) {
     return Object.keys(_all).slice();
   }
-
 }
 window.customElements.define('etools-prp-languages', EtoolsPrpLanguages);
 

@@ -19,30 +19,33 @@ import '../../etools-prp-number';
 class NumberOfProjects extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-    ${dashboardWidgetStyles}
-    <style include="iron-flex">
-      :host {
-        display: block;
-      }
-    </style>
+      ${dashboardWidgetStyles}
+      <style include="iron-flex">
+        :host {
+          display: block;
+        }
+      </style>
 
-    <paper-card class="widget-container layout vertical">
-      <h3 class="widget-heading flex">[[localize('number_of_projects')]]</h3>
+      <paper-card class="widget-container layout vertical">
+        <h3 class="widget-heading flex">[[localize('number_of_projects')]]</h3>
 
-      <div class="widget-figure flex">
-        <etools-prp-number value="[[numberOfProjects]]"></etools-prp-number>
-      </div>
+        <div class="widget-figure flex">
+          <etools-prp-number value="[[numberOfProjects]]"></etools-prp-number>
+        </div>
 
-      <div class="widget-actions">
+        <div class="widget-actions">
           <a href="[[projectsUrl]]">[[localize('see_all_projects')]]</a>
-      </div>
+        </div>
 
-      <etools-loading active="[[loading]]"></etools-loading>
-    </paper-card>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </paper-card>
     `;
   }
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_projects_in_my_organization)'})
+  @property({
+    type: Number,
+    computed: 'getReduxStateValue(rootState.clusterDashboardData.data.num_of_projects_in_my_organization)'
+  })
   numberOfProjects = null;
 
   @property({type: String, computed: '_computePartnersUrl(_baseUrlCluster)'})
@@ -54,7 +57,6 @@ class NumberOfProjects extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)
   _computePartnersUrl(baseUrl: string) {
     return this.buildUrl(baseUrl, '/planned-action/projects');
   }
-
 }
 
 window.customElements.define('number-of-projects', NumberOfProjects);

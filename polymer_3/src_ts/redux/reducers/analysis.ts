@@ -20,7 +20,7 @@ export class AnalysisState {
       byId: {},
       loadingById: {}
     }
-  }
+  };
 }
 
 export const Analysis = combineReducers({
@@ -52,7 +52,6 @@ function operationalPresenceDataReducer(state = {}, action: any) {
 }
 
 function operationalPresenceDataLoadingReducer(state = false, action: any) {
-
   switch (action.type) {
     case Constants.OPERATIONAL_PRESENCE_DATA_LOADING_START:
       return true;
@@ -65,7 +64,7 @@ function operationalPresenceDataLoadingReducer(state = false, action: any) {
   }
 }
 
-function operationalPresenceMapReducer(state: {type: string, features: []}, action: any) {
+function operationalPresenceMapReducer(state: {type: string; features: []}, action: any) {
   if (typeof state === 'undefined') {
     state = {
       type: 'FeatureCollection',
@@ -121,13 +120,13 @@ function indicatorsDataLoadingReducer(state = false, action: any) {
 function indicatorDataByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ANALYSIS_INDICATOR_DATA:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.indicatorId] = action.data;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;
@@ -137,22 +136,22 @@ function indicatorDataByIdReducer(state = {}, action: any) {
 function indicatorDataLoadingByIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_START:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.indicatorId] = true;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.ANALYSIS_INDICATOR_DATA_LOADING_STOP:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.indicatorId] = false;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;

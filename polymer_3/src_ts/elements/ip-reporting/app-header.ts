@@ -11,86 +11,76 @@ import '../language-dropdown';
 import '../user-profile/profile-dropdown';
 import {property} from '@polymer/decorators';
 
-
 /**
  * @polymer
  * @customElement
  */
 class IpReportingAppHeader extends PolymerElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-        position: relative;
-        z-index: 100;
-        height: 65px;
-      }
+      <style>
+        :host {
+          display: block;
+          position: relative;
+          z-index: 100;
+          height: 65px;
+        }
 
-      app-header {
-        background: var(--theme-page-header-background-color);
-        position: fixed;
-        left: 225px;
-        right: 0px;
-      }
+        app-header {
+          background: var(--theme-page-header-background-color);
+          position: fixed;
+          left: 225px;
+          right: 0px;
+        }
 
-      app-toolbar {
-        @apply --layout-justified;
+        app-toolbar {
+          @apply --layout-justified;
 
-        padding-left: 0;
-      }
+          padding-left: 0;
+        }
 
-      workspace-dropdown {
-        @apply --layout-self-center;
-      }
+        workspace-dropdown {
+          @apply --layout-self-center;
+        }
 
-      .wrapper {
-        height: 100%;
+        .wrapper {
+          height: 100%;
 
-        @apply --layout-horizontal;
-        @apply --layout-center-center;
-      }
+          @apply --layout-horizontal;
+          @apply --layout-center-center;
+        }
 
-      .app-switcher-container {
-        width: 64px;
-        height: 100%;
-        margin-right: .75em;
-        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        .app-switcher-container {
+          width: 64px;
+          height: 100%;
+          margin-right: 0.75em;
+          border-right: 1px solid rgba(255, 255, 255, 0.3);
 
-        @apply --layout-vertical;
-        @apply --layout-center-center;
-      }
-    </style>
+          @apply --layout-vertical;
+          @apply --layout-center-center;
+        }
+      </style>
 
-    <app-header-layout fullbleed>
-      <app-header fixed>
-        <app-toolbar>
-          <div class="wrapper">
-            <div class="app-switcher-container">
-              <app-switcher></app-switcher>
+      <app-header-layout fullbleed>
+        <app-header fixed>
+          <app-toolbar>
+            <div class="wrapper">
+              <div class="app-switcher-container">
+                <app-switcher></app-switcher>
+              </div>
+              ${etoolsLogo}
             </div>
-            ${etoolsLogo}
-          </div>
 
+            <div class="wrapper">
+              <language-dropdown data="[[languages]]" current="[[language]]"> </language-dropdown>
+              <workspace-dropdown data="[[workspaces]]" current="[[workspace]]"> </workspace-dropdown>
 
-          <div class="wrapper">
-            <language-dropdown
-                data="[[languages]]"
-                current="[[language]]">
-            </language-dropdown>
-            <workspace-dropdown
-                data="[[workspaces]]"
-                current="[[workspace]]">
-            </workspace-dropdown>
-
-            <profile-dropdown></profile-dropdown>
-          </div>
-
-        </app-toolbar>
-      </app-header>
-    </app-header-layout>
-  `;
+              <profile-dropdown></profile-dropdown>
+            </div>
+          </app-toolbar>
+        </app-header>
+      </app-header-layout>
+    `;
   }
 
   @property({type: Array, computed: 'getReduxStateObject(rootState.localize.resources)'})

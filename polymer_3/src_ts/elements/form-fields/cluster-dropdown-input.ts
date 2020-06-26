@@ -13,7 +13,6 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  */
 class ClusterDropdownInput extends ReduxConnectedElement {
-
   static get template() {
     return html`
     <style>
@@ -62,7 +61,6 @@ class ClusterDropdownInput extends ReduxConnectedElement {
   @property({type: Number, notify: true})
   value!: number;
 
-
   _computeClusterNamesUrl(responsePlanId: string) {
     if (!responsePlanId) {
       return;
@@ -79,12 +77,12 @@ class ClusterDropdownInput extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
 
-    (this.$.clusterNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.clusterNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: GenericObject) => {
-        self.set('data', res.data);
+        this.set('data', res.data);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -104,7 +102,6 @@ class ClusterDropdownInput extends ReduxConnectedElement {
 
     (this.$.clusterNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-dropdown-input', ClusterDropdownInput);

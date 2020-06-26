@@ -19,14 +19,12 @@ export function computeShowImportButtons(programmeDocument: GenericObject) {
 }
 
 export function computeRefreshData(reportId: string) {
-  return {'report_id': reportId, 'report_type': 'PR'};
+  return {report_id: reportId, report_type: 'PR'};
 }
 
 export function computeCanRefresh(report: GenericObject, programmeDocument: GenericObject) {
   switch (true) {
-    case programmeDocument &&
-      (programmeDocument.status === 'Sig' ||
-        programmeDocument.status === 'Clo'):
+    case programmeDocument && (programmeDocument.status === 'Sig' || programmeDocument.status === 'Clo'):
     case programmeDocument && report.report_type === 'SR':
       return false;
 
@@ -36,7 +34,7 @@ export function computeCanRefresh(report: GenericObject, programmeDocument: Gene
 }
 
 export function computeShowRefresh(roles: any[]) {
-  return roles.every(function(role) {
+  return roles.every(function (role) {
     return role.role !== 'IP_ADMIN' && role.role !== 'IP_VIEWER';
   });
 }

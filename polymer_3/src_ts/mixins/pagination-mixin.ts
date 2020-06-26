@@ -3,14 +3,12 @@ import {Constructor, GenericObject} from '../typings/globals.types';
 import {property} from '@polymer/decorators';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 
-
 /**
  * @polymer
  * @mixinFunction
  */
 function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class PaginationClass extends baseClass {
-
     @property({type: Object})
     queryParams!: GenericObject;
 
@@ -23,9 +21,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     _tableContentDebouncer!: Debouncer | null;
 
     static get observers() {
-      return [
-        '_updateQueryParams(pageSize, pageNumber)'
-      ];
+      return ['_updateQueryParams(pageSize, pageNumber)'];
     }
 
     _computePageSize(queryParams: GenericObject) {
@@ -64,7 +60,7 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     _tableContentChanged() {
-      //(dci) to be removed, this logic moved to _pageNumberChanged
+      // (dci) to be removed, this logic moved to _pageNumberChanged
       // this._tableContentDebouncer = Debouncer.debounce(this._tableContentDebouncer,
       //   timeOut.after(100),
       //   () => {
@@ -80,7 +76,6 @@ function PaginationMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         this._tableContentDebouncer.cancel();
       }
     }
-
   }
   return PaginationClass;
 }

@@ -16,9 +16,13 @@
     "bundle": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp",
     "build": "export NODE_OPTIONS=--max_old_space_size=4096 && npm run tsToJs && polymer build",
     "tsToJs": "tsc --skipLibCheck || true",
-    "tsEslint": "npx eslint 'src_ts/**' --fix",
     "test": "gulp specs",
-    "test:watch": "gulp watch"
+    "test:watch": "gulp watch",
+    "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
+    "format:eslint": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
+    "lint:prettier": "prettier \"**/*.ts\" --check --ignore-path .gitignore",
+    "lint": "polymer lint && npm run lint:eslint",
+    "format": "npm run format:eslint"
   },
   "private": true,
   "dependencies": {
@@ -76,14 +80,19 @@
   },
   "devDependencies": {
     "@polymer/decorators": "^3.0.0",
-    "@typescript-eslint/eslint-plugin": "^3.1.0",
-    "@typescript-eslint/parser": "^3.1.0",
-    "@typescript-eslint/typescript-estree": "^3.1.0",
+    "@typescript-eslint/eslint-plugin": "^3.2.0",
+    "@typescript-eslint/parser": "^3.2.0",
+    "@typescript-eslint/typescript-estree": "^3.2.0",
     "axe-core": "^3.0.0",
     "del": "^3.0.0",
-    "eslint": "^7.1.0",
+    "eslint": "^7.2.0",
+    "prettier": "^2.0.5",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.10",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-html": "^6.0.2",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-html": "^6.0.1",
+    "eslint-plugin-prettier": "^3.1.4",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.3.0",
     "gulp-replace": "^1.0.0",
@@ -93,5 +102,15 @@
     "prpl-server": "^1.3.0",
     "puppeteer": "^1.5.0",
     "typescript": "^3.7.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && tsc --skipLibCheck"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
   }
 }

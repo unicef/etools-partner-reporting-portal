@@ -1,40 +1,39 @@
 import Constants from '../../constants';
 
-
-export const partnerActivitiesLoadingStart = function() {
+export const partnerActivitiesLoadingStart = function () {
   return {
     type: Constants.PARTNER_ACTIVITIES_LOADING_START
   };
 };
 
-export const partnerActivitiesLoadingStop = function() {
+export const partnerActivitiesLoadingStop = function () {
   return {
     type: Constants.PARTNER_ACTIVITIES_LOADING_STOP
   };
 };
 
-export const setPartnerActivitiesList = function(data: any) {
+export const setPartnerActivitiesList = function (data: any) {
   return {
     type: Constants.SET_PARTNER_ACTIVITIES_LIST,
     data: data
   };
 };
 
-export const setPartnerActivitiesCount = function(data: any) {
+export const setPartnerActivitiesCount = function (data: any) {
   return {
     type: Constants.SET_PARTNER_ACTIVITIES_COUNT,
     count: data.count
   };
 };
 
-export const fetchPartnerActivitiesList = function(thunk: any) {
-  return function(dispatch: any) {
+export const fetchPartnerActivitiesList = function (thunk: any) {
+  return function (dispatch: any) {
     dispatch(partnerActivitiesLoadingStart());
     return thunk()
-      .catch(function() {
+      .catch(function () {
         dispatch(partnerActivitiesLoadingStop());
       })
-      .then(function(res: any) {
+      .then(function (res: any) {
         dispatch(setPartnerActivitiesList(res.data));
         dispatch(setPartnerActivitiesCount(res.data));
         dispatch(partnerActivitiesLoadingStop());
@@ -88,13 +87,13 @@ export const fetchPartnerActivitiesList = function(thunk: any) {
 //   }
 // };
 
-const partnerActivitiesIndicatorsSetLoadingStart = function() {
+const partnerActivitiesIndicatorsSetLoadingStart = function () {
   return {
     type: Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_START
   };
 };
 
-export const partnerActivitiesIndicatorsSetIndicators = function(partnerActivityId: string, data: any) {
+export const partnerActivitiesIndicatorsSetIndicators = function (partnerActivityId: string, data: any) {
   return {
     type: Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID,
     partnerActivityId: partnerActivityId,
@@ -102,7 +101,7 @@ export const partnerActivitiesIndicatorsSetIndicators = function(partnerActivity
   };
 };
 
-export const partnerActivitiesIndicatorsSetCount = function(partnerActivityId: string, count: number) {
+export const partnerActivitiesIndicatorsSetCount = function (partnerActivityId: string, count: number) {
   return {
     type: Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID_COUNT,
     partnerActivityId: partnerActivityId,
@@ -110,25 +109,20 @@ export const partnerActivitiesIndicatorsSetCount = function(partnerActivityId: s
   };
 };
 
-const partnerActivitiesIndicatorsSetLoadingStop = function() {
+const partnerActivitiesIndicatorsSetLoadingStop = function () {
   return {
     type: Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_STOP
   };
 };
 
 // App.Actions.PartnerActivities.indicators
-export const partnerActivitiesIndicatorsFetch = function(thunk: any, partnerActivityId: string) {
-  return function(dispatch: any) {
+export const partnerActivitiesIndicatorsFetch = function (thunk: any, partnerActivityId: string) {
+  return function (dispatch: any) {
     dispatch(partnerActivitiesIndicatorsSetLoadingStart());
-    return thunk()
-      .then(function(res: any) {
-        dispatch(partnerActivitiesIndicatorsSetIndicators(
-          partnerActivityId, res.data.results
-        ));
-        dispatch(partnerActivitiesIndicatorsSetCount(
-          partnerActivityId, res.data.count
-        ));
-        dispatch(partnerActivitiesIndicatorsSetLoadingStop());
-      });
+    return thunk().then(function (res: any) {
+      dispatch(partnerActivitiesIndicatorsSetIndicators(partnerActivityId, res.data.results));
+      dispatch(partnerActivitiesIndicatorsSetCount(partnerActivityId, res.data.count));
+      dispatch(partnerActivitiesIndicatorsSetLoadingStop());
+    });
   };
 };

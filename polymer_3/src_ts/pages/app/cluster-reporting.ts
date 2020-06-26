@@ -25,58 +25,34 @@ import '../../pages/app/cluster-reporting/router';
  * @appliesMixin LocalizeMixin
  */
 class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <page-title title="[[localize('cluster_reporting')]]"></page-title>
+      <page-title title="[[localize('cluster_reporting')]]"></page-title>
 
-    <etools-prp-ajax
-        id="responsePlans"
-        url="[[plansUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="responsePlans" url="[[plansUrl]]"> </etools-prp-ajax>
 
-    <app-location
-        query-params="{{queryParams}}">
-    </app-location>
+      <app-location query-params="{{queryParams}}"> </app-location>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:page"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-        selected="[[page]]"
-        attr-for-selected="name">
-      <template
-          is="dom-if"
-          if="[[_equals(page, 'select-plan')]]"
-          restamp="true">
-        <page-cluster-reporting-select-plan
-            name="select-plan"
-            route="{{subroute}}">
-        </page-cluster-reporting-select-plan>
-      </template>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'select-plan')]]" restamp="true">
+          <page-cluster-reporting-select-plan name="select-plan" route="{{subroute}}">
+          </page-cluster-reporting-select-plan>
+        </template>
 
-      <template
-          is="dom-if"
-          if="[[_equals(page, 'router')]]">
-        <page-cluster-reporting-router
-            name="router"
-            route="{{subroute}}">
-        </page-cluster-reporting-router>
-      </template>
-    </iron-pages>
-`;
+        <template is="dom-if" if="[[_equals(page, 'router')]]">
+          <page-cluster-reporting-router name="router" route="{{subroute}}"> </page-cluster-reporting-router>
+        </template>
+      </iron-pages>
+    `;
   }
-
 
   @property({type: Object})
   route!: GenericObject;
@@ -93,21 +69,16 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
   @property({type: String, computed: '_workspaceId(rootState)'})
   workspaceId!: string;
 
-
   @property({type: String, computed: '_computeResponsePlansUrl(workspaceId)', observer: '_fetchResponsePlans'})
   plansUrl!: string;
 
-
   static get observers() {
-    return [
-      '_routePageChanged(routeData.page)',
-    ];
+    return ['_routePageChanged(routeData.page)'];
   }
 
   _workspaceId(rootState: RootState) {
     return workspaceId(rootState);
   }
-
 
   _routePageChanged(page: string) {
     switch (page) {
@@ -146,7 +117,8 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
 
     const responsePlansThunk = (this.$.responsePlans as EtoolsPrpAjaxEl).thunk();
 
-    this.reduxStore.dispatch(fetchResponsePlans(responsePlansThunk))
+    this.reduxStore
+      .dispatch(fetchResponsePlans(responsePlansThunk))
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling
@@ -171,7 +143,6 @@ class PageClusterReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElemen
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 window.customElements.define('page-cluster-reporting', PageClusterReporting);
 

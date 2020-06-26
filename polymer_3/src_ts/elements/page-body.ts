@@ -9,11 +9,11 @@ class PageBody extends PolymerElement {
     return html`
       <style>
         :host {
-            display: block;
-            padding: 25px 25px 75px;
-          }
+          display: block;
+          padding: 25px 25px 75px;
+        }
       </style>
-      <slot><slot>
+      <slot><slot> </slot></slot>
     `;
   }
 }

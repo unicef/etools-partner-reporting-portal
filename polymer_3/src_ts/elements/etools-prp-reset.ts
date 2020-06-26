@@ -12,15 +12,14 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
  * @appliesMixin UtilsMixin
  */
 class EtoolsPrpReset extends UtilsMixin(PolymerElement) {
-
   @property({type: Object, notify: true})
   reset!: GenericObject;
 
   @property({type: Boolean})
-  skipInitial: boolean = false;
+  skipInitial = false;
 
   @property({type: Boolean})
-  isInitial: boolean = true;
+  isInitial = true;
 
   @property({type: String, observer: '_trigerred'})
   trigger!: string;
@@ -28,18 +27,15 @@ class EtoolsPrpReset extends UtilsMixin(PolymerElement) {
   private _debouncer: Debouncer | null = null;
 
   _trigerred() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(10),
-      () => {
-        if (this.get('skipInitial') && this.get('isInitial')) {
-          this.set('isInitial', false);
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(10), () => {
+      if (this.get('skipInitial') && this.get('isInitial')) {
+        this.set('isInitial', false);
 
-          return;
-        }
-        this.set('reset', undefined);
-      });
+        return;
+      }
+      this.set('reset', undefined);
+    });
   }
-
 }
 
 window.customElements.define('etools-prp-reset', EtoolsPrpReset);

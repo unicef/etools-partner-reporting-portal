@@ -4,7 +4,6 @@ import '@polymer/iron-pages/iron-pages';
 import './pd-report-sr/reporting';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 
-
 /**
  * @polymer
  * @customElement
@@ -12,33 +11,24 @@ import UtilsMixin from '../../../../mixins/utils-mixin';
  * @appliesMixin UtilsMixin
  */
 class PagePdReportSr extends UtilsMixin(PolymerElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-pages
-        attr-for-selected="name"
-        selected="{{selectedTab}}">
-      <template
-          is="dom-if"
-          if="[[_equals(selectedTab, 'reporting')]]"
-          restamp="true">
-        <page-pd-report-sr-reporting
-            name="reporting">
-        </page-pd-report-sr-reporting>
-      </template>
-    </iron-pages>
-  `;
+      <iron-pages attr-for-selected="name" selected="{{selectedTab}}">
+        <template is="dom-if" if="[[_equals(selectedTab, 'reporting')]]" restamp="true">
+          <page-pd-report-sr-reporting name="reporting"> </page-pd-report-sr-reporting>
+        </template>
+      </iron-pages>
+    `;
   }
 
   @property({type: String, notify: true})
   selectedTab!: string;
-
 }
 
 window.customElements.define('page-pd-report-sr', PagePdReportSr);

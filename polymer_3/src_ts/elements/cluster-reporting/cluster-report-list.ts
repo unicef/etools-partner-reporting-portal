@@ -49,42 +49,29 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
         }
       </style>
 
-      <iron-location
-        query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
       <etools-data-table-footer
         page-size="[[pageSize]]"
         page-number="[[pageNumber]]"
         total-results="[[totalResults]]"
         on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
+        on-page-number-changed="_pageNumberChanged"
+      >
       </etools-data-table-footer>
 
       <div class="wrapper">
-        <template
-          is="dom-repeat"
-          items="[[data]]"
-          initial-count="[[pageSize]]">
+        <template is="dom-repeat" items="[[data]]" initial-count="[[pageSize]]">
           <etools-data-table-row no-collapse>
             <div slot="row-data">
-              <cluster-report-proxy
-                data="[[item]]"
-                mode="[[mode]]">
-              </cluster-report-proxy>
+              <cluster-report-proxy data="[[item]]" mode="[[mode]]"> </cluster-report-proxy>
             </div>
           </etools-data-table-row>
         </template>
 
-        <list-placeholder
-          data="[[data]]"
-          loading="[[loading]]">
-        </list-placeholder>
+        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
 
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
@@ -94,7 +81,8 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
         page-number="[[pageNumber]]"
         total-results="[[totalResults]]"
         on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
+        on-page-number-changed="_pageNumberChanged"
+      >
       </etools-data-table-footer>
 
       <confirm-box id="confirm"></confirm-box>
@@ -121,7 +109,6 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
   @property({type: Boolean, computed: '_computeIsIMOClusters(profile)'})
   isIMO!: boolean;
 
-
   _clusterIndicatorsReportsAll(rootState: RootState) {
     if (rootState) {
       return clusterIndicatorsReportsAll(rootState);
@@ -130,9 +117,11 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
   }
 
   _computeIsIMOClusters(profile: GenericObject) {
-    return profile.prp_roles ? profile.prp_roles.some((role: GenericObject) => {
-      return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
-    }) : [];
+    return profile.prp_roles
+      ? profile.prp_roles.some((role: GenericObject) => {
+          return role.role === Constants.PRP_ROLE.CLUSTER_IMO;
+        })
+      : [];
   }
 
   _onConfirm(e: CustomEvent) {
@@ -194,7 +183,6 @@ class ClusterReportList extends DataTableMixin(PaginationMixin(UtilsMixin(ReduxC
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('cluster-report-list', ClusterReportList);

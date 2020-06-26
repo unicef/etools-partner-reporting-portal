@@ -7,7 +7,6 @@ import {property} from '@polymer/decorators';
 import {fireEvent} from '../../../utils/fire-custom-event';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-
 /**
  * @polymer
  * @customElement
@@ -18,47 +17,41 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      ::slotted() .checkbox-label {
-        font-size: 12px;
-      }
-    </style>
+        ::slotted() .checkbox-label {
+          font-size: 12px;
+        }
+      </style>
 
-    <paper-checkbox
-        id="field"
-        name="[[name]]"
-        checked="{{checked}}"
-        on-tap="_handleInput">
-      <slot></slot>
-    </paper-checkbox>
-  `;
+      <paper-checkbox id="field" name="[[name]]" checked="{{checked}}" on-tap="_handleInput">
+        <slot></slot>
+      </paper-checkbox>
+    `;
   }
 
   @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
   checked!: boolean;
 
   @property({type: String})
-  value: string = '';
+  value = '';
 
   private _debouncer!: Debouncer;
 
   _handleInput() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
-        const newValue = (this.$.field as HTMLInputElement).checked;
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const newValue = (this.$.field as HTMLInputElement).checked;
 
-        if (newValue.toString() !== this.lastValue) {
-          fireEvent(this, 'filter-changed', {
-            name: this.name,
-            value: newValue.toString()
-          });
-        }
-      });
+      if (newValue.toString() !== this.lastValue) {
+        fireEvent(this, 'filter-changed', {
+          name: this.name,
+          value: newValue.toString()
+        });
+      }
+    });
   }
 
   _computeChecked(value: string) {

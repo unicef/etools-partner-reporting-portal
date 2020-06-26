@@ -1,9 +1,8 @@
 import {html} from '@polymer/polymer';
-import "@polymer/iron-flex-layout/iron-flex-layout-classes.js"
-import {printStyles} from "./print-styles";
+import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import {printStyles} from './print-styles';
 
-export const disaggregationTableStyles = html`
-  ${printStyles}
+export const disaggregationTableStyles = html` ${printStyles}
   <style include="iron-flex iron-flex-alignment">
     :host {
       display: block;
@@ -38,7 +37,8 @@ export const disaggregationTableStyles = html`
     }
 
     /*   Table header    */
-    .headerRow, th {
+    .headerRow,
+    th {
       font-weight: 400;
       padding: 5px 0;
       background-color: #f0f0f0;
@@ -51,11 +51,13 @@ export const disaggregationTableStyles = html`
       border-bottom: 1px solid white;
     }
 
-    .totalsRow, .totalsRow td {
+    .totalsRow,
+    .totalsRow td {
       background-color: #f0f0f0;
     }
 
-    .outerRow, .outerRow td {
+    .outerRow,
+    .outerRow td {
       background-color: var(--theme-table-bg-secondary, #c4e3f7);
     }
 
@@ -63,12 +65,13 @@ export const disaggregationTableStyles = html`
       background-color: var(--theme-table-bg-primary, #edf8ff);
     }
     /*   Totals table (three disaggregations only)   */
-    .bottomRow td:not(:first-child){
+    .bottomRow td:not(:first-child) {
       background-color: #f0f0f0;
     }
 
     /*   Cells   */
-    td, th {
+    td,
+    th {
       min-width: 40px;
       min-height: 25px;
       word-wrap: break-word;
@@ -87,7 +90,7 @@ export const disaggregationTableStyles = html`
       border-left: 1px solid white;
     }
 
-    td:not(:last-child)  {
+    td:not(:last-child) {
       border-right: 1px solid white;
     }
 
@@ -95,5 +98,4 @@ export const disaggregationTableStyles = html`
     .cellTotal {
       background-color: var(--paper-grey-100);
     }
-  </style>`
-  ;
+  </style>`;

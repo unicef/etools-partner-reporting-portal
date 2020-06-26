@@ -8,7 +8,6 @@ import {property} from '@polymer/decorators';
  */
 function FilterDependenciesMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class FilterDependenciesClass extends baseClass {
-
     @property({type: String})
     lastParams!: string;
 
@@ -16,15 +15,13 @@ function FilterDependenciesMixin<T extends Constructor<PolymerElement>>(baseClas
     params!: GenericObject;
 
     @property({type: String})
-    dependencies: string = '';
+    dependencies = '';
 
     @property({type: Object})
     defaultParams: GenericObject = {};
 
     static get observers() {
-      return [
-        '_computeParams(dependencies, queryParams)',
-      ];
+      return ['_computeParams(dependencies, queryParams)'];
     }
 
     _computeParams(dependencies: string, queryParams: GenericObject) {
@@ -35,7 +32,7 @@ function FilterDependenciesMixin<T extends Constructor<PolymerElement>>(baseClas
       const newParams = dependencies
         .split(',')
         .filter(Boolean)
-        .reduce(function(acc, key) {
+        .reduce(function (acc, key) {
           if (typeof queryParams[key] !== 'undefined') {
             acc[key] = queryParams[key];
           }

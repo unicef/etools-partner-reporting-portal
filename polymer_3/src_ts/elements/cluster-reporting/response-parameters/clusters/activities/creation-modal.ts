@@ -189,9 +189,7 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
   refresh = false;
 
   static get observers() {
-    return [
-      '_getObjectivesByClusterID(data.cluster, objectivesUrl)'
-    ];
+    return ['_getObjectivesByClusterID(data.cluster, objectivesUrl)'];
   }
 
   _computeUrl(responsePlanID: string) {
@@ -213,20 +211,20 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
   }
 
   _getObjectivesByClusterID(clusterID: number, objectivesUrl: string) {
-    const self = this;
     if (clusterID && objectivesUrl) {
       this.objectivesParams = {cluster_id: this.data.cluster};
 
-      (this.$.objectivesByClusterID as EtoolsPrpAjaxEl).thunk()()
+      (this.$.objectivesByClusterID as EtoolsPrpAjaxEl)
+        .thunk()()
         .then((res: any) => {
-          self.set('objectives', res.data.results);
+          this.set('objectives', res.data.results);
         })
         .catch((_err: GenericObject) => {
-          self.updatePending = false;
+          this.updatePending = false;
           // TODO: error handling
         });
     } else {
-      self.set('objectives', []);
+      this.set('objectives', []);
     }
   }
 
@@ -257,18 +255,18 @@ class CreationModalActivities extends LocalizeMixin(RoutingMixin(DateMixin(Utils
       return;
     }
 
-    const self = this;
-    self.updatePending = true;
-    (this.$.createActivity as EtoolsPrpAjaxEl).thunk()()
+    this.updatePending = true;
+    (this.$.createActivity as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.updatePending = false;
-        self.set('errors', {});
-        self.close();
-        waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
+        this.updatePending = false;
+        this.set('errors', {});
+        this.close();
+        waitForIronOverlayToClose(300).then(() => this._redirectToDetail(res.data.id));
       })
       .catch((err: any) => {
-        self.set('errors', err.data);
-        self.updatePending = false;
+        this.set('errors', err.data);
+        this.updatePending = false;
       });
   }
 }

@@ -2,18 +2,23 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor} from '../typings/globals.types';
 import {fireEvent} from '../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @mixinFunction
  */
 function NotificationsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class NotificationsClass extends baseClass {
-
     _notify(type: any, options?: any) {
-      fireEvent(this, 'notify', Object.assign({
-        type: type
-      }, options));
+      fireEvent(
+        this,
+        'notify',
+        Object.assign(
+          {
+            type: type
+          },
+          options
+        )
+      );
     }
 
     _notifyChangesSaved(options?: any) {
@@ -39,7 +44,6 @@ function NotificationsMixin<T extends Constructor<PolymerElement>>(baseClass: T)
     _notifyErrorMessage(options?: any) {
       this._notify('error-message', options);
     }
-
   }
   return NotificationsClass;
 }

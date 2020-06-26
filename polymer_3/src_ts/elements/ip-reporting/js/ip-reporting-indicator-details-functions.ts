@@ -18,9 +18,9 @@ export function computeParams(val: boolean) {
 }
 
 export function computeIndicatorReportsUrl(indicator: GenericObject) {
-  const target_indicator_id = indicator.cluster_partner_indicator_reportable_id ?
-    indicator.cluster_partner_indicator_reportable_id :
-    indicator.id;
+  const target_indicator_id = indicator.cluster_partner_indicator_reportable_id
+    ? indicator.cluster_partner_indicator_reportable_id
+    : indicator.id;
   return Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
 }
 
@@ -38,13 +38,13 @@ export function bucketByLocation(data: any[]) {
     return [];
   }
 
-  data.forEach(function(report, index) {
+  data.forEach(function (report, index) {
     let timeframe = 'current';
     if (index === 1) {
       timeframe = 'previous';
     }
 
-    report.indicator_location_data.forEach(function(locationReport: GenericObject) {
+    report.indicator_location_data.forEach(function (locationReport: GenericObject) {
       if (locations[locationReport.location.id]) {
         const toUpdate = locations[locationReport.location.id];
         toUpdate[timeframe] = locationReport;
@@ -62,7 +62,7 @@ export function bucketByLocation(data: any[]) {
 
   const locationList: any[] = [];
 
-  Object.keys(locations).forEach(function(i) {
+  Object.keys(locations).forEach(function (i) {
     locationList.push(locations[i]);
   });
 

@@ -9,7 +9,7 @@ export function getDeleteUrl(locationId: string, reportId: string, attachmentId:
 }
 
 export function setFiles(attachments: any[]) {
-  return attachments.map(function(attachment) {
+  return attachments.map(function (attachment) {
     if (attachment && !attachment.path) {
       return;
     }

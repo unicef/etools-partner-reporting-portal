@@ -17,16 +17,16 @@ class ProjectStatus extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return html`
       <style>
         :host {
-            display: inline-block;
+          display: inline-block;
         }
 
         status-badge {
-            position: relative;
-            top: -2px;
+          position: relative;
+          top: -2px;
         }
       </style>
       <status-badge type="[[type]]" hide-icon></status-badge> [[_localizeLowerCased(label, localize)]]
-      `;
+    `;
   }
 
   @property({type: String})

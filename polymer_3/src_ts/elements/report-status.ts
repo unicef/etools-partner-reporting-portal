@@ -13,11 +13,10 @@ import '@polymer/polymer/lib/elements/dom-if';
  */
 class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
           display: inline-block;
-          margin-right: .5em;
+          margin-right: 0.5em;
         }
 
         status-badge {
@@ -29,12 +28,9 @@ class ReportStatus extends LocalizeMixin(ReduxConnectedElement) {
       </style>
 
       <status-badge type="[[type]]"></status-badge>
-      <template
-          is="dom-if"
-          if="[[!noLabel]]">
+      <template is="dom-if" if="[[!noLabel]]">
         [[label]]
-      </template>`
-    ;
+      </template>`;
   }
 
   @property({type: String})

@@ -10,16 +10,14 @@ import '../pd-sent-back';
  * @mixinFunction
  */
 class PagePdReportReporting extends PolymerElement {
-
   public static get template() {
     return html`
-    <pd-sent-back></pd-sent-back>
-    <report-filters></report-filters>
-    <pd-output-list-toolbar></pd-output-list-toolbar>
-    <pd-output-list></pd-output-list>
-  `;
+      <pd-sent-back></pd-sent-back>
+      <report-filters></report-filters>
+      <pd-output-list-toolbar></pd-output-list-toolbar>
+      <pd-output-list></pd-output-list>
+    `;
   }
-
 }
 
 window.customElements.define('page-pd-report-reporting', PagePdReportReporting);

@@ -27,7 +27,6 @@ import {sharedStyles} from '../styles/shared-styles';
 import './cluster-reporting/indicator-editing-modal';
 import './cluster-reporting/indicator-locations-modal';
 
-
 /**
  * @polymer
  * @customElement
@@ -54,11 +53,11 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
           --etools-prp-progress-bar: {
             display: block;
             width: calc(100% - 35px);
-          };
+          }
 
           --iron-icon: {
             vertical-align: text-bottom;
-          };
+          }
 
           --iron-icon-width: 16px;
           --iron-icon-height: 16px;
@@ -68,7 +67,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
           @apply --link;
         }
 
-        .button-link{
+        .button-link {
           @apply --link;
           font-size: 13px;
           text-transform: none;
@@ -108,28 +107,14 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
         }
       </style>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-      <template
-          is="dom-if"
-          if="[[canEdit]]"
-          restamp="true">
-        <indicator-edit-modal
-            id="modal-edit"
-            edit-data="[[indicator]]">
-        </indicator-edit-modal>
+      <template is="dom-if" if="[[canEdit]]" restamp="true">
+        <indicator-edit-modal id="modal-edit" edit-data="[[indicator]]"> </indicator-edit-modal>
       </template>
 
-      <template
-          is="dom-if"
-          if="[[canEditLocations]]"
-          restamp="true">
-        <indicator-locations-modal
-            id="modal-locations"
-            edit-data="[[indicator]]">
-        </indicator-locations-modal>
+      <template is="dom-if" if="[[canEditLocations]]" restamp="true">
+        <indicator-locations-modal id="modal-locations" edit-data="[[indicator]]"> </indicator-locations-modal>
       </template>
 
       <etools-data-table-row details-opened="{{detailsOpened}}" on-details-opened-changed="onDetailsOpenedChanged">
@@ -144,7 +129,8 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
           <template
             is="dom-if"
             if="[[_equals(indicator.content_type_key, 'partner.partneractivityprojectcontext')]]"
-            restamp="[[true]]">
+            restamp="[[true]]"
+          >
             <span class="table-cell table-cell--text self-center">
               [[indicator.content_object_title]]
             </span>
@@ -156,22 +142,13 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
             [[indicator.blueprint.calculation_formula_across_periods]]
           </span>
           <span class="table-cell table-cell--text self-center">
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'number')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'number')]]" restamp="true">
               <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
             </template>
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'percentage')]]" restamp="true">
               <span><etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>%</span>
             </template>
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'ratio')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'ratio')]]" restamp="true">
               <span>
                 <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
                 /
@@ -180,22 +157,13 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
             </template>
           </span>
           <span class="table-cell table-cell--text self-center">
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'number')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'number')]]" restamp="true">
               <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
             </template>
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'percentage')]]" restamp="true">
               <span><etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>%</span>
             </template>
-            <template
-                is="dom-if"
-                if="[[_equals(indicator.blueprint.display_type, 'ratio')]]"
-                restamp="true">
+            <template is="dom-if" if="[[_equals(indicator.blueprint.display_type, 'ratio')]]" restamp="true">
               <span>
                 <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
                 /
@@ -211,22 +179,18 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
               <dl class="indicator-progress layout horizontal">
                 <dt class="flex-none self-center">[[localize('against_target')]]</dt>
                 <dd class="flex-none">
-                  <template
-                      is="dom-if"
-                      if="[[_equals(progressBarType, 'cluster')]]"
-                      restamp="true">
+                  <template is="dom-if" if="[[_equals(progressBarType, 'cluster')]]" restamp="true">
                     <etools-prp-progress-bar-cluster
-                        display-type="[[indicator.bluepring.display_type]]"
-                        number="[[indicator.total_against_target]]">
+                      display-type="[[indicator.bluepring.display_type]]"
+                      number="[[indicator.total_against_target]]"
+                    >
                     </etools-prp-progress-bar-cluster>
                   </template>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(progressBarType, 'default')]]"
-                      restamp="true">
+                  <template is="dom-if" if="[[_equals(progressBarType, 'default')]]" restamp="true">
                     <etools-prp-progress-bar
-                        display-type="[[indicator.blueprint.display_type]]"
-                        number="[[indicator.total_against_target]]">
+                      display-type="[[indicator.blueprint.display_type]]"
+                      number="[[indicator.total_against_target]]"
+                    >
                     </etools-prp-progress-bar>
                   </template>
                 </dd>
@@ -234,14 +198,15 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
               <template is="dom-if" if="[[isClusterApp]]" restamp="true">
                 <dl class="indicator-progress layout horizontal">
-                    <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
-                    <dd class="flex-none">
-                      <etools-prp-progress-bar-alt
-                          display-type="[[indicator.blueprint.display_type]]"
-                          number="[[indicator.total_against_in_need]]">
-                      </etools-prp-progress-bar-alt>
-                    </dd>
-                  </dl>
+                  <dt class="flex-none self-center">[[localize('against_in_need')]]:</dt>
+                  <dd class="flex-none">
+                    <etools-prp-progress-bar-alt
+                      display-type="[[indicator.blueprint.display_type]]"
+                      number="[[indicator.total_against_in_need]]"
+                    >
+                    </etools-prp-progress-bar-alt>
+                  </dd>
+                </dl>
               </template>
             </div>
           </span>
@@ -254,11 +219,9 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
           <template is="dom-if" if="[[canEdit]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
-              <paper-button class="button-link" on-tap="_openModal" data-modal-type="edit">[[localize('edit')]]
-                <template
-                    is="dom-if"
-                    if="[[_showLocationsWarning(indicator, type)]]"
-                    restamp="true">
+              <paper-button class="button-link" on-tap="_openModal" data-modal-type="edit"
+                >[[localize('edit')]]
+                <template is="dom-if" if="[[_showLocationsWarning(indicator, type)]]" restamp="true">
                   <iron-icon class="locations-warning" data-modal-type="edit" icon="icons:error"></iron-icon>
                 </template>
               </paper-button>
@@ -267,18 +230,17 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
           <template is="dom-if" if="[[canEditLocations]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
-              <paper-button class="button-link" on-tap="_openModal" data-modal-type="locations">[[localize('locations')]]</paper-button>
+              <paper-button class="button-link" on-tap="_openModal" data-modal-type="locations"
+                >[[localize('locations')]]</paper-button
+              >
             </span>
           </template>
         </div>
         <div slot="row-data-details">
-          <ip-reporting-indicator-details
-              indicator="[[indicator]]"
-              is-open="[[detailsOpened]]">
+          <ip-reporting-indicator-details indicator="[[indicator]]" is-open="[[detailsOpened]]">
           </ip-reporting-indicator-details>
         </div>
       </etools-data-table-row>
-
     `;
   }
 
@@ -289,7 +251,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   permissions!: GenericObject;
 
   @property({type: Boolean})
-  detailsOpened: boolean = false;
+  detailsOpened = false;
 
   @property({type: Boolean})
   isCustom!: boolean;
@@ -304,7 +266,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   appName!: string;
 
   @property({type: String})
-  type: string = '';
+  type = '';
 
   @property({type: Boolean, computed: '_computeCanEditLocations(isClusterApp, type, permissions)'})
   canEditLocations!: boolean;
@@ -314,7 +276,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
   @property({type: String, computed: '_computeProgressBarType(isClusterApp, indicator)'})
   progressBarType!: string;
-
 
   _flagIndicator(target: number, baseline: number, isCustom: boolean) {
     return !isCustom && (!target || !baseline);
@@ -382,14 +343,14 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   }
 
   onDetailsOpenedChanged(event: CustomEvent) {
-    this.dispatchEvent(new CustomEvent('details-opened-changed', {
-      detail: {row: event.target, detailsOpened: event.detail.value},
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('details-opened-changed', {
+        detail: {row: event.target, detailsOpened: event.detail.value},
+        bubbles: true,
+        composed: true
+      })
+    );
   }
-
-
 }
 
 window.customElements.define('list-view-single-indicator', ListViewSingleIndicator);

@@ -12,20 +12,16 @@ import {GenericObject} from '../../typings/globals.types';
  * @customElement
  */
 class ClusterLocationContent extends ReduxConnectedElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="locationNames"
-        url="[[locationNamesUrl]]">
-    </etools-prp-ajax>
-  `;
+      <etools-prp-ajax id="locationNames" url="[[locationNamesUrl]]"> </etools-prp-ajax>
+    `;
   }
 
   @property({type: Array, notify: true})
@@ -49,11 +45,11 @@ class ClusterLocationContent extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
-    (this.$.locationNames as EtoolsPrpAjaxEl).thunk()()
+    (this.$.locationNames as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: GenericObject) => {
-        self.set('locations', res.data);
+        this.set('locations', res.data);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -65,7 +61,6 @@ class ClusterLocationContent extends ReduxConnectedElement {
 
     (this.$.locationNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-location-content', ClusterLocationContent);

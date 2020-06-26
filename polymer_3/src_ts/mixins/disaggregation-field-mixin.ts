@@ -7,7 +7,6 @@ import {Constructor, GenericObject} from '../typings/globals.types';
  */
 function DisaggregationFieldMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DisaggregationFieldClass extends baseClass {
-
     _toNumericValues(obj: GenericObject) {
       return Object.keys(obj).reduce((prev: GenericObject, curr: string) => {
         prev[curr] = Number(obj[curr]);

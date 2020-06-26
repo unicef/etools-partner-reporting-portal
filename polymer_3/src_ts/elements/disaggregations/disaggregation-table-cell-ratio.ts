@@ -22,9 +22,8 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
   public static get template() {
     // language=HTML
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style include="app-grid-style">
-
         :host {
           display: block;
 
@@ -55,49 +54,36 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
           color: var(--theme-secondary-text-color);
         }
-
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
-          <div slot="editable" class="app-grid">
-            <div class="item">
-              <disaggregation-field
-                id="v"
-                key="v"
-                min="0"
-                value="[[data.v]]"
-                coords="[[coords]]">
-              </disaggregation-field>
-            </div>
-            <div class="item">
-              <disaggregation-field
-                id="d"
-                key="d"
-                min="0"
-                value="[[data.d]]"
-                coords="[[coords]]"
-                validator="[[vName]]">
-              </disaggregation-field>
-            </div>
-            <div class="computed-value">
-              <etools-prp-number value="[[localData.v]]"></etools-prp-number>
-              /
-              <etools-prp-number value="[[localData.d]]"></etools-prp-number>
-            </div>
+        <div slot="editable" class="app-grid">
+          <div class="item">
+            <disaggregation-field id="v" key="v" min="0" value="[[data.v]]" coords="[[coords]]"> </disaggregation-field>
           </div>
-          <div slot="non-editable" class="app-grid">
-            <div class="item">
-              <etools-prp-number value="[[data.v]]"></etools-prp-number>
-            </div>
-            <div class="item">
-              <etools-prp-number value="[[data.d]]"></etools-prp-number>
-            </div>
-            <div class="computed-value">
-              <etools-prp-number value="[[data.v]]"></etools-prp-number>
-              /
-              <etools-prp-number value="[[data.d]]"></etools-prp-number>
-            </div>
+          <div class="item">
+            <disaggregation-field id="d" key="d" min="0" value="[[data.d]]" coords="[[coords]]" validator="[[vName]]">
+            </disaggregation-field>
           </div>
+          <div class="computed-value">
+            <etools-prp-number value="[[localData.v]]"></etools-prp-number>
+            /
+            <etools-prp-number value="[[localData.d]]"></etools-prp-number>
+          </div>
+        </div>
+        <div slot="non-editable" class="app-grid">
+          <div class="item">
+            <etools-prp-number value="[[data.v]]"></etools-prp-number>
+          </div>
+          <div class="item">
+            <etools-prp-number value="[[data.d]]"></etools-prp-number>
+          </div>
+          <div class="computed-value">
+            <etools-prp-number value="[[data.v]]"></etools-prp-number>
+            /
+            <etools-prp-number value="[[data.d]]"></etools-prp-number>
+          </div>
+        </div>
       </disaggregation-table-cell>
     `;
   }
@@ -145,7 +131,7 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
       });
     }
 
-    ['v', 'd'].forEach(function(key) {
+    ['v', 'd'].forEach(function (key) {
       if (isNaN(change[key])) {
         delete change[key];
       }
@@ -156,14 +142,17 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
   _bindValidation(coords: string) {
     const vName = 'v-' + coords;
-    const self = this;
     const validator = {
       validatorName: vName,
       validatorType: 'validator',
-      validate: function(value: string) {
-        return Number(value) !== 0 ||
-          Number(((self!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value) === 0;
-      }.bind(self)
+      validate: (value: string) => {
+        return (
+          Number(value) !== 0 ||
+          Number(
+            ((this!.shadowRoot!.querySelector('#v') as DisaggregationFieldEl).getField() as PaperInputElement).value
+          ) === 0
+        );
+      }
     };
 
     new IronMeta({
@@ -209,7 +198,6 @@ class DisaggregationTableCellRatio extends UtilsMixin(PolymerElement) {
 
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('disaggregation-table-cell-ratio', DisaggregationTableCellRatio);
