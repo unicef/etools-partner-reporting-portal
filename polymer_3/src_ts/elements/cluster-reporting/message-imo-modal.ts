@@ -36,7 +36,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
           --paper-dialog: {
             width: 600px;
             margin: 0;
-            }
+          }
         }
         .row {
           margin: 16px 0;
@@ -85,9 +85,7 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
             Save
           </paper-button>
 
-          <paper-button
-              class="btn-cancel"
-              on-tap="close">
+          <paper-button class="btn-cancel" on-tap="close">
             Cancel
           </paper-button>
         </div>
@@ -154,8 +152,8 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
         this.close();
       })
       .catch((err: GenericObject) => {
-        self.set('pending', false);
-        self.set('errors', err.data);
+        this.set('pending', false);
+        this.set('errors', err.data);
         this.adjustPosition({} as any);
       });
   }

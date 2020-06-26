@@ -118,18 +118,10 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         <etools-prp-ajax id="[[item.id]]" url="[[locationsUrl]]" params="[[item.params]]"> </etools-prp-ajax>
       </template>
 
-      <etools-prp-ajax
-        id="search">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="search"> </etools-prp-ajax>
 
-      <template
-          is="dom-if"
-          if="[[canMessageIMO]]"
-          restamp="true">
-        <message-imo-modal
-            id="messageModal"
-            cluster-id="[[clusterId]]"
-            indicator-id="[[indicatorId]]">
+      <template is="dom-if" if="[[canMessageIMO]]" restamp="true">
+        <message-imo-modal id="messageModal" cluster-id="[[clusterId]]" indicator-id="[[indicatorId]]">
         </message-imo-modal>
       </template>
 
@@ -601,14 +593,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     const locTypeDebouncers = Array(this.maxAdminLevel)
       .fill('fetch-locations-')
       .map(function (item, index) {
-        return item + (++index);
+        return item + ++index;
       });
 
     this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
 
     if (this.messageModal) {
-      document.body.removeChild(this.messageModal);
-
       this.messageModal.removeEventListener('imo-message-sent', this._handleMessageSent as any);
       this.messageModal = null;
     }
