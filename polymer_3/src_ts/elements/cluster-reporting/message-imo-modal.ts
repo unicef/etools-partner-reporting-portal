@@ -34,18 +34,14 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
       <style include="iron-flex iron-flex-alignment iron-flex-reverse">
         :host {
           display: block;
-
           --paper-dialog: {
             width: 600px;
             margin: 0;
             }
-
         }
-
         .row {
           margin: 16px 0;
         }
-
         .sender-note {
           color: var(--theme-primary-text-color-medium);
         }

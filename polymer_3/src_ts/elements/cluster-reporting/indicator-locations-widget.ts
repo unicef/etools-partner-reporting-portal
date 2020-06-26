@@ -136,7 +136,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           if="[[canMessageIMO]]"
           restamp="true">
         <message-imo-modal
-            id="message-modal"
+            id="messageModal"
             cluster-id="[[clusterId]]"
             indicator-id="[[indicatorId]]">
         </message-imo-modal>
@@ -402,7 +402,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   _computeLocationTypes(maxAdminLevel: number) {
     return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function(_, index) {
+      .map(function (_, index) {
         return {
           id: String(index),
           title: 'Admin' + index,
@@ -412,7 +412,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
   _computeAjaxData(maxAdminLevel: number) {
     return Array.apply(null, Array(maxAdminLevel + 1))
-      .map(function(_, index) {
+      .map(function (_, index) {
         return {
           id: 'locations' + index,
           params: {
@@ -536,7 +536,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
           self._setPending(loc_type, false, index);
           self._setLocations(loc_type, res.data.results, index);
         })
-          .catch(function() {
+          .catch(function () {
             self._setPending(loc_type, false, index);
           });
       });
@@ -548,7 +548,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     const newLocations = this.locations.map((x: any) => x);
 
     if (lockedItems.length > 0) {
-      lockedItems.forEach(function(location, index) {
+      lockedItems.forEach(function (location, index) {
         if (location.admin_level === undefined) {
           newLocations[index] = {};
           newLocations[index][location.loc_type] = [location];
@@ -613,6 +613,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   _msgIMO() {
+    if (!this.messageModal) {
+      this.messageModal = this.shadowRoot!.querySelector('#messageModal') as MessageImoModalEl;
+      if (this.messageModal) {
+        this._handleMessageSent = this._handleMessageSent.bind(this);
+        this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent as any);
+      }
+    }
     if (this.messageModal) {
       this.messageModal.open();
     }
@@ -632,21 +639,13 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     super.connectedCallback();
     this.set('locations', []);
     this.set('pending', []);
-
-    this._handleMessageSent = this._handleMessageSent.bind(this);
-    this.messageModal = this.shadowRoot!.querySelector('#message-modal') as MessageImoModalEl;
-
-    if (this.messageModal) {
-      this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent as any);
-      document.body.appendChild(this.messageModal);
-    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     const locTypeDebouncers = Array(this.maxAdminLevel)
       .fill('fetch-locations-')
-      .map(function(item, index) {
+      .map(function (item, index) {
         return item + (++index);
       });
 

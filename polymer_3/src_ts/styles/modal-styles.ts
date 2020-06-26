@@ -39,6 +39,16 @@ export const modalStyles = html`
       position: relative;
     }
 
+    paper-textarea {
+      --paper-input-container-input: {
+        display: block;
+      }
+      --iron-autogrow-textarea: {
+        overflow: auto;
+        padding: 0;
+        max-height: 96px;
+      };
+    }
 
     // .full-width {
     //   @apply --app-grid-expandible-item;
