@@ -29,7 +29,9 @@ function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       if (!e) {
         return;
       }
-      e.stopPropagation();
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
 
       this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
         timeOut.after(100),
