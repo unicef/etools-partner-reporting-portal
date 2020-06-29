@@ -41,7 +41,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     return {'username': details.get('email')}
 
 
-def user_details(strategy, details, user=None, *args, **kwargs):
+def user_details(strategy, details, backend, user=None, *args, **kwargs):
     # # This is where we update the user
     # # see what the property to map by is here
     # updates_available = False
@@ -79,7 +79,7 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         #     user.save()
         #     user.profile.save()
 
-    return social_core_user.user_details(strategy, details, user, *args, **kwargs)
+    return social_core_user.user_details(strategy, details, backend, user, *args, **kwargs)
 
 
 class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
