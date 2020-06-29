@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def calc_cash_transfer_percentage(pd):
-    return pd.funds_received_to_date_percentage if pd.budget else 0
+    return pd.funds_received_to_date_percentage / 100 if pd.budget else 0
 
 
 class ProgrammeDocumentsXLSXExporter:
