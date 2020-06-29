@@ -229,9 +229,11 @@ def process_programme_documents(fast=False, area=False):
                             person.save()
                             pd.unicef_focal_point.add(person)
 
+                        notified_partner_users = []  # User.id
+
                         # Create agreement_auth_officers
-                        person_data_list = item['agreement_auth_officers']
-                        for person_data in person_data_list:
+                        partner_agreenment_officers = item['agreement_auth_officers']
+                        for person_data in partner_agreenment_officers:
                             person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
@@ -249,7 +251,8 @@ def process_programme_documents(fast=False, area=False):
                                 workspace=workspace,
                             )
 
-                            if created:
+                            if created and user.id not in notified_partner_users:
+                                notified_partner_users.append(user.id)
                                 obj.send_email_notification()
 
                             is_active = person_data.get('active')
@@ -259,15 +262,34 @@ def process_programme_documents(fast=False, area=False):
                                 obj.save()
 
                         # Create focal_points
-                        person_data_list = item['focal_points']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
+                        partner_focal_points = item['focal_points']
+                        for person_data in partner_focal_points:
+                            person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
 
                             person.active = True
                             person.save()
                             pd.partner_focal_point.add(person)
+
+                            user.partner = partner
+                            user.save()
+
+                            obj, created = PRPRole.objects.get_or_create(
+                                user=user,
+                                role=PRP_ROLE_TYPES.ip_viewer,
+                                workspace=workspace,
+                            )
+
+                            if created and user.id not in notified_partner_users:
+                                notified_partner_users.append(user.id)
+                                obj.send_email_notification()
+
+                            is_active = person_data.get('active')
+
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
 
                         # Create sections
                         section_data_list = item['sections']
