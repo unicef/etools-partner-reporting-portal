@@ -275,22 +275,6 @@ def process_programme_documents(fast=False, area=False):
                             user.partner = partner
                             user.save()
 
-                            obj, created = PRPRole.objects.get_or_create(
-                                user=user,
-                                role=PRP_ROLE_TYPES.ip_viewer,
-                                workspace=workspace,
-                            )
-
-                            if created and user.id not in notified_partner_users:
-                                notified_partner_users.append(user.id)
-                                obj.send_email_notification()
-
-                            is_active = person_data.get('active')
-
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
-
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
