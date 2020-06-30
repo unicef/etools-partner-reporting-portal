@@ -1,5 +1,7 @@
 from django.core.management import call_command
 
+import pytest
+
 
 def pytest_configure(config):
     call_command('loaddata', 'sites', verbosity=0)
