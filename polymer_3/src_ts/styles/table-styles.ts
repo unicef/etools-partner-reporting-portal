@@ -60,5 +60,11 @@ export const tableStyles = html`
       background-color: var(--paper-grey-100);
       border-top: 1px solid var(--list-divider-color, #9d9d9d);
     }
+
+    etools-data-table-header {
+      --list-header-column-height: auto;
+      --list-header-wrapper-height: auto;
+      --list-header-wrapper-column-height: auto;
+    }
   </style>
 `;
