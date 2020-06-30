@@ -1,5 +1,7 @@
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
+from account.models import User
 from cluster.models import Cluster, ClusterActivity, ClusterObjective
 from cluster.serializers import ClusterActivitySerializer, ClusterObjectiveSerializer, ClusterSimpleSerializer
 from core.common import CSO_TYPES, PARTNER_ACTIVITY_STATUS, PARTNER_TYPE
@@ -8,6 +10,8 @@ from core.serializers import ShortLocationSerializer
 from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
+from unicef.models import Person
+from unicef.serializers import PMPPDPersonSerializer
 
 from .models import (
     Partner,
@@ -867,3 +871,54 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
             "psea_assessment_date",
             "overall_risk_rating",
         )
+
+
+class PMPPartnerWithStaffMembersSerializer(PMPPartnerSerializer):
+    FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
+    LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
+
+    staff_members = PMPPDPersonSerializer(many=True)
+
+    class Meta(PMPPartnerSerializer.Meta):
+        fields = PMPPartnerSerializer.Meta.fields + (
+            'staff_members',
+        )
+
+    """
+    We only create staff members here without updating existing users
+    """
+    def create_staff_members(self, partner: Partner, staff_members: list) -> None:
+        for person_data in staff_members:
+            person = Person.objects.filter(email=person_data['email']).first()
+            if not person:
+                serializer = PMPPDPersonSerializer(data=person_data)
+                serializer.is_valid(raise_exception=True)
+                person = serializer.save()
+
+            user_defaults = {'email': person.email, 'partner': partner, 'password': make_password(None)}
+
+            if person.name:
+                name_parts = person.name.split()
+                if len(name_parts) == 2:
+                    user_defaults['first_name'] = name_parts[0][:self.FIRST_NAME_MAX_LENGTH]
+                    user_defaults['last_name'] = name_parts[1][:self.LAST_NAME_MAX_LENGTH]
+                else:
+                    user_defaults['first_name'] = person.name[:self.FIRST_NAME_MAX_LENGTH]
+
+            user, user_created = User.objects.get_or_create(username=person.email, defaults=user_defaults)
+            if user_created:
+                transaction.on_commit(lambda user_l=user: user_l.send_email_notification_on_create(portal='IP'))
+
+    @transaction.atomic
+    def create(self, validated_data: dict) -> Partner:
+        staff_members_data = validated_data.pop('staff_members', [])
+        instance = super().create(validated_data)
+        self.create_staff_members(instance, staff_members_data)
+        return instance
+
+    @transaction.atomic
+    def update(self, instance: Partner, validated_data: dict) -> Partner:
+        staff_members_data = validated_data.pop('staff_members', [])
+        instance = super().update(instance, validated_data)
+        self.create_staff_members(instance, staff_members_data)
+        return instance

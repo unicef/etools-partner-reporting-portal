@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from .views import (
     InterventionPMPDocumentView,
+    PMPPartnerImportAPIView,
     ProgrammeDocumentAPIView,
     ProgrammeDocumentCalculationMethodsAPIView,
     ProgrammeDocumentDetailsAPIView,
@@ -89,4 +90,8 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/attachments/(?P<pk>\d+)/$',
         ProgressReportAttachmentAPIView.as_view(),
         name="progress-reports-attachment"),
+
+    url(r'^pmp/import/(?P<business_area_code>[^/]+)/partner/$',
+        PMPPartnerImportAPIView.as_view(),
+        name='pmp-import-partner'),
 ]
