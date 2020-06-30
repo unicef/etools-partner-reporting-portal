@@ -188,6 +188,9 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'sea_risk_rating_name',
             'psea_assessment_date',
             'overall_risk_rating',
+            'type_of_assessment',
+            'highest_risk_rating_type',
+            'highest_risk_rating_name',
         )
 
     def get_partner_type_display(self, obj):

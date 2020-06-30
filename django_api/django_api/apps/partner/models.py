@@ -161,6 +161,23 @@ class Partner(TimeStampedExternalSourceModel):
         blank=True,
         default='',
     )
+    type_of_assessment = models.CharField(
+        verbose_name=_("Assessment Type"),
+        max_length=50,
+        null=True,
+    )
+    highest_risk_rating_type = models.CharField(
+        verbose_name=_("Highest Risk Rating Type"),
+        max_length=150,
+        blank=True,
+        default='',
+    )
+    highest_risk_rating_name = models.CharField(
+        verbose_name=_("Highest Risk Rating Name"),
+        max_length=150,
+        blank=True,
+        default='',
+    )
 
     class Meta:
         ordering = ['title']
