@@ -1354,7 +1354,7 @@ class PMPPartnerImportAPIView(APIView):
         if 'unicef_vendor_number' not in request.data:
             raise Http404
 
-        partner = Partner.objects.filter(vendor_number=self.kwargs['unicef_vendor_number']).first()
+        partner = Partner.objects.filter(vendor_number=request.data['unicef_vendor_number']).first()
         serializer = self.serializer_class(instance=partner, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

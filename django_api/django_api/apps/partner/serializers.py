@@ -873,16 +873,32 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         )
 
 
+class PMPPartnerStaffMemberSerializer(PMPPDPersonSerializer):
+    name = serializers.CharField()
+    email = serializers.CharField()
+    phone_num = serializers.CharField(source='phone_number', required=False, allow_blank=True, allow_null=True)
+
+    class Meta:
+        model = Person
+        fields = (
+            "name",
+            "title",
+            "phone_num",
+            "email",
+        )
+
+
 class PMPPartnerWithStaffMembersSerializer(PMPPartnerSerializer):
     FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
     LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
-    staff_members = PMPPDPersonSerializer(many=True)
+    staff_members = PMPPartnerStaffMemberSerializer(many=True, required=False, write_only=True)
 
     class Meta(PMPPartnerSerializer.Meta):
         fields = PMPPartnerSerializer.Meta.fields + (
             'staff_members',
         )
+        validators = []  # flush validators, because we don't have fields by original names and handle creation by hands
 
     """
     We only create staff members here without updating existing users
@@ -892,10 +908,12 @@ class PMPPartnerWithStaffMembersSerializer(PMPPartnerSerializer):
             person = Person.objects.filter(email=person_data['email']).first()
             if not person:
                 serializer = PMPPDPersonSerializer(data=person_data)
-                serializer.is_valid(raise_exception=True)
+                serializer.is_valid(raise_exception=True)  # todo: return error as validationerror
                 person = serializer.save()
 
-            user_defaults = {'email': person.email, 'partner': partner, 'password': make_password(None)}
+            user_defaults = {
+                'email': person.email, 'partner': partner, 'password': make_password(None), 'position': person.title
+            }
 
             if person.name:
                 name_parts = person.name.split()

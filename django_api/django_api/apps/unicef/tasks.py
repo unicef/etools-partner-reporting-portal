@@ -232,8 +232,8 @@ def process_programme_documents(fast=False, area=False):
                         notified_partner_users = []  # User.id
 
                         # Create agreement_auth_officers
-                        partner_agreenment_officers = item['agreement_auth_officers']
-                        for person_data in partner_agreenment_officers:
+                        person_data_list = item['agreement_auth_officers']
+                        for person_data in person_data_list:
                             person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
@@ -262,8 +262,8 @@ def process_programme_documents(fast=False, area=False):
                                 obj.save()
 
                         # Create focal_points
-                        partner_focal_points = item['focal_points']
-                        for person_data in partner_focal_points:
+                        person_data_list = item['focal_points']
+                        for person_data in person_data_list:
                             person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
