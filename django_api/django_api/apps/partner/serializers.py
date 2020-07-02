@@ -1,5 +1,6 @@
-from django.contrib.auth.hashers import make_password
 from collections import OrderedDict
+
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
 from account.models import User
@@ -11,9 +12,9 @@ from core.serializers import ShortLocationSerializer
 from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from unicef.models import Person
 from unicef.serializers import PMPPDPersonSerializer
-from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (
     Partner,
@@ -86,7 +87,7 @@ class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProject
         project = PartnerProject.objects.filter(pk=data["project"]["id"]).first()
         if not project:
             raise serializers.ValidationError({
-                'project_id': 'PartnerProject ID {} does not exist.'.format(pk)
+                'project_id': 'PartnerProject ID {} does not exist.'.format(data["project"]["id"])
             })
         # else:
         #     if not project.partner_id == self.instance.partner.pk:
@@ -935,7 +936,6 @@ class PMPPartnerWithStaffMembersSerializer(PMPPartnerSerializer):
         fields = PMPPartnerSerializer.Meta.fields + (
             'staff_members',
         )
-        validators = []  # flush validators, because we don't have fields by original names and handle creation by hands
 
     """
     We only create staff members here without updating existing users

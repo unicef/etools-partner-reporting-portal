@@ -29,7 +29,6 @@ from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from partner.models import Partner
 from rest_framework import status
-from rest_framework.test import APIClient
 from unicef.models import ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
 
