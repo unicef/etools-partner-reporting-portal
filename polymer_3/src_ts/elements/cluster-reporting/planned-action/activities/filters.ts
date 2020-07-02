@@ -19,76 +19,65 @@ import '../../../filters/cluster-project-filter/cluster-project-filter';
 import {GenericObject} from '../../../../typings/globals.types';
 
 /**
-* @polymer
-* @appliesMixin LocalizeMixin
-* @appliesMixin UtilsBehavior
-*/
+ * @polymer
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin UtilsBehavior
+ */
 class PlannedActionActivitiesFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        padding: 0;
-        display: block;
-        --app-grid-columns: 4;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-      }
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          padding: 0;
+          display: block;
+          --app-grid-columns: 4;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
+        }
 
-      .filter-2-col {
-        @apply --app-grid-expandible-item;
-      }
+        .filter-2-col {
+          @apply --app-grid-expandible-item;
+        }
 
-      .checkbox {
-        padding-left: 30px;
-        padding-top: 30px;
-      }
+        .checkbox {
+          padding-left: 30px;
+          padding-top: 30px;
+        }
+      </style>
 
-    </style>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <cluster-project-filter class="item" value="[[_withDefault(queryParams.project, '')]]">
+          </cluster-project-filter>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <cluster-project-filter
-            class="item"
-            value="[[_withDefault(queryParams.project, '')]]">
-        </cluster-project-filter>
+          <project-status-filter value="[[_withDefault(queryParams.status, '')]]"> </project-status-filter>
 
-        <project-status-filter
-          value="[[_withDefault(queryParams.status, '')]]">
-        </project-status-filter>
+          <cluster-location-filter class="item filter-2-col" value="[[_withDefault(queryParams.location, '')]]">
+          </cluster-location-filter>
 
-        <cluster-location-filter
-          class="item filter-2-col"
-          value="[[_withDefault(queryParams.location, '')]]">
-        </cluster-location-filter>
+          <text-filter
+            class="item filter-2-col"
+            label="[[localize('search_activity_title')]]"
+            name="activity"
+            value="[[_withDefault(queryParams.activity, '')]]"
+          >
+          </text-filter>
 
-        <text-filter
-          class="item filter-2-col"
-          label="[[localize('search_activity_title')]]"
-          name="activity"
-          value="[[_withDefault(queryParams.activity, '')]]">
-        </text-filter>
-
-        <checkbox-filter
-          class="item filter-2-col checkbox"
-          name="custom"
-          value="[[_withDefault(queryParams.custom, '')]]">
-          <span class="checkbox-label">[[localize('show_only_custom_activities')]]</span>
-        </checkbox-filter>
-      </div>
-    </filter-list>
-  `;
+          <checkbox-filter
+            class="item filter-2-col checkbox"
+            name="custom"
+            value="[[_withDefault(queryParams.custom, '')]]"
+          >
+            <span class="checkbox-label">[[localize('show_only_custom_activities')]]</span>
+          </checkbox-filter>
+        </div>
+      </filter-list>
+    `;
   }
 
   @property({type: Object})

@@ -1,11 +1,8 @@
 import {html} from '@polymer/polymer';
 import '@polymer/paper-styles/typography';
 
-
 export const dashboardWidgetStyles = html`
-
   <style>
-
     :host {
       height: 100%;
     }
@@ -29,7 +26,7 @@ export const dashboardWidgetStyles = html`
     .widget-figure {
       @apply --paper-font-display1;
 
-      margin: .25em 0;
+      margin: 0.25em 0;
       text-align: right;
     }
 
@@ -46,7 +43,5 @@ export const dashboardWidgetStyles = html`
       text-decoration: none;
       color: var(--theme-primary-color);
     }
-
   </style>
-
 `;

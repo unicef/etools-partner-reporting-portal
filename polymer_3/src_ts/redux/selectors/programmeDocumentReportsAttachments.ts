@@ -16,13 +16,15 @@ function prop(obj: any, prop: string) {
   return obj[prop];
 }
 
-//App.Selectors.ProgrammeDocumentReportsAttachments
+// App.Selectors.ProgrammeDocumentReportsAttachments
 export const programmeDocumentReportsAttachmentsCurrent = createSelector(
   selectAttachmentsByReport,
   selectCurrentReportId,
-  prop)
+  prop
+);
 
 export const programmeDocumentReportsAttachmentsPending = createSelector(
   selectAttachmentsPendingByReport,
   selectCurrentReportId,
-  prop)
+  prop
+);

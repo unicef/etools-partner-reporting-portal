@@ -13,23 +13,21 @@ import LocalizeMixin from '../../../mixins/localize-mixin';
  * @appliesMixin LocalizeMixin
  */
 class PageIpReportingOverview extends LocalizeMixin(ReduxConnectedElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <page-header title="[[localize('overview')]]"></page-header>
+      <page-header title="[[localize('overview')]]"></page-header>
 
-    <page-body>
+      <page-body>
         <partner-details></partner-details>
         <risk-rating></risk-rating>
-    </page-body>
-  `;
+      </page-body>
+    `;
   }
-
 }
 window.customElements.define('page-ip-reporting-overview', PageIpReportingOverview);

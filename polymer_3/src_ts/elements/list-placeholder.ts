@@ -15,14 +15,14 @@ class ListPlaceholder extends LocalizeMixin(ReduxConnectedElement) {
       </style>
 
       <div class="msg">[[localize(message)]]</div>
-      `;
+    `;
   }
 
   @property({type: Array})
   data = [];
 
   @property({type: Boolean})
-  loading: boolean = false;
+  loading = false;
 
   @property({type: String})
   message = 'no_results_found';

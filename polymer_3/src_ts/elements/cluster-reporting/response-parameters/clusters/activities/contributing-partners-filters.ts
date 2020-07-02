@@ -18,33 +18,26 @@ class ContributingPartnersFilters extends UtilsMixin(PolymerElement) {
   public static get template() {
     // language=HTML
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 1;
-        --app-grid-item-height: auto;
-      }
-    </style>
+          --app-grid-columns: 1;
+          --app-grid-item-height: auto;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <partner-filter
-            value="[[_withDefault(queryParams.partner, '')]]">
-        </partner-filter>
-      </div>
-    </filter-list>
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <partner-filter value="[[_withDefault(queryParams.partner, '')]]"> </partner-filter>
+        </div>
+      </filter-list>
     `;
   }
 

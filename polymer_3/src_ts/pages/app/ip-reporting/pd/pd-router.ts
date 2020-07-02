@@ -7,7 +7,6 @@ import './pd-report';
 import UtilsMixin from '../../../../mixins/utils-mixin';
 import {getDomainByEnv} from '../../../../config';
 
-
 /**
  * @polymer
  * @customElement
@@ -15,40 +14,26 @@ import {getDomainByEnv} from '../../../../config';
  * @appliesMixin UtilsMixin
  */
 class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:tree"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tree" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-        selected="[[page]]"
-        attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'pd-details')]]" restamp="true">
-        <page-ip-reporting-pd-details
-            name="pd-details"
-            route="{{subroute}}">
-        </page-ip-reporting-pd-details>
-      </template>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'pd-details')]]" restamp="true">
+          <page-ip-reporting-pd-details name="pd-details" route="{{subroute}}"> </page-ip-reporting-pd-details>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'pd-report')]]" restamp="true">
-        <page-ip-reporting-pd-report
-            name="pd-report"
-            route="{{subroute}}">
-        </page-ip-reporting-pd-report>
-      </template>
-    </iron-pages>
-  `;
+        <template is="dom-if" if="[[_equals(page, 'pd-report')]]" restamp="true">
+          <page-ip-reporting-pd-report name="pd-report" route="{{subroute}}"> </page-ip-reporting-pd-report>
+        </template>
+      </iron-pages>
+    `;
   }
 
   @property({type: String, observer: '_pageChanged'})
@@ -58,9 +43,7 @@ class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
   pdId!: string;
 
   public static get observers() {
-    return [
-      '_routeTreeChanged(routeData.tree)',
-    ]
+    return ['_routeTreeChanged(routeData.tree)'];
   }
 
   _routeTreeChanged(tree: string) {
@@ -85,13 +68,11 @@ class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    await import(resolvedPageUrl)
-      .catch((err: any) => {
-        console.log(err);
-        this._notFound();
-      });
+    await import(resolvedPageUrl).catch((err: any) => {
+      console.log(err);
+      this._notFound();
+    });
   }
-
 }
 
 window.customElements.define('page-ip-reporting-pd-router', PageIpReportingPdRouter);

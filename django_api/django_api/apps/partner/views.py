@@ -366,8 +366,10 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
             self.permission_denied(request)
 
     def get_queryset(self):
+        response_plan_pk = self.kwargs['response_plan_id']
         return PartnerActivity.objects.filter(
-            projects__clusters__response_plan_id=self.kwargs['response_plan_id']
+            Q(cluster_objective__cluster__response_plan_id=response_plan_pk) |
+            Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_pk),
         ).distinct()
 
     def get_object(self, pk):

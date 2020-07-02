@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from collections import OrderedDict
 from django.db import transaction
 
 from account.models import User
@@ -12,6 +13,7 @@ from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
 from unicef.models import Person
 from unicef.serializers import PMPPDPersonSerializer
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (
     Partner,
@@ -80,6 +82,58 @@ class PartnerActivityProjectContextSerializer(serializers.ModelSerializer):
 class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProjectContextSerializer):
     project_id = serializers.IntegerField(source="project.id")
 
+    def validate(self, data):
+        project = PartnerProject.objects.filter(pk=data["project"]["id"]).first()
+        if not project:
+            raise serializers.ValidationError({
+                'project_id': 'PartnerProject ID {} does not exist.'.format(pk)
+            })
+        # else:
+        #     if not project.partner_id == self.instance.partner.pk:
+        #         raise serializers.ValidationError({
+        #             'partner': 'PartnerProject does not belong to Partner {}.'.format(
+        #                 self.instance.partner.pk,
+        #             )
+        #         })
+
+        errors = OrderedDict()
+
+        if "start_date" not in data:
+            errors["start_date"] = serializers.ValidationError(
+                "This field is required.",
+            ).detail
+
+        if "end_date" not in data:
+            errors["end_date"] = serializers.ValidationError(
+                "This field is required.",
+            ).detail
+
+        if "status" not in data:
+            errors["status"] = serializers.ValidationError(
+                "This field is required.",
+            ).detail
+
+        if data.get('start_date') and data.get('end_date'):
+            if data.get('start_date') > data.get('end_date'):
+                errors["start_date"] = serializers.ValidationError(
+                    "Start date should come before end date",
+                ).detail
+
+            if project.start_date > data.get('start_date'):
+                errors["start_date"] = serializers.ValidationError(
+                    "Start date cannot start before its project's start date",
+                ).detail
+
+            if project.end_date < data.get('end_date'):
+                errors["emd_date"] = serializers.ValidationError(
+                    "End date cannot end after its project's end date",
+                ).detail
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate(data)
+
 
 class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
     projects = PartnerActivityProjectContextSerializer(source="partneractivityprojectcontext_set", many=True)
@@ -102,6 +156,7 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
     partner_type_display = serializers.SerializerMethodField()
     cso_type_display = serializers.SerializerMethodField()
     shared_partner_display = serializers.SerializerMethodField()
+    psea_assessment_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Partner
@@ -138,7 +193,15 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'sea_risk_rating_name',
             'psea_assessment_date',
             'overall_risk_rating',
+            'type_of_assessment',
+            'highest_risk_rating_type',
+            'highest_risk_rating_name',
         )
+
+    def get_psea_assessment_date(self, obj):
+        if obj.psea_assessment_date:
+            return obj.psea_assessment_date.strftime("%d-%b-%Y")
+        return None
 
     def get_partner_type_display(self, obj):
         return obj.get_partner_type_display()
@@ -705,8 +768,7 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
 
 class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
-
-    projects = PartnerActivityProjectContextDetailUpdateSerializer(source='partneractivityprojectcontext_set', many=True)
+    projects = PartnerActivityProjectContextDetailUpdateSerializer(many=True)
 
     class Meta:
         model = PartnerActivity
@@ -720,7 +782,7 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
 
         if not instance.is_custom:
             self.fields.pop('title')
-        super(PartnerActivityUpdateSerializer, self).__init__(instance, *args, **kwargs)
+        super().__init__(instance, *args, **kwargs)
 
     def get_extra_kwargs(self):
         # Treat all fields except ID as write_only
@@ -728,43 +790,13 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
             f: {'write_only': f != 'id'} for f in self.Meta.fields
         }
 
-    def validate(self, data):
-        for idx, project_context in enumerate(data['partneractivityprojectcontext_set']):
-            project = PartnerProject.objects.filter(id=project_context['project']['id']).first()
-            if not project:
-                raise serializers.ValidationError({
-                    'project_id': 'PartnerProject ID {} does not exist.'.format(project_context['project']['id'])
-                })
-            elif not project.partner_id == self.instance.partner.id:
-                raise serializers.ValidationError({
-                    'partner': 'PartnerProject does not belong to Partner {}.'.format(self.instance.partner.id)
-                })
-
-            data['partneractivityprojectcontext_set'][idx]['project'] = project
-
-            if project_context['start_date'] > project_context['end_date']:
-                raise serializers.ValidationError({
-                    "start_date": "start_date should come before end_date",
-                })
-
-            if project.start_date > project_context['start_date']:
-                raise serializers.ValidationError({
-                    "start_date": "start_date cannot start before its project's start date",
-                })
-
-            if project.end_date < project_context['end_date']:
-                raise serializers.ValidationError({
-                    "end_date": "end_date cannot end after its project's end date",
-                })
-
-        return super(PartnerActivityUpdateSerializer, self).validate(data)
-
     def update(self, instance, validated_data):
+        projects = validated_data.pop("projects") if "projects" in validated_data else []
         instance.title = validated_data.get('title', instance.title)
         instance.save()
 
         old_projects = set(instance.projects.values_list('id', flat=True))
-        updated_projects = set(map(lambda x: x['project'].id, validated_data['partneractivityprojectcontext_set']))
+        updated_projects = set([x['project']['id'] for x in projects])
         old_projects_to_delete = old_projects.difference(updated_projects)
 
         PartnerActivityProjectContext.objects.filter(
@@ -772,15 +804,14 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
             project__in=old_projects_to_delete
         ).delete()
 
-        for validated_context_data in validated_data['partneractivityprojectcontext_set']:
-            project = validated_context_data['project']
+        for project_data in projects:
             obj, created = PartnerActivityProjectContext.objects.update_or_create(
-                project=project,
+                project_id=project_data['project']["id"],
                 activity=instance,
                 defaults={
-                    'start_date': validated_context_data['start_date'],
-                    'end_date': validated_context_data['end_date'],
-                    'status': validated_context_data['status']
+                    'start_date': project_data['start_date'],
+                    'end_date': project_data['end_date'],
+                    'status': project_data['status']
                 }
             )
 
@@ -871,6 +902,12 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
             "psea_assessment_date",
             "overall_risk_rating",
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Partner.objects.all(),
+                fields=["name", "unicef_vendor_number"],
+            )
+        ]
 
 
 class PMPPartnerStaffMemberSerializer(PMPPDPersonSerializer):

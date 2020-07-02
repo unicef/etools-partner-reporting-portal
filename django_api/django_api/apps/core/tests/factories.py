@@ -1098,7 +1098,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.LazyFunction(faker.sentence)
     unicef_office = factory.LazyFunction(faker.city)
     workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
-    partner = factory.SubFactory('core.tests.factories.PartnerFactory', programme_document=None)
+    partner = factory.SubFactory('core.tests.factories.PartnerFactory')
     start_date = beginning_of_this_year
     end_date = datetime.date(today.year, 12, 31)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)

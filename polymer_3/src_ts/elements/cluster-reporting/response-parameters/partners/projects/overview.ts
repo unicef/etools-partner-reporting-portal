@@ -19,42 +19,33 @@ import {GenericObject} from '../../../../../typings/globals.types';
 class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
   public static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
-    </style>
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
+      </style>
 
-    <etools-prp-permissions
-      permissions="{{ permissions }}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{ permissions }}"> </etools-prp-permissions>
 
-    <page-body>
-      <template
-        is="dom-if"
-        if="[[_canEdit(permissions, projectData)]]"
-        restamp="true">
-        <div id="action">
-          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('edit_project')]]
-          </paper-button>
-        </div>
-        <planned-action-projects-modal
-          id="modal"
-          edit-data="[[projectData]]"
-          edit>
-        </planned-action-projects-modal>
-      </template>
+      <page-body>
+        <template is="dom-if" if="[[_canEdit(permissions, projectData)]]" restamp="true">
+          <div id="action">
+            <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('edit_project')]]
+            </paper-button>
+          </div>
+          <planned-action-projects-modal id="modal" edit-data="[[projectData]]" edit> </planned-action-projects-modal>
+        </template>
 
-      <project-details-display project-data=[[projectData]]></project-details-display>
-    </page-body>
+        <project-details-display project-data="[[projectData]]"></project-details-display>
+      </page-body>
     `;
   }
 
@@ -72,11 +63,8 @@ class RpPartnerProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElemen
     if (!permissions || !projectData) {
       return;
     }
-    return projectData.clusters ?
-      permissions.editPartnerEntities(projectData.clusters) :
-      false;
+    return projectData.clusters ? permissions.editPartnerEntities(projectData.clusters) : false;
   }
-
 }
 
 window.customElements.define('rp-partner-project-details-overview', RpPartnerProjectDetailsOverview);

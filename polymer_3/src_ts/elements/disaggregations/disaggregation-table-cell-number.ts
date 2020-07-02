@@ -7,7 +7,6 @@ import '../etools-prp-number';
 import {disaggregationTableStyles} from '../../styles/disaggregation-table-styles';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -24,13 +23,8 @@ class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement) {
       </style>
 
       <disaggregation-table-cell data="[[data]]" editable="[[editable]]">
-       <template is="dom-if" if="[[editable]]" restamp>
-          <disaggregation-field
-            slot="editable"
-            key="v"
-            value="[[data.v]]"
-            coords="[[coords]]">
-          </disaggregation-field>
+        <template is="dom-if" if="[[editable]]" restamp>
+          <disaggregation-field slot="editable" key="v" value="[[data.v]]" coords="[[coords]]"> </disaggregation-field>
         </template>
         <template is="dom-if" if="[[!editable]]" restamp>
           <etools-prp-number slot="non-editable" value="[[data.v]]"></etools-prp-number>
@@ -59,7 +53,6 @@ class DisaggregationTableCellNumber extends UtilsMixin(PolymerElement) {
     }
     this.set('data', nullData);
   }
-
 }
 
 window.customElements.define('disaggregation-table-cell-number', DisaggregationTableCellNumber);

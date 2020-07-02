@@ -7,7 +7,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../typings/globals.types';
 import '../disaggregation-table-row';
 
-
 /**
  * @polymer
  * @customElement
@@ -24,59 +23,57 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
       <!-- Column names -->
       <tr class="horizontal layout headerRow">
         <th></th>
-        <template is="dom-repeat"
-                  items="[[columns]]"
-                  as="column">
+        <template is="dom-repeat" items="[[columns]]" as="column">
           <th>[[_capitalizeFirstLetter(column.value)]]</th>
         </template>
         <th>Total</th>
       </tr>
 
       <!-- Data rows: outer and middle. -->
-      <template is="dom-repeat"
-                items="[[outerRowsForDisplay]]"
-                as="outerRow">
+      <template is="dom-repeat" items="[[outerRowsForDisplay]]" as="outerRow">
         <disaggregation-table-row
-            data="[[outerRow]]"
-            level-reported="[[data.level_reported]]"
-            indicator-type="[[data.display_type]]"
-            row-type="outerRow">
+          data="[[outerRow]]"
+          level-reported="[[data.level_reported]]"
+          indicator-type="[[data.display_type]]"
+          row-type="outerRow"
+        >
         </disaggregation-table-row>
 
         <template
-            is="dom-repeat"
-            items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data)]]"
-            as="middleRow">
+          is="dom-repeat"
+          items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data)]]"
+          as="middleRow"
+        >
           <disaggregation-table-row
-              data="[[middleRow]]"
-              level-reported="[[data.level_reported]]"
-              indicator-type="[[data.display_type]]"
-              row-type="middleRow"
-              editable="[[editable]]">
+            data="[[middleRow]]"
+            level-reported="[[data.level_reported]]"
+            indicator-type="[[data.display_type]]"
+            row-type="middleRow"
+            editable="[[editable]]"
+          >
           </disaggregation-table-row>
         </template>
+      </template>
 
-     </template>
-
-     <!-- Totals row -->
-     <disaggregation-table-row
+      <!-- Totals row -->
+      <disaggregation-table-row
         data="[[columnTotalRow]]"
         level-reported="[[data.level_reported]]"
         indicator-type="[[data.display_type]]"
-        row-type="totalsRow">
-     </disaggregation-table-row>
+        row-type="totalsRow"
+      >
+      </disaggregation-table-row>
 
-     <!-- Bottom table -->
-     <template is="dom-repeat"
-               items="[[bottomRows]]"
-               as="bottomRow">
-      <disaggregation-table-row
+      <!-- Bottom table -->
+      <template is="dom-repeat" items="[[bottomRows]]" as="bottomRow">
+        <disaggregation-table-row
           data="[[bottomRow]]"
           level-reported="[[data.level_reported]]"
           indicator-type="[[data.display_type]]"
-          row-type="bottomRow">
-      </disaggregation-table-row>
-    </template>
+          row-type="bottomRow"
+        >
+        </disaggregation-table-row>
+      </template>
     `;
   }
 
@@ -108,7 +105,6 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
   @property({type: Array, computed: '_determineOuterRows(columns, rows, data)'})
   outerRowsForDisplay!: any[];
 
-
   _getColumns(mapping: any[]) {
     return (mapping[0] || []).choices;
   }
@@ -129,20 +125,19 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
     if (!columns || !middleRows) {
       return [];
     }
-    const self = this;
-    return middleRows.map(function(y) {
+    return middleRows.map((y) => {
       let formatted;
 
-      const columnData = columns.map(function(z) {
-        formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
+      const columnData = columns.map((z) => {
+        formatted = this._formatDisaggregationIds([outerRowID, y.id, z.id]);
 
         return {
           key: formatted,
-          data: data.disaggregation[formatted],
+          data: data.disaggregation[formatted]
         };
-      }, self);
+      }, this);
 
-      formatted = self._formatDisaggregationIds([outerRowID, y.id]);
+      formatted = this._formatDisaggregationIds([outerRowID, y.id]);
 
       return {
         title: y.value,
@@ -150,22 +145,21 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
         id: y.id,
         total: {
           key: formatted,
-          data: data.disaggregation[formatted],
-        },
+          data: data.disaggregation[formatted]
+        }
       };
     }, this);
   }
 
   _determineTotals(columns: any[], middleRows: any[], data: GenericObject) {
-    const self = this;
-    const columnData = columns.map(function(z) {
-      const formatted = self._formatDisaggregationIds([z.id]);
+    const columnData = columns.map((z) => {
+      const formatted = this._formatDisaggregationIds([z.id]);
 
       return {
         key: formatted,
         data: data.disaggregation[formatted]
       };
-    }, self);
+    }, this);
 
     const columnTotalRow = {
       title: 'total',
@@ -179,7 +173,6 @@ class ThreeDisaggregations extends DisaggregationMixin(UtilsMixin(PolymerElement
     this.set('columnTotalRow', columnTotalRow);
     this.set('bottomRows', this._determineRows(this, middleRows, columns));
   }
-
 }
 
 window.customElements.define('three-disaggregations', ThreeDisaggregations);

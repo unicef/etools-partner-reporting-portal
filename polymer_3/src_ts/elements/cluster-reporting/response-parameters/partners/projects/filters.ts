@@ -27,51 +27,35 @@ import {GenericObject} from '../../../../../typings/globals.types';
 class PartnerProjectsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 3;
-        --app-grid-item-height: auto;
-      }
+          --app-grid-columns: 3;
+          --app-grid-item-height: auto;
+        }
+      </style>
 
-    </style>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <cluster-partner-filter class="item" value="[[_withDefault(queryParams.partner, '')]]">
+          </cluster-partner-filter>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <cluster-partner-filter
-            class="item"
-            value="[[_withDefault(queryParams.partner, '')]]">
-        </cluster-partner-filter>
+          <text-filter class="item" label="[[localize('project')]]" name="title" value="[[queryParams.title]]">
+          </text-filter>
 
-        <text-filter
-          class="item"
-          label="[[localize('project')]]"
-          name="title"
-          value="[[queryParams.title]]">
-        </text-filter>
+          <project-status-filter value="[[_withDefault(queryParams.status, '')]]"> </project-status-filter>
 
-        <project-status-filter
-          value="[[_withDefault(queryParams.status, '')]]">
-        </project-status-filter>
-
-        <cluster-location-filter
-          class="item"
-          value="[[_withDefault(queryParams.location, '')]]">
-        </cluster-location-filter>
-      </div>
-    </filter-list>
+          <cluster-location-filter class="item" value="[[_withDefault(queryParams.location, '')]]">
+          </cluster-location-filter>
+        </div>
+      </filter-list>
     `;
   }
 

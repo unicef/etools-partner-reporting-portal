@@ -32,413 +32,420 @@ import {IndicatorDetailsEl} from '../indicator-details';
 import '../reportable-meta';
 import {sharedStyles} from '../../styles/shared-styles';
 import {buttonsStyles} from '../../styles/buttons-styles';
-import {clusterIndicatorReportsSubmit, ClusterIndicatorReportsUpdate}
-  from '../../redux/actions/clusterIndicatorReports';
+import {
+  clusterIndicatorReportsSubmit,
+  clusterIndicatorReportsUpdate
+} from '../../redux/actions/clusterIndicatorReports';
 
 import {GenericObject} from '../../typings/globals.types';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
 
-
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin NotificationsMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin NotificationsMixin
+ * @appliesMixin RoutingMixin
+ */
 class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingMixin(ReduxConnectedElement)))) {
   public static get template() {
     // language=HTML
     return html`
-    ${sharedStyles} ${buttonsStyles}
-    <style include="iron-flex iron-flex-alignment iron-flex-factors">
-      :host {
-        display: block;
+      ${sharedStyles} ${buttonsStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-factors">
+        :host {
+          display: block;
 
-        --paper-item-icon-width: auto;
-      }
+          --paper-item-icon-width: auto;
+        }
 
-      a {
-        color: var(--theme-primary-color);
-      }
+        a {
+          color: var(--theme-primary-color);
+        }
 
-      .report {
-        background: var(--paper-grey-200);
-      }
+        .report {
+          background: var(--paper-grey-200);
+        }
 
-      .report__meta {
-        padding: 10px;
-        color: var(--paper-grey-600);
-      }
+        .report__meta {
+          padding: 10px;
+          color: var(--paper-grey-600);
+        }
 
-      .report__meta .first-column {
-        flex-basis: 40%;
-      }
+        .report__meta .first-column {
+          flex-basis: 40%;
+        }
 
-      .report__meta .column {
-        box-sizing: border-box;
-        min-width: 0;
-      }
+        .report__meta .column {
+          box-sizing: border-box;
+          min-width: 0;
+        }
 
-      .report__meta .column:not(:first-child) {
-        padding-left: 1em;
-      }
+        .report__meta .column:not(:first-child) {
+          padding-left: 1em;
+        }
 
-      .report__meta a {
-        color: var(--theme-primary-color);
-        text-decoration: none;
-      }
+        .report__meta a {
+          color: var(--theme-primary-color);
+          text-decoration: none;
+        }
 
-      .report__meta paper-button {
-        margin: 0;
-      }
+        .report__meta paper-button {
+          margin: 0;
+        }
 
-      .report__meta report-status {
-        --status-badge-size: 12px;
+        .report__meta report-status {
+          --status-badge-size: 12px;
 
-        margin-right: 1.5em;
-        font-size: 11px;
-        color: var(--theme-primary-text-color-dark);
-      }
+          margin-right: 1.5em;
+          font-size: 11px;
+          color: var(--theme-primary-text-color-dark);
+        }
 
-      .report__meta report-status+dl {
-        display: inline;
-      }
+        .report__meta report-status + dl {
+          display: inline;
+        }
 
-      .report__meta dl {
-        margin: 0;
-        font-size: 11px;
-      }
+        .report__meta dl {
+          margin: 0;
+          font-size: 11px;
+        }
 
-      .report__meta dl:not(:first-of-type) {
-        margin-top: .5em;
-      }
+        .report__meta dl:not(:first-of-type) {
+          margin-top: 0.5em;
+        }
 
-      .report__meta dt,
-      .report__meta dd {
-        display: inline;
-        margin: 0;
-      }
+        .report__meta dt,
+        .report__meta dd {
+          display: inline;
+          margin: 0;
+        }
 
-      .report__toggle {
-        width: 25px;
-        position: relative;
-        z-index: 1;
-        color: white;
-        background: var(--theme-primary-color);
-        cursor: pointer;
-      }
+        .report__toggle {
+          width: 25px;
+          position: relative;
+          z-index: 1;
+          color: white;
+          background: var(--theme-primary-color);
+          cursor: pointer;
+        }
 
-      .special-report-cluster .report__toggle {
-        background: #0099ff;
-      }
+        .special-report-cluster .report__toggle {
+          background: #0099ff;
+        }
 
-      .special-report-ip .report__toggle {
-        background: #009d55;
-      }
+        .special-report-ip .report__toggle {
+          background: #009d55;
+        }
 
-      .reportable {
-        padding: 6px 25px 6px 10px;
-        background: var(--paper-grey-300);
-      }
+        .reportable {
+          padding: 6px 25px 6px 10px;
+          background: var(--paper-grey-300);
+        }
 
-      .reportable__title h3 {
-        margin: 0;
-        font-size: 14px;
-      }
+        .reportable__title h3 {
+          margin: 0;
+          font-size: 14px;
+        }
 
-      .status-badge {
-        margin-right: 10px;
-      }
+        .status-badge {
+          margin-right: 10px;
+        }
 
-      .reportable__target {
-        width: 250px;
-        padding-left: 10px;
-      }
+        .reportable__target {
+          width: 250px;
+          padding-left: 10px;
+        }
 
-      .reportable__target dl {
-        margin: 0;
-        text-align: right;
-        font-size: 11px;
-      }
+        .reportable__target dl {
+          margin: 0;
+          text-align: right;
+          font-size: 11px;
+        }
 
-      .reportable__target dt {
-        color: var(--theme-secondary-text-color);
-      }
+        .reportable__target dt {
+          color: var(--theme-secondary-text-color);
+        }
 
-      .reportable__target dd {
-        margin: 0;
-        font-weight: bold;
-      }
+        .reportable__target dd {
+          margin: 0;
+          font-weight: bold;
+        }
 
-      .iron-collapse-opened {
-        @apply --cluster-report-content;
+        .iron-collapse-opened {
+          @apply --cluster-report-content;
 
-        background: white;
-      }
+          background: white;
+        }
 
-      .draft-badge {
-        display: inline-block;
-        padding: 0 5px;
-        border-radius: 2px;
-        font-size: 10px;
-        text-transform: uppercase;
-        color: white;
-        background: var(--paper-grey-500);
-      }
+        .draft-badge {
+          display: inline-block;
+          padding: 0 5px;
+          border-radius: 2px;
+          font-size: 10px;
+          text-transform: uppercase;
+          color: white;
+          background: var(--paper-grey-500);
+        }
 
-      reportable-meta {
-        padding: 25px;
-      }
+        reportable-meta {
+          padding: 25px;
+        }
 
-      paper-listbox {
-        white-space: nowrap;
-      }
+        paper-listbox {
+          white-space: nowrap;
+        }
 
-      paper-listbox a {
-        color: inherit;
-      }
+        paper-listbox a {
+          color: inherit;
+        }
 
-      paper-listbox iron-icon {
-        margin-right: .25em;
-      }
+        paper-listbox iron-icon {
+          margin-right: 0.25em;
+        }
 
-      indicator-details {
-        padding-top: 15px;
-      }
-    </style>
+        indicator-details {
+          padding-top: 15px;
+        }
+      </style>
 
-    <etools-prp-permissions permissions="{{ permissions }}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{ permissions }}"> </etools-prp-permissions>
 
-    <iron-location query="{{ query }}">
-    </iron-location>
+      <iron-location query="{{ query }}"> </iron-location>
 
-    <iron-query-params params-string="{{ query }}" params-object="{{ queryParams }}">
-    </iron-query-params>
+      <iron-query-params params-string="{{ query }}" params-object="{{ queryParams }}"> </iron-query-params>
 
-    <iron-query-params params-string="{{ exportQuery }}" params-object="{{ exportParams }}">
-    </iron-query-params>
+      <iron-query-params params-string="{{ exportQuery }}" params-object="{{ exportParams }}"> </iron-query-params>
 
-    <etools-prp-ajax id="submit" url="[[reportUrl]]" method="post">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="submit" url="[[reportUrl]]" method="post"> </etools-prp-ajax>
 
-    <etools-prp-ajax id="update" url="[[reportUrl]]" body="[[reportMeta]]" method="patch"
-      content-type="application/json">
-    </etools-prp-ajax>
+      <etools-prp-ajax
+        id="update"
+        url="[[reportUrl]]"
+        body="[[reportMeta]]"
+        method="patch"
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-    <div class$="report [[containerClassName]]">
-      <div class="layout horizontal">
-        <div class="report__toggle flex-none layout horizontal center-center" on-tap="_toggle" toggles="[[index]]"
-          role="button" aria-expanded$="[[opened]]" aria-controls$="collapse" tabindex="-1">
-          <iron-icon icon="icons:expand-[[_computeIcon(opened)]]">
-          </iron-icon>
-        </div>
+      <div class$="report [[containerClassName]]">
+        <div class="layout horizontal">
+          <div
+            class="report__toggle flex-none layout horizontal center-center"
+            on-tap="_toggle"
+            toggles="[[index]]"
+            role="button"
+            aria-expanded$="[[opened]]"
+            aria-controls$="collapse"
+            tabindex="-1"
+          >
+            <iron-icon icon="icons:expand-[[_computeIcon(opened)]]"> </iron-icon>
+          </div>
 
-        <div class="flex layout vertical">
-          <div class="report__meta layout horizontal">
-            <div class="first-column column flex-none">
-              <report-status status="[[data.report_status]]"></report-status>
-              <dl>
-                <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
-                  <dt>[[localize('due_date')]]:</dt>
-                  <dd>[[data.due_date]]</dd>
+          <div class="flex layout vertical">
+            <div class="report__meta layout horizontal">
+              <div class="first-column column flex-none">
+                <report-status status="[[data.report_status]]"></report-status>
+                <dl>
+                  <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
+                    <dt>[[localize('due_date')]]:</dt>
+                    <dd>[[data.due_date]]</dd>
+                  </template>
+                  <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
+                    <dt>[[localize('date_of_submission')]]:</dt>
+                    <dd>[[data.submission_date]]</dd>
+                  </template>
+                </dl>
+                <dl>
+                  <dt>[[localize('reporting_period')]]:</dt>
+                  <dd>[[data.reporting_period]]</dd>
+                </dl>
+                <dl>
+                  <dt>[[localize('calculation_methods')]]:</dt>
+                  <dd>
+                    [[data.reportable.blueprint.calculation_formula_across_locations]] (across locations),
+                    [[_calculationFormulaAcrossPeriods(data)]] (across reporting periods)
+                  </dd>
+                </dl>
+              </div>
+              <div class="column flex">
+                <template is="dom-if" if="[[data.partner]]" restamp="true">
+                  <dl>
+                    <dt>[[localize('partner')]]:</dt>
+                    <dd>[[_withDefault(data.partner.title)]]</dd>
+                  </dl>
                 </template>
-                <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
-                  <dt>[[localize('date_of_submission')]]:</dt>
-                  <dd>[[data.submission_date]]</dd>
+                <template is="dom-if" if="[[data.project]]" restamp="true">
+                  <dl>
+                    <dt>[[localize('project')]]:</dt>
+                    <dd>
+                      <a href="[[partnerProjectDetailUrl]]">
+                        [[_withDefault(data.project.title)]]
+                      </a>
+                    </dd>
+                  </dl>
                 </template>
-              </dl>
-              <dl>
-                <dt>[[localize('reporting_period')]]:</dt>
-                <dd>[[data.reporting_period]]</dd>
-              </dl>
-              <dl>
-                <dt>[[localize('calculation_methods')]]:</dt>
-                <dd>
-                  [[data.reportable.blueprint.calculation_formula_across_locations]] (across locations),
-                  [[_calculationFormulaAcrossPeriods(data)]] (across reporting periods)
-                </dd>
-              </dl>
-            </div>
-            <div class="column flex">
-              <template is="dom-if" if="[[data.partner]]" restamp="true">
-                <dl>
-                  <dt>[[localize('partner')]]:</dt>
-                  <dd>[[_withDefault(data.partner.title)]]</dd>
-                </dl>
+                <template is="dom-if" if="[[data.partner_activity]]" restamp="true">
+                  <dl>
+                    <dt>[[localize('activity')]]:</dt>
+                    <dd>
+                      <a href="[[partnerActivityDetailUrl]]">
+                        [[_withDefault(data.partner_activity.title)]]
+                      </a>
+                    </dd>
+                  </dl>
+                </template>
+                <template is="dom-if" if="[[data.cluster_objective]]" restamp="true">
+                  <dl>
+                    <dt>[[localize('cluster_objective')]]:</dt>
+                    <dd>
+                      <a href="[[clusterObjectiveDetailUrl]]">
+                        [[_withDefault(data.cluster_objective.title)]]
+                      </a>
+                    </dd>
+                  </dl>
+                </template>
+                <template is="dom-if" if="[[data.cluster_activity]]" restamp="true">
+                  <dl>
+                    <dt>[[localize('cluster_activity')]]:</dt>
+                    <dd>
+                      <a href="[[clusterActivityDetailUrl]]">
+                        [[_withDefault(data.cluster_activity.title)]]
+                      </a>
+                    </dd>
+                  </dl>
+                </template>
+              </div>
+              <template is="dom-if" if="[[data.is_draft]]" restamp="true">
+                <div class="column layout horizontal center-center flex-none">
+                  <span class="draft-badge">[[localize('draft')]]</span>
+                </div>
               </template>
-              <template is="dom-if" if="[[data.project]]" restamp="true">
-                <dl>
-                  <dt>[[localize('project')]]:</dt>
-                  <dd>
-                    <a href="[[partnerProjectDetailUrl]]">
-                      [[_withDefault(data.project.title)]]
-                    </a>
-                  </dd>
-                </dl>
-              </template>
-              <template is="dom-if" if="[[data.partner_activity]]" restamp="true">
-                <dl>
-                  <dt>[[localize('activity')]]:</dt>
-                  <dd>
-                    <a href="[[partnerActivityDetailUrl]]">
-                      [[_withDefault(data.partner_activity.title)]]
-                    </a>
-                  </dd>
-                </dl>
-              </template>
-              <template is="dom-if" if="[[data.cluster_objective]]" restamp="true">
-                <dl>
-                  <dt>[[localize('cluster_objective')]]:</dt>
-                  <dd>
-                    <a href="[[clusterObjectiveDetailUrl]]">
-                      [[_withDefault(data.cluster_objective.title)]]
-                    </a>
-                  </dd>
-                </dl>
-              </template>
-              <template is="dom-if" if="[[data.cluster_activity]]" restamp="true">
-                <dl>
-                  <dt>[[localize('cluster_activity')]]:</dt>
-                  <dd>
-                    <a href="[[clusterActivityDetailUrl]]">
-                      [[_withDefault(data.cluster_activity.title)]]
-                    </a>
-                  </dd>
-                </dl>
-              </template>
-            </div>
-            <template is="dom-if" if="[[data.is_draft]]" restamp="true">
               <div class="column layout horizontal center-center flex-none">
-                <span class="draft-badge">[[localize('draft')]]</span>
-              </div>
-            </template>
-            <div class="column layout horizontal center-center flex-none">
-              <template is="dom-if" if="[[!_equals(submitMode, 'view')]]" restamp="true">
-                <paper-button class="btn-primary" disabled="[[!canSubmit]]" on-tap="_submit" raised>
-                  [[localize('submit')]]
-                </paper-button>
-              </template>
-
-              <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
-                <send-back-modal id="sendBackModal" report="[[data]]">
-                </send-back-modal>
-
-                <paper-menu-button dynamic-align>
-                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-listbox id="viewMenu" class="dropdown-content" selected="2">
-                    <template is="dom-if" if="[[canSendBack]]">
-                      <paper-icon-item on-tap="_sendBack">
-                        <iron-icon icon="icons:reply" item-icon></iron-icon>
-                        [[localize('send_back_to_partner')]]
-                      </paper-icon-item>
-                    </template>
-
-                    <a href="[[exportUrl]]" target="_blank" tabindex="-1">
-                      <paper-icon-item>
-                        <iron-icon icon="icons:file-download" item-icon></iron-icon>
-                        [[localize('export')]]
-                      </paper-icon-item>
-                    </a>
-
-                    <div></div>
-                  </paper-listbox>
-                </paper-menu-button>
-              </template>
-
-              <template is="dom-if" if="[[showFeedback]]" restamp="true">
-
-                <feedback-modal id="feedbackModal" report="[[data]]">
-                </feedback-modal>
-                <paper-menu-button dynamic-align>
-                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                  <paper-listbox id="nonViewMenu" class="dropdown-content" selected="1">
-                    <paper-icon-item on-tap="_viewFeedback">
-                      <iron-icon icon="icons:announcement" item-icon></iron-icon>
-                      [[localize('view_feedback')]]
-                    </paper-icon-item>
-
-                    <div></div>
-                  </paper-listbox>
-                </paper-menu-button>
-              </template>
-            </div>
-          </div>
-          <div class="reportable layout horizontal">
-            <div class="reportable__title flex-3 layout vertical center-justified">
-              <div class="layout horizontal">
-                <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
-                  <div class="status-badge layout vertical center-justified">
-                    <report-status status="[[_computeCompleteIndicator(data.is_complete)]]" no-label>
-                    </report-status>
-                  </div>
+                <template is="dom-if" if="[[!_equals(submitMode, 'view')]]" restamp="true">
+                  <paper-button class="btn-primary" disabled="[[!canSubmit]]" on-tap="_submit" raised>
+                    [[localize('submit')]]
+                  </paper-button>
                 </template>
-                <h3>[[data.indicator_name]]</h3>
+
+                <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
+                  <send-back-modal id="sendBackModal" report="[[data]]"> </send-back-modal>
+
+                  <paper-menu-button dynamic-align>
+                    <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                    <paper-listbox id="viewMenu" class="dropdown-content" selected="2">
+                      <template is="dom-if" if="[[canSendBack]]">
+                        <paper-icon-item on-tap="_sendBack">
+                          <iron-icon icon="icons:reply" item-icon></iron-icon>
+                          [[localize('send_back_to_partner')]]
+                        </paper-icon-item>
+                      </template>
+
+                      <a href="[[exportUrl]]" target="_blank" tabindex="-1">
+                        <paper-icon-item>
+                          <iron-icon icon="icons:file-download" item-icon></iron-icon>
+                          [[localize('export')]]
+                        </paper-icon-item>
+                      </a>
+
+                      <div></div>
+                    </paper-listbox>
+                  </paper-menu-button>
+                </template>
+
+                <template is="dom-if" if="[[showFeedback]]" restamp="true">
+                  <feedback-modal id="feedbackModal" report="[[data]]"> </feedback-modal>
+                  <paper-menu-button dynamic-align>
+                    <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                    <paper-listbox id="nonViewMenu" class="dropdown-content" selected="1">
+                      <paper-icon-item on-tap="_viewFeedback">
+                        <iron-icon icon="icons:announcement" item-icon></iron-icon>
+                        [[localize('view_feedback')]]
+                      </paper-icon-item>
+
+                      <div></div>
+                    </paper-listbox>
+                  </paper-menu-button>
+                </template>
               </div>
             </div>
-            <div class="reportable__target flex-none layout vertical center-justified">
-              <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('target')]]:</dt>
-                <dd class="flex">
-                  <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
-                    <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
+            <div class="reportable layout horizontal">
+              <div class="reportable__title flex-3 layout vertical center-justified">
+                <div class="layout horizontal">
+                  <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
+                    <div class="status-badge layout vertical center-justified">
+                      <report-status status="[[_computeCompleteIndicator(data.is_complete)]]" no-label> </report-status>
+                    </div>
                   </template>
-                  <template is="dom-if" if="[[_equals(indicatorType, 'percentage')]]" restamp="true">
-                    <span>[[data.reportable.target.v]]%</span>
-                  </template>
-                  <template is="dom-if" if="[[_equals(indicatorType, 'ratio')]]" restamp="true">
-                    <span>
+                  <h3>[[data.indicator_name]]</h3>
+                </div>
+              </div>
+              <div class="reportable__target flex-none layout vertical center-justified">
+                <dl class="layout horizontal justified">
+                  <dt class="flex-3">[[localize('target')]]:</dt>
+                  <dd class="flex">
+                    <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
                       <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
-                      /
-                      <etools-prp-number value="[[data.reportable.target.d]]"></etools-prp-number>
-                    </span>
+                    </template>
+                    <template is="dom-if" if="[[_equals(indicatorType, 'percentage')]]" restamp="true">
+                      <span>[[data.reportable.target.v]]%</span>
+                    </template>
+                    <template is="dom-if" if="[[_equals(indicatorType, 'ratio')]]" restamp="true">
+                      <span>
+                        <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
+                        /
+                        <etools-prp-number value="[[data.reportable.target.d]]"></etools-prp-number>
+                      </span>
+                    </template>
+                  </dd>
+                </dl>
+                <dl class="layout horizontal justified">
+                  <dt class="flex-3">[[localize('total_cumulative_progress')]]:</dt>
+                  <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
+                    <dd class="flex">
+                      <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
+                    </dd>
                   </template>
-                </dd>
-              </dl>
-              <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('total_cumulative_progress')]]:</dt>
-                <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">
-                    <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
-                  </dd>
-                </template>
-                <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c, 1)]]</dd>
-                </template>
-              </dl>
-              <dl class="layout horizontal justified">
-                <dt class="flex-3">[[localize('achievement_in_reporting_period')]]:</dt>
-                <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">
-                    <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
-                  </dd>
-                </template>
-                <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
-                  <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c, 1)]]</dd>
-                </template>
-              </dl>
+                  <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
+                    <dd class="flex">[[_formatIndicatorValue(indicatorType, data.reportable.achieved.c, 1)]]</dd>
+                  </template>
+                </dl>
+                <dl class="layout horizontal justified">
+                  <dt class="flex-3">[[localize('achievement_in_reporting_period')]]:</dt>
+                  <template is="dom-if" if="[[_equals(indicatorType, 'number')]]" restamp="true">
+                    <dd class="flex">
+                      <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
+                    </dd>
+                  </template>
+                  <template is="dom-if" if="[[!_equals(indicatorType, 'number')]]" restamp="true">
+                    <dd class="flex">[[_formatIndicatorValue(indicatorType, data.total.c, 1)]]</dd>
+                  </template>
+                </dl>
+              </div>
             </div>
           </div>
         </div>
+
+        <div>
+          <iron-collapse id="collapse" opened="{{opened}}" on-opened-changed="_handleOpenedChanged" no-animation>
+            <reportable-meta data="[[data]]" mode="[[editMode]]" allow-no-status is-cluster> </reportable-meta>
+
+            <indicator-details
+              reportable-id="[[data.reportable.id]]"
+              indicator-name="[[data.indicator_name]]"
+              indicator-id="[[data.id]]"
+              reporting-period="[[data.reporting_period]]"
+              override-mode="[[editMode]]"
+            >
+            </indicator-details>
+          </iron-collapse>
+        </div>
       </div>
 
-      <div>
-        <iron-collapse id="collapse" opened="{{opened}}" on-opened-changed="_handleOpenedChanged" no-animation>
-          <reportable-meta data="[[data]]" mode="[[editMode]]" allow-no-status is-cluster>
-          </reportable-meta>
-
-          <indicator-details reportable-id="[[data.reportable.id]]" indicator-name="[[data.indicator_name]]"
-            indicator-id="[[data.id]]" reporting-period="[[data.reporting_period]]" override-mode="[[editMode]]">
-          </indicator-details>
-        </iron-collapse>
-      </div>
-    </div>
-
-    <error-modal id="error"></error-modal>
-  `;
+      <error-modal id="error"></error-modal>
+    `;
   }
 
   @property({type: Object})
@@ -508,8 +515,9 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   containerClassName!: string;
 
   _calculationFormulaAcrossPeriods(indicator: any) {
-    return indicator.reportable.blueprint.display_type === 'ratio' ?
-      this.localize('latest') : indicator.reportable.blueprint.calculation_formula_across_periods;
+    return indicator.reportable.blueprint.display_type === 'ratio'
+      ? this.localize('latest')
+      : indicator.reportable.blueprint.calculation_formula_across_periods;
   }
 
   _computeIcon(opened: string) {
@@ -541,10 +549,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     if (!paId) {
       return;
     }
-    return this.buildUrl(
-      baseUrl,
-      'response-parameters/partners/project/' + String(paId) + '/overview'
-    );
+    return this.buildUrl(baseUrl, 'response-parameters/partners/project/' + String(paId) + '/overview');
   }
 
   _computePartnerActivityDetailUrl(baseUrl: string, paId: any) {
@@ -566,11 +571,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       return;
     }
 
-    return [
-      Endpoints.clusterIndicatorReportsExport(responsePlanId),
-      '?',
-      query
-    ].join('');
+    return [Endpoints.clusterIndicatorReportsExport(responsePlanId), '?', query].join('');
   }
 
   _computeIndicatorType(data: GenericObject) {
@@ -595,6 +596,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
           indicatorDetails.init();
         }
       } catch (err) {
+        console.log(err);
       }
     }
   }
@@ -604,7 +606,9 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
     this._confirmIntent()
       .then(this._commit.bind(this))
-      .catch((_err: any) => {this._revert.bind(this);});
+      .catch((_err: any) => {
+        this._revert.bind(this);
+      });
   }
 
   _confirmIntent() {
@@ -617,21 +621,23 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
 
   _commit() {
     const submitThunk = (this.$.submit as EtoolsPrpAjaxEl).thunk();
-    const self = this;
 
-    return this.reduxStore.dispatch(clusterIndicatorReportsSubmit(submitThunk))
-      // @ts-ignore
-      .then(function() {
-        self.set('busy', false);
-        fireEvent(self, 'report-submitted', self.data.id);
-      })
-      .catch((res: any) => {
-        const errors = res.data.non_field_errors;
+    return (
+      this.reduxStore
+        .dispatch(clusterIndicatorReportsSubmit(submitThunk))
+        // @ts-ignore
+        .then(() => {
+          this.set('busy', false);
+          fireEvent(this, 'report-submitted', this.data.id);
+        })
+        .catch((res: any) => {
+          const errors = res.data.non_field_errors;
 
-        return (self.$.error as ErrorModalEl).open(errors).then(() => {
-          return Promise.reject(); // Revert
-        });
-      });
+          return (this.$.error as ErrorModalEl).open(errors).then(() => {
+            return Promise.reject(); // Revert
+          });
+        })
+    );
   }
 
   _revert() {
@@ -641,13 +647,13 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
   _onReportComplete(e: CustomEvent) {
     e.stopPropagation();
     // update `can_submit` property from `data` to enable Submit button,
-    // `data` is coming from `redux clusterDashboardData.overdue_indicator_reports`, this will not be updated because will trigger re-rendering of all
+    // `data` is coming from `redux clusterDashboardData.overdue_indicator_reports`,
+    // this will not be updated because will trigger re-rendering of all
     // cluster-reports (`List of overdue indicator reports` from dashboard)
     this.set('data', {...this.data, can_submit: true});
   }
 
   _updateMeta(e: CustomEvent) {
-    const self = this;
     const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 
     e.stopPropagation();
@@ -655,12 +661,13 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     this.set('reportMeta', reportMetaData);
 
     (this.$.update as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(ClusterIndicatorReportsUpdate(updateThunk, this.data.id))
+    this.reduxStore
+      .dispatch(clusterIndicatorReportsUpdate(updateThunk, this.data.id))
       // @ts-ignore
       .then(() => {
         // update `data` property with changes from `reportable-meta`
         this.set('data', {...this.data, ...reportMetaData});
-        self._notifyChangesSaved();
+        this._notifyChangesSaved();
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -702,16 +709,14 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
     if (!data || !permissions) {
       return;
     }
-    return (data.report_status === 'Sub' || data.report_status === 'Acc')
-      && permissions.sendBackIndicatorReport;
+    return (data.report_status === 'Sub' || data.report_status === 'Acc') && permissions.sendBackIndicatorReport;
   }
 
   _computeShowFeedback(data: GenericObject, permissions: any) {
     if (!data || !permissions) {
       return;
     }
-    return data.report_status === 'Sen' &&
-      permissions.editIndicatorReport(data);
+    return data.report_status === 'Sen' && permissions.editIndicatorReport(data);
   }
 
   _sendBack() {

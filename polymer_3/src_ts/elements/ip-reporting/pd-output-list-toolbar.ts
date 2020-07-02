@@ -9,8 +9,13 @@ import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {
-  computeImportTemplateUrl, computeImportUrl, computeShowImportButtons,
-  computePdReportUrl, computeRefreshData, computeCanRefresh, computeShowRefresh
+  computeImportTemplateUrl,
+  computeImportUrl,
+  computeShowImportButtons,
+  computePdReportUrl,
+  computeRefreshData,
+  computeCanRefresh,
+  computeShowRefresh
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
 import '../etools-prp-ajax';
@@ -28,63 +33,43 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin LocalizeMixin
  */
 class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-      id="refreshReport"
-      url="[[refreshUrl]]"
-      body="[[refreshData]]"
-      method="post"
-      content-type="application/json">
-    </etools-prp-ajax>
+      <etools-prp-ajax
+        id="refreshReport"
+        url="[[refreshUrl]]"
+        body="[[refreshData]]"
+        method="post"
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-    <refresh-report-modal
-        id="refresh"
-        data="[[refreshData]]"
-        refresh-url="[[refreshUrl]]">
-    </refresh-report-modal>
+      <refresh-report-modal id="refresh" data="[[refreshData]]" refresh-url="[[refreshUrl]]"> </refresh-report-modal>
 
-    <etools-prp-toolbar
-      query="{{query}}"
-      report-id="{{reportId}}"
-      location-id="{{locationId}}">
+      <etools-prp-toolbar query="{{query}}" report-id="{{reportId}}" location-id="{{locationId}}">
+        <download-button url="[[pdfExportUrl]]">PDF</download-button>
+        <download-button url="[[xlsExportUrl]]">XLS</download-button>
 
-      <download-button url="[[pdfExportUrl]]">PDF</download-button>
-      <download-button url="[[xlsExportUrl]]">XLS</download-button>
-
-      <template
-        is="dom-if"
-        if="[[showImportButtons]]"
-        restamp="true">
-        <upload-button
-          url="[[importUrl]]"
-          modal-title="Import Template">
-          [[localize('import_template')]]
-        </upload-button>
-        <download-button url="[[importTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
-        <template
-            is="dom-if"
-            if="[[showRefresh]]"
-            restamp="true">
-          <paper-button
-              class="btn-primary"
-              on-tap="_refresh"
-              disabled="[[busy]]"
-              raised>
-            [[localize('refresh')]]
-          </paper-button>
+        <template is="dom-if" if="[[showImportButtons]]" restamp="true">
+          <upload-button url="[[importUrl]]" modal-title="Import Template">
+            [[localize('import_template')]]
+          </upload-button>
+          <download-button url="[[importTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
+          <template is="dom-if" if="[[showRefresh]]" restamp="true">
+            <paper-button class="btn-primary" on-tap="_refresh" disabled="[[busy]]" raised>
+              [[localize('refresh')]]
+            </paper-button>
+          </template>
         </template>
-      </template>
-    </etools-prp-toolbar>
-  `;
+      </etools-prp-toolbar>
+    `;
   }
 
   @property({type: String})
@@ -108,10 +93,10 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: String, computed: '_computePdReportUrl(locationId, reportId)'})
   pdReportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdReportUrl, query, \'export=pdf\')'})
+  @property({type: String, computed: "_appendQuery(pdReportUrl, query, 'export=pdf')"})
   pdfExportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')'})
+  @property({type: String, computed: "_appendQuery(pdReportUrl, query, 'export=xlsx')"})
   xlsExportUrl!: string;
 
   @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
@@ -134,7 +119,6 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
 
   @property({type: String})
   refreshUrl = Endpoints.reportProgressReset();
-
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
     return programmeDocumentReportsCurrent(rootState);

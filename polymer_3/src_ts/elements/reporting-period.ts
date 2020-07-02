@@ -13,25 +13,23 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
  */
 class ReportingPeriod extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
-            display: inline-block;
-            padding: 1px 3px;
-            border: 1px solid var(--paper-grey-500);
-            font-size: 10px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            color: var(--paper-grey-500);
+          display: inline-block;
+          padding: 1px 3px;
+          border: 1px solid var(--paper-grey-500);
+          font-size: 10px;
+          text-transform: uppercase;
+          white-space: nowrap;
+          color: var(--paper-grey-500);
         }
 
         .range {
-            color: var(--theme-primary-text-color-dark);
+          color: var(--theme-primary-text-color-dark);
         }
-        </style>
+      </style>
 
-        [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>`
-    ;
+      [[localize('reporting_period')]]: <span class="range">[[_withDefault(range)]]</span>`;
   }
 
   @property({type: String})

@@ -14,39 +14,36 @@ class AddPlanPanel extends PolymerElement {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
-     <style include="iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
-        background: #FCFCFC;
-        padding: 15px;
-        margin-bottom: 10px;
-      }
+      ${buttonsStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
+          background: #fcfcfc;
+          padding: 15px;
+          margin-bottom: 10px;
+        }
 
-      span {
-        color: var(--paper-grey-600);
-      }
-
-    </style>
-    <div class="layout horizontal justified center-aligned">
-      <div class="layout horizontal center-center">
-        <span>Select Response Plan from the list below or add a new one if the needed one is not available.</span>
+        span {
+          color: var(--paper-grey-600);
+        }
+      </style>
+      <div class="layout horizontal justified center-aligned">
+        <div class="layout horizontal center-center">
+          <span>Select Response Plan from the list below or add a new one if the needed one is not available.</span>
+        </div>
+        <div>
+          <paper-button id="periods" on-tap="_openModal" class="btn-primary">
+            Add new response plan
+          </paper-button>
+        </div>
       </div>
-      <div>
-        <paper-button id="periods" on-tap="_openModal" class="btn-primary">
-          Add new response plan
-        </paper-button>
-      </div>
-    </div>
-    <add-response-plan-modal id="modal">
-    </add-response-plan-modal>
+      <add-response-plan-modal id="modal"> </add-response-plan-modal>
     `;
   }
 
   _openModal() {
     (this.$.modal as AddResponsePlanModalEl).open();
   }
-
 }
 
 window.customElements.define('add-plan-panel', AddPlanPanel);

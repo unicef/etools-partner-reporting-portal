@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import {property} from "@polymer/decorators/lib/decorators";
+import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/paper-item/paper-item';
@@ -18,8 +18,7 @@ import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
  */
 class LanguageDropdown extends ReduxConnectedElement {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
           display: block;
           position: relative;
@@ -32,32 +31,31 @@ class LanguageDropdown extends ReduxConnectedElement {
           padding-right: 36px;
           @apply --languages-dropdown-width;
 
-
           --paper-input-container-underline: {
             display: none;
             @apply --underline-shown;
-          };
+          }
 
           --paper-input-container-underline-focus: {
             display: none;
-          };
+          }
 
           --paper-input-container-underline-disabled: {
             display: none;
-          };
+          }
 
           --paper-input-container-input: {
             color: var(--theme-primary-text-color-medium);
-          };
+          }
 
           --paper-dropdown-menu-icon: {
             color: var(--theme-primary-text-color-medium);
-          };
+          }
 
           --paper-input-container-label: {
             top: 4px;
             color: var(--theme-primary-text-color-medium);
-          };
+          }
 
           --paper-input-container-input: {
             margin-bottom: 2px;
@@ -76,16 +74,18 @@ class LanguageDropdown extends ReduxConnectedElement {
       </style>
 
       <paper-dropdown-menu label="[[language]]" noink no-label-float>
-        <paper-listbox slot="dropdown-content"
-            class="dropdown-content"
-            on-iron-select="_languageSelected"
-            selected="[[selected]]">
+        <paper-listbox
+          slot="dropdown-content"
+          class="dropdown-content"
+          on-iron-select="_languageSelected"
+          selected="[[selected]]"
+        >
           <template id="repeat" is="dom-repeat" items="[[data]]">
             <paper-item>[[item]]</paper-item>
           </template>
         </paper-listbox>
-      </paper-dropdown-menu>`
-  };
+      </paper-dropdown-menu>`;
+  }
 
   @property({type: String, computed: '_computeLanguage(data, current)'})
   language!: string;
@@ -122,7 +122,7 @@ class LanguageDropdown extends ReduxConnectedElement {
   }
 
   _computeLanguage(data: any[], current: string) {
-    return data.filter(function(language: string) {
+    return data.filter(function (language: string) {
       return language === current;
     })[0];
   }
@@ -137,7 +137,6 @@ class LanguageDropdown extends ReduxConnectedElement {
   _computeLanguages(availableLanguages: GenericObject) {
     return Object.keys(availableLanguages).slice();
   }
-
 }
 
 window.customElements.define('language-dropdown', LanguageDropdown);

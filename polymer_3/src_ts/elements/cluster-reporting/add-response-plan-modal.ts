@@ -42,143 +42,93 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles} ${modalStyles}
-     <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${modalStyles}
+      <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
 
-        --app-grid-columns: 3;
-        --app-grid-gutter: 0px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+          --app-grid-columns: 3;
+          --app-grid-gutter: 0px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 3;
 
-        --paper-dialog: {
-          width: 820px;
+          --paper-dialog: {
+            width: 820px;
+          }
         }
-      }
 
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
+        .full-width {
+          @apply --app-grid-expandible-item;
+        }
 
-      .fields {
-        position: relative;
-        padding: 0px 30px;
-      }
+        .fields {
+          position: relative;
+          padding: 0px 30px;
+        }
 
-      #mode {
-        margin-bottom: 12px;
-      }
+        #mode {
+          margin-bottom: 12px;
+        }
 
-      #mode paper-radio-button {
-        padding-top: 12px;
-        display: block;
-        margin-left: -12px;
-      }
+        #mode paper-radio-button {
+          padding-top: 12px;
+          display: block;
+          margin-left: -12px;
+        }
 
-      paper-dialog-scrollable {
-        padding-bottom: 20px;
-      }
+        paper-dialog-scrollable {
+          padding-bottom: 20px;
+        }
 
       etools-dropdown, etools-dropdown-multi, datepicker-lite, paper-input {
         width: 100%;
       }
       .start-date, .end-date{
           --paper-input-container_-_width: 100%;
-      }
-      .app-grid{
-        padding-right: 90px;
-        padding-left: 30px;
-      }
+        }
+        .app-grid {
+          padding-right: 90px;
+          padding-left: 30px;
+        }
+      </style>
 
-    </style>
+      <etools-prp-permissions permissions="{{ permissions }}"> </etools-prp-permissions>
 
-    <etools-prp-permissions
-      permissions="{{ permissions }}">
-    </etools-prp-permissions>
+      <etools-prp-ajax id="plan" url="[[createPlanUrl]]" method="post" content-type="application/json">
+      </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="plan"
-      url="[[createPlanUrl]]"
-      method="post"
-      content-type="application/json">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="plans" timeout="100000" url="[[ochaPlansUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="plans"
-      timeout="100000"
-      url="[[ochaPlansUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="config" url="[[configUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="config"
-      url="[[configUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="planDetails" url="[[planDetailsUrl]]" timeout="100000"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="planDetails"
-      url="[[planDetailsUrl]]"
-      timeout="100000">
-    </etools-prp-ajax>
-
-
-    <paper-dialog
-      id="dialog"
-      modal
-      opened="{{opened}}">
-      <div class="header layout horizontal justified">
-        <h2>Add Response Plan</h2>
-        <paper-icon-button
-          class="self-center"
-          on-tap="close"
-          icon="icons:close">
-        </paper-icon-button>
-      </div>
-
-      <paper-dialog-scrollable>
-        <error-box errors="[[errors]]"></error-box>
-
-        <paper-radio-group id="mode" selected="{{mode}}">
-          <paper-radio-button name="ocha">
-            <strong>From OCHA</strong>
-          </paper-radio-button>
-
-          <paper-radio-button name="custom">
-            <strong>Custom</strong>
-          </paper-radio-button>
-        </paper-radio-group>
-
-        <div class="fields" empty$="[[!_equals(mode, 'ocha')]]">
-          <template
-            is="dom-if"
-            if="[[_equals(mode, 'ocha')]]"
-            restamp="true">
-            <div>
-              <etools-dropdown
-                class="item validate full-width"
-                label="Response Plan"
-                options="[[formattedPlans]]"
-                option-value="id"
-                option-label="title"
-                selected="{{selectedPlan}}"
-                disabled="[[plansLoading]]"
-                on-etools-selected-item-changed$="_validate"
-                trigger-value-change-event
-                no-dynamic-align
-                auto-validate
-                with-backdrop
-                required>
-              </etools-dropdown>
-              <response-plan-details
-                id="details"
-                plan-data="[[planDetails]]"
-                loading="[[planDetailsLoading]]"
-                error="[[emptyClustersError]]">
-              </response-plan-details>
-              <etools-loading active$="[[plansLoading]]"></etools-loading>
-            </div>
-          </template>
+      <paper-dialog id="dialog" modal opened="{{opened}}">
+        <div class="header layout horizontal justified">
+          <h2>Add Response Plan</h2>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
         </div>
+
+        <paper-dialog-scrollable>
+          <error-box errors="[[errors]]"></error-box>
+
+          <paper-radio-group id="mode" selected="{{mode}}">
+            <paper-radio-button name="ocha">
+              <strong>From OCHA</strong>
+            </paper-radio-button>
+
+            <paper-radio-button name="custom">
+              <strong>Custom</strong>
+            </paper-radio-button>
+          </paper-radio-group>
+
+          <div class="fields" empty$="[[!_equals(mode, 'ocha')]]">
+            <template is="dom-if" if="[[_equals(mode, 'ocha')]]" restamp="true">
+              <div>
+                <etools-dropdown
+                  class="item validate full-width"
+                  label="Response Plan"
+                  options="[[formattedPlans]]"
 
       <div empty$="[[!_equals(mode, 'custom')]]">
         <template
@@ -219,26 +169,114 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   options="[[types]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{data.plan_type}}"
+                  selected="{{selectedPlan}}"
+                  disabled="[[plansLoading]]"
+                  on-etools-selected-item-changed$="_validate"
+                  trigger-value-change-event
+                  no-dynamic-align
                   auto-validate
-                  hide-search
                   with-backdrop
-                  required>
-              </etools-dropdown>
-            </div>
-            <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
-              <div class="item">
-                <paper-input
-                  class="validate item full-width"
-                  label="Custom Plan Type"
-                  value="{{data.plan_custom_type_label}}"
-                  on-input="_validate"
-                  always-float-label
                   required
-                  maxlength="255">
-                </paper-input>
+                >
+                </etools-dropdown>
+                <response-plan-details
+                  id="details"
+                  plan-data="[[planDetails]]"
+                  loading="[[planDetailsLoading]]"
+                  error="[[emptyClustersError]]"
+                >
+                </response-plan-details>
+                <etools-loading active$="[[plansLoading]]"></etools-loading>
               </div>
             </template>
+          </div>
+
+          <div empty$="[[!_equals(mode, 'custom')]]">
+            <template is="dom-if" if="[[_equals(mode, 'custom')]]" restamp="true">
+              <div class="app-grid">
+                <div class="item full-width">
+                  <paper-input
+                    class="validate full-width"
+                    label="Response Plan"
+                    value="{{data.title}}"
+                    on-input="_validate"
+                    always-float-label
+                    required
+                  >
+                  </paper-input>
+                </div>
+                <div class="item">
+                  <etools-dropdown
+                    class="validate"
+                    label="Plan Type"
+                    options="[[types]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.plan_type}}"
+                    auto-validate
+                    hide-search
+                    with-backdrop
+                    required
+                  >
+                  </etools-dropdown>
+                </div>
+                <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
+                  <div class="item">
+                    <paper-input
+                      class="validate item full-width"
+                      label="Custom Plan Type"
+                      value="{{data.plan_custom_type_label}}"
+                      on-input="_validate"
+                      always-float-label
+                      required
+                      maxlength="255"
+                    >
+                    </paper-input>
+                  </div>
+                </template>
+                <div class="item">
+                  <datepicker-lite
+                    class="start-date"
+                    label="Start date"
+                    value="{{data.start}}"
+                    error-message=""
+                    selected-date-display-format="D MMM YYYY"
+                    required
+                  >
+                  </datepicker-lite>
+                </div>
+
+                <div class="item">
+                  <datepicker-lite
+                    class="end-date"
+                    label="End date"
+                    value="{{data.end}}"
+                    error-message=""
+                    selected-date-display-format="D MMM YYYY"
+                    required
+                  >
+                  </datepicker-lite>
+                </div>
+                <div class="item full-width">
+                  <etools-dropdown-multi
+                    class="validate"
+                    label="Clusters"
+                    options="[[clusters]]"
+                    option-value="value"
+                    option-label="label"
+                    selected-values="{{data.clusters}}"
+                    on-etools-selected-items-changed="_validate"
+                    trigger-value-change-event
+                    hide-close
+                    error-message=""
+                    with-backdrop
+                    required
+                  >
+                  </etools-dropdown-multi>
+                </div>
+              </div>
+            </template>
+
             <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
               <div class="item">
                   <div class="full-width">
@@ -266,29 +304,20 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
               </datepicker-lite>
             </div>
           </div>
-        </template>
-      </div>
+        </paper-dialog-scrollable>
 
-      </paper-dialog-scrollable>
+        <div class="buttons layout horizontal-reverse">
+          <paper-button on-tap="_savePlan" class="btn-primary" disabled="[[emptyClustersError]]" raised>
+            Save
+          </paper-button>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-          on-tap="_savePlan"
-          class="btn-primary"
-          disabled="[[emptyClustersError]]"
-          raised>
-          Save
-        </paper-button>
+          <paper-button class="btn-cancel" on-tap="close">
+            Cancel
+          </paper-button>
+        </div>
 
-        <paper-button
-          class='btn-cancel'
-          on-tap="close">
-          Cancel
-        </paper-button>
-      </div>
-
-      <etools-loading active="[[updatePending]]"></etools-loading>
-    </paper-dialog>
+        <etools-loading active="[[updatePending]]"></etools-loading>
+      </paper-dialog>
     `;
   }
 
@@ -421,13 +450,13 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
   }
 
   _computeFormattedPlans(plans: GenericObject[]) {
-    return plans.map(function(plan) {
+    return plans.map(function (plan) {
       return {id: plan.id, title: plan.name};
     });
   }
 
   _computeCurrentPlan(plans: GenericObject[], selectedPlan: string) {
-    return plans.filter(function(plan) {
+    return plans.filter(function (plan) {
       return plan.id === selectedPlan;
     })[0];
   }
@@ -436,10 +465,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     setTimeout(() => {
       this.set(
         'emptyClustersError',
-        mode === 'ocha' &&
-        planDetails &&
-        planDetails.clusterNames &&
-        !planDetails.clusterNames.length
+        mode === 'ocha' && planDetails && planDetails.clusterNames && !planDetails.clusterNames.length
       );
     });
   }
@@ -449,21 +475,21 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       return;
     }
     this.set('plansLoading', true);
-    const self = this;
+
     const thunk = (this.$.plans as EtoolsPrpAjaxEl).thunk();
     (this.$.plans as EtoolsPrpAjaxEl).abort();
 
     thunk()
       .then((res: any) => {
-        self.set('plansLoading', false);
-        self.set('plans', res.data);
+        this.set('plansLoading', false);
+        this.set('plans', res.data);
       })
       .catch((err: any) => {
         if (err.code === 504) {
-          fireEvent(self, 'notify', {type: 'ocha-timeout'});
+          fireEvent(this, 'notify', {type: 'ocha-timeout'});
         }
-        self.set('plansLoading', false);
-        self.set('errors', err.data);
+        this.set('plansLoading', false);
+        this.set('errors', err.data);
       });
   }
 
@@ -472,21 +498,21 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
       return;
     }
     this.set('planDetailsLoading', true);
-    const self = this;
+
     const thunk = (this.$.planDetails as EtoolsPrpAjaxEl).thunk();
     (this.$.planDetails as EtoolsPrpAjaxEl).abort();
     thunk()
       .then((res: any) => {
-        self.set('planDetailsLoading', false);
-        self.set('planDetails', res.data);
-        fireEvent(self, 'details-loaded');
+        this.set('planDetailsLoading', false);
+        this.set('planDetails', res.data);
+        fireEvent(this, 'details-loaded');
       })
       .catch((err: any) => {
         if (err.code === 504) {
-          fireEvent(self, 'notify', {type: 'ocha-timeout'});
+          fireEvent(this, 'notify', {type: 'ocha-timeout'});
         }
-        self.set('planDetailsLoading', false);
-        self.set('errors', err.data);
+        this.set('planDetailsLoading', false);
+        this.set('errors', err.data);
       });
   }
 
@@ -496,19 +522,16 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     }
     const configThunk = (this.$.config as EtoolsPrpAjaxEl).thunk();
     (this.$.config as EtoolsPrpAjaxEl).thunk();
-    const self = this;
     (this.$.config as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(
-      fetchConfig(configThunk, configClusterTypes)
-    )
+    this.reduxStore
+      .dispatch(fetchConfig(configThunk, configClusterTypes))
       // @ts-ignore
-      .catch(function(err: any) {
-        self.set('errors', err.data);
+      .catch((err: any) => {
+        this.set('errors', err.data);
       });
   }
 
   _savePlan() {
-    const self = this;
     this.set('updatePending', true);
 
     const bodyThunk = (this.$.plan as EtoolsPrpAjaxEl).thunk();
@@ -520,19 +543,19 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
 
     bodyThunk()
       .then((res: any) => {
-        self.set('updatePending', false);
-        self.close();
-        self.set('errors', {});
-        self.reduxStore.dispatch(addResponsePlan(res.data));
-        fireEvent(self, 'refresh-plan-list');
-        fireEvent(self, 'fetch-profile');
+        this.set('updatePending', false);
+        this.close();
+        this.set('errors', {});
+        this.reduxStore.dispatch(addResponsePlan(res.data));
+        fireEvent(this, 'refresh-plan-list');
+        fireEvent(this, 'fetch-profile');
       })
       .catch((err: any) => {
-        self.set('updatePending', false);
+        this.set('updatePending', false);
         if (err.code === 504) {
-          fireEvent(self, 'notify', {type: 'ocha-timeout'});
+          fireEvent(this, 'notify', {type: 'ocha-timeout'});
         }
-        self.set('errors', err.data);
+        this.set('errors', err.data);
       });
   }
 
@@ -557,7 +580,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('add-response-plan-modal', AddResponsePlanModal);

@@ -27,7 +27,6 @@ AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.azuread_b2c.AzureADB2COAuth2',
     'core.mixins.CustomAzureADBBCOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 LOGGING['handlers']['mail_admins'] = {

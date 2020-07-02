@@ -26,68 +26,59 @@ import {GenericObject} from '../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  */
 class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 4;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-      }
+          --app-grid-columns: 4;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
+        }
 
-      .item-2-col {
-        @apply --app-grid-expandible-item;
-      }
+        .item-2-col {
+          @apply --app-grid-expandible-item;
+        }
 
-      checkbox-filter {
-        margin-top: 2em;
-      }
-    </style>
+        checkbox-filter {
+          margin-top: 2em;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <dropdown-filter-multi
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <dropdown-filter-multi
             class="item item-2-col"
             label="[[localize('pd_status')]]"
             name="pd_statuses"
             value="[[_withDefault(queryParams.pd_statuses, '')]]"
             data="[[pd_statuses]]"
-            hide-search>
-        </dropdown-filter-multi>
+            hide-search
+          >
+          </dropdown-filter-multi>
 
-        <pd-dropdown-filter
-          class="item item-2-col"
-          value="[[_withDefault(queryParams.pds, '')]]">
-        </pd-dropdown-filter>
+          <pd-dropdown-filter class="item item-2-col" value="[[_withDefault(queryParams.pds, '')]]">
+          </pd-dropdown-filter>
 
-        <location-filter
-            class="item"
-            value="[[_withDefault(queryParams.location, '')]]">
-        </location-filter>
+          <location-filter class="item" value="[[_withDefault(queryParams.location, '')]]"> </location-filter>
 
-        <text-filter
+          <text-filter
             class="item"
             label="[[localize('indicator_title')]]"
             name="blueprint__title"
-            value="[[queryParams.blueprint__title]]">
-        </text-filter>
-      </div>
-    </filter-list>
-  `;
+            value="[[queryParams.blueprint__title]]"
+          >
+          </text-filter>
+        </div>
+      </filter-list>
+    `;
   }
 
   @property({type: Object})

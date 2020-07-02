@@ -37,7 +37,6 @@ AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.azuread_b2c.AzureADB2COAuth2',
     'core.mixins.CustomAzureADBBCOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')

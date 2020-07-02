@@ -18,7 +18,6 @@ import Endpoints from '../endpoints';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
-
 /**
  * @polymer
  * @customElement
@@ -26,147 +25,113 @@ import {PaperInputElement} from '@polymer/paper-input/paper-input';
  * @appliesMixin LocalizeMixin
  */
 class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
+      ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
 
-        --paper-input-container-disabled: {
-          opacity: 0.67
-        };
+          --paper-input-container-disabled: {
+            opacity: 0.67;
+          }
+        }
 
-      }
+        labelled-item {
+          font-size: 16px;
+        }
 
-      labelled-item {
-        font-size: 16px;
-      }
+        labelled-item:not(:last-child) {
+          margin-bottom: 25px;
+        }
 
-      labelled-item:not(:last-child) {
-        margin-bottom: 25px;
-      }
+        #input-button-container {
+          display: flex;
+          justify-content: flex-start;
+          align-items: flex-start;
+          flex-direction: row;
+        }
 
-      #input-button-container {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-        flex-direction: row;
-      }
+        paper-input {
+          width: 100%;
+          padding-right: 18px;
+        }
 
-      paper-input {
-        width: 100%;
-        padding-right: 18px;
-      }
+        paper-radio-group {
+          margin-left: -12px;
+        }
 
-      paper-radio-group {
-        margin-left: -12px;
-      }
+        #toggle-button {
+          font-size: 14px;
+        }
 
-      #toggle-button {
-        font-size: 14px;
-      }
+        status-badge {
+          position: relative;
+          top: -2px;
+        }
 
-      status-badge {
-        position: relative;
-        top: -2px;
-      }
+        #refresh-button {
+          margin-block-end: 1rem;
+        }
+      </style>
 
-      #refresh-button {
-        margin-block-end: 1rem;
-      }
-    </style>
-
-    <template
-      is="dom-if"
-      if="[[canRefresh]]"
-      restamp="true">
-      <paper-button
-        id="refresh-button"
-        class="btn-primary"
-        on-tap="_refresh"
-        disabled="[[busy]]"
-        raised>
-        [[localize('refresh')]]
-      </paper-button>
-    </template>
-
-    <labelled-item label="[[localize('overall_status')]]">
-      <template
-          is="dom-if"
-          if="[[!_equals(mode, 'view')]]"
-          restamp="true">
-        <paper-radio-group
-            id="overall_status"
-            selected="[[data.overall_status]]"
-            on-selected-changed="_handleInput">
-          <paper-radio-button name="Met">[[_computeMetLabel(completed, localize)]]</paper-radio-button>
-          <template
-            is="dom-if"
-            if="[[!completed]]"
-            restamp="true">
-            <paper-radio-button name="OnT">[[localize('on_track')]]</paper-radio-button>
-            <paper-radio-button name="NoP">[[localize('no_progress')]]</paper-radio-button>
-          </template>
-          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed, localize)]]</paper-radio-button>
-          <template
-              is="dom-if"
-              if="[[allowNoStatus]]"
-              restamp="true">
-            <paper-radio-button name="NoS">[[localize('no_status')]]</paper-radio-button>
-          </template>
-        </paper-radio-group>
+      <template is="dom-if" if="[[canRefresh]]" restamp="true">
+        <paper-button id="refresh-button" class="btn-primary" on-tap="_refresh" disabled="[[busy]]" raised>
+          [[localize('refresh')]]
+        </paper-button>
       </template>
 
-      <template
-          is="dom-if"
-          if="[[_equals(mode, 'view')]]"
-          restamp="true">
+      <labelled-item label="[[localize('overall_status')]]">
+        <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
+          <paper-radio-group id="overall_status" selected="[[data.overall_status]]" on-selected-changed="_handleInput">
+            <paper-radio-button name="Met">[[_computeMetLabel(completed, localize)]]</paper-radio-button>
+            <template is="dom-if" if="[[!completed]]" restamp="true">
+              <paper-radio-button name="OnT">[[localize('on_track')]]</paper-radio-button>
+              <paper-radio-button name="NoP">[[localize('no_progress')]]</paper-radio-button>
+            </template>
+            <paper-radio-button name="Con">[[_computeConstrainedLabel(completed, localize)]]</paper-radio-button>
+            <template is="dom-if" if="[[allowNoStatus]]" restamp="true">
+              <paper-radio-button name="NoS">[[localize('no_status')]]</paper-radio-button>
+            </template>
+          </paper-radio-group>
+        </template>
+
+        <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
           <report-status final="[[completed]]" status="[[data.overall_status]]"></report-status>
-      </template>
-    </labelled-item>
+        </template>
+      </labelled-item>
 
-    <labelled-item id="labelled-narrative" label="[[localize('narrative_assessment')]]">
-      <template
-          is="dom-if"
-          if="[[!_equals(mode, 'view')]]"
-          restamp="true">
-        <div id="input-button-container">
-          <paper-input
+      <labelled-item id="labelled-narrative" label="[[localize('narrative_assessment')]]">
+        <template is="dom-if" if="[[!_equals(mode, 'view')]]" restamp="true">
+          <div id="input-button-container">
+            <paper-input
               id="narrative_assessment"
               value="[[data.narrative_assessment]]"
               disabled
               char-counter
               no-label-float
-              maxlength="2000">
-          </paper-input>
-          <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-            {{localizedToggle}}
-          </paper-button>
-        </div>
-      </template>
+              maxlength="2000"
+            >
+            </paper-input>
+            <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
+              {{localizedToggle}}
+            </paper-button>
+          </div>
+        </template>
 
-      <template
-          is="dom-if"
-          if="[[_equals(mode, 'view')]]"
-          restamp="true">
-        [[data.narrative_assessment]]
-      </template>
-    </labelled-item>
-    <refresh-report-modal
-        id="refresh"
-        data="[[refreshData]]"
-        refresh-url="[[refreshUrl]]">
-    </refresh-report-modal>
-  `;
+        <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
+          [[data.narrative_assessment]]
+        </template>
+      </labelled-item>
+      <refresh-report-modal id="refresh" data="[[refreshData]]" refresh-url="[[refreshUrl]]"> </refresh-report-modal>
+    `;
   }
 
   @property({type: String})
   mode!: string;
 
   @property({type: String})
-  toggle: string = 'Edit';
+  toggle = 'Edit';
 
   @property({type: String, computed: '_localizeToggle(toggle, localize)'})
   localizedToggle!: string;
@@ -178,29 +143,26 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   localData!: GenericObject;
 
   @property({type: Boolean, reflectToAttribute: true})
-  allowNoStatus: boolean = false;
+  allowNoStatus = false;
 
   @property({type: Boolean, reflectToAttribute: true})
-  isCluster: boolean = false;
+  isCluster = false;
 
   @property({type: Boolean, reflectToAttribute: true})
-  completed: boolean = false;
+  completed = false;
 
   @property({type: Object, computed: '_computeRefreshData(data.id)'})
-  refreshData!: object;
+  refreshData!: GenericObject;
 
   @property({type: Boolean, computed: '_computeCanRefresh(isCluster, data)'})
-  canRefresh: boolean = false;
+  canRefresh = false;
 
   @property({type: String})
   refreshUrl: string = Endpoints.reportProgressReset();
 
   static get observers() {
-    return [
-      '_localDataChanged(localData.*)'
-    ];
+    return ['_localDataChanged(localData.*)'];
   }
-
 
   _handleInput(event: CustomEvent) {
     let field = event.target as GenericObject;
@@ -229,8 +191,9 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         break;
 
       case 'narrative_assessment':
-        if (field.value !== null && this.data.narrative_assessment === field.value.trim() ||
-          field.value === null && this.data.narrative_assessment === null
+        if (
+          (field.value !== null && this.data.narrative_assessment === field.value.trim()) ||
+          (field.value === null && this.data.narrative_assessment === null)
         ) {
           this.set('toggle', 'Edit');
           narrativeTextInput.disabled = true;
@@ -243,21 +206,21 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
   }
 
-  _computeMetLabel(completed: boolean, localize: Function) {
+  _computeMetLabel(completed: boolean, localize: (x: string) => string) {
     if (completed) {
       return localize('met_results');
     }
     return localize('met');
   }
 
-  _computeConstrainedLabel(completed: boolean, localize: Function) {
+  _computeConstrainedLabel(completed: boolean, localize: (x: string) => string) {
     if (completed) {
       return localize('constrained_partially');
     }
     return localize('constrained');
   }
 
-  _localizeToggle(toggle: string, localize: Function) {
+  _localizeToggle(toggle: string, localize: (x: string) => string) {
     return localize(toggle.toLowerCase());
   }
 
@@ -270,7 +233,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _computeRefreshData(reportId: string) {
-    return {'report_id': reportId, 'report_type': 'IR'};
+    return {report_id: reportId, report_type: 'IR'};
   }
 
   _computeCanRefresh(isCluster: boolean, data: GenericObject) {
@@ -291,16 +254,23 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     super.disconnectedCallback();
 
     const labelledItem = this.shadowRoot!.querySelectorAll('labelled-item');
-    if (labelledItem && labelledItem.length > 1 && labelledItem[1] && labelledItem[1].querySelector('paper-input') !== null) {
+    if (
+      labelledItem &&
+      labelledItem.length > 1 &&
+      labelledItem[1] &&
+      labelledItem[1].querySelector('paper-input') !== null
+    ) {
       const paperButton = labelledItem[1].querySelector('paper-button');
       if (paperButton && paperButton.textContent!.trim() === 'Save') {
-        this.set(['localData', 'narrative_assessment'], (labelledItem[1].querySelector('paper-input') as PaperInputElement).value);
+        this.set(
+          ['localData', 'narrative_assessment'],
+          (labelledItem[1].querySelector('paper-input') as PaperInputElement).value
+        );
       }
 
       (this.$.refresh as RefreshReportModalEl).close();
     }
   }
-
 }
 window.customElements.define('reportable-meta', ReportableMeta);
 

@@ -19,7 +19,6 @@ import '../../../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
 import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProjects';
 
-
 /**
  * @polymer
  * @customElement
@@ -43,28 +42,16 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
         }
       </style>
 
-      <etools-prp-permissions
-          permissions="{{permissions}}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
       <iron-location query="{{query}}"></iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <etools-prp-ajax
-          id="indicators"
-          url="[[url]]"
-          params="[[queryParams]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="indicators" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
       <page-body>
-        <template
-            is="dom-if"
-            if="[[permissions.createPartnerEntities]]"
-            restamp="true">
+        <template is="dom-if" if="[[permissions.createPartnerEntities]]" restamp="true">
           <div id="action">
             <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
               [[localize('add_project_indicator')]]
@@ -76,13 +63,15 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
           id="indicatorModal"
           object-id="[[projectId]]"
           object-type="partner.partnerproject"
-          modal-title="Add Project Indicator">
+          modal-title="Add Project Indicator"
+        >
         </indicator-modal>
 
         <list-view-indicators
-            data="[[data]]"
-            total-results="[[totalResults]]"
-            can-edit="[[permissions.editIndicatorDetails]]">
+          data="[[data]]"
+          total-results="[[totalResults]]"
+          can-edit="[[permissions.editIndicatorDetails]]"
+        >
         </list-view-indicators>
       </page-body>
     `;
@@ -90,7 +79,6 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   @property({type: Object})
   permissions!: GenericObject;
-
 
   @property({type: String})
   query!: string;
@@ -115,7 +103,6 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
   @property({type: Object, computed: 'getReduxStateObject(rootState.partnerProjects.indicatorsCount)'})
   allIndicatorsCount!: GenericObject;
-
 
   static get observers() {
     return ['_indicatorsAjax(queryParams, projectId)'];
@@ -157,11 +144,12 @@ class Indicators extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
     if (!this.projectId || !this.url || !this.queryParams) {
       return;
     }
-    let thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+    const thunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
     (this.$.indicators as EtoolsPrpAjaxEl).abort();
 
-    this.reduxStore.dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
+    this.reduxStore
+      .dispatch(partnerProjIndicatorsFetch(thunk, String(this.projectId)))
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling.

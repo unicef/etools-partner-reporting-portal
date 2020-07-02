@@ -11,7 +11,6 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
 import {sharedStyles} from '../styles/shared-styles';
 
-
 /**
  * @polymer
  * @customElement
@@ -22,7 +21,7 @@ import {sharedStyles} from '../styles/shared-styles';
 class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-        ${sharedStyles}
+      ${sharedStyles}
       <style include="iron-flex iron-flex-alignment iron-flex-factors">
         :host {
           --header-gutter: 25px;
@@ -31,11 +30,11 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
           padding: var(--header-gutter);
 
           background: white;
-          box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+          box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
 
           --paper-icon-button: {
-              color: #666;
-          };
+            color: #666;
+          }
         }
         .title {
           min-width: 0;
@@ -50,13 +49,13 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
         .back-button {
           text-decoration: none;
         }
-        ::slotted([slot=above-title]) {
+        ::slotted([slot='above-title']) {
           margin-left: 40px;
         }
-        ::slotted([slot=toolbar]) {
+        ::slotted([slot='toolbar']) {
           text-align: right;
         }
-        ::slotted([slot=tabs]) {
+        ::slotted([slot='tabs']) {
           margin-bottom: -25px;
           text-transform: uppercase;
         }
@@ -65,7 +64,7 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
       <div class="layout horizontal baseline">
         <div class="title flex">
           <div class="above-title">
-             <slot name="above-title"></slot>
+            <slot name="above-title"></slot>
           </div>
           <div class="layout horizontal center">
             <template is="dom-if" if="[[back]]">
@@ -83,13 +82,13 @@ class PageHeader extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
       </div>
 
       <div class="header-content">
-          <slot name="header-content"></slot>
+        <slot name="header-content"></slot>
       </div>
 
       <div class="tabs">
         <slot name="tabs"></slot>
       </div>
-      `;
+    `;
   }
 
   @property({type: String})

@@ -33,7 +33,7 @@ class EtoolsPrpChips extends PolymerElement {
 
         .chip {
           max-width: 100%;
-          margin-right: .75em;
+          margin-right: 0.75em;
         }
 
         .chip__content {
@@ -57,23 +57,13 @@ class EtoolsPrpChips extends PolymerElement {
 
       <labelled-item label="[[label]]" invalid="[[_invalid]]">
         <div class="chips layout horizontal wrap">
-          <template
-              is="dom-repeat"
-              items="[[value]]"
-              as="chip">
+          <template is="dom-repeat" items="[[value]]" as="chip">
             <div class="chip layout horizontal">
               <div class$="[[_chipContentClass]]">[[chip]]</div>
 
-              <template
-                  is="dom-if"
-                  if="[[!disabled]]"
-                  restamp="true">
+              <template is="dom-if" if="[[!disabled]]" restamp="true">
                 <div class="chip__actions">
-                  <iron-icon
-                      data-index$="[[index]]"
-                      on-tap="_onChipRemove"
-                      icon="icons:clear">
-                  </iron-icon>
+                  <iron-icon data-index$="[[index]]" on-tap="_onChipRemove" icon="icons:clear"> </iron-icon>
                 </div>
               </template>
             </div>
@@ -82,7 +72,6 @@ class EtoolsPrpChips extends PolymerElement {
           <slot></slot>
         </div>
       </labelled-item>
-
     `;
   }
 
@@ -96,18 +85,16 @@ class EtoolsPrpChips extends PolymerElement {
   value: any[] = [];
 
   @property({type: Boolean})
-  required: boolean = false;
+  required = false;
 
   @property({type: Boolean})
-  disabled: boolean = false;
+  disabled = false;
 
   @property({type: Boolean, notify: true, computed: '_computeInvalid(required, value)'})
-  invalid: boolean = true;
+  invalid = true;
 
   static get observers() {
-    return [
-      '_sortDateValues(value, value.length)'
-    ];
+    return ['_sortDateValues(value, value.length)'];
   }
 
   connectedCallback() {
@@ -143,8 +130,8 @@ class EtoolsPrpChips extends PolymerElement {
   }
 
   _onChipRemove(e: CustomEvent) {
-    let value = this.value.slice();
-    let toRemove = +(e.target as IronIconElement).dataset.index!;
+    const value = this.value.slice();
+    const toRemove = +(e.target as IronIconElement).dataset.index!;
 
     value.splice(toRemove, 1);
 
@@ -165,7 +152,6 @@ class EtoolsPrpChips extends PolymerElement {
     this._removeEventListeners();
     this.set('value', []);
   }
-
 }
 
 window.customElements.define('etools-prp-chips', EtoolsPrpChips);

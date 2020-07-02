@@ -19,86 +19,59 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../../../typings/globals.types';
 
-
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ */
 class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-      .tabs paper-tab {
-        text-transform: uppercase;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <etools-prp-ajax
-      id="activity"
-      url="[[overviewUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activity" url="[[overviewUrl]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{parentRoute}}"
-      pattern="/:id"
-      data="{{parentRouteData}}"
-      tail="{{route}}">
-    </app-route>
+      <app-route route="{{parentRoute}}" pattern="/:id" data="{{parentRouteData}}" tail="{{route}}"> </app-route>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" data="{{routeData}}"> </app-route>
 
+      <page-header title="[[activityData.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('partner_activity')]]"> </page-badge>
 
-    <page-header
-        title="[[activityData.title]]"
-        back="[[backLink]]">
+        <div slot="toolbar">
+          <project-status status="[[activityData.status]]"></project-status>
+        </div>
 
-      <page-badge
-        slot="above-title" name="[[localize('partner_activity')]]">
-      </page-badge>
+        <div slot="tabs">
+          <paper-tabs selected="{{routeData.tab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="toolbar">
-        <project-status status="[[activityData.status]]"></project-status>
-      </div>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <rp-partner-activity-details-overview activity-data="[[activityData]]"> </rp-partner-activity-details-overview>
+      </template>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('activity_indicators')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
-
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-partner-activity-details-overview
-          activity-data="[[activityData]]">
-      </rp-partner-activity-details-overview>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-partner-activity-details-indicators
-        activity-id="[[parentRouteData.id]]"
-        activity-data="[[activityData]]"
-        is_custom="[[activityData.is_custom]]">
-      </rp-partner-activity-details-indicators>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <rp-partner-activity-details-indicators
+          activity-id="[[parentRouteData.id]]"
+          activity-data="[[activityData]]"
+          is_custom="[[activityData.is_custom]]"
+        >
+        </rp-partner-activity-details-indicators>
+      </template>
     `;
   }
 
@@ -120,7 +93,11 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object})
   activityData = {};
 
-  @property({type: String, computed: '_computeOverviewUrl(responsePlanID, parentRouteData.id)', observer: '_getActivityAjax'})
+  @property({
+    type: String,
+    computed: '_computeOverviewUrl(responsePlanID, parentRouteData.id)',
+    observer: '_getActivityAjax'
+  })
   overviewUrl!: string;
 
   @property({type: String, computed: '_computeBackLink(query)'})
@@ -130,9 +107,7 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   updatePending = false;
 
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)'
-    ];
+    return ['_updateUrlTab(routeData.tab)'];
   }
 
   private _activityAjaxDebouncer!: Debouncer;
@@ -165,22 +140,19 @@ class Activity extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     if (!this.overviewUrl) {
       return;
     }
-    this._activityAjaxDebouncer = Debouncer.debounce(this._activityAjaxDebouncer,
-      timeOut.after(100),
-      () => {
-        const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
-        const self = this;
+    this._activityAjaxDebouncer = Debouncer.debounce(this._activityAjaxDebouncer, timeOut.after(100), () => {
+      const thunk = (this.$.activity as EtoolsPrpAjaxEl).thunk();
 
-        thunk()
-          .then((res: any) => {
-            self.updatePending = false;
-            self.activityData = res.data;
-          })
-          .catch((_err: GenericObject) => {
-            self.updatePending = false;
-            // TODO: error handling
-          });
-      });
+      thunk()
+        .then((res: any) => {
+          this.updatePending = false;
+          this.activityData = res.data;
+        })
+        .catch((_err: GenericObject) => {
+          this.updatePending = false;
+          // TODO: error handling
+        });
+    });
   }
 
   _addEventListeners() {

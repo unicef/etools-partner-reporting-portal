@@ -22,19 +22,18 @@ import {GenericObject} from '../../../../../typings/globals.types';
 import {fetchPartnerProjectsList} from '../../../../../redux/actions/partnerProjects';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-* @appliesMixin SortingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ * @appliesMixin SortingMixin
+ */
 class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
-
   static get template() {
     return html`
-    ${sharedStyles} ${buttonsStyles}
-    <style>
+      ${sharedStyles} ${buttonsStyles}
+      <style>
         :host {
           display: block;
         }
@@ -45,42 +44,28 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
         }
       </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="plannedActionsProjects"
-        url="[[url]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="plannedActionsProjects" url="[[url]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
+      <page-body>
+        <partner-projects-filters></partner-projects-filters>
 
-      <partner-projects-filters></partner-projects-filters>
+        <template is="dom-if" if="[[_canAddProject(permissions, responsePlanCurrent)]]" restamp="true">
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_project')]]
+            </paper-button>
+          </div>
+          <planned-action-projects-modal id="modal"></planned-action-projects-modal>
+        </template>
 
-      <template
-        is="dom-if"
-        if="[[_canAddProject(permissions, responsePlanCurrent)]]"
-        restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_project')]]
-          </paper-button>
-        </div>
-        <planned-action-projects-modal id="modal"></planned-action-projects-modal>
-      </template>
-
-      <project-list-table page="response-parameters"></project-list-table>
-
-    </page-body>
+        <project-list-table page="response-parameters"></project-list-table>
+      </page-body>
     `;
   }
 
@@ -97,9 +82,7 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
   responsePlanCurrent!: GenericObject;
 
   static get observers() {
-    return [
-      '_projectsAjax(queryParams, url)'
-    ];
+    return ['_projectsAjax(queryParams, url)'];
   }
 
   private _projectsAjaxDebouncer!: Debouncer;
@@ -126,21 +109,20 @@ class Projects extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxC
     if (!this.url || !queryParams) {
       return;
     }
-    this._projectsAjaxDebouncer = Debouncer.debounce(this._projectsAjaxDebouncer,
-      timeOut.after(300),
-      () => {
-        const thunk = (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).thunk();
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
-        (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).abort();
+    this._projectsAjaxDebouncer = Debouncer.debounce(this._projectsAjaxDebouncer, timeOut.after(300), () => {
+      const thunk = (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).thunk();
+      if (!Object.keys(queryParams).length) {
+        return;
+      }
+      (this.$.plannedActionsProjects as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchPartnerProjectsList(thunk))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(fetchPartnerProjectsList(thunk))
+        // @ts-ignore
+        .catch((_err: GenericObject) => {
+          // TODO: error handling.
+        });
+    });
   }
 
   disconnectedCallback() {

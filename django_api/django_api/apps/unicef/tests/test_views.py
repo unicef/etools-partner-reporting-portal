@@ -821,6 +821,31 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
 
+    def test_detail_api_filter_incomplete(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        ir_qs = ir_qs.filter(submission_date__isnull=True)
+        url += '?incomplete=true'
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
     @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)

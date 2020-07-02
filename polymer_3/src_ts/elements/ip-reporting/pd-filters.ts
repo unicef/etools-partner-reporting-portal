@@ -13,7 +13,6 @@ import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter-multi/location-filter-multi';
 
-
 /**
  * @polymer
  * @customElement
@@ -22,59 +21,53 @@ import '../../elements/filters/location-filter-multi/location-filter-multi';
  * @appliesMixin LocalizeMixin
  */
 class PdFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 5;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-      }
+          --app-grid-columns: 5;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
+        }
 
-      .filter-2-col {
-        @apply --app-grid-expandible-item;
-      }
-    </style>
+        .filter-2-col {
+          @apply --app-grid-expandible-item;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <text-filter
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <text-filter
             class="item"
             label="[[localize('pd_ref_and_title')]]"
             name="ref_title"
-            value="[[queryParams.ref_title]]">
-        </text-filter>
+            value="[[queryParams.ref_title]]"
+          >
+          </text-filter>
 
-        <dropdown-filter-multi
+          <dropdown-filter-multi
             class="item filter-2-col"
             label="[[localize('pd_ssfa_status')]]"
             name="status"
             value="[[_withDefault(queryParams.status, '')]]"
             data="[[statuses]]"
-            hide-search>
-        </dropdown-filter-multi>
+            hide-search
+          >
+          </dropdown-filter-multi>
 
-        <location-filter-multi
-          class="item filter-2-col"
-          value="[[_withDefault(queryParams.location, '')]]">
-        </location-filter-multi>
-      </div>
-    </filter-list>
-  `;
+          <location-filter-multi class="item filter-2-col" value="[[_withDefault(queryParams.location, '')]]">
+          </location-filter-multi>
+        </div>
+      </filter-list>
+    `;
   }
 
   @property({type: Object})
@@ -96,7 +89,6 @@ class PdFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: this.localize('terminated'), id: 'Ter'}
     ];
   }
-
 }
 
 window.customElements.define('pd-filters', PdFilters);

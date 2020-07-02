@@ -7,6 +7,7 @@ from indicator.models import IndicatorBlueprint
 from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportContextIndicatorReportSerializer
 from partner.models import Partner
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from utils.filters.constants import Boolean
 
 from .models import (
@@ -402,7 +403,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         if self.location_id and self.llo_id is not None:
             queryset = queryset.filter(reportable__locations__id=self.location_id)
 
-        if self.show_incomplete_only == Boolean.TRUE:
+        if self.show_incomplete_only in [1, "1", "true", "True", True]:
             queryset = filter(
                 lambda x: not x.is_complete,
                 queryset
@@ -723,6 +724,16 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "disbursement_percent",
             "document_type",
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ProgrammeDocument.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "workspace",
+                ],
+            )
+        ]
 
 
 class PMPLLOSerializer(serializers.ModelSerializer):
@@ -738,6 +749,16 @@ class PMPLLOSerializer(serializers.ModelSerializer):
             'cp_output',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=LowerLevelOutput.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "cp_output",
+                ],
+            )
+        ]
 
 
 class PMPSectionSerializer(serializers.ModelSerializer):
@@ -751,13 +772,28 @@ class PMPSectionSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+class BasePMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportingPeriodDates
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ReportingPeriodDates.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "report_type",
+                    "programme_document",
+                ],
+            ),
+        ]
+
+
+class PMPReportingPeriodDatesSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'start_date',
@@ -769,13 +805,12 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPReportingPeriodDatesSRSerializer(serializers.ModelSerializer):
+class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'due_date',
@@ -802,6 +837,16 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'programme_document',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=PDResultLink.objects.all(),
+                fields=[
+                    "result_link",
+                    "external_business_area_code",
+                    "id",
+                ],
+            ),
+        ]
 
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):

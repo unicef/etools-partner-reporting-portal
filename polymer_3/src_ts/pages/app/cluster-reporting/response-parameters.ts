@@ -16,48 +16,30 @@ import {getDomainByEnv} from '../../../config';
  * @appliesMixin LocalizeMixin
  */
 class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:page"
-      data="{{routeData}}"
-      tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-      selected="{{page}}"
-      attr-for-selected="name">
+      <iron-pages selected="{{page}}" attr-for-selected="name">
         <template is="dom-if" if="[[_equals(page, 'clusters')]]" restamp="true">
-          <clusters-response-parameters
-            name="clusters"
-            route="{{subroute}}">
-          </clusters-response-parameters>
+          <clusters-response-parameters name="clusters" route="{{subroute}}"> </clusters-response-parameters>
         </template>
 
         <template is="dom-if" if="[[_equals(page, 'partners')]]" restamp="true">
-          <partners-response-parameters
-            name="partners"
-            route="{{subroute}}">
-          </partners-response-parameters>
-      </template>
-
-    </iron-pages>
-`;
+          <partners-response-parameters name="partners" route="{{subroute}}"> </partners-response-parameters>
+        </template>
+      </iron-pages>
+    `;
   }
 
-
   static get observers() {
-    return [
-      '_routeChanged(routeData.page)'
-    ];
+    return ['_routeChanged(routeData.page)'];
   }
 
   @property({type: Boolean})
@@ -65,7 +47,6 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
 
   @property({type: String, observer: '_pageChanged'})
   page!: string;
-
 
   _routeChanged(page: string) {
     if (!page) {
@@ -86,12 +67,12 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
       return;
     }
 
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/${page}/${page}.js`;
+    const resolvedPageUrl =
+      getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/${page}/${page}.js`;
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
     });
-
   }
 
   connectedCallback() {
@@ -103,7 +84,6 @@ class PageClusterReportingResponseParameters extends UtilsMixin(PolymerElement) 
     super.disconnectedCallback();
     this.set('visible', false);
   }
-
 }
 
 window.customElements.define('page-cluster-reporting-response-parameters', PageClusterReportingResponseParameters);

@@ -26,93 +26,84 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
     return html`
       ${tableStyles}
       <style include="data-table-styles">
-      :host {
-        display: block;
+        :host {
+          display: block;
 
-        --ecp-content: {
-          padding: 0;
-        };
-      }
+          --ecp-content: {
+            padding: 0;
+          }
+        }
 
-      a {
-        text-decoration: none;
-        color: var(--theme-primary-color);
-      }
+        a {
+          text-decoration: none;
+          color: var(--theme-primary-color);
+        }
 
-      footer {
-        padding: 16px;
-        text-align: right;
-        text-transform: uppercase;
-      }
-    </style>
+        footer {
+          padding: 16px;
+          text-align: right;
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-query-params
-        id="queryParams"
-        params-string="{{resultsQuery}}"
-        params-object="{{resultsQueryParams}}">
-    </iron-query-params>
+      <iron-query-params id="queryParams" params-string="{{resultsQuery}}" params-object="{{resultsQueryParams}}">
+      </iron-query-params>
 
-    <etools-content-panel panel-title="[[localize('submitted_list_constrained')]]">
-      <etools-data-table-header
-          no-title
-          no-collapse>
-        <etools-data-table-column field="cluster">
-          <div class="table-column">[[localize('cluster')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="title" flex-2>
-          <div class="table-column flex-2">[[localize('indicator')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="partner">
-          <div class="table-column">[[localize('partner')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="last_reported">
-          <div class="table-column">[[localize('last_reported')]]</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="progress_percentage" flex-2>
-          <div class="table-column">[[localize('current_progress')]]</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
+      <etools-content-panel panel-title="[[localize('submitted_list_constrained')]]">
+        <etools-data-table-header no-title no-collapse>
+          <etools-data-table-column field="cluster">
+            <div class="table-column">[[localize('cluster')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="title" flex-2>
+            <div class="table-column flex-2">[[localize('indicator')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="partner">
+            <div class="table-column">[[localize('partner')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="last_reported">
+            <div class="table-column">[[localize('last_reported')]]</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="progress_percentage" flex-2>
+            <div class="table-column">[[localize('current_progress')]]</div>
+          </etools-data-table-column>
+        </etools-data-table-header>
 
-      <template
-          is="dom-repeat"
-          items="[[data]]">
-        <etools-data-table-row no-collapse>
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[item.cluster.title]]
+        <template is="dom-repeat" items="[[data]]">
+          <etools-data-table-row no-collapse>
+            <div slot="row-data">
+              <div class="table-cell table-cell--text">
+                [[item.cluster.title]]
+              </div>
+              <div class="table-cell table-cell--text" flex-2>
+                <a href="[[_getReportUrl(_baseUrlCluster, item.reportable.id, resultsQueryParams)]]">[[item.title]]</a>
+              </div>
+              <div class="table-cell table-cell--text">
+                [[item.partner.title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[item.submission_date]]
+              </div>
+              <div class="table-cell" flex-2>
+                <etools-prp-progress-bar number="[[item.reportable.progress_percentage]]"> </etools-prp-progress-bar>
+              </div>
             </div>
-            <div class="table-cell table-cell--text" flex-2>
-              <a href="[[_getReportUrl(_baseUrlCluster, item.reportable.id, resultsQueryParams)]]">[[item.title]]</a>
-            </div>
-            <div class="table-cell table-cell--text">
-              [[item.partner.title]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[item.submission_date]]
-            </div>
-            <div class="table-cell" flex-2>
-              <etools-prp-progress-bar
-                  number="[[item.reportable.progress_percentage]]">
-              </etools-prp-progress-bar>
-            </div>
-          </div>
-        </etools-data-table-row>
-      </template>
+          </etools-data-table-row>
+        </template>
 
-      <list-placeholder
-          data="[[data]]"
-          loading="[[loading]]">
-      </list-placeholder>
+        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
 
-      <etools-loading active="[[loading]]"></etools-loading>
-    </etools-content-panel>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </etools-content-panel>
     `;
   }
 
   @property({type: String})
   resultsQuery!: string;
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.clusterDashboardData.data.constrained_indicator_reports)'})
+  @property({
+    type: Array,
+    computed: 'getReduxStateArray(rootState.clusterDashboardData.data.constrained_indicator_reports)'
+  })
   data!: any[];
 
   @property({type: String, computed: '_computeReportsUrl(_baseUrlCluster, resultsQuery)'})

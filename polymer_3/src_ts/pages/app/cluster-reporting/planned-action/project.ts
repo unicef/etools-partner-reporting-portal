@@ -30,99 +30,71 @@ import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
  * @appliesMixin LocalizeMixin
  */
 class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedElement))) {
-
   public static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-    :host {
-      display: block;
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
 
-      --page-header-above-title: {
-        position: absolute;
-        display: block;
-        left: 0;
-        top: -23px;
-      };
-    }
+          --page-header-above-title: {
+            position: absolute;
+            display: block;
+            left: 0;
+            top: -23px;
+          }
+        }
 
-    .toolbar report-status {
-      margin-right: 1em;
-    }
+        .toolbar report-status {
+          margin-right: 1em;
+        }
 
-    .toolbar a {
-      text-decoration: none;
-    }
+        .toolbar a {
+          text-decoration: none;
+        }
 
-    .tabs paper-tab {
-      text-transform: uppercase;
-    }
-  </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-      id="overview"
-      url="[[overviewUrl]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="overview" url="[[overviewUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      subroute="{{subroute}}"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" subroute="{{subroute}}" data="{{routeData}}"> </app-route>
 
-    <page-header
-        title="[[projectData.title]]"
-        back="[[backLink]]">
+      <page-header title="[[projectData.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('project')]]"> </page-badge>
 
-      <page-badge
-        slot="above-title" name="[[localize('project')]]">
-      </page-badge>
+        <div slot="toolbar">
+          <project-status status="[[projectData.status]]"></project-status>
+        </div>
 
-      <div slot="toolbar">
-        <project-status status="[[projectData.status]]"></project-status>
-      </div>
+        <div slot="tabs">
+          <paper-tabs selected="{{ routeData.tab }}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('project_indicators')]]</paper-tab>
+            <paper-tab name="activities">[[localize('project_activities')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{ routeData.tab }}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('project_indicators')]]</paper-tab>
-          <paper-tab name="activities">[[localize('project_activities')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <pa-project-details-overview project-data="[[projectData]]"></pa-project-details-overview>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <pa-project-details-overview project-data="[[projectData]]"></pa-project-details-overview>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <pa-project-details-indicators project-id="[[projectId]]"> </pa-project-details-indicators>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <pa-project-details-indicators
-        project-id="[[projectId]]">
-      </pa-project-details-indicators>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <pa-project-details-activities
-        project-data="[[projectData]]"
-        project-id="[[projectId]]">
-      </pa-project-details-activities>
-    </template>
-`;
+      <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+        <pa-project-details-activities project-data="[[projectData]]" project-id="[[projectId]]">
+        </pa-project-details-activities>
+      </template>
+    `;
   }
 
   @property({type: String})
@@ -146,12 +118,11 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
   @property({type: String, computed: '_computeBackLink(query)'})
   backLink!: string;
 
+  @property({type: Boolean})
+  updatePending = false;
 
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)',
-      '_getProjectAjax(overviewUrl)'
-    ];
+    return ['_updateUrlTab(routeData.tab)', '_getProjectAjax(overviewUrl)'];
   }
 
   _onSuccess() {
@@ -180,15 +151,14 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
       return;
     }
 
-    const self: any = this;
     const thunk = (this.$.overview as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: GenericObject) => {
-        self.updatePending = false;
-        self.projectData = res.data;
+        this.updatePending = false;
+        this.projectData = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }
@@ -213,7 +183,6 @@ class PlannedActionProjectsDetails extends LocalizeMixin(RoutingMixin(UtilsMixin
 
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('planned-action-projects-details', PlannedActionProjectsDetails);

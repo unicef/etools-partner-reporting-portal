@@ -185,15 +185,14 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
       return;
     }
     const thunk = (this.$.createObjective as EtoolsPrpAjaxEl).thunk();
-    const self = this;
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        self.close();
-        waitForIronOverlayToClose(300).then(() => self._redirectToDetail(res.data.id));
+        this.updatePending = false;
+        this.close();
+        waitForIronOverlayToClose(300).then(() => this._redirectToDetail(res.data.id));
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

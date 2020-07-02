@@ -14,26 +14,18 @@ import {GenericObject} from '../../../typings/globals.types';
 class PartnerProjectFilterMulti extends ReduxConnectedElement {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="partnerProjects"
-        url="[[partnerProjectsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="partnerProjects" url="[[partnerProjectsUrl]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
-        label="Partner Projects"
-        name="partner_projects"
-        value="[[value]]"
-        data="[[data]]">
-    </dropdown-filter-multi>
-  `;
+      <dropdown-filter-multi label="Partner Projects" name="partner_projects" value="[[value]]" data="[[data]]">
+      </dropdown-filter-multi>
+    `;
   }
-
 
   @property({type: String, computed: '_computePartnerProjectsUrl(responsePlanId)', observer: '_fetchPartnerProjects'})
   partnerProjectsUrl!: string;
@@ -59,11 +51,11 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
       return;
     }
 
-    const self = this;
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
-    (this.$.partnerProjects as EtoolsPrpAjaxEl).thunk()()
+    (this.$.partnerProjects as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.set('data', res.data.results);
+        this.set('data', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -74,7 +66,6 @@ class PartnerProjectFilterMulti extends ReduxConnectedElement {
     super.connectedCallback();
     (this.$.partnerProjects as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('partner-project-filter-multi', PartnerProjectFilterMulti);

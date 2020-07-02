@@ -56,7 +56,7 @@ urlpatterns = [
         name="progress-reports-details"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/update/$',
         ProgressReportDetailsUpdateAPIView.as_view(),
-        name="progress-reports-details"),
+        name="progress-reports-details-update"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/annex-C-export-PDF/$',
         ProgressReportAnnexCPDFView.as_view(),
         name="progress-reports-pdf"),

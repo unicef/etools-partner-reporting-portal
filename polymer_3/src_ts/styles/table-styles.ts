@@ -2,16 +2,14 @@ import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import {sharedStyles} from './shared-styles';
 
-
 export const tableStyles = html`
-    ${sharedStyles}
+  ${sharedStyles}
   <style>
     :host {
       --data-table-header: {
         box-sizing: border-box;
         width: 100%;
-      };
-
+      }
     }
 
     etools-data-table-column {
@@ -60,10 +58,13 @@ export const tableStyles = html`
     .row-details-expanded-wrapper {
       padding: 15px 24px 15px 72px;
       background-color: var(--paper-grey-100);
-      border-top: 1px solid var(--list-divider-color, #9D9D9D);
+      border-top: 1px solid var(--list-divider-color, #9d9d9d);
     }
 
+    etools-data-table-header {
+      --list-header-column-height: auto;
+      --list-header-wrapper-height: auto;
+      --list-header-wrapper-column-height: auto;
+    }
   </style>
-
-
 `;

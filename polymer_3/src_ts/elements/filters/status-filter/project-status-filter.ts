@@ -13,20 +13,21 @@ import UtilsMixin from '../../../mixins/utils-mixin';
 class ProjectStatusFilter extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <dropdown-filter
-      class="item"
-      label="[[localize('status')]]"
-      name="status"
-      value="[[_withDefault(value, '')]]"
-      data="[[data]]">
-    </dropdown-filter>
-  `;
+      <dropdown-filter
+        class="item"
+        label="[[localize('status')]]"
+        name="status"
+        value="[[_withDefault(value, '')]]"
+        data="[[data]]"
+      >
+      </dropdown-filter>
+    `;
   }
 
   @property({type: String})

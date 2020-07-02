@@ -33,146 +33,122 @@ import {GenericObject} from '../../../typings/globals.types';
  * @appliesMixin LocalizeMixin
  */
 class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    <style include="app-grid-style">
-      :host {
-        display: block;
+      <style include="app-grid-style">
+        :host {
+          display: block;
 
-        --app-grid-columns: 2;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-      }
+          --app-grid-columns: 2;
+          --app-grid-gutter: 25px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 2;
+        }
 
-      .toolbar {
-        position: relative;
-        width: 225px;
-      }
+        .toolbar {
+          position: relative;
+          width: 225px;
+        }
 
-      filter-list-by-cluster {
-        position: absolute;
-        right: 0;
-        top: -35px;
-      }
+        filter-list-by-cluster {
+          position: absolute;
+          right: 0;
+          top: -35px;
+        }
 
-      .row {
-        margin-bottom: var(--app-grid-gutter);
-      }
+        .row {
+          margin-bottom: var(--app-grid-gutter);
+        }
 
-      .app-grid {
-        margin: -var(--app-grid-gutter);
-      }
+        .app-grid {
+          margin: -var(--app-grid-gutter);
+        }
 
-      .item-wide {
-        @apply --app-grid-expandible-item;
-      }
+        .item-wide {
+          @apply --app-grid-expandible-item;
+        }
 
-      .no-padding-tl {
-        padding-top: 0;
-        padding-left: 0;
-      }
+        .no-padding-tl {
+          padding-top: 0;
+          padding-left: 0;
+        }
 
-      .max-w {
-        max-width: 100%;
-      }
+        .max-w {
+          max-width: 100%;
+        }
 
-      .max-h {
-        max-height: 100%;
-      }
+        .max-h {
+          max-height: 100%;
+        }
 
-      .zero-marg-r {
-        margin-right: 0;
-      }
+        .zero-marg-r {
+          margin-right: 0;
+        }
 
-      .zero-marg-b {
-        margin-bottom: 0;
-      }
-    </style>
+        .zero-marg-b {
+          margin-bottom: 0;
+        }
+      </style>
 
-    <etools-prp-auth
-      account-type="{{accountType}}">
-    </etools-prp-auth>
+      <etools-prp-auth account-type="{{accountType}}"> </etools-prp-auth>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-      id="data"
-      url="[[dataUrl]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="data" url="[[dataUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-header title="{{page_title}}">
-      <div slot="toolbar" class="toolbar">
-        <filter-list-by-cluster></filter-list-by-cluster>
-      </div>
-    </page-header>
+      <page-header title="{{page_title}}">
+        <div slot="toolbar" class="toolbar">
+          <filter-list-by-cluster></filter-list-by-cluster>
+        </div>
+      </page-header>
 
-    <page-body>
-      <div class="row">
-        <div class="app-grid no-padding-tl">
-          <div class="item max-w">
-            <indicators-by-status></indicators-by-status>
-          </div>
+      <page-body>
+        <div class="row">
+          <div class="app-grid no-padding-tl">
+            <div class="item max-w">
+              <indicators-by-status></indicators-by-status>
+            </div>
 
-          <div class="item max-w zero-marg-r max-h">
-            <div class="app-grid no-padding-tl max-h">
-              <div class="item max-w">
-                <template
-                  is="dom-if"
-                  if="[[_equals(mode, 'cluster')]]"
-                  restamp="true">
-                  <number-of-partners></number-of-partners>
-                </template>
+            <div class="item max-w zero-marg-r max-h">
+              <div class="app-grid no-padding-tl max-h">
+                <div class="item max-w">
+                  <template is="dom-if" if="[[_equals(mode, 'cluster')]]" restamp="true">
+                    <number-of-partners></number-of-partners>
+                  </template>
 
-                <template
-                  is="dom-if"
-                  if="[[_equals(mode, 'partner')]]"
-                  restamp="true">
-                  <number-of-projects></number-of-projects>
-                </template>
-              </div>
-              <div class="item max-w zero-marg-r">
-                <number-of-due-reports></number-of-due-reports>
-              </div>
-              <div class="item max-w max-h zero-marg-r zero-marg-b">
-                <number-of-non-cluster-activities></number-of-non-cluster-activities>
+                  <template is="dom-if" if="[[_equals(mode, 'partner')]]" restamp="true">
+                    <number-of-projects></number-of-projects>
+                  </template>
+                </div>
+                <div class="item max-w zero-marg-r">
+                  <number-of-due-reports></number-of-due-reports>
+                </div>
+                <div class="item max-w max-h zero-marg-r zero-marg-b">
+                  <number-of-non-cluster-activities></number-of-non-cluster-activities>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <reports-list
-          label="[[localize('list_of_overdue_indicator')]]"
-          collection="overdue_indicator_reports">
-        </reports-list>
-      </div>
-
-      <div class="row">
-        <constrained-reports-list></constrained-reports-list>
-      </div>
-
-      <template
-        is="dom-if"
-        if="[[_equals(mode, 'partner')]]"
-        restamp="true">
         <div class="row">
-          <activities-list></activities-list>
+          <reports-list label="[[localize('list_of_overdue_indicator')]]" collection="overdue_indicator_reports">
+          </reports-list>
         </div>
-      </template>
-    </page-body>
 
-  `;
+        <div class="row">
+          <constrained-reports-list></constrained-reports-list>
+        </div>
+
+        <template is="dom-if" if="[[_equals(mode, 'partner')]]" restamp="true">
+          <div class="row">
+            <activities-list></activities-list>
+          </div>
+        </template>
+      </page-body>
+    `;
   }
 
   @property({type: Object})
@@ -202,9 +178,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
   fetchDataDebouncer!: Debouncer;
 
   static get observers() {
-    return [
-      '_fetchData(dataUrl, queryParams)'
-    ];
+    return ['_fetchData(dataUrl, queryParams)'];
   }
 
   // @ts-ignore
@@ -222,7 +196,7 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     }
   }
 
-  _computePageTitle(mode: string, localize: Function) {
+  _computePageTitle(mode: string, localize: (x: string) => string) {
     if (!mode) {
       return undefined;
     }
@@ -247,15 +221,11 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
     if (!this.dataUrl || !this.queryParams || Object.keys(this.queryParams).length === 0) {
       return;
     }
-    const self = this;
-    this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer,
-      timeOut.after(300),
-      () => {
-
-        const dataThunk = (self.$.data as EtoolsPrpAjaxEl).thunk();
-        (this.$.data as EtoolsPrpAjaxEl).abort();
-        self.reduxStore.dispatch(clusterDashboardDataFetch(dataThunk));
-      });
+    this.fetchDataDebouncer = Debouncer.debounce(this.fetchDataDebouncer, timeOut.after(300), () => {
+      const dataThunk = (this.$.data as EtoolsPrpAjaxEl).thunk();
+      (this.$.data as EtoolsPrpAjaxEl).abort();
+      this.reduxStore.dispatch(clusterDashboardDataFetch(dataThunk));
+    });
   }
 
   _addEventListeners() {
@@ -278,6 +248,5 @@ class PageClusterReportingDashboard extends LocalizeMixin(UtilsMixin(ReduxConnec
       this.fetchDataDebouncer.cancel();
     }
   }
-
 }
 window.customElements.define('page-cluster-reporting-dashboard', PageClusterReportingDashboard);

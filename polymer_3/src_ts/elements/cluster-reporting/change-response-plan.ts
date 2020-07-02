@@ -7,45 +7,45 @@ import RoutingMixin from '../../mixins/routing-mixin';
 import {sharedStyles} from '../../styles/shared-styles';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ */
 class ChangeResponsePlan extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     // language=HTML
     return html`
-    ${sharedStyles}
-    <style>
-      :host {
-        display: block;
-        font-size: 15px;
-        font-weight: 200;
-        color: var(--theme-primary-text-color-medium);
-      }
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
+          font-size: 15px;
+          font-weight: 200;
+          color: var(--theme-primary-text-color-medium);
+        }
 
-      span {
-        @apply --truncate;
+        span {
+          @apply --truncate;
 
-        display: inline-block;
-        vertical-align: middle;
-        max-width: 150px;
-        cursor: default;
-      }
+          display: inline-block;
+          vertical-align: middle;
+          max-width: 150px;
+          cursor: default;
+        }
 
-      a {
-        color: var(--theme-primary-color);
-        font-size: 13px;
-      }
-    </style>
+        a {
+          color: var(--theme-primary-color);
+          font-size: 13px;
+        }
+      </style>
 
-    <span>
-      [[currentPlanTitle]]
-      <paper-tooltip>[[currentPlanTitle]]</paper-tooltip>
-    </span>
-    <a href="[[changePlanUrl]]">[[localize('change')]]</a>
-  `;
+      <span>
+        [[currentPlanTitle]]
+        <paper-tooltip>[[currentPlanTitle]]</paper-tooltip>
+      </span>
+      <a href="[[changePlanUrl]]">[[localize('change')]]</a>
+    `;
   }
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.responsePlans.all)'})
@@ -59,7 +59,6 @@ class ChangeResponsePlan extends LocalizeMixin(RoutingMixin(ReduxConnectedElemen
 
   @property({type: String, computed: '_computeChangePlanUrl(_baseUrl, responsePlanID)'})
   changePlanUrl!: string;
-
 
   _getCurrentPlanTitle(plans: any, id: string) {
     let i = 0;

@@ -13,11 +13,10 @@ import IntlMessageFormat from 'intl-messageformat';
  */
 function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class LocalizeClass extends baseClass {
-
     __localizationCache = {
       messages: {} /* Unique localized strings. Invalidated when the language,
                       formats or resources change. */
-    }
+    };
 
     @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
     language!: string;
@@ -32,7 +31,7 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
     useKeyIfMissing = false;
 
     @property({type: Object, computed: '__computeLocalize(language, resources, formats)'})
-    localize!: Function;
+    localize!: (x: string) => string;
 
     @property({type: Boolean})
     bubbleEvent = false;
@@ -48,50 +47,45 @@ function LocalizeMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: 
         proto['__localizationCache'] = {messages: {}};
       }
       proto.__localizationCache.messages = {};
-      const self = this;
 
-      return function() {
-        const key = arguments[0];
+      return (...args: any[]) => {
+        const key = args[0];
         if (!key || !resources || !language || !resources[language]) {
           return;
         }
-
 
         // Cache the key/value pairs for the same language, so that we don't
         // do extra work if we're just reusing strings across an application.
         const translatedValue = resources[language][key];
 
         if (!translatedValue) {
-          return self.useKeyIfMissing ? key : '';
+          return this.useKeyIfMissing ? key : '';
         }
 
         const messageKey = key + translatedValue;
         let translatedMessage = proto.__localizationCache.messages[messageKey];
 
         if (!translatedMessage) {
-          translatedMessage =
-            new IntlMessageFormat(translatedValue, language, formats);
+          translatedMessage = new IntlMessageFormat(translatedValue, language, formats);
           proto.__localizationCache.messages[messageKey] = translatedMessage;
         }
 
-        const args: GenericObject = {};
-        for (let i = 1; i < arguments.length; i += 2) {
-          args[arguments[i]] = arguments[i + 1];
+        const argsChanged: GenericObject = {};
+        for (let i = 1; i < args.length; i += 2) {
+          argsChanged[args[i]] = args[i + 1];
         }
 
-        return translatedMessage.format(args);
-      }.bind(this);
+        return translatedMessage.format(argsChanged);
+      };
     }
 
     dispatchResources(locales: GenericObject) {
       this.reduxStore.dispatch(setL11NResources(locales));
       fireEvent(this, 'app-localize-resources-loaded', event);
     }
-
   }
 
   return LocalizeClass;
 }
 
 export default LocalizeMixin;
-

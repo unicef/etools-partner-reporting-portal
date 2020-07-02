@@ -1,6 +1,6 @@
 import {Constructor} from '../typings/globals.types';
 import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {userLogout} from '../redux/actions';
+import {fireEvent} from '../utils/fire-custom-event';
 
 /**
  * @polymer
@@ -8,34 +8,24 @@ import {userLogout} from '../redux/actions';
  */
 function ErrorHandlerMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class ErrorHandlerClass extends baseClass {
-
     _handleError(e: CustomEvent) {
       let xhr;
-
       try {
         xhr = e.detail.request.xhr;
-
         if (!xhr) {
           return;
         }
-
         switch (xhr.status) {
-          case 403: // FIXME: 401?
-            // (dci)
-            // @ts-ignore
-            this.reduxStore.dispatch(userLogout())
-              // @ts-ignore
-              .then(() => {
-                location.pathname = '/landing';
-              });
+          case 401:
+            fireEvent(this, 'sign-out');
             break;
-
           default:
             break;
         }
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     }
-
   }
   return ErrorHandlerClass;
 }

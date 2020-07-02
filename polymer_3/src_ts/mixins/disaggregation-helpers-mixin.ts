@@ -7,37 +7,36 @@ import {Constructor, GenericObject} from '../typings/globals.types';
  */
 function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class DisaggregationHelpersClass extends baseClass {
-
     private matchers = {
-      '(?,?)': function() {
+      '(?,?)': function () {
         return /^\((\d*),\s?(\d*)\)$/;
       },
 
-      '(?,?,?)': function() {
+      '(?,?,?)': function () {
         return /^\((\d*),\s?(\d*),\s?(\d*)\)$/;
       },
 
-      '(?,Y)': function(y: string) {
+      '(?,Y)': function (y: string) {
         return new RegExp('^\\((\\d+),\\s?(' + y + ')\\)$');
       },
 
-      '(X,?)': function(x: string) {
+      '(X,?)': function (x: string) {
         return new RegExp('^\\((' + x + '),\\s?(\\d+)\\)$');
       },
 
-      '(X,Y,?)': function(x: string, y: string) {
+      '(X,Y,?)': function (x: string, y: string) {
         return new RegExp('^\\((' + x + '),\\s?(' + y + '),\\s?(\\d+)\\)$');
       },
 
-      '(X,?,Z)': function(x: string, z: string) {
+      '(X,?,Z)': function (x: string, z: string) {
         return new RegExp('^\\((' + x + '),\\s?(\\d+),\\s?(' + z + ')\\)$');
       },
 
-      '(?,Y,Z)': function(y: string, z: string) {
+      '(?,Y,Z)': function (y: string, z: string) {
         return new RegExp('^\\((\\d+),\\s?(' + y + '),\\s?(' + z + ')\\)$');
       },
 
-      '(?,?,Z)': function(z: string) {
+      '(?,?,Z)': function (z: string) {
         return new RegExp('^\\((\\d+),\\s?(\\d+),\\s?(' + z + ')\\)$');
       }
     };
@@ -47,24 +46,24 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
     }
 
     private divideBy(d: number) {
-      return function(v: number) {
+      return function (v: number) {
         return v / d;
       };
     }
 
-    private sumDisaggValues(fields: any[], transform?: Function) {
+    private sumDisaggValues(fields: any[], transform?: (x: number) => number) {
       if (typeof transform === 'undefined') {
         transform = this.identity;
       }
 
       const result = fields
-        .filter(function(field) {
-          return ['v', 'd'].every(function(key) {
+        .filter(function (field) {
+          return ['v', 'd'].every(function (key) {
             return !isNaN(field[key]);
           });
         })
-        .reduce(function(acc, curr) {
-          ['v', 'd'].forEach(function(key) {
+        .reduce(function (acc, curr) {
+          ['v', 'd'].forEach(function (key) {
             acc[key] = (acc[key] || 0) + transform!(curr[key]);
           });
 
@@ -78,31 +77,29 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
     }
 
     private getCoords(key: string) {
-      const match = [
-        this.matchers['(?,?)'](),
-        this.matchers['(?,?,?)']()
-      ]
-        .map(function(re) {
+      const match = [this.matchers['(?,?)'](), this.matchers['(?,?,?)']()]
+        .map(function (re) {
           return re.exec(key);
         })
         .filter(Boolean)[0];
       if (match) {
         return match.slice(1, 4);
-      } return [];
+      }
+      return [];
     }
 
     private extractFields(data: GenericObject, re: RegExp) {
       return Object.keys(data)
-        .filter(function(k) {
+        .filter(function (k) {
           return re.exec(k);
         })
-        .map(function(k) {
+        .map(function (k) {
           return data[k];
         });
     }
 
-    private formatKey() {
-      const chunks = [].slice.call(arguments);
+    private formatKey(...args: any[]) {
+      const chunks = [].slice.call(args);
       const formatted = '(' + chunks.join(', ') + ')';
 
       // Normalizes whitespace inconsistencies across keys
@@ -226,7 +223,6 @@ function DisaggregationHelpersMixin<T extends Constructor<PolymerElement>>(baseC
 
       return Object.assign({}, tmpTotals1, tmpTotals2, tmpTotals3);
     }
-
   }
   return DisaggregationHelpersClass;
 }

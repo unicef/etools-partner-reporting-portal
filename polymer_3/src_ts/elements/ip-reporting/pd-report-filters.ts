@@ -20,41 +20,36 @@ import '../../elements/filters/dropdown-filter/dropdown-filter';
  * @appliesMixin LocalizeMixin
  */
 class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-columns: 3;
-        --app-grid-item-height: auto;
-      }
-    </style>
+          --app-grid-columns: 3;
+          --app-grid-item-height: auto;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <dropdown-filter
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <dropdown-filter
             class="item"
             label="[[localize('status')]]"
             name="status"
             value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]">
-        </dropdown-filter>
-      </div>
-    </filter-list>
-  `;
+            data="[[statuses]]"
+          >
+          </dropdown-filter>
+        </div>
+      </filter-list>
+    `;
   }
 
   @property({type: String})
@@ -79,7 +74,6 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: this.localize('accepted'), id: 'Acc'}
     ];
   }
-
 }
 window.customElements.define('pd-report-filters', PdReportFilters);
 

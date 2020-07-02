@@ -18,7 +18,6 @@ import {RootState} from '../../../../typings/redux.types';
  * @appliesMixin UtilsMixin
  */
 class PdSentBack extends UtilsMixin(ReduxConnectedElement) {
-
   public static get template() {
     return html`
     ${buttonsStyles}
@@ -163,8 +162,7 @@ class PdSentBack extends UtilsMixin(ReduxConnectedElement) {
 
   _computeCollapsible(threshold: number, currentReport: GenericObject) {
     if (currentReport) {
-      return currentReport.sent_back_feedback &&
-        currentReport.sent_back_feedback.length >= threshold;
+      return currentReport.sent_back_feedback && currentReport.sent_back_feedback.length >= threshold;
     }
     return false;
   }
@@ -177,6 +175,5 @@ class PdSentBack extends UtilsMixin(ReduxConnectedElement) {
     this.set('expanded', !this.expanded);
   }
 }
-
 
 window.customElements.define('pd-sent-back', PdSentBack);

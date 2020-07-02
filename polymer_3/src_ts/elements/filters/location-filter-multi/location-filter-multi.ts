@@ -9,7 +9,6 @@ import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
 import {GenericObject} from '../../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -19,24 +18,17 @@ import {GenericObject} from '../../../typings/globals.types';
 class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
-        label="[[localize('location')]]"
-        name="location"
-        value="[[value]]"
-        data="[[data]]">
-    </dropdown-filter-multi>
-  `;
+      <dropdown-filter-multi label="[[localize('location')]]" name="location" value="[[value]]" data="[[data]]">
+      </dropdown-filter-multi>
+    `;
   }
 
   @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
@@ -63,17 +55,16 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
   }
 
   _fetchLocations(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
 
     (this.$.locations as EtoolsPrpAjaxEl).abort();
 
-    (this.$.locations as EtoolsPrpAjaxEl).thunk()()
+    (this.$.locations as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.set('data', res.data);
+        this.set('data', res.data);
       })
       // @ts-ignore
       .catch((_err: GenericObject) => {

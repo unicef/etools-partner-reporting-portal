@@ -25,70 +25,56 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fetchClusterObjectivesList} from '../../../../../redux/actions/clusterObjectives';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-* @appliesMixin SortingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ * @appliesMixin SortingMixin
+ */
 class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(ReduxConnectedElement)))) {
-
   static get template() {
     return html`
-    ${tableStyles} ${buttonsStyles}
-    <style include="iron-flex data-table-styles">
-      :host {
-        display: block;
-      }
+      ${tableStyles} ${buttonsStyles}
+      <style include="iron-flex data-table-styles">
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
 
-      a {
-        color: var(--theme-primary-color);
-      }
-    </style>
+        a {
+          color: var(--theme-primary-color);
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="objectives"
-        url="[[objectivesUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="objectives" url="[[objectivesUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <cluster-objectives-filters></cluster-objectives-filters>
+      <page-body>
+        <cluster-objectives-filters></cluster-objectives-filters>
 
+        <template is="dom-if" if="[[permissions.createClusterEntities]]" restamp="true">
+          <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
-      <template
-          is="dom-if"
-          if="[[permissions.createClusterEntities]]"
-          restamp="true">
-        <cluster-objectives-modal id="modal"></cluster-objectives-modal>
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_cluster_objective')]]
+            </paper-button>
+          </div>
+        </template>
 
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_cluster_objective')]]
-          </paper-button>
-        </div>
-      </template>
-
-      <clusters-objectives-list></clusters-objectives-list>
-    </page-body>
+        <clusters-objectives-list></clusters-objectives-list>
+      </page-body>
     `;
   }
 
@@ -105,9 +91,7 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
   objectivesUrl!: string;
 
   static get observers() {
-    return [
-      '_clusterObjectivesAjax(queryParams, objectivesUrl)'
-    ];
+    return ['_clusterObjectivesAjax(queryParams, objectivesUrl)'];
   }
 
   private _clusterObjectivesAjaxDebouncer!: Debouncer;
@@ -124,7 +108,8 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
   }
 
   _clusterObjectivesAjax(queryParams: string) {
-    this._clusterObjectivesAjaxDebouncer = Debouncer.debounce(this._clusterObjectivesAjaxDebouncer,
+    this._clusterObjectivesAjaxDebouncer = Debouncer.debounce(
+      this._clusterObjectivesAjaxDebouncer,
       timeOut.after(300),
       () => {
         const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
@@ -135,12 +120,14 @@ class Objectives extends LocalizeMixin(RoutingMixin(SortingMixin(UtilsMixin(Redu
 
         (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchClusterObjectivesList(thunk))
+        this.reduxStore
+          .dispatch(fetchClusterObjectivesList(thunk))
           // @ts-ignore
           .catch((_err) => {
             //   // TODO: error handling.
           });
-      });
+      }
+    );
   }
 
   disconnectedCallback() {

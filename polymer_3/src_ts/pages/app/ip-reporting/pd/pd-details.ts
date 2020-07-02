@@ -27,71 +27,56 @@ import {IronPagesElement} from '@polymer/iron-pages/iron-pages';
  * @appliesMixin UtilsMixin
  */
 class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-      :host {
-        display: block;
-      }
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
+        }
 
-      .header-content {
-        margin: .5em 0;
-      }
+        .header-content {
+          margin: 0.5em 0;
+        }
+      </style>
 
-    </style>
+      <app-route route="{{route}}" pattern="/:dashTab" data="{{routeData}}"> </app-route>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:dashTab"
-      data="{{routeData}}">
-    </app-route>
+      <page-header title="[[pd.title]]" back="pd?&status=Sig%2CAct%2CSus">
+        <template is="dom-if" if="[[_equals(pd.status, 'Suspended')]]" restamp="true">
+          <message-box slot="header-content" type="warning">
+            PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
+          </message-box>
+        </template>
 
-    <page-header title="[[pd.title]]" back="pd?&status=Sig%2CAct%2CSus">
-      <template
-          is="dom-if"
-          if="[[_equals(pd.status, 'Suspended')]]"
-          restamp="true">
-        <message-box
-            slot="header-content"
-            type="warning">
-          PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
-        </message-box>
-      </template>
+        <div slot="tabs">
+          <paper-tabs selected="{{routeData.dashTab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="details">[[localize('details')]]</paper-tab>
+            <paper-tab name="reports">[[localize('reports')]]</paper-tab>
+            <paper-tab name="calculation-methods">[[localize('calculation_methods')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{routeData.dashTab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="details">[[localize('details')]]</paper-tab>
-          <paper-tab name="reports">[[localize('reports')]]</paper-tab>
-          <paper-tab name="calculation-methods">[[localize('calculation_methods')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
-
-    <iron-pages
+      <iron-pages
         id="tabContent"
         attr-for-selected="name"
         fallback-selection="details"
-        on-iron-items-changed="_updateTabSelection">
-      <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-        <pd-details-overview name="details"></pd-details-overview>
-      </template>
+        on-iron-items-changed="_updateTabSelection"
+      >
+        <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
+          <pd-details-overview name="details"></pd-details-overview>
+        </template>
 
-      <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-        <pd-details-reports name="reports" ></pd-details-reports>
-      </template>
+        <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
+          <pd-details-reports name="reports"></pd-details-reports>
+        </template>
 
-      <template is="dom-if" if="[[_equals(pdTab, 'calculation-methods')]]" restamp="true">
-        <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>
-      </template>
-    </iron-pages>
-
-  `;
+        <template is="dom-if" if="[[_equals(pdTab, 'calculation-methods')]]" restamp="true">
+          <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>
+        </template>
+      </iron-pages>
+    `;
   }
 
   @property({type: String})
@@ -104,9 +89,7 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
   pd: GenericObject = {};
 
   public static get observers() {
-    return [
-      '_updateUrlTab(routeData.dashTab)'
-    ];
+    return ['_updateUrlTab(routeData.dashTab)'];
   }
 
   _updateTabSelection() {
@@ -120,7 +103,6 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
   }
-
 }
 
 window.customElements.define('page-ip-reporting-pd-details', PageIpReportingPdDetails);

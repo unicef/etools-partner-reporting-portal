@@ -4,7 +4,6 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/paper-button/paper-button';
 import {property} from '@polymer/decorators/lib/decorators';
 
-
 /**
  * @polymer
  * @customElement
@@ -19,22 +18,17 @@ class DownloadButton extends PolymerElement {
         }
       </style>
 
-      <a
-          href="[[url]]"
-          tabindex="-1"
-          target="_blank">
+      <a href="[[url]]" tabindex="-1" target="_blank">
         <paper-button class="btn-primary">
           <iron-icon icon="icons:file-download"></iron-icon>
           <slot></slot>
         </paper-button>
       </a>
-
     `;
   }
 
   @property({type: String})
   url!: string;
-
 }
 
 window.customElements.define('download-button', DownloadButton);

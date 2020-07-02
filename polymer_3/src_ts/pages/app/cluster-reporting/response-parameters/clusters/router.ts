@@ -9,70 +9,46 @@ import {getDomainByEnv} from '../../../../../config';
 import {GenericObject} from '../../../../../typings/globals.types';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ */
 class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location></iron-location>
+      <iron-location></iron-location>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:id"
-      data="{{routeData}}"
-      tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:id" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-        selected="[[page]]"
-        attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'objectives')]]" restamp="true">
-        <clusters-objectives
-          name="objectives"
-          route="{{subroute}}">
-        </clusters-objectives>
-      </template>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'objectives')]]" restamp="true">
+          <clusters-objectives name="objectives" route="{{subroute}}"> </clusters-objectives>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'objective')]]" restamp="true">
-        <clusters-objective-details
-          name="objective"
-          objective-id="{{id}}"
-          route="{{subroute}}">
-        </clusters-objective-details>
-      </template>
+        <template is="dom-if" if="[[_equals(page, 'objective')]]" restamp="true">
+          <clusters-objective-details name="objective" objective-id="{{id}}" route="{{subroute}}">
+          </clusters-objective-details>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
-        <clusters-activities
-          name="activities"
-          route="{{subroute}}">
-        </clusters-activities>
-      </template>
+        <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
+          <clusters-activities name="activities" route="{{subroute}}"> </clusters-activities>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
-        <clusters-activity-details
-          name="activity"
-          activity-id="{{id}}"
-          route="{{subroute}}">
-        </clusters-activity-details>
-      </template>
+        <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
+          <clusters-activity-details name="activity" activity-id="{{id}}" route="{{subroute}}">
+          </clusters-activity-details>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'disaggregations')]]" restamp="true">
-        <clusters-disaggregations
-          name="disaggregations"
-          route="{{subroute}}">
-        </clusters-disaggregations>
-      </template>
-
-    </iron-pages>
+        <template is="dom-if" if="[[_equals(page, 'disaggregations')]]" restamp="true">
+          <clusters-disaggregations name="disaggregations" route="{{subroute}}"> </clusters-disaggregations>
+        </template>
+      </iron-pages>
     `;
   }
 
@@ -89,9 +65,7 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
   page!: string;
 
   static get observers() {
-    return [
-      '_routeChanged(routeData.id)'
-    ]
+    return ['_routeChanged(routeData.id)'];
   }
 
   _routeChanged(id: string) {
@@ -107,12 +81,12 @@ class ResponseParametersClustersRouter extends UtilsMixin(PolymerElement) {
       return;
     }
 
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/clusters/${page}.js`;
-    await import(resolvedPageUrl)
-      .catch((err: any) => {
-        console.log(err);
-        this._notFound();
-      });
+    const resolvedPageUrl =
+      getDomainByEnv() + `/src/pages/app/cluster-reporting/response-parameters/clusters/${page}.js`;
+    await import(resolvedPageUrl).catch((err: any) => {
+      console.log(err);
+      this._notFound();
+    });
   }
 
   connectedCallback() {

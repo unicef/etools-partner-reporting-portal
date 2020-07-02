@@ -9,8 +9,10 @@ export const workspaceId = createSelector(
     if (workspaces === undefined || code === undefined) {
       return void 0;
     }
-    return workspaces.length ? workspaces.filter(function(workspace: any) {
-      return workspace.code === code;
-    })[0].id : void 0;
+    return workspaces.length
+      ? workspaces.filter(function (workspace: any) {
+          return workspace.code === code;
+        })[0].id
+      : void 0;
   }
 );

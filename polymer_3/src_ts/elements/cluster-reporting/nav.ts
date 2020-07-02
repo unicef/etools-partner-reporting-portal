@@ -65,16 +65,20 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
 
               <paper-item opened="{{subMenuOpened}}" class$="menu-trigger [[computeMenuTriggerCss(subMenuOpened)]]">
                 <a href="[[_appendQuery(responseParametersUrl, clusterQuery)]]">
-                  <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
+                  <span><iron-icon icon="compare-arrows" role="presentation">
+                    </iron-icon>[[localize('response_parameters')]]
+                  </span>
                 </a>
              </paper-item>
 
               <iron-collapse id="details" opened="{{subMenuOpened}}">
                   <paper-listbox class="menu-content">
-                    <paper-item name="response-parameters" id="clustersSubmenu" class$="sub-menu-item [[clustersSelected]]">
+                    <paper-item name="response-parameters"
+                      id="clustersSubmenu" class$="sub-menu-item [[clustersSelected]]">
                       <a href="[[_appendQuery(clustersUrl, clusterQuery)]]">[[localize('clusters')]]</a>
                     </paper-item>
-                    <paper-item name="response-parameters" id="partnersSubmenu" class$="sub-menu-item [[partnersSelected]]">
+                    <paper-item name="response-parameters" id="partnersSubmenu"
+                      class$="sub-menu-item [[partnersSelected]]">
                       <a href="[[_appendQuery(partnersUrl, clusterQuery)]]">[[localize('partners')]]</a>
                       </a>
                     </paper-item>
@@ -123,7 +127,9 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
             <hr>
             <paper-item name="indicators">
               <a href="https://prphelp.zendesk.com/" target="_blank">
-                <span><iron-icon icon="communication:import-contacts" role="presentation"></iron-icon>[[localize('knowledge_base')]]</span>
+                <span><iron-icon icon="communication:import-contacts" role="presentation">
+                  </iron-icon>[[localize('knowledge_base')]]
+                </span>
               </a>
             </paper-item>
           </div>
@@ -167,33 +173,32 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
 
   @property({type: Object})
   analysisQuery: GenericObject = {
-    loc_type: 0,
+    loc_type: 0
   };
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'dashboard\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'dashboard')"})
   dashboardUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'response-parameters\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'response-parameters')"})
   responseParametersUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'response-parameters/clusters\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'response-parameters/clusters')"})
   clustersUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'response-parameters/partners\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'response-parameters/partners')"})
   partnersUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'planned-action\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'planned-action')"})
   plannedActionUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'results\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'results')"})
   resultsUrl!: string;
 
-  @property({type: String, computed: 'buildUrl(_baseUrlCluster, \'analysis\')'})
+  @property({type: String, computed: "buildUrl(_baseUrlCluster, 'analysis')"})
   analysisUrl!: string;
 
   @property({type: Boolean, computed: '_computeViewPlannedAction(permissions)'})
   canViewPlannedAction!: boolean;
-
 
   static get observers() {
     return ['_routeChanged(route)'];
@@ -240,7 +245,6 @@ class ClusterReportingNav extends LocalizeMixin(PageNavMixin(RoutingMixin(UtilsM
   computeMenuTriggerCss(subMenuOpened: boolean) {
     return subMenuOpened ? ' menu-trigger-opened' : '';
   }
-
 }
 
 window.customElements.define('cluster-reporting-nav', ClusterReportingNav);
