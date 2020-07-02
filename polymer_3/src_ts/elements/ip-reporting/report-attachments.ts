@@ -243,8 +243,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     const files = isEmpty ? [] : change.base;
 
     files.findIndex((file: GenericObject) => {
-      if (/[^a-zA-Z0-9-_]+/.test(file.file_name)) {
-        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_]+/g, '_');
+      if (/[^a-zA-Z0-9-_\\.]+/.test(file.file_name)) {
+        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\\.]+/g, '_');
       }
     });
 
@@ -323,7 +323,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
             if (duplicates.length === 1) {
               this.set(attachmentPropertyName, [duplicates[0]]);
-            } else {
+            } else if (duplicates.length > 1) {
               let correctedItem;
 
               duplicates.forEach((item: GenericObject) => {
@@ -333,7 +333,9 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
                 }
               });
 
-              this.set(attachmentPropertyName, [correctedItem]);
+              if (correctedItem) {
+                this.set(attachmentPropertyName, [correctedItem]);
+              }
             }
           }
 
