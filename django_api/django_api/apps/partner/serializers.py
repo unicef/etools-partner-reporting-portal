@@ -152,6 +152,7 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
     partner_type_display = serializers.SerializerMethodField()
     cso_type_display = serializers.SerializerMethodField()
     shared_partner_display = serializers.SerializerMethodField()
+    psea_assessment_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Partner
@@ -188,7 +189,15 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'sea_risk_rating_name',
             'psea_assessment_date',
             'overall_risk_rating',
+            'type_of_assessment',
+            'highest_risk_rating_type',
+            'highest_risk_rating_name',
         )
+
+    def get_psea_assessment_date(self, obj):
+        if obj.psea_assessment_date:
+            return obj.psea_assessment_date.strftime("%d-%b-%Y")
+        return None
 
     def get_partner_type_display(self, obj):
         return obj.get_partner_type_display()

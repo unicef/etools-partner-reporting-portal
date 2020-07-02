@@ -51,13 +51,19 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('risk_rating')]]">
-              <span class="field-value">[[_withDefault(partner.rating)]]</span>
+            <labelled-item label="[[localize('type_of_assessment')]]">
+              <span class="field-value">[[_withDefault(partner.type_of_assessment)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('date_assessment')]]">
+            <labelled-item label="[[localize('risk_rating_last_date_assessment')]]">
               <span class="field-value">[[_withDefault(partner.last_assessment_date)]]</span>
+            </labelled-item>
+          </li>
+
+          <li class="item">
+            <labelled-item label="[[localize('risk_rating')]]">
+              <span class="field-value">[[_withDefault(partner.rating)]]</span>
             </labelled-item>
           </li>
           <li class="item">
@@ -66,12 +72,23 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
             </labelled-item>
           </li>
           <li class="item">
+            <labelled-item label="">
+              <span class="field-value"></span>
+            </labelled-item>
+          </li>
+
+          <li class="item">
             <labelled-item label="[[localize('sea_risk_rating')]]">
               <span class="field-value">[[_withDefault(partner.sea_risk_rating_name)]]</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('risk_rating_date_of_assessment')]]">
+            <labelled-item label="">
+              <span class="field-value"></span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="[[localize('psea_risk_rating_date_of_assessment')]]">
               <span class="field-value">[[_withDefault(partner.psea_assessment_date)]]</span>
             </labelled-item>
           </li>
