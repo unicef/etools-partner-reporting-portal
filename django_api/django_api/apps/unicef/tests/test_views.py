@@ -29,6 +29,7 @@ from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from partner.models import Partner
 from rest_framework import status
+from rest_framework.test import APIClient
 from unicef.models import ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
 
@@ -1472,6 +1473,7 @@ class TestPMPPartnerImportView(BaseAPITestCase):
             list(partner.users.order_by('email').values_list('email', flat=True)),
             ['bonnie@example.com', 'clyde@example.com']
         )
+        self.assertTrue(all(partner.users.values_list('is_active', flat=True)))
 
     def test_user_data_not_updated_twice(self):
         url = reverse('pmp-import-partner', args=[self.workspace.pk])
@@ -1486,3 +1488,17 @@ class TestPMPPartnerImportView(BaseAPITestCase):
             list(partner.users.order_by('first_name').values_list('first_name', flat=True)),
             ['Bonnie', 'Clyde']
         )
+
+    def test_unauthorized(self):
+        self.client.force_authenticate()
+
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+        response = self.client.post(url, self.org_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_staff_user(self):
+        self.client.force_authenticate(factories.NonPartnerUserFactory(is_staff=False))
+
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+        response = self.client.post(url, self.org_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
