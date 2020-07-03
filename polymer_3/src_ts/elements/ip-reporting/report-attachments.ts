@@ -231,6 +231,14 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     );
   }
 
+  replaceCharsThatAreNotLetterDigitDotOrUnderline(files: GenericObject[]) {
+    (files || []).forEach((file: GenericObject) => {
+      if (/[^a-zA-Z0-9-_\\.]+/.test(file.file_name)) {
+        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\\.]+/g, '_');
+      }
+    });
+  }
+
   _filesChanged(change: GenericObject) {
     let attachmentPropertyName = change.path.replace('.length', '');
     const isEmpty = change.value === 0 ? true : false;
@@ -241,13 +249,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     }
 
     const files = isEmpty ? [] : change.base;
-
-    files.findIndex((file: GenericObject) => {
-      if (/[^a-zA-Z0-9-_]+/.test(file.file_name)) {
-        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_]+/g, '_');
-      }
-    });
-
+    this.replaceCharsThatAreNotLetterDigitDotOrUnderline(files);
     const attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
     if (isEmpty || (!isEmpty && attachment.path !== null)) {
@@ -323,7 +325,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
             if (duplicates.length === 1) {
               this.set(attachmentPropertyName, [duplicates[0]]);
-            } else {
+            } else if (duplicates.length > 1) {
               let correctedItem;
 
               duplicates.forEach((item: GenericObject) => {
@@ -333,7 +335,9 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
                 }
               });
 
-              this.set(attachmentPropertyName, [correctedItem]);
+              if (correctedItem) {
+                this.set(attachmentPropertyName, [correctedItem]);
+              }
             }
           }
 
@@ -348,14 +352,10 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   _addEventListeners() {
     this._onDeleteFile = this._onDeleteFile.bind(this);
     this.addEventListener('delete-file', this._onDeleteFile as any);
-    // TODO(dci): NOT FOUND !!!
-    // this._onProgressChanged = this._onProgressChanged.bind(this);
-    // this.addEventListener('prp-file-progress-changed', this._onProgressChanged);
   }
 
   _removeEventListeners() {
     this.removeEventListener('delete-file', this._onDeleteFile as any);
-    // this.removeEventListener('prp-file-progress-changed', this._onProgressChanged);
   }
 
   connectedCallback() {
