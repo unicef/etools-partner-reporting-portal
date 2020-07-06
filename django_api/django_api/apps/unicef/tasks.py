@@ -229,8 +229,6 @@ def process_programme_documents(fast=False, area=False):
                             person.save()
                             pd.unicef_focal_point.add(person)
 
-                        notified_partner_users = []  # User.id
-
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
@@ -251,8 +249,7 @@ def process_programme_documents(fast=False, area=False):
                                 workspace=workspace,
                             )
 
-                            if created and user.id not in notified_partner_users:
-                                notified_partner_users.append(user.id)
+                            if created:
                                 obj.send_email_notification()
 
                             is_active = person_data.get('active')
