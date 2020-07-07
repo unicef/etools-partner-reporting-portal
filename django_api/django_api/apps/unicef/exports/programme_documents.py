@@ -24,7 +24,7 @@ def calc_cash_transfer_percentage(pd):
 
 class ProgrammeDocumentsXLSXExporter:
 
-    def __init__(self, programme_documents):
+    def __init__(self, programme_documents, request=None):
         self.programme_documents = programme_documents
         filename = hashlib.sha256(';'.join([str(p.pk) for p in programme_documents]).encode('utf-8')).hexdigest()
         self.file_path = os.path.join(tempfile.gettempdir(), filename + '.xlsx')
@@ -134,7 +134,7 @@ class ProgrammeDocumentsPDFExporter:
 
     template_name = 'programme_documents_pdf_export.html'
 
-    def __init__(self, programme_documents):
+    def __init__(self, programme_documents, request=None):
         self.programme_documents = programme_documents
         self.file_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.pdf'.format(
             timezone.now(), programme_documents.count()

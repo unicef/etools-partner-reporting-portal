@@ -74,6 +74,7 @@ class ProgressReportsXLSXExporter:
             progress_reports,
             include_disaggregations=None,
             export_to_single_sheet=None,
+            request=None,
     ):
         self.progress_reports = progress_reports or list()
         filename = ''.join([
@@ -83,6 +84,7 @@ class ProgressReportsXLSXExporter:
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] Progress Report(s) Summary.xlsx'.format(
             timezone.now()
         )
+        self.request = request
 
         self.workbook = Workbook()
 
