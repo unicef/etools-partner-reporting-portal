@@ -1371,7 +1371,7 @@ class PMPPartnerImportAPIView(APIView):
 class PMPPartnerExportAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, IsStaffUser)
     serializer_class = PMPPartnerExportSerializer
-    queryset = Partner.objects.all()
+    queryset = Partner.objects.all().order_by('id')
     pagination_class = SmallPagination
 
 
@@ -1381,7 +1381,7 @@ class PMPPartnerStaffMembersExportAPIView(ListAPIView):
     queryset = User.objects.all().annotate(
         person_active=Subquery(Person.objects.filter(email__iexact=OuterRef('email')).values('active')[:1]),
         phone_number=Subquery(Person.objects.filter(email__iexact=OuterRef('email')).values('phone_number')[:1]),
-    )
+    ).order_by('id')
     pagination_class = SmallPagination
 
     def get_queryset(self):

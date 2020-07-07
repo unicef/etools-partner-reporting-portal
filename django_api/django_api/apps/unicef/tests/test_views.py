@@ -25,6 +25,7 @@ from core.management.commands._generate_disaggregation_fake_data import generate
 from core.models import Location
 from core.tests import factories
 from core.tests.base import BaseAPITestCase
+from core.tests.factories import PartnerFactory, PersonFactory
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from partner.models import Partner
@@ -1526,3 +1527,86 @@ class TestPMPPartnerImportView(BaseAPITestCase):
         url = reverse('pmp-import-partner', args=[self.workspace.pk])
         response = self.client.post(url, self.org_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TestPMPPartnersExportView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = factories.NonPartnerUserFactory(is_staff=True)
+        cls.url = reverse('pmp-export-partners-list')
+
+        super().setUpTestData()
+
+    def test_unauthorized(self):
+        self.client.force_authenticate()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_staff_user(self):
+        self.client.force_authenticate(factories.NonPartnerUserFactory(is_staff=False))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_success(self):
+        PartnerFactory(external_id='42', vendor_number='test')
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['external_id'], '42')
+
+    def test_pagination(self):
+        PartnerFactory(external_id='42', vendor_number='test')
+        PartnerFactory.create_batch(size=4, external_id='43')
+        PartnerFactory(external_id='44')
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url, data={'page_size': 5, 'page': 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 6)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['external_id'], '44')
+
+
+class TestPMPPartnerStaffMemberssExportView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = factories.NonPartnerUserFactory(is_staff=True)
+        cls.partner = PartnerFactory(external_id='42', vendor_number='test')
+        cls.url = reverse('pmp-export-partner-staff-members-list', args=(cls.partner.id,))
+
+        super().setUpTestData()
+
+    def test_unauthorized(self):
+        self.client.force_authenticate()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_staff_user(self):
+        self.client.force_authenticate(factories.NonPartnerUserFactory(is_staff=False))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_success(self):
+        factories.PartnerUserFactory()  # doesn't match to the partner, should be skipped
+        partner_user = factories.PartnerUserFactory(partner=self.partner)
+        person = PersonFactory(email=partner_user.email)
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['email'], partner_user.email)
+        self.assertEqual(response.data['results'][0]['phone_number'], person.phone_number)
+
+    def test_pagination(self):
+        factories.PartnerUserFactory.create_batch(size=4, partner=self.partner)
+        last_user = factories.PartnerUserFactory(partner=self.partner)
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url, data={'page_size': 4, 'page': 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['title'], last_user.position)
