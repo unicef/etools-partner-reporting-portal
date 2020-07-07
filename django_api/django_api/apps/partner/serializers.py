@@ -977,3 +977,28 @@ class PMPPartnerWithStaffMembersSerializer(PMPPartnerSerializer):
         instance = super().update(instance, validated_data)
         self.create_staff_members(instance, staff_members_data)
         return instance
+
+
+class PMPPartnerExportSerializer(serializers.ModelSerializer):
+    unicef_vendor_number = serializers.CharField(source="vendor_number", read_only=True)
+    name = serializers.CharField(source='title', read_only=True)
+
+    class Meta:
+        model = Partner
+        fields = ('id', 'external_id', 'unicef_vendor_number', 'name',)
+
+
+class PMPPartnerStaffMemberExportSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='position', read_only=True)
+    phone_number = serializers.SerializerMethodField()
+    is_active = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'title', 'first_name', 'last_name', 'phone_number', 'is_active')
+
+    def get_phone_number(self, obj):
+        return obj.phone_number or ''
+
+    def get_is_active(self, obj):
+        return bool(obj.person_active and obj.is_active)

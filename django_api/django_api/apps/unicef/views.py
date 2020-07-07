@@ -4,10 +4,12 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import OuterRef, Subquery
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
+from account.models import User
 from core.api import PMP_API
 from core.api_error_codes import APIErrorCode
 from core.common import (
@@ -42,7 +44,11 @@ from indicator.serializers import (
 )
 from indicator.utilities import convert_string_number_to_float
 from partner.models import Partner
-from partner.serializers import PMPPartnerWithStaffMembersSerializer
+from partner.serializers import (
+    PMPPartnerExportSerializer,
+    PMPPartnerStaffMemberExportSerializer,
+    PMPPartnerWithStaffMembersSerializer,
+)
 from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -61,7 +67,7 @@ from utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .models import LowerLevelOutput, Person, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .serializers import (
     LLOutputSerializer,
@@ -1360,3 +1366,23 @@ class PMPPartnerImportAPIView(APIView):
         serializer.save()
 
         return Response({}, status=statuses.HTTP_200_OK)
+
+
+class PMPPartnerExportAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, IsStaffUser)
+    serializer_class = PMPPartnerExportSerializer
+    queryset = Partner.objects.all()
+    pagination_class = SmallPagination
+
+
+class PMPPartnerStaffMembersExportAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, IsStaffUser)
+    serializer_class = PMPPartnerStaffMemberExportSerializer
+    queryset = User.objects.all().annotate(
+        person_active=Subquery(Person.objects.filter(email__iexact=OuterRef('email')).values('active')[:1]),
+        phone_number=Subquery(Person.objects.filter(email__iexact=OuterRef('email')).values('phone_number')[:1]),
+    )
+    pagination_class = SmallPagination
+
+    def get_queryset(self):
+        return super().get_queryset().filter(partner_id=self.kwargs['partner_id'])
