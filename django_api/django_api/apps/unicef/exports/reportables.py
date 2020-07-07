@@ -1,4 +1,5 @@
 import logging
+from urllib import parse
 
 from django.utils import timezone
 
@@ -14,7 +15,35 @@ from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader
 logger = logging.getLogger(__name__)
 
 
-class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
+def get_filter_in(value):
+    if value:
+        value = list(parse.unquote(value).split(","))
+    return value
+
+
+class ProgressReportsMixin:
+    def get_reportable_qs(self, reportable):
+        # Need to have filtering applied here for indicator reports
+        # as filering occurred at higher level
+        reportable_qs = reportable.indicator_reports
+        status_filter = get_filter_in(
+            self.request.GET.get("report_status"),
+        )
+        if status_filter:
+            reportable_qs = reportable_qs.filter(
+                progress_report__status__in=status_filter,
+            )
+        type_filter = get_filter_in(
+            self.request.GET.get("report_type"),
+        )
+        if type_filter:
+            reportable_qs = reportable_qs.filter(
+                progress_report__report_type__in=type_filter,
+            )
+        return reportable_qs
+
+
+class ReportableListXLSXExporter(ProgressReportsMixin, ProgressReportsXLSXExporter):
 
     include_disaggregations = True
     export_to_single_sheet = True
@@ -37,7 +66,9 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
         disaggregation_column_map = self.write_disaggregation_headers_get_column_map()
 
         for reportable in reportables:
-            reports = reportable.indicator_reports.order_by('-time_period_start')[:2]
+            reports = self.get_reportable_qs(
+                reportable,
+            ).order_by('-time_period_start')[:2]
 
             current_row = self.write_indicator_reports_to_current_sheet(
                 current_row, reports, disaggregation_column_map
@@ -64,16 +95,17 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
         self.workbook.save(self.file_path)
 
 
-class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
+class ReportableListPDFExporter(ProgressReportsMixin, ProgressReportDetailPDFExporter):
 
     template_name = 'reportable_list_pdf_export.html'
 
-    def __init__(self, reportables):
+    def __init__(self, reportables, request=None):
         self.reportables = reportables
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] List of Indicators'.format(
             timezone.now()
         )
         self.file_name = self.display_name + '.pdf'
+        self.request = request
 
     def get_reportable_header_table(self, reportable):
         is_percentage = reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE
@@ -166,7 +198,9 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
                 self.get_reportable_header_table(reportable)
             ]
 
-            current_indicator_report = reportable.indicator_reports.order_by('-time_period_start').first()
+            current_indicator_report = self.get_reportable_qs(
+                reportable,
+            ).order_by('-time_period_start').first()
 
             if not current_indicator_report:
                 continue

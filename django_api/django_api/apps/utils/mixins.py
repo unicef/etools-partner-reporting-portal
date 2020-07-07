@@ -77,7 +77,8 @@ class ListExportMixin(object):
         exporter_class = self.get_exporter_class()
         if exporter_class:
             return exporter_class(
-                self.filter_queryset(self.get_queryset())
+                self.filter_queryset(self.get_queryset()),
+                request=request,
             ).get_as_response()
 
         return super(ListExportMixin, self).get(request, *args, **kwargs)
