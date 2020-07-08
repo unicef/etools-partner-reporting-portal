@@ -27,6 +27,7 @@ from core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsStaffUser,
     IsUNICEFAPIUser,
 )
 from core.serializers import ShortLocationSerializer
@@ -41,6 +42,7 @@ from indicator.serializers import (
 )
 from indicator.utilities import convert_string_number_to_float
 from partner.models import Partner
+from partner.serializers import PMPPartnerWithStaffMembersSerializer
 from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -1342,3 +1344,19 @@ class ProgressReportExcelImportView(APIView):
 
         else:
             return Response({}, status=statuses.HTTP_200_OK)
+
+
+class PMPPartnerImportAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsStaffUser)
+    serializer_class = PMPPartnerWithStaffMembersSerializer
+
+    def post(self, request, *args, **kwargs):
+        if 'unicef_vendor_number' not in request.data:
+            raise Http404
+
+        partner = Partner.objects.filter(vendor_number=request.data['unicef_vendor_number']).first()
+        serializer = self.serializer_class(instance=partner, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({}, status=statuses.HTTP_200_OK)

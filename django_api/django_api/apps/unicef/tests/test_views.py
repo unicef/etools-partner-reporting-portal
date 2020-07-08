@@ -4,6 +4,7 @@ import io
 import os
 import random
 import tempfile
+from copy import copy
 from unittest.mock import patch
 
 from django.conf import settings
@@ -26,6 +27,7 @@ from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from partner.models import Partner
 from rest_framework import status
 from unicef.models import ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
@@ -1453,3 +1455,74 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.content), response_length)
+
+
+class TestPMPPartnerImportView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = factories.CountryFactory()
+        cls.workspace = factories.WorkspaceFactory(countries=[cls.country])
+        cls.user = factories.NonPartnerUserFactory(is_staff=True)
+
+        cls.org_data = {
+            "id": 42,
+            "name": "Strange Organization", "alternate_name": "Strange Org.", "short_name": "strange",
+            "last_assessment_date": "2015-04-20",
+            "partner_type": "Civil Society Organization", "cso_type": "International",
+            "total_ct_cp": "457591.00", "total_ct_cy": "112867.00",
+            "street_address": "", "address": "Street of nowhere", "city": "Neverland",
+            "postal_code": "19214", "country": "NV",
+            "unicef_vendor_number": "2500229924",
+            "rating": "Low", "email": "info@example.com",
+            "phone_number": "01 745887", "basis_for_risk_rating": "",
+            "core_values_assessment_date": "2016-03-08", "type_of_assessment": "Micro Assessment",
+            "staff_members": [
+                {"name": "Clyde", "title": "Manager", "phone_num": "01 4242424", "email": "clyde@example.com"},
+                {"name": "Bonnie", "title": "Assistant", "phone_num": "", "email": "bonnie@example.com"},
+            ]
+        }
+
+        super().setUpTestData()
+
+    def test_success(self):
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+
+        self.assertFalse(Partner.objects.filter(external_id='42').exists())
+        response = self.client.post(url, self.org_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        partner = Partner.objects.filter(external_id='42').first()
+        self.assertIsNotNone(partner)
+        self.assertListEqual(
+            list(partner.users.order_by('email').values_list('email', flat=True)),
+            ['bonnie@example.com', 'clyde@example.com']
+        )
+        self.assertTrue(all(partner.users.values_list('is_active', flat=True)))
+
+    def test_user_data_not_updated_twice(self):
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+        self.client.post(url, self.org_data, format='json')
+
+        new_data = copy(self.org_data)
+        new_data['staff_members'][0]['name'] = 'Ralph'
+        self.client.post(url, new_data, format='json')
+
+        partner = Partner.objects.get(external_id='42')
+        self.assertListEqual(
+            list(partner.users.order_by('first_name').values_list('first_name', flat=True)),
+            ['Bonnie', 'Clyde']
+        )
+
+    def test_unauthorized(self):
+        self.client.force_authenticate()
+
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+        response = self.client.post(url, self.org_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_staff_user(self):
+        self.client.force_authenticate(factories.NonPartnerUserFactory(is_staff=False))
+
+        url = reverse('pmp-import-partner', args=[self.workspace.pk])
+        response = self.client.post(url, self.org_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

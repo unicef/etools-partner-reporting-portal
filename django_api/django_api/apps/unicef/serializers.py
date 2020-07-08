@@ -8,7 +8,6 @@ from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportCo
 from partner.models import Partner
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from utils.filters.constants import Boolean
 
 from .models import (
     LowerLevelOutput,

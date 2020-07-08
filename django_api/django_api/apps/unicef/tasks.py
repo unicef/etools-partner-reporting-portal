@@ -261,13 +261,16 @@ def process_programme_documents(fast=False, area=False):
                         # Create focal_points
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
+                            person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
 
                             person.active = True
                             person.save()
                             pd.partner_focal_point.add(person)
+
+                            user.partner = partner
+                            user.save()
 
                         # Create sections
                         section_data_list = item['sections']
