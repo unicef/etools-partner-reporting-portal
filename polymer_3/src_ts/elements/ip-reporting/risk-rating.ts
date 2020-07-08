@@ -46,8 +46,8 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="[[localize('hact_risk_rating')]]">
-              <span class="field-value">[[_withDefault(partner.overall_risk_rating)]]</span>
+            <labelled-item label="[[localize('financial_risk_rating')]]">
+              <span class="field-value">[[_withDefault(partner.rating)]]</span>
             </labelled-item>
           </li>
           <li class="item">
@@ -60,31 +60,9 @@ class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
               <span class="field-value">[[_withDefault(partner.last_assessment_date)]]</span>
             </labelled-item>
           </li>
-
-          <li class="item">
-            <labelled-item label="[[localize('risk_rating')]]">
-              <span class="field-value">[[_withDefault(partner.rating)]]</span>
-            </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="[[localize('basis_risk')]]">
-              <span class="field-value">[[_withDefault(partner.basis_for_risk_rating)]]</span>
-            </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="">
-              <span class="field-value"></span>
-            </labelled-item>
-          </li>
-
           <li class="item">
             <labelled-item label="[[localize('sea_risk_rating')]]">
               <span class="field-value">[[_withDefault(partner.sea_risk_rating_name)]]</span>
-            </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="">
-              <span class="field-value"></span>
             </labelled-item>
           </li>
           <li class="item">
