@@ -11,7 +11,7 @@ WORKDIR /tmp
 ADD package.json /tmp/
 ADD package-lock.json /tmp/
 
-RUN npm install --no-save
+RUN npm install --no-save --production
 
 ADD . /code/
 WORKDIR /code

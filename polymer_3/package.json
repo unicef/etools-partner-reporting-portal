@@ -57,6 +57,7 @@
     "@polymer/paper-toggle-button": "^3.0.1",
     "@polymer/paper-tooltip": "^3.0.1",
     "@polymer/polymer": "^3.4.1",
+    "@polymer/decorators": "^3.0.0",
     "@types/lodash-es": "^4.17.3",
     "@unicef-polymer/etools-behaviors": "^3.0.3",
     "@unicef-polymer/etools-content-panel": "^3.0.6",
@@ -81,7 +82,6 @@
     "web-animations-js": "^2.3.1"
   },
   "devDependencies": {
-    "@polymer/decorators": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
     "@typescript-eslint/typescript-estree": "^3.2.0",
