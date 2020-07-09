@@ -1593,8 +1593,7 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
         this.set('errors', err.data);
         this.set('data.locations', dataCopy.locations);
         this.set('updatePending', false);
-      })
-      .finally();
+      });
   }
 
   _close(e: CustomEvent & any) {
