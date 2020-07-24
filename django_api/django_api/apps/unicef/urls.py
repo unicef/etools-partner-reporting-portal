@@ -2,7 +2,9 @@ from django.conf.urls import url
 
 from .views import (
     InterventionPMPDocumentView,
+    PMPPartnerExportAPIView,
     PMPPartnerImportAPIView,
+    PMPPartnerStaffMembersExportAPIView,
     ProgrammeDocumentAPIView,
     ProgrammeDocumentCalculationMethodsAPIView,
     ProgrammeDocumentDetailsAPIView,
@@ -94,4 +96,10 @@ urlpatterns = [
     url(r'^pmp/import/(?P<business_area_code>[^/]+)/partner/$',
         PMPPartnerImportAPIView.as_view(),
         name='pmp-import-partner'),
+    url(r'^pmp/export/partners/$',
+        PMPPartnerExportAPIView.as_view(),
+        name='pmp-export-partners-list'),
+    url(r'^pmp/export/partners/(?P<partner_id>\d+)/staff-members/$',
+        PMPPartnerStaffMembersExportAPIView.as_view(),
+        name='pmp-export-partner-staff-members-list'),
 ]
