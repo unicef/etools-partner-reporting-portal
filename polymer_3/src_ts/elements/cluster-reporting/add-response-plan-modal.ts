@@ -80,10 +80,14 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
           padding-bottom: 20px;
         }
 
-      etools-dropdown, etools-dropdown-multi, datepicker-lite, paper-input {
-        width: 100%;
-      }
-      .start-date, .end-date{
+        etools-dropdown,
+        etools-dropdown-multi,
+        datepicker-lite,
+        paper-input {
+          width: 100%;
+        }
+        .start-date,
+        .end-date {
           --paper-input-container_-_width: 100%;
         }
         .app-grid {
@@ -129,44 +133,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   class="item validate full-width"
                   label="Response Plan"
                   options="[[formattedPlans]]"
-
-      <div empty$="[[!_equals(mode, 'custom')]]">
-        <template
-          is="dom-if"
-          if="[[_equals(mode, 'custom')]]"
-          restamp="true">
-          <div class="app-grid">
-            <div class="item full-width">
-              <paper-input
-                class="validate full-width"
-                label="Response Plan"
-                value="{{data.title}}"
-                on-input="_validate"
-                always-float-label
-                required>
-              </paper-input>
-            </div>
-            <div class="item full-width">
-              <etools-dropdown-multi
-                class="validate"
-                label="Clusters"
-                options="[[clusters]]"
-                option-value="value"
-                option-label="label"
-                selected-values="{{data.clusters}}"
-                on-etools-selected-items-changed="_validate"
-                trigger-value-change-event
-                hide-close
-                error-message=""
-                with-backdrop
-                required>
-              </etools-dropdown-multi>
-            </div>
-            <div class="item">
-              <etools-dropdown
-                  class="validate"
-                  label="Plan Type"
-                  options="[[types]]"
                   option-value="id"
                   option-label="title"
                   selected="{{selectedPlan}}"
@@ -174,7 +140,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   on-etools-selected-item-changed$="_validate"
                   trigger-value-change-event
                   no-dynamic-align
-                  auto-validate
                   with-backdrop
                   required
                 >
@@ -205,6 +170,23 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   >
                   </paper-input>
                 </div>
+                <div class="item full-width">
+                  <etools-dropdown-multi
+                    class="validate"
+                    label="Clusters"
+                    options="[[clusters]]"
+                    option-value="value"
+                    option-label="label"
+                    selected-values="{{data.clusters}}"
+                    on-etools-selected-items-changed="_validate"
+                    trigger-value-change-event
+                    hide-close
+                    error-message=""
+                    with-backdrop
+                    required
+                  >
+                  </etools-dropdown-multi>
+                </div>
                 <div class="item">
                   <etools-dropdown
                     class="validate"
@@ -213,6 +195,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                     option-value="id"
                     option-label="title"
                     selected="{{data.plan_type}}"
+                    disabled="[[plansLoading]]"
                     auto-validate
                     hide-search
                     with-backdrop
@@ -276,33 +259,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                 </div>
               </div>
             </template>
-
-            <template is="dom-if" if="[[_equals(data.plan_type, 'OTHER')]]" restamp="true">
-              <div class="item">
-                  <div class="full-width">
-                  </div>
-              </div>
-            </template>
-            <div class="item">
-              <datepicker-lite
-                class="start-date"
-                label="Start date"
-                value="{{data.start}}"
-                error-message=""
-                selected-date-display-format="D MMM YYYY"
-                required>
-              </datepicker-lite>
-            </div>
-            <div class="item">
-              <datepicker-lite
-                class="end-date"
-                label="End date"
-                value="{{data.end}}"
-                error-message=""
-                selected-date-display-format="D MMM YYYY"
-                required>
-              </datepicker-lite>
-            </div>
           </div>
         </paper-dialog-scrollable>
 
