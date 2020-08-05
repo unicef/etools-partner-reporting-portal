@@ -185,7 +185,7 @@ class V1FundingSourceImportSerializer(serializers.Serializer):
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     name = serializers.CharField()
-    iso3_code = serializers.CharField(source='iso3_code', allow_null=True)
+    iso3 = serializers.CharField(source='iso3_code', allow_null=True)
 
     class Meta:
         model = Country
