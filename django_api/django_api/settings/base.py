@@ -56,6 +56,11 @@ FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
     os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
 )
+FRONTEND_PMP_HOST = os.getenv(
+    'PRP_FRONTEND_PMP_HOST',
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
+)
+
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
 
