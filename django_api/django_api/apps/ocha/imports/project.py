@@ -148,3 +148,15 @@ def get_project_list_for_plan(plan_id):
     except Exception:
         logger.exception('Error trying to list projects for response plan')
         return []
+
+
+def get_project_list_for_plan_partner(plan_id, org_id):
+    source_url = HPC_V2_ROOT_URL + f"project/search?planIds={plan_id}" \
+                                   f"&excludeFields=locations&" \
+                                   f"limit=1000&organizationIds={org_id}"
+    try:
+
+        return get_json_from_url(source_url)['data']
+    except Exception:
+        logger.exception('Error trying to list projects for response plan')
+        return []

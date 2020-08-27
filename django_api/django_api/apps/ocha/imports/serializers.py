@@ -69,8 +69,8 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     name = serializers.CharField(source='title')
     objective = serializers.CharField(source='description', allow_null=True, allow_blank=True)
     currentRequestedFunds = serializers.FloatField(source='total_budget', allow_null=True)
-    startDate = serializers.DateTimeField(source='start_date')
-    endDate = serializers.DateTimeField(source='end_date')
+    startDate = serializers.DateField(source='start_date')
+    endDate = serializers.DateField(source='end_date')
     code = serializers.CharField(allow_null=True, allow_blank=True)
     additional_information = serializers.CharField(allow_null=True, allow_blank=True)
     locations = V2PartnerProjectLocationImportSerializer(many=True)
@@ -94,7 +94,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         )
 
     def get_status(self):
-        today = timezone.now()
+        today = timezone.now().date()
         if self.validated_data['start_date'] > today:
             return PARTNER_PROJECT_STATUS.planned
         elif self.validated_data['end_date'] < today:

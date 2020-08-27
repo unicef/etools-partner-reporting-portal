@@ -11,7 +11,7 @@ from core.serializers import ResponsePlanSerializer
 from dateutil.parser import parse
 from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL, RefCode
 from ocha.imports.bulk import fetch_json_urls, get_response_plans_for_countries
-from ocha.imports.project import get_project_list_for_plan, import_project
+from ocha.imports.project import get_project_list_for_plan_partner, import_project
 from ocha.imports.response_plan import import_response_plan
 from ocha.imports.utilities import get_json_from_url
 from ocha.utilities import trim_list
@@ -146,33 +146,37 @@ class RPMProjectListAPIView(APIView):
         self.check_response_plan_permission(self.request, response_plan)
         return response_plan
 
-    def get_projects(self):
+    def get_projects(self, ocha_external_id):
         response_plan = self.get_response_plan()
         if not response_plan.external_id:
             raise serializers.ValidationError('Cannot list projects for a RP without external ID')
 
-        return get_project_list_for_plan(response_plan.external_id)
+        return get_project_list_for_plan_partner(response_plan.external_id, ocha_external_id)
 
     def get(self, request, *args, **kwargs):
         ocha_external_id = request.GET.get('ocha_external_id', None)
-        projects = self.get_projects()
-        # Limit projects to choosed partner only
-        result = list()
-        if ocha_external_id:
-            for project in projects:
-                try:
-                    if 'projectVersions' in project \
-                            and len(project['projectVersions']) > 0 \
-                            and 'organizations' in project['projectVersions'][0]:
-                        organizations_id = [org['id'] for org in project['projectVersions'][0]['organizations']]
-                        if int(ocha_external_id) in organizations_id:
-                            result.append(project)
-                except Exception:
-                    continue
-        else:
-            result = projects
+        if not ocha_external_id:
+            return Response(status=400, data={"error": "OCHA External Id parameter is required"})
 
-        return Response(trim_list(result, 'partner_project'))
+        projects = self.get_projects(ocha_external_id)['results']
+        # Limit projects to choosed partner only
+
+        # result = list()
+        # if ocha_external_id:
+        #     for project in projects:
+        #         try:
+        #             if 'projectVersions' in project \
+        #                     and len(project['projectVersions']) > 0 \
+        #                     and 'organizations' in project['projectVersions'][0]:
+        #                 organizations_id = [org['id'] for org in project['projectVersions'][0]['organizations']]
+        #                 if int(ocha_external_id) in organizations_id:
+        #                     result.append(project)
+        #         except Exception:
+        #             continue
+        # else:
+        #     result = projects
+
+        return Response(trim_list(projects, 'partner_project'))
 
     def get_partner(self):
         if self.request.user.prp_roles.filter(
@@ -315,7 +319,8 @@ class RPMProjectDetailAPIView(APIView):
 
         out_data['clusters'] = clusters
 
-        today = timezone.now()
+        import datetime
+        today = datetime.datetime.now()
         if start_datetime > today:
             out_data['status'] = 'Planned'
         elif end_datetime < today:
