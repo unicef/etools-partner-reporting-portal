@@ -49,7 +49,7 @@ class OperationalPresenceTable extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
       </style>
 
       <analysis-widget widget-title="[[localize('operational_presence_table')]]" loading="[[loading]]">
-        <div class="table-container">
+        <div class="table-container" slot="map">
           <etools-data-table-header no-title no-collapse>
             <etools-data-table-column field="">
               <div class="table-column">[[localize('location')]]</div>

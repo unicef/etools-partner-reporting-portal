@@ -64,7 +64,7 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           <div id="map" slot="map"></div>
         </template>
 
-        <div class="legend">
+        <div class="legend" slot="map">
           <h4>[[localize('number_of_partners')]]:</h4>
           <ol>
             <template is="dom-repeat" items="[[legend]]">

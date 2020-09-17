@@ -34,11 +34,15 @@ class CurrentProgressByLocation extends UtilsMixin(LocalizeMixin(AnalysisChartMi
       </style>
 
       <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]">
-        <div hidden$="[[!rows.length]]">
+        <div hidden$="[[!rows.length]]" slot="map">
           <google-chart type="bar" options="[[options]]" cols="[[cols]]" rows="[[rows]]"> </google-chart>
         </div>
 
-        <list-placeholder data="[[rows]]" message="No data for [[_localizeLowerCased(widgetTitle, localize)]] yet.">
+        <list-placeholder
+          slot="map"
+          data="[[rows]]"
+          message="[[localize('no_data_for')]] [[_localizeLowerCased(widgetTitle, localize)]]."
+        >
         </list-placeholder>
       </analysis-widget>
     `;
