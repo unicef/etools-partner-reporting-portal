@@ -70,7 +70,8 @@ class PdDetailsReportingRequirements extends LocalizeMixin(UtilsMixin(ReduxConne
           </etools-data-table-row>
         </template>
 
-        <list-placeholder data="[[data]]" loading="[[loading]]" message="No reports found"> </list-placeholder>
+        <list-placeholder data="[[data]]" loading="[[loading]]" message="[[localize('no_report_data')]]">
+        </list-placeholder>
       </section>
     `;
   }
