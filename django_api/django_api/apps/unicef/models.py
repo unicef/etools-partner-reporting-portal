@@ -519,6 +519,11 @@ def send_notification_on_status_change(sender, instance, **kwargs):
                 content_subtype='html',
             )
 
+        # update pr url link to point to pmp, not prp
+        part_pr_url = f'/pmp/reportings/{instance.id}/progress'
+        pr_url = urljoin(settings.FRONTEND_PMP_HOST, part_pr_url)
+        template_data["pr_url"] = pr_url
+
         for person in pd.unicef_focal_point.all():
             template_data['person'] = person
             to_email_list = [person.email]

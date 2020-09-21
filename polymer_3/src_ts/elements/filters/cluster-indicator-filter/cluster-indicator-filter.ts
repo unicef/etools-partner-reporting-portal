@@ -47,7 +47,7 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
     if (!responsePlanId) {
       return;
     }
-    return Endpoints.clusterNames(responsePlanId);
+    return Endpoints.clusterIndicatorNames(responsePlanId);
   }
 
   _fetchIndicatorNames() {

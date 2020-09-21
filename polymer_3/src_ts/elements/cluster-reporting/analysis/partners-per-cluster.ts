@@ -32,11 +32,12 @@ class PartnersPerCluster extends LocalizeMixin(UtilsMixin(AnalysisChartMixin(Red
       </style>
 
       <analysis-widget widget-title="[[_localizeLowerCased(widgetTitle, localize)]]" loading="[[loading]]">
-        <div hidden$="[[!rows.length]]">
+        <div hidden$="[[!rows.length]]" slot="map">
           <google-chart type="bar" options="[[options]]" cols="[[cols]]" rows="[[rows]]"> </google-chart>
         </div>
 
-        <list-placeholder data="[[rows]]" message="No data for [[widgetTitle]]."> </list-placeholder>
+        <list-placeholder slot="map" data="[[rows]]" message="[[localize('no_data_for')]] [[widgetTitle]].">
+        </list-placeholder>
       </analysis-widget>
     `;
   }

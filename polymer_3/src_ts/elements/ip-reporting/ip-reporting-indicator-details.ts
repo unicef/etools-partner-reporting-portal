@@ -133,7 +133,8 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
         </div>
       </template>
 
-      <list-placeholder data="[[data]]" loading="[[loading]]" message="no_report_data"> </list-placeholder>
+      <list-placeholder data="[[data]]" loading="[[loading]]" message="[[localize('no_report_data')]]">
+      </list-placeholder>
 
       <template is="dom-if" if="[[_computeHidden(locations, 'true')]]">
         <paper-tabs
