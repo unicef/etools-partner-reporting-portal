@@ -357,11 +357,12 @@ class PageIpReportingPdReport extends LocalizeMixin(
     if (!report) {
       return false;
     }
-
+    const isEndedOrClosed =
+      report.programme_document &&
+      (report.programme_document.status === 'Clo' || report.programme_document.status === 'End');
     switch (true) {
-      case mode === 'view':
-      case report.programme_document &&
-        (report.programme_document.status === 'Sig' || report.programme_document.status === 'Clo'):
+      case mode === 'view' && !isEndedOrClosed:
+      case report.programme_document && report.programme_document.status === 'Sig':
       case !permissions || !permissions.editProgressReport:
         return false;
 
