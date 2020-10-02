@@ -360,7 +360,8 @@ class PageIpReportingPdReport extends LocalizeMixin(
     const isEnded = report.programme_document && report.programme_document.status === 'End';
     switch (true) {
       case mode === 'view' && !isEnded:
-      case report.programme_document && report.programme_document.status === 'Sig':
+      case report.programme_document &&
+        (report.programme_document.status === 'Sig' || report.programme_document.status === 'Clo'):
       case !permissions || !permissions.editProgressReport:
         return false;
 
