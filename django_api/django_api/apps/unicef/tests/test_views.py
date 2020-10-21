@@ -1015,7 +1015,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
     def test_detail_api_export_pdf(self):
         progress_report = self.pd.progress_reports.first()
-        ir_qs = IndicatorReport.objects.filter(
+        IndicatorReport.objects.filter(
             progress_report=progress_report,
         )
         url = reverse(
@@ -1029,7 +1029,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
     def test_report_annex_c_export(self):
         progress_report = self.pd.progress_reports.first()
-        ir_qs = IndicatorReport.objects.filter(
+        IndicatorReport.objects.filter(
             progress_report=progress_report,
         )
         url = reverse(
