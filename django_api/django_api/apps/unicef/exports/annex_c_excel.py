@@ -384,7 +384,7 @@ class ProgressReportsXLSXExporter:
     def cleanup(self):
         os.remove(self.file_path)
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         self.fill_workbook()
         response = HttpResponse()
         response.content_type = self.current_sheet.mime_type
