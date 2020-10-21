@@ -1,6 +1,5 @@
 import csv
 import datetime
-import io
 import os
 import random
 import tempfile
@@ -12,7 +11,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.urls import reverse
 
-import xlrd
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -26,20 +24,22 @@ from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from openpyxl import load_workbook
 from rest_framework import status
 from unicef.models import ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
 
 
 def convert_xlsx_to_csv(response):
-    download_file = io.BytesIO(response.content)
-    xlsx_file = xlrd.open_workbook(file_contents=download_file.read())
-    xlsx_sheet = xlsx_file.sheet_by_index(0)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+        tmp.write(response.content)
+    xlsx_file = load_workbook(tmp.name)
+    xlsx_sheet = xlsx_file[xlsx_file.sheetnames[0]]
     csv_filename = tempfile.NamedTemporaryFile()
     with open(csv_filename.name, "w") as csv_file:
         wr = csv.writer(csv_file)
-        for rownum in range(xlsx_sheet.nrows):
-            wr.writerow(xlsx_sheet.row_values(rownum))
+        for row in xlsx_sheet.values:
+            wr.writerow(row)
     return csv_filename
 
 
