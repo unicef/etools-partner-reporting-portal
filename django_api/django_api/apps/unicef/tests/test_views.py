@@ -990,6 +990,29 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_pdf(self, mock_create, mock_clean, mock_send):
+        # ensure at least one report has status submitted
+        report = self.queryset.first()
+        report.status = PROGRESS_REPORT_STATUS.submitted
+        report.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "pdf"})
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        with open("/tmp/test.pdf", "wb") as fp:
+            fp.write(b"".join(response.streaming_content))
+
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.submitted
+        )
+        self.assertTrue(len(self.reports))
+
     def test_detail_api_export_pdf(self):
         progress_report = self.pd.progress_reports.first()
         ir_qs = IndicatorReport.objects.filter(
