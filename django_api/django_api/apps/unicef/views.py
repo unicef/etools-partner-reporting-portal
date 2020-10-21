@@ -30,7 +30,6 @@ from core.permissions import (
     IsUNICEFAPIUser,
 )
 from core.serializers import ShortLocationSerializer
-from easy_pdf.rendering import render_to_pdf_response
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from indicator.filters import PDReportsFilter
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
@@ -53,6 +52,7 @@ from unicef.exports.programme_documents import ProgrammeDocumentsPDFExporter, Pr
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter, ProgressReportListPDFExporter
 from unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
+from unicef.utils import render_pdf_to_response
 from utils.emails import send_email_from_template
 from utils.mixins import ListExportMixin, ObjectExportMixin
 
@@ -361,7 +361,7 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
                       'be completed by CSO as part of reporting with FACE'.upper(),
         }
 
-        return render_to_pdf_response(request, "report_annex_c_pdf.html", data, encoding='utf8')
+        return render_pdf_to_response(request, "report_annex_c_pdf", data)
 
 
 class ProgressReportDetailsUpdateAPIView(APIView):

@@ -982,6 +982,18 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+    def test_detail_api_export(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-pdf',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
 
