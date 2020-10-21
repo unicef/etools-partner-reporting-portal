@@ -56,6 +56,7 @@ newrelic = "*"
 raven = "*"
 social-auth-app-django = "*"
 python-social-auth = "*"
+weasyprint = "*"
 
 [requires]
 python_version = "3.7"
