@@ -97,7 +97,7 @@ class ReportableListXLSXExporter(ProgressReportsMixin, ProgressReportsXLSXExport
 
 class ReportableListPDFExporter(ProgressReportsMixin, ProgressReportDetailPDFExporter):
 
-    template_name = 'reportable_list_pdf_export.html'
+    template_name = 'reportable_list_pdf_export'
 
     def __init__(self, reportables, request=None):
         self.reportables = reportables

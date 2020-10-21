@@ -1501,7 +1501,6 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        response_length = len(response.content)
 
         # add reportable that should not be part of export
         self._setup_reportable(report_status="Due")
@@ -1509,4 +1508,3 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.content), response_length)
