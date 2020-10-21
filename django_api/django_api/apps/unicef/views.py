@@ -321,7 +321,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
                     PROGRESS_REPORT_STATUS.accepted,
                 ],
             )
-            return exporter_class(filter_qs).get_as_response()
+            return exporter_class(filter_qs).get_as_response(request)
         return super().get(request, *args, **kwargs)
 
 
