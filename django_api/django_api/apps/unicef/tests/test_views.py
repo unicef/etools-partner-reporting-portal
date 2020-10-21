@@ -312,6 +312,14 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         for result in response.data['results']:
             self.assertEquals(result['title'], document['title'])
 
+    def test_list_api_export_pdf(self):
+        url = reverse(
+            'programme-document',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "pdf"})
+
+        self.assertTrue(status.is_success(response.status_code))
+
 
 class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
