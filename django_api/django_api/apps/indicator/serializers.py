@@ -2519,7 +2519,6 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         from cluster.models import Cluster
-
         from partner.models import PartnerActivityProjectContext
 
         cluster = get_object_or_404(

@@ -32,9 +32,7 @@ def reset_indicator_report_data(indicator_report):
     Arguments:
         indicator_report {IndicatorReport} -- IndicatorReport instance to delete its location data from
     """
-    from indicator.models import (
-        IndicatorLocationData,
-    )
+    from indicator.models import IndicatorLocationData
 
     # Reset submission and status attributes
     indicator_report.total = {'c': 0, 'd': 0, 'v': 0}

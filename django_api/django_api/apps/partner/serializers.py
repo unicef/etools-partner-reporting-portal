@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from django.db import transaction
 
 from cluster.models import Cluster, ClusterActivity, ClusterObjective
