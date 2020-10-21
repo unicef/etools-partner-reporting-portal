@@ -88,7 +88,7 @@ class ProgressReportsXLSXExporter:
 
         self.workbook = Workbook()
 
-        self.current_sheet = self.workbook.get_active_sheet()
+        self.current_sheet = self.workbook.active
         if include_disaggregations is not None:
             self.include_disaggregations = include_disaggregations
         if export_to_single_sheet is not None:
