@@ -111,7 +111,6 @@ INSTALLED_APPS = [
     'djcelery_email',
     'leaflet',
     'suit',
-    'easy_pdf',
     'django_cron',
     'social_django',
 
