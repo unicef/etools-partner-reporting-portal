@@ -31,5 +31,5 @@ export:
 	export ${ENV_VARS}
 
 lint:
-	pyflakes *; exit 0;
+	flake8 *; exit 0;
 	isort django_api/ --check-only; exit 0;

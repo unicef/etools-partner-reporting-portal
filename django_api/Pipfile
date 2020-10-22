@@ -5,8 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 factory-boy = "*"
-pyflakes = "*"
-pycodestyle = "*"
+flake8 = "*"
 django-debug-toolbar = "*"
 django-fixture-magic = "*"
 
