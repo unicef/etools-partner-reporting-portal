@@ -4,11 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-isort = "*"
 factory-boy = "*"
-pylint = "*"
+pyflakes = "*"
 pycodestyle = "*"
-flake8 = "*"
 django-debug-toolbar = "*"
 django-fixture-magic = "*"
 
