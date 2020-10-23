@@ -170,23 +170,6 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
                   >
                   </paper-input>
                 </div>
-                <div class="item full-width">
-                  <etools-dropdown-multi
-                    class="validate"
-                    label="Clusters"
-                    options="[[clusters]]"
-                    option-value="value"
-                    option-label="label"
-                    selected-values="{{data.clusters}}"
-                    on-etools-selected-items-changed="_validate"
-                    trigger-value-change-event
-                    hide-close
-                    error-message=""
-                    with-backdrop
-                    required
-                  >
-                  </etools-dropdown-multi>
-                </div>
                 <div class="item">
                   <etools-dropdown
                     class="validate"
