@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from account.validators import EmailValidator
 from cluster.models import Cluster
 from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
 from core.models import PRPRole
@@ -31,6 +32,7 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[EmailValidator()])
     partner = PartnerDetailsSerializer(read_only=True)
     prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
     access = serializers.SerializerMethodField()
@@ -84,6 +86,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField(read_only=True)
     user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
     is_incomplete = serializers.SerializerMethodField(read_only=True)
+    email = serializers.EmailField(validators=[EmailValidator()])
 
     def get_status(self, obj):
         if obj.is_active:
