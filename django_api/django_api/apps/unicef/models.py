@@ -520,7 +520,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             )
 
         # update pr url link to point to pmp, not prp
-        part_pr_url = f'/pmp/reportings/{instance.id}/progress'
+        part_pr_url = f'/pmp/reports/{instance.id}/progress'
         pr_url = urljoin(settings.FRONTEND_PMP_HOST, part_pr_url)
         template_data["pr_url"] = pr_url
 
