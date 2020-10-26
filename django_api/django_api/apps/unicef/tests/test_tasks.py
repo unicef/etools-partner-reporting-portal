@@ -6,8 +6,9 @@ from indicator.models import IndicatorBlueprint, Reportable
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPReportableSerializer
 from partner.models import Partner
 from partner.serializers import PMPPartnerSerializer
-from unicef.models import ProgrammeDocument, Section
-from unicef.serializers import PMPProgrammeDocumentSerializer, PMPSectionSerializer
+from rest_framework.exceptions import ValidationError
+from unicef.models import Person, ProgrammeDocument, Section
+from unicef.serializers import PMPPDPersonSerializer, PMPProgrammeDocumentSerializer, PMPSectionSerializer
 from unicef.tasks import process_model
 
 
@@ -47,6 +48,42 @@ class TestProcessModel(BaseAPITestCase):
             filter_dict=filter_dict,
         )
         self.assertTrue(partner_qs.exists())
+
+    def test_person_and_user(self):
+        email = "wrongone@example.com"
+        filter_dict = {'email': email}
+        person_qs = Person.objects.filter(**filter_dict)
+        data = {
+            "name": "New",
+            "email": email,
+        }
+        self.assertFalse(person_qs.exists())
+        process_model(
+            Person,
+            PMPPDPersonSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertTrue(person_qs.exists())
+
+    def test_person_and_user_invalid_email(self):
+        email = "WrongOne@example.com"
+        filter_dict = {'email': email}
+        person_qs = Person.objects.filter(**filter_dict)
+        data = {
+            "name": "New",
+            "email": email,
+        }
+        self.assertFalse(person_qs.exists())
+        self.assertRaises(
+            ValidationError,
+            process_model,
+            Person,
+            PMPPDPersonSerializer,
+            data=data,
+            filter_dict=filter_dict,
+        )
+        self.assertFalse(person_qs.exists())
 
     def test_programme_document(self):
         country = factories.CountryFactory()

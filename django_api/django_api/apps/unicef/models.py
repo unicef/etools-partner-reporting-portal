@@ -31,6 +31,7 @@ from indicator.models import Reportable  # IndicatorReport
 from model_utils.models import TimeStampedModel
 from model_utils.tracker import FieldTracker
 from requests.compat import urljoin
+from rest_framework.exceptions import ValidationError
 from utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,11 @@ class Person(TimeStampedExternalSyncModelMixin):
             email=self.email,
             prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
+
+    def save(self, *args, **kwargs):
+        if self.email != self.email.lower():
+            raise ValidationError("Email must be lowercase.")
+        super().save(*args, **kwargs)
 
 
 class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):

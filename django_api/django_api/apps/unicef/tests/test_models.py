@@ -2,6 +2,7 @@ from datetime import date
 from unittest.mock import patch
 
 from django.db.models import Q
+from django.test import TestCase
 
 from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES
 from core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
@@ -11,6 +12,7 @@ from core.tests.base import BaseAPITestCase
 from dateutil.relativedelta import relativedelta
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData
+from rest_framework.exceptions import ValidationError
 from unicef.models import ProgressReport
 from unicef_notification.models import Notification
 from utils.emails import send_due_progress_report_email
@@ -315,3 +317,13 @@ class TestProgressReportModel(BaseAPITestCase):
         report.save()
 
         self.assertTrue(mock_send.create)
+
+
+class TestPerson(TestCase):
+    def test_save(self):
+        person = factories.PersonFactory()
+        person.email = "normal@example.com"
+        person.save()
+
+        person.email = "NotNormal@example.com"
+        self.assertRaises(ValidationError, person.save)

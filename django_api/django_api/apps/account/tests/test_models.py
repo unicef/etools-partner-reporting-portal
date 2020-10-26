@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from core.common import PRP_ROLE_TYPES, USER_TYPES
@@ -36,3 +37,11 @@ class TestUser(TestCase):
             role=PRP_ROLE_TYPES.cluster_system_admin,
         )
         self.assertEqual(user.user_type, USER_TYPES.cluster_admin)
+
+    def test_save(self):
+        user = factories.PartnerUserFactory()
+        user.email = "normal@example.com"
+        user.save()
+
+        user.email = "NotNormal@example.com"
+        self.assertRaises(ValidationError, user.save)
