@@ -5,12 +5,12 @@ FROM unicef/etools-prp-base:latest
 ARG env
 ENV ENV ${env:-dev}
 
-# this is here as an interim step
-# need to move this to base image
+# these packages are required
 RUN apk add --no-cache --virtual --update \
     cairo-dev \
     pango-dev \
-    gdk-pixbuf
+    gdk-pixbuf \
+    font-bitstream-type1
 
 WORKDIR /etools/
 ADD Pipfile .
