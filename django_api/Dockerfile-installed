@@ -5,6 +5,13 @@ FROM unicef/etools-prp-base:latest
 ARG env
 ENV ENV ${env:-dev}
 
+# this is here as an interim step
+# need to move this to base image
+RUN apk add --no-cache --virtual --update \
+    cairo-dev \
+    pango-dev \
+    gdk-pixbuf
+
 WORKDIR /etools/
 ADD Pipfile .
 ADD Pipfile.lock .
