@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
@@ -105,6 +106,11 @@ class User(AbstractUser):
             content_subtype=content_subtype
         )
         return True
+
+    def save(self, *args, **kwargs):
+        if self.email != self.email.lower():
+            raise ValidationError("Email must be lowercase.")
+        super().save(*args, **kwargs)
 
 
 class UserProfile(TimeStampedModel):

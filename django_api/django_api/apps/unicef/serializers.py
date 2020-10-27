@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from account.validators import EmailValidator
 from core.common import CURRENCIES, INTERVENTION_TYPES, OVERALL_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
 from core.models import Location, Workspace
 from core.serializers import ShortLocationSerializer
@@ -22,6 +23,8 @@ from .models import (
 
 
 class PersonSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[EmailValidator()])
+
     class Meta:
         model = Person
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
@@ -633,7 +636,7 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
 
 
 class PMPPDPersonSerializer(serializers.ModelSerializer):
-
+    email = serializers.EmailField(validators=[EmailValidator()])
     phone_num = serializers.CharField(
         source='phone_number',
         required=False,

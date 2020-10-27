@@ -71,7 +71,6 @@ class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
         token_url = reverse('user-passwordless-token')
 
         response = self.client.post(token_url, data={'email': self.user.email})
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Test that email auth token email has been sent.
@@ -247,3 +246,29 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(reverse('users') + '?portal=CLUSTER')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create(self):
+        self.client.force_authenticate(self.user)
+        data = {
+            "first_name": "Not",
+            "last_name": "Normal",
+            "email": "NotNormal@example.com",
+        }
+        user_qs = User.objects.filter(email=data["email"])
+        self.assertFalse(user_qs.exists())
+        response = self.client.post(
+            reverse("users") + "?portal=IP",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(user_qs.exists())
+
+        data["email"] = "normal@example.com"
+        user_qs = User.objects.filter(email=data["email"])
+        self.assertFalse(user_qs.exists())
+        response = self.client.post(
+            reverse("users") + "?portal=IP",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(user_qs.exists())
