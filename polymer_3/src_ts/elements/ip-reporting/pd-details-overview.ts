@@ -109,6 +109,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         url="[[programmeDocumentsUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="programmeDocumentDetail"
+        url="[[programmeDocumentDetailUrl]]">
+    </etools-prp-ajax>
+
     <page-body>
       <etools-content-panel panel-title="[[localize('partnership_info')]]">
         <etools-loading active="[[!loaded]]"></etools-loading>
@@ -287,7 +292,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
+  @property({type: Object})
   pd = {};
 
   @property({type: Object})
@@ -318,10 +323,18 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
   programmeDocumentsUrl!: string;
 
+  @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
+  programmeDocumentDetailUrl!: string;
+
   @property({type: Object, computed: 'getReduxStateObject(rootState.programmeDocumentReports.countByPD)'})
   pdReportsCount!: GenericObject;
 
   private _debouncer!: Debouncer;
+  private _pdDetailDebouncer!: Debouncer;
+
+  public static get observers() {
+    return ['_getPdRecord(programmeDocumentDetailUrl)'];
+  }
 
   _computeFunds(num: number) {
     if (num === null || num === -1) {
@@ -351,6 +364,13 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
+  _computePdDetailsUrl(locationId: string, pdId: string) {
+    if (!locationId || !pdId) {
+      return;
+    }
+    return Endpoints.programmeDocumentDetail(locationId, pdId);
+  }
+
   _displayFullName(types: any[]) {
     if (!types) {
       return '';
@@ -361,6 +381,26 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         return this.amendmentTypes[type] ? this.amendmentTypes[type] : type;
       })
       .join(', ');
+  }
+
+  _getPdRecord() {
+    if (!this.programmeDocumentDetailUrl) {
+      return;
+    }
+    this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(100), () => {
+      const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
+
+      // Cancel the pending request, if any
+      (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).abort();
+
+      pdThunk()
+        .then((res: any) => {
+          this.pd = res.data;
+        })
+        .catch((err: GenericObject) => {
+          console.log(err);
+        });
+    });
   }
 
   _getPdReports() {
@@ -391,6 +431,16 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this.pdReportsCount && this.pdReportsCount.isActive()) {
+      this.pdReportsCount.cancel();
+    }
+    if (this._pdDetailDebouncer && this._pdDetailDebouncer.isActive()) {
+      this._pdDetailDebouncer.cancel();
+    }
   }
 }
 
