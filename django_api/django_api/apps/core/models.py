@@ -428,7 +428,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         given PA could be custom or not and hence eithe CA or CO could be null
         on it.
         """
-        from indicator.models import Reportable, IndicatorReport
+        from indicator.models import IndicatorReport, Reportable
         reportables = Reportable.objects.filter(
             Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__in=clusters) |
             Q(partner_activity_project_contexts__activity__cluster_objective__cluster__in=clusters))

@@ -32,7 +32,6 @@ from indicator.models import (
     IndicatorReport,
     Reportable,
     ReportableLocationGoal,
-    ReportingEntity,
 )
 from indicator.tasks import process_due_reports
 from partner.models import Partner, PartnerActivity, PartnerProject
