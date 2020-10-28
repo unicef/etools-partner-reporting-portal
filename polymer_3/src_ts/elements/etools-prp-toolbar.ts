@@ -62,7 +62,7 @@ class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_identity(_reportId)', notify: true})
   reportId!: string;
 
-  @property({type: String})
+  @property({type: String, notify: true})
   query!: string;
 
   @property({type: Object})
