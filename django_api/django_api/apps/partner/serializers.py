@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from django.db import transaction
 
 from cluster.models import Cluster, ClusterActivity, ClusterObjective
@@ -82,7 +83,9 @@ class PartnerActivityProjectContextDetailUpdateSerializer(PartnerActivityProject
         project = PartnerProject.objects.filter(pk=data["project"]["id"]).first()
         if not project:
             raise serializers.ValidationError({
-                'project_id': 'PartnerProject ID {} does not exist.'.format(pk)
+                'project_id': 'PartnerProject ID {} does not exist.'.format(
+                    project.pk,
+                )
             })
         # else:
         #     if not project.partner_id == self.instance.partner.pk:

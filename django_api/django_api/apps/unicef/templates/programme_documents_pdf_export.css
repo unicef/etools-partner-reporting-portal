@@ -1,0 +1,39 @@
+{% extends "custom_pdf_base.css" %}
+{% load pdf_extras %}
+
+{% block extra_style %}
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            margin: 1cm;
+        }
+
+        #pdf {
+            font-size: 10px;
+        }
+
+        h1 {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+        }
+
+        td, th {
+            padding-top: 10px;
+        }
+
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: left;
+        }
+    </style>
+{% endblock %}

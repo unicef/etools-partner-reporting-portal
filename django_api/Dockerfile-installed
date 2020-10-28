@@ -5,6 +5,13 @@ FROM unicef/etools-prp-base:latest
 ARG env
 ENV ENV ${env:-dev}
 
+# these packages are required
+RUN apk add --no-cache --virtual --update \
+    cairo-dev \
+    pango-dev \
+    gdk-pixbuf \
+    ttf-opensans
+
 WORKDIR /etools/
 ADD Pipfile .
 ADD Pipfile.lock .

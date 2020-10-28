@@ -1,6 +1,5 @@
 import csv
 import datetime
-import io
 import os
 import random
 import tempfile
@@ -12,7 +11,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.urls import reverse
 
-import xlrd
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -26,20 +24,22 @@ from core.tests import factories
 from core.tests.base import BaseAPITestCase
 from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from openpyxl import load_workbook
 from rest_framework import status
 from unicef.models import ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
 
 
 def convert_xlsx_to_csv(response):
-    download_file = io.BytesIO(response.content)
-    xlsx_file = xlrd.open_workbook(file_contents=download_file.read())
-    xlsx_sheet = xlsx_file.sheet_by_index(0)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+        tmp.write(response.content)
+    xlsx_file = load_workbook(tmp.name)
+    xlsx_sheet = xlsx_file[xlsx_file.sheetnames[0]]
     csv_filename = tempfile.NamedTemporaryFile()
     with open(csv_filename.name, "w") as csv_file:
         wr = csv.writer(csv_file)
-        for rownum in range(xlsx_sheet.nrows):
-            wr.writerow(xlsx_sheet.row_values(rownum))
+        for row in xlsx_sheet.values:
+            wr.writerow(row)
     return csv_filename
 
 
@@ -311,6 +311,14 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         for result in response.data['results']:
             self.assertEquals(result['title'], document['title'])
+
+    def test_list_api_export_pdf(self):
+        url = reverse(
+            'programme-document',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "pdf"})
+
+        self.assertTrue(status.is_success(response.status_code))
 
 
 class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
@@ -982,6 +990,51 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
+    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_pdf(self, mock_create, mock_clean, mock_send):
+        # ensure at least one report has status submitted
+        report = self.queryset.first()
+        report.status = PROGRESS_REPORT_STATUS.submitted
+        report.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "pdf"})
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.submitted
+        )
+        self.assertTrue(len(self.reports))
+
+    def test_detail_api_export_pdf(self):
+        progress_report = self.pd.progress_reports.first()
+        IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, data={"export": "pdf"})
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+    def test_report_annex_c_export(self):
+        progress_report = self.pd.progress_reports.first()
+        IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-pdf',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
 
@@ -1444,7 +1497,6 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        response_length = len(response.content)
 
         # add reportable that should not be part of export
         self._setup_reportable(report_status="Due")
@@ -1452,4 +1504,3 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.content), response_length)

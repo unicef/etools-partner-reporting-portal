@@ -31,6 +31,7 @@ from indicator.models import Reportable  # IndicatorReport
 from model_utils.models import TimeStampedModel
 from model_utils.tracker import FieldTracker
 from requests.compat import urljoin
+from rest_framework.exceptions import ValidationError
 from utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,11 @@ class Person(TimeStampedExternalSyncModelMixin):
             email=self.email,
             prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
+
+    def save(self, *args, **kwargs):
+        if self.email != self.email.lower():
+            raise ValidationError("Email must be lowercase.")
+        super().save(*args, **kwargs)
 
 
 class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
@@ -520,7 +526,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             )
 
         # update pr url link to point to pmp, not prp
-        part_pr_url = f'/pmp/reportings/{instance.id}/progress'
+        part_pr_url = f'/pmp/reports/{instance.id}/progress'
         pr_url = urljoin(settings.FRONTEND_PMP_HOST, part_pr_url)
         template_data["pr_url"] = pr_url
 

@@ -6,14 +6,13 @@ import tempfile
 from django.http import HttpResponse
 from django.utils import timezone
 
-from easy_pdf.exceptions import PDFRenderingError
-from easy_pdf.rendering import make_response, render_to_pdf
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.styles.numbers import FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader, PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.templatetags.pdf_extras import format_currency
+from unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +115,7 @@ class ProgrammeDocumentsXLSXExporter:
 
         self.workbook.save(self.file_path)
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         self.fill_worksheet()
         response = HttpResponse()
         response.content_type = self.worksheet.mime_type
@@ -132,7 +131,7 @@ class ProgrammeDocumentsXLSXExporter:
 
 class ProgrammeDocumentsPDFExporter:
 
-    template_name = 'programme_documents_pdf_export.html'
+    template_name = 'programme_documents_pdf_export'
 
     def __init__(self, programme_documents, request=None):
         self.programme_documents = programme_documents
@@ -213,12 +212,14 @@ class ProgrammeDocumentsPDFExporter:
 
         return context
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         try:
-            pdf = render_to_pdf(self.template_name, self.get_context())
-            response = make_response(pdf)
-            response['Content-disposition'] = 'inline; filename="{}"'.format(self.file_name)
+            response = render_pdf_to_response(
+                request,
+                self.template_name,
+                self.get_context(),
+            )
             return response
-        except PDFRenderingError:
-            logger.exception('Error trying to render PDF')
+        except Exception as exc:
+            logger.exception(exc)
             return HttpResponse('Error trying to render PDF')

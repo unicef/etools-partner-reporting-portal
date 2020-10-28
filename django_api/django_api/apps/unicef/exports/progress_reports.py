@@ -3,11 +3,10 @@ import logging
 from django.http import HttpResponse
 from django.utils import timezone
 
-from easy_pdf.exceptions import PDFRenderingError
-from easy_pdf.rendering import make_response, render_to_pdf
 from indicator.models import IndicatorBlueprint
 from indicator.utilities import format_total_value_to_string
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output, HTMLTableCell, HTMLTableHeader
+from unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 # TODO: Profiling + optimize, currently takes upwards of 10s to generate the export
 class ProgressReportDetailPDFExporter:
 
-    template_name = 'progress_report_detail_pdf_export.html'
+    template_name = 'progress_report_detail_pdf_export'
 
     def __init__(self, progress_report):
         self.progress_report = progress_report
@@ -131,21 +130,23 @@ class ProgressReportDetailPDFExporter:
 
         return context
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         try:
-            pdf = render_to_pdf(self.template_name, self.get_context())
-            response = make_response(pdf)
-            response['Content-disposition'] = 'inline; filename="{}"'.format(self.file_name)
+            response = render_pdf_to_response(
+                request,
+                self.template_name,
+                self.get_context(),
+            )
             return response
-        except PDFRenderingError:
+        except Exception as exc:
             error_message = 'Error trying to render PDF'
-            logger.exception(error_message)
+            logger.exception(exc)
             return HttpResponse(error_message)
 
 
 class ProgressReportListPDFExporter(ProgressReportDetailPDFExporter):
 
-    template_name = 'progress_report_list_pdf_export.html'
+    template_name = 'progress_report_list_pdf_export'
 
     def __init__(self, progress_reports):
         self.progress_reports = progress_reports or []
