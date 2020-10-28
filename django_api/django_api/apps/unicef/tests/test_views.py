@@ -1005,8 +1005,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
         response = self.client.get(url, data={"export": "pdf"})
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        with open("/tmp/test.pdf", "wb") as fp:
-            fp.write(b"".join(response.streaming_content))
 
         self.reports = self.queryset.filter(
             status=PROGRESS_REPORT_STATUS.submitted
@@ -1024,8 +1022,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         response = self.client.get(url, data={"export": "pdf"})
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        with open("/tmp/test.pdf", "wb") as fp:
-            fp.write(b"".join(response.streaming_content))
 
     def test_report_annex_c_export(self):
         progress_report = self.pd.progress_reports.first()

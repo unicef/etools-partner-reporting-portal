@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual --update \
     cairo-dev \
     pango-dev \
     gdk-pixbuf \
-    font-bitstream-type1
+    font-noto
 
 WORKDIR /etools/
 ADD Pipfile .
