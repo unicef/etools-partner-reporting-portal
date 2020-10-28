@@ -23,7 +23,9 @@ from .models import (
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(validators=[EmailValidator()])
+    email = serializers.EmailField(validators=[EmailValidator(
+        queryset=Person.objects.all(),
+    )])
 
     class Meta:
         model = Person
