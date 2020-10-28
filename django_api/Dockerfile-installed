@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual --update \
     cairo-dev \
     pango-dev \
     gdk-pixbuf \
-    font-noto
+    ttf-opensans
 
 WORKDIR /etools/
 ADD Pipfile .
