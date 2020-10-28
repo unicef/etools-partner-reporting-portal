@@ -636,7 +636,9 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
 
 
 class PMPPDPersonSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(validators=[EmailValidator()])
+    email = serializers.EmailField(validators=[EmailValidator(
+        queryset=Person.objects.all(),
+    )])
     phone_num = serializers.CharField(
         source='phone_number',
         required=False,
