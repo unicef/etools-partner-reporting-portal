@@ -26,7 +26,7 @@ from indicator.disaggregators import QuantityIndicatorDisaggregator
 from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from openpyxl import load_workbook
 from rest_framework import status
-from unicef.models import ProgressReport, ProgressReportAttachment
+from unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from unicef_notification.models import Notification
 
 
@@ -319,6 +319,32 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         response = self.client.get(url, data={"export": "pdf"})
 
         self.assertTrue(status.is_success(response.status_code))
+
+    def test_sort(self):
+        for __ in range(10):
+            factories.ProgrammeDocumentFactory(
+                workspace=self.workspace,
+                partner=self.partner,
+            )
+
+        url = reverse(
+            'programme-document',
+            kwargs={'workspace_id': self.workspace.pk},
+        )
+
+        pd_qs = ProgrammeDocument.objects.all()
+        self.assertTrue(pd_qs.count() > 1)
+
+        pd = pd_qs.order_by("budget").first()
+        response = self.client.get(url, data={"sort": "budget"})
+        response_first = response.data["results"][0]
+        self.assertEqual(response_first["id"], str(pd.pk))
+
+        # attempt reverse
+        pd = pd_qs.order_by("-budget").first()
+        response = self.client.get(url, data={"sort": "budget.desc"})
+        response_first = response.data["results"][0]
+        self.assertEqual(response_first["id"], str(pd.pk))
 
 
 class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):

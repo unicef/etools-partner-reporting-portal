@@ -100,11 +100,32 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
         'xlsx': ProgrammeDocumentsXLSXExporter,
         'pdf': ProgrammeDocumentsPDFExporter,
     }
+    sortable_fields = [
+        'reference_number',
+        'end_date',
+        'start_date',
+        'status',
+        'cso_contribution',
+        'total_unicef_cash',
+        'in_kind_amount',
+        'budget',
+        'funds_received_to_date',
+    ]
 
     def get_queryset(self):
-        return ProgrammeDocument.objects.filter(
+        qs = ProgrammeDocument.objects.filter(
             partner=self.request.user.partner, workspace=self.kwargs['workspace_id']
         )
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in self.sortable_fields:
+                qs = qs.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    qs = qs.order_by('-%s' % order_field)
+
+        return qs
 
 
 class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
