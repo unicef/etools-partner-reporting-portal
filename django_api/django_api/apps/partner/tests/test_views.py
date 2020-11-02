@@ -763,6 +763,45 @@ class TestPartnerActivityUpdateAPIView(TestPartnerActivityBaseAPIView):
         self.partner_activity.refresh_from_db()
         self.assertEquals(self.partner_activity.projects.count(), 1)
 
+    def test_patch_existing(self):
+        context = factories.PartnerActivityProjectContextFactory(
+            project=self.project,
+            activity=self.partner_activity,
+            start_date=self.project.start_date + datetime.timedelta(days=2),
+            end_date=self.project.start_date + datetime.timedelta(days=12),
+        )
+        url = reverse(
+            'partner-activity-update',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'pk': self.partner_activity.pk,
+            }
+        )
+
+        self.assertEquals(self.partner_activity.projects.count(), 1)
+
+        start_date = context.start_date + datetime.timedelta(days=3)
+        response = self.client.patch(
+            url,
+            data={
+                "title": "New Title",
+                "projects": [
+                    {
+                        "project_id": self.project.pk,
+                        "start_date": start_date,
+                        "end_date": context.end_date,
+                        "status": "Ong",
+                    },
+                ],
+            },
+            format='json',
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.partner_activity.refresh_from_db()
+        self.assertEquals(self.partner_activity.projects.count(), 1)
+        context.refresh_from_db()
+        self.assertEquals(context.start_date, start_date)
+
 
 class TestCustomPartnerProjectAPIView(BaseAPITestCase):
     def setUp(self):
