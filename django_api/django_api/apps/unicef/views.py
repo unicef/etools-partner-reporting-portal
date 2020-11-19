@@ -353,6 +353,8 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
             'challenges_in_the_reporting_period': report.challenges_in_the_reporting_period,
             'proposed_way_forward': report.proposed_way_forward,
             'partner_contribution_to_date': report.partner_contribution_to_date,
+            'financial_contribution_to_date': report.financial_contribution_to_date,
+            'financial_contribution_currency': report.financial_contribution_currency,
             'submission_date': report.get_submission_date(),
             'authorized_officer': report.programme_document.unicef_officers.first(),
             'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all()),
@@ -597,7 +599,11 @@ class ProgressReportSubmitAPIView(APIView):
             # Check if PR other tab is fulfilled
             other_tab_errors = []
             if not progress_report.partner_contribution_to_date:
-                other_tab_errors.append("You have not completed Partner Contribution To Date field on Other Info tab.")
+                other_tab_errors.append("You have not completed Non-Financial Contribution To Date field on Other Info tab.")
+            if not progress_report.financial_contribution_to_date:
+                other_tab_errors.append("You have not completed Financial Contribution To Date field on Other Info tab.")
+            if not progress_report.financial_contribution_currency:
+                other_tab_errors.append("You have not completed Financial Contribution Currency field on Other Info tab.")
             if not progress_report.challenges_in_the_reporting_period:
                 other_tab_errors.append(
                     "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab."

@@ -282,6 +282,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',
@@ -344,6 +346,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'partner_org_id',
             'partner_org_name',
             'partner_vendor_number',
@@ -428,6 +432,16 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
     partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    financial_contribution_to_date = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+    )
+    financial_contribution_currency = serializers.ChoiceField(
+        choices=CURRENCIES,
+        allow_blank=True,
+        allow_null=True,
+    )
     challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
@@ -436,6 +450,8 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
         )
