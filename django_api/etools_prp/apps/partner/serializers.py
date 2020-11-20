@@ -369,6 +369,16 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             value = None
         return value
 
+    def validate_code(self, value):
+        # if value is not blank/None then make sure unique
+        if value:
+            project_qs = PartnerProject.objects.filter(code=value)
+            if self.instance:
+                project_qs = project_qs.exclude(pk=self.instance.pk)
+            if project_qs.exists():
+                raise serializers.ValidationError("Code needs to be unique.")
+        return value
+
     def validate(self, attrs):
         validated_data = super().validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))

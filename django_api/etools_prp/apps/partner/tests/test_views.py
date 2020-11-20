@@ -268,6 +268,41 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
+    def test_create_partner_project_code_validation(self):
+        # check uniqueness of code value if it has value
+        factories.PartnerProjectFactory(
+            partner=self.partner,
+            clusters=[self.cluster],
+            code="",
+        )
+        project_qs = PartnerProject.objects.filter(code="")
+        self.assertTrue(project_qs.exists())
+        base_count = project_qs.count()
+        url = reverse(
+            'partner-project-list',
+            kwargs={'response_plan_id': self.cluster.response_plan_id},
+        )
+
+        # test add another project with code blank
+        self.data["code"] = ""
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerProject.objects.get(pk=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(project_qs.count(), base_count + 1)
+
+        # test adding project with unique code
+        self.data["code"] = "c123"
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerProject.objects.get(pk=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+
+        # attempt to add again with duplicate code
+        response = self.client.post(url, data=self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Code needs to be unique.", response.data["code"])
+
     def test_create_partner_project_no_status(self):
         self.data.pop("status")
         url = reverse(
