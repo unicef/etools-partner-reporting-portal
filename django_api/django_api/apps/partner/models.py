@@ -219,7 +219,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
         partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    code = models.TextField(null=True, blank=True, unique=True, verbose_name='Project code in HRP')
+    code = models.TextField(null=True, blank=True, verbose_name='Project code in HRP')
     type = models.CharField(
         max_length=3,
         choices=RESPONSE_PLAN_TYPE,
