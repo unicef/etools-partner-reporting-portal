@@ -4,8 +4,6 @@ import {GenericObject} from '../../typings/globals.types';
 
 const keys = [
   'partner_contribution_to_date',
-  'financial_contribution_to_date',
-  'financial_contribution_currency',
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
   'narrative',

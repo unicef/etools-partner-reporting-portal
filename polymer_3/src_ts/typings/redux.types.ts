@@ -22,7 +22,6 @@ import {ClusterDashboardDataState} from '../redux/reducers/clusterDashboardData'
 import {ClusterObjectivesState} from '../redux/reducers/clusterObjectives';
 import {ClusterDisaggregationsState} from '../redux/reducers/clusterDisaggregations';
 import {ClusterIndicatorReportsState} from '../redux/reducers/clusterIndicatorReports';
-import {CurrenciesDataState} from '../redux/reducers/currencies';
 
 export interface RootState {
   localize: LocaLizeState;
@@ -49,5 +48,4 @@ export interface RootState {
   userProfile: UserProfileState;
   analysis: AnalysisState;
   config: ConfigState;
-  currencies: CurrenciesDataState;
 }
