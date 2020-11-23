@@ -96,6 +96,19 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
         etools-dropdown {
           --app-grid-gutter: 0px;
         }
+
+        etools-dropdown[readonly],
+        etools-currency-amount-input[readonly] {
+          --paper-input-container-underline: {
+            display: none;
+          }
+          --paper-input-container-underline-focus: {
+            display: none;
+          }
+          --paper-input-container-underline-disabled: {
+            display: none;
+          }
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -140,7 +153,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   type="number"
                   value="{{data.financial_contribution_to_date}}"
                   placeholder="&#8212;"
-                  disabled="[[_equals(computedMode, 'view')]]"
+                  readonly="[[_equals(computedMode, 'view')]]"
                   no-label-float
                 >
                 </etools-currency-amount-input>
@@ -153,7 +166,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   option-value="value"
                   option-label="label"
                   selected="[[data.financial_contribution_currency]]"
-                  disabled="[[_equals(computedMode, 'view')]]"
+                  readonly="[[_equals(computedMode, 'view')]]"
                   required="[[_hasCurrencyAmmount(data.financial_contribution_to_date)]]"
                   no-dynamic-align
                 >
