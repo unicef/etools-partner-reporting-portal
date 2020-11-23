@@ -3,7 +3,6 @@ from django.conf.urls import url
 from .views import (
     ChildrenLocationAPIView,
     ConfigurationAPIView,
-    CurrenciesView,
     LocationListAPIView,
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
@@ -23,5 +22,4 @@ urlpatterns = [
         LocationListAPIView.as_view(), name="location"),
     url(r'^(?P<location_id>\d+)/children-location/$',
         ChildrenLocationAPIView.as_view(), name="children-location"),
-    url(r'^currencies/$', CurrenciesView.as_view(), name="currencies"),
 ]

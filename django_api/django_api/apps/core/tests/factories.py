@@ -1272,8 +1272,6 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     end_date = factory.LazyFunction(faker.date)
     due_date = factory.LazyFunction(faker.date)
     partner_contribution_to_date = factory.LazyFunction(faker.text)
-    financial_contribution_to_date = factory.LazyFunction(faker.text)
-    financial_contribution_currency = factory.LazyFunction(faker.currency_code)
     challenges_in_the_reporting_period = factory.LazyFunction(faker.text)
     proposed_way_forward = factory.LazyFunction(faker.text)
     review_date = due_date
