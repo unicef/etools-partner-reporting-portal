@@ -257,6 +257,10 @@ const Endpoints = {
     return this._buildUrl('/account/user-profile/');
   },
 
+  currencies() {
+    return this._buildUrl('/core/currencies/');
+  },
+
   progressReportAttachments(locationId: string, reportId: string) {
     return this.progressReports(locationId) + reportId + '/attachments/';
   },

@@ -2,6 +2,8 @@ import {ReduxConnectedElement} from '../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-currency-amount-input/etools-currency-amount-input';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../labelled-item';
@@ -22,7 +24,6 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
-import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
  * @polymer
@@ -72,6 +73,42 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
         .value {
           font-size: 16px;
         }
+
+        .currency-row {
+          display: flex;
+          align-items: flex-end;
+          margin-bottom: 10px;
+          margin-top: -20px;
+          flex-wrap: wrap;
+        }
+        .currency-ammount {
+          width: 242px;
+          margin-right: 40px;
+          margin-top: 20px;
+        }
+        .item-label {
+          font-size: 12px;
+          color: #737373;
+          display: block;
+          @apply --truncate;
+          margin-bottom: 0px;
+        }
+        etools-dropdown {
+          --app-grid-gutter: 0px;
+        }
+
+        etools-dropdown[readonly],
+        etools-currency-amount-input[readonly] {
+          --paper-input-container-underline: {
+            display: none;
+          }
+          --paper-input-container-underline-focus: {
+            display: none;
+          }
+          --paper-input-container-underline-disabled: {
+            display: none;
+          }
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -88,7 +125,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
       <etools-content-panel panel-title="Other info" no-header="[[noHeader]]">
         <div class="app-grid">
           <div class="row">
-            <labelled-item label="[[localize('partner_contribution')]]">
+            <labelled-item label="[[localize('non_financial_contribution_during_reporting_period')]]">
               <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
                 <span class="value">[[_withDefault(data.partner_contribution_to_date)]]</span>
               </template>
@@ -104,6 +141,38 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                 </paper-input>
               </template>
             </labelled-item>
+          </div>
+
+          <div class="row">
+            <span class="item-label">[[localize('financial_contribution_during_reporting_period')]]</span>
+            <div class="currency-row">
+              <div class="currency-ammount">
+                <etools-currency-amount-input
+                  id="financial_contribution_to_date"
+                  class="w100"
+                  type="number"
+                  value="{{data.financial_contribution_to_date}}"
+                  placeholder="&#8212;"
+                  readonly="[[_equals(computedMode, 'view')]]"
+                  no-label-float
+                >
+                </etools-currency-amount-input>
+              </div>
+              <div class="currency">
+                <etools-dropdown
+                  id="financial_contribution_currency"
+                  class="item validate full-width"
+                  options="[[currencies]]"
+                  option-value="value"
+                  option-label="label"
+                  selected="[[data.financial_contribution_currency]]"
+                  readonly="[[_equals(computedMode, 'view')]]"
+                  required="[[_hasCurrencyAmmount(data.financial_contribution_to_date)]]"
+                  no-dynamic-align
+                >
+                </etools-dropdown>
+              </div>
+            </div>
           </div>
 
           <div class="row">
@@ -181,6 +250,9 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
   reportId!: string;
 
+  @property({type: Array, computed: 'getReduxStateArray(rootState.currencies)'})
+  currencies!: any[];
+
   @property({type: String, computed: '_computeUpdateUrl(locationId, reportId)'})
   updateUrl!: string;
 
@@ -210,12 +282,26 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     return programmeDocumentReportsCurrent(rootState);
   }
 
-  _handleInput() {
-    const textInputs = this.shadowRoot!.querySelectorAll('paper-input');
+  _hasCurrencyAmmount(currencyAmmount: number) {
+    return currencyAmmount && currencyAmmount > 0;
+  }
 
-    textInputs.forEach((input: PaperInputElement) => {
-      if (input.value && input.value.trim()) {
-        this.set(['localData', input.id], input.value.trim());
+  _handleInput() {
+    if (!this._fieldsAreValid()) {
+      return;
+    }
+
+    const textInputs = this.shadowRoot!.querySelectorAll('paper-input, etools-currency-amount-input');
+    const dropDowns = this.shadowRoot!.querySelectorAll('etools-dropdown');
+
+    textInputs.forEach((input: any) => {
+      if (input.value && String(input.value).trim()) {
+        this.set(['localData', input.id], String(input.value).trim());
+      }
+    });
+    dropDowns.forEach((dropDown: any) => {
+      if (dropDown.selectedItem && dropDown.selectedItem[dropDown.optionValue]) {
+        this.set(['localData', dropDown.id], dropDown.selectedItem[dropDown.optionValue]);
       }
     });
   }
@@ -238,7 +324,8 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
           this._notifyChangesSaved();
         })
         // @ts-ignore
-        .catch(function (err) {
+        .catch((err) => {
+          this._notifyErrorMessage({text: this.localize('an_error_occurred')});
           console.log(err);
         });
     });
