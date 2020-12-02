@@ -596,6 +596,7 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'report_type', 'programme_document')
         )
+        ordering = ("-end_date", )
 
 
 class PDResultLink(TimeStampedExternalBusinessAreaModel):
