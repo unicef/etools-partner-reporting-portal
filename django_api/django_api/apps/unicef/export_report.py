@@ -315,15 +315,21 @@ class ProgressReportXLSXExporter:
         self.sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
         # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
-        # Partner contribution to date
+        # Non-Financial contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=9, end_row=start_row_id - 1, end_column=9)
-        # Challenges/bottlenecks in the reporting period
+        # Financial contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=11, end_row=start_row_id - 1, end_column=11)
-        # Proposed way forward
+        # Financial contribution currency
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=12, end_row=start_row_id - 1, end_column=12)
+        # Challenges/bottlenecks in the reporting period
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=13, end_row=start_row_id - 1, end_column=13)
+        # Proposed way forward
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=14, end_row=start_row_id - 1, end_column=14)
 
         return True
 
