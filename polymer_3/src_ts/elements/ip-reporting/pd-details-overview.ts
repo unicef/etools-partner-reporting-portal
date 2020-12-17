@@ -292,8 +292,8 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
-  @property({type: Object})
-  pd = {};
+  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
+  pd: GenericObject = {};
 
   @property({type: Object})
   amendmentTypes: GenericObject = {
@@ -357,6 +357,9 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   }
 
   _computeReportingRequirements(reportingPeriods: any) {
+    if (!reportingPeriods) {
+      return;
+    }
     return computeReportingRequirements(reportingPeriods, Settings.dateFormat);
   }
 
