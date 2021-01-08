@@ -77,7 +77,7 @@
     ]
   },
   "globals": {
-    "moment": true,
+    "dayjs": true,
     "ShadyCSS": true,
     "Etools": true
   }

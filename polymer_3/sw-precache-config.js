@@ -5,7 +5,8 @@ module.exports = {
     'src/**/*',
     'images/**/*',
     'node_modules/numeral/min/numeral.min.js',
-    'node_modules/moment/min/moment.min.js',
+    "node_modules/dayjs/dayjs.min.js",
+    "node_modules/dayjs/plugin/utc.js",
     'node_modules/web-animations-js/web-animations-next-lite.min.js',
     'node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js'
   ],

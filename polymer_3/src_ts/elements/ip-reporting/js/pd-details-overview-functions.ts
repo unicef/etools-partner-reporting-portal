@@ -1,5 +1,5 @@
 import {GenericObject} from '../../../typings/globals.types';
-declare const moment: any;
+declare const dayjs: any;
 
 export function computeLoaded(pd: GenericObject) {
   return !!pd.id;
@@ -24,8 +24,8 @@ export function computeReportingRequirements(reportingPeriods: any[], dateFormat
 
   Object.keys(byType).forEach(function (type) {
     byType[type].sort(function (a: any, b: any) {
-      const dateA = moment(a.start_date, dateFormat).toDate();
-      const dateB = moment(b.start_date, dateFormat).toDate();
+      const dateA = dayjs(a.start_date, dateFormat).toDate();
+      const dateB = dayjs(b.start_date, dateFormat).toDate();
 
       return dateA - dateB;
     });

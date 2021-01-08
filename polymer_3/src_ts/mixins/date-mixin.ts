@@ -1,6 +1,6 @@
 import {PolymerElement} from '@polymer/polymer';
 import {Constructor} from '../typings/globals.types';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -15,9 +15,9 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       if (typeof dateString === 'string' && dateString !== '') {
         const date = this.getUTCDate(dateString);
         if (date.toString() !== 'Invalid Date') {
-          // using moment.utc() ensures that the date will not be changed
+          // using dayjs.utc() ensures that the date will not be changed
           // no matter timezone the user has set
-          return moment.utc(date).format(format);
+          return dayjs.utc(date).format(format);
         }
       }
       return '';
@@ -63,8 +63,8 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
         const firstDate = this.getUTCDate(firstDateString);
         const secondDate = this.getUTCDate(secondDateString);
         if (firstDate.toString() !== 'Invalid Date' && secondDate.toString() !== 'Invalid Date') {
-          const mFirstDate = moment.utc(firstDate);
-          const mSecondDate = moment.utc(secondDate);
+          const mFirstDate = dayjs.utc(firstDate);
+          const mSecondDate = dayjs.utc(secondDate);
           return mSecondDate.diff(mFirstDate, unit);
         }
       }
@@ -82,7 +82,7 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       } else if (d1.toString() === 'Invalid Date' && d2.toString() === 'Invalid Date') {
         return null;
       } else {
-        if (moment.utc(d1).isSameOrBefore(d2)) {
+        if (dayjs.utc(d1).isSameOrBefore(d2)) {
           return d2Str;
         } else {
           return d1Str;
@@ -91,7 +91,7 @@ function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
     }
 
     isFutureDate(dateStr: string) {
-      return moment.utc().isBefore(moment.utc(this.getUTCDate(dateStr)));
+      return dayjs.utc().isBefore(dayjs.utc(this.getUTCDate(dateStr)));
     }
 
     getUTCDate(dateStr: string) {
