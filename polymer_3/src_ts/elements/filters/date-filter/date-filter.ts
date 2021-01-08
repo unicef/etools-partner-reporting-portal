@@ -7,7 +7,7 @@ import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
 import Settings from '../../../settings';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -43,7 +43,7 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   format = Settings.dateFormat;
 
   _filterDateHasChanged(event: CustomEvent) {
-    const newValue = event.detail.date ? moment(event.detail.date).format(this.format) : '';
+    const newValue = event.detail.date ? dayjs(event.detail.date).format(this.format) : '';
     fireEvent(this, 'filter-changed', {
       name: this.name,
       value: newValue

@@ -2,7 +2,7 @@ import {PolymerElement} from '@polymer/polymer';
 import {Constructor, GenericObject} from '../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import Settings from '../settings';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -323,12 +323,12 @@ function UtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       // date can be in 2 formats: specific 'DD-MMM-YYYY' or the more general 'YYYY-MM-DD'
       // trying to convert using specific format first
 
-      const formattedDate = moment(date, Settings.dateFormat, true);
+      const formattedDate = dayjs(date, Settings.dateFormat, true);
       if (formattedDate.isValid()) {
         return formattedDate.startOf('day').toDate();
       }
 
-      return moment(date, Settings.datepickerFormat).startOf('day').toDate();
+      return dayjs(date, Settings.datepickerFormat).startOf('day').toDate();
     }
   }
   return UtilsClass;

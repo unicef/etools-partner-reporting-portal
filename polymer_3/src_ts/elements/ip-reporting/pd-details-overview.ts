@@ -326,7 +326,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.programmeDocumentReports.countByPD)'})
+  @property({
+    type: Object,
+    computed: 'getReduxStateObject(rootState.programmeDocumentReports.countByPD)',
+    observer: '_getPdReports'
+  })
   pdReportsCount!: GenericObject;
 
   private _debouncer!: Debouncer;
@@ -438,9 +442,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this.pdReportsCount && this.pdReportsCount.isActive()) {
-      this.pdReportsCount.cancel();
-    }
+
     if (this._pdDetailDebouncer && this._pdDetailDebouncer.isActive()) {
       this._pdDetailDebouncer.cancel();
     }
