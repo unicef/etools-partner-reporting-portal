@@ -123,8 +123,52 @@ jobs:
               echo "Not a followed branch not pushing latest"
             fi
 
+  build_and_deploy_fe:
+    working_directory: ~/code/polymer_3
+    # The primary container is an instance of the first list image listed. Your build commands run in this container.
+    docker:
+      - image: node:12.18.3
+    steps:
+      - checkout:
+          path: ~/code
+      - setup_remote_docker
+      - run:
+          name: Exporting revision number
+          command: |
+            REVNO=${CIRCLE_SHA1}
+            BUILDDATE=$(date -u +%F_%T)
+            sed -i "0,/revNo/s//$REVNO/" package.json
+            sed -i "0,/bDate/s//$BUILDDATE/" package.json
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+      - run:
+          name: Building the image
+          command: |
+            TAG=${CIRCLE_BRANCH}
+            docker build -t unicef/etools-prp-polymer:$TAG .
+      - run:
+          name: Pushing to Docker Hub
+          command: |
+            TAG=${CIRCLE_BRANCH}
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push unicef/etools-prp-polymer:$TAG
+
+
 workflows:
   version: 2
   all:
     jobs:
-      - setup
+      # - setup
+      - build_and_deploy_fe
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
+          #       - staging
+          #       - develop
