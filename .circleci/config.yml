@@ -151,7 +151,7 @@ jobs:
           name: Building the image
           command: |
             TAG=${CIRCLE_BRANCH}
-            docker build -t unicef/etools-prp-polymer:$TAG .
+            docker build -t unicef/etools-prp-polymer:$TAG -f Dockerfile-bundle .
       - run:
           name: Pushing to Docker Hub
           command: |
