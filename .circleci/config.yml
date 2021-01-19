@@ -163,11 +163,11 @@ workflows:
   version: 2
   all:
     jobs:
-      # - setup
-      - build_and_deploy_fe
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
-          #       - staging
-          #       - develop
+      - setup
+      - build_and_deploy_fe:
+          filters:
+            branches:
+              only:
+                - master
+                - staging
+                - develop
