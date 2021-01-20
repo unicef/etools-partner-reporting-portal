@@ -12,7 +12,6 @@ import './pd-details-doc-download';
 import '../page-body';
 import '../list-placeholder';
 import {tableStyles} from '../../styles/table-styles';
-import {pdFetch} from '../../redux/actions/pd';
 import UtilsMixin from '../../mixins/utils-mixin';
 import LocalizeMixin from '../../mixins/localize-mixin';
 
@@ -326,13 +325,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
 
-  @property({
-    type: Object,
-    computed: 'getReduxStateObject(rootState.programmeDocumentReports.countByPD)',
-    observer: '_getPdReports'
-  })
-  pdReportsCount!: GenericObject;
-
   private _debouncer!: Debouncer;
   private _pdDetailDebouncer!: Debouncer;
 
@@ -408,32 +400,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
           console.log(err);
         });
     });
-  }
-
-  _getPdReports() {
-    // Status being present prevents Redux / res.data from getting reports,
-    // preventing pd-details title from rendering. In that case (which we
-    // check by seeing if this.pdReportsCount is present), just get the reports again
-    if (this.pdReportsCount[this.pdId] === undefined) {
-      this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-        pdThunk.params = {
-          page: 1,
-          page_size: 10,
-          programme_document: this.pdId
-        };
-
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore
-          .dispatch(pdFetch(pdThunk.thunk()))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            //   // TODO: error handling
-          });
-      });
-    }
   }
 
   _currentProgrammeDocument(rootState: RootState) {
