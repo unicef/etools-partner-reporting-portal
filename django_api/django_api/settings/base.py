@@ -142,6 +142,7 @@ CORS_ORIGIN_WHITELIST = [
     'https://etools.unicef.org',
     'https://etools-demo.unicef.org',
     'https://etools-test.unicef.org',
+    'https://etools-test.unicef.io',
     'https://etools-staging.unicef.org',
     'https://etools-dev.unicef.org',
 ]
