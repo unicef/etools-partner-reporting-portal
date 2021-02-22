@@ -23,7 +23,7 @@ class ReportsList extends ReduxConnectedElement {
         :host {
           display: block;
 
-          --ecp-content: {
+          etools-content-panel::part(ecp-content) {
             min-height: 110px;
             padding: 1px 0 0;
           }

@@ -27,7 +27,7 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
         :host {
           display: block;
 
-          --ecp-content: {
+          etools-content-panel::part(ecp-content) {
             padding: 0;
           }
         }

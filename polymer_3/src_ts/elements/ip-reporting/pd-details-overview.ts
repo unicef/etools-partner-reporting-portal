@@ -90,12 +90,12 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         color: var(--paper-grey-600);
       }
 
-      .amendments {
-        --ecp-content-padding: 0px;
+      etools-content-panel.amendments::part(ecp-content) {
+        padding: 0px;
       }
 
-      .reporting-requirements {
-        --ecp-content-padding: 0px;
+      etools-content-panel.reporting-requirements::part(ecp-content) {
+        padding: 0px;
       }
 
       pd-details-reporting-requirements:not(:last-of-type) {

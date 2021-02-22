@@ -30,7 +30,7 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
           display: block;
           margin-bottom: 25px;
 
-          --ecp-content: {
+          etools-content-panel::part(ecp-content) {
             padding: 0;
           }
 

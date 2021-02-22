@@ -29,7 +29,7 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
         :host {
           display: block;
 
-          --ecp-content: {
+          etools-content-panel::part(ecp-content) {
             padding: 0;
           }
         }
@@ -71,18 +71,12 @@ class ConstrainedReportsList extends LocalizeMixin(RoutingMixin(ReduxConnectedEl
         <template is="dom-repeat" items="[[data]]">
           <etools-data-table-row no-collapse>
             <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                [[item.cluster.title]]
-              </div>
+              <div class="table-cell table-cell--text">[[item.cluster.title]]</div>
               <div class="table-cell table-cell--text" flex-2>
                 <a href="[[_getReportUrl(_baseUrlCluster, item.reportable.id, resultsQueryParams)]]">[[item.title]]</a>
               </div>
-              <div class="table-cell table-cell--text">
-                [[item.partner.title]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[item.submission_date]]
-              </div>
+              <div class="table-cell table-cell--text">[[item.partner.title]]</div>
+              <div class="table-cell table-cell--text">[[item.submission_date]]</div>
               <div class="table-cell" flex-2>
                 <etools-prp-progress-bar number="[[item.reportable.progress_percentage]]"> </etools-prp-progress-bar>
               </div>

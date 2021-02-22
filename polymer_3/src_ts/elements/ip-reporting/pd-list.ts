@@ -38,7 +38,7 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
         :host {
           display: block;
 
-          --ecp-content: {
+          etools-content-panel::part(ecp-content)
             padding: 0;
           }
         }
@@ -107,15 +107,9 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
                   <paper-tooltip>[[pd.title]]</paper-tooltip>
                 </a>
               </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(pd.status, '', localize)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(pd.start_date)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(pd.end_date)]]
-              </div>
+              <div class="table-cell table-cell--text">[[_withDefault(pd.status, '', localize)]]</div>
+              <div class="table-cell table-cell--text">[[_withDefault(pd.start_date)]]</div>
+              <div class="table-cell table-cell--text">[[_withDefault(pd.end_date)]]</div>
               <div class="table-cell table-cell--text">
                 <etools-prp-currency value="[[pd.cso_contribution]]" currency="[[pd.cso_contribution_currency]]">
                 </etools-prp-currency>
