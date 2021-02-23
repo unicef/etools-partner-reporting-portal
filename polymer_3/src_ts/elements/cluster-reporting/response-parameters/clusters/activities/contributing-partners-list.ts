@@ -50,10 +50,10 @@ class ContributingPartnersList extends LocalizeMixin(
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 5;
         --links-width: calc((100% / 5 * 3) - 30px);
+      }
 
-        etools-content-panel::part(ecp-content) {
-          padding: 0;
-        };
+      etools-content-panel::part(ecp-content) {
+        padding: 0;
       }
 
       .app-grid {

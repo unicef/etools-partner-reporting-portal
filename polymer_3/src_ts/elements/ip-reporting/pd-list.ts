@@ -37,12 +37,10 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
       <style include="data-table-styles">
         :host {
           display: block;
-
-          etools-content-panel::part(ecp-content)
-            padding: 0;
-          }
         }
-
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
+        }
         .cell-reports {
           text-align: right;
           text-transform: uppercase;

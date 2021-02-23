@@ -45,10 +45,9 @@ class ProgressReportsList extends LocalizeMixin(
       <style include="data-table-styles">
         :host {
           display: block;
-
-          etools-content-panel::part(ecp-content) {
-            padding: 0;
-          }
+        }
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
         }
       </style>
 

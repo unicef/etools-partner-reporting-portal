@@ -26,10 +26,10 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
       <style include="iron-flex iron-flex-alignment">
         :host {
           display: block;
+        }
 
-          etools-content-panel::part(ecp-content) {
-            padding: 0;
-          }
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
         }
 
         .loader {

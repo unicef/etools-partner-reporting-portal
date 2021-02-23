@@ -30,10 +30,6 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
           display: block;
           margin-bottom: 25px;
 
-          etools-content-panel::part(ecp-content) {
-            padding: 0;
-          }
-
           --etools-prp-progress-bar: {
             display: block;
             width: 120px;
@@ -43,6 +39,10 @@ class IndicatorBucket extends LocalizeMixin(ReduxConnectedElement) {
           --etools-prp-progress-bar-height: 14px;
 
           --paper-progress-container-color: var(--paper-grey-100);
+        }
+
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
         }
 
         .cluster-objective {
