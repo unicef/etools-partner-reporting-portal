@@ -1,26 +1,25 @@
 import Constants from '../../constants';
 
-
-const clusterActivitiesLoadingStart = function() {
+const clusterActivitiesLoadingStart = function () {
   return {
     type: Constants.CLUSTER_ACTIVITIES_LOADING_START
   };
 };
 
-const clusterActivitiesLoadingStop = function() {
+const clusterActivitiesLoadingStop = function () {
   return {
     type: Constants.CLUSTER_ACTIVITIES_LOADING_STOP
   };
 };
 
-export const setClusterActivitiesList = function(data: any) {
+export const setClusterActivitiesList = function (data: any) {
   return {
     type: Constants.SET_CLUSTER_ACTIVITIES_LIST,
     data: data
   };
 };
 
-const setClusterActivitiesCount = function(data: any) {
+const setClusterActivitiesCount = function (data: any) {
   return {
     type: Constants.SET_CLUSTER_ACTIVITIES_COUNT,
     count: data.count
@@ -28,14 +27,14 @@ const setClusterActivitiesCount = function(data: any) {
 };
 
 // App.Actions.ClusterActivities
-export const fetchClusterActivitiesList = function(thunk: any) {
-  return function(dispatch: any) {
+export const fetchClusterActivitiesList = function (thunk: any) {
+  return function (dispatch: any) {
     dispatch(clusterActivitiesLoadingStart());
     return thunk()
-      .catch(function() {
+      .catch(function () {
         dispatch(clusterActivitiesLoadingStop());
       })
-      .then(function(res: any) {
+      .then(function (res: any) {
         dispatch(setClusterActivitiesList(res.data));
         dispatch(setClusterActivitiesCount(res.data));
         dispatch(clusterActivitiesLoadingStop());
@@ -43,13 +42,13 @@ export const fetchClusterActivitiesList = function(thunk: any) {
   };
 };
 
-const clusterActivitiesPartnersSetLoadingStart = function() {
+const clusterActivitiesPartnersSetLoadingStart = function () {
   return {
     type: Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START
   };
 };
 
-export const clusterActivitiesPartnersSet = function(clusterActivityId: any, data: any) {
+export const clusterActivitiesPartnersSet = function (clusterActivityId: any, data: any) {
   return {
     type: Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID,
     clusterActivityId: clusterActivityId,
@@ -57,7 +56,7 @@ export const clusterActivitiesPartnersSet = function(clusterActivityId: any, dat
   };
 };
 
-export const clusterActivitiesPartnersSetCount = function(clusterActivityId: any, count: any) {
+export const clusterActivitiesPartnersSetCount = function (clusterActivityId: any, count: any) {
   return {
     type: Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT,
     clusterActivityId: clusterActivityId,
@@ -65,36 +64,31 @@ export const clusterActivitiesPartnersSetCount = function(clusterActivityId: any
   };
 };
 
-const clusterActivitiesPartnersSetLoadingStop = function() {
+const clusterActivitiesPartnersSetLoadingStop = function () {
   return {
     type: Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP
   };
 };
 
 // App.Actions.ClusterActivities.partners
-export const clusterActivitiesPartnersFetch = function(thunk: any, clusterId: any) {
-  return function(dispatch: any) {
+export const clusterActivitiesPartnersFetch = function (thunk: any, clusterId: any) {
+  return function (dispatch: any) {
     dispatch(clusterActivitiesPartnersSetLoadingStart());
-    return thunk()
-      .then(function(res: any) {
-        dispatch(clusterActivitiesPartnersSet(
-          clusterId, res.data.results
-        ));
-        dispatch(clusterActivitiesPartnersSetCount(
-          clusterId, res.data.count
-        ));
-        dispatch(clusterActivitiesPartnersSetLoadingStop());
-      });
+    return thunk().then(function (res: any) {
+      dispatch(clusterActivitiesPartnersSet(clusterId, res.data.results));
+      dispatch(clusterActivitiesPartnersSetCount(clusterId, res.data.count));
+      dispatch(clusterActivitiesPartnersSetLoadingStop());
+    });
   };
 };
 
-const clusterActivitiesIndicatorsSetLoadingStart = function() {
+const clusterActivitiesIndicatorsSetLoadingStart = function () {
   return {
     type: Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_START
   };
 };
 
-export const clusterActivitiesIndicatorsSetIndicators = function(clusterActivityId: string, data: any) {
+export const clusterActivitiesIndicatorsSetIndicators = function (clusterActivityId: string, data: any) {
   return {
     type: Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID,
     clusterActivityId: clusterActivityId,
@@ -102,7 +96,7 @@ export const clusterActivitiesIndicatorsSetIndicators = function(clusterActivity
   };
 };
 
-export const clusterActivitiesIndicatorsSetCount = function(clusterActivityId: string, count: number) {
+export const clusterActivitiesIndicatorsSetCount = function (clusterActivityId: string, count: number) {
   return {
     type: Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID_COUNT,
     clusterActivityId: clusterActivityId,
@@ -110,25 +104,20 @@ export const clusterActivitiesIndicatorsSetCount = function(clusterActivityId: s
   };
 };
 
-const clusterActivitiesIndicatorsSetLoadingStop = function() {
+const clusterActivitiesIndicatorsSetLoadingStop = function () {
   return {
     type: Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP
   };
 };
 
 // App.Actions.ClusterActivities.indicators = {
-export const clusterActivitiesIndicatorsFetch = function(thunk: any, clusterActivityId: string) {
-  return function(dispatch: any) {
+export const clusterActivitiesIndicatorsFetch = function (thunk: any, clusterActivityId: string) {
+  return function (dispatch: any) {
     dispatch(clusterActivitiesIndicatorsSetLoadingStart());
-    return thunk()
-      .then(function(res: any) {
-        dispatch(clusterActivitiesIndicatorsSetIndicators(
-          clusterActivityId, res.data.results
-        ));
-        dispatch(clusterActivitiesIndicatorsSetCount(
-          clusterActivityId, res.data.count
-        ));
-        dispatch(clusterActivitiesIndicatorsSetLoadingStop());
-      });
+    return thunk().then(function (res: any) {
+      dispatch(clusterActivitiesIndicatorsSetIndicators(clusterActivityId, res.data.results));
+      dispatch(clusterActivitiesIndicatorsSetCount(clusterActivityId, res.data.count));
+      dispatch(clusterActivitiesIndicatorsSetLoadingStop());
+    });
   };
 };

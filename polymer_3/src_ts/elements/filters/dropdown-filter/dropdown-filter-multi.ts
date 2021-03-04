@@ -4,7 +4,6 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
 
-
 /**
  * @polymer
  * @customElement
@@ -13,28 +12,29 @@ import {fireEvent} from '../../../utils/fire-custom-event';
 class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      etools-dropdown-multi {
-        width: 100%;
-      }
-    </style>
+        etools-dropdown-multi {
+          width: 100%;
+        }
+      </style>
 
-    <etools-dropdown-multi
-      label="[[label]]"
-      options="[[data]]"
-      option-value="id"
-      option-label="title"
-      selected-values="{{selectedValues}}"
-      trigger-value-change-event
-      on-etools-selected-items-changed="_handleChange"
-      hide-search="[[hideSearch]]"
-      disabled="[[disabled]]">
-    </etools-dropdown-multi>
-  `;
+      <etools-dropdown-multi
+        label="[[label]]"
+        options="[[data]]"
+        option-value="id"
+        option-label="title"
+        selected-values="{{selectedValues}}"
+        trigger-value-change-event
+        on-etools-selected-items-changed="_handleChange"
+        hide-search="[[hideSearch]]"
+        disabled="[[disabled]]"
+      >
+      </etools-dropdown-multi>
+    `;
   }
 
   @property({type: String})
@@ -53,13 +53,11 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
   selectedValues = [];
 
   public static get observers() {
-    return [
-      '_setSelectedValues(value, data)'
-    ];
+    return ['_setSelectedValues(value, data)'];
   }
 
   _handleChange(e: CustomEvent) {
-    if (e.detail.selectedItems) {
+    if (e.detail.selectedItems && this.data) {
       const newValue = e.detail.selectedItems.map((item: any) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
@@ -85,7 +83,6 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
       this.set('selectedValues', value.split(',').filter(Boolean));
     }
   }
-
 }
 
 window.customElements.define('dropdown-filter-multi', DropdownFilterMulti);

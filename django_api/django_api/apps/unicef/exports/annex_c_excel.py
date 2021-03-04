@@ -1,23 +1,20 @@
+import itertools
 import logging
+import os
 import random
 import tempfile
-
-import os
-
-import itertools
+import time
 
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, NamedStyle
-from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
-from openpyxl.utils import get_column_letter
-
-import time
 from django.utils import timezone
 
 from indicator.constants import ValueType
 from indicator.models import Disaggregation, IndicatorBlueprint
 from indicator.utilities import convert_string_number_to_float
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, NamedStyle
+from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
+from openpyxl.utils import get_column_letter
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.models import ProgressReport
 
@@ -43,7 +40,9 @@ class ProgressReportsXLSXExporter:
         'PD Report Status',
         'PD Report Due Date',
         'PD Report Submission Date',
-        'Partner contribution to date',
+        'Non-Financial contribution to date',
+        'Financial contribution to date',
+        'Financial contribution currency',
         'Funds received to date',
         'Challenges/bottlenecks in the reporting period',
         'Proposed way forward',
@@ -77,6 +76,7 @@ class ProgressReportsXLSXExporter:
             progress_reports,
             include_disaggregations=None,
             export_to_single_sheet=None,
+            request=None,
     ):
         self.progress_reports = progress_reports or list()
         filename = ''.join([
@@ -86,10 +86,11 @@ class ProgressReportsXLSXExporter:
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] Progress Report(s) Summary.xlsx'.format(
             timezone.now()
         )
+        self.request = request
 
         self.workbook = Workbook()
 
-        self.current_sheet = self.workbook.get_active_sheet()
+        self.current_sheet = self.workbook.active
         if include_disaggregations is not None:
             self.include_disaggregations = include_disaggregations
         if export_to_single_sheet is not None:
@@ -176,6 +177,8 @@ class ProgressReportsXLSXExporter:
             (progress_report.due_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
             (progress_report.submission_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
             (progress_report.partner_contribution_to_date, None),
+            (progress_report.financial_contribution_to_date, None),
+            (progress_report.financial_contribution_currency, None),
             (programme_document.funds_received_to_date, FORMAT_CURRENCY_USD),
             (progress_report.challenges_in_the_reporting_period, None),
             (progress_report.proposed_way_forward, None),
@@ -385,7 +388,7 @@ class ProgressReportsXLSXExporter:
     def cleanup(self):
         os.remove(self.file_path)
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         self.fill_workbook()
         response = HttpResponse()
         response.content_type = self.current_sheet.mime_type

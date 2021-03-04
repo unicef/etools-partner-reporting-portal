@@ -2,9 +2,9 @@ import logging
 
 from django.conf import settings
 from django.template.loader import get_template
+
 from post_office.models import EmailTemplate
 from unicef_notification.models import Notification
-
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +78,9 @@ def send_due_progress_report_email():
     UNICEF Authorized Officers and Focal Points about reports due in 1 week.
     """
     from datetime import date
-    from dateutil.relativedelta import relativedelta
+
     from core.common import PROGRESS_REPORT_STATUS
+    from dateutil.relativedelta import relativedelta
     from unicef.models import ProgressReport
 
     logger.info("Notifying IP due progress reports")

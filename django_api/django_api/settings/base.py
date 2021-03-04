@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+import datetime
 import os
 import sys
-
-import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
@@ -24,8 +23,8 @@ APPS_DIR = os.path.join(BASE_DIR, 'apps/')
 sys.path.append(APPS_DIR)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+SECRET_KEY = os.getenv('SECRET_KEY', '123')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -57,6 +56,11 @@ FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
     os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
 )
+FRONTEND_PMP_HOST = os.getenv(
+    'PRP_FRONTEND_PMP_HOST',
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
+)
+
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
 
@@ -107,11 +111,8 @@ INSTALLED_APPS = [
     'djcelery_email',
     'leaflet',
     'suit',
-    'easy_pdf',
     'django_cron',
-    'fixture_magic',
     'social_django',
-    'django_nose',
 
     'account',
     'cluster',
@@ -125,8 +126,7 @@ INSTALLED_APPS = [
     'unicef_notification',
 ]
 
-MIDDLEWARE_CLASSES = [
-    # 'elasticapm.contrib.django.middleware.TracingMiddleware',
+MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -134,17 +134,17 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').replace(' ', '').strip().split(',') or [
-    'etools.unicef.org',
-    'etools-demo.unicef.org',
-    'etools-test.unicef.org',
-    'etools-staging.unicef.org',
-    'etools-dev.unicef.org',
+CORS_ORIGIN_WHITELIST = [
+    'https://etools.unicef.org',
+    'https://etools-demo.unicef.org',
+    'https://etools-test.unicef.org',
+    'https://etools-test.unicef.io',
+    'https://etools-staging.unicef.org',
+    'https://etools-dev.unicef.org',
 ]
 
 ROOT_URLCONF = 'django_api.urls'
@@ -184,10 +184,10 @@ WSGI_APPLICATION = 'django_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': '%s' % os.getenv('POSTGRES_DB'),
-        'USER': '%s' % os.getenv('POSTGRES_USER'),
-        'PASSWORD': '%s' % os.getenv('POSTGRES_PASSWORD'),
-        'HOST': '%s' % os.getenv('POSTGRES_HOST'),
+        'NAME': os.getenv('POSTGRES_DB', 'unicef_prp'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
         'PORT': 5432,
     }
 }
@@ -422,12 +422,13 @@ SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_PASSWORD_RESET_POLICY = os.getenv('AZURE_B2C_PASS_RESET_POLICY', "B2C_1_PasswordResetPolicy")
 POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
 
-TENANT_ID = os.getenv('AZURE_B2C_TENANT', 'unicefpartners.onmicrosoft.com')
+TENANT_ID = os.getenv('AZURE_B2C_TENANT', 'unicefpartners')
 SCOPE = ['openid', 'email']
 IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/app"
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
@@ -495,12 +496,19 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
 )
 
-TEST_RUNNER = 'utils.test_runner.CustomNoseTestSuiteRunner'
-NOSE_ARGS = ['--with-timer', '--nocapture', '--nologcapture']
-
 # apm related - it's enough to set those as env variables, here just for documentation
 # by default logging and apm is off, so below envs needs to be set per environment
 
 # ELASTIC_APM_SERVICE_NAME=<app-name> # set app name visible on dashboard
 # ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
 # ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
+
+# raven (Sentry): https://github.com/getsentry/raven-python
+SENTRY_DSN = os.getenv('SENTRY_DSN', default=False)
+if SENTRY_DSN:
+    RAVEN_CONFIG = {
+        'dsn': SENTRY_DSN,  # noqa: F405
+    }
+    INSTALLED_APPS += (  # noqa: F405
+        'raven.contrib.django.raven_compat',
+    )

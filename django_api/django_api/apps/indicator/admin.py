@@ -1,13 +1,13 @@
 from django.contrib import admin
 
 from .models import (
-    IndicatorBlueprint,
-    Reportable,
-    ReportableLocationGoal,
-    IndicatorReport,
-    IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    IndicatorBlueprint,
+    IndicatorLocationData,
+    IndicatorReport,
+    Reportable,
+    ReportableLocationGoal,
     ReportingEntity,
 )
 

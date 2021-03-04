@@ -23,134 +23,149 @@ import {modalStyles} from '../../styles/modal-styles';
  * @appliesMixin RoutingMixin
  */
 class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    ${modalStyles}
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
-        --app-grid-columns: 3;
-        --app-grid-gutter: 15px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+      ${modalStyles}
+      <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
+          --app-grid-columns: 3;
+          --app-grid-gutter: 15px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 3;
 
-        --paper-dialog: {
-          width: 700px;
+          --paper-dialog: {
+            width: 700px;
+          }
         }
 
-      }
+        .full-width {
+          @apply --app-grid-expandible-item;
+        }
 
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
+        .header {
+          height: 48px;
+          padding: 0 24px;
+          margin: 0;
+          color: white;
+          background: var(--theme-primary-color, #0099ff);
+        }
 
-      .header {
-        height: 48px;
-        padding: 0 24px;
-        margin: 0;
-        color: white;
-        background: var(--theme-primary-color, #0099ff);
-      }
+        .header h2 {
+          @apply --paper-font-title;
+          margin: 0;
+          line-height: 48px;
+        }
 
-      .header h2 {
-        @apply --paper-font-title;
-        margin: 0;
-        line-height: 48px;
-      }
+        .header paper-icon-button {
+          margin: 0 -13px 0 20px;
+          color: white;
+        }
 
-      .header paper-icon-button {
-        margin: 0 -13px 0 20px;
-        color: white;
-      }
+        .clusters {
+          margin: 0;
+        }
 
-      .clusters {
-        margin: 0;
-      }
+        .clusters dt,
+        .clusters dd {
+          display: inline;
+          margin: 0;
+        }
 
-      .clusters dt,
-      .clusters dd {
-        display: inline;
-        margin: 0;
-      }
+        .clusters dd::after {
+          content: 'A';
+          white-space: pre;
+        }
 
-      .clusters dd::after {
-        content: "\A";
-        white-space: pre;
-      }
+        .caption {
+          @apply --paper-font-caption;
+          color: var(--secondary-text-color);
+        }
 
-      .caption {
-        @apply --paper-font-caption;
-        color: var(--secondary-text-color);
-      }
+        hr {
+          color: #737373;
+          margin-top: 5px;
+          opacity: 1;
+        }
+      </style>
 
-      hr {
-        color: #737373;
-        margin-top: 5px;
-        opacity: 1;
-      }
-    </style>
+      <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
+        <div class="header layout horizontal justified">
+          <h2>My Profile</h2>
 
-    <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
-      <div class="header layout horizontal justified">
-        <h2>My Profile</h2>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
+        </div>
 
-        <paper-icon-button
-          class="self-center"
-          on-tap="close"
-          icon="icons:close">
-        </paper-icon-button>
-      </div>
+        <paper-dialog-scrollable>
+          <iron-form class="app-grid">
+            <div class="full-width">
+              <paper-input
+                label="First Name"
+                value="{{profile.first_name}}"
+                placeholder="---"
+                readonly
+                always-float-label
+              ></paper-input>
+            </div>
 
-      <paper-dialog-scrollable>
-        <iron-form class="app-grid">
-          <div class="full-width">
-            <paper-input label="First Name" value="{{profile.first_name}}" placeholder="---" readonly
-                         always-float-label></paper-input>
-          </div>
+            <div class="full-width">
+              <paper-input
+                label="Last Name"
+                value="{{profile.last_name}}"
+                placeholder="---"
+                readonly
+                always-float-label
+              ></paper-input>
+            </div>
 
-          <div class="full-width">
-            <paper-input label="Last Name" value="{{profile.last_name}}" placeholder="---" readonly
-                         always-float-label></paper-input>
-          </div>
+            <div class="full-width">
+              <paper-input
+                label="Email"
+                value="{{profile.email}}"
+                placeholder="---"
+                always-float-label
+                readonly
+              ></paper-input>
+            </div>
 
-          <div class="full-width">
-            <paper-input label="Email" value="{{profile.email}}" placeholder="---" always-float-label
-                         readonly></paper-input>
-          </div>
-
-          <div class="full-width">
-            <div class="caption">My roles</div>
-              <template is="dom-repeat"
-                        items="[[prpRoles]]"
-                        as="role">
+            <div class="full-width">
+              <div class="caption">My roles</div>
+              <template is="dom-repeat" items="[[prpRoles]]" as="role">
                 <div>
                   [[ role ]]
                 </div>
               </template>
-            <hr>
-          </div>
-
-          <template is="dom-if" if="{{profile.partner}}">
-            <div class="full-width">
-              <paper-input label="Partner" value="{{profile.partner.title}}" placeholder="---" readonly
-                           always-float-label></paper-input>
+              <hr />
             </div>
-          </template>
 
-          <template is="dom-if" if="{{profile.organization}}">
-            <div class="full-width">
-              <paper-input label="My Organization" value="{{profile.organization}}" placeholder="---" readonly
-                           always-float-label></paper-input>
-            </div>
-          </template>
+            <template is="dom-if" if="{{profile.partner}}">
+              <div class="full-width">
+                <paper-input
+                  label="Partner"
+                  value="{{profile.partner.title}}"
+                  placeholder="---"
+                  readonly
+                  always-float-label
+                ></paper-input>
+              </div>
+            </template>
 
-        </iron-form>
-      </paper-dialog-scrollable>
-    </paper-dialog>
-  `;
+            <template is="dom-if" if="{{profile.organization}}">
+              <div class="full-width">
+                <paper-input
+                  label="My Organization"
+                  value="{{profile.organization}}"
+                  placeholder="---"
+                  readonly
+                  always-float-label
+                ></paper-input>
+              </div>
+            </template>
+          </iron-form>
+        </paper-dialog-scrollable>
+      </paper-dialog>
+    `;
   }
-
 
   @property({type: Boolean})
   opened = false;
@@ -158,13 +173,11 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
-
   @property({type: Array, computed: '_computePrpRoles(profile, portal)'})
   prpRoles!: any[];
 
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   portal!: string;
-
 
   close() {
     this.set('opened', false);
@@ -178,7 +191,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
     if (!profile) {
       return;
     }
-    return (profile.prp_roles || []).map(function(role: any) {
+    return (profile.prp_roles || []).map(function (role: any) {
       let result = '';
 
       if (role.cluster && portal === 'cluster-reporting') {
@@ -194,7 +207,6 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
       return result + role.role_display;
     });
   }
-
 }
 
 window.customElements.define('user-profile-dialog', UserProfileDialog);

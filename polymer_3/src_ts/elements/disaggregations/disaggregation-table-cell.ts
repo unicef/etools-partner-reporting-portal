@@ -13,39 +13,27 @@ import {GenericObject} from '../../typings/globals.types';
 class DisaggregationTableCell extends UtilsMixin(PolymerElement) {
   public static get template() {
     return html`
-        ${disaggregationTableStyles}
+      ${disaggregationTableStyles}
       <style>
         :host {
           display: block;
         }
-
       </style>
 
-      <template
-        is="dom-if"
-        if="[[editableBool]]">
+      <template is="dom-if" if="[[editableBool]]">
         <slot name="editable"></slot>
       </template>
 
-      <template
-        is="dom-if"
-        if="[[!editableBool]]">
+      <template is="dom-if" if="[[!editableBool]]">
         <span class="cellValue">
-          <template
-            is="dom-if"
-            if="[[noValue]]"
-            restamp="true">
+          <template is="dom-if" if="[[noValue]]" restamp="true">
             0
           </template>
-          <template
-            is="dom-if"
-            if="[[!noValue]]"
-            restamp="true">
+          <template is="dom-if" if="[[!noValue]]" restamp="true">
             <slot name="non-editable"></slot>
           </template>
         </span>
       </template>
-
     `;
   }
 
@@ -68,7 +56,6 @@ class DisaggregationTableCell extends UtilsMixin(PolymerElement) {
   _computeNoValue(data: GenericObject) {
     return data ? !data.c && !data.d && !data.v : true;
   }
-
 }
 
 window.customElements.define('disaggregation-table-cell', DisaggregationTableCell);

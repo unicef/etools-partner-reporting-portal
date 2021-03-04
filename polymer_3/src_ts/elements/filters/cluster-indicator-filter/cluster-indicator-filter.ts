@@ -18,24 +18,17 @@ import {GenericObject} from '../../../typings/globals.types';
 class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="indicatorNames"
-        url="[[indicatorNamesUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="indicatorNames" url="[[indicatorNamesUrl]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="[[localize('indicator')]]"
-        name="indicator"
-        value="[[value]]"
-        data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="[[localize('indicator')]]" name="indicator" value="[[value]]" data="[[data]]">
+      </searchable-dropdown-filter>
+    `;
   }
 
   @property({type: String, computed: '_computeIndicatorNamesUrl(responsePlanId)', observer: '_fetchIndicatorNames'})
@@ -54,7 +47,7 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
     if (!responsePlanId) {
       return;
     }
-    return Endpoints.clusterNames(responsePlanId);
+    return Endpoints.clusterIndicatorNames(responsePlanId);
   }
 
   _fetchIndicatorNames() {
@@ -62,16 +55,20 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
       return;
     }
 
-    const self = this;
     const thunk = (this.$.indicatorNames as EtoolsPrpAjaxEl).thunk();
     (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
 
     thunk()
-      .then(function(res: any) {
-        self.set('data', [{
-          id: '',
-          title: 'All'
-        }].concat(res.data || []));
+      .then((res: any) => {
+        this.set(
+          'data',
+          [
+            {
+              id: '',
+              title: 'All'
+            }
+          ].concat(res.data || [])
+        );
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -82,7 +79,6 @@ class ClusterIndicatorFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.disconnectedCallback();
     (this.$.indicatorNames as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('cluster-indicator-filter', ClusterIndicatorFilter);

@@ -10,7 +10,6 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../typings/globals.types';
 import {PlannedActionProjectsModalEl} from './creation-modal';
 
-
 /**
  * @polymer
  * @customElement
@@ -33,20 +32,11 @@ class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <etools-prp-permissions
-        permissions="{{ permissions }}">
-      </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{ permissions }}"> </etools-prp-permissions>
 
       <page-body>
-        <template is="dom-if"
-                  if="[[_canEdit(permissions, projectData)]]"
-                  restamp="true">
-          <planned-action-projects-modal
-            id="modal"
-            edit-data="[[projectData]]"
-            edit>
-          </planned-action-projects-modal>
-
+        <template is="dom-if" if="[[_canEdit(permissions, projectData)]]" restamp="true">
+          <planned-action-projects-modal id="modal" edit-data="[[projectData]]" edit> </planned-action-projects-modal>
 
           <div id="action">
             <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
@@ -54,9 +44,8 @@ class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
             </paper-button>
           </div>
         </template>
-        <project-details-display project-data=[[projectData]]></project-details-display>
+        <project-details-display project-data="[[projectData]]"></project-details-display>
       </page-body>
-
     `;
   }
 
@@ -70,15 +59,12 @@ class PaProjectDetailsOverview extends LocalizeMixin(ReduxConnectedElement) {
     if (!permissions || !projectData) {
       return;
     }
-    return projectData.clusters ?
-      permissions.editPartnerEntities(projectData.clusters) :
-      false;
+    return projectData.clusters ? permissions.editPartnerEntities(projectData.clusters) : false;
   }
 
   _openModal() {
     (this.shadowRoot!.querySelector('#modal') as PlannedActionProjectsModalEl).open();
   }
-
 }
 
 window.customElements.define('pa-project-details-overview', PaProjectDetailsOverview);

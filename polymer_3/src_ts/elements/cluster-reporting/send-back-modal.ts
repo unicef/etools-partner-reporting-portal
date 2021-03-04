@@ -27,104 +27,91 @@ import {fireEvent} from '../../utils/fire-custom-event';
  * @appliesMixin ModalMixin
  */
 class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
-
   public static get template() {
     return html`
-    ${buttonsStyles} ${modalStyles}
-    <style include="iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${modalStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
 
-        --paper-dialog: {
-          width: 600px;
+          --paper-dialog: {
+            width: 600px;
+          }
         }
-      }
 
-      h3 {
-        @apply --paper-font-body2;
-      }
+        h3 {
+          @apply --paper-font-body2;
+        }
 
-      dl {
-        font-size: 12px;
-        color: var(--paper-grey-600);
-      }
+        dl {
+          font-size: 12px;
+          color: var(--paper-grey-600);
+        }
 
-      dt, dd {
-        display: inline;
-        margin: 0;
-      }
+        dt,
+        dd {
+          display: inline;
+          margin: 0;
+        }
 
-      dd::after {
-        content: '\A';
-	      white-space: pre;
-      }
-    </style>
+        dd::after {
+          content: 'A';
+          white-space: pre;
+        }
+      </style>
 
-    <etools-prp-ajax
+      <etools-prp-ajax
         id="sendBack"
         url="[[sendBackUrl]]"
         method="post"
         body="[[data]]"
-        content-type="application/json">
-    </etools-prp-ajax>
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-    <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
+      <paper-dialog id="dialog" modal opened="{{opened}}">
+        <div class="header layout horizontal justified">
+          <h2>Send back report</h2>
 
-      <div class="header layout horizontal justified">
-        <h2>Send back report</h2>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
+        </div>
 
-        <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
-        </paper-icon-button>
-      </div>
+        <paper-dialog-scrollable>
+          <template is="dom-if" if="[[refresh]]" restamp="true">
+            <h3>[[report.title]]</h3>
 
-      <paper-dialog-scrollable>
-        <template
-            is="dom-if"
-            if="[[refresh]]"
-            restamp="true">
-          <h3>[[report.title]]</h3>
+            <dl>
+              <dt>Submission date:</dt>
+              <dd>[[report.submission_date]]</dd>
+              <dt>Reporting period:</dt>
+              <dt>Reporting period:</dt>
+              <dd>[[report.reporting_period]]</dd>
+            </dl>
 
-          <dl>
-            <dt>Submission date:</dt>
-            <dd>[[report.submission_date]]</dd>
-            <dt>Reporting period:</dt>
-            <dt>Reporting period:</dt>
-            <dd>[[report.reporting_period]]</dd>
-          </dl>
-
-          <paper-textarea
+            <paper-textarea
               label="Feedback/Comments"
               value="{{data.comment}}"
               class="validate"
               always-float-label
-              required>
-          </paper-textarea>
-        </template>
-      </paper-dialog-scrollable>
+              required
+            >
+            </paper-textarea>
+          </template>
+        </paper-dialog-scrollable>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-            on-tap="_sendBack"
-            class="btn-primary"
-            raised>
-          Send back
-        </paper-button>
+        <div class="buttons layout horizontal-reverse">
+          <paper-button on-tap="_sendBack" class="btn-primary" raised>
+            Send back
+          </paper-button>
 
-        <paper-button
-            on-tap="close">
-          Cancel
-        </paper-button>
-      </div>
+          <paper-button on-tap="close">
+            Cancel
+          </paper-button>
+        </div>
 
-      <etools-loading active="[[pending]]"></etools-loading>
-    </paper-dialog>
-  `;
+        <etools-loading active="[[pending]]"></etools-loading>
+      </paper-dialog>
+    `;
   }
 
   @property({type: Boolean})
@@ -143,9 +130,7 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
   sendBackUrl!: string;
 
   public static get observers() {
-    return [
-      '_handleOpenedChanged(opened)'
-    ];
+    return ['_handleOpenedChanged(opened)'];
   }
 
   _handleOpenedChanged(opened: boolean) {
@@ -175,22 +160,21 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
     if (!this._fieldsAreValid()) {
       return;
     }
-    const self = this;
     this.set('pending', true);
 
     (this.$.sendBack as EtoolsPrpAjaxEl).abort();
 
-    (this.$.sendBack as EtoolsPrpAjaxEl).thunk()()
+    (this.$.sendBack as EtoolsPrpAjaxEl)
+      .thunk()()
       .then(() => {
-        self.set('pending', false);
-        self.close();
-        fireEvent(self, 'report-reviewed');
+        this.set('pending', false);
+        this.close();
+        fireEvent(this, 'report-reviewed');
       })
       .catch(() => {
-        self.set('pending', false);
+        this.set('pending', false);
       });
   }
-
 }
 window.customElements.define('send-back-modal', SendBackModal);
 

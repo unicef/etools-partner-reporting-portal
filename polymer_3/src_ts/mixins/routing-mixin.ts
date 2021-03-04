@@ -9,7 +9,6 @@ import {BASE_PATH} from '../config';
  */
 function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T) {
   class RoutingClass extends baseClass {
-
     @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
     _$currentWorkspace!: string;
 
@@ -27,7 +26,6 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
 
     private BEHAVIOR_NAME = 'RoutingBehavior';
 
-
     public _$computeBaseUrl(workspace: string, app: string) {
       return '/' + BASE_PATH + '/' + workspace + '/' + app;
     }
@@ -36,8 +34,8 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
       return this._$computeBaseUrl(workspace, app) + '/plan/' + planId;
     }
 
-    public buildBaseUrl() {
-      return this._$computeBaseUrl.apply(this, arguments);
+    public buildBaseUrl(workspace: string, item: string) {
+      return this._$computeBaseUrl(workspace, item);
     }
 
     /**
@@ -55,14 +53,13 @@ function RoutingMixin<T extends Constructor<ReduxConnectedElement>>(baseClass: T
     connectedCallback() {
       super.connectedCallback();
 
-      const self = this;
       setTimeout(() => {
-        if (typeof this.reduxStore.dispatch !== 'function') { // Duck typing
-          throw new Error(self.BEHAVIOR_NAME + ' requires ReduxBehavior');
+        if (typeof this.reduxStore.dispatch !== 'function') {
+          // Duck typing
+          throw new Error(this.BEHAVIOR_NAME + ' requires ReduxBehavior');
         }
       });
     }
-
   }
   return RoutingClass;
 }

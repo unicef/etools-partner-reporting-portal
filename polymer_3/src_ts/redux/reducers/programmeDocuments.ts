@@ -2,10 +2,10 @@ import {combineReducers} from 'redux';
 import Constants from '../../constants';
 
 export class ProgrammeDocumentsState {
-  all = [];
-  current: string = '';
-  count: number = 0;
-  loading: boolean = false;
+  all: any[] = [];
+  current = '';
+  count = 0;
+  loading = false;
 }
 
 export const ProgrammeDocuments = combineReducers({

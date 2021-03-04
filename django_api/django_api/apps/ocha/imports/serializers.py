@@ -2,15 +2,14 @@ import logging
 from collections import defaultdict
 
 from django.utils import timezone
-from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
-from core.models import Country, ResponsePlan, Workspace, Location
+from core.common import CLUSTER_TYPES, EXTERNAL_DATA_SOURCES, PARTNER_PROJECT_STATUS, RESPONSE_PLAN_TYPE
+from core.models import Country, Location, ResponsePlan, Workspace
 from ocha.constants import RefCode
 from ocha.imports.utilities import save_location_list
-from partner.models import PartnerProject, Partner
-
+from partner.models import Partner, PartnerProject
+from rest_framework import serializers
 
 logger = logging.getLogger('ocha-sync')
 
@@ -186,7 +185,7 @@ class V1FundingSourceImportSerializer(serializers.Serializer):
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     name = serializers.CharField()
-    iso3 = serializers.CharField(source='country_short_code', allow_null=True)
+    iso3 = serializers.CharField(source='iso3_code', allow_null=True)
 
     class Meta:
         model = Country
@@ -196,10 +195,10 @@ class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixi
         )
 
     def create(self, validated_data):
-        country_short_code = validated_data.pop('country_short_code')
+        iso3_code = validated_data.pop('iso3_code')
 
         return Country.objects.update_or_create(
-            country_short_code=country_short_code,  defaults=validated_data,
+            iso3_code=iso3_code,  defaults=validated_data,
         )[0]
 
 
@@ -208,8 +207,8 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
-    startDate = serializers.DateTimeField(source='start')
-    endDate = serializers.DateTimeField(source='end')
+    startDate = serializers.DateField(source='start')
+    endDate = serializers.DateField(source='end')
     locations = V1ResponsePlanLocationImportSerializer(many=True)
     emergencies = serializers.ListField()
     categories = serializers.ListField()
@@ -244,7 +243,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
         elif len(locations) == 1:
             workspace_id = None
             workspace_title = locations[0]['name']
-            workspace_code = locations[0]['country_short_code']
+            workspace_code = locations[0]['iso3_code']
         else:
             raise serializers.ValidationError('No overall emergency named for multi country plan')
         # TODO: Handling of duplicate workspace codes

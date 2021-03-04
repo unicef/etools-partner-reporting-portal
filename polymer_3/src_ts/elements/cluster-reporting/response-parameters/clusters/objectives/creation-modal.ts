@@ -17,6 +17,7 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
+import '@polymer/paper-input/paper-input';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
@@ -24,7 +25,7 @@ import {buttonsStyles} from '../../../../../styles/buttons-styles';
 import {modalStyles} from '../../../../../styles/modal-styles';
 import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../typings/globals.types';
-
+import {waitForIronOverlayToClose} from '../../../../../utils/util';
 
 /**
  * @polymer
@@ -68,7 +69,7 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[localize('add_cluster_objective')]]</h2>
@@ -104,7 +105,9 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
                 option-label="title"
                 selected="{{data.cluster}}"
                 hide-search
-                required>
+                with-backdrop
+                required
+                with-backdrop>
               </etools-dropdown>
 
           </iron-form>
@@ -182,17 +185,14 @@ class ClusterObjectivesModal extends LocalizeMixin(UtilsMixin(RoutingMixin(Redux
       return;
     }
     const thunk = (this.$.createObjective as EtoolsPrpAjaxEl).thunk();
-    const self = this;
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        self.close();
-        setTimeout(() => {
-          self._redirectToDetail(res.data.id);
-        }, 100);
+        this.updatePending = false;
+        this.close();
+        waitForIronOverlayToClose(300).then(() => this._redirectToDetail(res.data.id));
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

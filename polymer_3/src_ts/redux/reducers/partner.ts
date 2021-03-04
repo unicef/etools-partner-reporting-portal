@@ -2,7 +2,7 @@ import {GenericObject} from '../../typings/globals.types';
 import Constants from '../../constants';
 
 export class PartnerState {
-  current: GenericObject = {}
+  current: GenericObject = {};
 }
 
 const INITIAL_STATE = new PartnerState();

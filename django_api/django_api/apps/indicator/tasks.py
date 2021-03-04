@@ -2,12 +2,10 @@ import logging
 from datetime import datetime, timedelta
 
 from celery import shared_task
-
+from core.common import INDICATOR_REPORT_STATUS, PROGRESS_REPORT_STATUS
 from indicator.models import IndicatorReport
 from unicef.models import ProgressReport
-from core.common import INDICATOR_REPORT_STATUS, PROGRESS_REPORT_STATUS
 from utils.emails import send_due_progress_report_email, send_overdue_progress_report_email
-
 
 logger = logging.getLogger(__name__)
 OVERDUE_DAYS = 15

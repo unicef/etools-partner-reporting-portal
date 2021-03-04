@@ -10,106 +10,49 @@ import random
 
 from django.conf import settings
 
-from social_django.models import UserSocialAuth
-
-from account.models import (
-    User,
-    UserProfile,
-)
-from cluster.models import (
-    Cluster,
-    ClusterObjective,
-    ClusterActivity,
-)
-from core.models import (
-    PRPRole,
-)
-from partner.models import (
-    Partner,
-    PartnerProject,
-    PartnerActivity,
-)
-from indicator.models import (
-    IndicatorBlueprint,
-    Reportable,
-    IndicatorReport,
-    IndicatorLocationData,
-    Disaggregation,
-    DisaggregationValue,
-    ReportableLocationGoal,
-    ReportingEntity,
-)
-from unicef.models import (
-    Section,
-    ProgrammeDocument,
-    ProgressReport,
-    PDResultLink,
-    LowerLevelOutput,
-    Person,
-    ReportingPeriodDates,
-)
-from core.models import (
-    Workspace,
-    ResponsePlan,
-    Location,
-    GatewayType,
-    CartoDBTable,
-    Country,
-)
-from core.factories import (
-    QuantityReportableToLowerLevelOutputFactory,
-    RatioReportableToLowerLevelOutputFactory,
-    QuantityReportableToPartnerProjectFactory,
-    QuantityReportableToClusterObjectiveFactory,
-    RatioReportableToClusterObjectiveFactory,
-    QuantityReportableToPartnerActivityProjectContextFactory,
-    PartnerActivityProjectContextFactory,
-    QuantityReportableToClusterActivityFactory,
-    ProgressReportIndicatorReportFactory,
-    # QuantityIndicatorReportFactory,
-    LocationWithReportableLocationGoalFactory,
-    # RatioIndicatorReportFactory,
-    # UserFactory,
-    ClusterFactory,
-    ClusterObjectiveFactory,
-    ClusterActivityFactory,
-    PartnerFactory,
-    PartnerProjectFactory,
-    ClusterActivityPartnerActivityFactory,
-    SectionFactory,
-    ProgrammeDocumentFactory,
-    ProgressReportFactory,
-    WorkspaceFactory,
-    LocationFactory,
-    PersonFactory,
-    GatewayTypeFactory,
-    CartoDBTableFactory,
-    CountryFactory,
-    HRReportingPeriodDatesFactory,
-    QPRReportingPeriodDatesFactory,
-    ClusterPRPRoleFactory,
-)
+from account.models import User, UserProfile
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    REPORTING_TYPES,
     PD_STATUS,
-    REPORTABLE_FREQUENCY_LEVEL,
     PRP_ROLE_TYPES,
+    REPORTABLE_FREQUENCY_LEVEL,
+    REPORTING_TYPES,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
+from core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from core.tasks import process_period_reports, process_workspaces
+from core.tests import factories
+from indicator.models import (
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    IndicatorLocationData,
+    IndicatorReport,
+    Reportable,
+    ReportableLocationGoal,
+)
+from indicator.tasks import process_due_reports
+from partner.models import Partner, PartnerActivity, PartnerProject
+from partner.tasks import process_partners
+from social_django.models import UserSocialAuth
+from unicef.models import (
+    LowerLevelOutput,
+    PDResultLink,
+    Person,
+    ProgrammeDocument,
+    ProgressReport,
+    ReportingPeriodDates,
+    Section,
+)
+from unicef.tasks import process_programme_documents
+from utils.helpers import generate_random_character_sequence
 
 # from ._generate_disaggregation_fake_data import (
 #     generate_indicator_report_location_disaggregation_quantity_data,
 #     generate_indicator_report_location_disaggregation_ratio_data,
 # )
-
-from core.tasks import process_workspaces, process_period_reports
-from indicator.tasks import process_due_reports
-from partner.tasks import process_partners
-from unicef.tasks import process_programme_documents
-
-from utils.helpers import generate_random_character_sequence
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORTING_TYPE_LIST_WITHOUT_SR = [x[0] for x in REPORTING_TYPES if x != 'SR']
@@ -199,23 +142,23 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     sys_admin.save()
 
     # Give Cluster admin role to cluster_admin User
-    ClusterPRPRoleFactory(
+    factories.ClusterPRPRoleFactory(
         user=sys_admin,
         role=PRP_ROLE_TYPES.cluster_system_admin,
         workspace=None,
         cluster=None,
     )
 
-    SectionFactory.create_batch(workspace_quantity)
+    factories.SectionFactory.create_batch(workspace_quantity)
     print("{} Section objects created".format(workspace_quantity))
 
-    unicef_re = ReportingEntity.objects.get(title="UNICEF")
+    unicef_re = factories.ReportingEntityFactory(title="UNICEF")
     # cluster_re = ReportingEntity.objects.get(title="Cluster")
 
     ws_list = list()
 
     for i in random.sample(range(0, len(COUNTRIES_ALPHA2_CODE) - 1), workspace_quantity):
-        ws = WorkspaceFactory(
+        ws = factories.WorkspaceFactory(
             title=COUNTRIES_ALPHA2_CODE[i][1],
             workspace_code=COUNTRIES_ALPHA2_CODE[i][0]
         )
@@ -227,7 +170,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     end_of_this_year = datetime.date(today.year, 12, 31)
 
     for workspace in ws_list:
-        country = CountryFactory(
+        country = factories.CountryFactory(
             country_short_code=workspace.workspace_code,
             name=workspace.title,
         )
@@ -248,17 +191,17 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         gateways = list()
         for idx in range(5):
             gateways.append(
-                GatewayTypeFactory(
+                factories.GatewayTypeFactory(
                     country=country,
                     admin_level=idx + 1))
 
-        carto_db_table = CartoDBTableFactory(
+        carto_db_table = factories.CartoDBTableFactory(
             location_type=gateways[0], country=country)
 
         locations = list()
         for idx in range(12):
             locations.append(
-                LocationFactory.create(
+                factories.LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
                     parent=None if idx == 0 else (
                         locations[idx - 1] if idx < 6 else locations[4]),
@@ -289,51 +232,51 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
         )
 
-        cluster = ClusterFactory(
+        cluster = factories.ClusterFactory(
             response_plan=response_plan,
             type="wash"
         )
 
         # Give Cluster IMO role in this cluster to cluster_admin User
-        ClusterPRPRoleFactory(
+        factories.ClusterPRPRoleFactory(
             user=imo,
             role=PRP_ROLE_TYPES.cluster_imo,
             workspace=response_plan.workspace,
             cluster=cluster,
         )
 
-        co = ClusterObjectiveFactory(
+        co = factories.ClusterObjectiveFactory(
             title="{} - {} - {} CO".format(
                 idx, cluster.response_plan.title, cluster.type.upper()),
             cluster=cluster,
         )
 
         if random.randint(0, 1) == 0:
-            reportable = RatioReportableToClusterObjectiveFactory(
+            reportable = factories.RatioReportableToClusterObjectiveFactory(
                 content_object=co,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
         else:
-            reportable = QuantityReportableToClusterObjectiveFactory(
+            reportable = factories.QuantityReportableToClusterObjectiveFactory(
                 content_object=co,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
 
         for loc in locations[:2]:
-            LocationWithReportableLocationGoalFactory.create(
+            factories.LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
             )
 
         for loc in locations[-2:-1:-1]:
-            LocationWithReportableLocationGoalFactory.create(
+            factories.LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
             )
 
-        partner = PartnerFactory(
+        partner = factories.PartnerFactory(
             title="{} - {} Cluster Partner".format(
                 cluster.response_plan.title, cluster.type.upper())[:50],
             # partner_activity=None,
@@ -416,7 +359,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     partner_users.append(admin)
 
     # Give Cluster IMO role in this cluster to cluster_admin User
-    ClusterPRPRoleFactory(
+    factories.ClusterPRPRoleFactory(
         user=imo,
         role=PRP_ROLE_TYPES.cluster_imo,
         workspace=None,
@@ -442,7 +385,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         elif 'admin' in u.username:
             role = PRP_ROLE_TYPES.ip_admin
 
-        ClusterPRPRoleFactory(
+        factories.ClusterPRPRoleFactory(
             user=u,
             role=role,
             workspace=workspace,
@@ -451,25 +394,25 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     for cluster_objective in ClusterObjective.objects.all():
         for idx in range(2, 0, -1):
-            ca = ClusterActivityFactory(
+            ca = factories.ClusterActivityFactory(
                 title="{} CA".format(cluster_objective.title),
                 cluster_objective=cluster_objective,
             )
 
-            reportable = QuantityReportableToClusterActivityFactory(
+            reportable = factories.QuantityReportableToClusterActivityFactory(
                 content_object=ca,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations[:2]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable
                 )
 
             for loc in locations[-2:-1:-1]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable
                 )
@@ -480,27 +423,27 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     for partner in Partner.objects.all():
         first_cluster = partner.clusters.first()
-        pp = PartnerProjectFactory(
+        pp = factories.PartnerProjectFactory(
             partner=partner,
             title="{} PP".format(partner.title)
         )
 
         pp.clusters.add(first_cluster)
 
-        reportable = QuantityReportableToPartnerProjectFactory(
+        reportable = factories.QuantityReportableToPartnerProjectFactory(
             content_object=pp,
             # indicator_report__progress_report=None,
             # indicator_report__reporting_entity=cluster_re,
         )
 
         for loc in locations[:2]:
-            LocationWithReportableLocationGoalFactory.create(
+            factories.LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
             )
 
         for loc in locations[-2:-1:-1]:
-            LocationWithReportableLocationGoalFactory.create(
+            factories.LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
             )
@@ -514,21 +457,21 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         partner = cluster_activity.cluster_objective.cluster.partners.first()
 
         for project in partner.partner_projects.all():
-            pa = ClusterActivityPartnerActivityFactory(
+            pa = factories.ClusterActivityPartnerActivityFactory(
                 partner=project.partner,
                 # project=project,
                 cluster_activity=cluster_activity,
                 title="{} Partner Activity from CA".format(project.title)
             )
 
-            papc = PartnerActivityProjectContextFactory(
+            papc = factories.PartnerActivityProjectContextFactory(
                 activity=pa,
                 project=project,
                 start_date=project.start_date,
                 end_date=project.end_date
             )
 
-            reportable_to_pa = QuantityReportableToPartnerActivityProjectContextFactory(
+            reportable_to_pa = factories.QuantityReportableToPartnerActivityProjectContextFactory(
                 content_object=papc,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
@@ -537,18 +480,18 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             reportable_to_pa.save()
 
             for loc in locations[:2]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
                 )
 
             for loc in locations[-2:-1:-1]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
                 )
 
-            pa = ClusterActivityPartnerActivityFactory(
+            pa = factories.ClusterActivityPartnerActivityFactory(
                 partner=project.partner,
                 # project=project,
                 cluster_activity=None,
@@ -556,27 +499,27 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 title="{} Partner Activity".format(project.title)
             )
 
-            papc = PartnerActivityProjectContextFactory(
+            papc = factories.PartnerActivityProjectContextFactory(
                 activity=pa,
                 project=project,
                 start_date=project.start_date,
                 end_date=project.end_date
             )
 
-            reportable_to_pa = QuantityReportableToPartnerActivityProjectContextFactory(
+            reportable_to_pa = factories.QuantityReportableToPartnerActivityProjectContextFactory(
                 content_object=papc,
                 # indicator_report__progress_report=None,
                 # indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations[:2]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
                 )
 
             for loc in locations[-2:-1:-1]:
-                LocationWithReportableLocationGoalFactory.create(
+                factories.LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
                 )
@@ -589,12 +532,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     print("ClusterActivity <-> PartnerActivity objects linked")
 
-    PersonFactory.create_batch(workspace_quantity)
+    factories.PersonFactory.create_batch(workspace_quantity)
     # only create PD's for the partner being used above
     programme_documents = []
     for workspace in Workspace.objects.all():
         for i in range(workspace_quantity * 2):
-            pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
+            pd = factories.ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
             programme_documents.append(pd)
 
             now = datetime.datetime.now()
@@ -603,7 +546,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             for month in range(1, 13):
                 monthrange = calendar.monthrange(now.year, month)
 
-                HRReportingPeriodDatesFactory(
+                factories.HRReportingPeriodDatesFactory(
                     programme_document=pd,
                     start_date=datetime.datetime(now.year, month, 1),
                     end_date=datetime.datetime(now.year, month, monthrange[1]),
@@ -611,7 +554,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 )
 
             # Q1
-            QPRReportingPeriodDatesFactory(
+            factories.QPRReportingPeriodDatesFactory(
                 programme_document=pd,
                 start_date=datetime.datetime(now.year, 1, 1),
                 end_date=datetime.datetime(now.year, 3, 31),
@@ -619,7 +562,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             # Q2
-            QPRReportingPeriodDatesFactory(
+            factories.QPRReportingPeriodDatesFactory(
                 programme_document=pd,
                 start_date=datetime.datetime(now.year, 4, 1),
                 end_date=datetime.datetime(now.year, 6, 30),
@@ -627,7 +570,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             # Q3
-            QPRReportingPeriodDatesFactory(
+            factories.QPRReportingPeriodDatesFactory(
                 programme_document=pd,
                 start_date=datetime.datetime(now.year, 7, 1),
                 end_date=datetime.datetime(now.year, 9, 30),
@@ -635,7 +578,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             # Q4
-            QPRReportingPeriodDatesFactory(
+            factories.QPRReportingPeriodDatesFactory(
                 programme_document=pd,
                 start_date=datetime.datetime(now.year, 10, 1),
                 end_date=datetime.datetime(now.year, 12, 31),
@@ -684,7 +627,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 num_reportables_range = range(2)
                 for i in num_reportables_range:
                     if i % 2 != 0:
-                        reportable = QuantityReportableToLowerLevelOutputFactory(
+                        reportable = factories.QuantityReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
                             indicator_report__reporting_entity=unicef_re,
@@ -692,7 +635,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                             ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
                     elif i % 2 == 0 and not first_llo_indicator_flag:
-                        reportable = RatioReportableToLowerLevelOutputFactory(
+                        reportable = factories.RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
                             indicator_report__reporting_entity=unicef_re,
@@ -705,7 +648,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                     reportable.indicator_reports.all().delete()
 
                     for loc in locations[:7]:
-                        LocationWithReportableLocationGoalFactory.create(
+                        factories.LocationWithReportableLocationGoalFactory.create(
                             location=loc,
                             reportable=reportable
                         )
@@ -723,7 +666,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             for rpd_idx, rpd in enumerate(rpd_queryset):
                 print("Generating ProgressReport: ", rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
 
-                progress_report = ProgressReportFactory(
+                progress_report = factories.ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
                     report_number=rpd_idx + 1,
@@ -748,7 +691,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
                         for reportable in queryset:
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                                ProgressReportIndicatorReportFactory(
+                                factories.ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
@@ -758,7 +701,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     reporting_entity=unicef_re,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                                ProgressReportIndicatorReportFactory(
+                                factories.ProgressReportIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
@@ -810,8 +753,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 reportable_location_goals = [
                     ReportableLocationGoal(
                         reportable=indicator,
-                        location=l,
-                    ) for l in loc_diff
+                        location=loc,
+                    ) for loc in loc_diff
                 ]
 
                 ReportableLocationGoal.objects.bulk_create(reportable_location_goals)

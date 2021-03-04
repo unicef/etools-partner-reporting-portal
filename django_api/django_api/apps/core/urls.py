@@ -1,15 +1,15 @@
 from django.conf.urls import url
 
 from .views import (
-    WorkspaceAPIView,
-    LocationListAPIView,
     ChildrenLocationAPIView,
+    ConfigurationAPIView,
+    CurrenciesView,
+    LocationListAPIView,
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
-    ConfigurationAPIView,
     TaskTriggerAPIView,
+    WorkspaceAPIView,
 )
-
 
 urlpatterns = [
     url(r'^task-trigger/$', TaskTriggerAPIView.as_view(), name="task-trigger"),
@@ -23,4 +23,5 @@ urlpatterns = [
         LocationListAPIView.as_view(), name="location"),
     url(r'^(?P<location_id>\d+)/children-location/$',
         ChildrenLocationAPIView.as_view(), name="children-location"),
+    url(r'^currencies/$', CurrenciesView.as_view(), name="currencies"),
 ]

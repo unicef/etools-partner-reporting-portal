@@ -1,16 +1,10 @@
 import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../dropdown-filter/searchable-dropdown-filter';
-import '@polymer/paper-item/paper-item';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
+import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../mixins/filter-mixin';
 import LocalizeMixin from '../../../mixins/localize-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
-import '@polymer/polymer/lib/elements/dom-repeat';
-import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
-
 
 /**
  * @polymer
@@ -21,44 +15,29 @@ import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
+        #field {
+          width: 100%;
+        }
+      </style>
 
-      paper-dropdown-menu {
-        width: 100%;
-      }
-
-      paper-listbox paper-item {
-        height: 48px;
-        cursor: pointer;
-        padding: 0 16px;
-        white-space: nowrap;
-      }
-    </style>
-
-    <paper-dropdown-menu
+      <etools-dropdown
         id="field"
         label="[[label]]"
+        options="[[data]]"
+        option-value="id"
+        option-label="title"
+        selected="{{value}}"
         disabled="[[disabled]]"
-        always-float-label>
-      <paper-listbox
-          slot="dropdown-content"
-          selected="{{value}}"
-          attr-for-selected="item-value"
-          on-iron-select="_handleFilterChange">
-        <template
-            id="repeat"
-            is="dom-repeat"
-            items="[[data]]">
-          <paper-item item-value="[[item.id]]">[[item.title]]</paper-item>
-        </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-  `;
+        trigger-value-change-event
+        on-etools-selected-item-changed="_handleFilterChange"
+      >
+      </etools-dropdown>
+    `;
   }
-
 
   @property({type: Boolean})
   disabled!: boolean;
@@ -70,7 +49,10 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
   data!: any[];
 
   _handleFilterChange(e: CustomEvent) {
-    const newValue = (this.$.repeat as DomRepeat).itemForElement(e.detail.item).id;
+    if (!e.detail.selectedItem) {
+      return;
+    }
+    const newValue = e.detail.selectedItem.id;
 
     fireEvent(this, 'filter-changed', {
       name: this.name,
@@ -83,7 +65,6 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
       this._filterReady();
     }
   }
-
 }
 
 window.customElements.define('dropdown-filter', DropdownFilter);

@@ -22,32 +22,32 @@ import {ClusterDashboardDataState} from '../redux/reducers/clusterDashboardData'
 import {ClusterObjectivesState} from '../redux/reducers/clusterObjectives';
 import {ClusterDisaggregationsState} from '../redux/reducers/clusterDisaggregations';
 import {ClusterIndicatorReportsState} from '../redux/reducers/clusterIndicatorReports';
-
-
+import {CurrenciesDataState} from '../redux/reducers/currencies';
 
 export interface RootState {
-  localize: LocaLizeState,
-  auth: AuthState,
-  workspaces: WorkspacesState,
-  app: AppState,
-  partner: PartnerState,
-  indicators: IndicatorsState,
-  programmeDocuments: ProgrammeDocumentsState,
-  programmeDocumentsIndicators: ProgrammeDocumentsIndicatorsState,
-  programmeDocumentDetails: ProgrammeDocumentDetailsState,
-  programmeDocumentReports: ProgrammeDocumentReportsState,
-  programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachmentsState,
-  progressReports: ProgressReportsState,
-  responsePlans: ResponsePlansState,
-  disaggregations: DisaggregationsState,
-  partnerProjects: PartnerProjectsState,
-  partnerActivities: PartnerActivitiesState,
-  clusterActivities: ClusterActivitiesState,
-  clusterObjectives: ClusterObjectivesState,
-  clusterDisaggregations: ClusterDisaggregationsState,
-  clusterIndicatorReports: ClusterIndicatorReportsState,
-  clusterDashboardData: ClusterDashboardDataState,
-  userProfile: UserProfileState,
-  analysis: AnalysisState,
-  config: ConfigState
+  localize: LocaLizeState;
+  auth: AuthState;
+  workspaces: WorkspacesState;
+  app: AppState;
+  partner: PartnerState;
+  indicators: IndicatorsState;
+  programmeDocuments: ProgrammeDocumentsState;
+  programmeDocumentsIndicators: ProgrammeDocumentsIndicatorsState;
+  programmeDocumentDetails: ProgrammeDocumentDetailsState;
+  programmeDocumentReports: ProgrammeDocumentReportsState;
+  programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachmentsState;
+  progressReports: ProgressReportsState;
+  responsePlans: ResponsePlansState;
+  disaggregations: DisaggregationsState;
+  partnerProjects: PartnerProjectsState;
+  partnerActivities: PartnerActivitiesState;
+  clusterActivities: ClusterActivitiesState;
+  clusterObjectives: ClusterObjectivesState;
+  clusterDisaggregations: ClusterDisaggregationsState;
+  clusterIndicatorReports: ClusterIndicatorReportsState;
+  clusterDashboardData: ClusterDashboardDataState;
+  userProfile: UserProfileState;
+  analysis: AnalysisState;
+  config: ConfigState;
+  currencies: CurrenciesDataState;
 }

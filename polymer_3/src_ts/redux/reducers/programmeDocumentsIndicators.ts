@@ -15,13 +15,13 @@ export const ProgrammeDocumentsIndicators = combineReducers({
 function byPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.pdId] = action.indicatorData;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -34,13 +34,13 @@ function byPdReducer(state = {}, action: any) {
 function loadingByPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS_LOADING:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.pdId] = action.loading;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};

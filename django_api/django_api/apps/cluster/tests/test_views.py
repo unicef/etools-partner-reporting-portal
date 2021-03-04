@@ -1,55 +1,21 @@
 import datetime
-from dateutil.relativedelta import relativedelta
-from unittest.mock import Mock, patch
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from faker import Faker
-
+from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from core.tests import factories
 from core.tests.base import BaseAPITestCase
-from core.common import (
-    PRP_ROLE_TYPES,
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-)
-from core.factories import (
-    NonPartnerUserFactory,
-    PartnerFactory,
-    CountryFactory,
-    WorkspaceFactory,
-    ClusterPRPRoleFactory,
-    ResponsePlanFactory,
-    ClusterFactory,
-    GatewayTypeFactory,
-    CartoDBTableFactory,
-    ClusterObjectiveFactory,
-    LocationFactory,
-    ClusterActivityFactory,
-    PartnerProjectFactory,
-    PartnerActivityProjectContextFactory,
-    ClusterActivityPartnerActivityFactory,
-    QuantityTypeIndicatorBlueprintFactory,
-    QuantityReportableToClusterActivityFactory,
-    QuantityReportableToPartnerActivityProjectContextFactory,
-    QuantityReportableToClusterObjectiveFactory,
-    QuantityReportableToPartnerProjectFactory,
-    ClusterIndicatorReportFactory,
-    IndicatorLocationDataFactory,
-    CustomPartnerActivityFactory,
-)
-
-faker = Faker()
+from dateutil.relativedelta import relativedelta
+from rest_framework import status
 
 
 class ClusterListAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.user = NonPartnerUserFactory()
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.user = factories.NonPartnerUserFactory()
 
         super().setUp()
 
@@ -69,11 +35,16 @@ class ClusterListAPIViewTestCase(BaseAPITestCase):
         # Create some test clusters
         TEST_CLUSTERS = set(["cccm", "early_recovery", "education"])
         for cluster_type in TEST_CLUSTERS:
-            cluster = ClusterFactory(type=cluster_type, response_plan=self.response_plan)
+            cluster = factories.ClusterFactory(type=cluster_type, response_plan=self.response_plan)
 
             # Associate partner to created cluster for filtering later
-            PartnerFactory(clusters=[cluster, ])
-            ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
+            factories.PartnerFactory(clusters=[cluster, ])
+            factories.ClusterPRPRoleFactory(
+                user=self.user,
+                workspace=self.workspace,
+                cluster=cluster,
+                role=PRP_ROLE_TYPES.cluster_imo,
+            )
 
         response = self.client.get(reverse('cluster-list', kwargs={'response_plan_id': self.response_plan.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -94,14 +65,19 @@ class ClusterListAPIViewTestCase(BaseAPITestCase):
 class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.user = NonPartnerUserFactory()
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = factories.NonPartnerUserFactory()
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        factories.ClusterPRPRoleFactory(
+            user=self.user,
+            workspace=self.workspace,
+            cluster=self.cluster,
+            role=PRP_ROLE_TYPES.cluster_imo,
+        )
 
         super().setUp()
 
@@ -126,11 +102,11 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
         Also, the filtering by ClusterObjectiveFilter will be tested: partner.
         """
         for _ in range(3):
-            ClusterObjectiveFactory(
+            factories.ClusterObjectiveFactory(
                 cluster=self.cluster,
                 locations=[
-                    LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                    LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                    factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                    factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
                 ]
             )
 
@@ -169,7 +145,7 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
         """
         base_count = self.cluster.cluster_objectives.all().count()
         data = {
-            'title': faker.sentence(),
+            'title': factories.faker.sentence(),
             'cluster': self.cluster.id,
         }
 
@@ -187,10 +163,10 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
     def test_cluster_objective_create_validation_error(self):
         """Test the API response to throw a validation error if user has no cluster access.
         """
-        new_cluster = ClusterFactory(type='education', response_plan=self.response_plan)
+        new_cluster = factories.ClusterFactory(type='education', response_plan=self.response_plan)
 
         data = {
-            'title': faker.sentence(),
+            'title': factories.faker.sentence(),
             'cluster': new_cluster.id,
         }
 
@@ -205,25 +181,25 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
 class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.user = NonPartnerUserFactory()
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = factories.NonPartnerUserFactory()
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
         super().setUp()
 
     def test_invalid_requests(self):
         """Test the API response for invalid payloads.
         """
-        obj = ClusterObjectiveFactory(
+        obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
             ]
         )
 
@@ -247,11 +223,11 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
     def test_cluster_objective_detail(self):
         """Test the API response to get ClusterObjective detail response.
         """
-        obj = ClusterObjectiveFactory(
+        obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
             ]
         )
 
@@ -279,15 +255,15 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
     def test_update_put_cluster_objective(self):
         """Test the API response to update ClusterObjective object as a whole.
         """
-        obj = ClusterObjectiveFactory(
+        obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
             ]
         )
 
-        new_title = faker.sentence()
+        new_title = factories.faker.sentence()
         data = {
             'title': new_title,
             'cluster': self.cluster.id,
@@ -321,15 +297,15 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
     def test_update_patch_cluster_objective(self):
         """Test the API response to update ClusterObjective object partially.
         """
-        obj = ClusterObjectiveFactory(
+        obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
             ]
         )
 
-        new_title = faker.sentence()
+        new_title = factories.faker.sentence()
         data = {
             'title': new_title,
             'cluster': self.cluster.id,
@@ -357,19 +333,19 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
 class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.user = NonPartnerUserFactory()
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = factories.NonPartnerUserFactory()
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -400,7 +376,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         Also, the filtering by ClusterActivityFilter will be tested: partner.
         """
         for _ in range(3):
-            ClusterActivityFactory(
+            factories.ClusterActivityFactory(
                 cluster_objective=self.objective,
                 locations=[self.loc1, self.loc2, ]
             )
@@ -440,7 +416,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         """
         base_count = self.objective.cluster_activities.all().count()
         data = {
-            'title': faker.sentence(),
+            'title': factories.faker.sentence(),
             'cluster': self.cluster.id,
             'cluster_objective': self.objective.id,
         }
@@ -459,10 +435,10 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
     def test_cluster_activity_create_validation_error(self):
         """Test the API response to throw a validation error if user has no cluster access.
         """
-        new_cluster = ClusterFactory(type='education', response_plan=self.response_plan)
+        new_cluster = factories.ClusterFactory(type='education', response_plan=self.response_plan)
 
         data = {
-            'title': faker.sentence(),
+            'title': factories.faker.sentence(),
             'cluster': new_cluster.id,
         }
 
@@ -477,19 +453,19 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
 class ClusterActivityAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.user = NonPartnerUserFactory()
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.user = factories.NonPartnerUserFactory()
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -502,7 +478,7 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
     def test_invalid_requests(self):
         """Test the API response for invalid payloads.
         """
-        obj = ClusterActivityFactory(
+        obj = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
@@ -529,7 +505,7 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
     def test_cluster_activity_detail(self):
         """Test the API response to get ClusterActivity detail response.
         """
-        obj = ClusterActivityFactory(
+        obj = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
@@ -560,15 +536,15 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
     def test_update_put_cluster_activity(self):
         """Test the API response to update ClusterActivity object as a whole.
         """
-        obj = ClusterActivityFactory(
+        obj = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
+                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
             ]
         )
 
-        new_title = faker.sentence()
+        new_title = factories.faker.sentence()
         data = {
             'title': new_title,
             'cluster': self.cluster.id,
@@ -608,14 +584,14 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
     def test_update_patch_cluster_activity(self):
         """Test the API response to update ClusterActivity object partially.
         """
-        obj = ClusterActivityFactory(
+        obj = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        new_title = faker.sentence()
+        new_title = factories.faker.sentence()
         data = {
             'title': new_title,
             'cluster': self.cluster.id,
@@ -644,14 +620,14 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
 class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
         super().setUp()
 
@@ -675,10 +651,10 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         """Test the API response and queryset count with ordering.
         Also, the filtering by ClusterActivityFilter will be tested: partner.
         """
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -686,62 +662,61 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
 
-        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
-        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+        self.blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = factories.QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=self.blueprint
         )
-        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+        self.clusterobjective_reportable = factories.QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
         )
-        self.partnerproject_reportable = QuantityReportableToPartnerProjectFactory(
+        self.partnerproject_reportable = factories.QuantityReportableToPartnerProjectFactory(
             content_object=self.project, blueprint=self.blueprint
         )
 
         # Create 4 indicator reports across generic relation
-        with patch("django.db.models.signals.ModelSignal.send", Mock()):
-            self.clusteractivity_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.clusteractivity_reportable,
-            )
-            self.partneractivity_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.clusterobjective_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.clusterobjective_reportable,
-                report_status=INDICATOR_REPORT_STATUS.overdue,
-            )
-            self.partnerproject_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.partnerproject_reportable,
-            )
+        self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusteractivity_reportable,
+        )
+        self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusterobjective_reportable,
+            report_status=INDICATOR_REPORT_STATUS.overdue,
+        )
+        self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partnerproject_reportable,
+        )
 
-        self.loc_data = IndicatorLocationDataFactory(
+        self.loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.partnerproject_indicator_report,
             location=self.loc1,
         )
@@ -813,8 +788,8 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         )
 
         # Cluster system admin should also be able to query indicator reports
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         filter_args = '?indicator={}&cluster_activity={}&indicator_type={}'.format(
@@ -832,18 +807,18 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -851,94 +826,93 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_activity = ClusterActivityPartnerActivityFactory(
+        self.p_activity = factories.ClusterActivityPartnerActivityFactory(
             partner=self.partner,
             cluster_activity=self.activity,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
 
-        self.p_custom_activity = CustomPartnerActivityFactory(
+        self.p_custom_activity = factories.CustomPartnerActivityFactory(
             cluster_objective=self.objective,
             partner=self.partner,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_activity,
         )
 
-        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
-        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+        self.blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = factories.QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=self.blueprint
         )
-        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.custom_partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=self.blueprint
         )
-        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+        self.clusterobjective_reportable = factories.QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
         )
-        self.partnerproject_reportable = QuantityReportableToPartnerProjectFactory(
+        self.partnerproject_reportable = factories.QuantityReportableToPartnerProjectFactory(
             content_object=self.project, blueprint=self.blueprint
         )
 
         # Create 4 indicator reports across generic relation
-        with patch("django.db.models.signals.ModelSignal.send", Mock()):
-            self.clusteractivity_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.clusteractivity_reportable,
-            )
-            self.partneractivity_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.custom_partneractivity_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.custom_partneractivity_reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-            )
-            self.clusterobjective_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.clusterobjective_reportable,
-                report_status=INDICATOR_REPORT_STATUS.overdue,
-            )
-            self.partnerproject_indicator_report = ClusterIndicatorReportFactory(
-                reportable=self.partnerproject_reportable,
-            )
+        self.clusteractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusteractivity_reportable,
+        )
+        self.partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.custom_partneractivity_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.custom_partneractivity_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+        )
+        self.clusterobjective_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.clusterobjective_reportable,
+            report_status=INDICATOR_REPORT_STATUS.overdue,
+        )
+        self.partnerproject_indicator_report = factories.ClusterIndicatorReportFactory(
+            reportable=self.partnerproject_reportable,
+        )
 
-        self.clusteractivity_loc_data = IndicatorLocationDataFactory(
+        self.clusteractivity_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.clusteractivity_indicator_report,
             location=self.loc1,
         )
-        self.partneractivity_loc_data = IndicatorLocationDataFactory(
+        self.partneractivity_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.partneractivity_indicator_report,
             location=self.loc1,
         )
-        self.custom_partneractivity_loc_data = IndicatorLocationDataFactory(
+        self.custom_partneractivity_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.custom_partneractivity_indicator_report,
             location=self.loc1,
         )
-        self.clusterobjective_loc_data = IndicatorLocationDataFactory(
+        self.clusterobjective_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.clusterobjective_indicator_report,
             location=self.loc1,
         )
-        self.partnerproject_loc_data = IndicatorLocationDataFactory(
+        self.partnerproject_loc_data = factories.IndicatorLocationDataFactory(
             indicator_report=self.partnerproject_indicator_report,
             location=self.loc1,
         )
@@ -1015,8 +989,8 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         self.assertEquals(self.partnerproject_indicator_report.id, response.data['id'])
 
         # Cluster system admin should also be able to query indicator report details
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         url = reverse(
@@ -1031,19 +1005,19 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
 class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -1051,41 +1025,41 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
 
-        self.project = PartnerProjectFactory(
+        self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
             locations=[self.loc1, self.loc2],
         )
 
-        self.p_custom_activity = CustomPartnerActivityFactory(
+        self.p_custom_activity = factories.CustomPartnerActivityFactory(
             cluster_objective=self.objective,
             partner=self.partner,
         )
-        self.project_context = PartnerActivityProjectContextFactory(
+        self.project_context = factories.PartnerActivityProjectContextFactory(
             project=self.project,
             activity=self.p_custom_activity,
         )
 
-        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
-        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+        self.blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = factories.QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
-        self.custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+        self.custom_partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
             content_object=self.project_context, blueprint=self.blueprint
         )
-        self.clusterobjective_reportable = QuantityReportableToClusterObjectiveFactory(
+        self.clusterobjective_reportable = factories.QuantityReportableToClusterObjectiveFactory(
             content_object=self.objective, blueprint=self.blueprint
         )
-        self.partnerproject_reportable = QuantityReportableToPartnerProjectFactory(
+        self.partnerproject_reportable = factories.QuantityReportableToPartnerProjectFactory(
             content_object=self.project, blueprint=self.blueprint
         )
 
@@ -1119,8 +1093,8 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
         self.assertEquals(4, len(response.data))
 
         # Cluster system admin should also be able to query cluster reportables
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         response = self.client.get(url)
@@ -1133,18 +1107,18 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
 class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.response_plan = ResponsePlanFactory(workspace=self.workspace)
-        self.cluster = ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = GatewayTypeFactory(country=self.country)
-        self.carto_table = CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.user = NonPartnerUserFactory()
-        self.prp_role = ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
+        self.loc_type = factories.GatewayTypeFactory(country=self.country)
+        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.user = factories.NonPartnerUserFactory()
+        self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
 
-        self.objective = ClusterObjectiveFactory(
+        self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
                 self.loc1,
@@ -1152,15 +1126,15 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
             ]
         )
 
-        self.activity = ClusterActivityFactory(
+        self.activity = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
                 self.loc1, self.loc2
             ]
         )
 
-        self.blueprint = QuantityTypeIndicatorBlueprintFactory()
-        self.clusteractivity_reportable = QuantityReportableToClusterActivityFactory(
+        self.blueprint = factories.QuantityTypeIndicatorBlueprintFactory()
+        self.clusteractivity_reportable = factories.QuantityReportableToClusterActivityFactory(
             content_object=self.activity, blueprint=self.blueprint
         )
 
@@ -1197,53 +1171,53 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
         """
 
         for idx in range(4):
-            partner = PartnerFactory(country_code=self.country.country_short_code)
+            partner = factories.PartnerFactory(country_code=self.country.country_short_code)
             partner.clusters.add(self.cluster)
 
-            project = PartnerProjectFactory(
+            project = factories.PartnerProjectFactory(
                 partner=partner,
                 clusters=[self.cluster],
                 locations=[self.loc1, self.loc2],
             )
 
-            p_activity = ClusterActivityPartnerActivityFactory(
+            p_activity = factories.ClusterActivityPartnerActivityFactory(
                 cluster_activity=self.activity,
                 partner=partner,
             )
-            self.ca_project_context = PartnerActivityProjectContextFactory(
+            self.ca_project_context = factories.PartnerActivityProjectContextFactory(
                 project=project,
                 activity=p_activity,
             )
 
-            p_custom_activity = CustomPartnerActivityFactory(
+            p_custom_activity = factories.CustomPartnerActivityFactory(
                 cluster_objective=self.objective,
                 partner=partner,
             )
 
-            self.project_context = PartnerActivityProjectContextFactory(
+            self.project_context = factories.PartnerActivityProjectContextFactory(
                 project=project,
                 activity=p_custom_activity,
             )
 
-            partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
                 content_object=self.ca_project_context, blueprint=self.blueprint,
                 parent_indicator=self.clusteractivity_reportable,
             )
-            custom_partneractivity_reportable = QuantityReportableToPartnerActivityProjectContextFactory(
+            custom_partneractivity_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
                 content_object=self.project_context, blueprint=self.blueprint
             )
 
             if idx == 0:
-                IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.accepted,
                         overall_status=OVERALL_STATUS.met,
                     ),
                     location=self.loc1,
                 )
-                self.constrained_loc = IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                self.constrained_loc = factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=custom_partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.accepted,
                         overall_status=OVERALL_STATUS.constrained,
@@ -1251,16 +1225,16 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
                     location=self.loc1,
                 )
             elif idx == 1:
-                IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.accepted,
                         overall_status=OVERALL_STATUS.on_track,
                     ),
                     location=self.loc1,
                 )
-                IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=custom_partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.accepted,
                         overall_status=OVERALL_STATUS.no_progress,
@@ -1268,16 +1242,16 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
                     location=self.loc1,
                 )
             elif idx == 2:
-                IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=custom_partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.due,
                         overall_status=OVERALL_STATUS.on_track,
                     ),
                     location=self.loc1,
                 )
-                self.overdue_loc = IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                self.overdue_loc = factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=custom_partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.overdue,
                         overall_status=OVERALL_STATUS.constrained,
@@ -1285,16 +1259,16 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
                     location=self.loc1,
                 )
             elif idx == 3:
-                IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=custom_partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.accepted,
                         overall_status=OVERALL_STATUS.no_status,
                     ),
                     location=self.loc1,
                 )
-                self.upcoming_loc = IndicatorLocationDataFactory(
-                    indicator_report=ClusterIndicatorReportFactory(
+                self.upcoming_loc = factories.IndicatorLocationDataFactory(
+                    indicator_report=factories.ClusterIndicatorReportFactory(
                         reportable=partneractivity_reportable,
                         report_status=INDICATOR_REPORT_STATUS.due,
                         overall_status=OVERALL_STATUS.constrained,
@@ -1328,8 +1302,8 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
         self.assertEqual(self.constrained_loc.indicator_report.id, response.data['constrained_indicator_reports'][0]['id'])
 
         # Cluster system admin should also be able to query indicator report details
-        self.admin_user = NonPartnerUserFactory()
-        ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        self.admin_user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
         url = reverse(

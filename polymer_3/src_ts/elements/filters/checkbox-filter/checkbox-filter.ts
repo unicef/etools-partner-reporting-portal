@@ -1,13 +1,11 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-checkbox/paper-checkbox';
-import {PaperCheckboxElement} from '@polymer/paper-checkbox/paper-checkbox';
 import UtilsMixin from '../../../mixins/utils-mixin';
 import FilterMixin from '../../../mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
 import {fireEvent} from '../../../utils/fire-custom-event';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-
 
 /**
  * @polymer
@@ -19,24 +17,20 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      ::slotted() .checkbox-label {
-        font-size: 12px;
-      }
-    </style>
+        ::slotted() .checkbox-label {
+          font-size: 12px;
+        }
+      </style>
 
-    <paper-checkbox
-        id="field"
-        name="[[name]]"
-        checked="{{checked}}"
-        on-tap="_handleInput">
-      <slot></slot>
-    </paper-checkbox>
-  `;
+      <paper-checkbox id="field" name="[[name]]" checked="{{checked}}" on-tap="_handleInput">
+        <slot></slot>
+      </paper-checkbox>
+    `;
   }
 
   @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
@@ -47,20 +41,17 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
 
   private _debouncer!: Debouncer;
 
-  // @ts-ignore
-  _handleInput(e: CustomEvent) {
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
-        const newValue = '' + this._toNumber((this.$.field as PaperCheckboxElement).checked);
+  _handleInput() {
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const newValue = (this.$.field as HTMLInputElement).checked;
 
-        if (newValue !== this.lastValue) {
-          fireEvent(this, 'filter-changed', {
-            name: this.name,
-            value: newValue
-          });
-        }
-      });
+      if (newValue.toString() !== this.lastValue) {
+        fireEvent(this, 'filter-changed', {
+          name: this.name,
+          value: newValue.toString()
+        });
+      }
+    });
   }
 
   _computeChecked(value: string) {

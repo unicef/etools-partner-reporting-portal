@@ -21,64 +21,54 @@ import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments
  * @appliesMixin LocalizeMixin
  */
 class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
-
   public static get template() {
     return html`
-    <style include="iron-flex iron-flex-alignment">
-      :host {
-        display: block;
+      <style include="iron-flex iron-flex-alignment">
+        :host {
+          display: block;
 
-        --ecp-content: {
-          padding: 0;
-        };
-      }
+          --ecp-content: {
+            padding: 0;
+          }
+        }
 
-      .loader {
-        padding: 2em 0;
-      }
+        .loader {
+          padding: 2em 0;
+        }
 
-      pd-output {
-        margin-bottom: 25px;
-      }
+        pd-output {
+          margin-bottom: 25px;
+        }
 
-      pd-output:not(:first-of-type) {
-        border-top: 1px solid var(--paper-grey-300);
-      }
-    </style>
+        pd-output:not(:first-of-type) {
+          border-top: 1px solid var(--paper-grey-300);
+        }
+      </style>
 
-    <etools-content-panel panel-title="[[localize('pd_output_results')]]">
-      <template
-          is="dom-if"
-          if="[[loading]]"
-          restamp="true">
-        <div class="loader layout horizontal center-center">
-          <div>
-            <etools-loading no-overlay active></etools-loading>
+      <etools-content-panel panel-title="[[localize('pd_output_results')]]">
+        <template is="dom-if" if="[[loading]]" restamp="true">
+          <div class="loader layout horizontal center-center">
+            <div>
+              <etools-loading no-overlay active></etools-loading>
+            </div>
           </div>
-        </div>
-      </template>
+        </template>
 
-      <template
-          is="dom-if"
-          if="[[!loading]]">
-        <template
-            is="dom-repeat"
-            items="[[viewData]]">
-          <pd-output
+        <template is="dom-if" if="[[!loading]]">
+          <template is="dom-repeat" items="[[viewData]]">
+            <pd-output
               data="[[item]]"
               current-pd="[[currentPd]]"
               override-mode="[[overrideMode]]"
-              workspace-id="[[workspaceId]]">
-          </pd-output>
-        </template>
+              workspace-id="[[workspaceId]]"
+            >
+            </pd-output>
+          </template>
 
-        <list-placeholder
-            data="[[viewData]]"
-            loading="[[loading]]">
-        </list-placeholder>
-      </template>
-    </etools-content-panel>
-  `;
+          <list-placeholder data="[[viewData]]" loading="[[loading]]"> </list-placeholder>
+        </template>
+      </etools-content-panel>
+    `;
   }
 
   @property({type: String})
@@ -105,7 +95,6 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
   currentPd!: GenericObject;
 
-
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
   }
@@ -117,7 +106,6 @@ class PdOutputList extends LocalizeMixin(ReduxConnectedElement) {
   _llosAll(rootState: RootState) {
     return llosAll(rootState);
   }
-
 }
 
 window.customElements.define('pd-output-list', PdOutputList);

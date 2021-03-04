@@ -1,10 +1,9 @@
 from django.conf.urls import url
 
 from account.views import UserListCreateAPIView
-from core.views import PRPRoleUpdateDestroyAPIView, PRPRoleCreateAPIView
 from cluster.views import AssignableClustersListView, ClusterListForPartnerAPIView
-from partner.views import PartnerListCreateAPIView, AssignablePartnersListView, PartnerRetrieveUpdateAPIView
-
+from core.views import PRPRoleCreateAPIView, PRPRoleUpdateDestroyAPIView
+from partner.views import AssignablePartnersListView, PartnerListCreateAPIView, PartnerRetrieveUpdateAPIView
 
 urlpatterns = [
     url(r'^users/$', UserListCreateAPIView.as_view(), name='users'),

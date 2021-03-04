@@ -1,8 +1,10 @@
 import os
-from babel.numbers import format_currency as babel_currency_format
+
 from django import template
 from django.conf import settings
-from django.utils.translation import to_locale, get_language
+from django.utils.translation import get_language, to_locale
+
+from babel.numbers import format_currency as babel_currency_format
 
 register = template.Library()
 

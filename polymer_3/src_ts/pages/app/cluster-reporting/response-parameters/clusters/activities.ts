@@ -9,8 +9,7 @@ import LocalizeMixin from '../../../../../mixins/localize-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import SortingMixin from '../../../../../mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/filters';
-import {CreationModalActivitiesEl} from
-  '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
+import {CreationModalActivitiesEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/activities-list';
 import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
@@ -24,69 +23,56 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fetchClusterActivitiesList} from '../../../../../redux/actions/clusterActivities';
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-* @appliesMixin SortingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ * @appliesMixin SortingMixin
+ */
 class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(ReduxConnectedElement)))) {
-
   static get template() {
     return html`
-    ${tableStyles} ${buttonsStyles}
-    <style include="data-table-styles">
-      :host {
-        display: block;
-      }
+      ${tableStyles} ${buttonsStyles}
+      <style include="data-table-styles">
+        :host {
+          display: block;
+        }
 
-      div#action {
-        margin: 25px 0;
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
+        div#action {
+          margin: 25px 0;
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
 
-      a {
-        color: var(--theme-primary-color);
-      }
-    </style>
+        a {
+          color: var(--theme-primary-color);
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location query="{{query}}"></iron-location>
+      <iron-location query="{{query}}"></iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activities" url="[[activitiesUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <cluster-activities-filters></cluster-activities-filters>
+      <page-body>
+        <cluster-activities-filters></cluster-activities-filters>
 
-      <template
-          is="dom-if"
-          if="[[permissions.createClusterEntities]]"
-          restamp="true">
-        <cluster-activities-modal id="modal"></cluster-activities-modal>
+        <template is="dom-if" if="[[permissions.createClusterEntities]]" restamp="true">
+          <cluster-activities-modal id="modal"></cluster-activities-modal>
 
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            [[localize('add_cluster_activity')]]
-          </paper-button>
-        </div>
-      </template>
+          <div id="action">
+            <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+              [[localize('add_cluster_activity')]]
+            </paper-button>
+          </div>
+        </template>
 
-      <clusters-activities-list></clusters-activities-list>
-    </page-body>
+        <clusters-activities-list></clusters-activities-list>
+      </page-body>
     `;
   }
 
@@ -112,9 +98,7 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
   totalResults!: number;
 
   static get observers() {
-    return [
-      '_clusterActivitiesAjax(queryParams, activitiesUrl)'
-    ];
+    return ['_clusterActivitiesAjax(queryParams, activitiesUrl)'];
   }
 
   _computeUrl(responsePlanID: string) {
@@ -136,18 +120,21 @@ class Activities extends LocalizeMixin(UtilsMixin(RoutingMixin(SortingMixin(Redu
       return;
     }
 
-    this._clusterActivitiesAjaxDebouncer = Debouncer.debounce(this._clusterActivitiesAjaxDebouncer,
+    this._clusterActivitiesAjaxDebouncer = Debouncer.debounce(
+      this._clusterActivitiesAjaxDebouncer,
       timeOut.after(300),
       () => {
         const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
         (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        this.reduxStore.dispatch(fetchClusterActivitiesList(thunk))
+        this.reduxStore
+          .dispatch(fetchClusterActivitiesList(thunk))
           // @ts-ignore
           .catch((_err: GenericObject) => {
             // TODO: error handling.
           });
-      });
+      }
+    );
   }
 
   disconnectedCallback() {

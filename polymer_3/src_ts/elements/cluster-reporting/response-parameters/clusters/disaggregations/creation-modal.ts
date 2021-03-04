@@ -35,52 +35,42 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles} ${modalStyles}
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${modalStyles}
+      <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
 
-        --app-grid-columns: 3;
-        --app-grid-gutter: 15px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+          --app-grid-columns: 3;
+          --app-grid-gutter: 15px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 3;
 
-        --paper-dialog: {
-          width: 700px;
+          --paper-dialog: {
+            width: 700px;
+          }
         }
-      }
-    </style>
+      </style>
 
-    <etools-prp-ajax
+      <etools-prp-ajax
         id="createDisaggregation"
         url="[[url]]"
         body="[[data]]"
         content-type="application/json"
-        method="post">
-    </etools-prp-ajax>
+        method="post"
+      >
+      </etools-prp-ajax>
 
-    <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
-      <div class="header layout horizontal justified">
-        <h2>[[localize('add_disaggregation')]]</h2>
-        <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
-        </paper-icon-button>
-      </div>
+      <paper-dialog id="dialog" modal opened="{{opened}}">
+        <div class="header layout horizontal justified">
+          <h2>[[localize('add_disaggregation')]]</h2>
+          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
+        </div>
 
-      <paper-dialog-scrollable>
-        <template
-            is="dom-if"
-            if="[[refresh]]"
-            restamp="true">
-          <iron-form class="app-grid">
-
-            <div class="flex col-name">
-              <paper-input
+        <paper-dialog-scrollable>
+          <template is="dom-if" if="[[refresh]]" restamp="true">
+            <iron-form class="app-grid">
+              <div class="flex col-name">
+                <paper-input
                   class="validate"
                   id="name"
                   name="name"
@@ -89,37 +79,37 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
                   on-input="_onInput"
                   on-blur="_formatName"
                   always-float-label
-                  required>
-              </paper-input>
-            </div>
-            <div class="flex col-values">
-              <etools-prp-chips
+                  required
+                >
+                </paper-input>
+              </div>
+              <div class="flex col-values">
+                <etools-prp-chips
                   class="validate"
                   index="0"
                   name="values"
                   label="[[localize('disaggregation_groups')]]"
                   value="{{data.choices}}"
                   on-selected-chips-updated="_onInput"
-                  required>
-                <chip-disagg-value></chip-disagg-value>
-              </etools-prp-chips>
-            </div>
+                  required
+                >
+                  <chip-disagg-value></chip-disagg-value>
+                </etools-prp-chips>
+              </div>
+            </iron-form>
+          </template>
+        </paper-dialog-scrollable>
 
-          </iron-form>
-        </template>
-      </paper-dialog-scrollable>
+        <div class="buttons layout horizontal-reverse">
+          <paper-button class="btn-primary" on-tap="_save" raised>
+            [[localize('save')]]
+          </paper-button>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button class="btn-primary" on-tap="_save" raised>
-          [[localize('save')]]
-        </paper-button>
-
-        <paper-button class="btn-cancel" on-tap="close">
-          [[localize('cancel')]]
-        </paper-button>
-      </div>
-
-    </paper-dialog>
+          <paper-button class="btn-cancel" on-tap="close">
+            [[localize('cancel')]]
+          </paper-button>
+        </div>
+      </paper-dialog>
     `;
   }
 
@@ -166,7 +156,7 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
   }
 
   open() {
-    this.data = {'response_plan': +this.responsePlanID, 'choices': [], 'active': true};
+    this.data = {response_plan: +this.responsePlanID, choices: [], active: true};
     this.set('opened', true);
     this.set('refresh', true);
   }
@@ -179,22 +169,22 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
       (this.shadowRoot!.querySelector('#name') as PaperInputElement).set('invalid', true);
       return;
     }
-    const self = this;
+
     const thunk = (this.$.createDisaggregation as EtoolsPrpAjaxEl).thunk();
-    const newChoices = [];
+    const newChoices: GenericObject[] = [];
     for (let i = 0; i < this.data.choices.length; i++) {
-      newChoices.push({'value': this.data.choices[i], 'active': true});
+      newChoices.push({value: this.data.choices[i], active: true});
     }
     this.data.choices = newChoices;
     thunk()
       .then((res: any) => {
-        fireEvent(self, 'disaggregation-added', res.data);
-        self.updatePending = false;
-        self.close();
+        fireEvent(this, 'disaggregation-added', res.data);
+        this.updatePending = false;
+        this.close();
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
-        self.updatePending = false;
+        this.updatePending = false;
       });
   }
 

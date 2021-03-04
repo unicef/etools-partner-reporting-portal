@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .models import DisaggregationValue, Disaggregation
+from .models import Disaggregation, DisaggregationValue
 
 
 @receiver(post_save,

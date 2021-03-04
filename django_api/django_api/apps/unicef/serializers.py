@@ -1,28 +1,32 @@
 from django.conf import settings
 
-from rest_framework import serializers
-
+from account.validators import EmailValidator
+from core.common import CURRENCIES, INTERVENTION_TYPES, OVERALL_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
+from core.models import Location, Workspace
 from core.serializers import ShortLocationSerializer
-from utils.filters.constants import Boolean
-from .models import (
-    ProgrammeDocument, Section, ProgressReport, Person,
-    LowerLevelOutput, PDResultLink, ReportingPeriodDates,
-    ProgressReportAttachment,
-)
-
-from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS, INTERVENTION_TYPES
-from core.models import Workspace, Location
-
 from indicator.models import IndicatorBlueprint
-from indicator.serializers import (
-    PDReportContextIndicatorReportSerializer,
-    IndicatorBlueprintSimpleSerializer,
-)
-
+from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportContextIndicatorReportSerializer
 from partner.models import Partner
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
+
+from .models import (
+    LowerLevelOutput,
+    PDResultLink,
+    Person,
+    ProgrammeDocument,
+    ProgressReport,
+    ProgressReportAttachment,
+    ReportingPeriodDates,
+    Section,
+)
 
 
 class PersonSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[EmailValidator(
+        queryset=Person.objects.all(),
+    )])
+
     class Meta:
         model = Person
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
@@ -278,6 +282,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',
@@ -340,6 +346,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'partner_org_id',
             'partner_org_name',
             'partner_vendor_number',
@@ -403,7 +411,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         if self.location_id and self.llo_id is not None:
             queryset = queryset.filter(reportable__locations__id=self.location_id)
 
-        if self.show_incomplete_only == Boolean.TRUE:
+        if self.show_incomplete_only in [1, "1", "true", "True", True]:
             queryset = filter(
                 lambda x: not x.is_complete,
                 queryset
@@ -424,6 +432,16 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
     partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    financial_contribution_to_date = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+    )
+    financial_contribution_currency = serializers.ChoiceField(
+        choices=CURRENCIES,
+        allow_blank=True,
+        allow_null=True,
+    )
     challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
@@ -432,6 +450,8 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
         )
@@ -634,7 +654,9 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
 
 
 class PMPPDPersonSerializer(serializers.ModelSerializer):
-
+    email = serializers.EmailField(validators=[EmailValidator(
+        queryset=Person.objects.all(),
+    )])
     phone_num = serializers.CharField(
         source='phone_number',
         required=False,
@@ -724,6 +746,16 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "disbursement_percent",
             "document_type",
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ProgrammeDocument.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "workspace",
+                ],
+            )
+        ]
 
 
 class PMPLLOSerializer(serializers.ModelSerializer):
@@ -739,6 +771,16 @@ class PMPLLOSerializer(serializers.ModelSerializer):
             'cp_output',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=LowerLevelOutput.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "cp_output",
+                ],
+            )
+        ]
 
 
 class PMPSectionSerializer(serializers.ModelSerializer):
@@ -752,13 +794,28 @@ class PMPSectionSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+class BasePMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportingPeriodDates
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ReportingPeriodDates.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "report_type",
+                    "programme_document",
+                ],
+            ),
+        ]
+
+
+class PMPReportingPeriodDatesSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'start_date',
@@ -770,13 +827,12 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPReportingPeriodDatesSRSerializer(serializers.ModelSerializer):
+class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
-    class Meta:
-        model = ReportingPeriodDates
+    class Meta(BasePMPReportingPeriodDatesSerializer.Meta):
         fields = (
             'id',
             'due_date',
@@ -803,6 +859,16 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'programme_document',
             'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=PDResultLink.objects.all(),
+                fields=[
+                    "result_link",
+                    "external_business_area_code",
+                    "id",
+                ],
+            ),
+        ]
 
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):

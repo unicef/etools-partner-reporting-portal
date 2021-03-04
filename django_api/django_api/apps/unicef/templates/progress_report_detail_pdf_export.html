@@ -7,47 +7,6 @@
             size: a4 landscape;
             margin: 1cm;
         }
-
-        #pdf {
-            font-size: 10px;
-        }
-        table, td, th {
-            border: 1px solid black;
-        }
-        td, th {
-            padding-top: 4px;
-            padding-bottom: 1px;
-            padding-left: 3px;
-        }
-        th {
-            background-color: #d9d9d9;
-            font-weight: normal;
-            text-align: left;
-        }
-
-        td.signature {
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        td.Met, td.OnT {
-            background-color: #92D050;
-        }
-
-        td.NoP {
-            background-color: #E93F33;
-        }
-
-        td.Con {
-            background-color: #B2A1C7;
-        }
-
-        th.section {
-            background-color: #2498FA;
-            font-weight: bold;
-            color: #ffffff;
-            text-align: center;
-        }
     </style>
 {% endblock %}
 
@@ -62,7 +21,7 @@
                 <th rowspan="10">
                     1.3 Progress Report Information
                 </th>
-            
+
                 <th>Program Duration</th>
                 <td colspan="2">From {{ pd.start_date }} to {{ pd.end_date }}</td>
             </tr>
@@ -113,7 +72,7 @@
 
             <tr>
                 <th rowspan="3">1.4 Budget information</th>
-            
+
                 <th>Programme budget</th>
                 <td colspan="2">{{ pd.cso_contribution|format_currency:pd.cso_contribution_currency }}</td>
             </tr>
@@ -128,8 +87,17 @@
             </tr>
 
             <tr>
-                <th colspan="2">1.5 Partner Contribution to Date</th>
+                <th rowspan="3">1.5 Contribution to Date</th>
+                <th>Non-Financial Contribution to Date</th>
                 <td colspan="2">{{ progress_report.partner_contribution_to_date|default:"---" }}</td>
+            </tr>
+            <tr>
+                <th>Financial contribution made to Date</th>
+                <td colspan="2">{{ progress_report.financial_contribution_to_date|default:"---" }}</td>
+            </tr>
+            <tr>
+                <th>Financial contribution currency</th>
+                <td colspan="2">{{ progress_report.financial_contribution_currency|default:"---" }}</td>
             </tr>
         </table>
 

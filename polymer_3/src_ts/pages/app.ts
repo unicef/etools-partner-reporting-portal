@@ -12,6 +12,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import Endpoints from '../endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
+import {fetchCurrencies} from '../redux/actions/currencies';
 import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
@@ -25,128 +26,78 @@ import {getDomainByEnv} from '../config';
  * @appliesMixin LocalizeMixin
  */
 class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
+      <style>
+        :host {
+          display: block;
+        }
 
-      .no-groups-notification {
-        margin-top: 20%;
-        width: 100%;
-        text-align: center;
-      }
+        .no-groups-notification {
+          margin-top: 20%;
+          width: 100%;
+          text-align: center;
+        }
 
-      .no-groups-notification h3 {
-        font-size: 36px;
-      }
+        .no-groups-notification h3 {
+          font-size: 36px;
+        }
 
-      .no-groups-notification p {
-        font-size: 24px;
-      }
-    </style>
+        .no-groups-notification p {
+          font-size: 24px;
+        }
+      </style>
 
-    <etools-prp-workspaces
-        id="workspaces"
-        all="{{workspaces}}"
-        current="{{currentWorkspace}}">
-    </etools-prp-workspaces>
+      <etools-prp-workspaces id="workspaces" all="{{workspaces}}" current="{{currentWorkspace}}">
+      </etools-prp-workspaces>
 
-    <etools-prp-ajax
-        id="interventions"
-        url="[[interventionsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="interventions" url="[[interventionsUrl]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-      id="userProfile"
-      url="[[profileUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:workspace_code/:app"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
+      <etools-prp-ajax id="currenciesData" url="[[currenciesUrl]]"> </etools-prp-ajax>
 
-    <template
-        is="dom-if"
-        if="[[!userHasPrpRolesOrAccess]]">
-    <div class="no-groups-notification">
-      <h3>[[localize('account_created')]]</h3>
-      <p>[[localize('please_wait_business_days')]]</p>
-    </div>
-    </template>
+      <app-route route="{{route}}" pattern="/:workspace_code/:app" data="{{routeData}}" tail="{{subroute}}">
+      </app-route>
 
-    <iron-pages
-        selected="[[page]]"
-        attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
-        <page-ip-reporting
-            name="ip-reporting"
-            route="{{subroute}}">
-        </page-ip-reporting>
+      <template is="dom-if" if="[[!userHasPrpRolesOrAccess]]">
+        <div class="no-groups-notification">
+          <h3>[[localize('account_created')]]</h3>
+          <p>[[localize('please_wait_business_days')]]</p>
+        </div>
       </template>
 
-      <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
-        <page-cluster-reporting
-            name="cluster-reporting"
-            route="{{subroute}}">
-        </page-cluster-reporting>
-      </template>
-    </iron-pages>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
+          <page-ip-reporting name="ip-reporting" route="{{subroute}}"> </page-ip-reporting>
+        </template>
 
-    <paper-toast
-        id="changes-saved"
-        text="[[localize('changes_saved')]]"
-        duration="3000">
-    </paper-toast>
+        <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
+          <page-cluster-reporting name="cluster-reporting" route="{{subroute}}"> </page-cluster-reporting>
+        </template>
+      </iron-pages>
 
-    <paper-toast
-        id="server-error"
-        text="[[localize('an_error_occurred')]]"
-        duration="3000">
-    </paper-toast>
+      <paper-toast id="changes-saved" text="[[localize('changes_saved')]]" duration="3000"> </paper-toast>
 
-    <paper-toast
-        id="file-uploaded"
-        text="[[localize('file_uploaded')]]"
-        duration="3000">
-    </paper-toast>
+      <paper-toast id="server-error" text="[[localize('an_error_occurred')]]" duration="3000"> </paper-toast>
 
-    <paper-toast
-        id="file-deleted"
-        text="[[localize('file_deleted')]]"
-        duration="3000">
-    </paper-toast>
+      <paper-toast id="file-uploaded" text="[[localize('file_uploaded')]]" duration="3000"> </paper-toast>
 
-    <paper-toast
-        id="ocha-timeout"
-        text="[[localize('request_ocha_timed_out')]]"
-        duration="3000">
-    </paper-toast>
+      <paper-toast id="file-deleted" text="[[localize('file_deleted')]]" duration="3000"> </paper-toast>
 
-    <paper-toast
-        id="message-sent"
-        text="[[localize('message_sent')]]"
-        duration="3000">
-    </paper-toast>
+      <paper-toast id="ocha-timeout" text="[[localize('request_ocha_timed_out')]]" duration="3000"> </paper-toast>
 
-    <paper-toast
-        id="error-message"
-        duration="5000">
-    </paper-toast>
-  `;
+      <paper-toast id="message-sent" text="[[localize('message_sent')]]" duration="3000"> </paper-toast>
+
+      <paper-toast id="error-message" duration="5000"> </paper-toast>
+    `;
   }
-
 
   @property({type: Object})
   route!: Route;
 
   @property({type: Object})
-  routeData!: {workspace_code: string, app: string};
+  routeData!: {workspace_code: string; app: string};
 
   @property({type: String, observer: '_pageChanged'})
   page!: string;
@@ -162,6 +113,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String})
   profileUrl: string = Endpoints.userProfile();
+
+  @property({type: String})
+  currenciesUrl: string = Endpoints.currencies();
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
@@ -190,7 +144,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     const code = workspace.code;
 
     this.set('route.path', '/' + code + '/');
-    //this.set('routeData.workspace_code', code);
+    // this.set('routeData.workspace_code', code);
   }
 
   _redirectToApp(app: string) {
@@ -205,7 +159,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         const workspace = change.value[0];
         this._redirectToWorkspace(workspace);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   _routeWorkspaceChanged(workspaceCodeFromUrl: any) {
@@ -214,11 +170,10 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       if (this.workspaces && this.workspaces.length) {
         // Default to first
         this._redirectToWorkspace(this.workspaces[0]);
-      }
-      else {
+      } else {
         // Wait until workspaces are available, then pick one & redirect
-        //this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-        //this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
+        // this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
+        // this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
       }
     } else if (!this._workspaceCode) {
       this.reduxStore.dispatch(setWorkspace(workspaceCodeFromUrl));
@@ -226,24 +181,25 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _routeAppChanged(app: string) {
-    const self = this;
     setTimeout(() => {
       let defaultApp = localStorage.getItem('defaultApp');
       defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
 
-      if (!self.routeData.workspace_code) {
+      if (!this.routeData.workspace_code) {
         return;
       }
       if (!app) {
-        self._redirectToApp(defaultApp!);
-      } else if (!self._app) {
+        this._redirectToApp(defaultApp!);
+      } else if (!this._app) {
         this.reduxStore.dispatch(setApp(app));
+
+        this._fetchCurrencies(app);
 
         // Store selected app
         localStorage.setItem('defaultApp', app);
 
         // Render
-        self.page = app;
+        this.page = app;
       } else {
         localStorage.setItem('defaultApp', app);
       }
@@ -313,6 +269,13 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
   }
 
+  _fetchCurrencies(app: string) {
+    if (this.page !== app && app === 'ip-reporting') {
+      const currenciesDataThunk = (this.$.currenciesData as EtoolsPrpAjaxEl).thunk();
+      this.reduxStore.dispatch(fetchCurrencies(currenciesDataThunk));
+    }
+  }
+
   _addEventListeners() {
     this._notify = this._notify.bind(this);
     this.addEventListener('notify', this._notify as any);
@@ -330,13 +293,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
     this._addEventListeners();
     const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
-    await Promise.all([
-      this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)),
-      this._fetchProfile()
-    ])
-      .catch((_err: GenericObject) => {
+    await Promise.all([this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)), this._fetchProfile()]).catch(
+      (_err: GenericObject) => {
         window.location.href = '/landing';
-      });
+      }
+    );
   }
 
   disconnectedCallback() {

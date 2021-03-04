@@ -11,7 +11,6 @@ import {PaperDialogElement} from '@polymer/paper-dialog';
  */
 function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class ModalClass extends baseClass {
-
     @property({type: Boolean, notify: true})
     opened!: boolean;
 
@@ -29,13 +28,13 @@ function ModalMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
       if (!e) {
         return;
       }
-      e.stopPropagation();
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
 
-      this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer,
-        timeOut.after(100),
-        () => {
-          (this.$.dialog as PaperDialogElement).refit();
-        });
+      this._adjustPositionDebouncer = Debouncer.debounce(this._adjustPositionDebouncer, timeOut.after(100), () => {
+        (this.$.dialog as PaperDialogElement).refit();
+      });
     }
 
     disconnectedCallback() {

@@ -9,10 +9,5 @@ export function getDeleteUrl(locationId: string, reportId: string, attachmentId:
 }
 
 export function setFiles(attachments: any[]) {
-  return attachments.map(function(attachment) {
-    if (attachment && !attachment.path) {
-      return;
-    }
-    return attachment;
-  });
+  return (attachments || []).filter((attachment) => attachment && attachment.path);
 }

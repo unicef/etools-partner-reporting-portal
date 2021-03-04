@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 
 class BaseAPITestCase(APITestCase):

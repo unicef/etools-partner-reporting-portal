@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from core.models import ResponsePlan
-from ocha.imports.project import import_project, get_project_list_for_plan
+from ocha.imports.project import get_project_list_for_plan, import_project
 from ocha.imports.utilities import OCHAImportException
 from partner.models import Partner
 

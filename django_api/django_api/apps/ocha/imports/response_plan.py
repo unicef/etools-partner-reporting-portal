@@ -4,8 +4,12 @@ from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from ocha.constants import HPC_V1_ROOT_URL, RefCode
 from ocha.imports.serializers import V1ResponsePlanImportSerializer
-from ocha.imports.utilities import logger, get_json_from_url, save_cluster_objective, \
-    save_reportables_for_cluster_objective_or_activity
+from ocha.imports.utilities import (
+    get_json_from_url,
+    logger,
+    save_cluster_objective,
+    save_reportables_for_cluster_objective_or_activity,
+)
 
 
 def import_response_plan(external_plan_id, workspace=None, asynch=True):

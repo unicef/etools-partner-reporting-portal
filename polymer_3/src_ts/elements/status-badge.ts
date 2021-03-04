@@ -10,27 +10,22 @@ import '@polymer/iron-icons/image-icons';
  */
 class StatusBadge extends PolymerElement {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
-            display: inline-block;
-            vertical-align: top;
+          display: inline-block;
+          vertical-align: top;
 
-            --iron-icon-height: var(--status-badge-size, 16px);
-            --iron-icon-width: var(--status-badge-size, 16px);
+          --iron-icon-height: var(--status-badge-size, 16px);
+          --iron-icon-width: var(--status-badge-size, 16px);
 
-            margin-right: 4px;
+          margin-right: 4px;
         }
         :host iron-icon {
-            line-height: 1;
+          line-height: 1;
         }
       </style>
 
-      <iron-icon
-        icon="[[icon]]"
-        style="color: [[color]];">
-      </iron-icon>`
-    ;
+      <iron-icon icon="[[icon]]" style="color: [[color]];"> </iron-icon>`;
   }
 
   @property({type: String})

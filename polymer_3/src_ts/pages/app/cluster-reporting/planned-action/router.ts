@@ -12,62 +12,40 @@ import {getDomainByEnv} from '../../../../config';
  * @appliesMixin UtilsMixin
  */
 class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
-
   public static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:id"
-      data="{{routeData}}"
-      tail="{{subroute}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:id" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
-    <iron-pages
-      selected="[[page]]"
-      attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
-        <planned-action-projects-list
-          name="projects"
-          route="{{subroute}}">
-        </planned-action-projects-list>
-      </template>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
+          <planned-action-projects-list name="projects" route="{{subroute}}"> </planned-action-projects-list>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'project')]]" restamp="true">
-        <planned-action-projects-details
-          name="project"
-          project-id="{{id}}"
-          route="{{subroute}}">
-        </planned-action-projects-details>
-      </template>
+        <template is="dom-if" if="[[_equals(page, 'project')]]" restamp="true">
+          <planned-action-projects-details name="project" project-id="{{id}}" route="{{subroute}}">
+          </planned-action-projects-details>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
-        <planned-action-activities-list
-          name="activities"
-          route="{{subroute}}">
-        </planned-action-activities-list>
-      </template>
+        <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
+          <planned-action-activities-list name="activities" route="{{subroute}}"> </planned-action-activities-list>
+        </template>
 
-      <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
-        <planned-action-activities-details
-          name="activity"
-          activity-id="{{id}}"
-          route="{{subroute}}">
-        </planned-action-activities-details>
-      </template>
-    </iron-pages>
-  `;
+        <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
+          <planned-action-activities-details name="activity" activity-id="{{id}}" route="{{subroute}}">
+          </planned-action-activities-details>
+        </template>
+      </iron-pages>
+    `;
   }
 
   static get observers() {
-    return [
-      '_routeChanged(routeData.id)'
-    ];
+    return ['_routeChanged(routeData.id)'];
   }
 
   @property({type: String})
@@ -78,7 +56,6 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
 
   @property({type: String, observer: '_pageChanged'})
   page!: string;
-
 
   _routeChanged(id: string) {
     this.id = id;
@@ -94,12 +71,10 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
     }
 
     const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/cluster-reporting/planned-action/${page}.js`;
-    console.log('cluster planned-action router loading... :' + resolvedPageUrl);
     await import(resolvedPageUrl).catch((err: any) => {
       console.log(err);
       this._notFound();
     });
-
   }
 
   connectedCallback() {
@@ -112,7 +87,6 @@ class PlannedActionProjectsRouter extends UtilsMixin(PolymerElement) {
 
     this.set('visible', false);
   }
-
 }
 
 window.customElements.define('planned-action-projects-router', PlannedActionProjectsRouter);

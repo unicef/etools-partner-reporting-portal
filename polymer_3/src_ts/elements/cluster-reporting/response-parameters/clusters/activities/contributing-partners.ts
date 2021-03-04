@@ -14,7 +14,6 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
 import {clusterActivitiesPartnersFetch} from '../../../../../redux/actions/clusterActivities';
 
-
 /**
  * @polymer
  * @customElement
@@ -24,35 +23,23 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
   public static get template() {
     // language=HTML
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="partners"
-        url="[[partnersUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="partners" url="[[partnersUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <page-body>
-      <cluster-activities-contributing-partners-filters>
-      </cluster-activities-contributing-partners-filters>
+      <page-body>
+        <cluster-activities-contributing-partners-filters> </cluster-activities-contributing-partners-filters>
 
-      <contributing-partners-list
-        activity-id=[[activityId]]>
-      </contributing-partners-list>
-    </page-body>
+        <contributing-partners-list activity-id="[[activityId]]"> </contributing-partners-list>
+      </page-body>
     `;
   }
 
@@ -72,19 +59,17 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
   }
 
   _fetchPartners() {
-    this._fetchPartnersDebouncer = Debouncer.debounce(this._fetchPartnersDebouncer,
-      timeOut.after(300),
-      () => {
+    this._fetchPartnersDebouncer = Debouncer.debounce(this._fetchPartnersDebouncer, timeOut.after(300), () => {
+      const thunk = (this.$.partners as EtoolsPrpAjaxEl).thunk();
+      (this.$.partners as EtoolsPrpAjaxEl).abort();
 
-        const thunk = (this.$.partners as EtoolsPrpAjaxEl).thunk();
-        (this.$.partners as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore.dispatch(clusterActivitiesPartnersFetch(thunk, this.activityId))
-          // @ts-ignore
-          .catch((_err: any) => {
-            // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(clusterActivitiesPartnersFetch(thunk, this.activityId))
+        // @ts-ignore
+        .catch((_err: any) => {
+          // TODO: error handling.
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -95,7 +80,6 @@ class ContributingPartners extends UtilsMixin(ReduxConnectedElement) {
       this._fetchPartnersDebouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('rp-clusters-activity-contributing-partners', ContributingPartners);

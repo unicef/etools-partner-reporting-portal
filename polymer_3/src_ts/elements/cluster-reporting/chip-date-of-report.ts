@@ -9,79 +9,72 @@ import Settings from '../../settings';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin ChipMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin ChipMixin
+ */
 class ChipDateOfReport extends ChipMixin(PolymerElement) {
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles}
-    <style include="iron-flex iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles}
+      <style include="iron-flex iron-flex-reverse">
+        :host {
+          display: block;
 
-        --default-primary-color: var(--theme-primary-color);
+          --default-primary-color: var(--theme-primary-color);
 
-        --paper-dialog: {
-          width: auto;
-          max-width: none !important; /* :( */
-          max-height: none !important; /* :( */
-          margin: 0;
+          --paper-dialog: {
+            width: auto;
+            max-width: none !important; /* :( */
+            max-height: none !important; /* :( */
+            margin: 0;
+          }
         }
 
-      }
+        .add-chip {
+          text-decoration: none;
+          color: var(--theme-primary-color);
+        }
 
-      .add-chip {
-        text-decoration: none;
-        color: var(--theme-primary-color);
-      }
+        .buttons {
+          padding: 10px;
+        }
+      </style>
 
-      .buttons {
-        padding: 10px;
-      }
-    </style>
+      <a id="add" class="add-chip" on-tap="_open" href="#">
+        &plus; Add
+      </a>
 
-    <a
-        id="add"
-        class="add-chip"
-        on-tap="_open"
-        href="#">
-      &plus; Add
-    </a>
-
-     <paper-dialog
+      <paper-dialog
         id="dialog"
         class="paper-date-picker-dialog"
         opened="{{_adding}}"
         horizontal-align="right"
-        vertical-align="bottom">
+        vertical-align="bottom"
+      >
+        <datepicker-lite
+          id="picker"
+          value="{{_date}}"
+          min-date="[[minDate]]"
+          selected-date-display-format="[[dateFormat]]"
+        >
+        </datepicker-lite>
 
-      <datepicker-lite
-        id="picker"
-        value="{{_date}}"
-        min-date="[[minDate]]"
-        selected-date-display-format="[[dateFormat]]">
-      </datepicker-lite>
+        <div class="buttons layout horizontal-reverse">
+          <paper-button class="btn-primary" on-tap="_add">
+            Add
+          </paper-button>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-            class="btn-primary"
-            on-tap="_add">
-          Add
-        </paper-button>
-
-        <paper-button
-            on-tap="_close">
-          Cancel
-        </paper-button>
-      </div>
-    </paper-dialog>
-  `;
+          <paper-button on-tap="_close">
+            Cancel
+          </paper-button>
+        </div>
+      </paper-dialog>
+    `;
   }
 
   @property({type: String})
@@ -94,7 +87,7 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
   dateFormat = Settings.dateFormat;
 
   _add() {
-    const formatted = moment(this._date).format(this.dateFormat);
+    const formatted = dayjs(this._date).format(this.dateFormat);
     fireEvent(this, 'chip-add', formatted);
     this._close();
   }
@@ -104,8 +97,8 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
       return;
     }
 
-    const dateToUse = moment.utc().isBefore(moment.utc(this.minDate)) ? this.minDate : new Date();
-    this.set('_date', moment(dateToUse).format(Settings.datepickerFormat));
+    const dateToUse = dayjs.utc().isBefore(dayjs.utc(this.minDate)) ? this.minDate : new Date();
+    this.set('_date', dayjs(dateToUse).format(Settings.datepickerFormat));
   }
 
   connectedCallback() {
@@ -113,7 +106,6 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
 
     (this.$.dialog as PaperDialogElement).positionTarget = this.$.add;
   }
-
 }
 
 window.customElements.define('chip-date-of-report', ChipDateOfReport);

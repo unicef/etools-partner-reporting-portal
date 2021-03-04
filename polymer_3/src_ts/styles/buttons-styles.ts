@@ -2,7 +2,6 @@ import {html} from '@polymer/polymer';
 
 export const buttonsStyles = html`
   <style>
-
     paper-button[raised].btn-primary {
       color: white;
       background: var(--theme-primary-color);
@@ -13,12 +12,11 @@ export const buttonsStyles = html`
     }
 
     paper-button[disabled].btn-primary {
-      opacity: .5;
+      opacity: 0.5;
     }
 
     .btn-cancel {
       color: var(--theme-primary-text-color-dark);
     }
-
   </style>
 `;

@@ -3,20 +3,22 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models.signals import pre_save, m2m_changed
+from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
-
-from model_utils.models import TimeStampedModel
+from django.utils.translation import ugettext as _
 
 from core.common import (
-    PARTNER_TYPE,
-    SHARED_PARTNER_TYPE,
     CSO_TYPES,
+    EXTERNAL_DATA_SOURCES,
     PARTNER_PROJECT_STATUS,
-    RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES)
-from core.models import TimeStampedExternalSourceModel
+    PARTNER_TYPE,
+    RESPONSE_PLAN_TYPE,
+    SHARED_PARTNER_TYPE,
+)
+from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
 from core.fields import UniqueNullCharField
-from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
+from core.models import TimeStampedExternalSourceModel
+from model_utils.models import TimeStampedModel
 
 
 class Partner(TimeStampedExternalSourceModel):
@@ -142,8 +144,40 @@ class Partner(TimeStampedExternalSourceModel):
     clusters = models.ManyToManyField(
         'cluster.Cluster', related_name="partners"
     )
-
     ocha_external_id = UniqueNullCharField(max_length=128, blank=True, null=True, unique=True)
+    sea_risk_rating_name = models.CharField(
+        max_length=150,
+        verbose_name=_("PSEA Risk Rating"),
+        blank=True,
+        default='',
+    )
+    psea_assessment_date = models.DateTimeField(
+        verbose_name=_("Last PSEA Assess. Date"),
+        null=True,
+        blank=True,
+    )
+    overall_risk_rating = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+    )
+    type_of_assessment = models.CharField(
+        verbose_name=_("Assessment Type"),
+        max_length=50,
+        null=True,
+    )
+    highest_risk_rating_type = models.CharField(
+        verbose_name=_("Highest Risk Rating Type"),
+        max_length=150,
+        blank=True,
+        default='',
+    )
+    highest_risk_rating_name = models.CharField(
+        verbose_name=_("Highest Risk Rating Name"),
+        max_length=150,
+        blank=True,
+        default='',
+    )
 
     class Meta:
         ordering = ['title']
@@ -199,7 +233,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = JSONField(default=[], blank=True, null=True)
+    custom_fields = JSONField(default=list, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(
@@ -224,7 +258,9 @@ class PartnerProject(TimeStampedExternalSourceModel):
         'core.Location', related_name="partner_projects"
     )
     partner = models.ForeignKey(
-        Partner, related_name="partner_projects"
+        Partner,
+        related_name="partner_projects",
+        on_delete=models.CASCADE,
     )
     additional_partners = models.ManyToManyField(
         Partner, blank=True, verbose_name='Additional implementing partners'
@@ -289,7 +325,10 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
 
 
 class PartnerProjectFunding(TimeStampedModel):
-    project = models.OneToOneField(PartnerProject)
+    project = models.OneToOneField(
+        PartnerProject,
+        on_delete=models.CASCADE,
+    )
 
     # All fields below stored in USD
     required_funding = models.DecimalField(decimal_places=2, max_digits=32, null=True, blank=True)
@@ -351,13 +390,25 @@ class PartnerActivity(TimeStampedModel):
         related_name="partner_activities",
         through="PartnerActivityProjectContext",
     )
-    partner = models.ForeignKey(Partner, related_name="partner_activities")
-    cluster_activity = models.ForeignKey('cluster.ClusterActivity',
-                                         related_name="partner_activities",
-                                         null=True, blank=True)
-    cluster_objective = models.ForeignKey('cluster.ClusterObjective',
-                                          related_name="partner_activities",
-                                          null=True, blank=True)
+    partner = models.ForeignKey(
+        Partner,
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+    )
+    cluster_activity = models.ForeignKey(
+        'cluster.ClusterActivity',
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    cluster_objective = models.ForeignKey(
+        'cluster.ClusterObjective',
+        related_name="partner_activities",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_activities')
     locations = models.ManyToManyField('core.Location',

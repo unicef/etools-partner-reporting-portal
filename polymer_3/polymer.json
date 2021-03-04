@@ -41,26 +41,20 @@
     "src/pages/app/cluster-reporting/results.js",
     "src/pages/app/cluster-reporting/analysis.js"
   ],
-  "sources": [
-    "src/**/*",
-    "images/**/*",
-    "package.json"
-  ],
+  "sources": ["src/**/*", "images/**/*", "package.json"],
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/**",
     "node_modules/web-animations-js/web-animations-next-lite.min.js",
-    "node_modules/moment/min/moment.min.js",
+    "node_modules/dayjs/dayjs.min.js",
+    "node_modules/dayjs/plugin/utc.js",
     "node_modules/numeral/min/numeral.min.js",
     "node_modules/intl-messageformat/dist/umd/intl-messageformat.min.js"
   ],
   "builds": [
     {
       "name": "esm-bundled",
-      "browserCapabilities": [
-        "es2015",
-        "modules"
-      ],
+      "browserCapabilities": ["es2015", "modules"],
       "js": {
         "minify": true
       },
@@ -77,13 +71,12 @@
       "name": "es6-bundled",
       "preset": "es6-bundled",
       "addServiceWorker": true
-    },
-    {
-      "name": "es5-bundled",
-      "preset": "es5-bundled",
-      "addServiceWorker": true
     }
   ],
+  "lint": {
+    "rules": ["polymer-3"],
+    "ignoreWarnings": []
+  },
   "moduleResolution": "node",
   "npm": true
 }

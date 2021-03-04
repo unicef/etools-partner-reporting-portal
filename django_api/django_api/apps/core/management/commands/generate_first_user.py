@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-import datetime
-
 from django.core.management.base import BaseCommand
 
 from account.models import User
@@ -10,7 +7,6 @@ class Command(BaseCommand):
     help = 'Creates a set of ORM objects for initial data'
 
     def handle(self, *args, **options):
-        today = datetime.date.today()
         admin_password = 'Passw0rd!'
 
         # Cluster admin creation

@@ -13,7 +13,6 @@ import '../../elements/filters/reportable-filter/reportable-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/report-location-filter/report-location-filter';
 
-
 /**
  * @polymer
  * @customElement
@@ -39,31 +38,18 @@ class ReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
       <filter-list filters="{{filters}}">
         <div class="app-grid">
-          <reportable-filter
-              class="item"
-              value="[[_withDefault(queryParams.llo, '')]]">
-          </reportable-filter>
+          <reportable-filter class="item" value="[[_withDefault(queryParams.llo, '')]]"> </reportable-filter>
 
-          <report-location-filter
-              class="item"
-              value="[[_withDefault(queryParams.location, '')]]">
+          <report-location-filter class="item" value="[[_withDefault(queryParams.location, '')]]">
           </report-location-filter>
 
-          <checkbox-filter
-              class="incomplete"
-              name="incomplete"
-              value="[[_withDefault(queryParams.incomplete, '')]]">
+          <checkbox-filter class="incomplete" name="incomplete" value="[[_withDefault(queryParams.incomplete, '')]]">
             <span class="checkbox-label">[[localize('show_incomplete_only')]]</span>
           </checkbox-filter>
         </div>
@@ -76,7 +62,6 @@ class ReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: Object})
   filters!: GenericObject;
-
 }
 
 window.customElements.define('report-filters', ReportFilters);

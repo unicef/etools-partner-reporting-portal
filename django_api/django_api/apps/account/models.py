@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
-from model_utils.models import TimeStampedModel
-
 from core.common import PRP_ROLE_TYPES, USER_TYPES
+from model_utils.models import TimeStampedModel
 from utils.emails import send_email_from_template
 
 
@@ -23,7 +23,11 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=64)
 
     partner = models.ForeignKey(
-        'partner.Partner', related_name="users", null=True, blank=True
+        'partner.Partner',
+        related_name="users",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     organization = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(
@@ -103,6 +107,11 @@ class User(AbstractUser):
         )
         return True
 
+    def save(self, *args, **kwargs):
+        if self.email != self.email.lower():
+            raise ValidationError("Email must be lowercase.")
+        super().save(*args, **kwargs)
+
 
 class UserProfile(TimeStampedModel):
     """
@@ -111,7 +120,11 @@ class UserProfile(TimeStampedModel):
     related models:
         account.User (OneToOne): "user"
     """
-    user = models.OneToOneField(User, related_name="profile")
+    user = models.OneToOneField(
+        User,
+        related_name="profile",
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return "{} - Profile".format(self.user.get_fullname())

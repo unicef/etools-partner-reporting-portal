@@ -94,7 +94,7 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
 
     <paper-dialog
         id="dialog"
-        with-backdrop
+        modal
         opened="[[opened]]">
       <div class="header layout horizontal justified">
         <h2>[[localize('edit_cluster_activity')]]</h2>
@@ -187,18 +187,17 @@ class ClusterActivitiesEditingModal extends LocalizeMixin(UtilsMixin(DateMixin(R
       return;
     }
 
-    const self = this;
     const thunk = (this.$.editActivity as EtoolsPrpAjaxEl).thunk();
 
-    self.updatePending = true;
+    this.updatePending = true;
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        fireEvent(self, 'activity-edited', res.data);
-        self.close();
+        this.updatePending = false;
+        fireEvent(this, 'activity-edited', res.data);
+        this.close();
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         // TODO: error handling
       });
   }

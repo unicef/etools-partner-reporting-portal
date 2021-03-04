@@ -1,17 +1,13 @@
 from datetime import datetime, timedelta
 
-from django.utils.deconstruct import deconstructible
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
-from social_core.backends.azuread_b2c import AzureADB2COAuth2
-from social_core.pipeline import social_auth
-from social_core.pipeline import user as social_core_user
-
-from social_django.middleware import SocialAuthExceptionMiddleware
+from django.utils.deconstruct import deconstructible
 
 from azure.storage import AccessPolicy, SharedAccessPolicy
-
+from social_core.backends.azuread_b2c import AzureADB2COAuth2
+from social_core.pipeline import social_auth, user as social_core_user
+from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
 from storages.utils import setting
 
@@ -45,7 +41,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     return {'username': details.get('email')}
 
 
-def user_details(strategy, details, user=None, *args, **kwargs):
+def user_details(strategy, details, backend, user=None, *args, **kwargs):
     # # This is where we update the user
     # # see what the property to map by is here
     # updates_available = False
@@ -83,10 +79,11 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         #     user.save()
         #     user.profile.save()
 
-    return social_core_user.user_details(strategy, details, user, *args, **kwargs)
+    return social_core_user.user_details(strategy, details, backend, user, *args, **kwargs)
 
 
 class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
+    BASE_URL = 'https://{tenant_id}.b2clogin.com/{tenant_id}.onmicrosoft.com'
 
     def __init__(self, *args, **kwargs):
         super(CustomAzureADBBCOAuth2, self).__init__(*args, **kwargs)
@@ -107,13 +104,11 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
             if 'AADB2C90118' in error_description:
                 auth_class = CustomAzureADBBCOAuth2()
                 redirect_home = auth_class.get_redirect_uri()
-                redirect_url = 'https://login.microsoftonline.com/' + \
-                               settings.TENANT_ID + \
-                               "/oauth2/v2.0/authorize?p=" + \
-                               settings.SOCIAL_PASSWORD_RESET_POLICY + \
-                               "&client_id=" + settings.KEY + \
-                               "&nonce=defaultNonce&redirect_uri=" + redirect_home + \
-                               "&scope=openid+email&response_type=code"
+                redirect_url = auth_class.base_url + '/oauth2/v2.0/' + \
+                    'authorize?p=' + settings.SOCIAL_PASSWORD_RESET_POLICY + \
+                    '&client_id=' + settings.KEY + \
+                    '&nonce=defaultNonce&redirect_uri=' + redirect_home + \
+                    '&scope=openid+email&response_type=code'
                 return redirect_url
 
         # TODO: In case of password reset the state can't be verified figure out a way to log the user in after reset

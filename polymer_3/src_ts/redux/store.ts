@@ -1,10 +1,4 @@
-import {
-  createStore,
-  compose,
-  applyMiddleware,
-  combineReducers,
-  StoreEnhancer
-} from 'redux';
+import {createStore, compose, applyMiddleware, combineReducers, StoreEnhancer} from 'redux';
 
 import thunk from 'redux-thunk';
 import {Localize} from './reducers/localize';
@@ -32,7 +26,7 @@ import {ClusterDashboardData} from './reducers/clusterDashboardData';
 import {ClusterObjectives} from './reducers/clusterObjectives';
 import {ClusterDisaggregations} from './reducers/clusterDisaggregations';
 import {ClusterIndicatorReports} from './reducers/clusterIndicatorReports';
-
+import {CurrenciesData} from './reducers/currencies';
 
 declare global {
   interface Window {
@@ -44,12 +38,10 @@ declare global {
 
 // Sets up a Chrome extension for time travel debugging.
 // See https://github.com/zalmoxisus/redux-devtools-extension for more information.
-const devCompose: <Ext0, StateExt0>(
-  f1: StoreEnhancer<Ext0, StateExt0>
-) => StoreEnhancer<Ext0, StateExt0> =
+const devCompose: <Ext0, StateExt0>(f1: StoreEnhancer<Ext0, StateExt0>) => StoreEnhancer<Ext0, StateExt0> =
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-let rootReducer = combineReducers({
+const rootReducer = combineReducers({
   localize: Localize,
   auth: Auth,
   workspaces: Workspaces,
@@ -74,12 +66,10 @@ let rootReducer = combineReducers({
   clusterDashboardData: ClusterDashboardData,
   userProfile: UserProfile,
   analysis: Analysis,
-  config: Config
+  config: Config,
+  currencies: CurrenciesData
 });
 
-export const store = createStore(
-  rootReducer,
-  devCompose(applyMiddleware(thunk))
-);
+export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk)));
 
 export type ReduxDispatch = typeof store.dispatch;

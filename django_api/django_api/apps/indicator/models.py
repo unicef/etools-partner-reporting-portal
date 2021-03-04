@@ -1,40 +1,44 @@
 from __future__ import unicode_literals
 
+from functools import reduce
+
 from django.conf import settings
-from django.utils.functional import cached_property
-from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from model_utils.models import TimeStampedModel
-from model_utils.tracker import FieldTracker
-from requests.compat import urljoin
-from rest_framework import serializers
+from django.utils.functional import cached_property
 
 from core.common import (
-    INDICATOR_REPORT_STATUS,
-    FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
-    PROGRESS_REPORT_STATUS,
-    OVERALL_STATUS,
     FINAL_OVERALL_STATUS,
+    FREQUENCY_LEVEL,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    PROGRESS_REPORT_STATUS,
+    PRP_ROLE_TYPES,
+    REPORTABLE_FREQUENCY_LEVEL,
     REPORTING_TYPES,
-    PRP_ROLE_TYPES)
-from core.models import TimeStampedExternalSourceModel
-from functools import reduce
-
-from partner.models import PartnerActivity
-
-from indicator.disaggregators import (
-    QuantityIndicatorDisaggregator,
-    RatioIndicatorDisaggregator
 )
+from core.models import TimeStampedExternalSourceModel
 from indicator.constants import ValueType
+from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from indicator.utilities import convert_string_number_to_float
+from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from partner.models import PartnerActivity
+from requests.compat import urljoin
+from rest_framework import serializers
 from utils.emails import send_email_from_template
+
+
+def default_total():
+    return dict([('c', 0), ('d', 1), ('v', 0)])
+
+
+def default_value():
+    return dict([('d', 1), ('v', 0)])
 
 
 class Disaggregation(TimeStampedExternalSourceModel):
@@ -47,7 +51,11 @@ class Disaggregation(TimeStampedExternalSourceModel):
     name = models.CharField(max_length=255, verbose_name="Disaggregation by")
     # IP reporting ones won't have this fk.
     response_plan = models.ForeignKey(
-        'core.ResponsePlan', related_name="disaggregations", blank=True, null=True
+        'core.ResponsePlan',
+        related_name="disaggregations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     active = models.BooleanField(default=True)
 
@@ -65,7 +73,11 @@ class DisaggregationValue(TimeStampedExternalSourceModel):
     related models:
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
-    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
+    disaggregation = models.ForeignKey(
+        Disaggregation,
+        related_name="disaggregation_values",
+        on_delete=models.CASCADE,
+    )
     value = models.CharField(max_length=128)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
@@ -230,8 +242,8 @@ class Reportable(TimeStampedExternalSourceModel):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = JSONField(default=dict([('d', 1), ('v', 0)]))
-    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    target = JSONField(default=default_value)
+    baseline = JSONField(default=default_value)
     in_need = JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
@@ -249,7 +261,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
+    total = JSONField(default=default_total)
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -262,11 +274,19 @@ class Reportable(TimeStampedExternalSourceModel):
     # One of ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity
     content_object = GenericForeignKey('content_type', 'object_id')
     blueprint = models.ForeignKey(
-        IndicatorBlueprint, null=True, related_name="reportables"
+        IndicatorBlueprint,
+        related_name="reportables",
+        on_delete=models.CASCADE,
+        null=True,
     )
-    parent_indicator = models.ForeignKey('self', null=True, blank=True,
-                                         related_name='children',
-                                         db_index=True)
+    parent_indicator = models.ForeignKey(
+        'self',
+        related_name='children',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     locations = models.ManyToManyField(
         'core.Location',
         related_name="reportables",
@@ -291,8 +311,11 @@ class Reportable(TimeStampedExternalSourceModel):
     active = models.BooleanField(default=True)
 
     ca_indicator_used_by_reporting_entity = models.ForeignKey(
-        'self', null=True, blank=True,
+        'self',
         related_name='ca_indicators_re',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         db_index=True
     )
 
@@ -611,8 +634,8 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = JSONField(default=dict([('d', 1), ('v', 0)]))
-    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    target = JSONField(default=default_value)
+    baseline = JSONField(default=default_value)
     in_need = JSONField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
@@ -638,9 +661,17 @@ class IndicatorReport(TimeStampedModel):
         indicator.ReportingEntity (ForeignKey): "reporting_entity"
     """
     title = models.CharField(max_length=2048)
-    reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
+    reportable = models.ForeignKey(
+        Reportable,
+        related_name="indicator_reports",
+        on_delete=models.CASCADE,
+    )
     progress_report = models.ForeignKey(
-        'unicef.ProgressReport', related_name="indicator_reports", null=True, blank=True
+        'unicef.ProgressReport',
+        related_name="indicator_reports",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
@@ -655,7 +686,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
+    total = JSONField(default=default_total)
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -676,21 +707,27 @@ class IndicatorReport(TimeStampedModel):
                                    null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
 
-    parent = models.ForeignKey('self',
-                               null=True,
-                               blank=True,
-                               related_name='children',
-                               db_index=True)
+    parent = models.ForeignKey(
+        'self',
+        related_name='children',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
 
     reporting_entity = models.ForeignKey(
-        'indicator.ReportingEntity', related_name="indicator_reports"
+        'indicator.ReportingEntity',
+        related_name="indicator_reports",
+        on_delete=models.CASCADE,
     )
 
     project = models.ForeignKey(
         'partner.PartnerProject',
         related_name="indicator_reports",
+        on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
     )
 
     tracker = FieldTracker(fields=['report_status'])
@@ -1022,11 +1059,14 @@ class IndicatorLocationData(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="indicator_location_data"
+        IndicatorReport,
+        related_name="indicator_location_data",
+        on_delete=models.CASCADE,
     )
     location = models.ForeignKey(
         'core.Location',
-        related_name="indicator_location_data"
+        related_name="indicator_location_data",
+        on_delete=models.CASCADE,
     )
 
     disaggregation = JSONField(default=dict)

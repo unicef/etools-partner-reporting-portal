@@ -7,8 +7,7 @@ import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '../../../utils/fire-custom-event';
 import Settings from '../../../settings';
-declare const moment: any;
-
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -19,21 +18,22 @@ declare const moment: any;
 class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display:block;
-      };
-    </style>
-    <datepicker-lite
-      id="field"
-      label="[[label]]"
-      value="[[value]]"
-      input-date-format="[[format]]"
-      selected-date-display-format="[[format]]"
-      fire-date-has-changed
-      on-date-has-changed="_filterDateHasChanged">
-    </datepicker-lite>
-  `;
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <datepicker-lite
+        id="field"
+        label="[[label]]"
+        value="[[value]]"
+        input-date-format="[[format]]"
+        selected-date-display-format="[[format]]"
+        fire-date-has-changed
+        on-date-has-changed="_filterDateHasChanged"
+      >
+      </datepicker-lite>
+    `;
   }
 
   @property({type: String})
@@ -43,7 +43,7 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
   format = Settings.dateFormat;
 
   _filterDateHasChanged(event: CustomEvent) {
-    const newValue = event.detail.date ? moment(event.detail.date).format(this.format) : '';
+    const newValue = event.detail.date ? dayjs(event.detail.date).format(this.format) : '';
     fireEvent(this, 'filter-changed', {
       name: this.name,
       value: newValue
@@ -55,8 +55,6 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
 
     this._filterReady();
   }
-
-
 }
 
 window.customElements.define('date-filter', DateFilter);

@@ -16,27 +16,18 @@ import {GenericObject} from '../../../typings/globals.types';
 class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
-      class="item"
-      label="[[localize('pd')]]"
-      name="pds"
-      value="[[value]]"
-      data="[[data]]">
-    </dropdown-filter-multi>
-  `;
+      <dropdown-filter-multi class="item" label="[[localize('pd')]]" name="pds" value="[[value]]" data="[[data]]">
+      </dropdown-filter-multi>
+    `;
   }
-
 
   @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)', observer: '_fetchPDs'})
   programmeDocumentsUrl!: string;
@@ -58,16 +49,15 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _fetchPDs(url: string) {
-    const self = this;
-
     if (!url) {
       return;
     }
 
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk()()
+    (this.$.programmeDocuments as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        self.set('data', res.data.results);
+        this.set('data', res.data.results);
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling
@@ -78,7 +68,6 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
     super.connectedCallback();
     (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
   }
-
 }
 
 window.customElements.define('pd-dropdown-filter', PDDropdownFilter);

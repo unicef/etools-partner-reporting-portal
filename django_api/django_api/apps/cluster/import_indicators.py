@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import traceback
 from datetime import datetime
-from django.db.models import Q
+
 from django.db import transaction
+from django.db.models import Q
 
-from openpyxl.reader.excel import load_workbook
-
-from indicator.models import IndicatorLocationData, IndicatorBlueprint, DisaggregationValue
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
+from openpyxl.reader.excel import load_workbook
 
 COLUMN_HASH_ID = 4
 MAX_COLUMNS = 1000

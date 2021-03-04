@@ -1,22 +1,19 @@
 import operator
-
 from functools import reduce
 
-from django.db.models import Q, F
+from django.db.models import F, Q
 
+from core.common import CLUSTER_TYPE_NAME_DICT, OVERALL_STATUS, PARTNER_PROJECT_STATUS
+from core.models import GatewayType, Location, ResponsePlan
+from indicator.models import IndicatorLocationData, IndicatorReport, Reportable
+from indicator.serializers import ClusterIndicatorReportSerializer
+from partner.models import Partner
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework_gis.fields import GeometryField, GeoJsonDict
+from rest_framework_gis.fields import GeoJsonDict, GeometryField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
-from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
-from core.models import ResponsePlan, GatewayType, Location
-from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
-from indicator.serializers import (
-    ClusterIndicatorReportSerializer,
-)
-from partner.models import Partner
-from .models import ClusterObjective, ClusterActivity, Cluster
+from .models import Cluster, ClusterActivity, ClusterObjective
 
 
 class ClusterSimpleSerializer(serializers.ModelSerializer):

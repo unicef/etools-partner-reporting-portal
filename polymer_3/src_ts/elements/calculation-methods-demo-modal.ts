@@ -10,12 +10,11 @@ import '@polymer/paper-styles/typography';
 import {GenericObject} from '../typings/globals.types';
 import ModalMixin from '../mixins/modal-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
-import './calculation-methods-demo-locations.js';
-import './calculation-methods-demo-periods.js';
+import './calculation-methods-demo-locations';
+import './calculation-methods-demo-periods';
 import './etools-prp-number';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {modalStyles} from '../styles/modal-styles';
-
 
 /**
  * @polymer
@@ -24,7 +23,6 @@ import {modalStyles} from '../styles/modal-styles';
  * @appliesMixin UtilsMixin
  */
 class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement)) {
-
   static get template() {
     return html`
     ${buttonsStyles} ${modalStyles}
@@ -67,7 +65,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
       }
     </style>
 
-    <paper-dialog id="calculation-methods-demo-modal-dialog" with-backdrop opened="{{opened}}">
+    <paper-dialog id="calculation-methods-demo-modal-dialog" modal opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Calculation method across [[domain]]</h2>
 
@@ -90,7 +88,7 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
           <labelled-item
             label="Guidance on measurement (for each reporting period)">
             <span>
-              Quality standard: requires agreed treatment protocol and duration
+              Quality standard: requires agreed treatment protocol and duration
               (usually 2 mo); Measurement/reporting clarification: measures
               newly admitted cases for an ongoing service, therefore requires
               agreement to consistently report NEW admissions for an agreed
@@ -153,9 +151,11 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   selectedType = 'sum';
 
   @property({type: Array})
-  totals = [{id: 1, value: 4000},
-  {id: 2, value: 6000},
-  {id: 3, value: 2000}];
+  totals = [
+    {id: 1, value: 4000},
+    {id: 2, value: 6000},
+    {id: 3, value: 2000}
+  ];
 
   @property({type: Array, computed: '_computeTotals(totals, items)'})
   locationTotals!: any[];
@@ -166,7 +166,8 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   @property({type: Object})
   descriptionsLocations = {
     value: {
-      sum: 'Adds values as cumulative results for all locations. ' +
+      sum:
+        'Adds values as cumulative results for all locations. ' +
         'Answers the question, what is total coverage for reporting ' +
         'period across locations. Requires that indicator definition ' +
         'does not count same case or event twice across locations, i.e. ' +
@@ -174,39 +175,47 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
         'estimated catchment population for mass dissemination by ' +
         'radio, total coverage must be calculated manually ' +
         'discounting overlap).',
-      max: 'Takes the top value for all locations. Answers the ' +
+      max:
+        'Takes the top value for all locations. Answers the ' +
         'question, ' +
         'where is the  highest number of "x" reached at any one time. ' +
         'Useful for identification of pattern of demand.  Not generally ' +
         'a useful measure of overall performance of programme across ' +
         'locations.',
-      avg: 'Provides a measure of the typical value across the ' +
+      avg:
+        'Provides a measure of the typical value across the ' +
         'locations. Answers the question, how many people does a ' +
         'programme or service usually reach at any given location. ' +
-        'Does not reflect the best or worst or total picture. ',
+        'Does not reflect the best or worst or total picture. '
     }
-  }
+  };
 
   @property({type: Object})
   descriptionsReportingPeriods = {
     value: {
-      sum: 'Sum adds all results for all reporting periods. Answers the ' +
+      sum:
+        'Sum adds all results for all reporting periods. Answers the ' +
         'question: what is total coverage over time? Only valid ' +
         'indicator counts the same case or event only once over time ' +
         'e.g. sum of children admitted to SAM treatment (each child ' +
         'registered once at programme start) is valid. Not valid to ' +
         'aggregate sum of children participating in ongoing learning ' +
         'programme each month as this counts each child multiple times. ',
-      max: 'Max takes the top value for all reporting intervals. ' +
+      max:
+        'Max takes the top value for all reporting intervals. ' +
         'Answers the question: what was the peak case load or highest ' +
         'coverage at any one time?',
-      avg: 'Average provides a measure of the typical value across ' +
+      avg:
+        'Average provides a measure of the typical value across ' +
         'reporting periods. Answers the question: what is the usual ' +
-        'reach/coverage in ongoing programme. ',
+        'reach/coverage in ongoing programme. '
     }
-  }
+  };
 
-  @property({type: String, computed: '_computeDescription(selectedType, domain, descriptionsLocations, descriptionsReportingPeriods)'})
+  @property({
+    type: String,
+    computed: '_computeDescription(selectedType, domain, descriptionsLocations, descriptionsReportingPeriods)'
+  })
   description!: string;
 
   _computeFinalTotal(selectedType: string, totals: GenericObject[]) {
@@ -218,9 +227,11 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
       case 'sum':
         return this._totalSum(totals);
       case 'max':
-        return Math.max.apply(Math, totals.map(function(total) {
-          return total.value;
-        }));
+        return Math.max(
+          ...totals.map(function (total) {
+            return total.value;
+          })
+        );
       case 'avg':
         return this._totalAvg(totals);
       default:
@@ -232,10 +243,13 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
     return totals.slice(0, items);
   }
 
-  _computeDescription(selectedType: string, domain: string, descriptionsLocations: GenericObject,
-    descriptionsReportingPeriods: GenericObject) {
-    return domain === 'locations' ? descriptionsLocations[selectedType] :
-      descriptionsReportingPeriods[selectedType];
+  _computeDescription(
+    selectedType: string,
+    domain: string,
+    descriptionsLocations: GenericObject,
+    descriptionsReportingPeriods: GenericObject
+  ) {
+    return domain === 'locations' ? descriptionsLocations[selectedType] : descriptionsReportingPeriods[selectedType];
   }
 
   _onRadioChange(e: CustomEvent) {
@@ -243,17 +257,18 @@ class CalculationMethodsDemoModal extends UtilsMixin(ModalMixin(PolymerElement))
   }
 
   _totalSum(data: GenericObject[]) {
-    return data.reduce(function(acc, next) {
+    return data.reduce(function (acc, next) {
       return acc + next.value;
     }, 0);
   }
 
   _totalAvg(data: GenericObject[]) {
-    return data.reduce(function(acc, next) {
-      return acc + next.value;
-    }, 0) / data.length;
+    return (
+      data.reduce(function (acc, next) {
+        return acc + next.value;
+      }, 0) / data.length
+    );
   }
-
 }
 window.customElements.define('calculation-methods-demo-modal', CalculationMethodsDemoModal);
 

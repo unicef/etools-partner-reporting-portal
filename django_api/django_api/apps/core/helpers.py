@@ -1,19 +1,17 @@
-import math
-import random
 import logging
-import sys
+import math
 import os
+import random
+import sys
 from ast import literal_eval
 from calendar import monthrange
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
 from itertools import combinations, product
 
-from core.common import (
-    PD_FREQUENCY_LEVEL,
-)
+from core.common import PD_FREQUENCY_LEVEL
+from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger("django")
 
@@ -37,8 +35,8 @@ def suppress_stdout():
 
 def get_zero_dict(indicator_type):
     v = 0
-    d = 1 if indicator_type is "SUM" else 0
-    c = v / d if indicator_type is "SUM" else 0
+    d = 1 if indicator_type == "SUM" else 0
+    c = v / d if indicator_type == "SUM" else 0
     return {
         "c": c,
         "v": v,
@@ -526,12 +524,7 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
         IndicatorReport -- A newly created IndicatorReport instance
     """
 
-    from indicator.models import (
-        IndicatorBlueprint,
-        IndicatorReport,
-        IndicatorLocationData,
-        ReportingEntity,
-    )
+    from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, ReportingEntity
 
     if not pai_ir_for_period:
         ir_title = reportable.blueprint.title
@@ -620,11 +613,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
         end_date {datetime.datetime} -- End date for reporting
         due_date {datetime.datetime} -- due date for reporting
     """
-    from indicator.models import (
-        IndicatorReport,
-        Reportable,
-    )
-
+    from indicator.models import IndicatorReport, Reportable
     from unicef.models import ProgressReport
 
     if next_progress_report.report_type != "SR":
@@ -813,12 +802,7 @@ def create_ir_for_cluster(reportable, start_date, end_date, project):
     Returns:
         IndicatorReport -- Newly generated IndicatorReport instance
     """
-    from indicator.models import (
-        IndicatorBlueprint,
-        IndicatorReport,
-        IndicatorLocationData,
-        ReportingEntity,
-    )
+    from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, ReportingEntity
 
     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
         logger.info("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(

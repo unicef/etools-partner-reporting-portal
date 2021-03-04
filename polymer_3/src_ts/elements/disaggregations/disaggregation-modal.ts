@@ -27,62 +27,50 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
   public static get template() {
     // language=HTML
     return html`
-    ${buttonsStyles} ${modalStyles}
-    <style include="iron-flex iron-flex-alignment iron-flex-reverse">
-      :host {
-        display: block;
+      ${buttonsStyles} ${modalStyles}
+      <style include="iron-flex iron-flex-alignment iron-flex-reverse">
+        :host {
+          display: block;
 
-        --paper-dialog: {
-          width: 700px;
+          --paper-dialog: {
+            width: 700px;
+          }
         }
-      }
-      ::slotted([slot=disaggregation-table]) {
-        margin-bottom: 1em;
-      }
-    </style>
+        ::slotted([slot='disaggregation-table']) {
+          margin-bottom: 1em;
+        }
+      </style>
 
-    <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
-      <div class="header layout horizontal justified">
-        <h2>[[localize('enter_data')]]</h2>
+      <paper-dialog id="dialog" modal opened="{{opened}}">
+        <div class="header layout horizontal justified">
+          <h2>[[localize('enter_data')]]</h2>
 
-        <div class="layout horizontal">
-          <p>[[localize('reporting_period')]]: [[reportingPeriod]]</p>
+          <div class="layout horizontal">
+            <p>[[localize('reporting_period')]]: [[reportingPeriod]]</p>
 
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
+            <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
+          </div>
         </div>
-      </div>
 
-      <paper-dialog-scrollable>
-        <slot name="meta"></slot>
-        <slot name="disaggregation-table" class="table"></slot>
-      </paper-dialog-scrollable>
+        <paper-dialog-scrollable>
+          <slot name="meta"></slot>
+          <slot name="disaggregation-table" class="table"></slot>
+        </paper-dialog-scrollable>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-            class="btn-primary"
-            on-tap="_save"
-            raised>
-          [[localize('save')]]
-        </paper-button>
+        <div class="buttons layout horizontal-reverse">
+          <paper-button class="btn-primary" on-tap="_save" raised>
+            [[localize('save')]]
+          </paper-button>
 
-        <paper-button
-            class="btn-cancel"
-            on-tap="close">
-          [[localize('cancel')]]
-        </paper-button>
-      </div>
+          <paper-button class="btn-cancel" on-tap="close">
+            [[localize('cancel')]]
+          </paper-button>
+        </div>
 
-      <confirm-box id="confirm"></confirm-box>
+        <confirm-box id="confirm"></confirm-box>
 
-      <etools-loading active="[[updatePending]]"></etools-loading>
-    </paper-dialog>
+        <etools-loading active="[[updatePending]]"></etools-loading>
+      </paper-dialog>
     `;
   }
 
@@ -91,7 +79,6 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
 
   @property({type: Boolean})
   updatePending = false;
-
 
   _save() {
     const tableSlot = this.shadowRoot!.querySelectorAll('.table')[0] as HTMLSlotElement;
@@ -104,19 +91,18 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
       });
     }
     if (tableElem) {
-      const self = this;
-
       this.set('updatePending', true);
 
-      (tableElem as DisaggregationTableEl).save()
+      (tableElem as DisaggregationTableEl)
+        .save()
         .then(() => {
-          self.set('updatePending', false);
-          self.close();
+          this.set('updatePending', false);
+          this.close();
         })
         // @ts-ignore
         .catch((_err: GenericObject) => {
-          // TODO: error handling
-          self.set('updatePending', false);
+          console.log(_err);
+          this.set('updatePending', false);
         });
     }
   }
@@ -125,8 +111,7 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     e.stopPropagation();
 
     (this.$.confirm as ConfirmBoxEl).run({
-      body: 'Changing disaggregation will cause your previous data to be lost. ' +
-        'Do you want to continue?',
+      body: 'Changing disaggregation will cause your previous data to be lost. ' + 'Do you want to continue?',
       result: e.detail
     });
   }
@@ -155,7 +140,6 @@ class DisaggregationModal extends ModalMixin(LocalizeMixin(ReduxConnectedElement
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('disaggregation-modal', DisaggregationModal);

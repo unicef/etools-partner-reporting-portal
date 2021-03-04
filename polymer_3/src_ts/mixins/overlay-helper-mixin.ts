@@ -8,28 +8,32 @@ import {IronOverlayBackdropElement} from '@polymer/iron-overlay-behavior/iron-ov
  */
 function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
   class OverlayHelperClass extends baseClass {
-
-    tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT'];
+    tagsToExclude = ['CHIP-DISAGG-VALUE', 'CHIP-DATE-OF-REPORT', 'MESSAGE-IMO-MODAL'];
 
     connectedCallback() {
       super.connectedCallback();
-
-      this._addEventListeners();
+      this._addOverlayEventListeners();
     }
 
-    _addEventListeners() {
+    _addOverlayEventListeners() {
       this.addEventListener('iron-overlay-opened', this._dialogOpening as any);
       this.addEventListener('iron-overlay-closed', this._dialogClosing as any);
     }
 
-    _dialogOpening() {
+    _dialogOpening(event: CustomEvent & any) {
       const dialogOverlays = document.querySelectorAll('iron-overlay-backdrop[opened]');
-      if (!dialogOverlays.length) {return;}
+      if (!dialogOverlays.length) {
+        return;
+      }
 
-      const zIndex = (dialogOverlays[0] as any).style.zIndex;
+      // in order to see correctly the profile dialog, must set zIndex to 100 (as in app-header elements)
+      const paths = event.path || [{id: ''}];
+      const zIndex = paths[0].id === 'userProfileDialog' ? '100' : (dialogOverlays[0] as any).style.zIndex;
       this._closeOverlays(dialogOverlays);
 
-      (this.$.drawer as any).style.zIndex = '0';
+      if (this.$.drawer) {
+        (this.$.drawer as any).style.zIndex = '0';
+      }
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       if (!pageOverlay.classList.contains('opened')) {
         pageOverlay.style.zIndex = zIndex;
@@ -42,18 +46,24 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
 
       const paths = event.path || [];
       if (paths.length) {
-        if ((paths[0].tagName.toLowerCase().indexOf('dropdown') > -1) ||
-          (paths.filter((x: any) => this.tagsToExclude.includes(x.tagName)).length)) {
+        if (
+          paths[0].tagName.toLowerCase().indexOf('dropdown') > -1 ||
+          paths.filter((x: any) => this.tagsToExclude.includes(x.tagName)).length
+        ) {
           return;
         }
       }
       // edge
-      if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {return;}
+      if (event.__target && event.__target.is && event.__target.is.toLowerCase().indexOf('dropdown') > -1) {
+        return;
+      }
 
       const pageOverlay = this.$.pageOverlay as IronOverlayBackdropElement;
       pageOverlay.style.zIndex = '';
       pageOverlay.classList.remove('opened');
-      (this.$.drawer as any).style.zIndex = '1';
+      if (this.$.drawer) {
+        (this.$.drawer as any).style.zIndex = '1';
+      }
     }
 
     _closeOverlays(overlays: NodeListOf<Element>) {
@@ -63,7 +73,6 @@ function OverlayHelperMixin<T extends Constructor<PolymerElement>>(baseClass: T)
         }
       });
     }
-
   }
   return OverlayHelperClass;
 }

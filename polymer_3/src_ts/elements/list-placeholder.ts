@@ -14,18 +14,18 @@ class ListPlaceholder extends LocalizeMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <div class="msg">[[localize(message)]]</div>
-      `;
+      <div class="msg">[[getMessageToDisplay(localize)]]</div>
+    `;
   }
 
   @property({type: Array})
   data = [];
 
   @property({type: Boolean})
-  loading: boolean = false;
+  loading = false;
 
   @property({type: String})
-  message = 'no_results_found';
+  message!: string;
 
   @property({type: Boolean, reflectToAttribute: true, computed: '_computeHidden(data, loading)'})
   hidden!: boolean;
@@ -39,6 +39,10 @@ class ListPlaceholder extends LocalizeMixin(ReduxConnectedElement) {
 
   _computeAriaHidden(hidden: boolean) {
     return hidden ? 'true' : 'false';
+  }
+
+  getMessageToDisplay(localize: any) {
+    return this.message ? this.message : localize('no_results_found');
   }
 }
 

@@ -15,50 +15,40 @@ import {ReduxConnectedElement} from '../ReduxConnectedElement';
  * @customElement
  */
 class FilterList extends LocalizeMixin(ReduxConnectedElement) {
-
   static get template() {
     return html`
-    <style include="iron-flex">
-      :host {
-        background-color: #f9f9f9;
-        display: block;
-        position: relative;
-      }
+      <style include="iron-flex">
+        :host {
+          background-color: #f9f9f9;
+          display: block;
+          position: relative;
+        }
 
-      div#action {
-        @apply --layout-horizontal;
-        @apply --layout-end-justified;
-      }
+        div#action {
+          @apply --layout-horizontal;
+          @apply --layout-end-justified;
+        }
 
-      paper-button {
-        margin: 0 10px;
-        text-transform: uppercase;
-      }
+        paper-button {
+          margin: 0 10px;
+          text-transform: uppercase;
+        }
+      </style>
 
-    </style>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <slot></slot>
 
-    <slot></slot>
+      <template is="dom-if" if="[[!hideClear]]" restamp="true">
+        <div id="action">
+          <paper-button on-tap="_clearFilters">[[localize('clear')]]</paper-button>
+        </div>
+      </template>
 
-    <template
-        is="dom-if"
-        if="[[!hideClear]]"
-        restamp="true">
-      <div id="action">
-        <paper-button on-tap="_clearFilters">[[localize('clear')]]</paper-button>
-      </div>
-    </template>
-
-    <etools-loading active="[[loading]]"></etools-loading>
-  `;
+      <etools-loading active="[[loading]]"></etools-loading>
+    `;
   }
 
   @property({type: Object})
@@ -71,21 +61,19 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
   filtersReady!: GenericObject;
 
   @property({type: String})
-  ignore: string = '';
+  ignore = '';
 
   @property({type: Array, computed: '_computeIgnoredFilters(ignore)'})
   ignoredFilters!: any[];
 
   @property({type: Boolean})
-  loading: boolean = false;
+  loading = false;
 
   @property({type: Boolean})
-  hideClear: boolean = false;
+  hideClear = false;
 
   public static get observers() {
-    return [
-      '_updateLoading(filters.splices, filtersReady.*)',
-    ]
+    return ['_updateLoading(filters.splices, filtersReady.*)'];
   }
 
   _onFilterChanged(e: CustomEvent) {
@@ -96,19 +84,20 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
      * here's the place to put the logic for it.
      */
 
-    //setTimeout(() => {
-    const newParams = Object.assign({}, this.queryParams);
+    // setTimeout is needed because without it, this.queryParams are not updated
+    setTimeout(() => {
+      const newParams = Object.assign({}, this.queryParams);
 
-    if (change.value && change.value.length) {
-      newParams[change.name] = change.value;
-    } else {
-      delete newParams[change.name];
-    }
+      if (change.value && change.value.length) {
+        newParams[change.name] = change.value;
+      } else {
+        delete newParams[change.name];
+      }
 
-    this.set('queryParams', newParams);
+      this.set('queryParams', newParams);
 
-    this._resetPageNumber();
-    //});
+      this._resetPageNumber();
+    });
   }
 
   _registerFilter(e: CustomEvent) {
@@ -152,31 +141,31 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
   }
 
   _clearFilters() {
-    const self = this;
-    const clearParams = Object.keys(this.queryParams)
-      .reduce(function(prev: any, curr) {
-        if (self.filters.indexOf(curr) === -1) {
-          prev[curr] = self.queryParams[curr];
-        } else {
-          prev[curr] = ''; // Can't set to undefined (does not trigger observers)
-        }
+    const clearParams = Object.keys(this.queryParams).reduce((prev: any, curr) => {
+      if (this.filters.indexOf(curr) === -1) {
+        prev[curr] = this.queryParams[curr];
+      } else {
+        prev[curr] = ''; // Can't set to undefined (does not trigger observers)
+      }
 
-        return prev;
-      }, {})
+      return prev;
+    }, {});
     this.set('queryParams', clearParams);
 
     this._resetPageNumber();
   }
 
   _resetPageNumber() {
-    this.set('queryParams', Object.assign({}, this.queryParams, {
-      page: 1,
-    }));
+    this.set(
+      'queryParams',
+      Object.assign({}, this.queryParams, {
+        page: 1
+      })
+    );
   }
 
   _computeIgnoredFilters(ignore: string) {
-    return ignore.split(',')
-      .filter(Boolean);
+    return ignore.split(',').filter(Boolean);
   }
 
   _updateLoading() {
@@ -218,7 +207,6 @@ class FilterList extends LocalizeMixin(ReduxConnectedElement) {
 
     this._removeEventListeners();
   }
-
 }
 window.customElements.define('filter-list', FilterList);
 

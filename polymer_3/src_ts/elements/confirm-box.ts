@@ -18,7 +18,7 @@ import {buttonsStyles} from '../styles/buttons-styles';
 class ConfirmBox extends PolymerElement {
   public static get template() {
     return html`
-        ${buttonsStyles}
+      ${buttonsStyles}
       <style include="iron-flex iron-flex-reverse iron-flex-alignment">
         :host {
           display: block;
@@ -30,7 +30,7 @@ class ConfirmBox extends PolymerElement {
           top: 0;
           bottom: 0;
           z-index: 10;
-          background: rgba(0, 0, 0, .3);
+          background: rgba(0, 0, 0, 0.3);
         }
 
         .prompt {
@@ -38,7 +38,7 @@ class ConfirmBox extends PolymerElement {
           width: calc(100% - 48px);
           padding: 24px;
           background: white;
-          box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+          box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
           font-weight: 600;
         }
 
@@ -56,15 +56,9 @@ class ConfirmBox extends PolymerElement {
         }
       </style>
 
-      <template
-        is="dom-if"
-        if="[[active]]">
-        <div
-          class="overlay layout horizontal center-center"
-          style="position: [[position]];">
-          <div
-            class="prompt"
-            style="max-width: [[config.maxWidth]];">
+      <template is="dom-if" if="[[active]]">
+        <div class="overlay layout horizontal center-center" style="position: [[position]];">
+          <div class="prompt" style="max-width: [[config.maxWidth]];">
             <div class="info-wrapper">
               <iron-icon class="info-icon" icon="info-outline"></iron-icon>
               <p>
@@ -72,27 +66,22 @@ class ConfirmBox extends PolymerElement {
               </p>
             </div>
             <div class="layout horizontal-reverse">
-              <paper-button
-                class="btn-primary"
-                on-tap="_ok">
+              <paper-button class="btn-primary" on-tap="_ok">
                 [[config.okLabel]]
               </paper-button>
 
-              <paper-button
-                on-tap="_cancel">
+              <paper-button on-tap="_cancel">
                 [[config.cancelLabel]]
               </paper-button>
             </div>
           </div>
         </div>
       </template>
-
-
     `;
   }
 
   @property({type: Boolean})
-  active: boolean = false;
+  active = false;
 
   @property({type: String, computed: '_computePosition(config)'})
   position!: string;
@@ -153,7 +142,6 @@ class ConfirmBox extends PolymerElement {
     this.set('config', Object.assign({}, this.config, config));
     this._open();
   }
-
 }
 
 window.customElements.define('confirm-box', ConfirmBox);

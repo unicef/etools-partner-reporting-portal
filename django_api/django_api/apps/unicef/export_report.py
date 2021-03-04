@@ -1,17 +1,15 @@
 import itertools
 
-from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle, PatternFill
-from openpyxl.utils import get_column_letter
-
 from django.conf import settings
 from django.db.models import Count
 
 from core import common
-
-from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.constants import ValueType
+from indicator.models import DisaggregationValue, IndicatorBlueprint
 from indicator.utilities import convert_string_number_to_float
+from openpyxl.reader.excel import load_workbook
+from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
+from openpyxl.utils import get_column_letter
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'
@@ -317,15 +315,21 @@ class ProgressReportXLSXExporter:
         self.sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
         # Merge Other Info columns, since they are unique per Progress Report, not per Location Data
-        # Partner contribution to date
+        # Non-Financial contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=9, end_row=start_row_id - 1, end_column=9)
-        # Challenges/bottlenecks in the reporting period
+        # Financial contribution to date
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=11, end_row=start_row_id - 1, end_column=11)
-        # Proposed way forward
+        # Financial contribution currency
         self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
                                start_column=12, end_row=start_row_id - 1, end_column=12)
+        # Challenges/bottlenecks in the reporting period
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=13, end_row=start_row_id - 1, end_column=13)
+        # Proposed way forward
+        self.sheet.merge_cells(start_row=INDICATOR_DATA_ROW_START,
+                               start_column=14, end_row=start_row_id - 1, end_column=14)
 
         return True
 

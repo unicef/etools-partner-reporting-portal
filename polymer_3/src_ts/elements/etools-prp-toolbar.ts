@@ -8,7 +8,6 @@ import '@polymer/iron-location/iron-query-params';
 import {buttonsStyles} from '../styles/buttons-styles';
 import {GenericObject} from '../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -16,7 +15,6 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin UtilsMixin
  */
 class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
-
   public static get template() {
     return html`
       ${buttonsStyles}
@@ -27,19 +25,13 @@ class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <iron-location
-          query="{{query}}">
-      </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-      <iron-query-params
-          params-string="{{query}}"
-          params-object="{{params}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{params}}"> </iron-query-params>
 
       <div class="layout horizontal-reverse">
         <slot></slot>
       </div>
-
     `;
   }
 
@@ -70,7 +62,7 @@ class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
   @property({type: String, computed: '_identity(_reportId)', notify: true})
   reportId!: string;
 
-  @property({type: String})
+  @property({type: String, notify: true})
   query!: string;
 
   @property({type: Object})

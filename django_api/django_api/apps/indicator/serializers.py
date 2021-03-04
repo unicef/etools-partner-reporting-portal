@@ -1,5 +1,5 @@
-from ast import literal_eval as make_tuple
 import copy
+from ast import literal_eval as make_tuple
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
@@ -7,33 +7,34 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
-from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
-from unicef.models import LowerLevelOutput, ProgressReport
-from partner.models import PartnerProject, PartnerActivity, Partner, PartnerActivityProjectContext
-from cluster.models import ClusterObjective, ClusterActivity, Cluster
-
-from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
-from core.serializers import LocationSerializer, IdLocationSerializer
-from core.models import Location
-from core.validators import add_indicator_object_type_validator
+from cluster.models import Cluster, ClusterActivity, ClusterObjective
+from core.common import FINAL_OVERALL_STATUS, INDICATOR_REPORT_STATUS, OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.helpers import (
     generate_data_combination_entries,
-    get_sorted_ordered_dict_by_keys,
-    get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
+    get_cast_dictionary_keys_as_tuple,
+    get_sorted_ordered_dict_by_keys,
 )
+from core.models import Location
+from core.serializers import IdLocationSerializer, LocationSerializer
+from core.validators import add_indicator_object_type_validator
+from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
+from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
 from .models import (
-    Reportable, IndicatorBlueprint,
-    IndicatorReport, IndicatorLocationData,
-    Disaggregation, DisaggregationValue,
+    create_pa_reportables_for_new_ca_reportable,
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    IndicatorLocationData,
+    IndicatorReport,
+    Reportable,
     ReportableLocationGoal,
     ReportingEntity,
-    create_pa_reportables_for_new_ca_reportable,
 )
 from .utilities import convert_string_number_to_float
 
@@ -584,7 +585,9 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
 
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
-
+    disaggregation_reported_on = serializers.ListField(
+        child=serializers.IntegerField()
+    )
     disaggregation = serializers.JSONField()
     reporting_entity_percentage_map = serializers.JSONField(
         required=False,
@@ -1282,9 +1285,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         if 'baseline' not in validated_data:
             if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivityProjectContext):
-                    raise ValidationError(
-                        {"baseline": "baseline is required for IMO to create Indicator"}
-                    )
+                raise ValidationError(
+                    {"baseline": "baseline is required for IMO to create Indicator"}
+                )
             else:
                 validated_data['baseline'] = {'v': 0, 'd': 1}
 
@@ -1497,7 +1500,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             reportable_object_content_type = self.resolve_reportable_content_type('partner.partneractivityprojectcontext')
             reportable_object_content_model = PartnerActivityProjectContext
         else:
-            raise NotImplemented()
+            raise NotImplementedError()
 
         validated_data['content_type'] = reportable_object_content_type
 
@@ -1505,7 +1508,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
-        location_ids = [l['location'].id for l in locations]
+        location_ids = [loc['location'].id for loc in locations]
 
         # Duplicated location safeguard
         if len(location_ids) != len(set(location_ids)):
@@ -1693,7 +1696,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
 
-        location_ids = [l['location'].id for l in locations]
+        location_ids = [loc['location'].id for loc in locations]
 
         # Duplicated location safeguard
         if len(location_ids) != len(set(location_ids)):
@@ -1725,7 +1728,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 data.pop('baseline', None)
                 data.pop('in_need', None)
 
-            if loc_goal.location.id != data['location'].id:
+            if loc_goal and loc_goal.location.id != data['location'].id:
                 raise ValidationError(
                     "Location %s cannot be changed for updating location goal" % loc_goal.location,
                 )
@@ -2516,7 +2519,6 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         from cluster.models import Cluster
-
         from partner.models import PartnerActivityProjectContext
 
         cluster = get_object_or_404(

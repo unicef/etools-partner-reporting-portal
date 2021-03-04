@@ -14,7 +14,6 @@ import {GenericObject} from '../../../typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-
 /**
  * @polymer
  * @customElement
@@ -25,34 +24,21 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]"
-        params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="activities" url="[[activitiesUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-    <searchable-dropdown-filter
-        label="Activity"
-        name="activity"
-        value="[[value]]"
-        data="[[data]]">
-    </searchable-dropdown-filter>
-  `;
+      <searchable-dropdown-filter label="Activity" name="activity" value="[[value]]" data="[[data]]">
+      </searchable-dropdown-filter>
+    `;
   }
 
   @property({type: Object})
@@ -87,27 +73,27 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
   }
 
   _fetchActivities() {
-
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      () => {
-        const self = this;
-
-        //activities.abort();
-        (this.$.activities as EtoolsPrpAjaxEl).abort();
-        (this.$.activities as EtoolsPrpAjaxEl).thunk()()
-          .then(function(res: any) {
-            self.set('data', [{
-              id: '',
-              title: 'All',
-            }].concat(res.data.results || []));
-          })
-          // @ts-ignore
-          .catch(function(err: any) {
-            // TODO: error handling
-          });
-
-      });
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      // activities.abort();
+      (this.$.activities as EtoolsPrpAjaxEl).abort();
+      (this.$.activities as EtoolsPrpAjaxEl)
+        .thunk()()
+        .then((res: any) => {
+          this.set(
+            'data',
+            [
+              {
+                id: '',
+                title: 'All'
+              }
+            ].concat(res.data.results || [])
+          );
+        })
+        // @ts-ignore
+        .catch(function (err: any) {
+          console.log(err);
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -119,7 +105,6 @@ class ClusterActivityFilter extends UtilsMixin(FilterMixin(FilterDependenciesMix
       this._debouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('cluster-activity-filter', ClusterActivityFilter);

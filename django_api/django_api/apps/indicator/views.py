@@ -1,78 +1,68 @@
-from datetime import date, datetime
-import operator
 import logging
+import operator
+from datetime import date, datetime
+from functools import reduce
 
 from django.conf import settings
-from django.db.models import Q
 from django.db import transaction
-from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from django.http import Http404
-
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
-
-from core.permissions import (
-    AnyPermission,
-    IsUNICEFAPIUser,
-    IsAuthenticated,
-    HasAnyRole,
-)
-from core.paginations import SmallPagination
-from core.models import Location
 from core.common import (
     INDICATOR_REPORT_STATUS,
-    REPORTABLE_LLO_CONTENT_OBJECT,
-    REPORTABLE_CO_CONTENT_OBJECT,
-    REPORTABLE_CA_CONTENT_OBJECT,
-    REPORTABLE_PP_CONTENT_OBJECT,
-    REPORTABLE_PA_CONTENT_OBJECT,
     OVERALL_STATUS,
-    REPORTABLE_FREQUENCY_LEVEL,
     PRP_ROLE_TYPES,
+    REPORTABLE_CA_CONTENT_OBJECT,
+    REPORTABLE_CO_CONTENT_OBJECT,
+    REPORTABLE_FREQUENCY_LEVEL,
+    REPORTABLE_LLO_CONTENT_OBJECT,
+    REPORTABLE_PA_CONTENT_OBJECT,
+    REPORTABLE_PP_CONTENT_OBJECT,
 )
+from core.models import Location
+from core.paginations import SmallPagination
+from core.permissions import AnyPermission, HasAnyRole, IsAuthenticated, IsUNICEFAPIUser
 from core.serializers import ShortLocationSerializer
-from partner.models import PartnerProject, PartnerActivityProjectContext
+from partner.models import PartnerActivityProjectContext, PartnerProject
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from unicef.models import ProgressReport
 from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
 
-from .disaggregators import (
-    QuantityIndicatorDisaggregator,
-    RatioIndicatorDisaggregator,
-)
-from .serializers import (
-    IndicatorListSerializer,
-    IndicatorReportListSerializer,
-    PDReportContextIndicatorReportSerializer,
-    IndicatorLocationDataUpdateSerializer,
-    OverallNarrativeSerializer,
-    ClusterIndicatorSerializer,
-    DisaggregationListSerializer,
-    IndicatorReportReviewSerializer,
-    IndicatorReportSimpleSerializer,
-    ReportRefreshSerializer,
-    ClusterObjectiveIndicatorAdoptSerializer,
-    ReportableLocationGoalBaselineInNeedSerializer,
-    ClusterIndicatorIMOMessageSerializer,
-    ReportableReportingFrequencyIdSerializer,
-)
+from .disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
+    create_reportable_for_pp_from_co_reportable,
+    Disaggregation,
     IndicatorBlueprint,
+    IndicatorLocationData,
     IndicatorReport,
     Reportable,
-    IndicatorLocationData,
-    Disaggregation,
     ReportableLocationGoal,
-    create_reportable_for_pp_from_co_reportable,
+)
+from .serializers import (
+    ClusterIndicatorIMOMessageSerializer,
+    ClusterIndicatorSerializer,
+    ClusterObjectiveIndicatorAdoptSerializer,
+    DisaggregationListSerializer,
+    IndicatorListSerializer,
+    IndicatorLocationDataUpdateSerializer,
+    IndicatorReportListSerializer,
+    IndicatorReportReviewSerializer,
+    IndicatorReportSimpleSerializer,
+    OverallNarrativeSerializer,
+    PDReportContextIndicatorReportSerializer,
+    ReportableLocationGoalBaselineInNeedSerializer,
+    ReportableReportingFrequencyIdSerializer,
+    ReportRefreshSerializer,
 )
 from .utilities import reset_indicator_report_data, reset_progress_report_data
-from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -878,7 +868,8 @@ class ReportRefreshAPIView(APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """
-        Removes all IndicatorReport instances for given ProgressReport, including underlying IndicatorLocationData instances
+        Removes all IndicatorReport instances for given ProgressReport,
+        including underlying IndicatorLocationData instances
         """
         serializer = ReportRefreshSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -897,7 +888,38 @@ class ReportRefreshAPIView(APIView):
             report = get_object_or_404(IndicatorReport, id=serializer.validated_data['report_id'])
 
             if report.progress_report:
-                raise ValidationError("This indicator report is linked to a progress report. Use the progress report ID instead.")
+                raise ValidationError(
+                    "This indicator report is linked to a progress report. "
+                    "Use the progress report ID instead.",
+                )
+
+            # if future report and indicator location data exists,
+            # then do not perform reset
+            future_reports_qs = IndicatorReport.objects.exclude(
+                pk=report.pk,
+            ).filter(
+                progress_report=report.progress_report,
+                due_date__gt=report.due_date,
+            )
+            if future_reports_qs.exists():
+                # make sure the future reports have data
+                data = [
+                    d for d in IndicatorLocationData.objects.filter(
+                        indicator_report__in=future_reports_qs.all()
+                    )
+                    if d.disaggregation.get("()") != {"c": 0, "d": 0, "v": 0}
+                ]
+                if data:
+                    msg = {
+                        "response": "Data has already been submitted for "
+                        "reports that follow the current report you are "
+                        "trying to refresh. To avoid data loss, please "
+                        "contact the PRP help desk "
+                        "[https://prphelp.zendesk.com/hc/en-us/requests/new] "
+                        "to request assistance in refreshing your reporting "
+                        "data.",
+                    }
+                    return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
             reset_indicator_report_data(report)
 

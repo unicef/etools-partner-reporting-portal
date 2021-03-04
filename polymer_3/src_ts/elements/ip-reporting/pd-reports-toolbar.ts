@@ -23,16 +23,12 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
         }
       </style>
 
-      <etools-prp-toolbar
-        query="{{query}}"
-        pd-id="{{pdId}}"
-        location-id="{{locationId}}">
+      <etools-prp-toolbar query="{{query}}" pd-id="{{pdId}}" location-id="{{locationId}}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
           <download-button url="[[xlsExportUrl]]">XLS</download-button>
           <download-button url="[[pdfExportUrl]]">PDF</download-button>
         </template>
       </etools-prp-toolbar>
-
     `;
   }
 
@@ -54,10 +50,10 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
   @property({type: Object, computed: '_computePdQuery(pdId)'})
   pdQuery!: GenericObject;
 
-  @property({type: String, computed: '_appendQuery(pdReportsUrl, query, pdQuery, \'export=xlsx\')'})
+  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, pdQuery, 'export=xlsx')"})
   xlsExportUrl!: string;
 
-  @property({type: String, computed: '_appendQuery(pdReportsUrl, query, pdQuery, \'export=pdf\')'})
+  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, pdQuery, 'export=pdf')"})
   pdfExportUrl!: string;
 
   _programmeDocumentReportsCount(rootState: RootState) {
@@ -75,7 +71,6 @@ class PdReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
   _computePdQuery(pdId: string) {
     return computePdQuery(pdId);
   }
-
 }
 
 window.customElements.define('pd-reports-toolbar', PdReportsToolbar);

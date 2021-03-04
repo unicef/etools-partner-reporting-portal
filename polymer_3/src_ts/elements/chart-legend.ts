@@ -7,7 +7,6 @@ import './etools-prp-number';
 import LocalizeMixin from '../mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 
-
 /**
  * @polymer
  * @customElement
@@ -31,42 +30,36 @@ class ChartLegend extends LocalizeMixin(ReduxConnectedElement) {
         }
 
         .legend-row {
-          padding: 0 .5em .5em;
+          padding: 0 0.5em 0.5em;
           border-bottom: 1px solid var(--paper-grey-200);
         }
 
         .legend-row:not(:last-child) {
-          margin-bottom: .75em;
+          margin-bottom: 0.75em;
         }
 
         .color {
           display: inline-block;
           vertical-align: middle;
-          width: .5em;
+          width: 0.5em;
           height: 1.25em;
-          margin-right: .25em;
+          margin-right: 0.25em;
           position: relative;
           top: -1px;
         }
       </style>
 
       <ul class="legend">
-        <template
-            is="dom-repeat"
-            items="[[rows]]">
+        <template is="dom-repeat" items="[[rows]]">
           <li class="legend-row layout horizontal justified">
             <span>
-              <span
-                  class="color"
-                  style="background: [[_getColor(colors, index)]];">
-              </span>
+              <span class="color" style="background: [[_getColor(colors, index)]];"> </span>
               [[localize(item.0)]]
             </span>
             <etools-prp-number value="[[item.1]]"></etools-prp-number>
           </li>
         </template>
       </ul>
-
     `;
   }
 
@@ -79,7 +72,6 @@ class ChartLegend extends LocalizeMixin(ReduxConnectedElement) {
   _getColor(colors: string[], index: number) {
     return colors[index];
   }
-
 }
 
 window.customElements.define('chart-legend', ChartLegend);

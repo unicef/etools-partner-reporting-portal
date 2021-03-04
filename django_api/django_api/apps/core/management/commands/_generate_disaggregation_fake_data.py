@@ -1,18 +1,8 @@
-from indicator.models import (
-    Disaggregation,
-    ReportingEntity,
-)
-from core.helpers import (
-    generate_data_combination_entries,
-)
+from core.helpers import generate_data_combination_entries
+from core.tests import factories
 
-from core.factories import (
-    IndicatorLocationDataFactory,
-)
-
-
-unicef_re = ReportingEntity.objects.get(title="UNICEF")
-cluster_re = ReportingEntity.objects.get(title="Cluster")
+# unicef_re = factories.ReportingEntityFactory(title="UNICEF")
+# cluster_re = factories.ReportingEntityFactory(title="Cluster")
 
 
 # def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
@@ -52,7 +42,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #             }
 
 #         # 0 num_disaggregation & 0 level_reported
-#         IndicatorLocationDataFactory(
+#         factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=0,
@@ -91,7 +81,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #                 }
 #             }
 
-#         location_data = IndicatorLocationDataFactory(
+#         location_data = factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=1,
@@ -115,7 +105,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_1_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=1,
@@ -165,7 +155,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #                 }
 #             }
 
-#         location_data = IndicatorLocationDataFactory(
+#         location_data = factories.IndicatorLocationDataFactory(
 #             indicator_report=indicator_report_from_reportable,
 #             location=location,
 #             num_disaggregation=2,
@@ -189,7 +179,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_1_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=2,
@@ -216,7 +206,7 @@ cluster_re = ReportingEntity.objects.get(title="Cluster")
 #         for pair in disaggregation_comb_2_pairs:
 #             location = locations[disagg_idx]
 
-#             location_data = IndicatorLocationDataFactory(
+#             location_data = factories.IndicatorLocationDataFactory(
 #                 indicator_report=indicator_report_from_reportable,
 #                 location=location,
 #                 num_disaggregation=2,
@@ -244,7 +234,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
     for indicator_report_from_reportable in reportable.indicator_reports.all():
         for location in reportable.locations.all():
             # 3 num_disaggregation & 3 level_reported
-            IndicatorLocationDataFactory(
+            factories.IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
                 location=location,
                 num_disaggregation=3,
@@ -268,6 +258,8 @@ def add_disaggregations_to_reportable(reportable, disaggregation_targets):
 
     # Disaggregation generation
     for target in disaggregation_targets:
-        disaggregation = Disaggregation.objects.get(name=target,
-                                                    response_plan=response_plan)
+        disaggregation = factories.DisaggregationFactory(
+            name=target,
+            response_plan=response_plan,
+        )
         reportable.disaggregations.add(disaggregation)

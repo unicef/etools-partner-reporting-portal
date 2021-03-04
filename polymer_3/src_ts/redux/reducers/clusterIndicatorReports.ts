@@ -16,27 +16,23 @@ export const ClusterIndicatorReports = combineReducers({
   loading: loadingReducer
 });
 
-function reportsByIdReducer(state = {}, action: any) {
+function reportsByIdReducer(state: GenericObject = {}, action: any) {
   switch (action.type) {
     case Constants.SET_CLUSTER_INDICATOR_REPORTS:
-      return action.data.reduce(function(prev: any, curr: any) {
+      return action.data.reduce(function (prev: any, curr: any) {
         prev[curr.id] = curr;
 
         return prev;
       }, {});
 
     case Constants.UPDATE_CLUSTER_INDICATOR_REPORT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
-        change[action.reportId] = Object.assign(
-          {},
-          state[action.reportId],
-          action.data
-        );
+        change[action.reportId] = Object.assign({}, state[action.reportId], action.data);
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -49,7 +45,7 @@ function reportsByIdReducer(state = {}, action: any) {
 function allIdsReducer(state = [], action: any) {
   switch (action.type) {
     case Constants.SET_CLUSTER_INDICATOR_REPORTS:
-      return action.data.map(function(report: GenericObject) {
+      return action.data.map(function (report: GenericObject) {
         return report.id;
       });
 

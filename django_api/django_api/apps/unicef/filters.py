@@ -1,42 +1,50 @@
+from distutils.util import strtobool
 from urllib import parse
 
 from django.conf import settings
 from django.db.models import Q
 
 import django_filters
-from distutils.util import strtobool
-from django_filters.filters import (
-    DateFilter, TypedChoiceFilter, CharFilter
-)
-
-from core.common import PROGRESS_REPORT_STATUS, PD_STATUS
-from utils.filters.fields import CommaSeparatedListFilter
-from utils.filters.constants import Boolean
+from core.common import PD_STATUS, PROGRESS_REPORT_STATUS
+from django_filters.filters import CharFilter, DateFilter, TypedChoiceFilter
 from indicator.models import Reportable
+from utils.filters.constants import Boolean
+from utils.filters.fields import CommaSeparatedListFilter
+
 from .models import ProgrammeDocument, ProgressReport
 
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
-    pd_statuses = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__programme_document__status')
-    pds = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__programme_document_id')
+    pd_statuses = CommaSeparatedListFilter(
+        field_name='lower_level_outputs__cp_output__programme_document__status',
+    )
+    pds = CommaSeparatedListFilter(
+        field_name='lower_level_outputs__cp_output__programme_document_id',
+    )
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
     report_partner_external = CommaSeparatedListFilter(
-        name='indicator_reports__progress_report__programme_document__partner__external_id'
+        field_name='indicator_reports__progress_report__programme_document__partner__external_id'
     )
     report_status = CommaSeparatedListFilter(
-        name='indicator_reports__progress_report__status'
+        field_name='indicator_reports__progress_report__status'
     )
     report_type = CommaSeparatedListFilter(
-        name='indicator_reports__progress_report__report_type'
+        field_name='indicator_reports__progress_report__report_type'
     )
-    cp_output = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__external_cp_output_id')
+    cp_output = CommaSeparatedListFilter(
+        field_name='lower_level_outputs__cp_output__external_cp_output_id',
+    )
     report_section = CommaSeparatedListFilter(
-        name='lower_level_outputs__cp_output__programme_document__sections__external_id')
-    pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
-                              label='PD/Ref # title')
+        field_name='lower_level_outputs__cp_output__programme_document__sections__external_id',
+    )
+    pd_ref_title = CharFilter(
+        field_name='pd ref title',
+        method='get_pd_ref_title',
+        label='PD/Ref # title',
+    )
 
     unicef_focal_points = CharFilter(method='get_unicef_focal_points')
 
@@ -79,8 +87,10 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
-    status = CommaSeparatedListFilter(name='status')
-    location = CommaSeparatedListFilter(name='progress_reports__indicator_reports__indicator_location_data__location')
+    status = CommaSeparatedListFilter(field_name='status')
+    location = CommaSeparatedListFilter(
+        field_name='progress_reports__indicator_reports__indicator_location_data__location',
+    )
 
     class Meta:
         model = ProgrammeDocument
@@ -94,18 +104,36 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 class ProgressReportFilter(django_filters.FilterSet):
     status = CharFilter(method='get_status')
-    pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
-                              label='PD/Ref # title')
-    due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
-                          input_formats=[settings.PRINT_DATA_FORMAT])
-    due = TypedChoiceFilter(name='due', choices=Boolean.CHOICES, coerce=strtobool,
-                            method='get_due_overdue_status', label='Show only due or overdue')
-    location = CharFilter(name='location', method='get_location',
-                          label='Location')
-    programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
-                                        label='programme_document_ext')
-    section = CharFilter(name='section', method='get_section')
-    cp_output = CharFilter(name='cp_output', method='get_cp_output')
+    pd_ref_title = CharFilter(
+        field_name='pd ref title',
+        method='get_pd_ref_title',
+        label='PD/Ref # title',
+    )
+    due_date = DateFilter(
+        field_name='due date',
+        method='get_due_date',
+        label='Due date',
+        input_formats=[settings.PRINT_DATA_FORMAT],
+    )
+    due = TypedChoiceFilter(
+        field_name='due',
+        choices=Boolean.CHOICES,
+        coerce=strtobool,
+        method='get_due_overdue_status',
+        label='Show only due or overdue',
+    )
+    location = CharFilter(
+        field_name='location',
+        method='get_location',
+        label='Location',
+    )
+    programme_document_ext = CharFilter(
+        field_name='programme_document_ext',
+        method='get_pd_ext',
+        label='programme_document_ext',
+    )
+    section = CharFilter(field_name='section', method='get_section')
+    cp_output = CharFilter(field_name='cp_output', method='get_cp_output')
     report_type = CharFilter(method='get_report_type')
     unicef_focal_points = CharFilter(method='get_unicef_focal_points')
 

@@ -7,21 +7,19 @@ import {property} from '@polymer/decorators/lib/decorators';
  */
 class PageBadge extends PolymerElement {
   public static get template() {
-    return html`
-      <style>
+    return html` <style>
         :host {
-            display: inline-block;
-            border-radius: 1px;
-            padding: 1px 6px;
-            font-size: 10px;
-            text-transform: uppercase;
-            background-color: var(--paper-grey-500);
-            color: white;
+          display: inline-block;
+          border-radius: 1px;
+          padding: 1px 6px;
+          font-size: 10px;
+          text-transform: uppercase;
+          background-color: var(--paper-grey-500);
+          color: white;
         }
       </style>
 
-      [[name]]`
-    ;
+      [[name]]`;
   }
 
   @property({type: String})

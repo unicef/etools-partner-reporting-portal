@@ -21,104 +21,81 @@ import RoutingMixin from '../../../../../mixins/routing-mixin';
 import Endpoints from '../../../../../endpoints';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {GenericObject} from '../../../../../typings/globals.types';
-import {PaperTabsElement} from "@polymer/paper-tabs/paper-tabs";
 
 /**
-* @polymer
-* @customElement
-* @appliesMixin UtilsMixin
-* @appliesMixin LocalizeMixin
-* @appliesMixin RoutingMixin
-*/
+ * @polymer
+ * @customElement
+ * @appliesMixin UtilsMixin
+ * @appliesMixin LocalizeMixin
+ * @appliesMixin RoutingMixin
+ */
 class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement))) {
-
   static get template() {
     return html`
-    ${sharedStyles}
-    <style>
-    :host {
-      display: block;
+      ${sharedStyles}
+      <style>
+        :host {
+          display: block;
 
-      --page-header-above-title: {
-        position: absolute;
-        display: block;
-        left: 0;
-        top: -23px;
-      };
-    }
+          --page-header-above-title: {
+            position: absolute;
+            display: block;
+            left: 0;
+            top: -23px;
+          }
+        }
 
-    .toolbar report-status {
-      margin-right: 1em;
-    }
+        .toolbar report-status {
+          margin-right: 1em;
+        }
 
-    .toolbar a {
-      text-decoration: none;
-    }
+        .toolbar a {
+          text-decoration: none;
+        }
 
-    .tabs paper-tab {
-      text-transform: uppercase;
-    }
-  </style>
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <etools-prp-ajax
-      id="objective"
-      url="[[objectiveUrl]]"
-      params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="objective" url="[[objectiveUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <app-route
-      route="{{route}}"
-      pattern="/:tab"
-      subroute="{{subroute}}"
-      data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:tab" subroute="{{subroute}}" data="{{routeData}}"> </app-route>
 
-    <page-header
-        title="[[data.title]]"
-        back="[[backLink]]">
+      <page-header title="[[data.title]]" back="[[backLink]]">
+        <page-badge slot="above-title" name="[[localize('objective')]]"> </page-badge>
 
-      <page-badge
-          slot="above-title" name="[[localize('objective')]]">
-      </page-badge>
+        <div class="toolbar">
+          <project-status status="[[data.status]]"></project-status>
+        </div>
 
-      <div class="toolbar">
-        <project-status status="[[data.status]]"></project-status>
-      </div>
+        <div slot="tabs">
+          <paper-tabs selected="{{routeData.tab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="overview">[[localize('overview')]]</paper-tab>
+            <paper-tab name="indicators">[[localize('cluster_objective_indicators')]]</paper-tab>
+            <paper-tab name="activities">[[localize('cluster_activity')]]</paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="overview">[[localize('overview')]]</paper-tab>
-          <paper-tab name="indicators">[[localize('cluster_objective_indicators')]]</paper-tab>
-          <paper-tab name="activities">[[localize('cluster_activity')]]</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <rp-clusters-details-overview data="[[data]]"></rp-clusters-details-overview>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-clusters-details-overview data=[[data]]></rp-clusters-details-overview>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+        <rp-clusters-details-indicators
+          objective-id="[[objectiveId}}"
+          activity-data="[[data]]"
+          cluster-id="[[data.cluster]]"
+        >
+        </rp-clusters-details-indicators>
+      </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-clusters-details-indicators
-        objective-id="[[objectiveId}}"
-        activity-data="[[data]]"
-        cluster-id="[[data.cluster]]">
-      </rp-clusters-details-indicators>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <rp-clusters-details-activities
-        objective-id="{{objectiveId}}">
-      </rp-clusters-details-activities>
-    </template>
+      <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+        <rp-clusters-details-activities objective-id="{{objectiveId}}"> </rp-clusters-details-activities>
+      </template>
     `;
   }
 
@@ -147,10 +124,7 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
   updatePending = false;
 
   static get observers() {
-    return [
-      '_updateUrlTab(routeData.tab)',
-      '_getObjectiveAjax(objectiveUrl)'
-    ];
+    return ['_updateUrlTab(routeData.tab)', '_getObjectiveAjax(objectiveUrl)'];
   }
 
   _onSuccess() {
@@ -181,14 +155,13 @@ class Objective extends LocalizeMixin(UtilsMixin(RoutingMixin(ReduxConnectedElem
       return;
     }
     const thunk = (this.$.objective as EtoolsPrpAjaxEl).thunk();
-    const self = this;
     thunk()
       .then((res: any) => {
-        self.updatePending = false;
-        self.data = res.data;
+        this.updatePending = false;
+        this.data = res.data;
       })
       .catch((_err: GenericObject) => {
-        self.updatePending = false;
+        this.updatePending = false;
         //   // TODO: error handling
       });
   }

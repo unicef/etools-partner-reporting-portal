@@ -4,34 +4,23 @@ import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import pycountry
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.core.validators import (
-    MinValueValidator,
-    MaxValueValidator
-)
-from django.utils.translation import ugettext as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
-
-from model_utils.models import TimeStampedModel
+from django.utils.translation import ugettext as _
 
 import mptt
-from mptt.models import MPTTModel, TreeForeignKey
-from mptt.managers import TreeManager
-
+import pycountry
 from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
-from .common import (
-    RESPONSE_PLAN_TYPE,
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    EXTERNAL_DATA_SOURCES,
-    PRP_ROLE_TYPES,
-)
+from model_utils.models import TimeStampedModel
+from mptt.managers import TreeManager
+from mptt.models import MPTTModel, TreeForeignKey
 from utils.emails import send_email_from_template
 
+from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 
 logger = logging.getLogger('locations.models')
 
@@ -80,6 +69,12 @@ class Country(TimeStampedModel):
     on Sep. 14, 2017.
     """
     name = models.CharField(max_length=100)
+    iso3_code = models.CharField(
+        max_length=10,
+        blank=True,
+        default='',
+        verbose_name=_("ISO3 Code"),
+    )
     country_short_code = models.CharField(
         max_length=10,
         null=True,
@@ -208,16 +203,24 @@ class PRPRole(TimeStampedExternalSourceModel):
         account.User (ForeignKey): "user"
     """
     user = models.ForeignKey(
-        'account.User', related_name="prp_roles"
+        'account.User',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
     )
     role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
     workspace = models.ForeignKey(
-        'core.Workspace', related_name="prp_roles",
-        null=True, blank=True
+        'core.Workspace',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     cluster = models.ForeignKey(
-        'cluster.Cluster', related_name="prp_roles",
-        blank=True, null=True
+        'cluster.Cluster',
+        related_name="prp_roles",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(default=True)
 
@@ -303,7 +306,9 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         verbose_name='End date'
     )
     workspace = models.ForeignKey(
-        'core.Workspace', related_name="response_plans"
+        'core.Workspace',
+        related_name="response_plans",
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -423,7 +428,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         given PA could be custom or not and hence eithe CA or CO could be null
         on it.
         """
-        from indicator.models import Reportable, IndicatorReport
+        from indicator.models import IndicatorReport, Reportable
         reportables = Reportable.objects.filter(
             Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__in=clusters) |
             Q(partner_activity_project_contexts__activity__cluster_objective__cluster__in=clusters))
@@ -511,7 +516,11 @@ class GatewayType(TimeStampedModel):
     display_name = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Display Name'))
     admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
-    country = models.ForeignKey(Country, related_name="gateway_types")
+    country = models.ForeignKey(
+        Country,
+        related_name="gateway_types",
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         ordering = ['name']
@@ -560,6 +569,7 @@ class Location(MPTTModel):
     carto_db_table = models.ForeignKey(
         'core.CartoDBTable',
         related_name="locations",
+        on_delete=models.CASCADE,
         blank=True,
         null=True
     )
@@ -651,7 +661,11 @@ class CartoDBTable(MPTTModel):
         on_delete=models.CASCADE,
     )
 
-    country = models.ForeignKey(Country, related_name="carto_db_tables")
+    country = models.ForeignKey(
+        Country,
+        related_name="carto_db_tables",
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name_plural = 'CartoDB tables'

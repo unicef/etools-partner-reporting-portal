@@ -1,20 +1,18 @@
-import jwt
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
-
+import jwt
 from core.permissions import (
     AnyPermission,
+    IsIMOForCurrentWorkspace,
+    IsPartnerAdminForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
-    IsPartnerAdminForCurrentWorkspace,
-    IsIMOForCurrentWorkspace,
     IsUNICEFAPIUser,
 )
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
 
 
 class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
@@ -79,8 +77,9 @@ class ListExportMixin(object):
         exporter_class = self.get_exporter_class()
         if exporter_class:
             return exporter_class(
-                self.filter_queryset(self.get_queryset())
-            ).get_as_response()
+                self.filter_queryset(self.get_queryset()),
+                request=request,
+            ).get_as_response(request)
 
         return super(ListExportMixin, self).get(request, *args, **kwargs)
 
@@ -110,6 +109,6 @@ class ObjectExportMixin(object):
     def get(self, request, *args, **kwargs):
         exporter_class = self.get_exporter_class()
         if exporter_class:
-            return exporter_class(self.get_object()).get_as_response()
+            return exporter_class(self.get_object()).get_as_response(request)
 
         return super(ObjectExportMixin, self).get(request, *args, **kwargs)

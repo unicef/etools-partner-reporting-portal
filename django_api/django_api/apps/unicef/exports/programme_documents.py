@@ -5,22 +5,25 @@ import tempfile
 
 from django.http import HttpResponse
 from django.utils import timezone
-from easy_pdf.exceptions import PDFRenderingError
-from easy_pdf.rendering import render_to_pdf, make_response
+
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
+from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.styles.numbers import FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
-
-from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell, HTMLTableHeader
+from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader, PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from unicef.templatetags.pdf_extras import format_currency
+from unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 
 
+def calc_cash_transfer_percentage(pd):
+    return pd.funds_received_to_date_percentage / 100 if pd.budget else 0
+
+
 class ProgrammeDocumentsXLSXExporter:
 
-    def __init__(self, programme_documents):
+    def __init__(self, programme_documents, request=None):
         self.programme_documents = programme_documents
         filename = hashlib.sha256(';'.join([str(p.pk) for p in programme_documents]).encode('utf-8')).hexdigest()
         self.file_path = os.path.join(tempfile.gettempdir(), filename + '.xlsx')
@@ -69,10 +72,7 @@ class ProgrammeDocumentsXLSXExporter:
         current_row += 1
 
         for pd in self.programme_documents:
-            if pd.budget:
-                funds_received_to_date_percentage = pd.funds_received_to_date / pd.budget
-            else:
-                funds_received_to_date_percentage = 0
+            cash_transfer_percentage = calc_cash_transfer_percentage(pd)
 
             data_row = [
                 (pd.title, None),
@@ -91,7 +91,7 @@ class ProgrammeDocumentsXLSXExporter:
                 (pd.in_kind_amount, '#,##0.00_-[${} ]'.format(pd.in_kind_amount_currency)),
                 (pd.budget, '#,##0.00_-[${} ]'.format(pd.budget_currency)),
                 (pd.funds_received_to_date, '#,##0.00_-[${} ]'.format(pd.funds_received_to_date_currency)),
-                (funds_received_to_date_percentage, FORMAT_PERCENTAGE),
+                (cash_transfer_percentage, FORMAT_PERCENTAGE),
             ]
 
             if not len(headers) == len(data_row):
@@ -115,7 +115,7 @@ class ProgrammeDocumentsXLSXExporter:
 
         self.workbook.save(self.file_path)
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         self.fill_worksheet()
         response = HttpResponse()
         response.content_type = self.worksheet.mime_type
@@ -131,9 +131,9 @@ class ProgrammeDocumentsXLSXExporter:
 
 class ProgrammeDocumentsPDFExporter:
 
-    template_name = 'programme_documents_pdf_export.html'
+    template_name = 'programme_documents_pdf_export'
 
-    def __init__(self, programme_documents):
+    def __init__(self, programme_documents, request=None):
         self.programme_documents = programme_documents
         self.file_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.pdf'.format(
             timezone.now(), programme_documents.count()
@@ -159,12 +159,7 @@ class ProgrammeDocumentsPDFExporter:
         ]
 
         for pd in self.programme_documents.order_by('id'):
-            if pd.budget:
-                funds_received_to_date_percentage = pd.funds_received_to_date_percentage
-            else:
-                funds_received_to_date_percentage = 0
-
-            funds_received_to_date_percentage = "%.2f" % funds_received_to_date_percentage
+            cash_transfer_percentage = calc_cash_transfer_percentage(pd)
 
             rows.append([
                 HTMLTableCell(pd.title, rowspan=5),
@@ -206,9 +201,9 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableHeader('End Date'),
                 HTMLTableCell(pd.end_date),
                 HTMLTableHeader('Cash Transfers to Date'),
-                HTMLTableCell('{} ({}%)'.format(
+                HTMLTableCell('{} ({:.2f}%)'.format(
                     format_currency(pd.funds_received_to_date, pd.funds_received_to_date_currency),
-                    funds_received_to_date_percentage
+                    cash_transfer_percentage,
                 ))
             ])
 
@@ -217,12 +212,14 @@ class ProgrammeDocumentsPDFExporter:
 
         return context
 
-    def get_as_response(self):
+    def get_as_response(self, request):
         try:
-            pdf = render_to_pdf(self.template_name, self.get_context())
-            response = make_response(pdf)
-            response['Content-disposition'] = 'inline; filename="{}"'.format(self.file_name)
+            response = render_pdf_to_response(
+                request,
+                self.template_name,
+                self.get_context(),
+            )
             return response
-        except PDFRenderingError:
-            logger.exception('Error trying to render PDF')
+        except Exception as exc:
+            logger.exception(exc)
             return HttpResponse('Error trying to render PDF')

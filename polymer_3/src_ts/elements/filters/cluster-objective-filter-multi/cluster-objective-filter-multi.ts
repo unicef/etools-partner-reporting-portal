@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from "../../../ReduxConnectedElement";
+import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -21,35 +21,27 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <etools-prp-ajax
-        id="objectives"
-        url="[[objectivesUrl]]"
-        params="[[objectivesParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="objectives" url="[[objectivesUrl]]" params="[[objectivesParams]]"> </etools-prp-ajax>
 
-    <dropdown-filter-multi
+      <dropdown-filter-multi
         label="[[localize('cluster_objective')]]"
         name="cluster_objectives"
         value="[[value]]"
         data="[[data]]"
-        disabled="[[pending]]">
-    </dropdown-filter-multi>
-  `;
+        disabled="[[pending]]"
+      >
+      </dropdown-filter-multi>
+    `;
   }
 
   @property({type: String, computed: '_computeObjectivesUrl(responsePlanId)'})
@@ -73,9 +65,7 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
   private _debouncer!: Debouncer;
 
   static get observers() {
-    return [
-      '_fetchObjectives(objectivesParams, objectivesUrl)'
-    ];
+    return ['_fetchObjectives(objectivesParams, objectivesUrl)'];
   }
 
   _computeObjectivesUrl(responsePlanId: string) {
@@ -102,25 +92,22 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
       return;
     }
 
-    const self = this;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(250),
-      function() {
-        const thunk = (self.$.objectives as EtoolsPrpAjaxEl).thunk();
-        self.set('pending', true);
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
+      const thunk = (this.$.objectives as EtoolsPrpAjaxEl).thunk();
+      this.set('pending', true);
 
-        (self.$.objectives as EtoolsPrpAjaxEl).abort();
+      (this.$.objectives as EtoolsPrpAjaxEl).abort();
 
-        thunk()
-          .then((res: any) => {
-            self.set('pending', false);
-            self.set('data', res.data.results);
-          })
-          .catch((_err: GenericObject) => {
-            // TODO: error handling
-            self.set('pending', false);
-          });
-      });
+      thunk()
+        .then((res: any) => {
+          this.set('pending', false);
+          this.set('data', res.data.results);
+        })
+        .catch((_err: GenericObject) => {
+          // TODO: error handling
+          this.set('pending', false);
+        });
+    });
   }
 
   disconnectedCallback() {
@@ -129,7 +116,6 @@ class ClusterObjectiveFilterMulti extends LocalizeMixin(FilterDependenciesMixin(
       this._debouncer.cancel();
     }
   }
-
 }
 
 window.customElements.define('cluster-objective-filter-multi', ClusterObjectiveFilterMulti);

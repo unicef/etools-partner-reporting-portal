@@ -1,12 +1,11 @@
 from django.conf.urls import url
 
 from ocha.views import (
+    RPMProjectDetailAPIView,
+    RPMProjectListAPIView,
     RPMWorkspaceResponsePlanAPIView,
     RPMWorkspaceResponsePlanDetailAPIView,
-    RPMProjectListAPIView,
-    RPMProjectDetailAPIView,
 )
-
 
 urlpatterns = [
     url(r'^response-plans/workspace/(?P<workspace_id>\d+)/$',

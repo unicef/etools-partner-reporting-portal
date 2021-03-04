@@ -4,7 +4,6 @@ import os
 
 from .base import *
 
-
 # dev overrides
 DEBUG = True
 IS_DEV = True
@@ -29,18 +28,17 @@ INSTALLED_APPS += [
     'django_extensions',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-] + MIDDLEWARE_CLASSES
+] + MIDDLEWARE
 
 # No SAML for local dev
 AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.azuread_b2c.AzureADB2COAuth2',
     'core.mixins.CustomAzureADBBCOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-CORS_ORIGIN_WHITELIST += ('localhost:8082', 'localhost:8081')
+CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
 
 FIXTURE_DIRS += ["fixtures"]

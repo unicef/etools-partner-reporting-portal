@@ -7,28 +7,27 @@ import '@polymer/paper-button/paper-button.js';
  * @customElement
  */
 class PageNotFound extends PolymerElement {
-
   static get template() {
     return html`
-    <style>
-      :host {
-        display: block;
-        padding: 25px;
+      <style>
+        :host {
+          display: block;
+          padding: 25px;
 
-        --paper-button: {
-          background-color: #fff;
-        };
-      }
+          --paper-button: {
+            background-color: #fff;
+          }
+        }
 
-      h1 {
-        @apply --paper-font-display1;
-      }
-    </style>
+        h1 {
+          @apply --paper-font-display1;
+        }
+      </style>
 
-    <h1>Page not found</h1>
+      <h1>Page not found</h1>
 
-    <paper-button id="return" on-tap="_return" raised>Head back home</paper-button>
-  `;
+      <paper-button id="return" on-tap="_return" raised>Head back home</paper-button>
+    `;
   }
 
   connectedCallback() {
@@ -47,7 +46,5 @@ class PageNotFound extends PolymerElement {
   _return() {
     window.location.href = '/';
   }
-
 }
 window.customElements.define('page-not-found', PageNotFound);
-

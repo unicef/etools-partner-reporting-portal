@@ -21,35 +21,35 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
   public static get template() {
     // language=HTML
     return html`
-     <style include="app-grid-style">
-      :host {
-        display: block;
-        --app-grid-columns:4;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
-      }
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          --app-grid-columns: 4;
+          --app-grid-gutter: 25px;
+          --app-grid-item-height: auto;
+          --app-grid-expandible-item-columns: 4;
+        }
 
-      .app-grid {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
+        .app-grid {
+          padding: 0;
+          margin: 0;
+          list-style: none;
+        }
 
-      .full-width {
-        @apply --app-grid-expandible-item;
-      }
+        .full-width {
+          @apply --app-grid-expandible-item;
+        }
 
-      ul {
-        padding-left: 0;
-      }
+        ul {
+          padding-left: 0;
+        }
 
-      li {
-        list-style-type: none;
-      }
-    </style>
+        li {
+          list-style-type: none;
+        }
+      </style>
 
-    <etools-content-panel panel-title="[[localize('activity_details')]]">
+      <etools-content-panel panel-title="[[localize('activity_details')]]">
         <div class="row">
           <ul class="app-grid">
             <li class="item full-width">
@@ -64,9 +64,7 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
               </labelled-item>
             </li>
 
-            <template
-              is="dom-if"
-              if="[[activityData.cluster_activity]]">
+            <template is="dom-if" if="[[activityData.cluster_activity]]">
               <li class="item">
                 <labelled-item label="[[localize('cluster_activity')]]">
                   <span class="value">[[activityData.cluster_activity.title]]</span>
@@ -74,9 +72,7 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
               </li>
             </template>
 
-            <template
-              is="dom-if"
-              if="[[!activityData.cluster_activity]]">
+            <template is="dom-if" if="[[!activityData.cluster_activity]]">
               <li class="item">
                 <labelled-item label="[[localize('cluster_activity')]]">
                   <span class="value">---</span>
@@ -84,9 +80,7 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
               </li>
             </template>
 
-            <template
-              is="dom-if"
-              if="[[activityData.cluster_objective]]">
+            <template is="dom-if" if="[[activityData.cluster_objective]]">
               <li class="item">
                 <labelled-item label="[[localize('cluster_objective')]]">
                   <span class="value">[[activityData.cluster_objective.title]]</span>
@@ -100,10 +94,7 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
               </labelled-item>
             </li>
 
-            <template
-              is="dom-repeat"
-              items="[[activityData.projects]]">
-
+            <template is="dom-repeat" items="[[activityData.projects]]">
               <div>
                 <li class="item">
                   <labelled-item label="[[localize('partner_project')]]">
@@ -122,10 +113,9 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
                 </li>
               </div>
             </template>
-
           </ul>
         </div>
-    </etools-content-panel>
+      </etools-content-panel>
     `;
   }
 
@@ -134,4 +124,3 @@ class ActivityDetailsDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
 }
 
 window.customElements.define('activity-details-display', ActivityDetailsDetails);
-

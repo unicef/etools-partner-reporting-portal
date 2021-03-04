@@ -17,8 +17,11 @@ import '../disaggregations/disaggregation-table';
 import '../list-placeholder';
 import {GenericObject} from '../../typings/globals.types';
 import {
-  computeParams, computeIsClusterApp, computeIndicatorReportsUrl,
-  bucketByLocation, computeHidden
+  computeParams,
+  computeIsClusterApp,
+  computeIndicatorReportsUrl,
+  bucketByLocation,
+  computeHidden
 } from './js/ip-reporting-indicator-details-functions';
 
 /**
@@ -29,184 +32,154 @@ import {
  * @appliesMixin LocalizeMixin
  */
 class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-
   static get template() {
     return html`
-    <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
-      :host {
-        display: block;
-        width: 100%;
+      <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
+        :host {
+          display: block;
+          width: 100%;
 
-        --paper-tabs: {
-          padding-left: 12px;
-          border-bottom: 1px solid var(--paper-grey-300);
-        };
+          --paper-tabs: {
+            border-bottom: 1px solid var(--paper-grey-300);
+          }
 
-        --app-grid-columns: 2;
-        --app-grid-gutter: 15px;
-        --app-grid-item-height: auto;
-      }
+          --app-grid-columns: 2;
+          --app-grid-gutter: 15px;
+          --app-grid-item-height: auto;
+        }
 
-      .item {
-        padding: 0;
-      }
+        .item {
+          padding: 0;
+        }
 
-      .loading-wrapper {
-        padding: 15px;
-      }
+        .loading-wrapper {
+          padding: 15px;
+        }
 
-      h4 {
-        margin: 0 0 1em;
-        font-size: 12px;
-        font-weight: normal;
-      }
+        h4 {
+          margin: 0 0 1em;
+          font-size: 12px;
+          font-weight: normal;
+        }
 
-      h4 > span:last-child {
-        padding-left: 10px;
-        text-align: right;
-      }
+        h4 > span:last-child {
+          padding-left: 10px;
+          text-align: right;
+        }
 
-      .reporting-period {
-        color: var(--theme-primary-text-color-medium);
-      }
+        .reporting-period {
+          color: var(--theme-primary-text-color-medium);
+        }
 
-      .report-meta {
-        font-size: 12px;
-        background: var(--paper-grey-100);
-      }
+        .report-meta {
+          font-size: 12px;
+          background: var(--paper-grey-100);
+        }
 
-      .report-meta dt,
-      .report-meta dd {
-        display: inline;
-        margin: 0;
-      }
+        .report-meta dt,
+        .report-meta dd {
+          display: inline;
+          margin: 0;
+        }
 
-      .report-meta dt {
-        font-weight: bold;
-      }
+        .report-meta dt {
+          font-weight: bold;
+        }
 
-      .report-meta dd {
-        color: var(--paper-grey-600);
-      }
+        .report-meta dd {
+          color: var(--paper-grey-600);
+        }
 
-      .report-meta labelled-item {
-        margin: 1em 0;
-      }
-    </style>
+        .report-meta labelled-item {
+          margin: 1em 0;
+        }
+      </style>
 
-    <etools-prp-ajax
-        id="indicatorDetail"
-        url="[[indicatorDetailUrl]]"
-        params="[[params]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="indicatorDetail" url="[[indicatorDetailUrl]]" params="[[params]]"> </etools-prp-ajax>
 
-    <template is="dom-if" if="[[loading]]">
-      <div class="loading-wrapper">
-        <etools-loading no-overlay></etools-loading>
-      </div>
-    </template>
+      <template is="dom-if" if="[[loading]]">
+        <div class="loading-wrapper">
+          <etools-loading no-overlay></etools-loading>
+        </div>
+      </template>
 
-    <template
-        is="dom-if"
-        if="[[_computeHidden(data, 'true')]]">
-      <div class="report-meta app-grid">
-        <template
-            is="dom-repeat"
-            items="[[data]]"
-            as="report">
-          <div class="item">
-            <dl>
-              <dt>[[localize('submitted')]]:</dt>
-              <dd>[[report.submission_date]]</dd>
-            </dl>
-            <dl>
-              <dt>[[localize('total_progress')]]:</dt>
-              <dd>
-                <template
-                    is="dom-if"
-                    if="[[_equals(report.display_type, 'number')]]"
-                    restamp="true">
-                  <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
-                </template>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(report.display_type, 'number')]]"
-                    restamp="true">
-                  [[_formatIndicatorValue(report.display_type, report.total.c, 1)]]
-                </template>
-              </dd>
-            </dl>
-            <dl>
-              <dt>[[localize('progress_in_reporting_period')]]:</dt>
-              <dd class="reporting-period">
-                [[report.time_period_start]] - [[report.time_period_end]]
-              </dd>
-            </dl>
-          </div>
-        </template>
-      </div>
-    </template>
+      <template is="dom-if" if="[[_computeHidden(data, 'true')]]">
+        <div class="report-meta app-grid">
+          <template is="dom-repeat" items="[[data]]" as="report">
+            <div class="item">
+              <dl>
+                <dt>[[localize('submitted')]]:</dt>
+                <dd>[[report.submission_date]]</dd>
+              </dl>
+              <dl>
+                <dt>[[localize('total_progress')]]:</dt>
+                <dd>
+                  <template is="dom-if" if="[[_equals(report.display_type, 'number')]]" restamp="true">
+                    <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
+                  </template>
+                  <template is="dom-if" if="[[!_equals(report.display_type, 'number')]]" restamp="true">
+                    [[_formatIndicatorValue(report.display_type, report.total.c, 1)]]
+                  </template>
+                </dd>
+              </dl>
+              <dl>
+                <dt>[[localize('progress_in_reporting_period')]]:</dt>
+                <dd class="reporting-period">
+                  [[report.time_period_start]] - [[report.time_period_end]]
+                </dd>
+              </dl>
+            </div>
+          </template>
+        </div>
+      </template>
 
-    <list-placeholder
-      data="[[data]]"
-      loading="[[loading]]"
-      message="no_report_data">
-    </list-placeholder>
+      <list-placeholder data="[[data]]" loading="[[loading]]" message="[[localize('no_report_data')]]">
+      </list-placeholder>
 
-    <template
-        is="dom-if"
-        if="[[_computeHidden(locations, 'true')]]">
-      <paper-tabs
+      <template is="dom-if" if="[[_computeHidden(locations, 'true')]]">
+        <paper-tabs
           selected="{{selected}}"
           fallback-selection="location-[[locations.0.current.id]]"
           attr-for-selected="name"
           scrollable
-          hide-scroll-buttons>
-        <template
-            is="dom-repeat"
-            items="[[locations]]"
-            as="location">
-          <paper-tab name="location-[[location.current.id]]">
-            [[location.name]]
-          </paper-tab>
-        </template>
-      </paper-tabs>
-    </template>
-
-    <iron-pages
-        attr-for-selected="name"
-        selected="{{selected}}">
-
-      <template
-          is="dom-repeat"
-          items="[[locations]]"
-          as="location">
-        <div name="location-[[location.current.id]]">
-          <div class="app-grid">
-            <template is="dom-if" if="[[location.current]]">
-              <div class="item">
-                <disaggregation-table
-                  data=[[location.current]]
-                  mapping=[[location.reportInfo.current.disagg_lookup_map]]>
-                </disaggregation-table>
-              </div>
-            </template>
-
-            <template is="dom-if" if="[[location.previous]]">
-              <div class="item">
-                <disaggregation-table
-                  data=[[location.previous]]
-                  mapping=[[location.reportInfo.previous.disagg_lookup_map]]>
-                </disaggregation-table>
-              </div>
-            </template>
-          </div>
-        </div>
+        >
+          <template is="dom-repeat" items="[[locations]]" as="location">
+            <paper-tab name="location-[[location.current.id]]">
+              [[location.name]]
+            </paper-tab>
+          </template>
+        </paper-tabs>
       </template>
-    </iron-pages>
-  `;
-  }
 
+      <iron-pages attr-for-selected="name" selected="{{selected}}">
+        <template is="dom-repeat" items="[[locations]]" as="location">
+          <div name="location-[[location.current.id]]">
+            <div class="app-grid">
+              <template is="dom-if" if="[[location.current]]">
+                <div class="item">
+                  <disaggregation-table
+                    data="[[location.current]]"
+                    mapping="[[location.reportInfo.current.disagg_lookup_map]]"
+                  >
+                  </disaggregation-table>
+                </div>
+              </template>
+
+              <template is="dom-if" if="[[location.previous]]">
+                <div class="item">
+                  <disaggregation-table
+                    data="[[location.previous]]"
+                    mapping="[[location.reportInfo.previous.disagg_lookup_map]]"
+                  >
+                  </disaggregation-table>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </iron-pages>
+    `;
+  }
 
   @property({type: String, computed: '_computeIndicatorReportsUrl(indicator)'})
   indicatorDetailUrl!: string;
@@ -274,7 +247,8 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   _openChanged() {
     if (this.isOpen) {
       const thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
-      this.reduxStore.dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
+      this.reduxStore
+        .dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
         // @ts-ignore
         .catch((_err) => {
           //   // TODO: error handling.
@@ -283,7 +257,6 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
       (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
     }
   }
-
 }
 
 window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);

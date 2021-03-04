@@ -5,7 +5,7 @@ import {GenericObject} from '../../typings/globals.types';
 export class ProgrammeDocumentReportsState {
   byPD: GenericObject = {};
   countByPD: GenericObject = {};
-  allIds = [];
+  allIds: GenericObject[] = [];
   current = {
     id: '',
     mode: '',
@@ -27,21 +27,22 @@ export const ProgrammeDocumentReports = combineReducers({
 function reportsByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.pdId] = action.data;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.SET_PD_REPORT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
+        // @ts-ignore
         const reports: GenericObject[] = state[action.pdId] || [];
 
-        const index = reports.findIndex(function(report) {
+        const index = reports.findIndex(function (report) {
           return Number(report.id) === Number(action.data.id);
         });
 
@@ -54,41 +55,39 @@ function reportsByPDReducer(state = {}, action: any) {
         change[action.pdId] = reports;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.UPDATE_PD_REPORT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
-        change[action.pdId] = (state[action.pdId] || []).map(function(report: GenericObject) {
-          return Number(report.id) === Number(action.reportId) ?
-            Object.assign({}, report, action.data) : report;
+        // @ts-ignore
+        change[action.pdId] = (state[action.pdId] || []).map(function (report: GenericObject) {
+          return Number(report.id) === Number(action.reportId) ? Object.assign({}, report, action.data) : report;
         });
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.AMEND_REPORTABLE:
-      return (function() {
+      return (function () {
         /**
          * Narrative & status for a given LLO are currently extracted
          * from the first of its indicator reports. Need to update all
          * of them, to be consistent :(
          */
 
-        const change = {};
+        const change: GenericObject = {};
 
-        change[action.pdId] = state[action.pdId].map(function(report: GenericObject) {
+        // @ts-ignore
+        change[action.pdId] = state[action.pdId].map(function (report: GenericObject) {
           if (Number(report.id) !== Number(action.reportId)) {
             return report;
           }
 
           return Object.assign({}, report, {
-            indicator_reports: report.indicator_reports.map(function(indicatorReport: GenericObject) {
-              if (
-                Number(indicatorReport.reportable.object_id) !==
-                Number(action.reportableId)
-              ) {
+            indicator_reports: report.indicator_reports.map(function (indicatorReport: GenericObject) {
+              if (Number(indicatorReport.reportable.object_id) !== Number(action.reportableId)) {
                 return indicatorReport;
               }
 
@@ -98,7 +97,7 @@ function reportsByPDReducer(state = {}, action: any) {
         });
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -111,29 +110,29 @@ function reportsByPDReducer(state = {}, action: any) {
 function reportsCountByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS_COUNT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.pdId] = action.count;
 
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;
   }
 }
 
-function pdIdsReducer(state = [], action: any) {
+function pdIdsReducer(state: GenericObject[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
-      return (function() {
+      return (function () {
         if (state.indexOf(action.pdId) === -1) {
           return state.concat([action.pdId]);
         }
 
         return state;
-      }());
+      })();
 
     case Constants.RESET:
       return [];
@@ -170,7 +169,6 @@ function modeReducer(state = '', action: any) {
 }
 
 function loadingReducer(state = false, action: any) {
-
   switch (action.type) {
     case Constants.PD_REPORT_LOADING_START:
       return true;

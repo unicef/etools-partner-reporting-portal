@@ -4,10 +4,10 @@ import {GenericObject} from '../../typings/globals.types';
 
 export class PartnerProjectsState {
   all = [];
-  count: number = 0;
+  count = 0;
   loading = false;
   activities: GenericObject = {};
-  activitiesCount: number = 0;
+  activitiesCount = 0;
   activitiesLoading = false;
   indicators: GenericObject = {};
   indicatorsCount = 0;
@@ -67,12 +67,12 @@ function loadingPartnerProjectsReducer(state = false, action: any) {
 function activitiesByPartnerProjectIdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -85,11 +85,11 @@ function activitiesByPartnerProjectIdReducer(state = {}, action: any) {
 function activitiesByPartnerProjectIdCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;
@@ -112,12 +112,12 @@ function activitiesByPartnerProjectIdLoadingReducer(state = false, action: any) 
 function indicatorsReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.data;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     case Constants.RESET:
       return {};
@@ -130,12 +130,12 @@ function indicatorsReducer(state = {}, action: any) {
 function indicatorsCountReducer(state = 0, action: any) {
   switch (action.type) {
     case Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT:
-      return (function() {
+      return (function () {
         const change: GenericObject = {};
 
         change[action.partnerProjectId] = action.count;
         return Object.assign({}, state, change);
-      }());
+      })();
 
     default:
       return state;

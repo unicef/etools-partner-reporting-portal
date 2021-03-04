@@ -1,15 +1,15 @@
+from distutils.util import strtobool
+
 from django.db.models import Q
 
 import django_filters
-from django_filters import rest_framework as filters
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
-from distutils.util import strtobool
-
 from core.common import PARTNER_PROJECT_STATUS
+from django_filters import rest_framework as filters
+from django_filters.filters import CharFilter, ChoiceFilter, DateFilter, TypedChoiceFilter
 from utils.filters.constants import Boolean
 from utils.filters.fields import CommaSeparatedListFilter
 
-from .models import PartnerProject, Partner, PartnerActivity
+from .models import Partner, PartnerActivity, PartnerProject
 
 
 class PartnerProjectFilter(filters.FilterSet):
@@ -63,8 +63,11 @@ class PartnerActivityFilter(django_filters.FilterSet):
     cluster_id = CharFilter(method='get_cluster_id')
     activity = CharFilter(method='get_activity')
     custom = TypedChoiceFilter(
-        name='custom', choices=Boolean.CHOICES, coerce=strtobool,
-        method='get_custom', label='Show only custom activities'
+        field_name='custom',
+        choices=Boolean.CHOICES,
+        coerce=strtobool,
+        method='get_custom',
+        label='Show only custom activities',
     )
     status = ChoiceFilter(choices=PARTNER_PROJECT_STATUS)
     location = CharFilter(method='get_location')
@@ -100,7 +103,7 @@ class PartnerActivityFilter(django_filters.FilterSet):
 
 class PartnerFilter(django_filters.FilterSet):
 
-    clusters = CommaSeparatedListFilter(name='clusters__id')
+    clusters = CommaSeparatedListFilter(field_name='clusters__id')
 
     class Meta:
         model = Partner
@@ -108,8 +111,8 @@ class PartnerFilter(django_filters.FilterSet):
 
 
 class PartnerIDManagementFilter(django_filters.FilterSet):
-    partner_type = CharFilter(name='partner_type')
-    clusters = CommaSeparatedListFilter(name='clusters__id')
+    partner_type = CharFilter(field_name='partner_type')
+    clusters = CommaSeparatedListFilter(field_name='clusters__id')
     title = CharFilter(method='get_title')
 
     class Meta:

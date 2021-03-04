@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-import sys
+
 import os
+import sys
 
 from .base import *
-
 
 DEBUG = False
 IS_DEV = False
@@ -26,7 +26,6 @@ AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.azuread_b2c.AzureADB2COAuth2',
     'core.mixins.CustomAzureADBBCOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 LOGGING['handlers']['mail_admins'] = {
@@ -40,7 +39,7 @@ LOGGING['loggers']['django.request'] = {
     'propagate': False,
 }
 
-CORS_ORIGIN_WHITELIST += ('localhost:8082', 'localhost:8081')
+# CORS_ORIGIN_WHITELIST += ('localhost:8082', 'localhost:8081')
 
 if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

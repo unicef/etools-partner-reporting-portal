@@ -1,22 +1,10 @@
 from django.contrib.gis import admin
 
+from core.cartodb import update_sites_from_cartodb
+from core.forms import AutoSizeTextForm, CartoDBTableForm, GatewayTypeModelForm
 from leaflet.admin import LeafletGeoAdmin
 
-from core.forms import (
-    GatewayTypeModelForm,
-    CartoDBTableForm,
-    AutoSizeTextForm
-)
-from core.cartodb import update_sites_from_cartodb
-from .models import (
-    Workspace,
-    Location,
-    ResponsePlan,
-    GatewayType,
-    CartoDBTable,
-    Country,
-    PRPRole,
-)
+from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -78,8 +66,8 @@ class WorkspaceAdmin(admin.ModelAdmin):
 
 
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country_short_code')
-    search_fields = ('name', 'country_short_code')
+    list_display = ('name', 'iso3_code', 'country_short_code')
+    search_fields = ('name', 'iso3_code', 'country_short_code')
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):

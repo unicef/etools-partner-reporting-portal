@@ -6,11 +6,8 @@ import {property} from '@polymer/decorators';
  * @customElement
  */
 class FrequencyOfReporting extends PolymerElement {
-
   static get template() {
-    return html`
-    <span>[[label]]</span>
-  `;
+    return html` <span>[[label]]</span> `;
   }
 
   @property({type: String})
@@ -35,9 +32,7 @@ class FrequencyOfReporting extends PolymerElement {
     }
     return '';
   }
-
 }
 window.customElements.define('frequency-of-reporting', FrequencyOfReporting);
 
 export {FrequencyOfReporting as FilterListEl};
-

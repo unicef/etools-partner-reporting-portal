@@ -18,34 +18,26 @@ import {GenericObject} from '../../../../../typings/globals.types';
 class PartnerActivitiesFilters extends UtilsMixin(PolymerElement) {
   public static get template() {
     return html`
-    ${filterStyles}
-    <style include="app-grid-style">
-      :host {
-        display: block;
-        background: white;
+      ${filterStyles}
+      <style include="app-grid-style">
+        :host {
+          display: block;
+          background: white;
 
-        --app-grid-item-height: auto;
-      }
+          --app-grid-item-height: auto;
+        }
+      </style>
 
-    </style>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
-
-    <filter-list filters="{{filters}}">
-      <div class="app-grid">
-        <cluster-partner-filter
-            class="item"
-            value="[[_withDefault(queryParams.partner, '')]]">
-        </cluster-partner-filter>
-      </div>
-    </filter-list>
+      <filter-list filters="{{filters}}">
+        <div class="app-grid">
+          <cluster-partner-filter class="item" value="[[_withDefault(queryParams.partner, '')]]">
+          </cluster-partner-filter>
+        </div>
+      </filter-list>
     `;
   }
 

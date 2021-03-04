@@ -19,21 +19,21 @@ import '../../etools-prp-number';
 class NumberOfPartners extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
-    ${dashboardWidgetStyles}
-    <style include="iron-flex">
-      :host {
-        display: block;
-      }
-    </style>
+      ${dashboardWidgetStyles}
+      <style include="iron-flex">
+        :host {
+          display: block;
+        }
+      </style>
 
-    <paper-card class="widget-container layout vertical">
-      <h3 class="widget-heading flex">[[localize('number_of_contributing_partners')]]</h3>
+      <paper-card class="widget-container layout vertical">
+        <h3 class="widget-heading flex">[[localize('number_of_contributing_partners')]]</h3>
 
-      <div class="widget-figure flex">
-        <etools-prp-number value="[[numberOfPartners]]"></etools-prp-number>
-      </div>
-      <etools-loading active="[[loading]]"></etools-loading>
-    </paper-card>
+        <div class="widget-figure flex">
+          <etools-prp-number value="[[numberOfPartners]]"></etools-prp-number>
+        </div>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </paper-card>
     `;
   }
 
@@ -49,7 +49,6 @@ class NumberOfPartners extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)
   _computePartnersUrl(baseUrl: string) {
     return this.buildUrl(baseUrl, '/response-parameters/partners');
   }
-
 }
 
 window.customElements.define('number-of-partners', NumberOfPartners);

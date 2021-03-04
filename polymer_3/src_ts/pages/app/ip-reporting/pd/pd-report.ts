@@ -29,10 +29,8 @@ import './pd-report-hr';
 import './pd-report-qpr';
 
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
-import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments'
-import {
-  pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle
-} from '../../../../redux/actions/pdReports';
+import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments';
+import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports';
 
 import Endpoints from '../../../../endpoints';
 import UtilsMixin from '../../../../mixins/utils-mixin';
@@ -53,223 +51,147 @@ import {RootState} from '../../../../typings/redux.types';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
-  ProgressReportUtilsMixin(UtilsMixin(ReduxConnectedElement)))) {
-
+class PageIpReportingPdReport extends LocalizeMixin(
+  RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(ReduxConnectedElement)))
+) {
   public static get template() {
     return html`
-    ${sharedStyles} ${buttonsStyles}
-    <style>
-      :host {
-        display: block;
+      ${sharedStyles} ${buttonsStyles}
+      <style>
+        :host {
+          display: block;
 
-        --page-header-above-title: {
-          position: absolute;
-          left: 0;
-          top: -23px;
-        };
-      }
+          --page-header-above-title: {
+            position: absolute;
+            left: 0;
+            top: -23px;
+          }
+        }
 
-      pd-reports-report-title {
-        margin-left: 5px;
-        font-size: 10px;
-        padding: 1px 3px;
-      }
+        pd-reports-report-title {
+          margin-left: 5px;
+          font-size: 10px;
+          padding: 1px 3px;
+        }
 
-      .header-content {
-        margin: .5em 0;
-      }
+        .header-content {
+          margin: 0.5em 0;
+        }
 
-      .toolbar report-status {
-        margin-right: .5em;
-      }
+        .toolbar report-status {
+          margin-right: 0.5em;
+        }
 
-      .toolbar a {
-        text-decoration: none;
-      }
+        .toolbar a {
+          text-decoration: none;
+        }
 
-      .tabs paper-tab {
-        text-transform: uppercase;
-      }
+        .tabs paper-tab {
+          text-transform: uppercase;
+        }
 
-      .pd-details-link {
-        margin-left: .5em;
+        .pd-details-link {
+          margin-left: 0.5em;
 
-        @apply --link;
-      }
-    </style>
+          @apply --link;
+        }
+      </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
+      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
+      <iron-location query="{{query}}"> </iron-location>
 
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:report_id/:mode"
-        data="{{routeData}}">
-    </app-route>
+      <app-route route="{{route}}" pattern="/:report_id/:mode" data="{{routeData}}"> </app-route>
 
-    <etools-prp-ajax
-        id="report"
-        url="[[reportUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="report" url="[[reportUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="submit"
-        url="[[submitUrl]]"
-        method="post">
-    </etools-prp-ajax>
+      <etools-prp-ajax id="submit" url="[[submitUrl]]" method="post"> </etools-prp-ajax>
 
-    <page-header
-        title="[[headingPrefix]]"
-        back="[[backLink]]">
-      <reporting-period
-          slot="above-title"
-          range="[[currentReport.reporting_period]]">
-      </reporting-period>
+      <page-header title="[[headingPrefix]]" back="[[backLink]]">
+        <reporting-period slot="above-title" range="[[currentReport.reporting_period]]"> </reporting-period>
 
-      <pd-reports-report-title
-        slot="above-title"
-        report="[[currentReport]]">
-      </pd-reports-report-title>
+        <pd-reports-report-title slot="above-title" report="[[currentReport]]"> </pd-reports-report-title>
 
-      <a
-          href="#"
-          slot="in-title"
-          class="pd-details-link"
-          on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
+        <paper-button class="btn-primary" slot="in-title" role="button" on-tap="_showPdDetails">
+          [[currentReport.programme_document.reference_number]]
+        </paper-button>
 
-      <template
-          is="dom-if"
-          if="[[_equals(currentPd.status, 'Suspended')]]"
-          restamp="true">
-        <message-box
-            slot="header-content"
-            type="warning">
-          This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting requirement.
-        </message-box>
-      </template>
-
-      <div slot="toolbar">
-        <report-status status="[[currentReport.status]]"></report-status>
-
-        <template
-            is="dom-if"
-            if="[[_canExport(currentReport, mode, permissions)]]"
-            restamp="true">
-          <pd-report-export-button></pd-report-export-button>
+        <template is="dom-if" if="[[_equals(currentPd.status, 'Suspended')]]" restamp="true">
+          <message-box slot="header-content" type="warning">
+            This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting
+            requirement.
+          </message-box>
         </template>
 
-        <template
-            is="dom-if"
-            if="[[canSubmit]]"
-            restamp="true">
-          <paper-button
-              class="btn-primary"
-              on-tap="_submit"
-              disabled="[[busy]]"
-              raised>
-            [[localize('submit')]]
-          </paper-button>
+        <div slot="toolbar">
+          <report-status status="[[currentReport.status]]"></report-status>
+
+          <template is="dom-if" if="[[_canExport(currentReport, mode, permissions)]]" restamp="true">
+            <pd-report-export-button></pd-report-export-button>
+          </template>
+
+          <template is="dom-if" if="[[canSubmit]]" restamp="true">
+            <paper-button class="btn-primary" on-tap="_submit" disabled="[[busy]]" raised>
+              [[localize('submit')]]
+            </paper-button>
+          </template>
+        </div>
+
+        <div slot="toolbar">
+          <template is="dom-if" if="[[submittedOnBehalf]]" restamp="true">
+            <p>[[localize('submitted_by')]]: [[currentReport.submitting_user]]</p>
+            <p>[[localize('on_behalf_of')]]: [[currentReport.submitted_by]]</p>
+            <p>[[localize('date_of_submission')]]: [[currentReport.submission_date]]</p>
+          </template>
+        </div>
+
+        <div slot="tabs">
+          <paper-tabs selected="{{selectedTab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <template is="dom-if" if="[[_equals(currentReport.report_type, 'HR')]]" restamp="true">
+              <paper-tab name="reporting">[[localize('reporting_on_indicators')]]</paper-tab>
+            </template>
+
+            <template is="dom-if" if="[[_equals(currentReport.report_type, 'QPR')]]" restamp="true">
+              <paper-tab name="reporting">[[localize('reporting_on_results')]]</paper-tab>
+              <paper-tab name="info">[[localize('other_info')]]</paper-tab>
+            </template>
+
+            <template is="dom-if" if="[[_equals(currentReport.report_type, 'SR')]]" restamp="true">
+              <paper-tab name="reporting">[[localize('reporting_on_data')]]</paper-tab>
+            </template>
+          </paper-tabs>
+        </div>
+      </page-header>
+
+      <page-body>
+        <template is="dom-if" if="[[_equals(currentReport.report_type, 'HR')]]" restamp="true">
+          <page-pd-report-hr selected-tab="[[selectedTab]]" report="[[currentReport]]"> </page-pd-report-hr>
         </template>
-      </div>
 
-      <div slot="toolbar">
-        <template
-            is="dom-if"
-            if="[[submittedOnBehalf]]"
-            restamp="true">
-          <p>[[localize('submitted_by')]]: [[currentReport.submitting_user]]</p>
-          <p>[[localize('on_behalf_of')]]: [[currentReport.submitted_by]]</p>
-          <p>[[localize('date_of_submission')]]: [[currentReport.submission_date]]</p>
+        <template is="dom-if" if="[[_equals(currentReport.report_type, 'QPR')]]" restamp="true">
+          <page-pd-report-qpr selected-tab="[[selectedTab]]" report="[[currentReport]]"> </page-pd-report-qpr>
         </template>
-      </div>
 
-      <div slot="tabs">
-        <paper-tabs
-            selected="{{selectedTab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <template
-              is="dom-if"
-              if="[[_equals(currentReport.report_type, 'HR')]]"
-              restamp="true">
-            <paper-tab name="reporting">[[localize('reporting_on_indicators')]]</paper-tab>
-          </template>
+        <template is="dom-if" if="[[_equals(currentReport.report_type, 'SR')]]" restamp="true">
+          <page-pd-report-sr selected-tab="[[selectedTab]]" report="[[currentReport]]"> </page-pd-report-sr>
+        </template>
+      </page-body>
 
-          <template
-              is="dom-if"
-              if="[[_equals(currentReport.report_type, 'QPR')]]"
-              restamp="true">
-            <paper-tab name="reporting">[[localize('reporting_on_results')]]</paper-tab>
-            <paper-tab name="info">[[localize('other_info')]]</paper-tab>
-          </template>
+      <pd-modal id="pdDetails"></pd-modal>
 
-          <template
-              is="dom-if"
-              if="[[_equals(currentReport.report_type, 'SR')]]"
-              restamp="true">
-            <paper-tab name="reporting">[[localize('reporting_on_data')]]</paper-tab>
-          </template>
-        </paper-tabs>
-      </div>
-    </page-header>
+      <error-modal id="error"></error-modal>
 
-    <page-body>
-      <template
-          is="dom-if"
-          if="[[_equals(currentReport.report_type, 'HR')]]"
-          restamp="true">
-        <page-pd-report-hr
-            selected-tab="[[selectedTab]]"
-            report="[[currentReport]]">
-        </page-pd-report-hr>
-      </template>
-
-      <template
-          is="dom-if"
-          if="[[_equals(currentReport.report_type, 'QPR')]]"
-          restamp="true">
-        <page-pd-report-qpr
-            selected-tab="[[selectedTab]]"
-            report="[[currentReport]]">
-        </page-pd-report-qpr>
-      </template>
-
-      <template
-          is="dom-if"
-          if="[[_equals(currentReport.report_type, 'SR')]]"
-          restamp="true">
-        <page-pd-report-sr
-            selected-tab="[[selectedTab]]"
-            report="[[currentReport]]">
-        </page-pd-report-sr>
-      </template>
-    </page-body>
-
-    <pd-modal id="pdDetails"></pd-modal>
-
-    <error-modal id="error"></error-modal>
-
-    <authorized-officer-modal
+      <authorized-officer-modal
         id="officer"
         pd-id="[[pdId]]"
         report-id="[[reportId]]"
         data="[[currentReport]]"
-        submit-url="[[submitUrl]]">
-    </authorized-officer-modal>
-  `;
+        submit-url="[[submitUrl]]"
+      >
+      </authorized-officer-modal>
+    `;
   }
 
   @property({type: String})
@@ -356,7 +278,10 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
-    return programmeDocumentReportsCurrent(rootState);
+    const currentReport = programmeDocumentReportsCurrent(rootState);
+    if (currentReport && Object.keys(currentReport).length) {
+      return currentReport;
+    }
   }
 
   _onReportChanged(reportId: string, mode: any) {
@@ -374,10 +299,7 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     if (currentReport.status === 'Sen') {
       this.set('routeData.mode', 'edit');
     }
-    if (
-      this._isReadOnlyReport(currentReport) &&
-      (mode || '').toLowerCase !== 'view'
-    ) {
+    if (this._isReadOnlyReport(currentReport) && (mode || '').toLowerCase !== 'view') {
       this.set('routeData.mode', 'view');
     }
   }
@@ -387,17 +309,14 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
       return;
     }
 
-    const self = this;
-    this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer,
-      timeOut.after(300),
-      () => {
-        const reportThunk = (self.$.report as EtoolsPrpAjaxEl).thunk();
-        (self.$.report as EtoolsPrpAjaxEl).abort();
-        self.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
-      });
+    this.fetchReportDebouncer = Debouncer.debounce(this.fetchReportDebouncer, timeOut.after(300), () => {
+      const reportThunk = (this.$.report as EtoolsPrpAjaxEl).thunk();
+      (this.$.report as EtoolsPrpAjaxEl).abort();
+      this.reduxStore.dispatch(pdReportsFetchSingle(reportThunk, this.pdId));
+    });
   }
 
-  _computeHeadingPrefix(mode: string, localize: Function) {
+  _computeHeadingPrefix(mode: string, localize: (x: string) => string) {
     switch (mode) {
       case 'view':
         return localize('report_for');
@@ -421,6 +340,9 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _canExport(report: GenericObject, mode: string, permissions: GenericObject) {
+    if (!report || !permissions) {
+      return false;
+    }
     switch (true) {
       case report.status === 'Sub' && (!permissions || !permissions.exportSubmittedProgressReport):
       case mode === 'edit':
@@ -435,13 +357,12 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     if (!report) {
       return false;
     }
-
+    const isEnded = report.programme_document && report.programme_document.status === 'End';
     switch (true) {
-      case mode === 'view':
+      case mode === 'view' && !isEnded:
       case report.programme_document &&
-        (report.programme_document.status === 'Sig' ||
-          report.programme_document.status === 'Clo'):
-      case (!permissions || !permissions.editProgressReport):
+        (report.programme_document.status === 'Sig' || report.programme_document.status === 'Clo'):
+      case !permissions || !permissions.editProgressReport:
         return false;
 
       default:
@@ -450,6 +371,9 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _computeSubmittedOnBehalf(currentReport: GenericObject) {
+    if (!currentReport || currentReport.submitted_by === undefined) {
+      return;
+    }
     return currentReport.submitted_by !== currentReport.submitting_user;
   }
 
@@ -463,36 +387,28 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
   }
 
   _submit() {
-    const self = this;
-
     this.set('busy', true);
-    (this.$.submit as EtoolsPrpAjaxEl).thunk()()
+    (this.$.submit as EtoolsPrpAjaxEl)
+      .thunk()()
       .then((res: any) => {
-        const newPath = self.buildUrl(
-          self._baseUrl,
-          'pd/' + self.pdId + '/view/reports'
-        );
+        const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
 
-        self.reduxStore.dispatch(pdReportsUpdateSingle(
-          self.pdId,
-          self.reportId,
-          res.data
-        ));
+        this.reduxStore.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res.data));
 
-        self.set('busy', false);
-        self.set('path', newPath);
+        this.set('busy', false);
+        this.set('path', newPath);
       })
       .catch((res: GenericObject) => {
         const authorizedError = res.data.error_codes.filter((error: string) => {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
-        self.set('busy', false);
+        this.set('busy', false);
 
         if (authorizedError.length > 0) {
-          return (self.$.officer as AuthorizedOfficerModalEl).open();
+          return (this.$.officer as AuthorizedOfficerModalEl).open();
         }
-        return (self.$.error as ErrorModalEl).open(res.data.non_field_errors);
+        return (this.$.error as ErrorModalEl).open(res.data.non_field_errors);
       });
   }
 
@@ -506,7 +422,6 @@ class PageIpReportingPdReport extends LocalizeMixin(RoutingMixin(
     (this.$.error as ErrorModalEl).close();
     (this.$.officer as AuthorizedOfficerModalEl).close();
   }
-
 }
 
 window.customElements.define('page-ip-reporting-pd-report', PageIpReportingPdReport);

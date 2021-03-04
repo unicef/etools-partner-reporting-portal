@@ -9,7 +9,6 @@ import {GenericObject} from '../typings/globals.types';
  * @appliesMixin RoutingMixin
  */
 class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
-
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   app!: string;
 
@@ -22,11 +21,8 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
   @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
   profile!: GenericObject;
 
-
   public static get observers() {
-    return [
-      '_redirectIfNeeded(app, workspaces, workspace, profile)'
-    ];
+    return ['_redirectIfNeeded(app, workspaces, workspace, profile)'];
   }
 
   _redirectIfNeeded(app: string, workspaces: any[], workspace: string, profile: GenericObject) {
@@ -34,14 +30,13 @@ class AppRedirect extends RoutingMixin(ReduxConnectedElement) {
       // user has no workspaces
       location.href = '/unauthorized';
     }
-    if ((app === undefined) || (workspace === undefined) || !profile) {
+    if (app === undefined || workspace === undefined || !profile) {
       return;
     }
 
     if (!profile.access || !profile.access.length) {
       location.href = '/unauthorized';
     } else if (app && profile.access.indexOf(app) === -1) {
-      // @ts-ignore
       location.href = this.buildBaseUrl(workspace, profile.access[0]);
     }
   }

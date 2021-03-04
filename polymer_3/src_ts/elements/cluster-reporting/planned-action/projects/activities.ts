@@ -20,7 +20,6 @@ import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProje
 import {PlannedActionAddActivityFromProjectModalEl} from '../activities/add-activity-from-project-modal';
 import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/add-existing-activity-from-project-modal';
 
-
 /**
  * @polymer
  * @customElement
@@ -45,20 +44,19 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
       <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
-      <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-      </iron-query-params>
+      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
 
-      <etools-prp-ajax
-        id="activities"
-        url="[[url]]"
-        params="[[params]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="activities" url="[[url]]" params="[[params]]"> </etools-prp-ajax>
 
       <page-body>
-        <planned-action-add-activity-from-project-modal id="modal" project-data="[[projectData]]"></planned-action-add-activity-from-project-modal>
-        <planned-action-add-existing-activity-from-project-modal id="existing-modal" project-data="[[projectData]]"></planned-action-add-existing-activity-from-project-modal>
+        <planned-action-add-activity-from-project-modal
+          id="modal"
+          project-data="[[projectData]]"
+        ></planned-action-add-activity-from-project-modal>
+        <planned-action-add-existing-activity-from-project-modal
+          id="existing-modal"
+          project-data="[[projectData]]"
+        ></planned-action-add-existing-activity-from-project-modal>
 
         <div id="action">
           <paper-button id="add_new_pa" on-tap="_openModal" class="btn-primary" raised>
@@ -70,10 +68,7 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
           </paper-button>
         </div>
 
-        <project-activity-table
-          page="planned-action"
-          project-id="[[projectId]]">
-        </project-activity-table>
+        <project-activity-table page="planned-action" project-id="[[projectId]]"> </project-activity-table>
       </page-body>
     `;
   }
@@ -101,7 +96,6 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
 
   private _debouncer!: Debouncer;
 
-
   static get observers() {
     return ['_activitiesByPartnerProjectIdAjax(url, params)'];
   }
@@ -128,19 +122,18 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _activitiesByPartnerProjectIdAjax() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(100), () => {
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
+      const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
 
-        const thunk = (this.$.activities as EtoolsPrpAjaxEl).thunk();
+      (this.$.activities as EtoolsPrpAjaxEl).abort();
 
-        (this.$.activities as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore.dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            // TODO: error handling.
-          });
-      });
+      this.reduxStore
+        .dispatch(partnerProjActivitiesFetch(thunk, this.projectId))
+        // @ts-ignore
+        .catch((_err: GenericObject) => {
+          // TODO: error handling.
+        });
+    });
   }
 
   _openModal() {
@@ -169,7 +162,6 @@ class Activities extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) {
     super.disconnectedCallback();
     this._removeEventListeners();
   }
-
 }
 
 window.customElements.define('pa-project-details-activities', Activities);

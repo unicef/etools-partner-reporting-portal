@@ -8,7 +8,8 @@ import '../etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
 import '@polymer/polymer/lib/elements/dom-if';
 import {
-  programmeDocumentReportsAttachmentsPending, programmeDocumentReportsAttachmentsCurrent
+  programmeDocumentReportsAttachmentsPending,
+  programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
 import {GenericObject} from '../../typings/globals.types';
 import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
@@ -16,7 +17,7 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-file/etools-file';
-import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
+// import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
 
 /**
@@ -27,7 +28,6 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin LocalizeMixin
  */
 class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
-
   public static get template() {
     return html`
       <style>
@@ -35,7 +35,9 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           display: block;
         }
 
-        #face-container, #other-one-container, #other-two-container {
+        #face-container,
+        #other-one-container,
+        #other-two-container {
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -43,39 +45,23 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         }
       </style>
 
-      <etools-prp-ajax
-          id="upload"
-          method="post"
-          loading="{{loading}}"
-          url="[[attachmentsListUrl]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="upload" method="post" loading="{{loading}}" url="[[attachmentsListUrl]]"> </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="replace"
-          method="put"
-          url="[[attachmentDeleteUrl]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="replace" method="put" url="[[attachmentDeleteUrl]]"> </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="download"
-          method="get"
-          url="[[attachmentsListUrl]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="download" method="get" url="[[attachmentsListUrl]]"> </etools-prp-ajax>
 
-      <etools-prp-ajax
-          id="delete"
-          method="delete"
-          url="[[attachmentDeleteUrl]]">
-      </etools-prp-ajax>
+      <etools-prp-ajax id="delete" method="delete" url="[[attachmentDeleteUrl]]"> </etools-prp-ajax>
 
       <div id="face-container">
         <etools-file
-            id="faceAttachmentComponent"
-            files="{{faceAttachment}}"
-            label="[[localize('face')]]"
-            disabled="[[pending]]"
-            readonly="[[readonly]]"
-            use-delete-events>
+          id="faceAttachmentComponent"
+          files="{{faceAttachment}}"
+          label="[[localize('face')]]"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events
+        >
         </etools-file>
 
         <template is="dom-if" if="{{faceLoading}}">
@@ -85,12 +71,13 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
       <div id="other-one-container">
         <etools-file
-            id="otherOneAttachmentComponent"
-            files="{{otherOneAttachment}}"
-            label="[[localize('other')]] #1"
-            disabled="[[pending]]"
-            readonly="[[readonly]]"
-            use-delete-events>
+          id="otherOneAttachmentComponent"
+          files="{{otherOneAttachment}}"
+          label="[[localize('other')]] #1"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events
+        >
         </etools-file>
 
         <template is="dom-if" if="{{otherOneLoading}}">
@@ -100,20 +87,19 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
       <div id="other-two-container">
         <etools-file
-            id="otherTwoAttachmentComponent"
-            files="{{otherTwoAttachment}}"
-            label="[[localize('other')]] #2"
-            disabled="[[pending]]"
-            readonly="[[readonly]]"
-            use-delete-events>
+          id="otherTwoAttachmentComponent"
+          files="{{otherTwoAttachment}}"
+          label="[[localize('other')]] #2"
+          disabled="[[pending]]"
+          readonly="[[readonly]]"
+          use-delete-events
+        >
         </etools-file>
 
         <template is="dom-if" if="{{otherTwoLoading}}">
           <paper-spinner active></paper-spinner>
         </template>
       </div>
-
-
     `;
   }
 
@@ -182,21 +168,19 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _setFiles() {
-    const self = this;
     this.set('faceAttachment', []);
     this.set('otherOneAttachment', []);
     this.set('otherTwoAttachment', []);
 
-    setFiles(this.attachments)
-      .forEach((attachment: GenericObject) => {
-        if (attachment.type === 'Other' && self.get('otherOneAttachment').length === 1) {
-          self.set('otherTwoAttachment', [attachment]);
-        } else if (attachment.type === 'Other') {
-          self.set('otherOneAttachment', [attachment]);
-        } else {
-          self.set('faceAttachment', [attachment]);
-        }
-      });
+    setFiles(this.attachments).forEach((attachment: GenericObject) => {
+      if (attachment.type === 'Other' && this.get('otherOneAttachment').length === 1) {
+        this.set('otherTwoAttachment', [attachment]);
+      } else if (attachment.type === 'Other') {
+        this.set('otherOneAttachment', [attachment]);
+      } else {
+        this.set('faceAttachment', [attachment]);
+      }
+    });
   }
 
   _getDeleteUrl(locationId: string, reportId: string, attachmentId: string) {
@@ -204,8 +188,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   }
 
   _onDeleteFile(e: CustomEvent) {
-    const self = this;
-    const deleteUrl = self._getDeleteUrl(self.locationId, self.reportId, e.detail.file.id);
+    const deleteUrl = this._getDeleteUrl(this.locationId, this.reportId, e.detail.file.id);
 
     this.set('attachmentDeleteUrl', deleteUrl);
 
@@ -216,56 +199,62 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
 
     // @ts-ignore
-    return this.reduxStore.dispatch(
-      pdReportsAttachmentsSync(deleteThunk, this.reportId)
-      // @ts-ignore
-    ).then(() => {
-      self._notifyFileDeleted();
-      self.set('attachmentDeleteUrl', undefined);
+    return (
+      this.reduxStore
+        .dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
+        // @ts-ignore
+        .then(() => {
+          this._notifyFileDeleted();
+          this.set('attachmentDeleteUrl', undefined);
 
-      if (self.get('faceAttachment').length !== 0 && e.detail.file.id === self.get('faceAttachment')[0].id) {
-        (self.$.faceAttachmentComponent as EtoolsFile).fileInput.value = null;
-        (self.$.faceAttachmentComponent as EtoolsFile).set('files', []);
-      } else if (self.get('otherOneAttachment').length !== 0 &&
-        e.detail.file.id === self.get('otherOneAttachment')[0].id) {
-        (self.$.otherOneAttachmentComponent as EtoolsFile).fileInput.value = null;
-        (self.$.otherOneAttachmentComponent as EtoolsFile).set('files', []);
-      } else if (self.get('otherTwoAttachment').length !== 0 &&
-        e.detail.file.id === self.get('otherTwoAttachment')[0].id) {
-        (self.$.otherTwoAttachmentComponent as EtoolsFile).fileInput.value = null;
-        (self.$.otherTwoAttachmentComponent as EtoolsFile).set('files', []);
+          if (this.get('faceAttachment').length !== 0 && e.detail.file.id === this.get('faceAttachment')[0].id) {
+            (this.$.faceAttachmentComponent as any).fileInput.value = null;
+            (this.$.faceAttachmentComponent as any).set('files', []);
+          } else if (
+            this.get('otherOneAttachment').length !== 0 &&
+            e.detail.file.id === this.get('otherOneAttachment')[0].id
+          ) {
+            (this.$.otherOneAttachmentComponent as any).fileInput.value = null;
+            (this.$.otherOneAttachmentComponent as any).set('files', []);
+          } else if (
+            this.get('otherTwoAttachment').length !== 0 &&
+            e.detail.file.id === this.get('otherTwoAttachment')[0].id
+          ) {
+            (this.$.otherTwoAttachmentComponent as any).fileInput.value = null;
+            (this.$.otherTwoAttachmentComponent as any).set('files', []);
+          }
+        })
+        // @ts-ignore
+        .catch((_err) => {
+          // TODO: error handling
+        })
+    );
+  }
+
+  replaceCharsThatAreNotLetterDigitDotOrUnderline(files: GenericObject[]) {
+    (files || []).forEach((file: GenericObject) => {
+      if (/[^a-zA-Z0-9-_\\.]+/.test(file.file_name)) {
+        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\\.]+/g, '_');
       }
-    })
-    // @ts-ignore
-      .catch((_err) => {
-        // TODO: error handling
-      });
+    });
   }
 
   _filesChanged(change: GenericObject) {
     let attachmentPropertyName = change.path.replace('.length', '');
     const isEmpty = change.value === 0 ? true : false;
     const attachment = isEmpty ? undefined : change.base[0];
-    const self = this;
 
     if (attachment === undefined) {
       return;
     }
 
     const files = isEmpty ? [] : change.base;
-
-    files.findIndex((file: GenericObject) => {
-      if (/[^a-zA-Z0-9-_\.]+/.test(file.file_name)) {
-        file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\.]+/g, '_');
-      }
-    });
-
+    this.replaceCharsThatAreNotLetterDigitDotOrUnderline(files);
     const attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
 
     if (isEmpty || (!isEmpty && attachment.path !== null)) {
       return;
     }
-
 
     this.filesChanged = Debouncer.debounce(this.filesChanged, timeOut.after(100), () => {
       if (change.path.split('.').length < 2 || !files.length) {
@@ -282,7 +271,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
       if (attachment.id === null) {
         thunk = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl).thunk();
-        const uplodCtrl = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl);
+        const uplodCtrl = this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl;
         uplodCtrl.abort();
         uplodCtrl.body = data;
 
@@ -294,33 +283,32 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           this.set('otherTwoLoading', true);
         }
       } else {
-        const replaceUrl = self._getDeleteUrl(self.locationId, self.reportId, attachment.id);
+        const replaceUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
         this.set('attachmentDeleteUrl', replaceUrl);
 
         thunk = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl).thunk();
-        const replaceCtrl = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl);
+        const replaceCtrl = this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl;
         replaceCtrl.abort();
         replaceCtrl.body = data;
 
         attachmentPropertyName = attachmentPropertyName.split('.')[0];
       }
 
-      this.reduxStore.dispatch(
-        pdReportsAttachmentsSync(thunk, this.reportId)
-      )
+      this.reduxStore
+        .dispatch(pdReportsAttachmentsSync(thunk, this.reportId))
         // @ts-ignore
         .then(() => {
-          self._notifyFileUploaded();
+          this._notifyFileUploaded();
 
-          self.set('faceLoading', false);
-          self.set('otherOneLoading', false);
-          self.set('otherTwoLoading', false);
+          this.set('faceLoading', false);
+          this.set('otherOneLoading', false);
+          this.set('otherTwoLoading', false);
 
-          const attachments = self.get('attachments');
+          const attachments = this.get('attachments');
 
           attachments.forEach((item: GenericObject) => {
             if (attachment.id !== null && item.id === attachment.id) {
-              self.set(attachmentPropertyName, [item]);
+              this.set(attachmentPropertyName, [item]);
               return;
             }
           });
@@ -336,8 +324,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
             });
 
             if (duplicates.length === 1) {
-              self.set(attachmentPropertyName, [duplicates[0]]);
-            } else {
+              this.set(attachmentPropertyName, [duplicates[0]]);
+            } else if (duplicates.length > 1) {
               let correctedItem;
 
               duplicates.forEach((item: GenericObject) => {
@@ -347,30 +335,27 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
                 }
               });
 
-              self.set(attachmentPropertyName, [correctedItem]);
+              if (correctedItem) {
+                this.set(attachmentPropertyName, [correctedItem]);
+              }
             }
           }
 
-          self.set('attachmentDeleteUrl', undefined);
+          this.set('attachmentDeleteUrl', undefined);
         })
         .catch((_err: GenericObject) => {
           // TODO: error handling
         });
     });
-
   }
 
   _addEventListeners() {
     this._onDeleteFile = this._onDeleteFile.bind(this);
     this.addEventListener('delete-file', this._onDeleteFile as any);
-    // TODO(dci): NOT FOUND !!!
-    // this._onProgressChanged = this._onProgressChanged.bind(this);
-    // this.addEventListener('prp-file-progress-changed', this._onProgressChanged);
   }
 
   _removeEventListeners() {
     this.removeEventListener('delete-file', this._onDeleteFile as any);
-    // this.removeEventListener('prp-file-progress-changed', this._onProgressChanged);
   }
 
   connectedCallback() {
@@ -385,9 +370,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     }
     const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
-    this.reduxStore.dispatch(
-      pdReportsAttachmentsSync(downloadThunk, this.reportId)
-    )
+    this.reduxStore
+      .dispatch(pdReportsAttachmentsSync(downloadThunk, this.reportId))
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling
@@ -409,7 +393,6 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
       this.filesChanged.cancel();
     }
   }
-
 }
 
 window.customElements.define('report-attachments', ReportAttachments);

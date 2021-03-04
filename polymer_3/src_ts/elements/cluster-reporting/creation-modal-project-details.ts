@@ -10,7 +10,6 @@ import '../labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../typings/globals.types';
 
-
 /**
  * @polymer
  * @customElement
@@ -23,7 +22,7 @@ class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
       <style include="app-grid-style">
         :host {
           display: block;
-          --app-grid-columns:2;
+          --app-grid-columns: 2;
           --app-grid-gutter: 25px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 4;
@@ -83,7 +82,7 @@ class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
           <li class="item">
             <labelled-item label="[[localize('funding_source')]]">
               <span class="value">[[projectData.fundingSources]]</span>
-              </labelled-item>
+            </labelled-item>
           </li>
 
           <li class="item">
@@ -101,15 +100,12 @@ class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
           <li class="item">
             <labelled-item label="[[localize('indicators')]]">
               <ul class="indicators-list">
-                <template
-                  is="dom-repeat"
-                  items="[[projectData.attachments]]">
+                <template is="dom-repeat" items="[[projectData.attachments]]">
                   <li>[[item]]</li>
                 </template>
               </ul>
             </labelled-item>
           </li>
-
         </ul>
       </div>
     `;
@@ -117,7 +113,6 @@ class CreationModalProjectDetails extends UtilsMixin(LocalizeMixin(ReduxConnecte
 
   @property({type: Object})
   projectData!: GenericObject;
-
 }
 
 window.customElements.define('creation-modal-project-details', CreationModalProjectDetails);

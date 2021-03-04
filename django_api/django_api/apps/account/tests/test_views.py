@@ -1,33 +1,20 @@
 from django.core import mail
-from django.urls import reverse
 from django.db.models import Count
-
-from rest_framework import status
-
-from drfpasswordless.models import CallbackToken
-
-from core.factories import (
-    PartnerUserFactory,
-    PartnerFactory,
-    CountryFactory,
-    WorkspaceFactory,
-    IPPRPRoleFactory,
-    NonPartnerUserFactory,
-    ClusterPRPRoleFactory,
-    ResponsePlanFactory,
-    ClusterFactory,
-)
-from core.common import PRP_ROLE_TYPES
-from core.tests.base import BaseAPITestCase
+from django.urls import reverse
 
 from account.models import User
+from core.common import PRP_ROLE_TYPES
+from core.tests import factories
+from core.tests.base import BaseAPITestCase
+from drfpasswordless.models import CallbackToken
+from rest_framework import status
 
 
 class UserProfileAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.partner = PartnerFactory()
-        self.user = PartnerUserFactory(partner=self.partner)
+        self.partner = factories.PartnerFactory()
+        self.user = factories.PartnerUserFactory(partner=self.partner)
 
         super().setUp()
 
@@ -53,8 +40,8 @@ class UserProfileAPIViewTestCase(BaseAPITestCase):
 class UserLogoutAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.partner = PartnerFactory()
-        self.user = PartnerUserFactory(partner=self.partner)
+        self.partner = factories.PartnerFactory()
+        self.user = factories.PartnerUserFactory(partner=self.partner)
 
         super().setUp()
 
@@ -70,8 +57,8 @@ class UserLogoutAPIViewTestCase(BaseAPITestCase):
 class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.partner = PartnerFactory()
-        self.user = PartnerUserFactory(partner=self.partner)
+        self.partner = factories.PartnerFactory()
+        self.user = factories.PartnerUserFactory(partner=self.partner)
 
         super().setUp()
 
@@ -84,7 +71,6 @@ class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
         token_url = reverse('user-passwordless-token')
 
         response = self.client.post(token_url, data={'email': self.user.email})
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Test that email auth token email has been sent.
@@ -123,11 +109,11 @@ class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
 class UserListCreateAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = CountryFactory()
-        self.workspace = WorkspaceFactory(countries=[self.country, ])
-        self.partner = PartnerFactory(country_code=self.country.country_short_code)
-        self.user = PartnerUserFactory(partner=self.partner)
-        self.ao_user_role = IPPRPRoleFactory(
+        self.country = factories.CountryFactory()
+        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.user = factories.PartnerUserFactory(partner=self.partner)
+        self.ao_user_role = factories.IPPRPRoleFactory(
             user=self.user,
             workspace=self.workspace,
             role=PRP_ROLE_TYPES.ip_authorized_officer
@@ -155,17 +141,17 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         # Create some test users for partner
         NUM_TEST_USERS = 2
         for idx in range(NUM_TEST_USERS):
-            user = PartnerUserFactory(
+            user = factories.PartnerUserFactory(
                 partner=self.partner
             )
-            IPPRPRoleFactory(
+            factories.IPPRPRoleFactory(
                 user=user,
                 workspace=self.workspace,
                 role=PRP_ROLE_TYPES.ip_editor
             )
 
             if idx == 0:
-                IPPRPRoleFactory(
+                factories.IPPRPRoleFactory(
                     user=user,
                     workspace=self.workspace,
                     role=PRP_ROLE_TYPES.ip_admin
@@ -206,10 +192,10 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         """Test the API response for cluster users.
         """
         # Create some test users for partner
-        self.imo_user = NonPartnerUserFactory()
-        response_plan = ResponsePlanFactory(workspace=self.workspace)
-        cluster = ClusterFactory(response_plan=response_plan)
-        ClusterPRPRoleFactory(user=self.imo_user, workspace=self.workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        self.imo_user = factories.NonPartnerUserFactory()
+        response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
+        cluster = factories.ClusterFactory(response_plan=response_plan)
+        factories.ClusterPRPRoleFactory(user=self.imo_user, workspace=self.workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
         # Test API as IMO first
         self.client.force_authenticate(self.imo_user)
@@ -218,23 +204,23 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         NUM_TEST_USERS = 2
         for idx in range(NUM_TEST_USERS):
             if idx == 0:
-                user = NonPartnerUserFactory()
-                ClusterPRPRoleFactory(
+                user = factories.NonPartnerUserFactory()
+                factories.ClusterPRPRoleFactory(
                     user=user,
                     workspace=self.workspace,
                     cluster=cluster,
                     role=PRP_ROLE_TYPES.cluster_viewer
                 )
             else:
-                user = PartnerUserFactory(
+                user = factories.PartnerUserFactory(
                     partner=self.partner
                 )
-                IPPRPRoleFactory(
+                factories.IPPRPRoleFactory(
                     user=user,
                     workspace=self.workspace,
                     role=PRP_ROLE_TYPES.ip_editor,
                 )
-                ClusterPRPRoleFactory(
+                factories.ClusterPRPRoleFactory(
                     user=user,
                     workspace=self.workspace,
                     cluster=cluster,
@@ -260,3 +246,29 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(reverse('users') + '?portal=CLUSTER')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create(self):
+        self.client.force_authenticate(self.user)
+        data = {
+            "first_name": "Not",
+            "last_name": "Normal",
+            "email": "NotNormal@example.com",
+        }
+        user_qs = User.objects.filter(email=data["email"])
+        self.assertFalse(user_qs.exists())
+        response = self.client.post(
+            reverse("users") + "?portal=IP",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(user_qs.exists())
+
+        data["email"] = "normal@example.com"
+        user_qs = User.objects.filter(email=data["email"])
+        self.assertFalse(user_qs.exists())
+        response = self.client.post(
+            reverse("users") + "?portal=IP",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(user_qs.exists())

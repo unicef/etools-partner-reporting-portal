@@ -3,14 +3,11 @@ import logging
 from django import forms
 from django.core.exceptions import ValidationError
 
-from suit.widgets import AutosizedTextarea
-
-from carto.sql import SQLClient
 from carto.exceptions import CartoException
-
+from carto.sql import SQLClient
 from core.cartodb import EtoolsCartoNoAuthClient
-from core.models import GatewayType, CartoDBTable
-
+from core.models import CartoDBTable, GatewayType
+from suit.widgets import AutosizedTextarea
 
 logger = logging.getLogger('locations.models')
 

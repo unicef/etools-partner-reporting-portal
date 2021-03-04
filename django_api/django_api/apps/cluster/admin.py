@@ -1,10 +1,6 @@
 from django.contrib import admin
 
-from .models import (
-    Cluster,
-    ClusterObjective,
-    ClusterActivity,
-)
+from .models import Cluster, ClusterActivity, ClusterObjective
 
 
 class ClusterAdmin(admin.ModelAdmin):
