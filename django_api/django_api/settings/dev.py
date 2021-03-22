@@ -1,8 +1,6 @@
-from __future__ import absolute_import
-
 import os
 
-from .base import *
+from .base import *  # noqa:403
 
 # dev overrides
 DEBUG = True

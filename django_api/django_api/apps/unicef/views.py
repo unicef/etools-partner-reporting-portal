@@ -223,7 +223,7 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
             partner=self.request.user.partner,
             workspace=self.kwargs['workspace_id']
         )
-        return super(ProgrammeDocumentLocationsAPIView, self).get_queryset().filter(
+        return super().get_queryset().filter(
             indicator_location_data__indicator_report__progress_report__programme_document__in=programme_documents
         ).distinct()
 
@@ -257,7 +257,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
         if not user_has_global_view:
             programme_documents = programme_documents.filter(partner=self.request.user.partner)
 
-        return super(ProgrammeDocumentIndicatorsAPIView, self).get_queryset().filter(
+        return super().get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=programme_documents
         ).distinct()
 

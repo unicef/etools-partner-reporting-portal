@@ -113,9 +113,9 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             external_id=validated_data['external_id']
         ).first()
         if partner_project:
-            partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
+            partner_project = super().update(partner_project, validated_data)
         else:
-            partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
+            partner_project = super().create(validated_data)
 
         locations = save_location_list(location_data_list, "project")
 

@@ -1,10 +1,8 @@
 import weakref
 
 from django.contrib.auth.models import Group
-from django.utils.six import python_2_unicode_compatible, string_types
 
 
-@python_2_unicode_compatible
 class GroupWrapper(object):
     code = None
     name = None
@@ -34,13 +32,13 @@ class GroupWrapper(object):
         if isinstance(other, Group):
             return other.name == self.name
 
-        if isinstance(other, string_types):
+        if isinstance(other, str):
             return other == self.code or other == self.name
 
         if self is other:
             return True
 
-        return super(GroupWrapper, self) == other
+        return super() == other
 
     def invalidate_cache(self):
         self._group = None

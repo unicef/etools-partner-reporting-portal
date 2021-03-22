@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from functools import reduce
 
 from django.conf import settings
@@ -179,7 +177,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
         # together constraint
         if self.code == '':
             self.code = None
-        super(IndicatorBlueprint, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self):
         """

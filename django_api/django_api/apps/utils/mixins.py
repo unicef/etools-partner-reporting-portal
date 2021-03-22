@@ -30,7 +30,7 @@ class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
             return None
 
         try:
-            user, jwt_value = super(CustomJSONWebTokenAuthentication, self).authenticate(request)
+            user, jwt_value = super().authenticate(request)
         except TypeError:
             raise PermissionDenied(detail='No valid authentication provided')
         except AuthenticationFailed:
@@ -81,7 +81,7 @@ class ListExportMixin(object):
                 request=request,
             ).get_as_response(request)
 
-        return super(ListExportMixin, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class ObjectExportMixin(object):
@@ -111,4 +111,4 @@ class ObjectExportMixin(object):
         if exporter_class:
             return exporter_class(self.get_object()).get_as_response(request)
 
-        return super(ObjectExportMixin, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)

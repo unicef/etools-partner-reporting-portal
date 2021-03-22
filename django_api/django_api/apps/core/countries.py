@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# encoding: utf-8
-from __future__ import unicode_literals
-
 COUNTRIES_ALPHA2_CODE = (
     ('AF', 'Afghanistan'),
     ('AX', 'Åland Islands'),
