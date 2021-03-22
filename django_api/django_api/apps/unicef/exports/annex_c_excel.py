@@ -410,4 +410,4 @@ class SingleProgressReportsXLSXExporter(ProgressReportsXLSXExporter):
 
     def __init__(self, progress_report, **kwargs):
         progress_reports = ProgressReport.objects.filter(id=progress_report.id)
-        super(SingleProgressReportsXLSXExporter, self).__init__(progress_reports, **kwargs)
+        super().__init__(progress_reports, **kwargs)

@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from .base import *
+from .base import *  # noqa:403
 
 overrides = import_module('django_api.settings.{}'.format(ENV))
 

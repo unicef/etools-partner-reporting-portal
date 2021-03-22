@@ -86,7 +86,7 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
     BASE_URL = 'https://{tenant_id}.b2clogin.com/{tenant_id}.onmicrosoft.com'
 
     def __init__(self, *args, **kwargs):
-        super(CustomAzureADBBCOAuth2, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.redirect_uri = settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
 
 
@@ -131,7 +131,7 @@ class EToolsAzureStorage(AzureStorage):
     ap_expiry = setting("AZURE_ACCESS_POLICY_EXPIRY")
 
     def __init__(self, *args, **kwargs):
-        super(EToolsAzureStorage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._connection = None
 
     def url(self, name):
