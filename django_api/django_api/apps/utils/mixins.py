@@ -51,7 +51,7 @@ class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
         return user, jwt_value
 
 
-class ListExportMixin(object):
+class ListExportMixin:
 
     export_url_kwarg = 'export'
     exporters = {}
@@ -84,7 +84,7 @@ class ListExportMixin(object):
         return super().get(request, *args, **kwargs)
 
 
-class ObjectExportMixin(object):
+class ObjectExportMixin:
 
     export_url_kwarg = 'export'
     exporters = {}

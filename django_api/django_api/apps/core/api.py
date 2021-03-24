@@ -6,7 +6,7 @@ from django.conf import settings
 import requests
 
 
-class PMP_API(object):
+class PMP_API:
 
     def __init__(self):
 

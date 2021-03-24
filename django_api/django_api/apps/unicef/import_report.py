@@ -14,7 +14,7 @@ COLUMN_HASH_ID = 4
 MAX_COLUMNS = 1000
 
 
-class ProgressReportXLSXReader(object):
+class ProgressReportXLSXReader:
 
     def __init__(self, path, partner):
         self.wb = load_workbook(path)

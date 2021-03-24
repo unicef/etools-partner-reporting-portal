@@ -14,7 +14,7 @@ from rest_framework import serializers
 logger = logging.getLogger('ocha-sync')
 
 
-class DiscardUniqueTogetherValidationMixin(object):
+class DiscardUniqueTogetherValidationMixin:
 
     def get_unique_together_validators(self):
         return []

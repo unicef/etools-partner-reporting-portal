@@ -5,7 +5,7 @@ from partner.models import PartnerActivity, PartnerActivityProjectContext, Partn
 from rest_framework.exceptions import ValidationError
 
 
-class AddIndicatorObjectTypeValidator(object):
+class AddIndicatorObjectTypeValidator:
 
     def __call__(self, value):
         model_choices = {

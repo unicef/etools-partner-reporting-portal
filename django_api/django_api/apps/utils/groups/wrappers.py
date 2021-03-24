@@ -3,7 +3,7 @@ import weakref
 from django.contrib.auth.models import Group
 
 
-class GroupWrapper(object):
+class GroupWrapper:
     code = None
     name = None
     _group = None
