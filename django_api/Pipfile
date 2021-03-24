@@ -47,7 +47,7 @@ requests = "*"
 newrelic = "*"
 raven = "*"
 social-auth-app-django = "*"
-social-auth-core = "<4.0.2" # pyjtw compatibility
+social-auth-core = "<4.0.2"  # pyjtw compatibility
 python-social-auth = "*"
 weasyprint = "*"
 
