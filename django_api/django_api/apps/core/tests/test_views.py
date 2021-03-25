@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from core.common import CURRENCIES, CLUSTER_TYPES, PRP_ROLE_TYPES
+from core.common import CLUSTER_TYPES, CURRENCIES, PRP_ROLE_TYPES
 from core.management.commands._generate_disaggregation_fake_data import add_disaggregations_to_reportable
 from core.models import Location, ResponsePlan, Workspace
 from core.tests import factories
