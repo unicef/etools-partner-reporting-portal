@@ -158,7 +158,7 @@ CORS_ORIGIN_WHITELIST = [
     'https://etools-dev.unicef.org',
 ]
 
-ROOT_URLCONF = 'django_api.urls'
+ROOT_URLCONF = 'django_api.config.urls'
 
 TEMPLATES = [
     {
@@ -186,7 +186,7 @@ FIXTURE_DIRS = [
     '/code/fixtures/',
 ]
 
-WSGI_APPLICATION = 'django_api.wsgi.application'
+WSGI_APPLICATION = 'django_api.config.wsgi.application'
 
 
 # Database
