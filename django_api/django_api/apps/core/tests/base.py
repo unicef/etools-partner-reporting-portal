@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from rest_framework.test import APIClient, APITestCase
 
 
@@ -8,7 +6,7 @@ class BaseAPITestCase(APITestCase):
     user = None
 
     def setUp(self):
-        super(BaseAPITestCase, self).setUp()
+        super().setUp()
 
         if self.user:
             self.client = self.client_class()

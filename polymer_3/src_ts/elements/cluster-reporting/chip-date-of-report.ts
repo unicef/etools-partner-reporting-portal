@@ -9,7 +9,7 @@ import Settings from '../../settings';
 import {buttonsStyles} from '../../styles/buttons-styles';
 import {fireEvent} from '../../utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -87,7 +87,7 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
   dateFormat = Settings.dateFormat;
 
   _add() {
-    const formatted = moment(this._date).format(this.dateFormat);
+    const formatted = dayjs(this._date).format(this.dateFormat);
     fireEvent(this, 'chip-add', formatted);
     this._close();
   }
@@ -97,8 +97,8 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
       return;
     }
 
-    const dateToUse = moment.utc().isBefore(moment.utc(this.minDate)) ? this.minDate : new Date();
-    this.set('_date', moment(dateToUse).format(Settings.datepickerFormat));
+    const dateToUse = dayjs.utc().isBefore(dayjs.utc(this.minDate)) ? this.minDate : new Date();
+    this.set('_date', dayjs(dateToUse).format(Settings.datepickerFormat));
   }
 
   connectedCallback() {

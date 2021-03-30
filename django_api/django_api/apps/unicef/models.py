@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import os
 from datetime import date
@@ -381,6 +379,13 @@ class ProgressReport(TimeStampedModel):
     for a certain time period, against a PD.
     """
     partner_contribution_to_date = models.TextField(blank=True, null=True)
+    financial_contribution_to_date = models.TextField(blank=True, null=True)
+    financial_contribution_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Financial Contribution Currency'
+    )
     challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
     proposed_way_forward = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
@@ -596,6 +601,7 @@ class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
         unique_together = (
             (*TimeStampedExternalBusinessAreaModel.Meta.unique_together, 'report_type', 'programme_document')
         )
+        ordering = ("-end_date", )
 
 
 class PDResultLink(TimeStampedExternalBusinessAreaModel):

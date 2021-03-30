@@ -12,6 +12,7 @@ import LocalizeMixin from '../mixins/localize-mixin';
 import UtilsMixin from '../mixins/utils-mixin';
 import Endpoints from '../endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
+import {fetchCurrencies} from '../redux/actions/currencies';
 import {GenericObject, Route} from '../typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
@@ -53,6 +54,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       <etools-prp-ajax id="interventions" url="[[interventionsUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
+
+      <etools-prp-ajax id="currenciesData" url="[[currenciesUrl]]"> </etools-prp-ajax>
 
       <app-route route="{{route}}" pattern="/:workspace_code/:app" data="{{routeData}}" tail="{{subroute}}">
       </app-route>
@@ -110,6 +113,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String})
   profileUrl: string = Endpoints.userProfile();
+
+  @property({type: String})
+  currenciesUrl: string = Endpoints.currencies();
 
   @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
@@ -187,6 +193,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       } else if (!this._app) {
         this.reduxStore.dispatch(setApp(app));
 
+        this._fetchCurrencies(app);
+
         // Store selected app
         localStorage.setItem('defaultApp', app);
 
@@ -259,6 +267,13 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _fetchProfile() {
     const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
     return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
+  }
+
+  _fetchCurrencies(app: string) {
+    if (this.page !== app && app === 'ip-reporting') {
+      const currenciesDataThunk = (this.$.currenciesData as EtoolsPrpAjaxEl).thunk();
+      this.reduxStore.dispatch(fetchCurrencies(currenciesDataThunk));
+    }
   }
 
   _addEventListeners() {

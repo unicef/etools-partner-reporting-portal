@@ -282,6 +282,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',
@@ -334,7 +336,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
         self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
-        super(ProgressReportSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = ProgressReport
@@ -344,6 +346,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'partner_org_id',
             'partner_org_name',
             'partner_vendor_number',
@@ -428,6 +432,16 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
     partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    financial_contribution_to_date = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+    )
+    financial_contribution_currency = serializers.ChoiceField(
+        choices=CURRENCIES,
+        allow_blank=True,
+        allow_null=True,
+    )
     challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
@@ -436,6 +450,8 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'partner_contribution_to_date',
+            'financial_contribution_to_date',
+            'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
         )
@@ -690,7 +706,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
 
     def validate(self, attrs):
-        validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
+        validated_data = super().validate(attrs)
 
         validated_data['budget'] = sum([
             validated_data['cso_contribution'],
@@ -867,7 +883,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
         return obj.file.size if obj.file else None
 
     def to_representation(self, instance):
-        representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
+        representation = super().to_representation(instance)
 
         if instance.file and "http" not in instance.file.url:
             representation['path'] = settings.WWW_ROOT[:-1] + instance.file.url

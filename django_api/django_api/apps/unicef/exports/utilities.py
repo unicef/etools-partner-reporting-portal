@@ -21,7 +21,7 @@ def group_indicator_reports_by_lower_level_output(indicator_reports):
     ]
 
 
-class HTMLTableCell(object):
+class HTMLTableCell:
 
     element = 'td'
 

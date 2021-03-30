@@ -31,10 +31,10 @@ class ActivitiesList extends LocalizeMixin(RoutingMixin(ReduxConnectedElement)) 
       <style include="iron-flex iron-flex-factors data-table-styles">
       :host {
         display: block;
+      }
 
-        --ecp-content: {
-          padding: 0;
-        };
+      etools-content-panel::part(ecp-content) {
+        padding: 0;
       }
 
       .cell-is-cluster {

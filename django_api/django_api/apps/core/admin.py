@@ -27,7 +27,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
-        return super(LocationAdmin, self).get_form(request, obj, **kwargs)
+        return super().get_form(request, obj, **kwargs)
 
 
 class GatewayTypeAdmin(admin.ModelAdmin):
