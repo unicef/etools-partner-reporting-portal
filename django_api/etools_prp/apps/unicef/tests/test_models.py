@@ -219,7 +219,7 @@ class TestProgressReportModel(BaseAPITestCase):
         )
         return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_send_notification_on_status_change_post_save_signal_for_submitted(
@@ -240,7 +240,7 @@ class TestProgressReportModel(BaseAPITestCase):
 
         self.assertTrue(mock_create.called)
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_send_notification_on_status_change_post_save_signal_for_sent_back(
@@ -262,7 +262,7 @@ class TestProgressReportModel(BaseAPITestCase):
 
         self.assertTrue(mock_create.called)
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_send_notification_on_status_change_post_save_signal_for_accepted(
@@ -284,7 +284,7 @@ class TestProgressReportModel(BaseAPITestCase):
 
         self.assertTrue(mock_create.called)
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_send_due_progress_report_email(self, mock_create, mock_clean, mock_send):
@@ -304,7 +304,7 @@ class TestProgressReportModel(BaseAPITestCase):
 
         self.assertTrue(mock_create.called)
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_send_overdue_progress_report_email(self, mock_create, mock_clean, mock_send):
