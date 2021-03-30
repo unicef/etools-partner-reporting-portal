@@ -36,12 +36,9 @@ class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(Local
     return html`
       ${tableStyles}
       <style include="iron-flex iron-flex-factors data-table-styles">
-        :host {
-          --ecp-content: {
-            padding: 1px 0 0;
-          }
+        etools-content-panel::part(ecp-content) {
+          padding: 1px 0 0;
         }
-
         message-box {
           margin: 25px 25px 0;
         }
@@ -55,9 +52,7 @@ class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(Local
 
       <etools-content-panel panel-title="[[localize('list_of_indicators')]]">
         <template is="dom-if" if="[[showLocationsWarning]]" restamp="[[true]]">
-          <message-box type="warning">
-            [[localize('please_make_sure_indicators')]]
-          </message-box>
+          <message-box type="warning"> [[localize('please_make_sure_indicators')]] </message-box>
         </template>
 
         <etools-data-table-header
