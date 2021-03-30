@@ -365,7 +365,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        validated_data = super(PartnerProjectSerializer, self).validate(attrs)
+        validated_data = super().validate(attrs)
         start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
         end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
         locations = self.initial_data.get('locations', list())
@@ -421,7 +421,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         custom_fields = validated_data.pop('custom_fields', None)
 
-        project = super(PartnerProjectSerializer, self).create(validated_data)
+        project = super().create(validated_data)
 
         if custom_fields is not None:
             project.custom_fields = custom_fields
@@ -469,7 +469,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
         custom_fields = validated_data.pop('custom_fields', None)
 
-        project = super(PartnerProjectSerializer, self).update(instance, validated_data)
+        project = super().update(instance, validated_data)
 
         if custom_fields is not None:
             project.custom_fields = custom_fields
@@ -607,7 +607,7 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
     cluster_activity = serializers.IntegerField(write_only=True)
 
     def validate(self, data):
-        data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
+        data = super().validate(data)
         cluster_activity = ClusterActivity.objects.filter(id=data['cluster_activity']).first()
         if not cluster_activity:
             raise serializers.ValidationError({
@@ -673,7 +673,7 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
     title = serializers.CharField(max_length=255, write_only=True)
 
     def validate(self, data):
-        data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
+        data = super().validate(data)
         cluster_objective = ClusterObjective.objects.filter(id=data['cluster_objective']).first()
 
         if not cluster_objective:

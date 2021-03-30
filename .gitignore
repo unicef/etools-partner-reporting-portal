@@ -2,7 +2,9 @@
 *~
 
 # Docker environment file
-.env
+**/.env
+**/.envrc
+**/.venv/
 
 # PyCharm etc.
 .idea/

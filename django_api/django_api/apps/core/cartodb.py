@@ -20,11 +20,11 @@ class EtoolsCartoNoAuthClient(_BaseUrlChecker, BaseAuthClient):
     """
     def __init__(self, base_url):
         base_url = self.check_base_url(base_url)
-        super(EtoolsCartoNoAuthClient, self).__init__(base_url)
+        super().__init__(base_url)
 
     def send(self, relative_path, http_method, **requests_args):
         try:
-            return super(EtoolsCartoNoAuthClient, self).send(
+            return super().send(
                 relative_path,
                 http_method.lower(),
                 **requests_args

@@ -1748,7 +1748,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'title', reportable.blueprint.title)
         reportable.blueprint.save()
 
-        return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
+        return super().update(reportable, validated_data)
 
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):

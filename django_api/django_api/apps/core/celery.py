@@ -1,12 +1,10 @@
-from __future__ import absolute_import
-
 from contextlib import contextmanager
+from time import monotonic
 
 from django.core.cache import cache
 from django.db import connection
 
 from celery import Celery, Task
-from celery.five import monotonic
 from celery.utils.log import get_task_logger
 
 # # set the default Django settings module for the 'celery' program.
