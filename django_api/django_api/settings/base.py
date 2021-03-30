@@ -14,6 +14,7 @@ import datetime
 import os
 import sys
 
+import environ
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
 
@@ -22,23 +23,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APPS_DIR = os.path.join(BASE_DIR, 'apps/')
 sys.path.append(APPS_DIR)
 
+env = environ.Env()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', '123')
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+SECRET_KEY = env('SECRET_KEY', default='123')
+REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-IS_TEST = False
-IS_DEV = False
-IS_STAGING = False
-IS_PROD = False
+DEBUG = env.bool('DEBUG', default=False)
+IS_TEST = env.bool('IS_TEST', default=False)
+IS_DEV = env.bool('IS_DEV', default=False)
+IS_STAGING = env.bool('IS_STAGING', default=False)
+IS_PROD = env.bool('IS_PROD', default=False)
+
 
 # Get the ENV setting.
-ENV = os.getenv('ENV')
-if not ENV:
-    raise Exception('Environment variable ENV is required!')
+ENV = env.bool('ENV', default='dev')
 
-DATA_VOLUME = os.getenv('DATA_VOLUME', '/data')
+DATA_VOLUME = env('DATA_VOLUME', default='/data')
 
 UPLOADS_DIR_NAME = 'uploads'
 MEDIA_URL = '/api/%s/' % UPLOADS_DIR_NAME
@@ -50,28 +53,34 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-DOMAIN_NAME = os.getenv('DOMAIN_NAME')
-
-FRONTEND_HOST = os.getenv(
-    'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
+DOMAIN_NAME = os.getenv('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
+WWW_ROOT = 'http://%s/' % DOMAIN_NAME
+ALLOWED_HOSTS = (
+    env('ALLOWED_HOST', default='localhost'),
 )
-FRONTEND_PMP_HOST = os.getenv(
+
+
+FRONTEND_HOST = env(
+    'PRP_FRONTEND_HOST',
+    default=env('DJANGO_ALLOWED_HOST', default='http://localhost:8081')
+)
+FRONTEND_PMP_HOST = env(
     'PRP_FRONTEND_PMP_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8081')
+    default=env('DJANGO_ALLOWED_HOST', default='http://localhost:8081')
 )
 
 
 EMAIL_BACKEND = 'unicef_notification.backends.EmailBackend'
+SERVER_EMAIL = 'admin@' + DOMAIN_NAME
 
 DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
-EMAIL_HOST = os.getenv('EMAIL_HOST', '')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-EMAIL_PORT = os.getenv('EMAIL_HOST_PORT', 587)
-EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', 'true'))
+EMAIL_HOST = env('EMAIL_HOST', default='')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_PORT = env('EMAIL_HOST_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 
-ADMIN_MAIL = os.getenv('ADMIN_MAIL')
+ADMIN_MAIL = env('ADMIN_MAIL', default='prp@unicef.org')
 if ADMIN_MAIL:
     ADMINS = [
         ('Admin', ADMIN_MAIL),
@@ -122,8 +131,10 @@ INSTALLED_APPS = [
     'unicef',
     'ocha',
     'id_management',
+
     'post_office',
     'unicef_notification',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -184,10 +195,10 @@ WSGI_APPLICATION = 'django_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.getenv('POSTGRES_DB', 'unicef_prp'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'NAME': env('POSTGRES_DB', default='unicef_prp'),
+        'USER': env('POSTGRES_USER', default='postgres'),
+        'PASSWORD': env('POSTGRES_PASSWORD', default=''),
+        'HOST': env('POSTGRES_HOST', default='localhost'),
         'PORT': 5432,
     }
 }
@@ -244,7 +255,7 @@ JWT_AUTH = {
 
    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
-DISABLE_JWT_AUTH = os.getenv('DISABLE_JWT_AUTH', False)
+DISABLE_JWT_AUTH = env.bool('DISABLE_JWT_AUTH', default=False)
 # This user will be used for all externals that have a valid JWT but no user account in the system
 DEFAULT_UNICEF_USER = 'default_unicef_user'
 # Allows login for users that do not have a User account in the system, without creating a user account by using default
@@ -309,6 +320,10 @@ LOGGING = {
             'stream': sys.stdout,
             'formatter': 'standard',
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
         # 'elasticapm': {
         #     'level': 'ERROR',
         #     'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
@@ -324,6 +339,11 @@ LOGGING = {
             'handlers': ['ocha'],
             'level': 'DEBUG',
             'propagate': True
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
         },
         # 'elasticapm.errors': {
         #     'level': 'ERROR',
@@ -343,7 +363,8 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
-CELERY_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+CELERY_EMAIL_BACKEND = env('CELERY_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+# 'django.core.mail.backends.console.EmailBackend'
 
 # Sensible settings for celery
 CELERY_TASK_ALWAYS_EAGER = bool(os.environ.get('CELERY_TASK_ALWAYS_EAGER', False))
@@ -361,9 +382,10 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 POST_OFFICE = {
     'DEFAULT_PRIORITY': 'now',
     'BACKENDS': {
-        'default': 'djcelery_email.backends.CeleryEmailBackend'
+        'default': env('POST_OFFICE_BACKEND', default='djcelery_email.backends.CeleryEmailBackend')
     }
 }
+# 'django.core.mail.backends.console.EmailBackend'
 
 LEAFLET_CONFIG = {
     'TILES': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
@@ -373,8 +395,8 @@ LEAFLET_CONFIG = {
 }
 
 # CartoDB settings
-CARTODB_USERNAME = os.getenv('CARTODB_USERNAME')
-CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
+CARTODB_USERNAME = env('CARTODB_USERNAME', default='')
+CARTODB_APIKEY = env('CARTODB_APIKEY', default='')
 
 
 # Cronjobs
@@ -414,15 +436,15 @@ PASSWORDLESS_AUTH = {
 }
 
 # Django-social-auth settings
-KEY = os.getenv('AZURE_B2C_CLIENT_ID', None)
-SECRET = os.getenv('AZURE_B2C_CLIENT_SECRET', None)
+KEY = env('AZURE_B2C_CLIENT_ID', default=None)
+SECRET = env('AZURE_B2C_CLIENT_SECRET', default=None)
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 SOCIAL_AUTH_SANITIZE_REDIRECTS = False
-SOCIAL_PASSWORD_RESET_POLICY = os.getenv('AZURE_B2C_PASS_RESET_POLICY', "B2C_1_PasswordResetPolicy")
-POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
+SOCIAL_PASSWORD_RESET_POLICY = env('AZURE_B2C_PASS_RESET_POLICY', default="B2C_1_PasswordResetPolicy")
+POLICY = env('AZURE_B2C_POLICY_NAME', default="b2c_1A_UNICEF_PARTNERS_signup_signin")
 
-TENANT_ID = os.getenv('AZURE_B2C_TENANT', 'unicefpartners')
+TENANT_ID = env('AZURE_B2C_TENANT', default='unicefpartners')
 SCOPE = ['openid', 'email']
 IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
@@ -456,13 +478,13 @@ SOCIAL_AUTH_PIPELINE = (
 
 
 # PMP API
-PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.18.0.1:8082/api")
-PMP_API_USER = os.getenv('PMP_API_USER')
-PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
+PMP_API_ENDPOINT = env('PMP_API_ENDPOINT', default="http://172.18.0.1:8082/api")
+PMP_API_USER = env('PMP_API_USER', default=None)
+PMP_API_PASSWORD = env('PMP_API_PASSWORD', default=None)
 
 # OCHA API
-OCHA_API_USER = os.getenv('OCHA_API_USER', '')
-OCHA_API_PASSWORD = os.getenv('OCHA_API_PASSWORD', '')
+OCHA_API_USER = env('OCHA_API_USER', default='')
+OCHA_API_PASSWORD = env('OCHA_API_PASSWORD', default='')
 
 # assuming we're using Azure Storage:
 # django-storages: https://django-storages.readthedocs.io/en/latest/backends/azure.html
@@ -474,6 +496,19 @@ AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)
 AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', None)
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', None)
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', None)
+
+if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+
+elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
+    DEFAULT_FILE_STORAGE = 'core.mixins.EToolsAzureStorage'
+    AZURE_SSL = True
+    AZURE_AUTO_SIGN = True  # flag for automatically signing urls
+    AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
+    AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
 
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
@@ -493,7 +528,8 @@ if not DISABLE_JWT_AUTH:
     })
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',  # this is default
+    'core.mixins.CustomAzureADBBCOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # apm related - it's enough to set those as env variables, here just for documentation
@@ -504,7 +540,7 @@ AUTHENTICATION_BACKENDS = (
 # ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
 
 # raven (Sentry): https://github.com/getsentry/raven-python
-SENTRY_DSN = os.getenv('SENTRY_DSN', default=False)
+SENTRY_DSN = env('SENTRY_DSN', default=False)
 if SENTRY_DSN:
     RAVEN_CONFIG = {
         'dsn': SENTRY_DSN,  # noqa: F405
@@ -512,3 +548,11 @@ if SENTRY_DSN:
     INSTALLED_APPS += (  # noqa: F405
         'raven.contrib.django.raven_compat',
     )
+
+if DEBUG:
+    CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
+    FIXTURE_DIRS += ["fixtures"]
+    INSTALLED_APPS += [
+        'debug_toolbar',
+    ]
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
