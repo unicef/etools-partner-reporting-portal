@@ -877,7 +877,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             ir_qs.count(),
         )
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export(self, mock_create, mock_clean, mock_send):
@@ -906,7 +906,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export_filter(self, mock_create, mock_clean, mock_send):
@@ -953,7 +953,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export_filter_multiple(self, mock_create, mock_clean, mock_send):
@@ -1016,7 +1016,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             response,
         ))
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_list_api_export_pdf(self, mock_create, mock_clean, mock_send):
