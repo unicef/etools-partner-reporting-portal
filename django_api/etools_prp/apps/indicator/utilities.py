@@ -2,8 +2,9 @@ from django.db import transaction
 from django.utils.translation import get_language, to_locale
 
 from babel.numbers import format_number, format_percent
-from core.helpers import create_ir_and_ilds_for_pr
-from indicator.constants import ValueType
+
+from etools_prp.apps.core.helpers import create_ir_and_ilds_for_pr
+from etools_prp.apps.indicator.constants import ValueType
 
 
 def convert_string_number_to_float(num):
@@ -32,7 +33,7 @@ def reset_indicator_report_data(indicator_report):
     Arguments:
         indicator_report {IndicatorReport} -- IndicatorReport instance to delete its location data from
     """
-    from indicator.models import IndicatorLocationData
+    from etools_prp.apps.indicator.models import IndicatorLocationData
 
     # Reset submission and status attributes
     indicator_report.total = {'c': 0, 'd': 0, 'v': 0}

@@ -1,12 +1,13 @@
 from django.urls import reverse
 
-from account.models import User
-from cluster.models import Cluster
-from core.common import PRP_ROLE_TYPES
-from core.models import PRPRole, Workspace
-from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
-from partner.models import Partner
 from rest_framework.test import APIRequestFactory, APITestCase
+
+from etools_prp.apps.account.models import User
+from etools_prp.apps.cluster.models import Cluster
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.models import PRPRole, Workspace
+from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
+from etools_prp.apps.partner.models import Partner
 
 
 class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):

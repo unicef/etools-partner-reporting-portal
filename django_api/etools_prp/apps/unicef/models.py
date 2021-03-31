@@ -11,7 +11,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 
-from core.common import (
+from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
+from rest_framework.exceptions import ValidationError
+
+from etools_prp.apps.core.common import (
     CURRENCIES,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -24,13 +29,9 @@ from core.common import (
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
 )
-from core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
-from indicator.models import Reportable  # IndicatorReport
-from model_utils.models import TimeStampedModel
-from model_utils.tracker import FieldTracker
-from requests.compat import urljoin
-from rest_framework.exceptions import ValidationError
-from utils.emails import send_email_from_template
+from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
+from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
+from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
 

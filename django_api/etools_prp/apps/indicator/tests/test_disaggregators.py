@@ -1,15 +1,15 @@
 import copy
 
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
-from core.helpers import get_cast_dictionary_keys_as_tuple
-from core.management.commands._generate_disaggregation_fake_data import (
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.helpers import get_cast_dictionary_keys_as_tuple
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import (
     add_disaggregations_to_reportable,
     generate_3_num_disagg_data,
 )
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
-from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
-from indicator.models import IndicatorBlueprint, IndicatorLocationData
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData
 
 
 class TestQuantityIndicatorDisaggregator(BaseAPITestCase):

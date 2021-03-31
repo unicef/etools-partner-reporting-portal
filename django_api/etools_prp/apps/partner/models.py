@@ -5,7 +5,9 @@ from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 
-from core.common import (
+from model_utils.models import TimeStampedModel
+
+from etools_prp.apps.core.common import (
     CSO_TYPES,
     EXTERNAL_DATA_SOURCES,
     PARTNER_PROJECT_STATUS,
@@ -13,10 +15,9 @@ from core.common import (
     RESPONSE_PLAN_TYPE,
     SHARED_PARTNER_TYPE,
 )
-from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-from core.fields import UniqueNullCharField
-from core.models import TimeStampedExternalSourceModel
-from model_utils.models import TimeStampedModel
+from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
+from etools_prp.apps.core.fields import UniqueNullCharField
+from etools_prp.apps.core.models import TimeStampedExternalSourceModel
 
 
 class Partner(TimeStampedExternalSourceModel):
@@ -298,8 +299,8 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
     if action != "post_add":
         return
 
-    from core.models import Location
-    from indicator.models import ReportableLocationGoal
+    from etools_prp.apps.core.models import Location
+    from etools_prp.apps.indicator.models import ReportableLocationGoal
     locations = instance.locations.all()
 
     if locations.exists():
@@ -422,7 +423,7 @@ class PartnerActivity(TimeStampedModel):
 
     @property
     def clusters(self):
-        from cluster.models import Cluster
+        from etools_prp.apps.cluster.models import Cluster
         return Cluster.objects.filter(id__in=self.projects.values_list('clusters', flat=True).distinct())
 
     @property

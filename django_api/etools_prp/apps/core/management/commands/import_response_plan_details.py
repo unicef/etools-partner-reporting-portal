@@ -1,7 +1,7 @@
 
 from django.core.management.base import BaseCommand
 
-from ocha.tasks import finish_response_plan_import
+from etools_prp.apps.ocha.tasks import finish_response_plan_import
 
 
 class Command(BaseCommand):

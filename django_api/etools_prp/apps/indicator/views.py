@@ -10,7 +10,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
-from core.common import (
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PRP_ROLE_TYPES,
@@ -21,19 +27,14 @@ from core.common import (
     REPORTABLE_PA_CONTENT_OBJECT,
     REPORTABLE_PP_CONTENT_OBJECT,
 )
-from core.models import Location
-from core.paginations import SmallPagination
-from core.permissions import AnyPermission, HasAnyRole, IsAuthenticated, IsUNICEFAPIUser
-from core.serializers import ShortLocationSerializer
-from partner.models import PartnerActivityProjectContext, PartnerProject
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView, UpdateAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from unicef.models import ProgressReport
-from unicef.permissions import UnicefPartnershipManagerOrRead
-from utils.emails import send_email_from_template
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.core.permissions import AnyPermission, HasAnyRole, IsAuthenticated, IsUNICEFAPIUser
+from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.partner.models import PartnerActivityProjectContext, PartnerProject
+from etools_prp.apps.unicef.models import ProgressReport
+from etools_prp.apps.unicef.permissions import UnicefPartnershipManagerOrRead
+from etools_prp.apps.utils.emails import send_email_from_template
 
 from .disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from .filters import IndicatorFilter, PDReportsFilter
@@ -90,7 +91,7 @@ class PDReportsAPIView(ListAPIView):
     filter_class = PDReportsFilter
 
     def get_queryset(self):
-        from unicef.models import ProgrammeDocument
+        from etools_prp.apps.unicef.models import ProgrammeDocument
 
         pd = get_object_or_404(ProgrammeDocument, pk=self.pd_id)
 

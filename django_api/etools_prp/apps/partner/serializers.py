@@ -2,15 +2,20 @@ from collections import OrderedDict
 
 from django.db import transaction
 
-from cluster.models import Cluster, ClusterActivity, ClusterObjective
-from cluster.serializers import ClusterActivitySerializer, ClusterObjectiveSerializer, ClusterSimpleSerializer
-from core.common import CSO_TYPES, PARTNER_ACTIVITY_STATUS, PARTNER_TYPE
-from core.models import Location
-from core.serializers import ShortLocationSerializer
-from indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
-from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
+from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
+from etools_prp.apps.cluster.serializers import (
+    ClusterActivitySerializer,
+    ClusterObjectiveSerializer,
+    ClusterSimpleSerializer,
+)
+from etools_prp.apps.core.common import CSO_TYPES, PARTNER_ACTIVITY_STATUS, PARTNER_TYPE
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.indicator.models import create_pa_reportables_from_ca, get_reportable_data_to_clone, Reportable
+from etools_prp.apps.indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
     Partner,

@@ -1,5 +1,5 @@
-from core.helpers import generate_data_combination_entries
-from core.tests import factories
+from etools_prp.apps.core.helpers import generate_data_combination_entries
+from etools_prp.apps.core.tests import factories
 
 # unicef_re = factories.ReportingEntityFactory(title="UNICEF")
 # cluster_re = factories.ReportingEntityFactory(title="Cluster")

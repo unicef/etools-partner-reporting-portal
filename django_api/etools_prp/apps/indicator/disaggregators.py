@@ -6,14 +6,14 @@ indicator location data being saved for any disaggregation types.
 """
 
 
-from core.helpers import (
+from etools_prp.apps.core.helpers import (
     calculate_sum,
     get_all_subkeys,
     get_cast_dictionary_keys_as_string,
     get_cast_dictionary_keys_as_tuple,
     get_zero_dict,
 )
-from indicator.constants import ValueType
+from etools_prp.apps.indicator.constants import ValueType
 
 
 class BaseDisaggregator:
@@ -77,7 +77,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     @staticmethod
     def calculate_indicator_report_total(indicator_report):
         # Importing here to avoid circular dependencies
-        from indicator.models import IndicatorBlueprint
+        from etools_prp.apps.indicator.models import IndicatorBlueprint
 
         # Reset the IndicatorReport total
         ir_total = {
@@ -161,7 +161,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     @staticmethod
     def calculate_indicator_report_total(indicator_report):
         # Importing here to avoid circular dependencies
-        from indicator.models import IndicatorBlueprint
+        from etools_prp.apps.indicator.models import IndicatorBlueprint
 
         # Reset the IndicatorReport total
         ir_total = {

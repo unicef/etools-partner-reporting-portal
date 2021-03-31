@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from django.db import transaction
 
 from celery import shared_task
-from core.api import PMP_API
-from etools_prp.config.celery import app as celery_app, cache_lock
-from core.common import PD_FREQUENCY_LEVEL, PD_STATUS
-from core.helpers import (
+
+from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_STATUS
+from etools_prp.apps.core.helpers import (
     calculate_end_date_given_start_date,
     create_ir_and_ilds_for_pr,
     create_ir_for_cluster,
@@ -15,10 +15,11 @@ from core.helpers import (
     find_missing_frequency_period_dates_for_indicator_report,
     get_latest_pr_by_type,
 )
-from core.models import Country
-from core.serializers import PMPWorkspaceSerializer
-from indicator.models import Reportable
-from unicef.models import ProgrammeDocument
+from etools_prp.apps.core.models import Country
+from etools_prp.apps.core.serializers import PMPWorkspaceSerializer
+from etools_prp.apps.indicator.models import Reportable
+from etools_prp.apps.unicef.models import ProgrammeDocument
+from etools_prp.config.celery import app as celery_app, cache_lock
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15

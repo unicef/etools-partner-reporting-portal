@@ -3,7 +3,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
-import unicef.models
+from etools_prp.apps import unicef
 
 
 class Migration(migrations.Migration):

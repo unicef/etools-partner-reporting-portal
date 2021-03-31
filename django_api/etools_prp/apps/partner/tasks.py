@@ -1,8 +1,9 @@
 from celery import shared_task
-from core.api import PMP_API
-from core.models import Workspace
-from partner.models import Partner
-from partner.serializers import PMPPartnerSerializer
+
+from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.partner.models import Partner
+from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 
 MAX_RETRIES = 6
 

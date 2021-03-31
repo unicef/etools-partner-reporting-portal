@@ -4,7 +4,7 @@ from datetime import date
 from django.conf import settings
 from django.utils.html import escape
 
-from unicef.models import LowerLevelOutput
+from etools_prp.apps.unicef.models import LowerLevelOutput
 
 PARTNER_PORTAL_DATE_FORMAT_EXCEL = 'dd-mmm-yyyy'
 
