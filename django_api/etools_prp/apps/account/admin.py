@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from account.forms import CustomUserCreationForm, UserAdminForm
-from account.models import User, UserProfile
+from etools_prp.apps.account.forms import CustomUserCreationForm, UserAdminForm
+from etools_prp.apps.account.models import User, UserProfile
 
 
 class CustomUserAdmin(UserAdmin):

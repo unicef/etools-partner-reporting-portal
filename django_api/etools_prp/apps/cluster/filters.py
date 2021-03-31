@@ -1,9 +1,10 @@
 from django.db.models import Q
 
 import django_filters
-from core.common import INDICATOR_REPORT_STATUS
 from django_filters.filters import CharFilter
-from indicator.models import IndicatorReport, Reportable
+
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS
+from etools_prp.apps.indicator.models import IndicatorReport, Reportable
 
 from .models import Cluster, ClusterActivity, ClusterObjective
 

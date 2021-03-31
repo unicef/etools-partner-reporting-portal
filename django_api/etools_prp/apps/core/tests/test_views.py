@@ -1,11 +1,14 @@
 from django.urls import reverse
 
-from core.common import CLUSTER_TYPES, CURRENCIES, PRP_ROLE_TYPES
-from core.management.commands._generate_disaggregation_fake_data import add_disaggregations_to_reportable
-from core.models import Location, ResponsePlan, Workspace
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
 from rest_framework import status
+
+from etools_prp.apps.core.common import CLUSTER_TYPES, CURRENCIES, PRP_ROLE_TYPES
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import (
+    add_disaggregations_to_reportable,
+)
+from etools_prp.apps.core.models import Location, ResponsePlan, Workspace
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
 
 
 class TestWorkspaceListAPIView(BaseAPITestCase):

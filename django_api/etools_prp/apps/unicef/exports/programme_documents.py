@@ -10,9 +10,10 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.styles.numbers import FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
-from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader, PARTNER_PORTAL_DATE_FORMAT_EXCEL
-from unicef.templatetags.pdf_extras import format_currency
-from unicef.utils import render_pdf_to_response
+
+from etools_prp.apps.unicef.exports.utilities import HTMLTableCell, HTMLTableHeader, PARTNER_PORTAL_DATE_FORMAT_EXCEL
+from etools_prp.apps.unicef.templatetags.pdf_extras import format_currency
+from etools_prp.apps.unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 

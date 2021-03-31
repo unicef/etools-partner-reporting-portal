@@ -6,14 +6,21 @@ from django.conf import settings
 from django.core.cache import cache
 
 import requests
-from cluster.models import Cluster, ClusterObjective
-from core.common import EXTERNAL_DATA_SOURCES
-from core.models import Country, GatewayType, Location
-from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint, Reportable, ReportableLocationGoal
-from ocha.constants import HPC_V2_ROOT_URL
-from ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
 from requests import RequestException
 from requests.status_codes import codes
+
+from etools_prp.apps.cluster.models import Cluster, ClusterObjective
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES
+from etools_prp.apps.core.models import Country, GatewayType, Location
+from etools_prp.apps.indicator.models import (
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    Reportable,
+    ReportableLocationGoal,
+)
+from etools_prp.apps.ocha.constants import HPC_V2_ROOT_URL
+from etools_prp.apps.ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
 
 logger = logging.getLogger('ocha-sync')
 

@@ -8,8 +8,6 @@ from cryptography.x509 import load_pem_x509_certificate
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-APPS_DIR = os.path.join(BASE_DIR, 'apps/')
-sys.path.append(APPS_DIR)
 
 env = environ.Env()
 
@@ -111,14 +109,14 @@ INSTALLED_APPS = [
     'django_cron',
     'social_django',
 
-    'account',
-    'cluster',
-    'core',
-    'indicator',
-    'partner',
-    'unicef',
-    'ocha',
-    'id_management',
+    'etools_prp.apps.account',
+    'etools_prp.apps.cluster',
+    'etools_prp.apps.core',
+    'etools_prp.apps.indicator',
+    'etools_prp.apps.partner',
+    'etools_prp.apps.unicef',
+    'etools_prp.apps.ocha',
+    'etools_prp.apps.id_management',
 
     'post_office',
     'unicef_notification',
@@ -129,7 +127,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'core.mixins.CustomSocialAuthExceptionMiddleware',
+    'etools_prp.apps.core.mixins.CustomSocialAuthExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -377,7 +375,8 @@ POST_OFFICE = {
 
 LEAFLET_CONFIG = {
     'TILES': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-    'ATTRIBUTION_PREFIX': 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    'ATTRIBUTION_PREFIX': 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, '
+                          'Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
     'MIN_ZOOM': 3,
     'MAX_ZOOM': 18,
 }
@@ -391,7 +390,7 @@ CARTODB_APIKEY = env('CARTODB_APIKEY', default='')
 
 CRON_CLASSES = [
     'indicator.cron.IndicatorReportOverDueCronJob',
-    'core.cron.WorkspaceCronJob',
+    'etools_prp.apps.core.cron.WorkspaceCronJob',
     'partner.cron.PartnerCronJob',
     'unicef.cron.ProgrammeDocumentCronJob'
 ]
@@ -404,12 +403,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
         (
             'rest_framework.authentication.SessionAuthentication',
-            'utils.mixins.CustomJSONWebTokenAuthentication',
+            'etools_prp.apps.utils.mixins.CustomJSONWebTokenAuthentication',
             'rest_framework.authentication.TokenAuthentication',
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
     'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
-    'EXCEPTION_HANDLER': 'utils.exception_handler.detailed_exception_handler',
+    'EXCEPTION_HANDLER': 'etools_prp.apps.utils.exception_handler.detailed_exception_handler',
 }
 
 
@@ -418,7 +417,7 @@ PASSWORDLESS_AUTH = {
     'PASSWORDLESS_AUTH_TYPES': ['EMAIL', ],
     'PASSWORDLESS_EMAIL_TOKEN_HTML_TEMPLATE_NAME': "account/passwordless_login_email.html",
     'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'no-reply@unicef.org',
-    'PASSWORDLESS_CONTEXT_PROCESSORS': ['account.context_processors.passwordless_token_email', ],
+    'PASSWORDLESS_CONTEXT_PROCESSORS': ['etools_prp.apps.account.context_processors.passwordless_token_email', ],
     'PASSWORDLESS_REGISTER_NEW_USERS': False,
     'PASSWORDLESS_EMAIL_SUBJECT': 'UNICEF Partner Reporting Portal: Your login link'
 }
@@ -449,19 +448,19 @@ JWT_LEEWAY = 1000
 
 SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.social_details',
-    'core.mixins.social_details',
+    'etools_prp.apps.core.mixins.social_details',
     'social_core.pipeline.social_auth.social_uid',
     # allows based on emails being listed in 'WHITELISTED_EMAILS' or 'WHITELISTED_DOMAINS'
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     # 'social_core.pipeline.user.get_username',
-    'core.mixins.get_username',
+    'etools_prp.apps.core.mixins.get_username',
     'social_core.pipeline.social_auth.associate_by_email',
     # 'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     # 'social_core.pipeline.user.user_details',
-    'core.mixins.user_details',
+    'etools_prp.apps.core.mixins.user_details',
 )
 
 
@@ -492,7 +491,7 @@ if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]
     AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
 
 elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
-    DEFAULT_FILE_STORAGE = 'core.mixins.EToolsAzureStorage'
+    DEFAULT_FILE_STORAGE = 'etools_prp.apps.core.mixins.EToolsAzureStorage'
     AZURE_SSL = True
     AZURE_AUTO_SIGN = True  # flag for automatically signing urls
     AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
@@ -516,7 +515,7 @@ if not DISABLE_JWT_AUTH:
     })
 
 AUTHENTICATION_BACKENDS = (
-    'core.mixins.CustomAzureADBBCOAuth2',
+    'etools_prp.apps.core.mixins.CustomAzureADBBCOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 

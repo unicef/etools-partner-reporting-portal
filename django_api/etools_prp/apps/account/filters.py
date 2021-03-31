@@ -6,9 +6,10 @@ from django.db.models import Q, Value
 from django.db.models.functions import Concat
 
 import django_filters
-from core.common import USER_STATUS_TYPES
 from django_filters.filters import CharFilter
-from utils.filters.fields import CommaSeparatedListFilter
+
+from etools_prp.apps.core.common import USER_STATUS_TYPES
+from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
 
 from .models import User
 

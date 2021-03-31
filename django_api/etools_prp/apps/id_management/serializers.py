@@ -1,7 +1,8 @@
-from cluster.serializers import ClusterIDManagementSerializer
-from core.models import PRPRole
-from core.serializers import WorkspaceSimpleSerializer
 from rest_framework import serializers
+
+from etools_prp.apps.cluster.serializers import ClusterIDManagementSerializer
+from etools_prp.apps.core.models import PRPRole
+from etools_prp.apps.core.serializers import WorkspaceSimpleSerializer
 
 
 class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):

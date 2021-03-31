@@ -1,8 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
 
-from cluster.models import ClusterActivity, ClusterObjective
-from partner.models import PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from rest_framework.exceptions import ValidationError
+
+from etools_prp.apps.cluster.models import ClusterActivity, ClusterObjective
+from etools_prp.apps.partner.models import PartnerActivity, PartnerActivityProjectContext, PartnerProject
 
 
 class AddIndicatorObjectTypeValidator:

@@ -3,7 +3,7 @@ class CurrentWorkspaceDefault:
     workspace = None
 
     def set_context(self, serializer_field):
-        from core.models import Workspace
+        from etools_prp.apps.core.models import Workspace
         self.workspace = Workspace.objects.get(id=serializer_field.context['view'].kwargs['workspace_id'])
 
     def __call__(self):

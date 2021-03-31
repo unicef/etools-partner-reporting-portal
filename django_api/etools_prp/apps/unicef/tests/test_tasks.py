@@ -1,15 +1,20 @@
-from core.models import GatewayType, Location
-from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
-from indicator.models import IndicatorBlueprint, Reportable
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPReportableSerializer
-from partner.models import Partner
-from partner.serializers import PMPPartnerSerializer
 from rest_framework.exceptions import ValidationError
-from unicef.models import Person, ProgrammeDocument, Section
-from unicef.serializers import PMPPDPersonSerializer, PMPProgrammeDocumentSerializer, PMPSectionSerializer
-from unicef.tasks import process_model
+
+from etools_prp.apps.core.models import GatewayType, Location
+from etools_prp.apps.core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable
+from etools_prp.apps.indicator.serializers import PMPIndicatorBlueprintSerializer, PMPReportableSerializer
+from etools_prp.apps.partner.models import Partner
+from etools_prp.apps.partner.serializers import PMPPartnerSerializer
+from etools_prp.apps.unicef.models import Person, ProgrammeDocument, Section
+from etools_prp.apps.unicef.serializers import (
+    PMPPDPersonSerializer,
+    PMPProgrammeDocumentSerializer,
+    PMPSectionSerializer,
+)
+from etools_prp.apps.unicef.tasks import process_model
 
 
 class TestProcessModel(BaseAPITestCase):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from core.helpers import (
+from etools_prp.apps.core.helpers import (
     generate_data_combination_entries,
     get_cast_dictionary_keys_as_string,
     get_cast_dictionary_keys_as_tuple,

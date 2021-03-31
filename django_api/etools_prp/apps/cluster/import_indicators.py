@@ -4,9 +4,10 @@ from datetime import datetime
 from django.db import transaction
 from django.db.models import Q
 
-from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
-from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
 from openpyxl.reader.excel import load_workbook
+
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
 
 COLUMN_HASH_ID = 4
 MAX_COLUMNS = 1000

@@ -5,11 +5,12 @@ from django.conf import settings
 from django.db.models import Q
 
 import django_filters
-from core.common import PD_STATUS, PROGRESS_REPORT_STATUS
 from django_filters.filters import CharFilter, DateFilter, TypedChoiceFilter
-from indicator.models import Reportable
-from utils.filters.constants import Boolean
-from utils.filters.fields import CommaSeparatedListFilter
+
+from etools_prp.apps.core.common import PD_STATUS, PROGRESS_REPORT_STATUS
+from etools_prp.apps.indicator.models import Reportable
+from etools_prp.apps.utils.filters.constants import Boolean
+from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
 
 from .models import ProgrammeDocument, ProgressReport
 

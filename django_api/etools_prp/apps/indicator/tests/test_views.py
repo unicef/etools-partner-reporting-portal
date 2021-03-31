@@ -6,18 +6,26 @@ from unittest.mock import patch
 from django.conf import settings
 from django.urls import reverse
 
-from cluster.models import ClusterActivity, ClusterObjective
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, REPORTABLE_FREQUENCY_LEVEL
-from core.helpers import get_cast_dictionary_keys_as_tuple
-from core.management.commands._generate_disaggregation_fake_data import (
+from rest_framework import status
+from unicef_notification.models import Notification
+
+from etools_prp.apps.cluster.models import ClusterActivity, ClusterObjective
+from etools_prp.apps.core.common import (
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    PRP_ROLE_TYPES,
+    REPORTABLE_FREQUENCY_LEVEL,
+)
+from etools_prp.apps.core.helpers import get_cast_dictionary_keys_as_tuple
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import (
     add_disaggregations_to_reportable,
     generate_3_num_disagg_data,
 )
-from core.models import Location
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
-from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import (
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
+from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
     IndicatorBlueprint,
@@ -25,15 +33,13 @@ from indicator.models import (
     IndicatorReport,
     Reportable,
 )
-from indicator.serializers import (
+from etools_prp.apps.indicator.serializers import (
     IdDisaggregationSerializer,
     IndicatorLocationDataUpdateSerializer,
     ReportableLocationGoalSerializer,
 )
-from partner.models import PartnerActivity, PartnerProject
-from rest_framework import status
-from unicef.models import ProgrammeDocument
-from unicef_notification.models import Notification
+from etools_prp.apps.partner.models import PartnerActivity, PartnerProject
+from etools_prp.apps.unicef.models import ProgrammeDocument
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)

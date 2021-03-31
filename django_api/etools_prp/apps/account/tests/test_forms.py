@@ -1,6 +1,6 @@
-from account.forms import CustomUserCreationForm, UserAdminForm
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
+from etools_prp.apps.account.forms import CustomUserCreationForm, UserAdminForm
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
 
 
 class CustomUserCreationFormTestcase(BaseAPITestCase):

@@ -79,9 +79,10 @@ def send_due_progress_report_email():
     """
     from datetime import date
 
-    from core.common import PROGRESS_REPORT_STATUS
     from dateutil.relativedelta import relativedelta
-    from unicef.models import ProgressReport
+
+    from etools_prp.apps.core.common import PROGRESS_REPORT_STATUS
+    from etools_prp.apps.unicef.models import ProgressReport
 
     logger.info("Notifying IP due progress reports")
     notified = list()
@@ -124,8 +125,8 @@ def send_overdue_progress_report_email():
     """send_overdue_progress_report_email sends email notifications to
     UNICEF Authorized Officers and Focal Points about overdue reports.
     """
-    from core.common import PROGRESS_REPORT_STATUS
-    from unicef.models import ProgressReport
+    from etools_prp.apps.core.common import PROGRESS_REPORT_STATUS
+    from etools_prp.apps.unicef.models import ProgressReport
 
     logger.info("Notifying IP overdue progress reports")
     notified = list()
