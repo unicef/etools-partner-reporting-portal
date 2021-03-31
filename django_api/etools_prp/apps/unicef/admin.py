@@ -2,9 +2,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.shortcuts import redirect
 
-from core.models import Workspace
-from core.tasks import process_period_reports, process_workspaces
-from unicef.models import (
+from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
+from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -13,7 +13,7 @@ from unicef.models import (
     ReportingPeriodDates,
     Section,
 )
-from unicef.tasks import process_programme_documents
+from etools_prp.apps.unicef.tasks import process_programme_documents
 
 
 class ProgrammeDocumentAdmin(admin.ModelAdmin):

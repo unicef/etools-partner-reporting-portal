@@ -3,7 +3,7 @@
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 import django.db.models.deletion
-import indicator.models
+from etools_prp.apps import indicator
 
 
 class Migration(migrations.Migration):

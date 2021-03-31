@@ -9,7 +9,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 
-from core.common import (
+from model_utils.models import TimeStampedModel
+from model_utils.tracker import FieldTracker
+from requests.compat import urljoin
+from rest_framework import serializers
+
+from etools_prp.apps.core.common import (
     FINAL_OVERALL_STATUS,
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
@@ -19,16 +24,12 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     REPORTING_TYPES,
 )
-from core.models import TimeStampedExternalSourceModel
-from indicator.constants import ValueType
-from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
-from indicator.utilities import convert_string_number_to_float
-from model_utils.models import TimeStampedModel
-from model_utils.tracker import FieldTracker
-from partner.models import PartnerActivity
-from requests.compat import urljoin
-from rest_framework import serializers
-from utils.emails import send_email_from_template
+from etools_prp.apps.core.models import TimeStampedExternalSourceModel
+from etools_prp.apps.indicator.constants import ValueType
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float
+from etools_prp.apps.partner.models import PartnerActivity
+from etools_prp.apps.utils.emails import send_email_from_template
 
 
 def default_total():
@@ -323,7 +324,7 @@ class Reportable(TimeStampedExternalSourceModel):
     @property
     def ref_num(self):
         """reference_number of the PD"""
-        from unicef.models import LowerLevelOutput
+        from etools_prp.apps.unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
             return self.content_object.cp_output.programme_document.reference_number
@@ -333,7 +334,7 @@ class Reportable(TimeStampedExternalSourceModel):
     @property
     def pd_id(self):
         """reference_number of the PD"""
-        from unicef.models import LowerLevelOutput
+        from etools_prp.apps.unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
             return self.content_object.cp_output.programme_document.id

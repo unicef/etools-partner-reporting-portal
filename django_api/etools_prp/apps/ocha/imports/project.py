@@ -1,11 +1,11 @@
-from cluster.models import ClusterActivity
-from core.common import EXTERNAL_DATA_SOURCES
-from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
-from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
-from ocha.imports.serializers import V2PartnerProjectImportSerializer
-from ocha.imports.utilities import get_json_from_url, logger, save_disaggregations, save_location_list
-from ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
-from partner.models import PartnerActivity, PartnerActivityProjectContext
+from etools_prp.apps.cluster.models import ClusterActivity
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES
+from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
+from etools_prp.apps.ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
+from etools_prp.apps.ocha.imports.serializers import V2PartnerProjectImportSerializer
+from etools_prp.apps.ocha.imports.utilities import get_json_from_url, logger, save_disaggregations, save_location_list
+from etools_prp.apps.ocha.utilities import convert_to_json_ratio_value, get_dict_from_list_by_key
+from etools_prp.apps.partner.models import PartnerActivity, PartnerActivityProjectContext
 
 
 def import_project_details(project, external_project_id):
@@ -70,7 +70,7 @@ def import_project_details(project, external_project_id):
                 locations = []
 
             if cluster_activity:
-                from indicator.models import create_papc_reportables_from_ca
+                from etools_prp.apps.indicator.models import create_papc_reportables_from_ca
                 partner_activity, _ = PartnerActivity.objects.update_or_create(
                     cluster_activity=cluster_activity,
                     defaults={
@@ -133,7 +133,7 @@ def import_project(external_project_id, partner_id, response_plan=None, asynch=T
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
 
-    from ocha.tasks import finish_partner_project_import
+    from etools_prp.apps.ocha.tasks import finish_partner_project_import
     (finish_partner_project_import.delay if asynch else finish_partner_project_import)(
         project.pk, external_project_id, response_plan_id=getattr(response_plan, 'id', None)
     )

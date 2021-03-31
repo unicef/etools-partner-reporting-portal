@@ -8,15 +8,16 @@ import time
 from django.http import HttpResponse
 from django.utils import timezone
 
-from indicator.constants import ValueType
-from indicator.models import Disaggregation, IndicatorBlueprint
-from indicator.utilities import convert_string_number_to_float
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, NamedStyle
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
-from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
-from unicef.models import ProgressReport
+
+from etools_prp.apps.indicator.constants import ValueType
+from etools_prp.apps.indicator.models import Disaggregation, IndicatorBlueprint
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float
+from etools_prp.apps.unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
+from etools_prp.apps.unicef.models import ProgressReport
 
 logger = logging.getLogger(__name__)
 

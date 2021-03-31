@@ -3,17 +3,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from cluster.models import Cluster
-from core.common import PRP_ROLE_TYPES
-from core.paginations import SmallPagination
-from core.permissions import (
-    AnyPermission,
-    has_permission_for_clusters_check,
-    HasAnyRole,
-    IsAuthenticated,
-    IsClusterSystemAdmin,
-    IsIMO,
-)
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import OrderingFilter
@@ -27,6 +16,18 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from etools_prp.apps.cluster.models import Cluster
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.core.permissions import (
+    AnyPermission,
+    has_permission_for_clusters_check,
+    HasAnyRole,
+    IsAuthenticated,
+    IsClusterSystemAdmin,
+    IsIMO,
+)
 
 from .filters import (
     ClusterActivityPartnersFilter,

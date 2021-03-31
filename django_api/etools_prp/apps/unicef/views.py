@@ -8,9 +8,17 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
-from core.api import PMP_API
-from core.api_error_codes import APIErrorCode
-from core.common import (
+from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
+from rest_framework import status as statuses
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.api_error_codes import APIErrorCode
+from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
@@ -18,9 +26,9 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
 )
-from core.models import Location
-from core.paginations import SmallPagination
-from core.permissions import (
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.core.permissions import (
     AnyPermission,
     IsAuthenticated,
     IsPartnerAdminForCurrentWorkspace,
@@ -29,32 +37,31 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsUNICEFAPIUser,
 )
-from core.serializers import ShortLocationSerializer
-from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
-from indicator.filters import PDReportsFilter
-from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
-from indicator.serializers import (
+from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.filters import PDReportsFilter
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
     IndicatorListSerializer,
     PDReportContextIndicatorReportSerializer,
 )
-from indicator.utilities import convert_string_number_to_float
-from partner.models import Partner
-from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
-from rest_framework import status as statuses
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
-from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
-from unicef.exports.programme_documents import ProgrammeDocumentsPDFExporter, ProgrammeDocumentsXLSXExporter
-from unicef.exports.progress_reports import ProgressReportDetailPDFExporter, ProgressReportListPDFExporter
-from unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
-from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
-from unicef.utils import render_pdf_to_response
-from utils.emails import send_email_from_template
-from utils.mixins import ListExportMixin, ObjectExportMixin
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float
+from etools_prp.apps.partner.models import Partner
+from etools_prp.apps.unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
+from etools_prp.apps.unicef.exports.programme_documents import (
+    ProgrammeDocumentsPDFExporter,
+    ProgrammeDocumentsXLSXExporter,
+)
+from etools_prp.apps.unicef.exports.progress_reports import (
+    ProgressReportDetailPDFExporter,
+    ProgressReportListPDFExporter,
+)
+from etools_prp.apps.unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
+from etools_prp.apps.unicef.exports.utilities import group_indicator_reports_by_lower_level_output
+from etools_prp.apps.unicef.utils import render_pdf_to_response
+from etools_prp.apps.utils.emails import send_email_from_template
+from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter

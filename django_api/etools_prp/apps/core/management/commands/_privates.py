@@ -6,9 +6,11 @@ import random
 
 from django.conf import settings
 
-from account.models import User, UserProfile
-from cluster.models import Cluster, ClusterActivity, ClusterObjective
-from core.common import (
+from social_django.models import UserSocialAuth
+
+from etools_prp.apps.account.models import User, UserProfile
+from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
+from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
@@ -16,11 +18,11 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     REPORTING_TYPES,
 )
-from core.countries import COUNTRIES_ALPHA2_CODE
-from core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
-from core.tasks import process_period_reports, process_workspaces
-from core.tests import factories
-from indicator.models import (
+from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE
+from etools_prp.apps.core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
     IndicatorBlueprint,
@@ -29,11 +31,10 @@ from indicator.models import (
     Reportable,
     ReportableLocationGoal,
 )
-from indicator.tasks import process_due_reports
-from partner.models import Partner, PartnerActivity, PartnerProject
-from partner.tasks import process_partners
-from social_django.models import UserSocialAuth
-from unicef.models import (
+from etools_prp.apps.indicator.tasks import process_due_reports
+from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerProject
+from etools_prp.apps.partner.tasks import process_partners
+from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -42,8 +43,8 @@ from unicef.models import (
     ReportingPeriodDates,
     Section,
 )
-from unicef.tasks import process_programme_documents
-from utils.helpers import generate_random_character_sequence
+from etools_prp.apps.unicef.tasks import process_programme_documents
+from etools_prp.apps.utils.helpers import generate_random_character_sequence
 
 # from ._generate_disaggregation_fake_data import (
 #     generate_indicator_report_location_disaggregation_quantity_data,
@@ -115,7 +116,7 @@ def generate_reports():
 
 
 def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
-    if not settings.IS_TEST and workspace_quantity < 1:
+    if workspace_quantity < 1:
         workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
@@ -733,7 +734,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             partner=indicator.content_object.cp_output.programme_document.partner,
         ).first()
 
-        # Copy-paste from unicef/tasks.py
+        # Copy-paste from etools_prp.apps.unicef/tasks.py
         # Force update on PA Reportable instance for location update
         for pa_reportable in Reportable.objects.filter(partner_activity_project_contexts__activity=partner_activity):
             pa_reportable.frequency = REPORTABLE_FREQUENCY_LEVEL.monthly

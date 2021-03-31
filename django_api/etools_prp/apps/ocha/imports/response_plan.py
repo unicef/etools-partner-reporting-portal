@@ -1,10 +1,10 @@
 import itertools
 
-from cluster.models import ClusterActivity
-from core.common import EXTERNAL_DATA_SOURCES
-from ocha.constants import HPC_V1_ROOT_URL, RefCode
-from ocha.imports.serializers import V1ResponsePlanImportSerializer
-from ocha.imports.utilities import (
+from etools_prp.apps.cluster.models import ClusterActivity
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES
+from etools_prp.apps.ocha.constants import HPC_V1_ROOT_URL, RefCode
+from etools_prp.apps.ocha.imports.serializers import V1ResponsePlanImportSerializer
+from etools_prp.apps.ocha.imports.utilities import (
     get_json_from_url,
     logger,
     save_cluster_objective,
@@ -28,7 +28,7 @@ def import_response_plan(external_plan_id, workspace=None, asynch=True):
     response_plan = plan_serializer.save()
 
     # Do most of the work in background, otherwise it times out the request a lot
-    from ocha.tasks import finish_response_plan_import
+    from etools_prp.apps.ocha.tasks import finish_response_plan_import
     (finish_response_plan_import.delay if asynch else finish_response_plan_import)(external_plan_id)
 
     return response_plan

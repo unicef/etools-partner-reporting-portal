@@ -14,7 +14,7 @@
 # Python compiled
 *.pyc
 *.pem
-**/certificate.pem
+
 .coverage
 htmlcov
 .pytest_cache

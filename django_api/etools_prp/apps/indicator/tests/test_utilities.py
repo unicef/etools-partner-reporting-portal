@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from indicator.utilities import format_total_value_to_string
+from etools_prp.apps.indicator.utilities import format_total_value_to_string
 
 
 class TestFormatTotalValueToString(TestCase):

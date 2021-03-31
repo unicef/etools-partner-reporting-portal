@@ -4,16 +4,17 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from core.common import CURRENCIES, DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
-from core.paginations import SmallPagination
 from django_celery_beat.models import PeriodicTask
-from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils.serializers import serialize_choices
+
+from etools_prp.apps.core.common import CURRENCIES, DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
+from etools_prp.apps.utils.serializers import serialize_choices
 
 from .filters import LocationFilter
 from .models import Location, PRPRole, ResponsePlan, Workspace

@@ -1,8 +1,9 @@
 from django.db.models import Q
 
-from core.common import PRP_ROLE_TYPES as ROLES
-from core.models import PRPRole
 from rest_framework.permissions import BasePermission
+
+from etools_prp.apps.core.common import PRP_ROLE_TYPES as ROLES
+from etools_prp.apps.core.models import PRPRole
 
 
 class RoleGroupCreateUpdateDestroyPermission(BasePermission):

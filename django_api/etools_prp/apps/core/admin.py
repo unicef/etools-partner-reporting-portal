@@ -1,9 +1,9 @@
 from django.contrib.gis import admin
 
-from core.cartodb import update_sites_from_cartodb
-from core.forms import AutoSizeTextForm, CartoDBTableForm, GatewayTypeModelForm
 from leaflet.admin import LeafletGeoAdmin
 
+from .cartodb import update_sites_from_cartodb
+from .forms import AutoSizeTextForm, CartoDBTableForm, GatewayTypeModelForm
 from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
 
 
