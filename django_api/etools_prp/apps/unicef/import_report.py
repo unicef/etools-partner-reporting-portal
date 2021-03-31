@@ -3,10 +3,11 @@ from datetime import datetime
 
 from django.db import transaction
 
-from core import common
-from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
-from indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
 from openpyxl.reader.excel import load_workbook
+
+from etools_prp.apps.core import common
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.models import DisaggregationValue, IndicatorBlueprint, IndicatorLocationData
 
 from .models import ProgressReport
 

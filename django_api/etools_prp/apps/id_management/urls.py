@@ -1,9 +1,13 @@
 from django.conf.urls import url
 
-from account.views import UserListCreateAPIView
-from cluster.views import AssignableClustersListView, ClusterListForPartnerAPIView
-from core.views import PRPRoleCreateAPIView, PRPRoleUpdateDestroyAPIView
-from partner.views import AssignablePartnersListView, PartnerListCreateAPIView, PartnerRetrieveUpdateAPIView
+from etools_prp.apps.account.views import UserListCreateAPIView
+from etools_prp.apps.cluster.views import AssignableClustersListView, ClusterListForPartnerAPIView
+from etools_prp.apps.core.views import PRPRoleCreateAPIView, PRPRoleUpdateDestroyAPIView
+from etools_prp.apps.partner.views import (
+    AssignablePartnersListView,
+    PartnerListCreateAPIView,
+    PartnerRetrieveUpdateAPIView,
+)
 
 urlpatterns = [
     url(r'^users/$', UserListCreateAPIView.as_view(), name='users'),

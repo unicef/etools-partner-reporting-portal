@@ -6,11 +6,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from celery import shared_task
-from core.api import PMP_API
-from core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from core.models import GatewayType, Location, PRPRole, Workspace
-from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from indicator.models import (
+from rest_framework.exceptions import ValidationError
+
+from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.models import GatewayType, Location, PRPRole, Workspace
+from etools_prp.apps.core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
     Disaggregation,
@@ -19,17 +21,23 @@ from indicator.models import (
     Reportable,
     ReportableLocationGoal,
 )
-from indicator.serializers import (
+from etools_prp.apps.indicator.serializers import (
     PMPDisaggregationSerializer,
     PMPDisaggregationValueSerializer,
     PMPIndicatorBlueprintSerializer,
     PMPReportableSerializer,
 )
-from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
-from partner.serializers import PMPPartnerSerializer
-from rest_framework.exceptions import ValidationError
-from unicef.models import LowerLevelOutput, PDResultLink, Person, ProgrammeDocument, ReportingPeriodDates, Section
-from unicef.serializers import (
+from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from etools_prp.apps.partner.serializers import PMPPartnerSerializer
+from etools_prp.apps.unicef.models import (
+    LowerLevelOutput,
+    PDResultLink,
+    Person,
+    ProgrammeDocument,
+    ReportingPeriodDates,
+    Section,
+)
+from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDPersonSerializer,
     PMPPDResultLinkSerializer,

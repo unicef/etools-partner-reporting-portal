@@ -1,7 +1,7 @@
 
 from django.core.management.base import BaseCommand
 
-from ocha.tasks import sync_partners
+from etools_prp.apps.ocha.tasks import sync_partners
 
 
 class Command(BaseCommand):

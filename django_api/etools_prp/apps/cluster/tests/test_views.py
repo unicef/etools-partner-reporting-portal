@@ -2,11 +2,12 @@ import datetime
 
 from django.urls import reverse
 
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
 from dateutil.relativedelta import relativedelta
 from rest_framework import status
+
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
 
 
 class ClusterListAPIViewTestCase(BaseAPITestCase):

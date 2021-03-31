@@ -2,7 +2,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 import jwt
-from core.permissions import (
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
+
+from etools_prp.apps.core.permissions import (
     AnyPermission,
     IsIMOForCurrentWorkspace,
     IsPartnerAdminForCurrentWorkspace,
@@ -11,8 +14,6 @@ from core.permissions import (
     IsPartnerViewerForCurrentWorkspace,
     IsUNICEFAPIUser,
 )
-from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
 
 
 class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):

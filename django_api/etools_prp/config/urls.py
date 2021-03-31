@@ -27,14 +27,14 @@ schema_view = get_swagger_view(title='eTools PRP API')
 urlpatterns = [
     url(r'^api/docs/', schema_view),
     url(r'^api/admin/', admin.site.urls),
-    url(r'^api/core/', include('core.urls')),
-    url(r'^api/account/', include('account.urls')),
-    url(r'^api/indicator/', include('indicator.urls')),
-    url(r'^api/partner/', include('partner.urls')),
-    url(r'^api/unicef/', include('unicef.urls')),
-    url(r'^api/cluster/', include('cluster.urls')),
-    url(r'^api/ocha/', include('ocha.urls')),
-    url(r'^api/id-management/', include('id_management.urls')),
+    url(r'^api/core/', include('etools_prp.apps.core.urls')),
+    url(r'^api/account/', include('etools_prp.apps.account.urls')),
+    url(r'^api/indicator/', include('etools_prp.apps.indicator.urls')),
+    url(r'^api/partner/', include('etools_prp.apps.partner.urls')),
+    url(r'^api/unicef/', include('etools_prp.apps.unicef.urls')),
+    url(r'^api/cluster/', include('etools_prp.apps.cluster.urls')),
+    url(r'^api/ocha/', include('etools_prp.apps.ocha.urls')),
+    url(r'^api/id-management/', include('etools_prp.apps.id_management.urls')),
 
     # Social auth urls
     url(r'^social/', include('social_django.urls', namespace='social')),

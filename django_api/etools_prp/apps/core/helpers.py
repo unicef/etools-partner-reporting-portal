@@ -10,8 +10,9 @@ from contextlib import contextmanager
 from datetime import date, timedelta
 from itertools import combinations, product
 
-from core.common import PD_FREQUENCY_LEVEL
 from dateutil.relativedelta import relativedelta
+
+from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL
 
 logger = logging.getLogger("django")
 
@@ -449,7 +450,7 @@ def get_latest_pr_by_type(pd, report_type):
 
     if report_type == "HR":
         # Ordering by id since reporting period can now alternate
-        # from cluster indicator segregation
+        # from etools_prp.apps.cluster indicator segregation
         return pd.progress_reports \
             .filter(report_type="HR").order_by('id').last()
 
@@ -472,7 +473,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
         - Newly generated ProgressReport & 3 datetime objects
     """
-    from unicef.models import ProgressReport
+    from etools_prp.apps.unicef.models import ProgressReport
 
     end_date = reporting_period.end_date
     due_date = reporting_period.due_date
@@ -524,7 +525,12 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
         IndicatorReport -- A newly created IndicatorReport instance
     """
 
-    from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, ReportingEntity
+    from etools_prp.apps.indicator.models import (
+        IndicatorBlueprint,
+        IndicatorLocationData,
+        IndicatorReport,
+        ReportingEntity,
+    )
 
     if not pai_ir_for_period:
         ir_title = reportable.blueprint.title
@@ -613,8 +619,8 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
         end_date {datetime.datetime} -- End date for reporting
         due_date {datetime.datetime} -- due date for reporting
     """
-    from indicator.models import IndicatorReport, Reportable
-    from unicef.models import ProgressReport
+    from etools_prp.apps.indicator.models import IndicatorReport, Reportable
+    from etools_prp.apps.unicef.models import ProgressReport
 
     if next_progress_report.report_type != "SR":
         if next_progress_report.report_type == "QPR":
@@ -802,7 +808,12 @@ def create_ir_for_cluster(reportable, start_date, end_date, project):
     Returns:
         IndicatorReport -- Newly generated IndicatorReport instance
     """
-    from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, ReportingEntity
+    from etools_prp.apps.indicator.models import (
+        IndicatorBlueprint,
+        IndicatorLocationData,
+        IndicatorReport,
+        ReportingEntity,
+    )
 
     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
         logger.info("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(

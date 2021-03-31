@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.common import PRP_ROLE_TYPES, USER_TYPES
-from core.tests import factories
+from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_TYPES
+from etools_prp.apps.core.tests import factories
 
 
 class TestUser(TestCase):

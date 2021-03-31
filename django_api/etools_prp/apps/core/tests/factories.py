@@ -8,9 +8,13 @@ from django.core.files.base import ContentFile
 from django.db.models import signals
 
 import factory
-from account.models import User, UserProfile
-from cluster.models import Cluster, ClusterActivity, ClusterObjective
-from core.common import (
+from dateutil.relativedelta import relativedelta
+from factory import fuzzy
+from faker import Faker
+
+from etools_prp.apps.account.models import User, UserProfile
+from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
+from etools_prp.apps.core.common import (
     CLUSTER_TYPES,
     CSO_TYPES,
     FREQUENCY_LEVEL,
@@ -30,12 +34,9 @@ from core.common import (
     RESPONSE_PLAN_TYPE,
     SHARED_PARTNER_TYPE,
 )
-from core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-from core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
-from dateutil.relativedelta import relativedelta
-from factory import fuzzy
-from faker import Faker
-from indicator.models import (
+from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
+from etools_prp.apps.core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
     IndicatorBlueprint,
@@ -45,14 +46,14 @@ from indicator.models import (
     ReportableLocationGoal,
     ReportingEntity,
 )
-from partner.models import (
+from etools_prp.apps.partner.models import (
     Partner,
     PartnerActivity,
     PartnerActivityProjectContext,
     PartnerProject,
     PartnerProjectFunding,
 )
-from unicef.models import (
+from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -156,7 +157,7 @@ class AbstractUserFactory(factory.django.DjangoModelFactory):
     position = factory.LazyFunction(faker.job)
     username = factory.LazyFunction(faker.user_name)
     password = factory.PostGenerationMethodCall('set_password', 'test')
-    profile = factory.RelatedFactory('core.tests.factories.UserProfileFactory', 'user')
+    profile = factory.RelatedFactory('etools_prp.apps.core.tests.factories.UserProfileFactory', 'user')
 
     class Meta:
         model = User
@@ -169,7 +170,7 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = UserProfile
 
-    user = factory.SubFactory('core.tests.factories.AbstractUserFactory', profile=None)
+    user = factory.SubFactory('etools_prp.apps.core.tests.factories.AbstractUserFactory', profile=None)
 
 
 @factory.django.mute_signals(signals.post_save)
@@ -182,7 +183,7 @@ class PartnerUserFactory(AbstractUserFactory):
     """
 
     # We are going to let PartnerFactory create PartnerUser
-    partner = factory.SubFactory('core.tests.factories.PartnerFactory')
+    partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory')
 
     class Meta:
         model = User
@@ -202,8 +203,8 @@ class NonPartnerUserFactory(AbstractUserFactory):
 
 class AbstractPRPRoleFactory(factory.django.DjangoModelFactory):
     # We are going to manually fill foreignkeys
-    user = factory.SubFactory('core.tests.factories.NonPartnerUserFactory')
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
+    user = factory.SubFactory('etools_prp.apps.core.tests.factories.NonPartnerUserFactory')
+    workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')
     is_active = True
 
     class Meta:
@@ -238,7 +239,7 @@ class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
     Ex) ClusterPRPRoleFactory(user=user, workspace=workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
     """
 
-    cluster = factory.SubFactory('core.tests.factories.ClusterFactory')
+    cluster = factory.SubFactory('etools_prp.apps.core.tests.factories.ClusterFactory')
     role = fuzzy.FuzzyChoice(CLUSTER_PRP_ROLE_TYPES_LIST)
 
     class Meta:
@@ -295,7 +296,7 @@ class GatewayTypeFactory(factory.django.DjangoModelFactory):
     admin_level = factory.Sequence(lambda n: "%d" % n)
 
     # We are going to fill country manually
-    country = factory.SubFactory('core.tests.factories.CountryFactory', gateway_type=None)
+    country = factory.SubFactory('etools_prp.apps.core.tests.factories.CountryFactory', gateway_type=None)
 
     class Meta:
         model = GatewayType
@@ -314,13 +315,13 @@ class CartoDBTableFactory(factory.django.DjangoModelFactory):
     table_name = factory.LazyFunction(faker.uuid4)
     display_name = factory.LazyFunction(faker.city)
     # We are going to fill location type manually
-    location_type = factory.SubFactory('core.tests.factories.GatewayTypeFactory', carto_db_table=None)
+    location_type = factory.SubFactory('etools_prp.apps.core.tests.factories.GatewayTypeFactory', carto_db_table=None)
     name_col = factory.LazyFunction(faker.word)
     pcode_col = factory.LazyFunction(faker.word)
     parent_code_col = ''
     parent = None
     # We are going to fill location type manually
-    country = factory.SubFactory('core.tests.factories.CountryFactory', carto_db_table=None)
+    country = factory.SubFactory('etools_prp.apps.core.tests.factories.CountryFactory', carto_db_table=None)
 
     class Meta:
         model = CartoDBTable
@@ -338,9 +339,9 @@ class LocationFactory(factory.django.DjangoModelFactory):
     external_source = factory.LazyFunction(faker.text)
     title = factory.LazyFunction(faker.city)
     # We are going to fill location type manually
-    gateway = factory.SubFactory('core.tests.factories.GatewayTypeFactory', location=None)
+    gateway = factory.SubFactory('etools_prp.apps.core.tests.factories.GatewayTypeFactory', location=None)
     # We are going to fill CartoDBTable manually
-    carto_db_table = factory.SubFactory('core.tests.factories.CartoDBTableFactory', location=None)
+    carto_db_table = factory.SubFactory('etools_prp.apps.core.tests.factories.CartoDBTableFactory', location=None)
     latitude = factory.LazyFunction(faker.latitude)
     longitude = factory.LazyFunction(faker.longitude)
     p_code = factory.LazyAttribute(lambda o: "{}{}".format(o.gateway.country.country_short_code, faker.random_number(4)))
@@ -369,7 +370,7 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1) + datetime.timedelta(days=364))
     plan_type = RESPONSE_PLAN_TYPE.hrp
     plan_custom_type_label = ""
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
+    workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')
 
     class Meta:
         model = ResponsePlan
@@ -428,7 +429,7 @@ class ClusterFactory(factory.django.DjangoModelFactory):
 
     type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
     imported_type = factory.LazyAttribute(lambda o: o.type)
-    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory')
+    response_plan = factory.SubFactory('etools_prp.apps.core.tests.factories.ResponsePlanFactory')
 
     class Meta:
         model = Cluster
@@ -464,7 +465,7 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     prioritization = None
     total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     funding_source = factory.LazyFunction(faker.company)
-    partner = factory.SubFactory('core.tests.factories.PartnerFactory', partner_project=None)
+    partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory', partner_project=None)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
@@ -507,7 +508,7 @@ class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
         )
     """
 
-    project = factory.SubFactory('core.tests.factories.PartnerProjectFactory', partner_project_funding=None)
+    project = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerProjectFactory', partner_project_funding=None)
     required_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     internal_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     cerf_funding = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
@@ -521,7 +522,7 @@ class PartnerProjectFundingFactory(factory.django.DjangoModelFactory):
 
 
 class AbstractPartnerActivityFactory(factory.django.DjangoModelFactory):
-    partner = factory.SubFactory('core.tests.factories.PartnerFactory', partner_activity=None)
+    partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory', partner_activity=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -557,7 +558,7 @@ class ClusterActivityPartnerActivityFactory(AbstractPartnerActivityFactory):
     """
 
     title = factory.LazyAttribute(lambda o: "from ClusterActivity {}".format(o.cluster_activity.title))
-    cluster_activity = factory.SubFactory('core.tests.factories.ClusterActivityFactory', partner_activity=None)
+    cluster_activity = factory.SubFactory('etools_prp.apps.core.tests.factories.ClusterActivityFactory', partner_activity=None)
     cluster_objective = None
 
     class Meta:
@@ -576,7 +577,7 @@ class CustomPartnerActivityFactory(AbstractPartnerActivityFactory):
 
     title = factory.LazyAttributeSequence(lambda o, n: "{} -- Custom".format(o.partner.title))
     cluster_activity = None
-    cluster_objective = factory.SubFactory('core.tests.factories.ClusterObjectiveFactory', partner_activity=None)
+    cluster_objective = factory.SubFactory('etools_prp.apps.core.tests.factories.ClusterObjectiveFactory', partner_activity=None)
 
     class Meta:
         model = PartnerActivity
@@ -593,7 +594,7 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
         )
     """
     title = factory.LazyAttributeSequence(lambda o, n: "{} -- Objective {}".format(o.cluster.type, n))
-    cluster = factory.SubFactory('core.tests.factories.ClusterFactory', cluster_objective=None)
+    cluster = factory.SubFactory('etools_prp.apps.core.tests.factories.ClusterFactory', cluster_objective=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -619,7 +620,7 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
         )
     """
     title = factory.LazyAttributeSequence(lambda o, n: "{} -- Activity {}".format(o.cluster_objective.cluster.type, n))
-    cluster_objective = factory.SubFactory('core.tests.factories.ClusterObjectiveFactory', cluster_activity=None)
+    cluster_objective = factory.SubFactory('etools_prp.apps.core.tests.factories.ClusterObjectiveFactory', cluster_activity=None)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -694,7 +695,7 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
     active = True
     name = factory.LazyFunction(faker.word)
-    response_plan = factory.SubFactory('core.tests.factories.ResponsePlanFactory')
+    response_plan = factory.SubFactory('etools_prp.apps.core.tests.factories.ResponsePlanFactory')
 
     class Meta:
         model = Disaggregation
@@ -724,7 +725,7 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 
     active = True
     value = factory.LazyFunction(faker.word)
-    disaggregation = factory.SubFactory('core.tests.factories.DisaggregationFactory', disaggregation_value=None)
+    disaggregation = factory.SubFactory('etools_prp.apps.core.tests.factories.DisaggregationFactory', disaggregation_value=None)
 
     class Meta:
         model = DisaggregationValue
@@ -1033,7 +1034,7 @@ class PersonFactory(factory.django.DjangoModelFactory):
 
 
 class AbstractReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
-    programme_document = factory.SubFactory('core.tests.factories.ProgrammeDocumentFactory', reporting_period_date=None)
+    programme_document = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgrammeDocumentFactory', reporting_period_date=None)
     description = factory.LazyFunction(faker.sentence)
 
     class Meta:
@@ -1097,8 +1098,8 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     reference_number = factory.LazyFunction(lambda: faker.uuid4()[:255])
     title = factory.LazyFunction(faker.sentence)
     unicef_office = factory.LazyFunction(faker.city)
-    workspace = factory.SubFactory('core.tests.factories.WorkspaceFactory')
-    partner = factory.SubFactory('core.tests.factories.PartnerFactory')
+    workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')
+    partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory')
     start_date = beginning_of_this_year
     end_date = datetime.date(today.year, 12, 31)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
@@ -1167,7 +1168,7 @@ class PDResultLinkFactory(factory.django.DjangoModelFactory):
     """
 
     external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
-    programme_document = factory.SubFactory('core.tests.factories.ProgrammeDocumentFactory', cp_outputs=None)
+    programme_document = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgrammeDocumentFactory', cp_outputs=None)
     external_cp_output_id = factory.LazyFunction(lambda: faker.random_number(7, True))
     title = factory.LazyFunction(faker.sentence)
 
@@ -1186,7 +1187,7 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
         )
     """
     title = factory.LazyFunction(faker.sentence)
-    cp_output = factory.SubFactory('core.tests.factories.PDResultLinkFactory', lower_level_output=None)
+    cp_output = factory.SubFactory('etools_prp.apps.core.tests.factories.PDResultLinkFactory', lower_level_output=None)
     active = True
 
     class Meta:
@@ -1205,8 +1206,8 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
         )
     """
 
-    location = factory.SubFactory('core.tests.factories.LocationFactory', location_goal=None)
-    reportable = factory.SubFactory('core.tests.factories.ReportableFactory', location_goal=None)
+    location = factory.SubFactory('etools_prp.apps.core.tests.factories.LocationFactory', location_goal=None)
+    reportable = factory.SubFactory('etools_prp.apps.core.tests.factories.ReportableFactory', location_goal=None)
     target = dict(
         [('d', 1), ('v', random.randint(1000, 10000))])
     baseline = dict(
@@ -1231,8 +1232,8 @@ class PartnerActivityProjectContextFactory(factory.django.DjangoModelFactory):
         )
     """
 
-    project = factory.SubFactory('core.tests.factories.PartnerProjectFactory')
-    activity = factory.SubFactory('core.tests.factories.PartnerActivityFactory')
+    project = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerProjectFactory')
+    activity = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerActivityFactory')
     status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
     start_date = factory.LazyFunction(faker.date)
     end_date = factory.LazyFunction(faker.date)
@@ -1278,9 +1279,9 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     proposed_way_forward = factory.LazyFunction(faker.text)
     review_date = due_date
     submission_date = due_date
-    programme_document = factory.SubFactory('core.tests.factories.ProgrammeDocument', progress_report=None)
-    submitted_by = factory.SubFactory('core.tests.factories.PartnerUserFactory', profile=None)
-    submitting_user = factory.SubFactory('core.tests.factories.PartnerUserFactory', profile=None)
+    programme_document = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgrammeDocument', progress_report=None)
+    submitted_by = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
+    submitting_user = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
     reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
     reviewed_by_name = factory.LazyFunction(faker.name)
     sent_back_feedback = factory.LazyFunction(faker.text)
@@ -1308,7 +1309,7 @@ class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):
             file=fake_file # ContentFile object with name attribute defined. Make sure file and ORM is deleted after usage.
         )
     """
-    progress_report = factory.SubFactory('core.tests.factories.ProgressReportFactory', attachment=None)
+    progress_report = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgressReportFactory', attachment=None)
     type = fuzzy.FuzzyChoice(PR_ATTACHMENT_TYPES_LIST)
     file = fake_file
 
@@ -1333,7 +1334,7 @@ class AbstractIndicatorReportFactory(factory.django.DjangoModelFactory):
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
     report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
     frequency = fuzzy.FuzzyChoice(FREQUENCY_LEVEL_LIST)
-    reportable = factory.SubFactory('core.tests.factories.AbstractReportableFactory', indicator_report=None)
+    reportable = factory.SubFactory('etools_prp.apps.core.tests.factories.AbstractReportableFactory', indicator_report=None)
     remarks = factory.LazyFunction(faker.text)
     narrative_assessment = factory.LazyFunction(faker.sentence)
     sent_back_feedback = factory.LazyFunction(faker.text)
@@ -1382,7 +1383,7 @@ class ProgressReportIndicatorReportFactory(AbstractIndicatorReportFactory):
             progress_report=progress_report1,
         )
     """
-    progress_report = factory.SubFactory('core.tests.factories.ProgressReportFactory', indicator_report=None)
+    progress_report = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgressReportFactory', indicator_report=None)
     reporting_entity = factory.SubFactory(
         ReportingEntityFactory,
         title="UNICEF",
@@ -1410,8 +1411,8 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     disaggregation_reported_on = list()
     is_locked = False
     percentage_allocated = fuzzy.FuzzyDecimal(0, 100)
-    indicator_report = factory.SubFactory('core.tests.factories.IndicatorReportFactory', location_data=None)
-    location = factory.SubFactory('core.tests.factories.LocationFactory', location_data=None)
+    indicator_report = factory.SubFactory('etools_prp.apps.core.tests.factories.IndicatorReportFactory', location_data=None)
+    location = factory.SubFactory('etools_prp.apps.core.tests.factories.LocationFactory', location_data=None)
 
     class Meta:
         model = IndicatorLocationData

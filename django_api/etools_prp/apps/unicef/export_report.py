@@ -3,13 +3,14 @@ import itertools
 from django.conf import settings
 from django.db.models import Count
 
-from core import common
-from indicator.constants import ValueType
-from indicator.models import DisaggregationValue, IndicatorBlueprint
-from indicator.utilities import convert_string_number_to_float
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
+
+from etools_prp.apps.core import common
+from etools_prp.apps.indicator.constants import ValueType
+from etools_prp.apps.indicator.models import DisaggregationValue, IndicatorBlueprint
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float
 
 PATH = settings.BASE_DIR + "/apps/unicef/templates/excel/hr_export.xlsx"
 SAVE_PATH = '/tmp/'

@@ -5,9 +5,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
-from core.common import PRP_ROLE_TYPES, USER_TYPES
 from model_utils.models import TimeStampedModel
-from utils.emails import send_email_from_template
+
+from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_TYPES
+from etools_prp.apps.utils.emails import send_email_from_template
 
 
 class User(AbstractUser):
