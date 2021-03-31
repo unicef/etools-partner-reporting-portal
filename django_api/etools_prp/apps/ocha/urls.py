@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from ocha.views import (
+from etools_prp.apps.ocha.views import (
     RPMProjectDetailAPIView,
     RPMProjectListAPIView,
     RPMWorkspaceResponsePlanAPIView,

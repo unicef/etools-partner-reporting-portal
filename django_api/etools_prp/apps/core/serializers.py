@@ -1,11 +1,12 @@
 from django.db import transaction
 
-from cluster.models import Cluster
-from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
-from utils.serializers import CurrentWorkspaceDefault
+
+from etools_prp.apps.cluster.models import Cluster
+from etools_prp.apps.core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
+from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
 from .models import Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
 
@@ -126,7 +127,7 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
 
     def get_clusters(self, obj):
         # done this way to avoid circular import issue
-        from cluster.serializers import ClusterSimpleSerializer
+        from etools_prp.apps.cluster.serializers import ClusterSimpleSerializer
         return ClusterSimpleSerializer(obj.clusters.all(), many=True).data
 
 

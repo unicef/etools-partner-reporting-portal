@@ -11,23 +11,24 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.urls import reverse
 
-from core.common import (
+from openpyxl import load_workbook
+from rest_framework import status
+from unicef_notification.models import Notification
+
+from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
 )
-from core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
-from core.models import Location
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
-from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
-from openpyxl import load_workbook
-from rest_framework import status
-from unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
-from unicef_notification.models import Notification
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
+from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
 
 
 def convert_xlsx_to_csv(response):

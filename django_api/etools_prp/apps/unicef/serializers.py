@@ -1,14 +1,24 @@
 from django.conf import settings
 
-from account.validators import EmailValidator
-from core.common import CURRENCIES, INTERVENTION_TYPES, OVERALL_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
-from core.models import Location, Workspace
-from core.serializers import ShortLocationSerializer
-from indicator.models import IndicatorBlueprint
-from indicator.serializers import IndicatorBlueprintSimpleSerializer, PDReportContextIndicatorReportSerializer
-from partner.models import Partner
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
+from etools_prp.apps.account.validators import EmailValidator
+from etools_prp.apps.core.common import (
+    CURRENCIES,
+    INTERVENTION_TYPES,
+    OVERALL_STATUS,
+    PD_STATUS,
+    PROGRESS_REPORT_STATUS,
+)
+from etools_prp.apps.core.models import Location, Workspace
+from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.indicator.models import IndicatorBlueprint
+from etools_prp.apps.indicator.serializers import (
+    IndicatorBlueprintSimpleSerializer,
+    PDReportContextIndicatorReportSerializer,
+)
+from etools_prp.apps.partner.models import Partner
 
 from .models import (
     LowerLevelOutput,

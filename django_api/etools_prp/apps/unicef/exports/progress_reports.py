@@ -3,10 +3,14 @@ import logging
 from django.http import HttpResponse
 from django.utils import timezone
 
-from indicator.models import IndicatorBlueprint
-from indicator.utilities import format_total_value_to_string
-from unicef.exports.utilities import group_indicator_reports_by_lower_level_output, HTMLTableCell, HTMLTableHeader
-from unicef.utils import render_pdf_to_response
+from etools_prp.apps.indicator.models import IndicatorBlueprint
+from etools_prp.apps.indicator.utilities import format_total_value_to_string
+from etools_prp.apps.unicef.exports.utilities import (
+    group_indicator_reports_by_lower_level_output,
+    HTMLTableCell,
+    HTMLTableHeader,
+)
+from etools_prp.apps.unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 

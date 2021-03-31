@@ -5,11 +5,11 @@ from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
 
-from account.models import User
-from core.common import CLUSTER_TYPES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
-from core.models import PRPRole, TimeStampedExternalSourceModel
-from indicator.models import IndicatorReport, Reportable
-from partner.models import PartnerActivity
+from etools_prp.apps.account.models import User
+from etools_prp.apps.core.common import CLUSTER_TYPES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.models import PRPRole, TimeStampedExternalSourceModel
+from etools_prp.apps.indicator.models import IndicatorReport, Reportable
+from etools_prp.apps.partner.models import PartnerActivity
 
 
 class Cluster(TimeStampedExternalSourceModel):

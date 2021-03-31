@@ -1,5 +1,9 @@
-from core.permissions import IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck, IsPartnerEditorForCurrentWorkspaceCheck
 from rest_framework.permissions import BasePermission
+
+from etools_prp.apps.core.permissions import (
+    IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
+    IsPartnerEditorForCurrentWorkspaceCheck,
+)
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 

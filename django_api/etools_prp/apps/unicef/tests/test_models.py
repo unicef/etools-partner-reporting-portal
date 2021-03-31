@@ -4,18 +4,19 @@ from unittest.mock import patch
 from django.db.models import Q
 from django.test import TestCase
 
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES
-from core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
-from core.models import Location
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
 from dateutil.relativedelta import relativedelta
-from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import IndicatorBlueprint, IndicatorLocationData
 from rest_framework.exceptions import ValidationError
-from unicef.models import ProgressReport
 from unicef_notification.models import Notification
-from utils.emails import send_due_progress_report_email
+
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PROGRESS_REPORT_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData
+from etools_prp.apps.unicef.models import ProgressReport
+from etools_prp.apps.utils.emails import send_due_progress_report_email
 
 
 class TestProgressReportModel(BaseAPITestCase):

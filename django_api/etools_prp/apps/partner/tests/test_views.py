@@ -3,16 +3,17 @@ import datetime
 from django.conf import settings
 from django.urls import reverse
 
-from cluster.serializers import ClusterSimpleSerializer
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
-from core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
-from core.models import Location
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
-from indicator.disaggregators import QuantityIndicatorDisaggregator
-from indicator.models import IndicatorBlueprint, IndicatorLocationData
-from partner.models import PARTNER_PROJECT_STATUS, PartnerActivity, PartnerProject
 from rest_framework import status
+
+from etools_prp.apps.cluster.serializers import ClusterSimpleSerializer
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData
+from etools_prp.apps.partner.models import PARTNER_PROJECT_STATUS, PartnerActivity, PartnerProject
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)

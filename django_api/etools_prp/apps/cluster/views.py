@@ -6,11 +6,23 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from cluster.export_indicators import IndicatorsXLSXExporter
-from cluster.filters import ClusterActivityFilter, ClusterFilter, ClusterIndicatorsFilter, ClusterObjectiveFilter
-from cluster.import_indicators import IndicatorsXLSXReader
-from cluster.models import Cluster, ClusterActivity, ClusterObjective
-from cluster.serializers import (
+from rest_framework import status as statuses
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.mixins import ListModelMixin
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from etools_prp.apps.cluster.export_indicators import IndicatorsXLSXExporter
+from etools_prp.apps.cluster.filters import (
+    ClusterActivityFilter,
+    ClusterFilter,
+    ClusterIndicatorsFilter,
+    ClusterObjectiveFilter,
+)
+from etools_prp.apps.cluster.import_indicators import IndicatorsXLSXReader
+from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
+from etools_prp.apps.cluster.serializers import (
     ClusterActivityPatchSerializer,
     ClusterActivitySerializer,
     ClusterIDManagementSerializer,
@@ -22,26 +34,20 @@ from cluster.serializers import (
     ResponsePlanClusterDashboardSerializer,
     ResponsePlanPartnerDashboardSerializer,
 )
-from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
-from core.models import Location, ResponsePlan
-from core.paginations import SmallPagination
-from core.permissions import IsAuthenticated
-from core.serializers import ShortLocationSerializer
-from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
-from indicator.serializers import (
+from etools_prp.apps.core.common import PARTNER_TYPE, PRP_ROLE_TYPES
+from etools_prp.apps.core.models import Location, ResponsePlan
+from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.core.permissions import IsAuthenticated
+from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
+from etools_prp.apps.indicator.serializers import (
     ClusterAnalysisIndicatorDetailSerializer,
     ClusterAnalysisIndicatorsListSerializer,
     ClusterIndicatorReportSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
     ReportableIdSerializer,
 )
-from partner.models import Partner, PartnerActivity, PartnerProject
-from rest_framework import status as statuses
-from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
-from rest_framework.mixins import ListModelMixin
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerProject
 
 logger = logging.getLogger(__name__)
 

@@ -8,8 +8,9 @@ from carto.exceptions import CartoException
 from carto.sql import SQLClient
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from core.models import CartoDBTable, Location
 from pyrestcli.auth import BaseAuthClient
+
+from etools_prp.apps.core.models import CartoDBTable, Location
 
 logger = get_task_logger('core.cartodb')
 

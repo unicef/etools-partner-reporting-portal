@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from core.models import ResponsePlan
-from ocha.imports.project import get_project_list_for_plan, import_project
-from ocha.imports.utilities import OCHAImportException
-from partner.models import Partner
+from etools_prp.apps.core.models import ResponsePlan
+from etools_prp.apps.ocha.imports.project import get_project_list_for_plan, import_project
+from etools_prp.apps.ocha.imports.utilities import OCHAImportException
+from etools_prp.apps.partner.models import Partner
 
 
 class Command(BaseCommand):

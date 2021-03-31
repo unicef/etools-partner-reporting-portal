@@ -2,12 +2,13 @@ from django.core import mail
 from django.db.models import Count
 from django.urls import reverse
 
-from account.models import User
-from core.common import PRP_ROLE_TYPES
-from core.tests import factories
-from core.tests.base import BaseAPITestCase
 from drfpasswordless.models import CallbackToken
 from rest_framework import status
+
+from etools_prp.apps.account.models import User
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.tests import factories
+from etools_prp.apps.core.tests.base import BaseAPITestCase
 
 
 class UserProfileAPIViewTestCase(BaseAPITestCase):

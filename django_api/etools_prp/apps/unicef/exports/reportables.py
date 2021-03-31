@@ -4,13 +4,14 @@ from urllib import parse
 from django.utils import timezone
 
 from babel.numbers import format_percent
-from indicator.constants import ValueType
-from indicator.models import Disaggregation, IndicatorBlueprint
-from indicator.utilities import format_total_value_to_string
 from openpyxl.utils import get_column_letter
-from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
-from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
-from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader
+
+from etools_prp.apps.indicator.constants import ValueType
+from etools_prp.apps.indicator.models import Disaggregation, IndicatorBlueprint
+from etools_prp.apps.indicator.utilities import format_total_value_to_string
+from etools_prp.apps.unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
+from etools_prp.apps.unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+from etools_prp.apps.unicef.exports.utilities import HTMLTableCell, HTMLTableHeader
 
 logger = logging.getLogger(__name__)
 

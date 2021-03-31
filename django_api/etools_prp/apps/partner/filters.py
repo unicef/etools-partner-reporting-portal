@@ -3,11 +3,12 @@ from distutils.util import strtobool
 from django.db.models import Q
 
 import django_filters
-from core.common import PARTNER_PROJECT_STATUS
 from django_filters import rest_framework as filters
 from django_filters.filters import CharFilter, ChoiceFilter, DateFilter, TypedChoiceFilter
-from utils.filters.constants import Boolean
-from utils.filters.fields import CommaSeparatedListFilter
+
+from etools_prp.apps.core.common import PARTNER_PROJECT_STATUS
+from etools_prp.apps.utils.filters.constants import Boolean
+from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
 
 from .models import Partner, PartnerActivity, PartnerProject
 

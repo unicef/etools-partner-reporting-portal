@@ -3,15 +3,16 @@ from functools import reduce
 
 from django.db.models import F, Q
 
-from core.common import CLUSTER_TYPE_NAME_DICT, OVERALL_STATUS, PARTNER_PROJECT_STATUS
-from core.models import GatewayType, Location, ResponsePlan
-from indicator.models import IndicatorLocationData, IndicatorReport, Reportable
-from indicator.serializers import ClusterIndicatorReportSerializer
-from partner.models import Partner
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_gis.fields import GeoJsonDict, GeometryField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
+
+from etools_prp.apps.core.common import CLUSTER_TYPE_NAME_DICT, OVERALL_STATUS, PARTNER_PROJECT_STATUS
+from etools_prp.apps.core.models import GatewayType, Location, ResponsePlan
+from etools_prp.apps.indicator.models import IndicatorLocationData, IndicatorReport, Reportable
+from etools_prp.apps.indicator.serializers import ClusterIndicatorReportSerializer
+from etools_prp.apps.partner.models import Partner
 
 from .models import Cluster, ClusterActivity, ClusterObjective
 
@@ -257,7 +258,7 @@ class ResponsePlanPartnerDashboardSerializer(
             partner=self.context.get('partner', None))
 
     def get_my_project_activities(self, obj):
-        from partner.serializers import PartnerActivitySerializer
+        from etools_prp.apps.partner.serializers import PartnerActivitySerializer
 
         return PartnerActivitySerializer(
             obj.partner_activities(

@@ -11,11 +11,12 @@ from django.utils.translation import ugettext as _
 
 import mptt
 import pycountry
-from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
 from model_utils.models import TimeStampedModel
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
-from utils.emails import send_email_from_template
+
+from etools_prp.apps.core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
+from etools_prp.apps.utils.emails import send_email_from_template
 
 from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 
@@ -332,7 +333,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         )
 
     def num_of_partners(self, clusters=None):
-        from partner.models import Partner
+        from etools_prp.apps.partner.models import Partner
 
         if not clusters or clusters == []:
             clusters = self.all_clusters
@@ -408,7 +409,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return count
 
     def num_of_projects(self, clusters=None, partner=None):
-        from partner.models import PartnerProject
+        from etools_prp.apps.partner.models import PartnerProject
 
         if not clusters or clusters == []:
             clusters = self.all_clusters
@@ -425,7 +426,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         given PA could be custom or not and hence eithe CA or CO could be null
         on it.
         """
-        from indicator.models import IndicatorReport, Reportable
+        from etools_prp.apps.indicator.models import IndicatorReport, Reportable
         reportables = Reportable.objects.filter(
             Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__in=clusters) |
             Q(partner_activity_project_contexts__activity__cluster_objective__cluster__in=clusters))

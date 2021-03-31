@@ -1,13 +1,14 @@
 from django.db import transaction
 
-from account.validators import EmailValidator
-from cluster.models import Cluster
-from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
-from core.models import PRPRole
-from id_management.serializers import PRPRoleWithRelationsSerializer
-from partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
+
+from etools_prp.apps.account.validators import EmailValidator
+from etools_prp.apps.cluster.models import Cluster
+from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
+from etools_prp.apps.core.models import PRPRole
+from etools_prp.apps.id_management.serializers import PRPRoleWithRelationsSerializer
+from etools_prp.apps.partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 
 from .models import User
 

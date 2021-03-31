@@ -7,22 +7,28 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
-from cluster.models import Cluster, ClusterActivity, ClusterObjective
-from core.common import FINAL_OVERALL_STATUS, INDICATOR_REPORT_STATUS, OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
-from core.helpers import (
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
+from etools_prp.apps.core.common import (
+    FINAL_OVERALL_STATUS,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    REPORTABLE_FREQUENCY_LEVEL,
+)
+from etools_prp.apps.core.helpers import (
     generate_data_combination_entries,
     get_cast_dictionary_keys_as_string,
     get_cast_dictionary_keys_as_tuple,
     get_sorted_ordered_dict_by_keys,
 )
-from core.models import Location
-from core.serializers import IdLocationSerializer, LocationSerializer
-from core.validators import add_indicator_object_type_validator
-from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
-from partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from unicef.models import LowerLevelOutput, ProgressReport
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.serializers import IdLocationSerializer, LocationSerializer
+from etools_prp.apps.core.validators import add_indicator_object_type_validator
+from etools_prp.apps.ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
+from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from etools_prp.apps.unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
 from .models import (
@@ -2168,19 +2174,19 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
 
     def get_content_object(self, obj):
         if isinstance(obj.content_object, (PartnerProject, )):
-            from partner.serializers import PartnerProjectSimpleSerializer
+            from etools_prp.apps.partner.serializers import PartnerProjectSimpleSerializer
             return PartnerProjectSimpleSerializer(obj.content_object).data
 
         elif isinstance(obj.content_object, (PartnerActivityProjectContext, )):
-            from partner.serializers import PartnerActivityProjectContextSerializer
+            from etools_prp.apps.partner.serializers import PartnerActivityProjectContextSerializer
             return PartnerActivityProjectContextSerializer(obj.content_object).data
 
         elif isinstance(obj.content_object, (ClusterObjective, )):
-            from cluster.serializers import ClusterObjectiveSerializer
+            from etools_prp.apps.cluster.serializers import ClusterObjectiveSerializer
             return ClusterObjectiveSerializer(obj.content_object).data
 
         elif isinstance(obj.content_object, (ClusterActivity, )):
-            from cluster.serializers import ClusterActivitySerializer
+            from etools_prp.apps.cluster.serializers import ClusterActivitySerializer
             return ClusterActivitySerializer(obj.content_object).data
 
     class Meta:
@@ -2518,8 +2524,8 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
     reportable = serializers.IntegerField()
 
     def to_internal_value(self, data):
-        from cluster.models import Cluster
-        from partner.models import PartnerActivityProjectContext
+        from etools_prp.apps.cluster.models import Cluster
+        from etools_prp.apps.partner.models import PartnerActivityProjectContext
 
         cluster = get_object_or_404(
             Cluster,
