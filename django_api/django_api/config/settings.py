@@ -86,8 +86,6 @@ if ADMIN_MAIL:
         ('Admin', ADMIN_MAIL),
     ]
 
-ALLOWED_HOSTS = []
-
 CACHES = {
     "default": {
         'BACKEND': 'redis_cache.RedisCache',
