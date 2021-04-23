@@ -239,7 +239,7 @@ JWT_AUTH = {
 
    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
-DISABLE_JWT_AUTH = env.bool('DISABLE_JWT_AUTH', default=True)
+DISABLE_JWT_AUTH = env.bool('DISABLE_JWT_AUTH', default=False)
 # This user will be used for all externals that have a valid JWT but no user account in the system
 DEFAULT_UNICEF_USER = 'default_unicef_user'
 # Allows login for users that do not have a User account in the system, without creating a user account by using default
