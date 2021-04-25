@@ -13,7 +13,8 @@
 
 # Python compiled
 *.pyc
-*.pem
+# *.pem
+# !django_api/django_api/keys/jwt/certificate.pem
 .coverage
 htmlcov
 .pytest_cache
