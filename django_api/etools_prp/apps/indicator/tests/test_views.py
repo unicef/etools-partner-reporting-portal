@@ -296,7 +296,7 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 
         super().setUp()
 
-    @patch("django_api.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
     def test_submit_indicator(self, mock_create, mock_clean, mock_send):

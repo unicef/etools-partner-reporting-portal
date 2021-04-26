@@ -5,7 +5,6 @@ from django.db import transaction
 
 from celery import shared_task
 from core.api import PMP_API
-from django_api.config.celery import app as celery_app, cache_lock
 from core.common import PD_FREQUENCY_LEVEL, PD_STATUS
 from core.helpers import (
     calculate_end_date_given_start_date,
@@ -19,6 +18,8 @@ from core.models import Country
 from core.serializers import PMPWorkspaceSerializer
 from indicator.models import Reportable
 from unicef.models import ProgrammeDocument
+
+from etools_prp.config.celery import app as celery_app, cache_lock
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15
