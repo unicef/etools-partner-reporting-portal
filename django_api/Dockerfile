@@ -5,6 +5,7 @@ ARG env
 ENV ENV ${env:-dev}
 
 ADD . /code/
+COPY etools_prp/keys/jwt/certificate.pem /code/etools_prp/keys/jwt/certificate.pem
 
 WORKDIR /code/
 RUN apk add bash
