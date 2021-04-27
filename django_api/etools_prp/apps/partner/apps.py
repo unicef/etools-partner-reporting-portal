@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class PartnerConfig(AppConfig):
-    name = 'partner'
+    name = 'etools_prp.apps.partner'

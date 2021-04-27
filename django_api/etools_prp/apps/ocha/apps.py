@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class OchaConfig(AppConfig):
-    name = 'ocha'
+    name = 'etools_prp.apps.ocha'

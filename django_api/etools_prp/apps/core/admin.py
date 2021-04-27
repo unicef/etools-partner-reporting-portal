@@ -3,13 +3,12 @@ from django.contrib.gis import admin
 from leaflet.admin import LeafletGeoAdmin
 
 from .cartodb import update_sites_from_cartodb
-from .forms import AutoSizeTextForm, CartoDBTableForm, GatewayTypeModelForm
+from .forms import CartoDBTableForm, GatewayTypeModelForm
 from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     save_as = True
-    form = AutoSizeTextForm
     fields = [
         'title',
         'gateway',

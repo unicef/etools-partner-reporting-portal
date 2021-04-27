@@ -98,7 +98,6 @@ INSTALLED_APPS = [
     'django_celery_results',
     'djcelery_email',
     'leaflet',
-    'suit',
     'django_cron',
     'social_django',
 
@@ -239,8 +238,7 @@ DEFAULT_UNICEF_USER = 'default_unicef_user'
 # Allows login for users that do not have a User account in the system, without creating a user account by using default
 JWT_ALLOW_NON_EXISTENT_USERS = True
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
+# DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 LANGUAGE_CODE = 'en-us'
 

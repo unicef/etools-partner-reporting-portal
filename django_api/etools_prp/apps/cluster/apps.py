@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ClusterConfig(AppConfig):
-    name = 'cluster'
+    name = 'etools_prp.apps.cluster'
