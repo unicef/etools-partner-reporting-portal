@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -8,7 +6,6 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 
@@ -534,10 +531,9 @@ class GatewayType(TimeStampedModel):
 class LocationManager(TreeManager):
 
     def get_queryset(self):
-        return super(LocationManager, self).get_queryset().order_by('title').select_related('gateway')
+        return super().get_queryset().order_by('title').select_related('gateway')
 
 
-@python_2_unicode_compatible
 class Location(MPTTModel):
     """
     Location model define place where agents are working.

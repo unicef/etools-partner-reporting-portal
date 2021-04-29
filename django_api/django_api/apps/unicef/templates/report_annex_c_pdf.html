@@ -40,11 +40,11 @@
                 <th rowspan="3">1.4 Budget information</th>
 
                 <th>Programme budget</th>
-                <td colspan="2">{{ pd.cso_contribution|format_currency:pd.cso_contribution_currency }}</td>
+                <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
             </tr>
             <tr>
                 <th>UNICEF contribution</th>
-                <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
+                <td colspan="2">{{ pd.total_unicef_cash|format_currency:pd.total_unicef_cash_currency }}</td>
             </tr>
             <tr>
                 <th>Funds received to date</th>

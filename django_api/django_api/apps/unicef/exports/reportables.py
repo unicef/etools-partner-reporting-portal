@@ -50,7 +50,7 @@ class ReportableListXLSXExporter(ProgressReportsMixin, ProgressReportsXLSXExport
 
     def __init__(self, reportables, **kwargs):
         self.reportables = reportables
-        super(ReportableListXLSXExporter, self).__init__([], **kwargs)
+        super().__init__([], **kwargs)
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] Indicators Export.xlsx'.format(
             timezone.now()
         )

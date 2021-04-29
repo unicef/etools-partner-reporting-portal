@@ -148,7 +148,7 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
-        validated_data = super(CreateResponsePlanSerializer, self).validate(attrs)
+        validated_data = super().validate(attrs)
 
         if 'start' not in validated_data:
             raise serializers.ValidationError({

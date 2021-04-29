@@ -5,7 +5,7 @@ from django.db import transaction
 
 from celery import shared_task
 from core.api import PMP_API
-from core.celery import app as celery_app, cache_lock
+from django_api.config.celery import app as celery_app, cache_lock
 from core.common import PD_FREQUENCY_LEVEL, PD_STATUS
 from core.helpers import (
     calculate_end_date_given_start_date,

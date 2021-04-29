@@ -40,11 +40,11 @@ class PageAnalysisOperationalPresence extends LocalizeMixin(UtilsMixin(ReduxConn
           --app-grid-gutter: 25px;
           --app-grid-item-height: auto;
           --app-grid-expandible-item-columns: 2;
+        }
 
-          --ecp-content: {
-            padding: 0;
-            background: #fff;
-          }
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
+          background: #fff;
         }
 
         .full-width {

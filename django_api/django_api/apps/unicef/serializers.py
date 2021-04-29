@@ -336,7 +336,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
         self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
-        super(ProgressReportSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = ProgressReport
@@ -706,7 +706,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
 
     def validate(self, attrs):
-        validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
+        validated_data = super().validate(attrs)
 
         validated_data['budget'] = sum([
             validated_data['cso_contribution'],
@@ -883,7 +883,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
         return obj.file.size if obj.file else None
 
     def to_representation(self, instance):
-        representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
+        representation = super().to_representation(instance)
 
         if instance.file and "http" not in instance.file.url:
             representation['path'] = settings.WWW_ROOT[:-1] + instance.file.url

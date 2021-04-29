@@ -22,11 +22,11 @@ class ReportsList extends ReduxConnectedElement {
       <style>
         :host {
           display: block;
+        }
 
-          --ecp-content: {
-            min-height: 110px;
-            padding: 1px 0 0;
-          }
+        etools-content-panel::part(ecp-content) {
+          min-height: 110px;
+          padding: 1px 0 0;
         }
 
         cluster-report:not(:last-of-type) {

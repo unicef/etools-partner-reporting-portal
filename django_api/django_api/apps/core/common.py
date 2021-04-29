@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from model_utils import Choices
 
 REPORTABLE_LLO_CONTENT_OBJECT = 'llo'

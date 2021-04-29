@@ -1,4 +1,4 @@
-class CurrentWorkspaceDefault(object):
+class CurrentWorkspaceDefault:
 
     workspace = None
 
