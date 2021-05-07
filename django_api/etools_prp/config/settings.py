@@ -12,17 +12,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='123')
+SECRET_KEY = env('SECRET_KEY', default='prp-123')
 REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
-IS_TEST = env.bool('IS_TEST', default=False)
-IS_DEV = env.bool('IS_DEV', default=False)
-IS_STAGING = env.bool('IS_STAGING', default=False)
-IS_PROD = env.bool('IS_PROD', default=False)
-
 
 # Get the ENV setting.
 ENV = env.bool('ENV', default='dev')
@@ -39,7 +34,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-DOMAIN_NAME = os.getenv('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
+DOMAIN_NAME = env('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = (
     env('ALLOWED_HOST', default='localhost'),
@@ -174,8 +169,6 @@ WSGI_APPLICATION = 'etools_prp.config.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -185,6 +178,7 @@ DATABASES = {
         'HOST': env('POSTGRES_HOST', default='localhost'),
         'PORT': 5432,
     }
+    # 'default': env.db('DATABASE_URL', default='postgis://postgres:pass@localhost:5432/unicef_prp')
 }
 
 # Password validation
@@ -340,9 +334,9 @@ LOGGING = {
 # Celery
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'application/text']
 CELERY_BROKER_URL = REDIS_URL
-CELERY_BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
+CELERY_BROKER_VISIBILITY_VAR = env.int('CELERY_VISIBILITY_TIMEOUT', default=1800)
 CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'visibility_timeout': int(CELERY_BROKER_VISIBILITY_VAR)}  # 5 hours
+    'visibility_timeout': CELERY_BROKER_VISIBILITY_VAR}  # 5 hours
 
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
@@ -351,8 +345,8 @@ CELERY_EMAIL_BACKEND = env('CELERY_EMAIL_BACKEND', default='django.core.mail.bac
 # 'django.core.mail.backends.console.EmailBackend'
 
 # Sensible settings for celery
-CELERY_TASK_ALWAYS_EAGER = bool(os.environ.get('CELERY_TASK_ALWAYS_EAGER', False))
-CELERY_ALWAYS_EAGER = bool(os.environ.get('CELERY_ALWAYS_EAGER', False))
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', default=False)
+CELERY_ALWAYS_EAGER = env.bool('CELERY_ALWAYS_EAGER', default=False)
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_PUBLISH_RETRY = True
 CELERY_WORKER_DISABLE_RATE_LIMITS = False
@@ -473,20 +467,20 @@ OCHA_API_PASSWORD = env('OCHA_API_PASSWORD', default='')
 
 # assuming we're using Azure Storage:
 # django-storages: https://django-storages.readthedocs.io/en/latest/backends/azure.html
-AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME', None)
-AZURE_ACCOUNT_KEY = os.environ.get('AZURE_ACCOUNT_KEY', None)
-AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)
+AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME', default=None)
+AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY', default=None)
+AZURE_CONTAINER = env('AZURE_CONTAINER', default=None)
 
 # Optionally can use S3
-AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', None)
-AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', None)
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', None)
+AWS_S3_ACCESS_KEY_ID = env('AWS_S3_ACCESS_KEY_ID', default=None)
+AWS_S3_SECRET_ACCESS_KEY = env('AWS_S3_SECRET_ACCESS_KEY', default=None)
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default=None)
 
 if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_SIGNATURE_VERSION = 's3v4'
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='eu-central-1')
 
 elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
     DEFAULT_FILE_STORAGE = 'etools_prp.apps.core.mixins.EToolsAzureStorage'

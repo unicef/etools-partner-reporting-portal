@@ -116,7 +116,7 @@ def generate_reports():
 
 
 def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
-    if not settings.IS_TEST and workspace_quantity < 1:
+    if workspace_quantity < 1:
         workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
