@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from fabric.api import local
 
 
@@ -133,7 +132,7 @@ def tests(test_path=''):
     """
     Run django_api tests.
     """
-    local('docker-compose exec django_api python manage.py test {} --settings=django_api.settings.test --parallel --noinput'.format(test_path))
+    local('docker-compose exec django_api python manage.py test {} --settings=etools_prp.settings.test --parallel --noinput'.format(test_path))
 
 
 def update_real_fixtures(area=False):
