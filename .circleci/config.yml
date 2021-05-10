@@ -104,8 +104,8 @@ jobs:
             BASE_TAG="$(md5sum django_api/Pipfile.lock | cut -c1-6)$(md5sum django_api/Dockerfile-installed | cut -c1-6)"
             TAG=${CIRCLE_BRANCH}
             (docker pull unicef/etools-prp:$BASE_TAG) ||
-            (docker build -t unicef/etools-prp:$BASE_TAG -f django_api/Dockerfile-installed django_api/ && docker push unicef/etools-prp:$BASE_TAG)
-            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/etools-prp:$TAG django_api/
+            (docker build -t unicef/etools-prp:$BASE_TAG -f django_api/Dockerfile-installed etools_prp/ && docker push unicef/etools-prp:$BASE_TAG)
+            docker build --build-arg BASE_TAG=$BASE_TAG -t unicef/etools-prp:$TAG etools_prp/
       - run:
           name: Pushing to Docker Hub
           command: |
