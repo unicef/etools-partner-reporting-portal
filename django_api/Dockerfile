@@ -3,7 +3,6 @@ FROM unicef/etools-prp:$BASE_TAG
 
 ARG env
 ENV ENV ${env:-dev}
-ENV DOCKER_CERT_PATH /root/code/django_api/etools_prp/keys/jwt/
 
 ADD . /code/
 
