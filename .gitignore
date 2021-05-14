@@ -26,6 +26,7 @@ node_modules/
 data/
 
 polymer_3/index_dev.html
+polymer_cluster/index_dev.html
 
 # k8s secrets
 kubernetes/base/secrets.yml
