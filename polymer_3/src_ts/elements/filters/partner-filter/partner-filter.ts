@@ -1,14 +1,14 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../mixins/localize-mixin';
+import '../../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
+import Endpoints from '../../../etools-prp-common/endpoints';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

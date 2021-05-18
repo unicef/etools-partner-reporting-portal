@@ -1,9 +1,9 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icon/iron-icon';
-import UtilsMixin from '../mixins/utils-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import './error-box-errors';
 
 /**

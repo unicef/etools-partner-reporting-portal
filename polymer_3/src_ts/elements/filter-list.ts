@@ -6,9 +6,9 @@ import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/polymer/lib/elements/dom-if';
-import LocalizeMixin from '../mixins/localize-mixin';
-import {GenericObject} from '../typings/globals.types';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 
 /**
  * @polymer

@@ -1,4 +1,4 @@
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 import {createSelector} from 'reselect';
 
 // App.Selectors.ClusterIndicatorReports

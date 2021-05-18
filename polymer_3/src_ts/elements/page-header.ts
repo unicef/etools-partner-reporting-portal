@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
@@ -7,7 +7,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 
-import LocalizeMixin from '../mixins/localize-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
 import {sharedStyles} from '../styles/shared-styles';
 

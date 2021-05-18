@@ -1,5 +1,5 @@
 import {PolymerElement} from '@polymer/polymer';
-import Constants from '../constants';
+import Constants from '../etools-prp-common/constants';
 import {property} from '@polymer/decorators/lib/decorators';
 
 /**

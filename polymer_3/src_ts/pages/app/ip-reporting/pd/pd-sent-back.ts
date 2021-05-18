@@ -1,15 +1,15 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-card/paper-card';
 import '@polymer/paper-styles/typography';
 import '@polymer/paper-button/paper-button';
 import './pd-report-sr/reporting';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import {GenericObject} from '../../../../typings/globals.types';
-import {RootState} from '../../../../typings/redux.types';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
+import {RootState} from '../../../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

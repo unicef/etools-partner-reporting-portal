@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/iron-icons/iron-icons';
@@ -6,7 +6,7 @@ import '@polymer/iron-icons/image-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import '@polymer/paper-styles/typography';
 import RoutingMixin from '../mixins/routing-mixin';
 import '@polymer/polymer/lib/elements/dom-repeat';

@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-button/paper-button';
 import './calculation-methods-demo-modal';
 import {CalculationMethodsDemoModalEl} from './calculation-methods-demo-modal';
-import LocalizeMixin from '../mixins/localize-mixin';
-import {buttonsStyles} from '../styles/buttons-styles';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
 import {tableStyles} from '../styles/table-styles';
 
 /**

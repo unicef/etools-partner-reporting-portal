@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog';
@@ -11,17 +11,17 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-if';
-import {GenericObject} from '../typings/globals.types';
-import UtilsMixin from '../mixins/utils-mixin';
-import ModalMixin from '../mixins/modal-mixin';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import ModalMixin from '../etools-prp-common/mixins/modal-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import './error-modal';
-import './etools-prp-number';
-import './etools-prp-ajax';
-import {buttonsStyles} from '../styles/buttons-styles';
-import {modalStyles} from '../styles/modal-styles';
-import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
+import '../etools-prp-common/elements/etools-prp-number';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../etools-prp-common/styles/modal-styles';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 
 /**
  * @polymer
@@ -77,9 +77,7 @@ class RefreshReportModal extends LocalizeMixin(RoutingMixin(UtilsMixin(ModalMixi
           <paper-button class="btn-primary" on-tap="_refresh" raised disabled="[[busy]]">
             [[localize('refresh')]]
           </paper-button>
-          <paper-button class="btn-primary" on-tap="_cancel" disabled="[[busy]]">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-primary" on-tap="_cancel" disabled="[[busy]]"> [[localize('cancel')]] </paper-button>
         </div>
       </paper-dialog>
       <error-modal id="error"></error-modal>

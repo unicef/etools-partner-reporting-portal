@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../../../../mixins/data-table-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import PaginationMixin from '../../../../../mixins/pagination-mixin';
@@ -13,11 +13,11 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import '../../../../etools-prp-ajax';
-import '../../../../page-body';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/page-body';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -94,9 +94,7 @@ class ClustersObjectivesList extends LocalizeMixin(
               <div class="table-cell table-cell--text" flex-3>
                 <a href="[[_detailUrl(objective.id, anchorQuery)]]">[[objective.title]]</a>
               </div>
-              <div class="table-cell table-cell--text">
-                [[objective.cluster_title]]
-              </div>
+              <div class="table-cell table-cell--text">[[objective.cluster_title]]</div>
             </div>
           </etools-data-table-row>
         </template>

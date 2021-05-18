@@ -10,15 +10,15 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-textarea';
 import '@polymer/paper-styles/typography';
 import '@unicef-polymer/etools-loading/etools-loading';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
-import ModalMixin from '../../mixins/modal-mixin';
-import '../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import {GenericObject} from '../../typings/globals.types';
-import {fireEvent} from '../../utils/fire-custom-event';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -100,13 +100,9 @@ class SendBackModal extends ModalMixin(UtilsMixin(PolymerElement)) {
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_sendBack" class="btn-primary" raised>
-            Send back
-          </paper-button>
+          <paper-button on-tap="_sendBack" class="btn-primary" raised> Send back </paper-button>
 
-          <paper-button on-tap="close">
-            Cancel
-          </paper-button>
+          <paper-button on-tap="close"> Cancel </paper-button>
         </div>
 
         <etools-loading active="[[pending]]"></etools-loading>

@@ -11,16 +11,16 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@unicef-polymer/etools-file/etools-file';
-import UtilsMixin from '../mixins/utils-mixin';
-import ModalMixin from '../mixins/modal-mixin';
-import NotificationsMixin from '../mixins/notifications-mixin';
-import './etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from './etools-prp-ajax';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import ModalMixin from '../etools-prp-common/mixins/modal-mixin';
+import NotificationsMixin from '../etools-prp-common/mixins/notifications-mixin';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import './error-box';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {buttonsStyles} from '../styles/buttons-styles';
-import {modalStyles} from '../styles/modal-styles';
-import {fireEvent} from '../utils/fire-custom-event';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../etools-prp-common/styles/modal-styles';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 
 /**
@@ -78,13 +78,9 @@ class UploadButton extends ModalMixin(UtilsMixin(NotificationsMixin(ReduxConnect
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_save" class="btn-primary" raised>
-            Save
-          </paper-button>
+          <paper-button on-tap="_save" class="btn-primary" raised> Save </paper-button>
 
-          <paper-button on-tap="close">
-            Cancel
-          </paper-button>
+          <paper-button on-tap="close"> Cancel </paper-button>
         </div>
 
         <etools-loading active="[[pending]]"></etools-loading>

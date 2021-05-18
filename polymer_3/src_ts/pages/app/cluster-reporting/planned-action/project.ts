@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -7,20 +7,20 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/paper-tabs/paper-tab';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../../../mixins/routing-mixin';
-import Endpoints from '../../../../endpoints';
+import Endpoints from '../../../../etools-prp-common/endpoints';
 import '../../../../elements/cluster-reporting/planned-action/projects/overview';
 import '../../../../elements/cluster-reporting/planned-action/projects/indicators';
 import '../../../../elements/cluster-reporting/planned-action/projects/activities';
-import '../../../../elements/etools-prp-ajax';
+import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../elements/page-header';
-import '../../../../elements/project-status';
+import '../../../../etools-prp-common/elements/project-status';
 import '../../../../elements/page-badge';
 import {sharedStyles} from '../../../../styles/shared-styles';
-import {GenericObject} from '../../../../typings/globals.types';
-import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 
 /**
  * @polymer

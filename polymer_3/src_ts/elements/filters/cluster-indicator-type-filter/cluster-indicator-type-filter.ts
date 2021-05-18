@@ -1,10 +1,10 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import UtilsMixin from '../../../mixins/utils-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
-import {GenericObject} from '../../../typings/globals.types';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

@@ -1,23 +1,23 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import UtilsMixin from '../../../mixins/utils-mixin';
-import '../../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-ajax';
-import '../../etools-prp-number';
+import Endpoints from '../../../etools-prp-common/endpoints';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import '../../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../etools-prp-common/elements/etools-prp-number';
 import '../../frequency-of-reporting';
 import './partners-by-status';
 import './progress-over-time';
 import './current-progress-by-location';
 import './current-progress-by-partner';
 import './current-progress-by-project';
-import {GenericObject} from '../../../typings/globals.types';
-import {analysis_indicators_fetchSingle} from '../../../redux/actions/analysis';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {analysis_indicators_fetchSingle} from '../../../etools-prp-common/redux/actions/analysis';
 
 /**
  * @polymer

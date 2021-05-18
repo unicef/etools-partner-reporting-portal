@@ -1,5 +1,5 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor} from '../typings/globals.types';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
 import {property} from '@polymer/decorators';
 
 /**

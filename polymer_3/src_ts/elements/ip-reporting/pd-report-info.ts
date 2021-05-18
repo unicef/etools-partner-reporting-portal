@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
@@ -7,23 +7,23 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../labelled-item';
-import '../etools-prp-permissions';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../elements/filter-list';
-import '../../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 
-import {GenericObject} from '../../typings/globals.types';
-import UtilsMixin from '../../mixins/utils-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
 import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdReportsUpdate} from '../../redux/actions/pdReports';
-import {RootState} from '../../typings/redux.types';
+import {pdReportsUpdate} from '../../etools-prp-common/redux/actions/pdReports';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

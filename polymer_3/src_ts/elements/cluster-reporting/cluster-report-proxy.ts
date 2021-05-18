@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import './cluster-report';
 
 /**

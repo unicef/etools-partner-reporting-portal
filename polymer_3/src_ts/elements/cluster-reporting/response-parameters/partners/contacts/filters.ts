@@ -3,11 +3,11 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
 import '../../../../filter-list';
 import '../../../../filters/cluster-partner-filter/cluster-partner-filter';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

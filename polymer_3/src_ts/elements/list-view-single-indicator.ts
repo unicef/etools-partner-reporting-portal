@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -13,15 +13,15 @@ import './ip-reporting/ip-reporting-indicator-details';
 import './etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
-import './etools-prp-number';
+import '../etools-prp-common/elements/etools-prp-number';
 
-import LocalizeMixin from '../mixins/localize-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import RoutingMixin from '../mixins/routing-mixin';
-import './etools-prp-permissions';
-import './status-badge';
+import '../etools-prp-common/elements/etools-prp-permissions';
+import '../etools-prp-common/elements/status-badge';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
 import {sharedStyles} from '../styles/shared-styles';
 import './cluster-reporting/indicator-editing-modal';
@@ -131,9 +131,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
             if="[[_equals(indicator.content_type_key, 'partner.partneractivityprojectcontext')]]"
             restamp="[[true]]"
           >
-            <span class="table-cell table-cell--text self-center">
-              [[indicator.content_object_title]]
-            </span>
+            <span class="table-cell table-cell--text self-center"> [[indicator.content_object_title]] </span>
           </template>
           <span class="table-cell table-cell--text self-center">
             [[indicator.blueprint.calculation_formula_across_locations]]

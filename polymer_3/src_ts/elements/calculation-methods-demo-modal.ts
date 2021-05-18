@@ -7,14 +7,14 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/paper-styles/typography';
-import {GenericObject} from '../typings/globals.types';
-import ModalMixin from '../mixins/modal-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import ModalMixin from '../etools-prp-common/mixins/modal-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import './calculation-methods-demo-locations';
 import './calculation-methods-demo-periods';
-import './etools-prp-number';
-import {buttonsStyles} from '../styles/buttons-styles';
-import {modalStyles} from '../styles/modal-styles';
+import '../etools-prp-common/elements/etools-prp-number';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../etools-prp-common/styles/modal-styles';
 
 /**
  * @polymer

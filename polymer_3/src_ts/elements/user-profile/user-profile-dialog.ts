@@ -1,9 +1,9 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import UtilsMixin from '../../mixins/utils-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '@polymer/paper-input/paper-input.js';
@@ -14,7 +14,7 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../labelled-item';
-import {modalStyles} from '../../styles/modal-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 
 /**
  * @polymer
@@ -131,9 +131,7 @@ class UserProfileDialog extends RoutingMixin(UtilsMixin(ReduxConnectedElement)) 
             <div class="full-width">
               <div class="caption">My roles</div>
               <template is="dom-repeat" items="[[prpRoles]]" as="role">
-                <div>
-                  [[ role ]]
-                </div>
+                <div>[[ role ]]</div>
               </template>
               <hr />
             </div>

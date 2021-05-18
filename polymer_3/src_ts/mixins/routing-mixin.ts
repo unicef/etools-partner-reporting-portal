@@ -1,6 +1,6 @@
 import {property} from '@polymer/decorators';
-import {Constructor} from '../typings/globals.types';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {BASE_PATH} from '../config';
 
 /**

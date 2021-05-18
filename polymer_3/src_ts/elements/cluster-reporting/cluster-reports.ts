@@ -1,19 +1,19 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import './cluster-report-toolbar';
 import './cluster-report-list';
-import '../etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-ajax';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {
   clusterIndicatorReportsFetch,
   clusterIndicatorReportsFetchSingle
-} from '../../redux/actions/clusterIndicatorReports';
+} from '../../etools-prp-common/redux/actions/clusterIndicatorReports';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

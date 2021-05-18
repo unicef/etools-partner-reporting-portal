@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import './indicator-bucket';

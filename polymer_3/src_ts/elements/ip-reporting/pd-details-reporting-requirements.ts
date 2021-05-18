@@ -1,11 +1,11 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import '../list-placeholder';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import '../../etools-prp-common/elements/list-placeholder';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../styles/table-styles';
 import {getReportName} from './js/pd-details-reporting-requirements-functions';
 
@@ -43,29 +43,17 @@ class PdDetailsReportingRequirements extends LocalizeMixin(UtilsMixin(ReduxConne
         <h3>[[title]]</h3>
 
         <etools-data-table-header no-collapse no-title>
-          <etools-data-table-column field="">
-            [[localize('report_number')]]
-          </etools-data-table-column>
-          <etools-data-table-column field="">
-            [[localize('due_date')]]
-          </etools-data-table-column>
-          <etools-data-table-column field="">
-            [[localize('reporting_period')]]
-          </etools-data-table-column>
+          <etools-data-table-column field=""> [[localize('report_number')]] </etools-data-table-column>
+          <etools-data-table-column field=""> [[localize('due_date')]] </etools-data-table-column>
+          <etools-data-table-column field=""> [[localize('reporting_period')]] </etools-data-table-column>
         </etools-data-table-header>
 
         <template is="dom-repeat" items="[[data]]">
           <etools-data-table-row no-collapse>
             <div slot="row-data">
-              <div class="table-cell">
-                [[_getReportName(item.report_type, index, localize)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[item.due_date]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[item.start_date]] - [[item.end_date]]
-              </div>
+              <div class="table-cell">[[_getReportName(item.report_type, index, localize)]]</div>
+              <div class="table-cell table-cell--text">[[item.due_date]]</div>
+              <div class="table-cell table-cell--text">[[item.start_date]] - [[item.end_date]]</div>
             </div>
           </etools-data-table-row>
         </template>

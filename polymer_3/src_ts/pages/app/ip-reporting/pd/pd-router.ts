@@ -4,7 +4,7 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import './pd-details';
 import './pd-report';
-import UtilsMixin from '../../../../mixins/utils-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import {getDomainByEnv} from '../../../../config';
 
 /**

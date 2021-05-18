@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-radio-button/paper-radio-button.js';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
-import LocalizeMixin from '../mixins/localize-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 
 /**
  * @polymer

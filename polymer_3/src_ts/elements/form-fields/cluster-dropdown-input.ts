@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import './dropdown-form-input';
 import {DropdownFormInputEl} from './dropdown-form-input';
-import '../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import Endpoints from '../../endpoints';
-import {GenericObject} from '../../typings/globals.types';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import Endpoints from '../../etools-prp-common/endpoints';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

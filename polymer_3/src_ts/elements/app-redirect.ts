@@ -1,7 +1,7 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import RoutingMixin from '../mixins/routing-mixin';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

@@ -1,5 +1,5 @@
 import {createSelector} from 'reselect';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 // App.Selectors.ProgrammeDocumentReports
 export const programmeDocumentReportsAll = createSelector(

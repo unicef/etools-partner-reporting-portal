@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-icon/iron-icon';
@@ -6,13 +6,13 @@ import '@polymer/iron-icons/communication-icons';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePartnerType} from './js/partner-details-functions';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

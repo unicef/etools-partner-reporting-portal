@@ -1,18 +1,18 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../../../../mixins/data-table-mixin';
 import PaginationMixin from '../../../../../mixins/pagination-mixin';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../etools-prp-ajax';
-import '../../../../page-body';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/page-body';
 import {tableStyles} from '../../../../../styles/table-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -83,12 +83,8 @@ class DisaggregationList extends LocalizeMixin(UtilsMixin(DataTableMixin(Paginat
         >
           <etools-data-table-row no-collapse>
             <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                [[disaggregation.name]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_formatChoices(disaggregation)]]
-              </div>
+              <div class="table-cell table-cell--text">[[disaggregation.name]]</div>
+              <div class="table-cell table-cell--text">[[_formatChoices(disaggregation)]]</div>
             </div>
           </etools-data-table-row>
         </template>

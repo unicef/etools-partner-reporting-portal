@@ -3,11 +3,11 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/polymer/lib/elements/dom-repeat';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import '@polymer/paper-styles/typography';
-import './etools-prp-number';
-import {buttonsStyles} from '../styles/buttons-styles';
-import {modalStyles} from '../styles/modal-styles';
+import '../etools-prp-common/elements/etools-prp-number';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../etools-prp-common/styles/modal-styles';
 
 /**
  * @polymer

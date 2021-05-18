@@ -3,7 +3,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import UtilsMixin from '../../mixins/utils-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../filter-list';
 import '../filters/cluster-indicator-filter/cluster-indicator-filter';
@@ -13,7 +13,7 @@ import '../filters/indicator-location-filter/indicator-location-filter';
 import '../filters/cluster-filter/cluster-filter';
 import '../filters/cluster-indicator-type-filter/cluster-indicator-type-filter';
 import '../filters/cluster-indicator-filter/cluster-indicator-filter';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

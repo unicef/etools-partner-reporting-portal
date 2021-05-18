@@ -1,15 +1,15 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import './analysis-widget';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import UtilsMixin from '../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import {tableStyles} from '../../../styles/table-styles';
-import '../../list-placeholder';
-import '../../etools-prp-number';
-import {GenericObject} from '../../../typings/globals.types';
+import '../../../etools-prp-common/elements/list-placeholder';
+import '../../../etools-prp-common/elements/etools-prp-number';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -65,9 +65,7 @@ class OperationalPresenceTable extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
           <template is="dom-repeat" items="[[data.features]]" as="feature">
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell table-cell--text">
-                  [[feature.properties.title]]
-                </div>
+                <div class="table-cell table-cell--text">[[feature.properties.title]]</div>
 
                 <template is="dom-repeat" items="[[columnNames]]" as="column">
                   <div class="table-cell">

@@ -6,8 +6,8 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import ChipMixin from '../../mixins/chip-mixin';
 import Settings from '../../settings';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {fireEvent} from '../../utils/fire-custom-event';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 declare const dayjs: any;
 
@@ -45,9 +45,7 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
         }
       </style>
 
-      <a id="add" class="add-chip" on-tap="_open" href="#">
-        &plus; Add
-      </a>
+      <a id="add" class="add-chip" on-tap="_open" href="#"> &plus; Add </a>
 
       <paper-dialog
         id="dialog"
@@ -65,13 +63,9 @@ class ChipDateOfReport extends ChipMixin(PolymerElement) {
         </datepicker-lite>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button class="btn-primary" on-tap="_add">
-            Add
-          </paper-button>
+          <paper-button class="btn-primary" on-tap="_add"> Add </paper-button>
 
-          <paper-button on-tap="_close">
-            Cancel
-          </paper-button>
+          <paper-button on-tap="_close"> Cancel </paper-button>
         </div>
       </paper-dialog>
     `;

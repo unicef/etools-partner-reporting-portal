@@ -4,11 +4,11 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-styles/typography';
-import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -106,9 +106,7 @@ class FeedbackModal extends ModalMixin(PolymerElement) {
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button class="btn-primary" on-tap="close" raised>
-            Ok
-          </paper-button>
+          <paper-button class="btn-primary" on-tap="close" raised> Ok </paper-button>
         </div>
       </paper-dialog>
     `;

@@ -1,22 +1,22 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
-import '../../../../elements/page-body';
+import '../../../../etools-prp-common/elements/page-body';
 import '../../../../elements/page-header';
-import '../../../../elements/message-box';
+import '../../../../etools-prp-common/elements/message-box';
 import '../../../../elements/ip-reporting/pd-details-overview';
 import '../../../../elements/ip-reporting/pd-details-reports';
 import '../../../../elements/ip-reporting/pd-details-calculation-methods';
 
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import {GenericObject} from '../../../../typings/globals.types';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {sharedStyles} from '../../../../styles/shared-styles';
-import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments';
-import {RootState} from '../../../../typings/redux.types';
+import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
+import {RootState} from '../../../../etools-prp-common/typings/redux.types';
 import {IronPagesElement} from '@polymer/iron-pages/iron-pages';
 
 /**

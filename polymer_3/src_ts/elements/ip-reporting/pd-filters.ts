@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import {GenericObject} from '../../typings/globals.types';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';

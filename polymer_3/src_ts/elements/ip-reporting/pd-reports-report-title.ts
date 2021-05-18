@@ -1,13 +1,13 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
-import '../etools-prp-permissions';
-import {GenericObject} from '../../typings/globals.types';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import RoutingMixin from '../../mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {
   shouldDisplayLink,
   getReportTitleFull,
@@ -45,9 +45,7 @@ class PdReportsReportTitle extends LocalizeMixin(
       <template is="dom-if" if="[[showLink]]" restamp="true">
         <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report, localize)]]</a>
       </template>
-      <template is="dom-if" if="[[!showLink]]" restamp="true">
-        [[_getReportTitleFull(report, localize)]]
-      </template>
+      <template is="dom-if" if="[[!showLink]]" restamp="true"> [[_getReportTitleFull(report, localize)]] </template>
       <template is="dom-if" if="[[_isFinalReport(report)]]" restamp="true">
         <div class="final-badge">final</div>
       </template>

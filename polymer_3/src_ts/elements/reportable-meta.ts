@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
@@ -6,16 +6,16 @@ import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-input/paper-input';
 import './labelled-item';
-import './report-status';
+import '../etools-prp-common/elements/report-status';
 import {RefreshReportModalEl} from './refresh-report-modal';
 import './refresh-report-modal';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import {GenericObject} from '../typings/globals.types';
-import UtilsMixin from '../mixins/utils-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
-import {fireEvent} from '../utils/fire-custom-event';
-import Endpoints from '../endpoints';
-import {buttonsStyles} from '../styles/buttons-styles';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import Endpoints from '../etools-prp-common/endpoints';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
@@ -119,9 +119,7 @@ class ReportableMeta extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
           </div>
         </template>
 
-        <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true">
-          [[data.narrative_assessment]]
-        </template>
+        <template is="dom-if" if="[[_equals(mode, 'view')]]" restamp="true"> [[data.narrative_assessment]] </template>
       </labelled-item>
       <refresh-report-modal id="refresh" data="[[refreshData]]" refresh-url="[[refreshUrl]]"> </refresh-report-modal>
     `;

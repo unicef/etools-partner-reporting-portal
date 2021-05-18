@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
@@ -14,9 +14,9 @@ import '../filters/checkbox-filter/checkbox-filter';
 import '@polymer/paper-styles/typography';
 import '../error-modal';
 import {filterStyles} from '../../styles/filter-styles';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import {GenericObject} from '../../typings/globals.types';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

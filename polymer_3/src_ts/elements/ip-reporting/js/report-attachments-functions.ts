@@ -1,4 +1,4 @@
-import Endpoints from '../../../endpoints';
+import Endpoints from '../../../etools-prp-common/endpoints';
 
 export function computeListUrl(locationId: string, reportId: string) {
   return Endpoints.progressReportAttachments(locationId, reportId);

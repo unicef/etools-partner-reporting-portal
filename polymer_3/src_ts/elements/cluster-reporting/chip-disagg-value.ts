@@ -1,14 +1,14 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-input/paper-input';
 import '@polymer/paper-button/paper-button';
 import ChipMixin from '../../mixins/chip-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {fireEvent} from '../../utils/fire-custom-event';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
@@ -57,9 +57,7 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
         }
       </style>
 
-      <a id="add" class="add-chip" on-tap="_open" href="#">
-        &plus; [[localize('add')]]
-      </a>
+      <a id="add" class="add-chip" on-tap="_open" href="#"> &plus; [[localize('add')]] </a>
 
       <paper-dialog id="dialog" opened="{{_adding}}" horizontal-align="left" vertical-align="top">
         <div class="row layout horizontal">
@@ -75,13 +73,9 @@ class ChipDisaggValue extends ChipMixin(LocalizeMixin(ReduxConnectedElement)) {
           </paper-input>
         </div>
         <div class="row layout horizontal justified">
-          <paper-button on-tap="_add" class="btn-primary">
-            [[localize('add')]]
-          </paper-button>
+          <paper-button on-tap="_add" class="btn-primary"> [[localize('add')]] </paper-button>
 
-          <paper-button on-tap="_close">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button on-tap="_close"> [[localize('cancel')]] </paper-button>
         </div>
       </paper-dialog>
     `;

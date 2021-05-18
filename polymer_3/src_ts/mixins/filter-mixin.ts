@@ -1,7 +1,7 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor} from '../typings/globals.types';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
 import {property} from '@polymer/decorators';
-import {fireEvent} from '../utils/fire-custom-event';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer

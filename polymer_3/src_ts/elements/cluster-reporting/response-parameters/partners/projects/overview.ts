@@ -1,15 +1,15 @@
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '../../../planned-action/projects/creation-modal';
 import {PlannedActionProjectsModalEl} from '../../../planned-action/projects/creation-modal';
-import '../../../../page-body';
+import '../../../../../etools-prp-common/elements/page-body';
 import '../../../project-details';
-import '../../../../etools-prp-permissions';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import {GenericObject} from '../../../../../typings/globals.types';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

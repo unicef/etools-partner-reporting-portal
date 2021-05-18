@@ -1,5 +1,5 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor} from '../typings/globals.types';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

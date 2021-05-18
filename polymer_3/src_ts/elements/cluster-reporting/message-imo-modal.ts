@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -8,17 +8,17 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-input/paper-textarea';
-import Endpoints from '../../endpoints';
-import ModalMixin from '../../mixins/modal-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import '../../elements/etools-prp-ajax';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
+import Endpoints from '../../etools-prp-common/endpoints';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 import '../error-box';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {fireEvent} from '../../utils/fire-custom-event';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -81,13 +81,9 @@ class MessageImoModal extends ModalMixin(UtilsMixin(ReduxConnectedElement)) {
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_save" class="btn-primary" raised>
-            Save
-          </paper-button>
+          <paper-button on-tap="_save" class="btn-primary" raised> Save </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            Cancel
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> Cancel </paper-button>
         </div>
 
         <etools-loading active="[[pending]]"></etools-loading>

@@ -5,9 +5,9 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../../../../filter-list';
 import '../../../../filters/partner-filter/partner-filter';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

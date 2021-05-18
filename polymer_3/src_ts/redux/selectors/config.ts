@@ -1,4 +1,4 @@
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 // use instea of App.Selectors.Config
 export const configClusterTypes = function (state: RootState) {

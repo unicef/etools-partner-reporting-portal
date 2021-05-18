@@ -1,5 +1,5 @@
 import {property} from '@polymer/decorators/lib/decorators';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 
 /**
  * Why the f$%& is this component needed?

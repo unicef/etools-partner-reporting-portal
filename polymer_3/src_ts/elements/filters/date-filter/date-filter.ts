@@ -5,7 +5,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
-import {fireEvent} from '../../../utils/fire-custom-event';
+import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
 import Settings from '../../../settings';
 declare const dayjs: any;
 

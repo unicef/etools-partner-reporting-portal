@@ -1,6 +1,6 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-progress/paper-progress';
-import UtilsMixin from '../mixins/utils-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {progressBarStyles} from '../styles/progress-bar-styles';
 

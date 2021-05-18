@@ -1,24 +1,24 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../../etools-prp-ajax';
-import '../../../../etools-prp-permissions';
-import '../../../../page-body';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../../etools-prp-common/elements/page-body';
 import '../../../indicator-modal';
 import {IndicatorModalEl} from '../../../indicator-modal';
 import '../../../../list-view-indicators';
-import Endpoints from '../../../../../endpoints';
-import {clusterActivitiesIndicatorsFetch} from '../../../../../redux/actions/clusterActivities';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
+import {clusterActivitiesIndicatorsFetch} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

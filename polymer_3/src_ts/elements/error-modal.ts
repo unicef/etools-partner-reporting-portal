@@ -1,11 +1,11 @@
 import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import UtilsMixin from '../mixins/utils-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {buttonsStyles} from '../styles/buttons-styles';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
+import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
 
 /**
  * @polymer
@@ -36,9 +36,7 @@ class ErrorModal extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             </template>
           </ul>
           <div class="layout horizontal-reverse">
-            <paper-button class="btn-primary" dialog-dismiss>
-              Close
-            </paper-button>
+            <paper-button class="btn-primary" dialog-dismiss> Close </paper-button>
           </div>
         </div>
       </paper-dialog>

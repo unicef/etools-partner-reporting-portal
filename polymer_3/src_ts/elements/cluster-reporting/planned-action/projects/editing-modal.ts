@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-loading/etools-loading';
@@ -14,19 +14,19 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
-import '../../../etools-prp-ajax';
+import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
 import RoutingMixin from '../../../../mixins/routing-mixin';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import {modalStyles} from '../../../../styles/modal-styles';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../../../etools-prp-common/styles/modal-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../../../typings/globals.types';
-import Endpoints from '../../../../endpoints';
-import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
-import {fireEvent} from '../../../../utils/fire-custom-event';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
+import Endpoints from '../../../../etools-prp-common/endpoints';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
+import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer

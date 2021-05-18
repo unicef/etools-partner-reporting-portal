@@ -1,13 +1,13 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../etools-prp-toolbar';
 import '../download-button';
-import {GenericObject} from '../../typings/globals.types';
-import UtilsMixin from '../../mixins/utils-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
 import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

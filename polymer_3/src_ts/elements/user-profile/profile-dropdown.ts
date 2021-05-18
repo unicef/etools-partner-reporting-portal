@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/paper-icon-button/paper-icon-button';
@@ -6,10 +6,10 @@ import '@polymer/paper-styles/element-styles/paper-material-styles';
 import '@polymer/iron-collapse/iron-collapse';
 import '@polymer/iron-icons/social-icons';
 import {property} from '@polymer/decorators';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {GenericObject} from '../../typings/globals.types';
-import {fireEvent} from '../../utils/fire-custom-event';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import './user-profile-dialog';
 import {UserProfileDialogEl} from './user-profile-dialog';
 

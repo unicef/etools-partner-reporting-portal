@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
@@ -14,10 +14,10 @@ import '../../filters/cluster-objective-filter-multi/cluster-objective-filter-mu
 import '../../filters/location-type-filter/location-type-filter';
 import '../../filters/narrow-location-type-filter/narrow-location-type-filter';
 import '../../filters/location-filter-multi/location-filter-multi-narrowed';
-import UtilsMixin from '../../../mixins/utils-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 
 import Settings from '../../../settings';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

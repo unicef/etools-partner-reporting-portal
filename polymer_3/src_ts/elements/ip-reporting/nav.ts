@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-item/paper-item';
@@ -6,11 +6,11 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-selector/iron-selector';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import PageNavMixin from '../../mixins/page-nav-mixin';
-import '../etools-prp-permissions';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
 
 /**

@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../../../../mixins/data-table-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
 import PaginationMixin from '../../../../../mixins/pagination-mixin';
@@ -11,10 +11,10 @@ import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import '../../../../etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import {tableStyles} from '../../../../../styles/table-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -97,12 +97,8 @@ class ClustersActivityList extends LocalizeMixin(
                 <a href="[[_detailUrl(activity.id, anchorQuery)]]">[[activity.title]]</a>
               </div>
               <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-                <div class="table-cell table-cell--text">
-                  [[activity.cluster_title]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  [[activity.cluster_objective_title]]
-                </div>
+                <div class="table-cell table-cell--text">[[activity.cluster_title]]</div>
+                <div class="table-cell table-cell--text">[[activity.cluster_objective_title]]</div>
               </template>
             </div>
           </etools-data-table-row>

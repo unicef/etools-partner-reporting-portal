@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-pages/iron-pages';
@@ -11,13 +11,13 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
-import '../../../elements/etools-prp-permissions';
+import '../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../elements/cluster-reporting/nav';
 import '../../../elements/cluster-reporting/app-header';
-import UtilsMixin from '../../../mixins/utils-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import OverlayHelperMixin from '../../../mixins/overlay-helper-mixin';
-import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../redux/actions';
-import {GenericObject} from '../../../typings/globals.types';
+import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../etools-prp-common/redux/actions';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {getDomainByEnv} from '../../../config';
 
 /**

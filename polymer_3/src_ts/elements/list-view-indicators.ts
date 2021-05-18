@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -11,15 +11,15 @@ import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 
 import DataTableMixin from '../mixins/data-table-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import PaginationMixin from '../mixins/pagination-mixin';
 
 import './list-view-single-indicator';
-import './list-placeholder';
-import './message-box';
-import './etools-prp-permissions';
-import {GenericObject} from '../typings/globals.types';
+import '../etools-prp-common/elements/list-placeholder';
+import '../etools-prp-common/elements/message-box';
+import '../etools-prp-common/elements/etools-prp-permissions';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {tableStyles} from '../styles/table-styles';
 
 /**

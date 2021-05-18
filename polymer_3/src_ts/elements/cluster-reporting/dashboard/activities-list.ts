@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-data-table/etools-data-table';
@@ -7,15 +7,15 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
-import LocalizeMixin from '../../../mixins/localize-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../../mixins/routing-mixin';
 import {tableStyles} from '../../../styles/table-styles';
-import '../../report-status';
+import '../../../etools-prp-common/elements/report-status';
 import '../../frequency-of-reporting';
 import '../../etools-prp-progress-bar';
 import '../../etools-prp-progress-bar-alt';
 import '../../labelled-item';
-import '../../list-placeholder';
+import '../../../etools-prp-common/elements/list-placeholder';
 
 /**
  * @polymer

@@ -1,6 +1,6 @@
-import {Constructor} from '../typings/globals.types';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
-import {fireEvent} from '../utils/fire-custom-event';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer

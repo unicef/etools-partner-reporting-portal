@@ -1,7 +1,7 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '../dropdown-filter/dropdown-filter-multi';
-import LocalizeMixin from '../../../mixins/localize-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {property} from '@polymer/decorators';
 
 /**

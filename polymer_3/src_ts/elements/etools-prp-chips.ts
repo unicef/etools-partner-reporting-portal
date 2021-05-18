@@ -7,7 +7,7 @@ import '@polymer/iron-icon/iron-icon';
 import {IronIconElement} from '@polymer/iron-icon/iron-icon';
 import './labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
-import {fireEvent} from '../utils/fire-custom-event';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 import {sharedStyles} from '../styles/shared-styles';
 import Settings from '../settings';
 declare const dayjs: any;

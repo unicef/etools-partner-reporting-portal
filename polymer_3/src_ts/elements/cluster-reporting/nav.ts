@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-item/paper-item';
 import '@polymer/app-route/app-route';
@@ -7,17 +7,17 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '@polymer/iron-collapse/iron-collapse';
 import '@polymer/paper-listbox/paper-listbox';
 import '@polymer/iron-selector/iron-selector';
-import UtilsMixin from '../../mixins/utils-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import PageNavMixin from '../../mixins/page-nav-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
-import '../etools-prp-permissions';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject, Route} from '../../typings/globals.types';
+import {GenericObject, Route} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

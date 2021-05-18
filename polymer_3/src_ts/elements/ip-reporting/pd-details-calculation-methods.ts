@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-radio-group/paper-radio-group';
@@ -7,27 +7,27 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import Constants from '../../constants';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import Constants from '../../etools-prp-common/constants';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../mixins/data-table-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
-import {pdFetch} from '../../redux/actions/pd';
-import '../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import '../page-body';
-import '../etools-prp-permissions';
-import '../confirm-box';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../etools-prp-common/redux/actions/pdIndicators';
+import {pdFetch} from '../../etools-prp-common/redux/actions/pd';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/page-body';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import '../../etools-prp-common/elements/confirm-box';
 import '../calculation-methods-info-bar';
-import {ConfirmBoxEl} from '../confirm-box';
+import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
 import {tableStyles} from '../../styles/table-styles';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {GenericObject} from '../../typings/globals.types';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Endpoints from '../../endpoints';
+import Endpoints from '../../etools-prp-common/endpoints';
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -37,7 +37,7 @@ import {
   canEdit,
   canSave
 } from './js/pd-details-calculation-methods-functions';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

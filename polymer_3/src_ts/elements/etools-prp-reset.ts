@@ -1,8 +1,8 @@
 import {PolymerElement} from '@polymer/polymer';
-import UtilsMixin from '../mixins/utils-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**

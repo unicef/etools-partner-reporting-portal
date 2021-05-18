@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-button/paper-button.js';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {GenericObject} from '../../typings/globals.types';
-import Endpoints from '../../endpoints';
-import {buttonsStyles} from '../../styles/buttons-styles';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import Endpoints from '../../etools-prp-common/endpoints';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {
   computeImportTemplateUrl,
@@ -18,12 +18,12 @@ import {
   computeShowRefresh
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
-import '../etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../refresh-report-modal';
 import {RefreshReportModalEl} from '../refresh-report-modal';
 import '../download-button';
 import '../upload-button';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

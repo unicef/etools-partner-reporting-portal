@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
@@ -8,16 +8,16 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/overview';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/activities/indicators';
-import '../../../../../elements/page-body';
+import '../../../../../etools-prp-common/elements/page-body';
 import '../../../../../elements/page-header';
 import '../../../../../elements/page-badge';
-import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import Endpoints from '../../../../../endpoints';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {GenericObject} from '../../../../../typings/globals.types';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

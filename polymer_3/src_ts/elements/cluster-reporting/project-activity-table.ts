@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/app-route/app-route';
 import '@unicef-polymer/etools-data-table/etools-data-table';
@@ -11,15 +11,15 @@ import '@polymer/iron-flex-layout/iron-flex-layout';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import PaginationMixin from '../../mixins/pagination-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import '../etools-prp-ajax';
-import '../project-status';
-import '../page-body';
-import '../../elements/list-placeholder';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/project-status';
+import '../../etools-prp-common/elements/page-body';
+import '../../etools-prp-common/elements/list-placeholder';
 import {tableStyles} from '../../styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -93,9 +93,7 @@ class ProjectActivityTable extends DataTableMixin(
           <template id="list" is="dom-repeat" items="[[data]]" initial-count="[[pageSize]]">
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell table-cell--text">
-                  [[item.cluster.name]]
-                </div>
+                <div class="table-cell table-cell--text">[[item.cluster.name]]</div>
                 <div class="table-cell table-cell--text">
                   <project-status status="[[item.status]]"></project-status>
                 </div>
@@ -103,9 +101,7 @@ class ProjectActivityTable extends DataTableMixin(
                   <a href="[[_detailUrl(item, anchorQuery)]]">[[item.title]]</a>
                 </div>
                 <div class="table-cell table-cell--text">
-                  <template is="dom-if" if="[[item.cluster_activity]]">
-                    [[item.cluster_activity.title]]
-                  </template>
+                  <template is="dom-if" if="[[item.cluster_activity]]"> [[item.cluster_activity.title]] </template>
                   <template is="dom-if" if="[[!item.cluster_activity]]">
                     <span role="presentation"> - </span>
                   </template>
