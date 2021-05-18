@@ -208,7 +208,7 @@ workflows:
                 - master
                 - staging
                 - develop
-                -separate-ip-cluster
+                - separate-ip-cluster
       # - build_and_deploy_fe_cluster:
       #     filters:
       #       branches:
