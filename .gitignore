@@ -14,7 +14,7 @@
 # Python compiled
 *.pyc
 *.pem
-!django_api/django_api/keys/jwt/certificate.pem
+!django_api/etools_prp/keys/jwt/certificate.pem
 .coverage
 htmlcov
 .pytest_cache
