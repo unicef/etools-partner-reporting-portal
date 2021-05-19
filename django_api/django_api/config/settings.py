@@ -511,7 +511,7 @@ elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
 if not DISABLE_JWT_AUTH:
-    certificate_location = os.path.join(os.path.dirname(BASE_DIR), 'etools_prp/keys/jwt/certificate.pem')
+    certificate_location = os.path.join(os.path.dirname(BASE_DIR), 'etools_prp/config/keys/jwt/certificate.pem')
     print(11, certificate_location)
     public_key_text = open(certificate_location, 'rb').read()  # noqa: F405
     certificate = load_pem_x509_certificate(public_key_text, default_backend())
