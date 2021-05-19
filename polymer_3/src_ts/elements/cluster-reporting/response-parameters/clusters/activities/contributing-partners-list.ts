@@ -5,7 +5,7 @@ import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixi
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../../../../mixins/data-table-mixin';
 import RoutingMixin from '../../../../../mixins/routing-mixin';
-import PaginationMixin from '../../../../../mixins/pagination-mixin';
+import PaginationMixin from '../../../../../etools-prp-common/mixins/pagination-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/app-route/app-route';

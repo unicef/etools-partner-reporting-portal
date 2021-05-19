@@ -12,7 +12,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';

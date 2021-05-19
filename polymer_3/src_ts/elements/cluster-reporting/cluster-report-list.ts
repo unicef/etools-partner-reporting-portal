@@ -7,7 +7,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import '../../etools-prp-common/elements/confirm-box';
 import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';

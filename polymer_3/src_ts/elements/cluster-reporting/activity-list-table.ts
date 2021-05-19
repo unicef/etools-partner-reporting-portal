@@ -12,7 +12,7 @@ import '@polymer/iron-icons/iron-icons';
 import DataTableMixin from '../../mixins/data-table-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../etools-prp-common/endpoints';

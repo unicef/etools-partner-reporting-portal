@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../../../../mixins/data-table-mixin';
-import PaginationMixin from '../../../../../mixins/pagination-mixin';
+import PaginationMixin from '../../../../../etools-prp-common/mixins/pagination-mixin';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';

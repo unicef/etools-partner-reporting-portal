@@ -3,7 +3,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import PaginationMixin from '../mixins/pagination-mixin';
+import PaginationMixin from '../etools-prp-common/mixins/pagination-mixin';
 import {GenericObject} from '../etools-prp-common/typings/globals.types';
 
 /**

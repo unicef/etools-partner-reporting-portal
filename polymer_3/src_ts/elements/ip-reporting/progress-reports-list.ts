@@ -14,7 +14,7 @@ import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../mixins/sorting-mixin';

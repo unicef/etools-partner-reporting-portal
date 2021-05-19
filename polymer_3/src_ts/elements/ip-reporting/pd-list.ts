@@ -13,7 +13,7 @@ import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../mixins/routing-mixin';
 import {tableStyles} from '../../styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
