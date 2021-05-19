@@ -325,7 +325,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
 
-  private _debouncer!: Debouncer;
   private _pdDetailDebouncer!: Debouncer;
 
   public static get observers() {
