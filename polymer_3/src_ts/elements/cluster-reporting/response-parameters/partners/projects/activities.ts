@@ -9,7 +9,7 @@ import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../../etools-prp-common/elements/page-body';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import Endpoints from '../../../../../etools-prp-common/endpoints';
 import '../../../project-activity-table';

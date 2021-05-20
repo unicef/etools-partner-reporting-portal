@@ -1,6 +1,6 @@
 import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import '../../../elements/page-header';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../etools-prp-common/elements/page-body';
 import '../../../elements/ip-reporting/partner-details';
 import '../../../elements/ip-reporting/risk-rating';

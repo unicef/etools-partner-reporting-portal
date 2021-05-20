@@ -8,7 +8,7 @@ import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
-import '../../elements/filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter-multi/location-filter-multi';

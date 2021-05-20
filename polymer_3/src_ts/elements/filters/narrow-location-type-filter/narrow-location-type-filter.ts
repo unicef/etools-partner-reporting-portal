@@ -5,7 +5,7 @@ import Settings from '../../../settings';
 import '../dropdown-filter/dropdown-filter';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 

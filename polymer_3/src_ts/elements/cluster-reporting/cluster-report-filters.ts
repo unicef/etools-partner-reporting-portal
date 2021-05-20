@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {filterStyles} from '../../styles/filter-styles';
-import '../filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import '../filters/cluster-indicator-filter/cluster-indicator-filter';
 import '../filters/cluster-project-filter/cluster-project-filter';
 import '../filters/cluster-partner-filter/cluster-partner-filter';

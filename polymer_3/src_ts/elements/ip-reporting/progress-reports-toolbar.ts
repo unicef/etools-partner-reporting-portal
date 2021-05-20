@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedEleme
 import {html} from '@polymer/polymer';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../etools-prp-toolbar';
-import '../download-button';
+import '../../etools-prp-common/elements/download-button';
 import {property} from '@polymer/decorators/lib/decorators';
 import {computePdReportsUrl, canExport} from './js/progress-reports-toolbar-functions';
 

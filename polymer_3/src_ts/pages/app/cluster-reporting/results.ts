@@ -7,7 +7,7 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../elements/page-header';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../etools-prp-common/elements/page-body';
 import '../../../elements/cluster-reporting/cluster-report-filters';
 import '../../../elements/cluster-reporting/cluster-reports';

@@ -8,7 +8,7 @@ import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePartnerType} from './js/partner-details-functions';

@@ -13,7 +13,7 @@ import {tableStyles} from '../../../../styles/table-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import '../../indicator-modal';
 import {IndicatorModalEl} from '../../indicator-modal';
-import '../../../list-view-indicators';
+import '../../../../etools-prp-common/elements/list-view-indicators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';

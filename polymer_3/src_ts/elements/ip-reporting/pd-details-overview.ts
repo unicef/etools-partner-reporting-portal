@@ -15,9 +15,9 @@ import {tableStyles} from '../../styles/table-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 
-import '../../elements/labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import '../../elements/etools-prp-currency';
-import '../../elements/etools-prp-progress-bar';
+import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

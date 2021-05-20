@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedEl
 import {html} from '@polymer/polymer';
 import '@polymer/paper-input/paper-input';
 import {property} from '@polymer/decorators';
-import FilterMixin from '../../../mixins/filter-mixin';
+import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';

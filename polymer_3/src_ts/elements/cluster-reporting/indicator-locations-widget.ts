@@ -20,7 +20,7 @@ import '../json-field';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-reset';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import './message-imo-modal';
 import {MessageImoModalEl} from './message-imo-modal';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';

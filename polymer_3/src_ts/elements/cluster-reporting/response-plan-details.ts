@@ -7,7 +7,7 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DateMixin from '../../mixins/date-mixin';
 import '../ip-reporting/partner-details';
 import '../../etools-prp-common/elements/etools-prp-number';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**

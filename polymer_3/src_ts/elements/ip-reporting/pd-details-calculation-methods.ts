@@ -11,7 +11,7 @@ import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
-import DataTableMixin from '../../mixins/data-table-mixin';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../etools-prp-common/redux/actions/pdIndicators';
 import {pdFetch} from '../../etools-prp-common/redux/actions/pd';
@@ -20,7 +20,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/confirm-box';
-import '../calculation-methods-info-bar';
+import '../../etools-prp-common/elements/calculation-methods-info-bar';
 import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
 import {tableStyles} from '../../styles/table-styles';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';

@@ -11,11 +11,11 @@ import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import DataTableMixin from '../../mixins/data-table-mixin';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
   programmeDocumentReportsAll,

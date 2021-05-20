@@ -6,7 +6,7 @@ import './analysis-widget';
 import '../../../etools-prp-common/elements/list-placeholder';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
+import AnalysisChartMixin from '../../../etools-prp-common/mixins/analysis-chart-mixin';
 import {sharedStyles} from '../../../styles/shared-styles';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 

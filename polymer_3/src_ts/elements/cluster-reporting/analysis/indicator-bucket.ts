@@ -6,7 +6,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/iron-collapse/iron-collapse';
-import '../../etools-prp-progress-bar';
+import '../../../etools-prp-common/elements/etools-prp-progress-bar';
 import '../../etools-prp-progress-bar-alt';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import './indicator-details';

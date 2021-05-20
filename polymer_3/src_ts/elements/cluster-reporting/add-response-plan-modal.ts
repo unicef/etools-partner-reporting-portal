@@ -25,7 +25,7 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import {configClusterTypes} from '../../redux/selectors/config';
 import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
-import '../error-box';
+import '../../etools-prp-common/elements/error-box';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import {fetchConfig} from '../../etools-prp-common/redux/actions/config';

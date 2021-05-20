@@ -23,7 +23,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp
 import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
-import '../../../error-box-errors';
+import '../../../../etools-prp-common/elements/error-box-errors';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../etools-prp-common/utils/util';

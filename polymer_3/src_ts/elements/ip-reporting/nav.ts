@@ -8,8 +8,8 @@ import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-selector/iron-selector';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import PageNavMixin from '../../mixins/page-nav-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import PageNavMixin from '../../etools-prp-common/mixins/page-nav-mixin';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
 

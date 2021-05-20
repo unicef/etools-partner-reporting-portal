@@ -7,7 +7,7 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-query-params';
 
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../../mixins/routing-mixin';
+import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
 import {tableStyles} from '../../../styles/table-styles';
 import '../../etools-prp-progress-bar-alt';
 import '../../../etools-prp-common/elements/list-placeholder';

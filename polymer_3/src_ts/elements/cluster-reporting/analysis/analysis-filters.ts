@@ -7,7 +7,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import {filterStyles} from '../../../styles/filter-styles';
 
-import '../../filter-list';
+import '../../../etools-prp-common/elements/filter-list';
 import '../../filters/cluster-filter-multi/cluster-filter-multi';
 import '../../filters/partner-type-filter-multi/partner-type-filter-multi';
 import '../../filters/cluster-objective-filter-multi/cluster-objective-filter-multi';

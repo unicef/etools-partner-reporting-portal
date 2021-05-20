@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-location';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
-import '../../elements/filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import '../../elements/filters/reportable-filter/reportable-filter';

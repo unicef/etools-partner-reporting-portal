@@ -24,7 +24,7 @@ import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
-import '../../../error-box-errors';
+import '../../../../etools-prp-common/elements/error-box-errors';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button/paper-icon-button';

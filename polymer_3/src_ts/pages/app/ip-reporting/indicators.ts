@@ -5,16 +5,16 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 
-import '../../../elements/page-header';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../etools-prp-common/elements/page-body';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../elements/ip-reporting/indicators-filters';
 import '../../../elements/ip-reporting/indicators-toolbar';
-import '../../../elements/list-view-indicators';
+import '../../../etools-prp-common/elements/list-view-indicators';
 import Endpoints from '../../../etools-prp-common/endpoints';
 
-import SortingMixin from '../../../mixins/sorting-mixin';
+import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

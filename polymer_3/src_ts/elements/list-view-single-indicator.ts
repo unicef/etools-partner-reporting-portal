@@ -10,14 +10,14 @@ import {PaperButtonElement} from '@polymer/paper-button/paper-button';
 import '@polymer/polymer/lib/elements/dom-if';
 
 import './ip-reporting/ip-reporting-indicator-details';
-import './etools-prp-progress-bar';
+import '../etools-prp-common/elements/etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
 import '../etools-prp-common/elements/etools-prp-number';
 
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import RoutingMixin from '../mixins/routing-mixin';
+import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import {property} from '@polymer/decorators/lib/decorators';

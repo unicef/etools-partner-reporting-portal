@@ -10,7 +10,7 @@ import '../../../../../elements/cluster-reporting/response-parameters/partners/p
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/indicators';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/activities';
 import '../../../../../etools-prp-common/elements/page-body';
-import '../../../../../elements/page-header';
+import '../../../../../etools-prp-common/elements/page-header';
 import '../../../../../elements/page-badge';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';

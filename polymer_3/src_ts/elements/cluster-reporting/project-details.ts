@@ -6,7 +6,7 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../ip-reporting/partner-details';
 import '../../etools-prp-common/elements/etools-prp-number';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';

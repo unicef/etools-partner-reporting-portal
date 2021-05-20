@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../../../styles/filter-styles';
-import '../../../filter-list';
+import '../../../../etools-prp-common/elements/filter-list';
 import '../../../filters/text-filter/text-filter';
 import '../../../filters/dropdown-filter/dropdown-filter';
 import '../../../filters/checkbox-filter/checkbox-filter';

@@ -7,14 +7,13 @@ import '@unicef-polymer/etools-date-time/datepicker-lite';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../../elements/filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter/location-filter';
-import '../../elements/filters/date-filter/date-filter';
 
 /**
  * @polymer

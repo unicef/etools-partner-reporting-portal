@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import {CreationModalDisaggregationEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list';

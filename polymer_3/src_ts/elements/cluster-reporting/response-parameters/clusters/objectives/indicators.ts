@@ -11,7 +11,7 @@ import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../../etools-prp-common/elements/page-body';
 import '../../../indicator-modal';
-import '../../../../list-view-indicators';
+import '../../../../../etools-prp-common/elements/list-view-indicators';
 import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {clusterObjectivesIndicatorsFetch} from '../../../../../etools-prp-common/redux/actions/clusterObjectives';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';

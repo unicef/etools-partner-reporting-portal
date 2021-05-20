@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import {filterStyles} from '../../../../../styles/filter-styles';
-import '../../../../filter-list';
+import '../../../../../etools-prp-common/elements/filter-list';
 import '../../../../filters/cluster-partner-filter/cluster-partner-filter';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 

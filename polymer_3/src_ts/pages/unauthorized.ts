@@ -9,7 +9,7 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
-import '../elements/user-profile/profile-dropdown';
+import '../etools-prp-common/elements/user-profile/profile-dropdown';
 import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 import {BASE_PATH} from '../config';
 

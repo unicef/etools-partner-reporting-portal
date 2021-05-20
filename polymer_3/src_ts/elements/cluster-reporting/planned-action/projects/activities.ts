@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-location';
 import '../../../../etools-prp-common/elements/page-body';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
-import RoutingMixin from '../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
 import Endpoints from '../../../../etools-prp-common/endpoints';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';

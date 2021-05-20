@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import Constants from '../../../etools-prp-common/constants';
 import '@google-web-components/google-chart';
 import '../../../etools-prp-common/elements/numeral-js';
-import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
+import AnalysisChartMixin from '../../../etools-prp-common/mixins/analysis-chart-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import './analysis-widget';

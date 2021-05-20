@@ -14,7 +14,7 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
-import '../error-box';
+import '../../etools-prp-common/elements/error-box';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';

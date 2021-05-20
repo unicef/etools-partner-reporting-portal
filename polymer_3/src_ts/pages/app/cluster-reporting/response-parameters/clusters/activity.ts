@@ -6,7 +6,7 @@ import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-location';
-import '../../../../../elements/page-header';
+import '../../../../../etools-prp-common/elements/page-header';
 import '../../../../../etools-prp-common/elements/page-body';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/overview';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/indicators';
@@ -17,7 +17,7 @@ import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {sharedStyles} from '../../../../../styles/shared-styles';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

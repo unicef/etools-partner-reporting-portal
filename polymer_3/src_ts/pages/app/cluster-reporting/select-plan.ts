@@ -12,11 +12,11 @@ import '@polymer/iron-location/iron-query-params';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 
 import '../../../etools-prp-common/elements/etools-prp-permissions';
-import '../../../elements/workspace-dropdown';
+import '../../../etools-prp-common/elements/workspace-dropdown';
 import '../../../elements/etools-prp-workspaces';
 import '../../../elements/cluster-reporting/add-plan-panel';
-import RoutingMixin from '../../../mixins/routing-mixin';
-import OverlayHelperMixin from '../../../mixins/overlay-helper-mixin';
+import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
+import OverlayHelperMixin from '../../../etools-prp-common/mixins/overlay-helper-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {tableStyles} from '../../../styles/table-styles';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';

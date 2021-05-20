@@ -10,7 +10,7 @@ import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {
   computeReportableUrl,
@@ -21,8 +21,8 @@ import {
 } from './js/pd-output-functions';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {pdReportsUpdateReportable} from '../../etools-prp-common/redux/actions/pdReports';
-import '../reportable-meta';
-import '../labelled-item';
+import '../../etools-prp-common/elements/reportable-meta';
+import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-ajax';

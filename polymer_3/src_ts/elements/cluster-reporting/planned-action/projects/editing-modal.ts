@@ -18,7 +18,7 @@ import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/dropdown-form-input';
 import '../../../form-fields/cluster-dropdown-content';
-import RoutingMixin from '../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../../../etools-prp-common/styles/modal-styles';

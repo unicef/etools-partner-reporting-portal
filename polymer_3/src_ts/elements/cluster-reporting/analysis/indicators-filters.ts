@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import {filterStyles} from '../../../styles/filter-styles';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import '../../filter-list';
+import '../../../etools-prp-common/elements/filter-list';
 import '../../filters/cluster-indicator-type-filter/cluster-indicator-type-filter';
 import '../../filters/partner-project-filter-multi/partner-project-filter-multi';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';

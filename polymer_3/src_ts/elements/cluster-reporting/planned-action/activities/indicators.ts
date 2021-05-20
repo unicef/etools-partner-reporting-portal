@@ -11,7 +11,7 @@ import Endpoints from '../../../../etools-prp-common/endpoints';
 import {partnerActivitiesIndicatorsFetch} from '../../../../etools-prp-common/redux/actions/partnerActivities';
 import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../etools-prp-common/elements/page-body';
-import '../../../list-view-indicators';
+import '../../../../etools-prp-common/elements/list-view-indicators';
 import '../../indicator-modal';
 import {IndicatorModalEl} from '../../indicator-modal';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';

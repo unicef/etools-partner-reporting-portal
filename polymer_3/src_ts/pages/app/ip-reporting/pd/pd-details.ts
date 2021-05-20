@@ -5,7 +5,7 @@ import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '../../../../etools-prp-common/elements/page-body';
-import '../../../../elements/page-header';
+import '../../../../etools-prp-common/elements/page-header';
 import '../../../../etools-prp-common/elements/message-box';
 import '../../../../elements/ip-reporting/pd-details-overview';
 import '../../../../elements/ip-reporting/pd-details-reports';

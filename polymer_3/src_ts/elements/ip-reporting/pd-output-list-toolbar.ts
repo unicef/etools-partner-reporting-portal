@@ -19,10 +19,10 @@ import {
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/etools-prp-ajax';
-import '../refresh-report-modal';
-import {RefreshReportModalEl} from '../refresh-report-modal';
-import '../download-button';
-import '../upload-button';
+import '../../etools-prp-common/elements/refresh-report-modal';
+import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-report-modal';
+import '../../etools-prp-common/elements/download-button';
+import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**

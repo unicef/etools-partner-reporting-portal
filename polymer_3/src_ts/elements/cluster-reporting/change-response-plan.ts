@@ -3,7 +3,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import '@polymer/paper-tooltip/paper-tooltip';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import {sharedStyles} from '../../styles/shared-styles';
 
 /**

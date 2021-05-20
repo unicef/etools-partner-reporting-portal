@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedEl
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
-import FilterMixin from '../../../mixins/filter-mixin';
+import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
 

@@ -12,12 +12,12 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/iron-form/iron-form';
 
 import Endpoints from '../etools-prp-common/endpoints';
-import ResponsiveMixin from '../mixins/responsive-mixin';
+import ResponsiveMixin from '../etools-prp-common/mixins/responsive-mixin';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
-import '../elements/etools-logo';
+import '../etools-prp-common/elements/etools-logo';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/etools-prp-ajax';
-import '../elements/page-title';
+import '../etools-prp-common/elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
 import {BASE_PATH} from '../config';
 

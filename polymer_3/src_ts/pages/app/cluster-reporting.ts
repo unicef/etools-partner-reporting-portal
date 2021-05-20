@@ -5,7 +5,7 @@ import '@polymer/app-route/app-route';
 import '@polymer/app-route/app-location';
 import '@polymer/iron-pages/iron-pages';
 import '../../etools-prp-common/elements/etools-prp-ajax';
-import '../../elements/page-title';
+import '../../etools-prp-common/elements/page-title';
 import Endpoints from '../../etools-prp-common/endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';

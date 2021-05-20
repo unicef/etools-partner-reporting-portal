@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/paper-checkbox/paper-checkbox';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import FilterMixin from '../../../mixins/filter-mixin';
+import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
 import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';

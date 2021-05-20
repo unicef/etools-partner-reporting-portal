@@ -11,13 +11,13 @@ import '@polymer/iron-pages/iron-pages';
 
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../etools-prp-common/elements/etools-prp-permissions';
-import '../../../../elements/page-header';
+import '../../../../etools-prp-common/elements/page-header';
 import '../../../../etools-prp-common/elements/page-body';
 import '../../../../elements/reporting-period';
 import '../../../../etools-prp-common/elements/report-status';
 import '../../../../etools-prp-common/elements/message-box';
-import '../../../../elements/error-modal';
-import {ErrorModalEl} from '../../../../elements/error-modal';
+import '../../../../etools-prp-common/elements/error-modal';
+import {ErrorModalEl} from '../../../../etools-prp-common/elements/error-modal';
 import '../../../../elements/ip-reporting/pd-reports-report-title';
 import '../../../../elements/ip-reporting/pd-report-export-button';
 import '../../../../elements/ip-reporting/pd-modal';
@@ -39,7 +39,7 @@ import {
 import Endpoints from '../../../../etools-prp-common/endpoints';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin';
-import RoutingMixin from '../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {sharedStyles} from '../../../../styles/shared-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';

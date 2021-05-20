@@ -10,7 +10,7 @@ import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../etools-prp-common/endpoints';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import SortingMixin from '../../../mixins/sorting-mixin';
+import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

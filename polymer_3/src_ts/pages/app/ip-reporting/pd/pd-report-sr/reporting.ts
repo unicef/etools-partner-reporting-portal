@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '../../../../../elements/labelled-item';
+import '../../../../../etools-prp-common/elements/labelled-item';
 import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';

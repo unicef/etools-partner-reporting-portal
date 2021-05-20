@@ -6,10 +6,10 @@ import '@unicef-polymer/etools-currency-amount-input/etools-currency-amount-inpu
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
-import '../../elements/filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 

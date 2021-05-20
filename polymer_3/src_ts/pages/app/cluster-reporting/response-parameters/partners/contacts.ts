@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/contacts/filters';
 import '../../../../../elements/cluster-reporting/contacts-table';
 import {sharedStyles} from '../../../../../styles/shared-styles';

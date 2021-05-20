@@ -8,11 +8,11 @@ import 'etools-piwik-analytics/etools-piwik-analytics.js';
 
 import LocalizeMixin from './etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from './etools-prp-common/mixins/utils-mixin';
-import ErrorHandlerMixin from './mixins/errors-mixin';
+import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin';
 import Endpoints from './etools-prp-common/endpoints';
-import './elements/app-redirect';
+import './etools-prp-common/elements/app-redirect';
 import './etools-prp-common/elements/etools-prp-ajax';
-import './elements/etools-prp-auth';
+import './etools-prp-common/elements/etools-prp-auth';
 import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax';
 import {GenericObject} from './etools-prp-common/typings/globals.types';
 import {reset, userLogout} from './etools-prp-common/redux/actions';

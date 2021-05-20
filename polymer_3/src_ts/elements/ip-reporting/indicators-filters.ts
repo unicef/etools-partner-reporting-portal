@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../filter-list';
+import '../../etools-prp-common/elements/filter-list';
 import '../filters/text-filter/text-filter';
 import '../filters/dropdown-filter/dropdown-filter-multi';
 import '../filters/location-filter/location-filter';
@@ -12,7 +12,7 @@ import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
 
 import '@polymer/paper-styles/typography';
-import '../error-modal';
+import '../../etools-prp-common/elements/error-modal';
 import {filterStyles} from '../../styles/filter-styles';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';

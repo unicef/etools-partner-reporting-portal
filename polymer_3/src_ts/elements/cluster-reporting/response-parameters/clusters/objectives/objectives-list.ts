@@ -3,8 +3,8 @@ import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConne
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import DataTableMixin from '../../../../../mixins/data-table-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import DataTableMixin from '../../../../../etools-prp-common/mixins/data-table-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import PaginationMixin from '../../../../../etools-prp-common/mixins/pagination-mixin';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-data-table/etools-data-table';

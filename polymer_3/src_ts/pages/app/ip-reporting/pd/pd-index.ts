@@ -1,7 +1,7 @@
 import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '../../../../etools-prp-common/elements/page-body';
-import '../../../../elements/page-header';
+import '../../../../etools-prp-common/elements/page-header';
 import '../../../../elements/ip-reporting/pd-filters';
 import '../../../../elements/ip-reporting/pd-list-toolbar';
 import '../../../../elements/ip-reporting/pd-list';

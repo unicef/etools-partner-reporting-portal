@@ -10,7 +10,7 @@ import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import '../../../elements/page-header';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './planned-action/router';
 import {sharedStyles} from '../../../styles/shared-styles';

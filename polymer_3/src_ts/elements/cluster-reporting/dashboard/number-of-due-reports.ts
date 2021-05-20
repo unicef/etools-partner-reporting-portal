@@ -7,7 +7,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-location/iron-query-params';
 import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../../mixins/routing-mixin';
+import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
 import '../../../etools-prp-common/elements/etools-prp-number';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 

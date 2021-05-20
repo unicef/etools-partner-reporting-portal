@@ -8,7 +8,7 @@ import '@polymer/app-route/app-route';
 
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import '../../../elements/page-header';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../etools-prp-common/elements/page-body';
 import '../../../elements/cluster-reporting/analysis/analysis-filters';
 import './analysis/operational-presence';

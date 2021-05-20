@@ -12,7 +12,7 @@ import '../../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../../etools-prp-common/elements/page-body';
 import '../../../indicator-modal';
 import {IndicatorModalEl} from '../../../indicator-modal';
-import '../../../../list-view-indicators';
+import '../../../../../etools-prp-common/elements/list-view-indicators';
 import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {clusterActivitiesIndicatorsFetch} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';

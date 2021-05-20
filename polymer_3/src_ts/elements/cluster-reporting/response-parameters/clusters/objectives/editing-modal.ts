@@ -3,7 +3,7 @@ import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConne
 import {property} from '@polymer/decorators/lib/decorators';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/app-layout/app-grid/app-grid-style';

@@ -11,7 +11,7 @@ import '../../../../../etools-prp-common/elements/page-body';
 import '../../../../frequency-of-reporting';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import '../../../../labelled-item';
+import '../../../../../etools-prp-common/elements/labelled-item';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

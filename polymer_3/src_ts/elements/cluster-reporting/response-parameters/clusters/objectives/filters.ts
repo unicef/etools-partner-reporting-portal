@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '../../../../filter-list';
+import '../../../../../etools-prp-common/elements/filter-list';
 import '../../../../filters/text-filter/text-filter';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';

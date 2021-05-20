@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-query-params';
 import '../dropdown-filter/dropdown-filter-multi';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
+import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../etools-prp-common/endpoints';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

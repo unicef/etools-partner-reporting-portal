@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import RoutingMixin from '../../mixins/routing-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';

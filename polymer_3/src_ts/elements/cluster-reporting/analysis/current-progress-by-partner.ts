@@ -7,7 +7,7 @@ import './analysis-widget';
 import '../../../etools-prp-common/elements/list-placeholder';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
+import AnalysisChartMixin from '../../../etools-prp-common/mixins/analysis-chart-mixin';
 import Constants from '../../../etools-prp-common/constants';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 declare const numeral: any;
