@@ -15,7 +15,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
-import {sharedStyles} from '../../styles/shared-styles';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
 import '../../etools-prp-common/elements/error-box';
 import '../json-field';
 import '../../etools-prp-common/elements/labelled-item';

@@ -5,7 +5,7 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import {getDomainByEnv} from '../../../../../config';
+import {getDomainByEnv} from '../../../../../etools-prp-common/config';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

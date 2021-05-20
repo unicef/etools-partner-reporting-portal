@@ -16,7 +16,7 @@ import {fetchCurrencies} from '../etools-prp-common/redux/actions/currencies';
 import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../etools-prp-common/redux/actions/location';
-import {getDomainByEnv} from '../config';
+import {getDomainByEnv} from '../etools-prp-common/config';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**

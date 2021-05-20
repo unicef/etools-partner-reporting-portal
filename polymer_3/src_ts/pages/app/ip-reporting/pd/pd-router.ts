@@ -5,7 +5,7 @@ import '@polymer/iron-pages/iron-pages';
 import './pd-details';
 import './pd-report';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
-import {getDomainByEnv} from '../../../../config';
+import {getDomainByEnv} from '../../../../etools-prp-common/config';
 
 /**
  * @polymer

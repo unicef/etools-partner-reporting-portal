@@ -18,7 +18,7 @@ import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import OverlayHelperMixin from '../../../etools-prp-common/mixins/overlay-helper-mixin';
 import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../etools-prp-common/redux/actions';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {getDomainByEnv} from '../../../config';
+import {getDomainByEnv} from '../../../etools-prp-common/config';
 
 /**
  * @polymer

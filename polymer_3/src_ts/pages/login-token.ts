@@ -7,7 +7,7 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../etools-prp-common/endpoints';
 import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
-import {BASE_PATH} from '../config';
+import {BASE_PATH} from '../etools-prp-common/config';
 
 /**
  * @polymer

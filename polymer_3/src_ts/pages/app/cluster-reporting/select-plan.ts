@@ -18,7 +18,7 @@ import '../../../elements/cluster-reporting/add-plan-panel';
 import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
 import OverlayHelperMixin from '../../../etools-prp-common/mixins/overlay-helper-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {tableStyles} from '../../../styles/table-styles';
+import {tableStyles} from '../../../etools-prp-common/styles/table-styles';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
 
 /**

@@ -7,7 +7,7 @@ import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import {getDomainByEnv} from '../../../config';
+import {getDomainByEnv} from '../../../etools-prp-common/config';
 
 /**
  * @polymer

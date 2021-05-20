@@ -10,7 +10,7 @@ import '../../../etools-prp-common/elements/etools-prp-progress-bar';
 import '../../etools-prp-progress-bar-alt';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import './indicator-details';
-import {sharedStyles} from '../../../styles/shared-styles';
+import {sharedStyles} from '../../../etools-prp-common/styles/shared-styles';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import '../../cluster-reporting/analysis/indicator-details';
 import {IndicatorDetailsEl} from '../../cluster-reporting/analysis/indicator-details';

@@ -11,11 +11,11 @@ import Endpoints from '../../../../etools-prp-common/endpoints';
 import {partnerActivitiesIndicatorsFetch} from '../../../../etools-prp-common/redux/actions/partnerActivities';
 import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../etools-prp-common/elements/page-body';
-import '../../../../etools-prp-common/elements/list-view-indicators';
+import '../../../list-view-indicators';
 import '../../indicator-modal';
 import {IndicatorModalEl} from '../../indicator-modal';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
-import {tableStyles} from '../../../../styles/table-styles';
+import {tableStyles} from '../../../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 
 /**

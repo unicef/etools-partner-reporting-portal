@@ -16,7 +16,7 @@ import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selecto
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdFetch, pdSetCurrent} from '../../../etools-prp-common/redux/actions/pd';
-import {getDomainByEnv} from '../../../config';
+import {getDomainByEnv} from '../../../etools-prp-common/config';
 import './pd/pd-index';
 import './pd/pd-router';
 import {RootState} from '../../../etools-prp-common/typings/redux.types';

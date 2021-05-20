@@ -13,7 +13,7 @@ import '../../../../../elements/cluster-reporting/activity-list-table';
 import {PlannedActionActivityModalEl} from '../../../../../elements/cluster-reporting/planned-action/activities/creation-modal';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
-import {sharedStyles} from '../../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {fetchPartnerActivitiesList} from '../../../../../etools-prp-common/redux/actions/partnerActivities';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';

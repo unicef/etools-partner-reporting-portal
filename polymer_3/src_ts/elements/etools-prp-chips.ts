@@ -8,8 +8,8 @@ import {IronIconElement} from '@polymer/iron-icon/iron-icon';
 import '../etools-prp-common/elements/labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
-import {sharedStyles} from '../styles/shared-styles';
-import Settings from '../settings';
+import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
+import Settings from '../etools-prp-common/settings';
 declare const dayjs: any;
 
 /**

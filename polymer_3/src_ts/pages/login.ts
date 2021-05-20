@@ -19,7 +19,7 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
-import {BASE_PATH} from '../config';
+import {BASE_PATH} from '../etools-prp-common/config';
 
 /**
  * @polymer

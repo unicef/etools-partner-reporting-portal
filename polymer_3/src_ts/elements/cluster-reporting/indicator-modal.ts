@@ -30,7 +30,7 @@ import '../../etools-prp-common/elements/error-box';
 import '../form-fields/cluster-dropdown-content';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Settings from '../../settings';
+import Settings from '../../etools-prp-common/settings';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';

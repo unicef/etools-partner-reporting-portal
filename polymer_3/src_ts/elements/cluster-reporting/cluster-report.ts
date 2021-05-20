@@ -30,7 +30,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
 import {IndicatorDetailsEl} from '../../etools-prp-common/elements/indicator-details';
 import '../../etools-prp-common/elements/reportable-meta';
-import {sharedStyles} from '../../styles/shared-styles';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {
   clusterIndicatorReportsSubmit,

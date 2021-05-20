@@ -13,7 +13,7 @@ import {workspaceId} from '../../redux/selectors/workspace';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {RootState} from '../../etools-prp-common/typings/redux.types';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import {getDomainByEnv} from '../../config';
+import {getDomainByEnv} from '../../etools-prp-common/config';
 import {fetchResponsePlans} from '../../etools-prp-common/redux/actions';
 import '../../pages/app/cluster-reporting/select-plan';
 import '../../pages/app/cluster-reporting/router';

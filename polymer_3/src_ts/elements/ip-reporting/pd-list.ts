@@ -15,7 +15,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';

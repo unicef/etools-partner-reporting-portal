@@ -19,7 +19,7 @@ import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {getReportTitle} from './js/progress-reports-list-functions';
 

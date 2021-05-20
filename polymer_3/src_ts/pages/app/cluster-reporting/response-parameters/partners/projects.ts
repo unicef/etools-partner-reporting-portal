@@ -13,7 +13,7 @@ import {PlannedActionProjectsModalEl} from '../../../../../elements/cluster-repo
 import '../../../../../elements/cluster-reporting/project-list-table';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
-import {sharedStyles} from '../../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

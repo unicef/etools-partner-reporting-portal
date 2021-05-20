@@ -17,7 +17,7 @@ import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../etools-prp-common/elements/page-header';
 import '../../../../etools-prp-common/elements/project-status';
 import '../../../../elements/page-badge';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 

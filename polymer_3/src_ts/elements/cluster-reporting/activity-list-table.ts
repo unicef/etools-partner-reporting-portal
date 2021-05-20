@@ -20,7 +20,7 @@ import '../../etools-prp-common/elements/project-status';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/redux/actions';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**

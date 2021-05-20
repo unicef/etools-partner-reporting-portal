@@ -11,7 +11,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/page-body';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

@@ -16,7 +16,7 @@ import './etools-prp-common/elements/etools-prp-auth';
 import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax';
 import {GenericObject} from './etools-prp-common/typings/globals.types';
 import {reset, userLogout} from './etools-prp-common/redux/actions';
-import {getDomainByEnv, BASE_PATH} from './config';
+import {getDomainByEnv, BASE_PATH} from './etools-prp-common/config';
 import {locales} from './locales';
 import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 declare const dayjs: any;

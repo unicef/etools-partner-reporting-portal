@@ -7,7 +7,7 @@ import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/contacts/filters';
 import '../../../../../elements/cluster-reporting/contacts-table';
-import {sharedStyles} from '../../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 // import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';

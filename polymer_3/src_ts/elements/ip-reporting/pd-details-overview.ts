@@ -11,7 +11,7 @@ import './pd-details-reporting-requirements';
 import './pd-details-doc-download';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/list-placeholder';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 
@@ -23,7 +23,7 @@ import Endpoints from '../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import Settings from '../../settings';
+import Settings from '../../etools-prp-common/settings';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 import {RootState} from '../../etools-prp-common/typings/redux.types';

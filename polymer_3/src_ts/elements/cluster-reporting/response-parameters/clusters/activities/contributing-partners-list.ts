@@ -21,8 +21,8 @@ import '../../../../../etools-prp-common/elements/labelled-item';
 import '../../../../../etools-prp-common/elements/list-placeholder';
 import '../../../../../etools-prp-common/elements/project-status';
 import '../../../../../etools-prp-common/elements/page-body';
-import {sharedStyles} from '../../../../../styles/shared-styles';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

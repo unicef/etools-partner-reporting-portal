@@ -22,7 +22,7 @@ import {
   programmeDocumentReportsCount
 } from '../../redux/selectors/programmeDocumentReports';
 import {getLink} from './js/pd-reports-list-functions';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**

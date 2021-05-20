@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-query-params';
 import '../ip-reporting/pd-report-filters';
 import '../ip-reporting/pd-reports-toolbar';
 import '../ip-reporting/pd-reports-list';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

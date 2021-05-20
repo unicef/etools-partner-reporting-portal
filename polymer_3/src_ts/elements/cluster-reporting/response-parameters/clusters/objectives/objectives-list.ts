@@ -15,8 +15,8 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/page-body';
-import {sharedStyles} from '../../../../../styles/shared-styles';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**

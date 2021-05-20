@@ -13,7 +13,7 @@ import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import '../../../etools-prp-common/elements/page-header';
 import '../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './planned-action/router';
-import {sharedStyles} from '../../../styles/shared-styles';
+import {sharedStyles} from '../../../etools-prp-common/styles/shared-styles';
 
 // When the user first clicks My Planned Action, this component determines whether
 // to display the Planned Action page header and tabs.  It passes the page name to

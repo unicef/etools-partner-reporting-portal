@@ -14,7 +14,7 @@ import '../../../../../elements/cluster-reporting/response-parameters/clusters/a
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/activities/activities-list';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../../../etools-prp-common/endpoints';

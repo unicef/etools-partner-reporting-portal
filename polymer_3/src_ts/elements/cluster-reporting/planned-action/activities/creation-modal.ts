@@ -30,7 +30,7 @@ import '../../../../etools-prp-common/elements/error-box-errors';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../etools-prp-common/utils/util';
-import Settings from '../../../../settings';
+import Settings from '../../../../etools-prp-common/settings';
 
 /**
  * @polymer

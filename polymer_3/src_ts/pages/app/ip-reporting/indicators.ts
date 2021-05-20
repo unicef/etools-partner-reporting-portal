@@ -11,7 +11,7 @@ import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../elements/ip-reporting/indicators-filters';
 import '../../../elements/ip-reporting/indicators-toolbar';
-import '../../../etools-prp-common/elements/list-view-indicators';
+import '../../../elements/list-view-indicators';
 import Endpoints from '../../../etools-prp-common/endpoints';
 
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';

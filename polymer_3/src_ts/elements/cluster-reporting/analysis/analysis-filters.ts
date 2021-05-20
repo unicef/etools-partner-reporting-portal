@@ -16,7 +16,7 @@ import '../../filters/narrow-location-type-filter/narrow-location-type-filter';
 import '../../filters/location-filter-multi/location-filter-multi-narrowed';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 
-import Settings from '../../../settings';
+import Settings from '../../../etools-prp-common/settings';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';

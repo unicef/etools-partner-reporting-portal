@@ -22,7 +22,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/confirm-box';
 import '../../etools-prp-common/elements/calculation-methods-info-bar';
 import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

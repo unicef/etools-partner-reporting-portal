@@ -11,7 +11,7 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
-import Settings from '../../settings';
+import Settings from '../../etools-prp-common/settings';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import './disaggregations-dropdown-widget';
 import './indicator-locations-widget';

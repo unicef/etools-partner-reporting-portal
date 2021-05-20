@@ -13,7 +13,7 @@ import '../../../../../elements/cluster-reporting/response-parameters/clusters/d
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../../etools-prp-common/elements/page-body';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../../../etools-prp-common/endpoints';

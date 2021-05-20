@@ -14,7 +14,7 @@ import '../../../../elements/cluster-reporting/planned-action/projects/filters';
 import '../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import {PlannedActionProjectsModalEl} from '../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../elements/cluster-reporting/project-list-table';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';

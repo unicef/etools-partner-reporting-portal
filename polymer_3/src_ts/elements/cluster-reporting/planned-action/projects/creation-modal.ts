@@ -46,7 +46,7 @@ import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../etools-prp-common/utils/util';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../indicator-locations-widget';
-import Settings from '../../../../settings';
+import Settings from '../../../../etools-prp-common/settings';
 
 /**
  * @polymer

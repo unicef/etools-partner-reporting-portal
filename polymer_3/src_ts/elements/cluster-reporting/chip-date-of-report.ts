@@ -5,7 +5,7 @@ import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import ChipMixin from '../../mixins/chip-mixin';
-import Settings from '../../settings';
+import Settings from '../../etools-prp-common/settings';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import {PaperDialogElement} from '@polymer/paper-dialog/paper-dialog';

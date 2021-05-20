@@ -14,7 +14,7 @@ import '../../../../elements/ip-reporting/pd-details-calculation-methods';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
 import {RootState} from '../../../../etools-prp-common/typings/redux.types';
 import {IronPagesElement} from '@polymer/iron-pages/iron-pages';

@@ -17,7 +17,7 @@ import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import OverlayHelperMixin from '../../etools-prp-common/mixins/overlay-helper-mixin';
-import {getDomainByEnv} from '../../config';
+import {getDomainByEnv} from '../../etools-prp-common/config';
 
 /**
  * @polymer

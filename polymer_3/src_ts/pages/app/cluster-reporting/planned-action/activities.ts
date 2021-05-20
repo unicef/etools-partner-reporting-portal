@@ -12,7 +12,7 @@ import '../../../../elements/cluster-reporting/planned-action/activities/creatio
 import '../../../../elements/cluster-reporting/activity-list-table';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../etools-prp-common/elements/etools-prp-permissions';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../../etools-prp-common/endpoints';

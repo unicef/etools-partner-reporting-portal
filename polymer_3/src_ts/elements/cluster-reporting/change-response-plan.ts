@@ -4,7 +4,7 @@ import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedEleme
 import '@polymer/paper-tooltip/paper-tooltip';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
-import {sharedStyles} from '../../styles/shared-styles';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
 
 /**
  * @polymer

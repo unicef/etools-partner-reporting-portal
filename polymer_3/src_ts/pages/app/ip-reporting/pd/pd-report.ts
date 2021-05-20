@@ -41,7 +41,7 @@ import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

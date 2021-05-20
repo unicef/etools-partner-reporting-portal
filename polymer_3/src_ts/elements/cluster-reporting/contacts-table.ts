@@ -15,7 +15,7 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/project-status';
 import '../../etools-prp-common/elements/page-body';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 

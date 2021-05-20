@@ -6,7 +6,7 @@ import '@unicef-polymer/etools-data-table/etools-data-table';
 import '../../etools-prp-common/elements/list-placeholder';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import {tableStyles} from '../../styles/table-styles';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {getReportName} from './js/pd-details-reporting-requirements-functions';
 
 /**

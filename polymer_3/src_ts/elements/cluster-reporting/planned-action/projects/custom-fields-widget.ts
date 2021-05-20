@@ -6,7 +6,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-icon-button';
 import '@polymer/paper-input/paper-input';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
-import {sharedStyles} from '../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';

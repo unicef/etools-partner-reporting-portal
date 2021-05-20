@@ -11,7 +11,7 @@ import '@polymer/polymer/lib/elements/dom-if';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
-import {sharedStyles} from '../../../../../styles/shared-styles';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import '../../../../../etools-prp-common/elements/page-header';
 import '../../../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './router';

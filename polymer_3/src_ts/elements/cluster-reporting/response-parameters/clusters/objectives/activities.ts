@@ -9,7 +9,7 @@ import '../../../../../etools-prp-common/elements/page-body';
 import '../../../response-parameters/clusters/activities/activities-list';
 import '../../../response-parameters/clusters/activities/filters';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

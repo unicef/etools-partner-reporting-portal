@@ -1,7 +1,7 @@
 import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import Settings from '../../../settings';
+import Settings from '../../../etools-prp-common/settings';
 import '../dropdown-filter/dropdown-filter';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';

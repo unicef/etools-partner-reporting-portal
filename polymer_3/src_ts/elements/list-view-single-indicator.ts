@@ -22,8 +22,8 @@ import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../etools-prp-common/typings/globals.types';
-import {tableStyles} from '../styles/table-styles';
-import {sharedStyles} from '../styles/shared-styles';
+import {tableStyles} from '../etools-prp-common/styles/table-styles';
+import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 import './cluster-reporting/indicator-editing-modal';
 import './cluster-reporting/indicator-locations-modal';
 
