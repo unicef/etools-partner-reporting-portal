@@ -1,4 +1,0 @@
-[submodule "src_ts/etools-prp-common"]
-	path = src_ts/etools-prp-common
-	url = https://github.com/unicef/etools-prp-common.git
-	branch = develop
