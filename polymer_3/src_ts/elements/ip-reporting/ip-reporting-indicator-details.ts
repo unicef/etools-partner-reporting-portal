@@ -18,7 +18,6 @@ import '../../etools-prp-common/elements/list-placeholder';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {
   computeParams,
-  computeIsClusterApp,
   computeIndicatorReportsUrl,
   bucketByLocation,
   computeHidden
@@ -204,22 +203,15 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
 
-  @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
-  isClusterApp!: boolean;
-
-  @property({type: Object, computed: '_computeParams(isClusterApp)'})
+  @property({type: Object, computed: '_computeParams()'})
   params!: GenericObject;
 
   static get observers() {
     return ['_getDataByKey(dataDict)'];
   }
 
-  _computeParams(isClusterApp: boolean) {
-    computeParams(isClusterApp);
-  }
-
-  _computeIsClusterApp(appName: string) {
-    computeIsClusterApp(appName);
+  _computeParams() {
+    computeParams(false);
   }
 
   _computeIndicatorReportsUrl(indicator: GenericObject) {

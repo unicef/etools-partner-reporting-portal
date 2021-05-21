@@ -71,10 +71,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
           <page-ip-reporting name="ip-reporting" route="{{subroute}}"> </page-ip-reporting>
         </template>
-
-        <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
-          <page-cluster-reporting name="cluster-reporting" route="{{subroute}}"> </page-cluster-reporting>
-        </template>
       </iron-pages>
 
       <paper-toast id="changes-saved" text="[[localize('changes_saved')]]" duration="3000"> </paper-toast>
@@ -182,9 +178,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _routeAppChanged(app: string) {
     setTimeout(() => {
-      let defaultApp = localStorage.getItem('defaultApp');
-      defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
-
+      const defaultApp = 'ip-reporting';
       if (!this.routeData.workspace_code) {
         return;
       }
@@ -195,13 +189,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
         this._fetchCurrencies(app);
 
-        // Store selected app
-        localStorage.setItem('defaultApp', app);
-
         // Render
         this.page = app;
-      } else {
-        localStorage.setItem('defaultApp', app);
       }
     });
   }
