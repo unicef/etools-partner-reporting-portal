@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-repeat';
@@ -7,15 +7,15 @@ import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {fetchIndicatorDetails} from '../../redux/actions/indicators';
-import '../labelled-item';
-import '../report-status';
-import '../disaggregations/disaggregation-table';
-import '../list-placeholder';
-import {GenericObject} from '../../typings/globals.types';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {fetchIndicatorDetails} from '../../etools-prp-common/redux/actions/indicators';
+import '../../etools-prp-common/elements/labelled-item';
+import '../../etools-prp-common/elements/report-status';
+import '../../etools-prp-common/elements/disaggregations/disaggregation-table';
+import '../../etools-prp-common/elements/list-placeholder';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {
   computeParams,
   computeIsClusterApp,
@@ -124,9 +124,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
               </dl>
               <dl>
                 <dt>[[localize('progress_in_reporting_period')]]:</dt>
-                <dd class="reporting-period">
-                  [[report.time_period_start]] - [[report.time_period_end]]
-                </dd>
+                <dd class="reporting-period">[[report.time_period_start]] - [[report.time_period_end]]</dd>
               </dl>
             </div>
           </template>
@@ -144,9 +142,7 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
           scrollable
         >
           <template is="dom-repeat" items="[[locations]]" as="location">
-            <paper-tab name="location-[[location.current.id]]">
-              [[location.name]]
-            </paper-tab>
+            <paper-tab name="location-[[location.current.id]]"> [[location.name]] </paper-tab>
           </template>
         </paper-tabs>
       </template>

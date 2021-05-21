@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
@@ -11,14 +11,14 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 
-import '../../../elements/etools-prp-permissions';
-import '../../../elements/workspace-dropdown';
+import '../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../etools-prp-common/elements/workspace-dropdown';
 import '../../../elements/etools-prp-workspaces';
 import '../../../elements/cluster-reporting/add-plan-panel';
-import RoutingMixin from '../../../mixins/routing-mixin';
-import OverlayHelperMixin from '../../../mixins/overlay-helper-mixin';
-import {GenericObject} from '../../../typings/globals.types';
-import {tableStyles} from '../../../styles/table-styles';
+import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
+import OverlayHelperMixin from '../../../etools-prp-common/mixins/overlay-helper-mixin';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {tableStyles} from '../../../etools-prp-common/styles/table-styles';
 import {appThemeClusterStyles} from '../../../styles/app-theme-cluster-styles';
 
 /**
@@ -201,18 +201,10 @@ class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(Red
                     >
                     </paper-radio-button>
                   </div>
-                  <div class="table-cell" flex-2>
-                    [[plan.title]]
-                  </div>
-                  <div class="table-cell" flex-2>
-                    [[_planType(plan)]]
-                  </div>
-                  <div class="table-cell" flex-2>
-                    [[plan.start]]
-                  </div>
-                  <div class="table-cell" flex-2>
-                    [[plan.end]]
-                  </div>
+                  <div class="table-cell" flex-2>[[plan.title]]</div>
+                  <div class="table-cell" flex-2>[[_planType(plan)]]</div>
+                  <div class="table-cell" flex-2>[[plan.start]]</div>
+                  <div class="table-cell" flex-2>[[plan.end]]</div>
                 </div>
               </etools-data-table-row>
             </template>
@@ -222,9 +214,7 @@ class PageClusterReportingSelectPlan extends OverlayHelperMixin(RoutingMixin(Red
           <template is="dom-if" if="[[queryParams.previous]]">
             <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
           </template>
-          <paper-button id="confirm" on-tap="_confirm" raised disabled="[[!selected]]">
-            Confirm
-          </paper-button>
+          <paper-button id="confirm" on-tap="_confirm" raised disabled="[[!selected]]"> Confirm </paper-button>
         </div>
       </div>
     `;

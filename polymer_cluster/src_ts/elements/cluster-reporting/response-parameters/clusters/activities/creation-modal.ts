@@ -1,10 +1,10 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import DateMixin from '../../../../../mixins/date-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-loading/etools-loading';
@@ -22,13 +22,13 @@ import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@polymer/paper-dialog/paper-dialog';
 import '../../../../form-fields/dropdown-form-input';
 import '../../../../form-fields/cluster-dropdown-content';
-import '../../../../error-box';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import Endpoints from '../../../../../endpoints';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import {modalStyles} from '../../../../../styles/modal-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
-import {waitForIronOverlayToClose} from '../../../../../utils/util';
+import '../../../../../etools-prp-common/elements/error-box';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import {waitForIronOverlayToClose} from '../../../../../etools-prp-common/utils/util';
 
 /**
  * @polymer

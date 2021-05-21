@@ -1,13 +1,13 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import Settings from '../../../settings';
+import Settings from '../../../etools-prp-common/settings';
 import '../dropdown-filter/dropdown-filter';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import FilterDependenciesMixin from '../../../mixins/filter-dependencies-mixin';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import {GenericObject} from '../../../typings/globals.types';
+import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

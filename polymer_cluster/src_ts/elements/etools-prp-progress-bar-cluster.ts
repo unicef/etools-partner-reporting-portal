@@ -1,5 +1,5 @@
 import {PolymerElement, html} from '@polymer/polymer';
-import './etools-prp-progress-bar';
+import '../etools-prp-common/elements/etools-prp-progress-bar';
 import {property} from '@polymer/decorators/lib/decorators';
 
 /**

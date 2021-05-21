@@ -2,17 +2,17 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import '../../../../page-body';
-import Endpoints from '../../../../../endpoints';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/page-body';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
 import './contributing-partners-filters';
 import './contributing-partners-list';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import {GenericObject} from '../../../../../typings/globals.types';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
-import {clusterActivitiesPartnersFetch} from '../../../../../redux/actions/clusterActivities';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
+import {clusterActivitiesPartnersFetch} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
 
 /**
  * @polymer

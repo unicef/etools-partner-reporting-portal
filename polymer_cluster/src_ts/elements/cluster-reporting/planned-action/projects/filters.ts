@@ -1,12 +1,12 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../../../styles/filter-styles';
-import '../../../filter-list';
+import '../../../../etools-prp-common/elements/filter-list';
 import '../../../filters/text-filter/text-filter';
 import '../../../filters/dropdown-filter/dropdown-filter';
 import '../../../filters/checkbox-filter/checkbox-filter';
@@ -14,7 +14,7 @@ import '../../../filters/date-filter/date-filter';
 import '../../../filters/status-filter/project-status-filter';
 import '../../../filters/cluster-location-filter/cluster-location-filter';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../../../typings/globals.types';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

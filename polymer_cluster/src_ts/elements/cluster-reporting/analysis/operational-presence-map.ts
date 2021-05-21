@@ -1,12 +1,12 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import 'leaflet/dist/leaflet-src.esm.js';
 import {leafletStyles} from '../../../styles/leaflet-styles';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import UtilsMixin from '../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import './analysis-widget';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 // @ts-ignore
 import {map, tileLayer, polygon, marker, latLng} from 'leaflet/dist/leaflet-src.esm.js';
 

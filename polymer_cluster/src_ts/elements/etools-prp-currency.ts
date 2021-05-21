@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import {GenericObject} from '../typings/globals.types';
-import './etools-prp-number';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import '../etools-prp-common/elements/etools-prp-number';
 
 /**
  * @polymer

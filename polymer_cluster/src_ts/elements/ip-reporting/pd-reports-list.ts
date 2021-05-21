@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
@@ -6,24 +6,24 @@ import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
-import '../report-status';
-import '../list-placeholder';
-import '../etools-prp-permissions';
+import '../../etools-prp-common/elements/report-status';
+import '../../etools-prp-common/elements/list-placeholder';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
-import {GenericObject} from '../../typings/globals.types';
-import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
   programmeDocumentReportsAll,
   programmeDocumentReportsCount
 } from '../../redux/selectors/programmeDocumentReports';
 import {getLink} from './js/pd-reports-list-functions';
-import {tableStyles} from '../../styles/table-styles';
-import {RootState} from '../../typings/redux.types';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

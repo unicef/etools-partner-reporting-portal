@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -8,21 +8,21 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import Endpoints from '../../endpoints';
-import ModalMixin from '../../mixins/modal-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import '../../elements/etools-prp-ajax';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import {sharedStyles} from '../../styles/shared-styles';
-import '../error-box';
+import Endpoints from '../../etools-prp-common/endpoints';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
+import '../../etools-prp-common/elements/error-box';
 import '../json-field';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {fireEvent} from '../../utils/fire-custom-event';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -126,9 +126,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
 
             <div class="row">
               <div class="layout horizontal justified">
-                <labelled-item label="[[localize('title')]]">
-                  [[data.blueprint.title]]
-                </labelled-item>
+                <labelled-item label="[[localize('title')]]"> [[data.blueprint.title]] </labelled-item>
 
                 <dl class="data-key">
                   <dt>[[localize('label')]] -</dt>
@@ -136,9 +134,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
                     <dd>[[_withDefault(data.label)]]</dd>
                   </template>
                   <template is="dom-if" if="[[!_equals(data.blueprint.display_type, 'number')]]" restamp="true">
-                    <dd>
-                      [[_withDefault(data.numerator_label)]] / [[_withDefault(data.denominator_label)]]
-                    </dd>
+                    <dd>[[_withDefault(data.numerator_label)]] / [[_withDefault(data.denominator_label)]]</dd>
                   </template>
                 </dl>
               </div>
@@ -197,13 +193,9 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_save" class="btn-primary" raised>
-            [[localize('save')]]
-          </paper-button>
+          <paper-button on-tap="_save" class="btn-primary" raised> [[localize('save')]] </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> [[localize('cancel')]] </paper-button>
         </div>
 
         <etools-loading active="[[pending]]"></etools-loading>

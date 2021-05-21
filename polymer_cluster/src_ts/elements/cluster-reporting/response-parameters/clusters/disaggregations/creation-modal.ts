@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -17,12 +17,12 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-dialog/paper-dialog';
 import '../../../../etools-prp-chips';
 import '../../../chip-disagg-value';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import {modalStyles} from '../../../../../styles/modal-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
-import Endpoints from '../../../../../endpoints';
-import {fireEvent} from '../../../../../utils/fire-custom-event';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
+import {fireEvent} from '../../../../../etools-prp-common/utils/fire-custom-event';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
@@ -101,13 +101,9 @@ class CreationModalDisaggregation extends LocalizeMixin(UtilsMixin(ReduxConnecte
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button class="btn-primary" on-tap="_save" raised>
-            [[localize('save')]]
-          </paper-button>
+          <paper-button class="btn-primary" on-tap="_save" raised> [[localize('save')]] </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> [[localize('cancel')]] </paper-button>
         </div>
       </paper-dialog>
     `;

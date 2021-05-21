@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/app-route/app-route';
 import '@unicef-polymer/etools-data-table/etools-data-table';
@@ -9,18 +9,18 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import '../etools-prp-ajax';
-import '../project-status';
-import '../page-body';
-import '../list-placeholder';
-import {tableStyles} from '../../styles/table-styles';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/project-status';
+import '../../etools-prp-common/elements/page-body';
+import '../../etools-prp-common/elements/list-placeholder';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -121,20 +121,14 @@ class ProjectListTable extends DataTableMixin(
                   <a href="[[_detailUrl(project, anchorQuery)]]">[[project.title]]</a>
                   <paper-tooltip>[[project.title]]</paper-tooltip>
                 </div>
-                <div class="table-cell table-cell--text">
-                  [[_commaSeparatedDictValues(project.clusters, 'title')]]
-                </div>
+                <div class="table-cell table-cell--text">[[_commaSeparatedDictValues(project.clusters, 'title')]]</div>
                 <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-                  <div class="table-cell table-cell--text">
-                    [[project.partner]]
-                  </div>
+                  <div class="table-cell table-cell--text">[[project.partner]]</div>
                 </template>
                 <div class="table-cell table-cell--text">
                   <project-status status="[[project.status]]"></project-status>
                 </div>
-                <div class="table-cell table-cell--text">
-                  [[_commaSeparatedDictValues(project.locations, 'title')]]
-                </div>
+                <div class="table-cell table-cell--text">[[_commaSeparatedDictValues(project.locations, 'title')]]</div>
                 <div class="table-cell table-cell--text">
                   <template is="dom-if" if="[[project.is_ocha_imported]]">
                     <iron-icon icon="icons:check"></iron-icon>

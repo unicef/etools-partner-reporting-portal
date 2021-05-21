@@ -1,14 +1,14 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import '@google-web-components/google-chart';
 import './analysis-widget';
-import '../../list-placeholder';
-import UtilsMixin from '../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import AnalysisChartMixin from '../../../mixins/analysis-chart-mixin';
-import Constants from '../../../constants';
-import {GenericObject} from '../../../typings/globals.types';
+import '../../../etools-prp-common/elements/list-placeholder';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import AnalysisChartMixin from '../../../etools-prp-common/mixins/analysis-chart-mixin';
+import Constants from '../../../etools-prp-common/constants';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 declare const numeral: any;
 
 /**

@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-route';
@@ -6,17 +6,17 @@ import '@polymer/iron-pages/iron-pages';
 import '@polymer/paper-toast/paper-toast';
 
 import '../elements/etools-prp-workspaces';
-import '../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
-import LocalizeMixin from '../mixins/localize-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
-import Endpoints from '../endpoints';
-import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
-import {fetchCurrencies} from '../redux/actions/currencies';
-import {GenericObject, Route} from '../typings/globals.types';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import Endpoints from '../etools-prp-common/endpoints';
+import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../etools-prp-common/redux/actions';
+import {fetchCurrencies} from '../etools-prp-common/redux/actions/currencies';
+import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
 import '../pages/app/ip-reporting';
-import {locationSet} from '../redux/actions/location';
-import {getDomainByEnv} from '../config';
+import {locationSet} from '../etools-prp-common/redux/actions/location';
+import {getDomainByEnv} from '../etools-prp-common/config';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**

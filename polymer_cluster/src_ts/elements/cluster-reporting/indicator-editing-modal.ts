@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dialog/paper-dialog';
@@ -11,27 +11,27 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
-import Settings from '../../settings';
+import Settings from '../../etools-prp-common/settings';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import './disaggregations-dropdown-widget';
 import './indicator-locations-widget';
 import './chip-date-of-report';
-import '../labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import '../etools-prp-chips';
-import '../etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../json-field';
-import '../calculation-method';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
-import ModalMixin from '../../mixins/modal-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import '../error-box';
-import '../etools-prp-permissions';
-import {GenericObject} from '../../typings/globals.types';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {fireEvent} from '../../utils/fire-custom-event';
+import '../../etools-prp-common/elements/calculation-method';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import '../../etools-prp-common/elements/error-box';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -397,13 +397,9 @@ class IndicatorEditingModal extends UtilsMixin(ModalMixin(LocalizeMixin(ReduxCon
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_save" class="btn-primary" raised>
-            [[localize('save')]]
-          </paper-button>
+          <paper-button on-tap="_save" class="btn-primary" raised> [[localize('save')]] </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> [[localize('cancel')]] </paper-button>
         </div>
 
         <etools-loading active="[[updatePending]]"></etools-loading>

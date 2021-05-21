@@ -1,21 +1,21 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import Constants from '../../constants';
-import UtilsMixin from '../../mixins/utils-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
-import DataTableMixin from '../../mixins/data-table-mixin';
-import '../confirm-box';
-import {ConfirmBoxEl} from '../confirm-box';
-import '../list-placeholder';
+import Constants from '../../etools-prp-common/constants';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
+import '../../etools-prp-common/elements/confirm-box';
+import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
+import '../../etools-prp-common/elements/list-placeholder';
 import './cluster-report-proxy';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {clusterIndicatorsReportsAll} from '../../redux/selectors/clusterIndicatorReports';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

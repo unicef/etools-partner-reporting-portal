@@ -3,8 +3,8 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-route';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-pages/iron-pages';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import {getDomainByEnv} from '../../../../config';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import {getDomainByEnv} from '../../../../etools-prp-common/config';
 
 /**
  * @polymer

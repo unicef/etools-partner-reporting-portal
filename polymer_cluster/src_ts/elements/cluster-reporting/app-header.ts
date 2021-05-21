@@ -3,14 +3,14 @@ import '@polymer/app-layout/app-header/app-header';
 import '@polymer/app-layout/app-header-layout/app-header-layout';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import '../etools-logo';
-import '../app-switcher';
-import '../workspace-dropdown';
+import '../../etools-prp-common/elements/etools-logo';
+import '../../etools-prp-common/elements/app-switcher';
+import '../../etools-prp-common/elements/workspace-dropdown';
 import '../language-dropdown';
 import '../etools-prp-workspaces';
 import '../etools-prp-languages';
 import './change-response-plan';
-import '../user-profile/profile-dropdown';
+import '../../etools-prp-common/elements/user-profile/profile-dropdown';
 
 /**
  * @polymer

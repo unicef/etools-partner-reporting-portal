@@ -1,6 +1,6 @@
 import {createSelector} from 'reselect';
-import {RootState} from '../../typings/redux.types';
-import {GenericObject} from '../../typings/globals.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 // App.Selectors.ProgrammeDocumentDetails
 export const programmeDocumentDetailsLoading = createSelector(

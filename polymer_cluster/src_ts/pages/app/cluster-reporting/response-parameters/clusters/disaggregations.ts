@@ -1,25 +1,25 @@
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import {CreationModalDisaggregationEl} from '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal';
 import '../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list';
-import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
-import '../../../../../elements/etools-prp-permissions';
-import '../../../../../elements/page-body';
-import {tableStyles} from '../../../../../styles/table-styles';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
-import Endpoints from '../../../../../endpoints';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../../etools-prp-common/elements/page-body';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchClusterDisaggregationsList} from '../../../../../redux/actions/clusterDisaggregations';
+import {fetchClusterDisaggregationsList} from '../../../../../etools-prp-common/redux/actions/clusterDisaggregations';
 
 /**
  * @polymer

@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
@@ -7,17 +7,17 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import {filterStyles} from '../../../styles/filter-styles';
 
-import '../../filter-list';
+import '../../../etools-prp-common/elements/filter-list';
 import '../../filters/cluster-filter-multi/cluster-filter-multi';
 import '../../filters/partner-type-filter-multi/partner-type-filter-multi';
 import '../../filters/cluster-objective-filter-multi/cluster-objective-filter-multi';
 import '../../filters/location-type-filter/location-type-filter';
 import '../../filters/narrow-location-type-filter/narrow-location-type-filter';
 import '../../filters/location-filter-multi/location-filter-multi-narrowed';
-import UtilsMixin from '../../../mixins/utils-mixin';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 
-import Settings from '../../../settings';
-import {GenericObject} from '../../../typings/globals.types';
+import Settings from '../../../etools-prp-common/settings';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

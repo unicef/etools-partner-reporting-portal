@@ -1,15 +1,15 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '../page-body';
+import '../../etools-prp-common/elements/page-body';
 import '../ip-reporting/partner-details';
-import '../etools-prp-number';
-import '../labelled-item';
-import {GenericObject} from '../../typings/globals.types';
+import '../../etools-prp-common/elements/etools-prp-number';
+import '../../etools-prp-common/elements/labelled-item';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

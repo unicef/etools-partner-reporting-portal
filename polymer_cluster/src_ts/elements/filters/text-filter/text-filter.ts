@@ -1,11 +1,11 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/paper-input/paper-input';
 import {property} from '@polymer/decorators';
-import FilterMixin from '../../../mixins/filter-mixin';
+import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fireEvent} from '../../../utils/fire-custom-event';
+import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**

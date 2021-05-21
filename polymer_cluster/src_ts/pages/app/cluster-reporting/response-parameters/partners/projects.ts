@@ -1,25 +1,25 @@
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
-import SortingMixin from '../../../../../mixins/sorting-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
+import SortingMixin from '../../../../../etools-prp-common/mixins/sorting-mixin';
 import '../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters';
 import '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import {PlannedActionProjectsModalEl} from '../../../../../elements/cluster-reporting/planned-action/projects/creation-modal';
 import '../../../../../elements/cluster-reporting/project-list-table';
-import {EtoolsPrpAjaxEl} from '../../../../../elements/etools-prp-ajax';
-import '../../../../../elements/etools-prp-permissions';
-import {sharedStyles} from '../../../../../styles/shared-styles';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import Endpoints from '../../../../../endpoints';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {GenericObject} from '../../../../../typings/globals.types';
-import {fetchPartnerProjectsList} from '../../../../../redux/actions/partnerProjects';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import {fetchPartnerProjectsList} from '../../../../../etools-prp-common/redux/actions/partnerProjects';
 
 /**
  * @polymer

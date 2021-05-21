@@ -1,18 +1,18 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import './editing-modal';
 import {ClusterObjectivesEditingModalEl} from './editing-modal';
-import '../../../../etools-prp-ajax';
-import '../../../../etools-prp-permissions';
-import '../../../../page-body';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../../etools-prp-common/elements/page-body';
 import '../../../../frequency-of-reporting';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import '../../../../labelled-item';
-import {GenericObject} from '../../../../../typings/globals.types';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import '../../../../../etools-prp-common/elements/labelled-item';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

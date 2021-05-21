@@ -1,9 +1,9 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import Settings from '../../../settings';
+import Settings from '../../../etools-prp-common/settings';
 import '../dropdown-filter/dropdown-filter';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 
 /**
  * @polymer

@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -6,22 +6,22 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import '../../../../elements/etools-prp-ajax';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../elements/cluster-reporting/analysis/partners-per-type';
 import '../../../../elements/cluster-reporting/analysis/partners-per-cluster';
 import '../../../../elements/cluster-reporting/analysis/partners-per-cluster-objective';
 import '../../../../elements/cluster-reporting/analysis/operational-presence-map';
 import '../../../../elements/cluster-reporting/analysis/operational-presence-table';
-import Endpoints from '../../../../endpoints';
+import Endpoints from '../../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {
   analysis_operationalPresence_fetchData,
   analysis_operationalPresence_fetchMap
-} from '../../../../redux/actions/analysis';
+} from '../../../../etools-prp-common/redux/actions/analysis';
 
 /**
  * @polymer

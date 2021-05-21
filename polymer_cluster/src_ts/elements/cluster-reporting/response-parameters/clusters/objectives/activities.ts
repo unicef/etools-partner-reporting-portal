@@ -1,20 +1,20 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import '../../../../page-body';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import '../../../../../etools-prp-common/elements/page-body';
 import '../../../response-parameters/clusters/activities/activities-list';
 import '../../../response-parameters/clusters/activities/filters';
-import {GenericObject} from '../../../../../typings/globals.types';
-import {tableStyles} from '../../../../../styles/table-styles';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {fetchClusterActivitiesList} from '../../../../../redux/actions/clusterActivities';
-import Endpoints from '../../../../../endpoints';
+import {fetchClusterActivitiesList} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
 
 /**
  * @polymer

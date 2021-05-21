@@ -1,14 +1,14 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../etools-prp-toolbar';
-import '../download-button';
-import '../upload-button';
-import '../../elements/etools-prp-permissions';
+import '../../etools-prp-common/elements/download-button';
+import '../../etools-prp-common/elements/upload-button';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import {property} from '@polymer/decorators/lib/decorators';
-import {fireEvent} from '../../utils/fire-custom-event';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer

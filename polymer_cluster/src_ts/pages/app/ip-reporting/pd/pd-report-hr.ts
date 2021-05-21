@@ -2,7 +2,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-pages/iron-pages';
 import './pd-report-hr-qpr/reporting';
-import UtilsMixin from '../../../../mixins/utils-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 
 /**
  * @polymer

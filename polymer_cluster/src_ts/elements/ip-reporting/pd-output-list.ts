@@ -1,18 +1,18 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@unicef-polymer/etools-loading/etools-loading.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import './pd-output';
-import '../list-placeholder';
+import '../../etools-prp-common/elements/list-placeholder';
 import '../ip-reporting/pd-output';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
-import {RootState} from '../../typings/redux.types';
-import {GenericObject} from '../../typings/globals.types';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 
 /**
  * @polymer

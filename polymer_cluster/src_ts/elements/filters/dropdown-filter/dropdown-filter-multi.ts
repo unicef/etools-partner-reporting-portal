@@ -1,8 +1,8 @@
 import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
-import FilterMixin from '../../../mixins/filter-mixin';
-import {fireEvent} from '../../../utils/fire-custom-event';
+import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
+import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer

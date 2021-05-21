@@ -1,23 +1,23 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../etools-prp-permissions';
-import '../../../page-body';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import Endpoints from '../../../../endpoints';
-import {tableStyles} from '../../../../styles/table-styles';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
+import '../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../etools-prp-common/elements/page-body';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import Endpoints from '../../../../etools-prp-common/endpoints';
+import {tableStyles} from '../../../../etools-prp-common/styles/table-styles';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import '../../indicator-modal';
 import {IndicatorModalEl} from '../../indicator-modal';
 import '../../../list-view-indicators';
-import {GenericObject} from '../../../../typings/globals.types';
-import '../../../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
-import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProjects';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
+import '../../../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
+import {partnerProjIndicatorsFetch} from '../../../../etools-prp-common/redux/actions/partnerProjects';
 
 /**
  * @polymer

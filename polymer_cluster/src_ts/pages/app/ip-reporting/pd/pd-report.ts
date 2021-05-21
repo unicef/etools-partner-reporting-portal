@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
@@ -9,15 +9,15 @@ import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/paper-tabs/paper-tab';
 import '@polymer/iron-pages/iron-pages';
 
-import '../../../../elements/etools-prp-ajax';
-import '../../../../elements/etools-prp-permissions';
-import '../../../../elements/page-header';
-import '../../../../elements/page-body';
+import '../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../etools-prp-common/elements/page-header';
+import '../../../../etools-prp-common/elements/page-body';
 import '../../../../elements/reporting-period';
-import '../../../../elements/report-status';
-import '../../../../elements/message-box';
-import '../../../../elements/error-modal';
-import {ErrorModalEl} from '../../../../elements/error-modal';
+import '../../../../etools-prp-common/elements/report-status';
+import '../../../../etools-prp-common/elements/message-box';
+import '../../../../etools-prp-common/elements/error-modal';
+import {ErrorModalEl} from '../../../../etools-prp-common/elements/error-modal';
 import '../../../../elements/ip-reporting/pd-reports-report-title';
 import '../../../../elements/ip-reporting/pd-report-export-button';
 import '../../../../elements/ip-reporting/pd-modal';
@@ -29,21 +29,25 @@ import './pd-report-hr';
 import './pd-report-qpr';
 
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
-import {currentProgrammeDocument} from '../../../../redux/selectors/programmeDocuments';
-import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports';
+import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
+import {
+  pdReportsSetCurrent,
+  pdReportsFetchSingle,
+  pdReportsUpdateSingle
+} from '../../../../etools-prp-common/redux/actions/pdReports';
 
-import Endpoints from '../../../../endpoints';
-import UtilsMixin from '../../../../mixins/utils-mixin';
+import Endpoints from '../../../../etools-prp-common/endpoints';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin';
-import RoutingMixin from '../../../../mixins/routing-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import {sharedStyles} from '../../../../styles/shared-styles';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import {GenericObject} from '../../../../typings/globals.types';
+import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {EtoolsPrpAjaxEl} from '../../../../elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {RootState} from '../../../../typings/redux.types';
+import {RootState} from '../../../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

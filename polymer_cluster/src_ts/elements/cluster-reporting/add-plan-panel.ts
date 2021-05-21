@@ -2,7 +2,7 @@ import {html, PolymerElement} from '@polymer/polymer';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
-import {buttonsStyles} from '../../styles/buttons-styles';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import './add-response-plan-modal';
 import {AddResponsePlanModalEl} from './add-response-plan-modal';
 
@@ -32,9 +32,7 @@ class AddPlanPanel extends PolymerElement {
           <span>Select Response Plan from the list below or add a new one if the needed one is not available.</span>
         </div>
         <div>
-          <paper-button id="periods" on-tap="_openModal" class="btn-primary">
-            Add new response plan
-          </paper-button>
+          <paper-button id="periods" on-tap="_openModal" class="btn-primary"> Add new response plan </paper-button>
         </div>
       </div>
       <add-response-plan-modal id="modal"> </add-response-plan-modal>

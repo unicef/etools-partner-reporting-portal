@@ -1,6 +1,6 @@
 import {PolymerElement} from '@polymer/polymer';
-import {Constructor, GenericObject} from '../typings/globals.types';
-import Settings from '../settings';
+import {Constructor, GenericObject} from '../etools-prp-common/typings/globals.types';
+import Settings from '../etools-prp-common/settings';
 
 /**
  * @polymer

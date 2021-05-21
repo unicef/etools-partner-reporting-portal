@@ -1,8 +1,8 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import UtilsMixin from '../mixins/utils-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 
 /**
  * @polymer

@@ -1,6 +1,6 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
@@ -13,22 +13,22 @@ import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
-import Endpoints from '../../../../endpoints';
-import ModalMixin from '../../../../mixins/modal-mixin';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import {modalStyles} from '../../../../styles/modal-styles';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-ajax';
-import '../../../etools-prp-permissions';
+import Endpoints from '../../../../etools-prp-common/endpoints';
+import ModalMixin from '../../../../etools-prp-common/mixins/modal-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../../../etools-prp-common/styles/modal-styles';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import '../../../form-fields/partner-dropdown-content';
 import '../../../form-fields/cluster-dropdown-content';
-import '../../../error-box-errors';
-import {GenericObject} from '../../../../typings/globals.types';
-import {fireEvent} from '../../../../utils/fire-custom-event';
+import '../../../../etools-prp-common/elements/error-box-errors';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
+import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {PaperIconButtonElement} from '@polymer/paper-icon-button/paper-icon-button';
-import Settings from '../../../../settings';
+import Settings from '../../../../etools-prp-common/settings';
 
 /**
  * @polymer
@@ -404,13 +404,9 @@ class PlannedActionActivityEditingModal extends UtilsMixin(ModalMixin(LocalizeMi
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button on-tap="_save" class="btn-primary" raised>
-            [[localize('save')]]
-          </paper-button>
+          <paper-button on-tap="_save" class="btn-primary" raised> [[localize('save')]] </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> [[localize('cancel')]] </paper-button>
         </div>
 
         <etools-loading active="[[updatePending]]"></etools-loading>

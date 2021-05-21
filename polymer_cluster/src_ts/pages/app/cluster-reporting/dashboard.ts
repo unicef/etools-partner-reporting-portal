@@ -1,14 +1,14 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import '../../../elements/etools-prp-auth';
-import '../../../elements/page-header';
-import '../../../elements/page-body';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import '../../../etools-prp-common/elements/etools-prp-auth';
+import '../../../etools-prp-common/elements/page-header';
+import '../../../etools-prp-common/elements/page-body';
 import '../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import '../../../elements/cluster-reporting/dashboard/indicators-by-status';
 import '../../../elements/cluster-reporting/dashboard/number-of-partners';
@@ -18,13 +18,13 @@ import '../../../elements/cluster-reporting/dashboard/number-of-non-cluster-acti
 import '../../../elements/cluster-reporting/dashboard/reports-list';
 import '../../../elements/cluster-reporting/dashboard/constrained-reports-list';
 import '../../../elements/cluster-reporting/dashboard/activities-list';
-import Constants from '../../../constants';
-import Endpoints from '../../../endpoints';
+import Constants from '../../../etools-prp-common/constants';
+import Endpoints from '../../../etools-prp-common/endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
-import {clusterDashboardDataFetch} from '../../../redux/actions/clusterDashboardData';
-import {GenericObject} from '../../../typings/globals.types';
+import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
+import {clusterDashboardDataFetch} from '../../../etools-prp-common/redux/actions/clusterDashboardData';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

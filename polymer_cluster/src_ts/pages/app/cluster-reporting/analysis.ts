@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-pages/iron-pages';
@@ -6,14 +6,14 @@ import '@polymer/paper-tabs/paper-tab';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/app-route/app-route';
 
-import UtilsMixin from '../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import '../../../elements/page-header';
-import '../../../elements/page-body';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import '../../../etools-prp-common/elements/page-header';
+import '../../../etools-prp-common/elements/page-body';
 import '../../../elements/cluster-reporting/analysis/analysis-filters';
 import './analysis/operational-presence';
 import './analysis/indicators';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

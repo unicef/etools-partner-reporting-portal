@@ -1,5 +1,5 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -14,23 +14,23 @@ import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-loading/etools-loading';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
-import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import '../etools-prp-permissions';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-permissions';
 import '@unicef-polymer/etools-date-time/datepicker-lite';
 import {configClusterTypes} from '../../redux/selectors/config';
 import {workspaceId} from '../../redux/selectors/workspace';
 import './response-plan-details';
-import '../error-box';
-import {GenericObject} from '../../typings/globals.types';
-import {fireEvent} from '../../utils/fire-custom-event';
-import {fetchConfig} from '../../redux/actions/config';
-import {addResponsePlan} from '../../redux/actions';
-import {RootState} from '../../typings/redux.types';
+import '../../etools-prp-common/elements/error-box';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
+import {fetchConfig} from '../../etools-prp-common/redux/actions/config';
+import {addResponsePlan} from '../../etools-prp-common/redux/actions';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer
@@ -250,9 +250,7 @@ class AddResponsePlanModal extends UtilsMixin(ModalMixin(ReduxConnectedElement))
             Save
           </paper-button>
 
-          <paper-button class="btn-cancel" on-tap="close">
-            Cancel
-          </paper-button>
+          <paper-button class="btn-cancel" on-tap="close"> Cancel </paper-button>
         </div>
 
         <etools-loading active="[[updatePending]]"></etools-loading>

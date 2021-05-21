@@ -3,9 +3,9 @@ import {property} from '@polymer/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/paper-input/paper-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import './labelled-item';
-import {GenericObject} from '../typings/globals.types';
-import UtilsMixin from '../mixins/utils-mixin';
+import '../etools-prp-common/elements/labelled-item';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 
 /**
  * @polymer

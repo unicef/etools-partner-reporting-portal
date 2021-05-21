@@ -1,5 +1,5 @@
-import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../typings/globals.types';
+import Endpoints from '../../../etools-prp-common/endpoints';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computeIsClusterApp(name: string) {
   return name === 'cluster-reporting';

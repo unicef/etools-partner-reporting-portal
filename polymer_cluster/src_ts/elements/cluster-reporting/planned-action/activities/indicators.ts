@@ -1,22 +1,22 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../mixins/utils-mixin';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-ajax';
-import Endpoints from '../../../../endpoints';
-import {partnerActivitiesIndicatorsFetch} from '../../../../redux/actions/partnerActivities';
-import '../../../etools-prp-permissions';
-import '../../../page-body';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
+import Endpoints from '../../../../etools-prp-common/endpoints';
+import {partnerActivitiesIndicatorsFetch} from '../../../../etools-prp-common/redux/actions/partnerActivities';
+import '../../../../etools-prp-common/elements/etools-prp-permissions';
+import '../../../../etools-prp-common/elements/page-body';
 import '../../../list-view-indicators';
 import '../../indicator-modal';
 import {IndicatorModalEl} from '../../indicator-modal';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import {tableStyles} from '../../../../styles/table-styles';
-import {GenericObject} from '../../../../typings/globals.types';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import {tableStyles} from '../../../../etools-prp-common/styles/table-styles';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

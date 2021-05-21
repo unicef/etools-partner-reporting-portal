@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-tabs/paper-tab';
@@ -7,13 +7,13 @@ import '@polymer/app-route/app-route';
 import '@polymer/iron-pages/iron-pages';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../../mixins/utils-mixin';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import {GenericObject} from '../../../typings/globals.types';
-import '../../../elements/page-header';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import '../../../etools-prp-common/elements/page-header';
 import '../../../elements/filters/cluster-filter/filter-list-by-cluster';
 import './planned-action/router';
-import {sharedStyles} from '../../../styles/shared-styles';
+import {sharedStyles} from '../../../etools-prp-common/styles/shared-styles';
 
 // When the user first clicks My Planned Action, this component determines whether
 // to display the Planned Action page header and tabs.  It passes the page name to

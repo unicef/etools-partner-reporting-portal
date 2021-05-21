@@ -1,6 +1,6 @@
 import {createSelector} from 'reselect';
 import {programmeDocumentReportsCurrent} from './programmeDocumentReports';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 // App.Selectors.LLOs
 export const llosAll = createSelector(

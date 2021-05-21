@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
@@ -11,15 +11,15 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-input/paper-input';
 import '@polymer/iron-form/iron-form';
 
-import Endpoints from '../endpoints';
-import ResponsiveMixin from '../mixins/responsive-mixin';
-import LocalizeMixin from '../mixins/localize-mixin';
-import '../elements/etools-logo';
-import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
-import '../elements/etools-prp-ajax';
-import '../elements/page-title';
+import Endpoints from '../etools-prp-common/endpoints';
+import ResponsiveMixin from '../etools-prp-common/mixins/responsive-mixin';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import '../etools-prp-common/elements/etools-logo';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import '../etools-prp-common/elements/page-title';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles';
-import {BASE_PATH} from '../config';
+import {BASE_PATH} from '../etools-prp-common/config';
 
 /**
  * @polymer

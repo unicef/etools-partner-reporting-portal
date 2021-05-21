@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -10,22 +10,22 @@ import '@polymer/paper-tooltip/paper-tooltip';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Settings from '../../settings';
-import UtilsMixin from '../../mixins/utils-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {sharedStyles} from '../../styles/shared-styles';
+import Settings from '../../etools-prp-common/settings';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
 import '../json-field';
-import '../etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-reset';
-import '../etools-prp-permissions';
-import '../labelled-item';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import '../../etools-prp-common/elements/labelled-item';
 import './message-imo-modal';
 import {MessageImoModalEl} from './message-imo-modal';
-import {GenericObject} from '../../typings/globals.types';
-import Endpoints from '../../endpoints';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import Endpoints from '../../etools-prp-common/endpoints';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown';
 
 /**
@@ -247,9 +247,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
         </div>
       </template>
 
-      <paper-button class="btn-primary" on-tap="_add">
-        [[localize('add_location')]]
-      </paper-button>
+      <paper-button class="btn-primary" on-tap="_add"> [[localize('add_location')]] </paper-button>
     `;
   }
 

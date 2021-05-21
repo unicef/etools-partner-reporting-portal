@@ -1,6 +1,6 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import '@polymer/iron-collapse/iron-collapse';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
@@ -12,33 +12,33 @@ import '@polymer/paper-menu-button/paper-menu-button';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-item/paper-icon-item';
 import '@polymer/paper-listbox/paper-listbox';
-import Endpoints from '../../endpoints';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
+import Endpoints from '../../etools-prp-common/endpoints';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import './send-back-modal';
 import {SendBackModalEl} from './send-back-modal';
 import './feedback-modal';
 import {FeedbackModalEl} from './feedback-modal';
-import '../error-modal';
-import {ErrorModalEl} from '../error-modal';
-import '../report-status';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import '../etools-prp-number';
-import '../etools-prp-permissions';
-import '../indicator-details';
-import {IndicatorDetailsEl} from '../indicator-details';
-import '../reportable-meta';
-import {sharedStyles} from '../../styles/shared-styles';
-import {buttonsStyles} from '../../styles/buttons-styles';
+import '../../etools-prp-common/elements/error-modal';
+import {ErrorModalEl} from '../../etools-prp-common/elements/error-modal';
+import '../../etools-prp-common/elements/report-status';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-number';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import '../../etools-prp-common/elements/indicator-details';
+import {IndicatorDetailsEl} from '../../etools-prp-common/elements/indicator-details';
+import '../../etools-prp-common/elements/reportable-meta';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {
   clusterIndicatorReportsSubmit,
   clusterIndicatorReportsUpdate
-} from '../../redux/actions/clusterIndicatorReports';
+} from '../../etools-prp-common/redux/actions/clusterIndicatorReports';
 
-import {GenericObject} from '../../typings/globals.types';
-import {fireEvent} from '../../utils/fire-custom-event';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 import {PaperListboxElement} from '@polymer/paper-listbox/paper-listbox';
 
 /**
@@ -281,9 +281,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   <dl>
                     <dt>[[localize('project')]]:</dt>
                     <dd>
-                      <a href="[[partnerProjectDetailUrl]]">
-                        [[_withDefault(data.project.title)]]
-                      </a>
+                      <a href="[[partnerProjectDetailUrl]]"> [[_withDefault(data.project.title)]] </a>
                     </dd>
                   </dl>
                 </template>
@@ -291,9 +289,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   <dl>
                     <dt>[[localize('activity')]]:</dt>
                     <dd>
-                      <a href="[[partnerActivityDetailUrl]]">
-                        [[_withDefault(data.partner_activity.title)]]
-                      </a>
+                      <a href="[[partnerActivityDetailUrl]]"> [[_withDefault(data.partner_activity.title)]] </a>
                     </dd>
                   </dl>
                 </template>
@@ -301,9 +297,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   <dl>
                     <dt>[[localize('cluster_objective')]]:</dt>
                     <dd>
-                      <a href="[[clusterObjectiveDetailUrl]]">
-                        [[_withDefault(data.cluster_objective.title)]]
-                      </a>
+                      <a href="[[clusterObjectiveDetailUrl]]"> [[_withDefault(data.cluster_objective.title)]] </a>
                     </dd>
                   </dl>
                 </template>
@@ -311,9 +305,7 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
                   <dl>
                     <dt>[[localize('cluster_activity')]]:</dt>
                     <dd>
-                      <a href="[[clusterActivityDetailUrl]]">
-                        [[_withDefault(data.cluster_activity.title)]]
-                      </a>
+                      <a href="[[clusterActivityDetailUrl]]"> [[_withDefault(data.cluster_activity.title)]] </a>
                     </dd>
                   </dl>
                 </template>

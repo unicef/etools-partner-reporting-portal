@@ -1,17 +1,17 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/iron-collapse/iron-collapse';
-import '../../etools-prp-progress-bar';
+import '../../../etools-prp-common/elements/etools-prp-progress-bar';
 import '../../etools-prp-progress-bar-alt';
-import LocalizeMixin from '../../../mixins/localize-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import './indicator-details';
-import {sharedStyles} from '../../../styles/shared-styles';
-import {GenericObject} from '../../../typings/globals.types';
+import {sharedStyles} from '../../../etools-prp-common/styles/shared-styles';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import '../../cluster-reporting/analysis/indicator-details';
 import {IndicatorDetailsEl} from '../../cluster-reporting/analysis/indicator-details';
 

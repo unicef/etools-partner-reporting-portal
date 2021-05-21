@@ -1,9 +1,9 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/app-layout/app-grid/app-grid-style';
@@ -20,12 +20,12 @@ import '@polymer/paper-dialog/paper-dialog';
 import '@polymer/paper-input/paper-input';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '../../../../form-fields/cluster-dropdown-content';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-ajax';
-import {buttonsStyles} from '../../../../../styles/buttons-styles';
-import {modalStyles} from '../../../../../styles/modal-styles';
-import Endpoints from '../../../../../endpoints';
-import {GenericObject} from '../../../../../typings/globals.types';
-import {waitForIronOverlayToClose} from '../../../../../utils/util';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
+import Endpoints from '../../../../../etools-prp-common/endpoints';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
+import {waitForIronOverlayToClose} from '../../../../../etools-prp-common/utils/util';
 
 /**
  * @polymer

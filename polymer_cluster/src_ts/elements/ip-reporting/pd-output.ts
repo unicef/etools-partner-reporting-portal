@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/iron-collapse/iron-collapse.js';
@@ -6,12 +6,12 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-tooltip/paper-tooltip.js';
-import {GenericObject} from '../../typings/globals.types';
-import UtilsMixin from '../../mixins/utils-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
@@ -20,16 +20,16 @@ import {
   calculationFormulaAcrossPeriods
 } from './js/pd-output-functions';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
-import {pdReportsUpdateReportable} from '../../redux/actions/pdReports';
-import '../reportable-meta';
-import '../labelled-item';
-import '../etools-prp-number';
-import '../report-status';
-import '../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import '../etools-prp-permissions';
-import '../indicator-details';
-import {RootState} from '../../typings/redux.types';
+import {pdReportsUpdateReportable} from '../../etools-prp-common/redux/actions/pdReports';
+import '../../etools-prp-common/elements/reportable-meta';
+import '../../etools-prp-common/elements/labelled-item';
+import '../../etools-prp-common/elements/etools-prp-number';
+import '../../etools-prp-common/elements/report-status';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import '../../etools-prp-common/elements/indicator-details';
+import {RootState} from '../../etools-prp-common/typings/redux.types';
 
 /**
  * @polymer

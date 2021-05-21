@@ -1,14 +1,14 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import '../../../page-body';
-import '../../../etools-prp-permissions';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
+import '../../../../etools-prp-common/elements/page-body';
+import '../../../../etools-prp-common/elements/etools-prp-permissions';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import '../../activity-details';
 import './editing-modal';
 import {PlannedActionActivityEditingModalEl} from './editing-modal';
-import {GenericObject} from '../../../../typings/globals.types';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

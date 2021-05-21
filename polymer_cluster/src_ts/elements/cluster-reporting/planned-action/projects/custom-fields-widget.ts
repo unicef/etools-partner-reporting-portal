@@ -1,15 +1,15 @@
-import {ReduxConnectedElement} from '../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/paper-button/paper-button';
 import '@polymer/paper-icon-button';
 import '@polymer/paper-input/paper-input';
-import {buttonsStyles} from '../../../../styles/buttons-styles';
-import {sharedStyles} from '../../../../styles/shared-styles';
-import LocalizeMixin from '../../../../mixins/localize-mixin';
+import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../../../typings/globals.types';
+import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -110,9 +110,7 @@ class CustomFieldsWidget extends LocalizeMixin(ReduxConnectedElement) {
         </div>
       </template>
 
-      <paper-button class="btn-primary" on-tap="_add">
-        [[localize('add_custom_field')]]
-      </paper-button>
+      <paper-button class="btn-primary" on-tap="_add"> [[localize('add_custom_field')]] </paper-button>
     `;
   }
 

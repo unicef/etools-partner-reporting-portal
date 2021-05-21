@@ -1,10 +1,10 @@
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import '@polymer/paper-tooltip/paper-tooltip';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import {sharedStyles} from '../../styles/shared-styles';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import {sharedStyles} from '../../etools-prp-common/styles/shared-styles';
 
 /**
  * @polymer

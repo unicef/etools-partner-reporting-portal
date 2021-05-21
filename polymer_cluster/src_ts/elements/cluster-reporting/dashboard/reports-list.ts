@@ -1,15 +1,15 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import Constants from '../../../constants';
-import {ConfirmBoxEl} from '../../confirm-box';
-import '../../list-placeholder';
+import Constants from '../../../etools-prp-common/constants';
+import {ConfirmBoxEl} from '../../../etools-prp-common/elements/confirm-box';
+import '../../../etools-prp-common/elements/list-placeholder';
 import '../../cluster-reporting/cluster-report';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

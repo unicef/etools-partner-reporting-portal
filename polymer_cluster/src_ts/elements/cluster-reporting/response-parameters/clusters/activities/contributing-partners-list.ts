@@ -1,11 +1,11 @@
-import {ReduxConnectedElement} from '../../../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import LocalizeMixin from '../../../../../mixins/localize-mixin';
-import UtilsMixin from '../../../../../mixins/utils-mixin';
-import DataTableMixin from '../../../../../mixins/data-table-mixin';
-import RoutingMixin from '../../../../../mixins/routing-mixin';
-import PaginationMixin from '../../../../../mixins/pagination-mixin';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
+import DataTableMixin from '../../../../../etools-prp-common/mixins/data-table-mixin';
+import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
+import PaginationMixin from '../../../../../etools-prp-common/mixins/pagination-mixin';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import '@polymer/app-route/app-route';
@@ -16,14 +16,14 @@ import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import '../../../../etools-prp-ajax';
-import '../../../../labelled-item';
-import '../../../../list-placeholder';
-import '../../../../project-status';
-import '../../../../page-body';
-import {sharedStyles} from '../../../../../styles/shared-styles';
-import {tableStyles} from '../../../../../styles/table-styles';
-import {GenericObject} from '../../../../../typings/globals.types';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax';
+import '../../../../../etools-prp-common/elements/labelled-item';
+import '../../../../../etools-prp-common/elements/list-placeholder';
+import '../../../../../etools-prp-common/elements/project-status';
+import '../../../../../etools-prp-common/elements/page-body';
+import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
+import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
+import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer

@@ -1,13 +1,13 @@
 import {html} from '@polymer/polymer';
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-card/paper-card';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import {dashboardWidgetStyles} from '../../../styles/dashboard-widget-styles';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import RoutingMixin from '../../../mixins/routing-mixin';
-import '../../etools-prp-number';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
+import '../../../etools-prp-common/elements/etools-prp-number';
 
 /**
  * @polymer

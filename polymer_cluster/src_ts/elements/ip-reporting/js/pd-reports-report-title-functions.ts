@@ -1,4 +1,4 @@
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function shouldDisplayLink(
   displayLink: string,
