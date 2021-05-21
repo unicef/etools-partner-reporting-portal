@@ -16,32 +16,13 @@
     "src/pages/app/ip-reporting/pd/pd-details.js",
     "src/pages/app/ip-reporting/pd/pd-report.js",
     "src/pages/app/ip-reporting/indicators.js",
-    "src/pages/app/ip-reporting/progress-reports.js",
-    "src/pages/app/cluster-reporting.js",
-    "src/pages/app/cluster-reporting/select-plan.js",
-    "src/pages/app/cluster-reporting/router.js",
-    "src/pages/app/cluster-reporting/dashboard.js",
-    "src/pages/app/cluster-reporting/response-parameters.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/clusters.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/objective.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/objectives.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/activity.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/activities.js",
-    "src/pages/app/cluster-reporting/response-parameters/clusters/disaggregations.js",
-    "src/pages/app/cluster-reporting/response-parameters/partners/partners.js",
-    "src/pages/app/cluster-reporting/response-parameters/partners/project.js",
-    "src/pages/app/cluster-reporting/response-parameters/partners/projects.js",
-    "src/pages/app/cluster-reporting/response-parameters/partners/activities.js",
-    "src/pages/app/cluster-reporting/response-parameters/partners/activity.js",
-    "src/pages/app/cluster-reporting/planned-action.js",
-    "src/pages/app/cluster-reporting/planned-action/project.js",
-    "src/pages/app/cluster-reporting/planned-action/projects.js",
-    "src/pages/app/cluster-reporting/planned-action/activity.js",
-    "src/pages/app/cluster-reporting/planned-action/activities.js",
-    "src/pages/app/cluster-reporting/results.js",
-    "src/pages/app/cluster-reporting/analysis.js"
+    "src/pages/app/ip-reporting/progress-reports.js"
   ],
-  "sources": ["src/**/*", "images/**/*", "package.json"],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "package.json"
+  ],
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/**",
@@ -54,7 +35,10 @@
   "builds": [
     {
       "name": "esm-bundled",
-      "browserCapabilities": ["es2015", "modules"],
+      "browserCapabilities": [
+        "es2015",
+        "modules"
+      ],
       "js": {
         "minify": true
       },
@@ -74,7 +58,9 @@
     }
   ],
   "lint": {
-    "rules": ["polymer-3"],
+    "rules": [
+      "polymer-3"
+    ],
     "ignoreWarnings": []
   },
   "moduleResolution": "node",

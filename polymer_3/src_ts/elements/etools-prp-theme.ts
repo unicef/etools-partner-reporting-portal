@@ -13,14 +13,8 @@ class EtoolsPrpTheme extends PolymerElement {
   @property({type: String, notify: true, computed: '_computePrimaryColor(_app)'})
   primaryColor!: string;
 
-  _computePrimaryColor(app: string) {
-    switch (app) {
-      case 'cluster-reporting':
-        return Constants.THEME_PRIMARY_COLOR_CLUSTER;
-      case 'ip-reporting':
-      default:
-        return Constants.THEME_PRIMARY_COLOR_IP;
-    }
+  _computePrimaryColor(_app: string) {
+    return Constants.THEME_PRIMARY_COLOR_IP;
   }
 }
 
