@@ -214,7 +214,6 @@ workflows:
                 - staging
                 - develop
                 - separate-ip-cluster
-                - removed-cluster-references
       # - build_and_deploy_fe_cluster:
       #     filters:
       #       branches:
