@@ -112,7 +112,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.userProfile as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        if (res.data && res.data.access && res.data.access.length) {
+        if (res.data && (res.data.access || []).includes('cluster-reporting')) {
           this.checkWorkspaceExistence();
         } else {
           this.showMessage(true);
