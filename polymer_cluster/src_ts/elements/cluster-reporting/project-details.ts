@@ -4,7 +4,6 @@ import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../ip-reporting/partner-details';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../../etools-prp-common/elements/labelled-item';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';

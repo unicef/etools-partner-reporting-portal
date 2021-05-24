@@ -12,9 +12,7 @@ import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import Endpoints from '../etools-prp-common/endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../etools-prp-common/redux/actions';
-import {fetchCurrencies} from '../etools-prp-common/redux/actions/currencies';
 import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
-import '../pages/app/ip-reporting';
 import {locationSet} from '../etools-prp-common/redux/actions/location';
 import {getDomainByEnv} from '../etools-prp-common/config';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
@@ -68,10 +66,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       </template>
 
       <iron-pages selected="[[page]]" attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
-          <page-ip-reporting name="ip-reporting" route="{{subroute}}"> </page-ip-reporting>
-        </template>
-
         <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
           <page-cluster-reporting name="cluster-reporting" route="{{subroute}}"> </page-cluster-reporting>
         </template>
@@ -182,9 +176,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _routeAppChanged(app: string) {
     setTimeout(() => {
-      let defaultApp = localStorage.getItem('defaultApp');
-      defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
-
+      const defaultApp = 'cluster-reporting';
       if (!this.routeData.workspace_code) {
         return;
       }
@@ -193,15 +185,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       } else if (!this._app) {
         this.reduxStore.dispatch(setApp(app));
 
-        this._fetchCurrencies(app);
-
-        // Store selected app
-        localStorage.setItem('defaultApp', app);
-
         // Render
         this.page = app;
-      } else {
-        localStorage.setItem('defaultApp', app);
       }
     });
   }
@@ -267,13 +252,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _fetchProfile() {
     const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
     return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
-  }
-
-  _fetchCurrencies(app: string) {
-    if (this.page !== app && app === 'ip-reporting') {
-      const currenciesDataThunk = (this.$.currenciesData as EtoolsPrpAjaxEl).thunk();
-      this.reduxStore.dispatch(fetchCurrencies(currenciesDataThunk));
-    }
   }
 
   _addEventListeners() {

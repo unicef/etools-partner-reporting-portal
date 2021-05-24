@@ -735,9 +735,6 @@ class ClusterReport extends UtilsMixin(LocalizeMixin(NotificationsMixin(RoutingM
       case !!data.child_ir_ids && app === 'cluster-reporting':
         return 'special-report-cluster';
 
-      case !!data.parent_ir_id && app === 'ip-reporting':
-        return 'special-report-ip';
-
       default:
         return '';
     }

@@ -9,7 +9,7 @@ import '@polymer/paper-button/paper-button';
 import {PaperButtonElement} from '@polymer/paper-button/paper-button';
 import '@polymer/polymer/lib/elements/dom-if';
 
-import './ip-reporting/ip-reporting-indicator-details';
+import './cluster-reporting/reporting-indicator-details';
 import '../etools-prp-common/elements/etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
@@ -235,8 +235,8 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
           </template>
         </div>
         <div slot="row-data-details">
-          <ip-reporting-indicator-details indicator="[[indicator]]" is-open="[[detailsOpened]]">
-          </ip-reporting-indicator-details>
+          <reporting-indicator-details indicator="[[indicator]]" is-open="[[detailsOpened]]">
+          </reporting-indicator-details>
         </div>
       </etools-data-table-row>
     `;
