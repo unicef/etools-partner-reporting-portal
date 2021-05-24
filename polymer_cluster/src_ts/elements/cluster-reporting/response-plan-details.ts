@@ -5,7 +5,6 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DateMixin from '../../mixins/date-mixin';
-import '../ip-reporting/partner-details';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../../etools-prp-common/elements/labelled-item';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';

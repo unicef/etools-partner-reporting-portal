@@ -8,15 +8,6 @@
     "src/pages/login-token.js",
     "src/pages/unauthorized.js",
     "src/pages/app.js",
-    "src/pages/app/ip-reporting.js",
-    "src/pages/app/ip-reporting/overview.js",
-    "src/pages/app/ip-reporting/pd.js",
-    "src/pages/app/ip-reporting/pd/pd-index.js",
-    "src/pages/app/ip-reporting/pd/pd-router.js",
-    "src/pages/app/ip-reporting/pd/pd-details.js",
-    "src/pages/app/ip-reporting/pd/pd-report.js",
-    "src/pages/app/ip-reporting/indicators.js",
-    "src/pages/app/ip-reporting/progress-reports.js",
     "src/pages/app/cluster-reporting.js",
     "src/pages/app/cluster-reporting/select-plan.js",
     "src/pages/app/cluster-reporting/router.js",
@@ -41,7 +32,11 @@
     "src/pages/app/cluster-reporting/results.js",
     "src/pages/app/cluster-reporting/analysis.js"
   ],
-  "sources": ["src/**/*", "images/**/*", "package.json"],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "package.json"
+  ],
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/**",
@@ -54,7 +49,10 @@
   "builds": [
     {
       "name": "esm-bundled",
-      "browserCapabilities": ["es2015", "modules"],
+      "browserCapabilities": [
+        "es2015",
+        "modules"
+      ],
       "js": {
         "minify": true
       },
@@ -74,7 +72,9 @@
     }
   ],
   "lint": {
-    "rules": ["polymer-3"],
+    "rules": [
+      "polymer-3"
+    ],
     "ignoreWarnings": []
   },
   "moduleResolution": "node",

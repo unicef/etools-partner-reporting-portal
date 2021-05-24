@@ -22,7 +22,7 @@ import {
   computeIndicatorReportsUrl,
   bucketByLocation,
   computeHidden
-} from './js/ip-reporting-indicator-details-functions';
+} from './reporting-indicator-details-functions';
 
 /**
  * @polymer
@@ -31,7 +31,7 @@ import {
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
+class ReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
       <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
@@ -255,4 +255,4 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
   }
 }
 
-window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);
+window.customElements.define('reporting-indicator-details', ReportingIndicatorDetails);
