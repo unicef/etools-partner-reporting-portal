@@ -74,11 +74,11 @@
                 <th rowspan="3">1.4 Budget information</th>
 
                 <th>Programme budget</th>
-                <td colspan="2">{{ pd.cso_contribution|format_currency:pd.cso_contribution_currency }}</td>
+                <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
             </tr>
             <tr>
                 <th>UNICEF contribution</th>
-                <td colspan="2">{{ pd.budget|format_currency:pd.budget_currency }}</td>
+                <td colspan="2">{{ pd.total_unicef_cash|format_currency:pd.total_unicef_cash_currency }}</td>
             </tr>
             <tr>
                 <th>Funds received to date</th>
@@ -87,8 +87,17 @@
             </tr>
 
             <tr>
-                <th colspan="2">1.5 Partner Contribution to Date</th>
+                <th rowspan="3">1.5 Contribution to Date</th>
+                <th>Non-Financial Contribution to Date</th>
                 <td colspan="2">{{ progress_report.partner_contribution_to_date|default:"---" }}</td>
+            </tr>
+            <tr>
+                <th>Financial contribution made to Date</th>
+                <td colspan="2">{{ progress_report.financial_contribution_to_date|default:"---" }}</td>
+            </tr>
+            <tr>
+                <th>Financial contribution currency</th>
+                <td colspan="2">{{ progress_report.financial_contribution_currency|default:"---" }}</td>
             </tr>
         </table>
 

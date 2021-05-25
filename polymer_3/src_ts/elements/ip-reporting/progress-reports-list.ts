@@ -45,10 +45,9 @@ class ProgressReportsList extends LocalizeMixin(
       <style include="data-table-styles">
         :host {
           display: block;
-
-          --ecp-content: {
-            padding: 0;
-          }
+        }
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
         }
       </style>
 
@@ -106,15 +105,9 @@ class ProgressReportsList extends LocalizeMixin(
               <div class="table-cell table-cell--text">
                 <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>
               </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.due_date, '-')]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.submission_date)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.reporting_period)]]
-              </div>
+              <div class="table-cell table-cell--text">[[_withDefault(report.due_date, '-')]]</div>
+              <div class="table-cell table-cell--text">[[_withDefault(report.submission_date)]]</div>
+              <div class="table-cell table-cell--text">[[_withDefault(report.reporting_period)]]</div>
             </div>
           </etools-data-table-row>
         </template>

@@ -26,6 +26,7 @@ import {ClusterDashboardData} from './reducers/clusterDashboardData';
 import {ClusterObjectives} from './reducers/clusterObjectives';
 import {ClusterDisaggregations} from './reducers/clusterDisaggregations';
 import {ClusterIndicatorReports} from './reducers/clusterIndicatorReports';
+import {CurrenciesData} from './reducers/currencies';
 
 declare global {
   interface Window {
@@ -65,7 +66,8 @@ const rootReducer = combineReducers({
   clusterDashboardData: ClusterDashboardData,
   userProfile: UserProfile,
   analysis: Analysis,
-  config: Config
+  config: Config,
+  currencies: CurrenciesData
 });
 
 export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk)));

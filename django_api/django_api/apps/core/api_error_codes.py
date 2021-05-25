@@ -1,5 +1,5 @@
 
-class APIErrorCode(object):
+class APIErrorCode:
     """
     These codes are used by frontend to detect certain workflows, be aware of that when editing / changing
     """

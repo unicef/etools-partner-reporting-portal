@@ -40,7 +40,9 @@ class ProgressReportsXLSXExporter:
         'PD Report Status',
         'PD Report Due Date',
         'PD Report Submission Date',
-        'Partner contribution to date',
+        'Non-Financial contribution to date',
+        'Financial contribution to date',
+        'Financial contribution currency',
         'Funds received to date',
         'Challenges/bottlenecks in the reporting period',
         'Proposed way forward',
@@ -175,6 +177,8 @@ class ProgressReportsXLSXExporter:
             (progress_report.due_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
             (progress_report.submission_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
             (progress_report.partner_contribution_to_date, None),
+            (progress_report.financial_contribution_to_date, None),
+            (progress_report.financial_contribution_currency, None),
             (programme_document.funds_received_to_date, FORMAT_CURRENCY_USD),
             (progress_report.challenges_in_the_reporting_period, None),
             (progress_report.proposed_way_forward, None),
@@ -406,4 +410,4 @@ class SingleProgressReportsXLSXExporter(ProgressReportsXLSXExporter):
 
     def __init__(self, progress_report, **kwargs):
         progress_reports = ProgressReport.objects.filter(id=progress_report.id)
-        super(SingleProgressReportsXLSXExporter, self).__init__(progress_reports, **kwargs)
+        super().__init__(progress_reports, **kwargs)

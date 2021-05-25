@@ -16,7 +16,7 @@ from core.helpers import (
 from indicator.constants import ValueType
 
 
-class BaseDisaggregator(object):
+class BaseDisaggregator:
     """
     A class for disaggregation processing.
     Each staticmethod should accept a Python dictionary that represents a

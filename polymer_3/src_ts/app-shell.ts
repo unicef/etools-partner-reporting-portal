@@ -19,7 +19,10 @@ import {reset, userLogout} from './redux/actions';
 import {getDomainByEnv, BASE_PATH} from './config';
 import {locales} from './locales';
 import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
+declare const dayjs: any;
+declare const dayjs_plugin_utc: any;
 
+dayjs.extend(dayjs_plugin_utc);
 /**
  * @polymer
  * @customElement

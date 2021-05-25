@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from core.common import CURRENCIES, DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from core.paginations import SmallPagination
 from django_celery_beat.models import PeriodicTask
 from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
@@ -220,3 +220,8 @@ class PRPRoleCreateAPIView(CreateAPIView):
         for prp_role_data in serializer.validated_data['prp_roles']:
             self.check_object_permissions(self.request, obj=PRPRole(user_id=user_id, **prp_role_data))
         super().perform_create(serializer)
+
+
+class CurrenciesView(APIView):
+    def get(self, request):
+        return Response([(k, v) for k, v in CURRENCIES])

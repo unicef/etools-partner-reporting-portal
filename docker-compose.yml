@@ -93,23 +93,6 @@ services:
   #     - traefik.http.services.id-management-frontend.loadBalancer.server.port=3000
   #     - traefik.enable=true
 
-  polymer1:
-    image: unicef/etools-prp-polymer1
-    build:
-      context: ./polymer
-      dockerfile: ./Dockerfile
-    volumes:
-        - ./polymer/:/code
-    command: ash -c "npm run dev"
-    labels:
-      - "traefik.http.routers.polymer1.rule=PathPrefix(`/app`)"
-      - traefik.http.routers.polymer1.service=polymer1
-      - traefik.http.routers.polymer1.middlewares=polymer1-stripprefix
-      - traefik.http.middlewares.polymer1-stripprefix.stripprefix.prefixes=/app
-      - traefik.http.services.polymer1.loadBalancer.server.port=8082
-      - traefik.enable=true
-
-
   polymer3:
     image: unicef/etools-prp-polymer_3
     build:

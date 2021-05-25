@@ -1728,7 +1728,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 data.pop('baseline', None)
                 data.pop('in_need', None)
 
-            if loc_goal.location.id != data['location'].id:
+            if loc_goal and loc_goal.location.id != data['location'].id:
                 raise ValidationError(
                     "Location %s cannot be changed for updating location goal" % loc_goal.location,
                 )
@@ -1748,7 +1748,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'title', reportable.blueprint.title)
         reportable.blueprint.save()
 
-        return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
+        return super().update(reportable, validated_data)
 
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):

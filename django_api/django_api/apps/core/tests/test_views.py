@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES
+from core.common import CLUSTER_TYPES, CURRENCIES, PRP_ROLE_TYPES
 from core.management.commands._generate_disaggregation_fake_data import add_disaggregations_to_reportable
 from core.models import Location, ResponsePlan, Workspace
 from core.tests import factories
@@ -255,3 +255,16 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         rp_data['title'] += ' 2'
         response = self.client.post(url, data=rp_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
+
+
+class TestCurrenciesView(BaseAPITestCase):
+    def test_get_permission(self):
+        response = self.client.get(reverse("currencies"))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get(self):
+        user = factories.NonPartnerUserFactory()
+        self.client.force_authenticate(user)
+        response = self.client.get(reverse("currencies"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), len(CURRENCIES))

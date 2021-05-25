@@ -10,7 +10,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {fireEvent} from '../utils/fire-custom-event';
 import {sharedStyles} from '../styles/shared-styles';
 import Settings from '../settings';
-declare const moment: any;
+declare const dayjs: any;
 
 /**
  * @polymer
@@ -112,7 +112,7 @@ class EtoolsPrpChips extends PolymerElement {
 
   _sortDateValues() {
     this.value.sort((a: any, b: any) => {
-      return moment(a, Settings.dateFormat) - moment(b, Settings.dateFormat);
+      return dayjs(a, Settings.dateFormat) - dayjs(b, Settings.dateFormat);
     });
   }
 

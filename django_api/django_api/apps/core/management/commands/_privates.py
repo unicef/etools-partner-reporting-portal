@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# encoding: utf-8
-
-from __future__ import unicode_literals
 
 import calendar
 import datetime
