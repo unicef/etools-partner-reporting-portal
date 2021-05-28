@@ -292,29 +292,31 @@ class OperationalPresenceMap extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
     mapCtrl.appendChild(style);
 
     (this.map.features || []).forEach((feature: any) => {
-      if (feature.geometry.type === 'MultiPolygon') {
-        (feature.geometry.coordinates || []).forEach((coords: any) => {
-          polygon(coords, {
-            color: '#fff',
-            'fill-color': this._computePolygonColor(feature.properties, this.legend),
-            'fill-opacity': '0.7',
-            weight: '2'
+      if (feature.geometry) {
+        if (feature.geometry.type === 'MultiPolygon') {
+          (feature.geometry.coordinates || []).forEach((coords: any) => {
+            polygon(coords, {
+              color: '#fff',
+              'fill-color': this._computePolygonColor(feature.properties, this.legend),
+              'fill-opacity': '0.7',
+              weight: '2'
+            })
+              .bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
+              .addTo(this.presenceMap);
+
+            // (dci) cannot test this but I think the points (in the old app) were polygon coordinates actually,
+            //  need to be checked (coords || []).forEach((coord: any) => {
+            //   featurePolygon.feature.
+            //     point(coord[0], coord[1]).addTo(featurePolygon);
+            // })
+          });
+        } else if (feature.geometry.type === 'Point') {
+          marker(latLng(feature.geometry.coordinates[0], feature.geometry.coordinates[1]), {
+            icon: {iconUrl: this._computeMarkerIcon(feature.properties, this.legend)}
           })
             .bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
             .addTo(this.presenceMap);
-
-          // (dci) cannot test this but I think the points (in the old app) were polygon coordinates actually,
-          //  need to be checked (coords || []).forEach((coord: any) => {
-          //   featurePolygon.feature.
-          //     point(coord[0], coord[1]).addTo(featurePolygon);
-          // })
-        });
-      } else if (feature.geometry.type === 'Point') {
-        marker(latLng(feature.geometry.coordinates[0], feature.geometry.coordinates[1]), {
-          icon: {iconUrl: this._computeMarkerIcon(feature.properties, this.legend)}
-        })
-          .bindTooltip(this.getFeatureTooltip(feature.properties), {sticky: true})
-          .addTo(this.presenceMap);
+        }
       }
     });
   }
