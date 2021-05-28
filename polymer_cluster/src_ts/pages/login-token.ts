@@ -5,7 +5,7 @@ import '@polymer/paper-styles/typography';
 import '@polymer/iron-location/iron-location';
 import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../etools-prp-common/endpoints';
+import Endpoints from '../endpoints';
 import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 import {BASE_PATH} from '../etools-prp-common/config';
 

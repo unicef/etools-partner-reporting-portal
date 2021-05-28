@@ -1,5 +1,5 @@
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 
 export function computeUpdateUrl(locationId: string, reportId: string) {
   return Endpoints.programmeDocumentReportUpdate(locationId, reportId);

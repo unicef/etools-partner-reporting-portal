@@ -16,7 +16,7 @@ import '../../../elements/cluster-reporting/nav';
 import '../../../elements/cluster-reporting/app-header';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import OverlayHelperMixin from '../../../etools-prp-common/mixins/overlay-helper-mixin';
-import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../etools-prp-common/redux/actions';
+import {setCurrentResponsePlanID, setCurrentResponsePlan} from '../../../redux/actions';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {getDomainByEnv} from '../../../etools-prp-common/config';
 

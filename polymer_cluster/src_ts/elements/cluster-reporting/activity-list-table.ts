@@ -15,11 +15,11 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import '../../etools-prp-common/elements/project-status';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/list-placeholder';
-import '../../etools-prp-common/redux/actions';
+import '../../redux/actions';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 

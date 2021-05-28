@@ -14,14 +14,14 @@ import '../../../../elements/cluster-reporting/analysis/partners-per-cluster';
 import '../../../../elements/cluster-reporting/analysis/partners-per-cluster-objective';
 import '../../../../elements/cluster-reporting/analysis/operational-presence-map';
 import '../../../../elements/cluster-reporting/analysis/operational-presence-table';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {
   analysis_operationalPresence_fetchData,
   analysis_operationalPresence_fetchMap
-} from '../../../../etools-prp-common/redux/actions/analysis';
+} from '../../../../redux/actions/analysis';
 
 /**
  * @polymer

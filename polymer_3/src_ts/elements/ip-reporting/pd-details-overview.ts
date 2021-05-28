@@ -19,14 +19,14 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../elements/etools-prp-currency';
 import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Settings from '../../etools-prp-common/settings';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

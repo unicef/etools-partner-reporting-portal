@@ -20,7 +20,7 @@ import '../etools-prp-chips';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../json-field';
 import '../../etools-prp-common/elements/calculation-method';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';

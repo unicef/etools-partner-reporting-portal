@@ -9,7 +9,7 @@ import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
-import {RootState} from '../../../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../../../typings/redux.types';
 
 /**
  * @polymer

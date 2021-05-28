@@ -11,7 +11,7 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

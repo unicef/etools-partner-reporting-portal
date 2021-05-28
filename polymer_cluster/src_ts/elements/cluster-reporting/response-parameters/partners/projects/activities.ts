@@ -11,13 +11,13 @@ import '../../../../../etools-prp-common/elements/page-body';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import '../../../project-activity-table';
 import '../../../planned-action/activities/add-activity-from-project-modal';
 import '../../../planned-action/activities/add-existing-activity-from-project-modal';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 
-import {partnerProjActivitiesFetch} from '../../../../../etools-prp-common/redux/actions/partnerProjects';
+import {partnerProjActivitiesFetch} from '../../../../../redux/actions/partnerProjects';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
@@ -170,7 +170,7 @@ class Activities extends LocalizeMixin(RoutingMixin(UtilsMixin(ReduxConnectedEle
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-    if (this.ActivitiesByPartnerDebouncer && this.ActivitiesByPartnerDebouncer.isActive) {
+    if (this.ActivitiesByPartnerDebouncer && this.ActivitiesByPartnerDebouncer.isActive()) {
       this.ActivitiesByPartnerDebouncer.cancel();
     }
   }

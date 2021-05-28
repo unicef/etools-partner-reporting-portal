@@ -8,13 +8,13 @@ import '../ip-reporting/pd-reports-toolbar';
 import '../ip-reporting/pd-reports-list';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import {pdReportsFetch} from '../../etools-prp-common/redux/actions/pdReports';
+import {pdReportsFetch} from '../../redux/actions/pdReports';
 import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions';
-import {pdFetch} from '../../etools-prp-common/redux/actions/pd';
+import {pdFetch} from '../../redux/actions/pd';
 
 /**
  * @polymer

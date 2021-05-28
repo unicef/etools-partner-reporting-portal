@@ -10,7 +10,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-input/paper-textarea';
 import '@polymer/paper-styles/typography';
 import '@unicef-polymer/etools-loading/etools-loading';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';

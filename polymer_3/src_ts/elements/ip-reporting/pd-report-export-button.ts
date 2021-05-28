@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedEleme
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-button/paper-button.js';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 
 /**

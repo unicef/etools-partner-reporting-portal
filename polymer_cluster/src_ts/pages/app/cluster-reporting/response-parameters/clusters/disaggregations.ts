@@ -16,10 +16,10 @@ import '../../../../../etools-prp-common/elements/page-body';
 import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchClusterDisaggregationsList} from '../../../../../etools-prp-common/redux/actions/clusterDisaggregations';
+import {fetchClusterDisaggregationsList} from '../../../../../redux/actions/clusterDisaggregations';
 
 /**
  * @polymer

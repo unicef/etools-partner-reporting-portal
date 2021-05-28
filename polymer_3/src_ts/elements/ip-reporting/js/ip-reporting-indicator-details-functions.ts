@@ -1,4 +1,4 @@
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computeParams(val: boolean) {

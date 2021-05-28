@@ -15,7 +15,7 @@ import '../../../../../elements/page-badge';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';

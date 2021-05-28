@@ -10,10 +10,10 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import Endpoints from '../etools-prp-common/endpoints';
-import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../etools-prp-common/redux/actions';
+import Endpoints from '../endpoints';
+import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
-import {locationSet} from '../etools-prp-common/redux/actions/location';
+import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../etools-prp-common/config';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
@@ -52,8 +52,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       <etools-prp-ajax id="interventions" url="[[interventionsUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="currenciesData" url="[[currenciesUrl]]"> </etools-prp-ajax>
 
       <app-route route="{{route}}" pattern="/:workspace_code/:app" data="{{routeData}}" tail="{{subroute}}">
       </app-route>

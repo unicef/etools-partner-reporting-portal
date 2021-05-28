@@ -20,7 +20,7 @@ import '@polymer/paper-dialog/paper-dialog';
 import '../../../../form-fields/dropdown-form-input';
 import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';

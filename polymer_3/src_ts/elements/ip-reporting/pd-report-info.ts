@@ -22,8 +22,8 @@ import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
 import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdReportsUpdate} from '../../etools-prp-common/redux/actions/pdReports';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {pdReportsUpdate} from '../../redux/actions/pdReports';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

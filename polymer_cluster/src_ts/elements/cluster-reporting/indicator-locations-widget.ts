@@ -24,7 +24,7 @@ import '../../etools-prp-common/elements/labelled-item';
 import './message-imo-modal';
 import {MessageImoModalEl} from './message-imo-modal';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown';
 

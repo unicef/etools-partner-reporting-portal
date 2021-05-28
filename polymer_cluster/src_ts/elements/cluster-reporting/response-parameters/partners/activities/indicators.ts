@@ -16,9 +16,9 @@ import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixi
 import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import '../../../../list-view-indicators';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import {partnerActivitiesIndicatorsFetch} from '../../../../../etools-prp-common/redux/actions/partnerActivities';
+import {partnerActivitiesIndicatorsFetch} from '../../../../../redux/actions/partnerActivities';
 
 /**
  * @polymer

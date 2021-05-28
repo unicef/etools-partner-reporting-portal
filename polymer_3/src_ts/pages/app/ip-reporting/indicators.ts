@@ -12,14 +12,14 @@ import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-aj
 import '../../../elements/ip-reporting/indicators-filters';
 import '../../../elements/ip-reporting/indicators-toolbar';
 import '../../../elements/list-view-indicators';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchIndicators} from '../../../etools-prp-common/redux/actions/indicators';
+import {fetchIndicators} from '../../../redux/actions/indicators';
 
 /**
  * @polymer

@@ -12,13 +12,13 @@ import {
   programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {pdReportsAttachmentsSync} from '../../etools-prp-common/redux/actions/pdReportsAttachments';
+import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-file/etools-file';
 // import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

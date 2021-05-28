@@ -8,18 +8,18 @@ import '@polymer/iron-location/iron-query-params';
 import '@polymer/polymer/lib/elements/dom-if';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdFetch, pdSetCurrent} from '../../../etools-prp-common/redux/actions/pd';
+import {pdFetch, pdSetCurrent} from '../../../redux/actions/pd';
 import {getDomainByEnv} from '../../../etools-prp-common/config';
 import './pd/pd-index';
 import './pd/pd-router';
-import {RootState} from '../../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../../typings/redux.types';
 
 /**
  * @polymer

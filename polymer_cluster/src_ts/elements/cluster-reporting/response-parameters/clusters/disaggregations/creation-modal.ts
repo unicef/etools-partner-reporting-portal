@@ -21,7 +21,7 @@ import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {fireEvent} from '../../../../../etools-prp-common/utils/fire-custom-event';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 

@@ -11,7 +11,7 @@ import '@polymer/paper-styles/typography';
 import '@polymer/paper-input/paper-input';
 import '@polymer/iron-form/iron-form';
 
-import Endpoints from '../etools-prp-common/endpoints';
+import Endpoints from '../endpoints';
 import ResponsiveMixin from '../etools-prp-common/mixins/responsive-mixin';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import '../etools-prp-common/elements/etools-logo';

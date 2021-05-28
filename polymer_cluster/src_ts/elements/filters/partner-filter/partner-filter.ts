@@ -3,7 +3,7 @@ import {html} from '@polymer/polymer';
 import '../dropdown-filter/searchable-dropdown-filter';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';

@@ -10,7 +10,7 @@ import '@polymer/app-layout/app-grid/app-grid-style';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import {fetchIndicatorDetails} from '../../etools-prp-common/redux/actions/indicators';
+import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/disaggregations/disaggregation-table';

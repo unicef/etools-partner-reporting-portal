@@ -18,7 +18,7 @@ import '../../../../../etools-prp-common/elements/project-status';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../../../../etools-prp-common/mixins/routing-mixin';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 

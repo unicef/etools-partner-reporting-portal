@@ -13,8 +13,8 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
-import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../etools-prp-common/redux/actions/pdIndicators';
-import {pdFetch} from '../../etools-prp-common/redux/actions/pd';
+import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
+import {pdFetch} from '../../redux/actions/pd';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-body';
@@ -27,7 +27,7 @@ import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -37,7 +37,7 @@ import {
   canEdit,
   canSave
 } from './js/pd-details-calculation-methods-functions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
