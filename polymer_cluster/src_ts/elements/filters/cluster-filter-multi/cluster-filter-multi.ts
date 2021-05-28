@@ -3,9 +3,9 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/dropdown-filter-multi';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
-import '../../../etools-prp-common/endpoints';
+import '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 
 /**

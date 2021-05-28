@@ -15,14 +15,14 @@ import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
 import NotificationsMixin from '../../../../../etools-prp-common/mixins/notifications-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 
 import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo';
 import {currentProgrammeDocument} from '../../../../../etools-prp-common/redux/selectors/programmeDocuments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdReportsUpdate} from '../../../../../etools-prp-common/redux/actions/pdReports';
-import {RootState} from '../../../../../etools-prp-common/typings/redux.types';
+import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
+import {RootState} from '../../../../../typings/redux.types';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**

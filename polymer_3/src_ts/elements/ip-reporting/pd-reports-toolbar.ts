@@ -7,7 +7,7 @@ import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
 import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

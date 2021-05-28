@@ -4,7 +4,7 @@ import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedEl
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/app-layout/app-grid/app-grid-style';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
@@ -17,7 +17,7 @@ import './current-progress-by-location';
 import './current-progress-by-partner';
 import './current-progress-by-project';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {analysis_indicators_fetchSingle} from '../../../etools-prp-common/redux/actions/analysis';
+import {analysis_indicators_fetchSingle} from '../../../redux/actions/analysis';
 
 /**
  * @polymer

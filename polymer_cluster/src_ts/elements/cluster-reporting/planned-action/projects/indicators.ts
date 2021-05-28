@@ -8,7 +8,7 @@ import '../../../../etools-prp-common/elements/etools-prp-permissions';
 import '../../../../etools-prp-common/elements/page-body';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import {tableStyles} from '../../../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import '../../indicator-modal';
@@ -17,7 +17,7 @@ import '../../../list-view-indicators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
-import {partnerProjIndicatorsFetch} from '../../../../etools-prp-common/redux/actions/partnerProjects';
+import {partnerProjIndicatorsFetch} from '../../../../redux/actions/partnerProjects';
 
 /**
  * @polymer

@@ -12,7 +12,7 @@ import '../../etools-prp-common/elements/labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePartnerType} from './js/partner-details-functions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

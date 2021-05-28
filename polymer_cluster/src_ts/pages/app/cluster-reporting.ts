@@ -6,15 +6,15 @@ import '@polymer/app-route/app-location';
 import '@polymer/iron-pages/iron-pages';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-title';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {workspaceId} from '../../redux/selectors/workspace';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {getDomainByEnv} from '../../etools-prp-common/config';
-import {fetchResponsePlans} from '../../etools-prp-common/redux/actions';
+import {fetchResponsePlans} from '../../redux/actions';
 import '../../pages/app/cluster-reporting/select-plan';
 import '../../pages/app/cluster-reporting/router';
 

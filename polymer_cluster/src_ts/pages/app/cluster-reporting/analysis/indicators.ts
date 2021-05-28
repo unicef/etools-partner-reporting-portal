@@ -7,11 +7,11 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../elements/cluster-reporting/analysis/indicators-filters';
 import '../../../../elements/cluster-reporting/analysis/indicators';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
-import {analysis_indicators_fetchData} from '../../../../etools-prp-common/redux/actions/analysis';
+import {analysis_indicators_fetchData} from '../../../../redux/actions/analysis';
 
 /**
  * @polymer

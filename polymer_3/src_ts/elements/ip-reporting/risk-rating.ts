@@ -9,7 +9,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../../etools-prp-common/elements/labelled-item';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {partnerLoading} from '../../redux/selectors/partner';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

@@ -12,7 +12,7 @@ import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-item/paper-item';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import '@polymer/paper-input/paper-input';
 import ModalMixin from '../../../../etools-prp-common/mixins/modal-mixin';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';

@@ -8,7 +8,7 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-button/paper-button';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-input/paper-textarea';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';

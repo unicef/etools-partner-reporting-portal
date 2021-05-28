@@ -10,7 +10,7 @@ import '../ip-reporting/pd-output';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 

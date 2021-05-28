@@ -3,7 +3,7 @@ import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-styles/typography';
-import Endpoints from '../etools-prp-common/endpoints';
+import Endpoints from '../endpoints';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';

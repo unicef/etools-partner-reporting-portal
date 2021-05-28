@@ -15,9 +15,9 @@ import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-
 import '../../../../../etools-prp-common/elements/etools-prp-permissions';
 import {sharedStyles} from '../../../../../etools-prp-common/styles/shared-styles';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
-import {fetchPartnerActivitiesList} from '../../../../../etools-prp-common/redux/actions/partnerActivities';
+import {fetchPartnerActivitiesList} from '../../../../../redux/actions/partnerActivities';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

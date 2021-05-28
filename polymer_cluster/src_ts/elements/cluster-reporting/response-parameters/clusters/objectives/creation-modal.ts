@@ -23,7 +23,7 @@ import '../../../../form-fields/cluster-dropdown-content';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../../../../etools-prp-common/styles/modal-styles';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import {waitForIronOverlayToClose} from '../../../../../etools-prp-common/utils/util';
 

@@ -13,8 +13,8 @@ import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles'
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {fetchClusterActivitiesList} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import {fetchClusterActivitiesList} from '../../../../../redux/actions/clusterActivities';
+import Endpoints from '../../../../../endpoints';
 
 /**
  * @polymer

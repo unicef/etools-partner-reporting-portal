@@ -4,7 +4,7 @@ import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
 import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../../../etools-prp-common/elements/page-body';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import './contributing-partners-filters';
 import './contributing-partners-list';
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
@@ -12,7 +12,7 @@ import {GenericObject} from '../../../../../etools-prp-common/typings/globals.ty
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
-import {clusterActivitiesPartnersFetch} from '../../../../../etools-prp-common/redux/actions/clusterActivities';
+import {clusterActivitiesPartnersFetch} from '../../../../../redux/actions/clusterActivities';
 
 /**
  * @polymer

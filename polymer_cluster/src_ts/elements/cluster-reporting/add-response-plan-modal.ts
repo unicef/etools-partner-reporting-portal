@@ -14,7 +14,7 @@ import '@polymer/paper-item/paper-item';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-loading/etools-loading';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
@@ -28,9 +28,9 @@ import './response-plan-details';
 import '../../etools-prp-common/elements/error-box';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
-import {fetchConfig} from '../../etools-prp-common/redux/actions/config';
-import {addResponsePlan} from '../../etools-prp-common/redux/actions';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {fetchConfig} from '../../redux/actions/config';
+import {addResponsePlan} from '../../redux/actions';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

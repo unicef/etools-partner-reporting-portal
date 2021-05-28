@@ -40,7 +40,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import Constants from '../../../../etools-prp-common/constants';
 import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 import {waitForIronOverlayToClose} from '../../../../etools-prp-common/utils/util';

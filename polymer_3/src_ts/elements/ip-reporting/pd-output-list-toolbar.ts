@@ -5,7 +5,7 @@ import '@polymer/paper-button/paper-button.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {
@@ -23,7 +23,7 @@ import '../../etools-prp-common/elements/refresh-report-modal';
 import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-report-modal';
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

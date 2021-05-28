@@ -7,7 +7,7 @@ import '@polymer/polymer/lib/elements/dom-repeat';
 
 import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {localizeSet} from '../etools-prp-common/redux/actions/localize';
+import {localizeSet} from '../redux/actions/localize';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 
 /**

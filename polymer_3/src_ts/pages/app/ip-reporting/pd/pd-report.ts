@@ -30,13 +30,9 @@ import './pd-report-qpr';
 
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports';
 import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
-import {
-  pdReportsSetCurrent,
-  pdReportsFetchSingle,
-  pdReportsUpdateSingle
-} from '../../../../etools-prp-common/redux/actions/pdReports';
+import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports';
 
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
@@ -47,7 +43,7 @@ import {GenericObject} from '../../../../etools-prp-common/typings/globals.types
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {RootState} from '../../../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../../../typings/redux.types';
 
 /**
  * @polymer

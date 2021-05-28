@@ -5,7 +5,7 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {llosAll} from '../../../redux/selectors/llos';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {RootState} from '../../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../../typings/redux.types';
 
 /**
  * @polymer

@@ -19,11 +19,11 @@ import '../../../elements/cluster-reporting/dashboard/reports-list';
 import '../../../elements/cluster-reporting/dashboard/constrained-reports-list';
 import '../../../elements/cluster-reporting/dashboard/activities-list';
 import Constants from '../../../etools-prp-common/constants';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import {clusterDashboardDataFetch} from '../../../etools-prp-common/redux/actions/clusterDashboardData';
+import {clusterDashboardDataFetch} from '../../../redux/actions/clusterDashboardData';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**

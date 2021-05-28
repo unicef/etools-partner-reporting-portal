@@ -15,7 +15,7 @@ import '../../etools-prp-common/elements/list-placeholder';
 import './cluster-report-proxy';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {clusterIndicatorsReportsAll} from '../../redux/selectors/clusterIndicatorReports';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

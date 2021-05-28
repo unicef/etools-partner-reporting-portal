@@ -7,7 +7,7 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';

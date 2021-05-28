@@ -10,7 +10,7 @@ import '@polymer/paper-tabs/paper-tab';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import '../../../../elements/cluster-reporting/planned-action/activities/overview';
 import '../../../../elements/cluster-reporting/planned-action/activities/indicators';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';

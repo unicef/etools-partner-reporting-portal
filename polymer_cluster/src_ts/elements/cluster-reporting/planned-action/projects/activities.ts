@@ -6,7 +6,7 @@ import '../../../../etools-prp-common/elements/page-body';
 import '../../../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
@@ -16,7 +16,7 @@ import '../activities/add-activity-from-project-modal';
 import '../activities/add-existing-activity-from-project-modal';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
-import {partnerProjActivitiesFetch} from '../../../../etools-prp-common/redux/actions/partnerProjects';
+import {partnerProjActivitiesFetch} from '../../../../redux/actions/partnerProjects';
 import {PlannedActionAddActivityFromProjectModalEl} from '../activities/add-activity-from-project-modal';
 import {PlannedActioAddExistingActivityFromProjectModalEl} from '../activities/add-existing-activity-from-project-modal';
 

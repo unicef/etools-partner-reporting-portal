@@ -13,7 +13,7 @@ import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
-import {pdReportsUpdateSingle} from '../../etools-prp-common/redux/actions/pdReports';
+import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
@@ -21,7 +21,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {waitForIronOverlayToClose} from '../../etools-prp-common/utils/util';
 

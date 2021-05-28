@@ -1,5 +1,5 @@
 import {createSelector} from 'reselect';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 import {Workspace} from '../../typings/entities.types';
 
 export const workspaceId = createSelector(

@@ -1,4 +1,4 @@
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 
 export function computePdReportsUrl(locationId: string) {
   return Endpoints.programmeDocumentReports(locationId);

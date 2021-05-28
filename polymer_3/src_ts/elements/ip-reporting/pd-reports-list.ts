@@ -23,7 +23,7 @@ import {
 } from '../../redux/selectors/programmeDocumentReports';
 import {getLink} from './js/pd-reports-list-functions';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

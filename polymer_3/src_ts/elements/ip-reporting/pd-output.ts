@@ -20,7 +20,7 @@ import {
   calculationFormulaAcrossPeriods
 } from './js/pd-output-functions';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
-import {pdReportsUpdateReportable} from '../../etools-prp-common/redux/actions/pdReports';
+import {pdReportsUpdateReportable} from '../../redux/actions/pdReports';
 import '../../etools-prp-common/elements/reportable-meta';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-number';
@@ -29,7 +29,7 @@ import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

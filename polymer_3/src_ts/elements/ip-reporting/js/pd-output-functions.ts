@@ -1,5 +1,5 @@
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 
 export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: (x: string) => string) {
   const localized =

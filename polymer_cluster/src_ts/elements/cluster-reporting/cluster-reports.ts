@@ -2,7 +2,7 @@ import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedEleme
 import {html} from '@polymer/polymer';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import Endpoints from '../../etools-prp-common/endpoints';
+import Endpoints from '../../endpoints';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import './cluster-report-toolbar';
 import './cluster-report-list';
@@ -13,7 +13,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import {
   clusterIndicatorReportsFetch,
   clusterIndicatorReportsFetchSingle
-} from '../../etools-prp-common/redux/actions/clusterIndicatorReports';
+} from '../../redux/actions/clusterIndicatorReports';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 

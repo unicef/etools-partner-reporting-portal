@@ -14,7 +14,7 @@ import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
-import {RootState} from '../../etools-prp-common/typings/redux.types';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer

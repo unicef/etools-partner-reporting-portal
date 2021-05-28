@@ -10,10 +10,10 @@ import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-aj
 import '../../../elements/ip-reporting/progress-reports-list';
 import '../../../elements/ip-reporting/progress-reports-toolbar';
 import '../../../elements/ip-reporting/progress-reports-filters';
-import Endpoints from '../../../etools-prp-common/endpoints';
+import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {progressReportsFetch} from '../../../etools-prp-common/redux/actions/progressReports';
+import {progressReportsFetch} from '../../../redux/actions/progressReports';
 
 /**
  * @polymer

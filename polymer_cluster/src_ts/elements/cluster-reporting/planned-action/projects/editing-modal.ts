@@ -24,7 +24,7 @@ import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles
 import {modalStyles} from '../../../../etools-prp-common/styles/modal-styles';
 import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../endpoints';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax';
 import {fireEvent} from '../../../../etools-prp-common/utils/fire-custom-event';
 

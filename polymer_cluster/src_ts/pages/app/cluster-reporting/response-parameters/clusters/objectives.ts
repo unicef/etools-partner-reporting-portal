@@ -19,10 +19,10 @@ import '../../../../../etools-prp-common/elements/page-body';
 import {buttonsStyles} from '../../../../../etools-prp-common/styles/buttons-styles';
 import {tableStyles} from '../../../../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../etools-prp-common/endpoints';
+import Endpoints from '../../../../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchClusterObjectivesList} from '../../../../../etools-prp-common/redux/actions/clusterObjectives';
+import {fetchClusterObjectivesList} from '../../../../../redux/actions/clusterObjectives';
 
 /**
  * @polymer
