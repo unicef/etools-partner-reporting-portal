@@ -10,7 +10,6 @@ import {UserProfileState} from '../redux/reducers/userProfile';
 import {IndicatorsState} from '../redux/reducers/indicators';
 import {ProgrammeDocumentDetailsState} from '../redux/reducers/programmeDocumentDetails';
 import {ProgrammeDocumentReportsState} from '../redux/reducers/programmeDocumentReports';
-import {ProgressReportsState} from '../etools-prp-common/redux/reducers/progressReports';
 import {ResponsePlansState} from '../redux/reducers/responsePlans';
 import {DisaggregationsState} from '../redux/reducers/disaggregations';
 import {PartnerProjectsState} from '../redux/reducers/partnerProjects';
@@ -31,7 +30,6 @@ export interface RootState {
   programmeDocuments: ProgrammeDocumentsState;
   programmeDocumentDetails: ProgrammeDocumentDetailsState;
   programmeDocumentReports: ProgrammeDocumentReportsState;
-  progressReports: ProgressReportsState;
   responsePlans: ResponsePlansState;
   disaggregations: DisaggregationsState;
   partnerProjects: PartnerProjectsState;

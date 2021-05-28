@@ -14,7 +14,6 @@ import {Config} from './reducers/config';
 import {UserProfile} from './reducers/userProfile';
 import {ProgrammeDocumentReports} from './reducers/programmeDocumentReports';
 import {ProgrammeDocumentDetails} from './reducers/programmeDocumentDetails';
-import {ProgressReports} from '../etools-prp-common/redux/reducers/progressReports';
 import {ResponsePlans} from './reducers/responsePlans';
 import {Disaggregations} from './reducers/disaggregations';
 import {PartnerProjects} from './reducers/partnerProjects';
@@ -49,7 +48,6 @@ const rootReducer = combineReducers({
   programmeDocuments: ProgrammeDocuments,
   programmeDocumentReports: ProgrammeDocumentReports,
   programmeDocumentDetails: ProgrammeDocumentDetails,
-  progressReports: ProgressReports,
   responsePlans: ResponsePlans,
   disaggregations: Disaggregations,
   partnerProjects: PartnerProjects,
