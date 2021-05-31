@@ -106,9 +106,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String})
   profileUrl: string = Endpoints.userProfile();
 
-  @property({type: String})
-  currenciesUrl: string = Endpoints.currencies();
-
   @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
 
