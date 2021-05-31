@@ -9,16 +9,8 @@ const Endpoints = {
     return '/social/login/azuread-b2c-oauth2/';
   },
 
-  config() {
-    return this._buildUrl('/core/configuration/');
-  },
-
   interventions() {
     return this._buildUrl('/core/workspace/');
-  },
-
-  indicators(content_object: string) {
-    return this._buildUrl('/indicator/' + content_object);
   },
 
   allPDIndicators(workspaceId: string) {
@@ -27,10 +19,6 @@ const Endpoints = {
 
   indicatorReports(reportableId: string) {
     return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
-  },
-
-  indicatorReportReview(reportId: string) {
-    return this._buildUrl('/indicator/indicator-reports/' + reportId + '/review/');
   },
 
   programmeDocuments(locationId: string) {
@@ -84,20 +72,8 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + locationId + '/progress-reports/');
   },
 
-  responsePlans(workspaceId: string) {
-    return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/');
-  },
-
   locations(workspaceId: string) {
     return this._buildUrl('/unicef/' + workspaceId + '/programme-document/locations/');
-  },
-
-  childLocations(locationId: string) {
-    return this._buildUrl('/core/' + locationId + '/children-location/');
-  },
-
-  indicatorData(reportId: string) {
-    return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
   },
 
   indicatorDataLocation(workspaceId: string, reportId: string) {
