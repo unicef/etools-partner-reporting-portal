@@ -61,7 +61,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
     steps:
-      - checkout
+      - checkout:
       - restore_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
