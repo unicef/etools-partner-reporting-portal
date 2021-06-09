@@ -1,9 +1,19 @@
 from django.conf.urls import url
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.admin import helpers
+from django.db.models import F
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.translation import gettext as _
 
+from admin_extra_urls.api import button, ExtraUrlMixin
+
+from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
+from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
@@ -16,7 +26,7 @@ from etools_prp.apps.unicef.models import (
 from etools_prp.apps.unicef.tasks import process_programme_documents
 
 
-class ProgrammeDocumentAdmin(admin.ModelAdmin):
+class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'reference_number', 'agreement', 'partner',
                     'status', 'workspace', 'external_id')
     list_filter = ('status', 'workspace',)
@@ -30,6 +40,93 @@ class ProgrammeDocumentAdmin(admin.ModelAdmin):
         'sections',
     ]
     change_list_template = "admin/unicef/change_list.html"
+
+    @button(css_class="btn-warning auto-disable")
+    def reconcile(self, request, pk):
+        self._reconcile(request, pk, False)
+
+    @button(css_class="btn-error auto-disable", permission=lambda request, obj: request.user.is_superuser)
+    def force_reconcile(self, request, pk):
+        self._reconcile(request, pk, True)
+
+    def _reconcile(self, request, pk, force):
+        obj = self.get_object(request, pk)
+        dates = obj.reporting_periods.all()
+        api = PMP_API()
+        pd = api.programme_documents(
+            business_area_code=obj.workspace.business_area_code, id=obj.external_id
+        )['results'][0]
+
+        if pd:
+            reporting_requirements = pd['reporting_requirements']
+            report_populated = reports_for_deletion = dates_for_deletion = pmp_date_match = []
+
+            for rep_req in reporting_requirements:
+                matching_dates = dates.filter(start_date=rep_req['start_date'], end_date=rep_req['end_date'])
+                if matching_dates:
+                    pmp_date_match.append(dates[0].pk)
+                else:
+                    progress_report = obj.progress_reports.filter(
+                        start_date=rep_req['start_date'], end_date=rep_req['end_date']).first()
+                    if progress_report:
+                        data = IndicatorLocationData.objects.filter(
+                            indicator_report__progress_report=progress_report).exclude(modified=F('created'))
+                        if data:
+                            report_populated.append(progress_report)
+                        else:
+                            reports_for_deletion.append(progress_report.pk)
+                            dates_for_deletion.append(dates[0].pk)
+
+            for unmatching_date in obj.reporting_periods.exclude(pk__in=pmp_date_match):
+                progress_report = obj.progress_reports.filter(
+                    start_date=unmatching_date.start_date, end_date=unmatching_date.end_date).first()
+                if progress_report:
+                    data = IndicatorLocationData.objects.filter(
+                        indicator_report__progress_report=progress_report).exclude(modified=F('created'))
+                    if data:
+                        report_populated.append(progress_report)
+                    else:
+                        reports_for_deletion.append(progress_report.pk)
+                        dates_for_deletion.append(dates[0].pk)
+
+            prs = ProgressReport.objects.filter(pk__in=reports_for_deletion)
+            rrd = ReportingPeriodDates.objects.filter(pk__in=dates_for_deletion)
+
+            if not (prs or rrd):
+                messages.add_message(request, messages.INFO, 'No need to reconcile! All good')
+                return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
+
+            elif report_populated and not force:
+                messages.add_message(request, messages.ERROR, 'Cannot reconcile, draft report data exist')
+                title = _("Forbidden: draft report data exist")
+            else:
+                title = _("Are you sure?")
+                if request.POST.get('post'):
+                    messages.add_message(request, messages.WARNING, f'{obj} has been reconcilied')
+                    prs.delete()
+                    rrd.delete()
+                    return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
+                else:
+                    if report_populated:
+                        messages.add_message(request, messages.ERROR, 'Important: Report data will be deleted!')
+                    else:
+                        messages.add_message(request, messages.WARNING, 'Following records will be deleted')
+
+            context = {
+                'perms_lacking': report_populated and not force,
+                'opts': self.model._meta,
+                'title': title,
+                'obj': obj,
+                'deletable_objects_prs': prs,
+                'deletable_objects_rrd': rrd,
+                'queryset': None,
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+                'media': self.media,
+            }
+            return TemplateResponse(request, "admin/reconcile/reconcile_deleted.html", context)
+
+        messages.add_message(request, messages.INFO, 'Cannot find data in eTools')
+        return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
 
     def get_urls(self):
         urls = super().get_urls()

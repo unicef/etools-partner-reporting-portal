@@ -1096,7 +1096,7 @@ class IndicatorLocationData(TimeStampedModel):
         it, and is complete.
         """
         # When changing this remember to adjust same method for indicator_report
-        return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
+        return self.modified != self.created
 
     @cached_property
     def previous_location_data(self):

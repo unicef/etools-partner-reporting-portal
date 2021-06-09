@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Reconciliation in progress' %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <h2>{% trans "Progress Reports" %}</h2>
+    <ul>{{ deletable_objects_prs|unordered_list }}</ul>
+    <h2>{% trans "Reporting Dates" %}</h2>
+    <ul>{{ deletable_objects_rrd|unordered_list }}</ul>
+
+    {% if perms_lacking %}
+        <h2>{% blocktrans %}You cannot reconcile <i>{{ obj }}</i>! Reporting data is there!{% endblocktrans %}</h2>
+        <a href="javascript:history.back()" class="button cancel-link">{% trans "Take me back" %}</a>
+    {% else %}
+
+        <p>{% blocktrans %}Are you sure you want to reconcile <i>{{ obj }}</i>? All of the following objects and their related items will be deleted:{% endblocktrans %}</p>
+
+        <form method="post">{% csrf_token %}
+        <div>
+        <input type="hidden" name="action" value="delete_selected">
+        <input type="hidden" name="post" value="yes">
+        <input type="submit" value="{% trans "Yes, I'm sure" %}" {% if perms_lacking %} disabled {% endif %}>
+        <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}
