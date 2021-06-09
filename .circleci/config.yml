@@ -172,6 +172,11 @@ jobs:
     steps:
       - checkout:
           path: ~/code
+      - run:
+          name: "Pull Submodule"
+          command: |
+            git submodule init
+            git submodule update --checkout
       - setup_remote_docker
       - run:
           name: Exporting revision number
