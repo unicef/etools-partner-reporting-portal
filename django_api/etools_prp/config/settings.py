@@ -3,10 +3,13 @@ import os
 import sys
 
 import environ
+import sentry_sdk
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 
@@ -516,15 +519,9 @@ AUTHENTICATION_BACKENDS = (
 # ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
 # ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
 
-# raven (Sentry): https://github.com/getsentry/raven-python
-SENTRY_DSN = env('SENTRY_DSN', default=False)
+SENTRY_DSN = env('SENTRY_DSN', default=None)
 if SENTRY_DSN:
-    RAVEN_CONFIG = {
-        'dsn': SENTRY_DSN,  # noqa: F405
-    }
-    INSTALLED_APPS += (  # noqa: F405
-        'raven.contrib.django.raven_compat',
-    )
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration(), CeleryIntegration()],)
 
 if DEBUG:
     CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
