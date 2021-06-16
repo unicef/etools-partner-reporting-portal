@@ -116,6 +116,7 @@ INSTALLED_APPS = [
     'post_office',
     'unicef_notification',
     'django_extensions',
+    'admin_extra_urls',
 ]
 
 MIDDLEWARE = [
