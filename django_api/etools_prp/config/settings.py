@@ -60,7 +60,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = env('EMAIL_HOST_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 
-ADMIN_MAIL = env('ADMIN_MAIL', default='prp@unicef.org')
+ADMIN_MAIL = env('ADMIN_MAIL', default=None)
 if ADMIN_MAIL:
     ADMINS = [
         ('Admin', ADMIN_MAIL),
