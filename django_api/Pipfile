@@ -47,12 +47,11 @@ pycountry = "*"
 python-social-auth = "*"
 pyrestcli = "*"
 requests = "*"
+sentry-sdk = "*"
 social-auth-app-django = "*"
 social-auth-core = "<4.0.2"  # pyjtw compatibility
 unicef-notification = "*"
 weasyprint = "*"
-
-raven = "*"  # update me
 
 [requires]
 python_version = "3.7"
