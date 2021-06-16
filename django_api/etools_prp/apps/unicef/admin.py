@@ -86,7 +86,7 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
                         report_populated.append(progress_report)
                     else:
                         reports_for_deletion.append(progress_report.pk)
-                        dates_for_deletion.append(unmatching_date[0].pk)
+                        dates_for_deletion.append(unmatching_date.pk)
 
             prs = ProgressReport.objects.filter(pk__in=reports_for_deletion)
             rpd = ReportingPeriodDates.objects.filter(pk__in=dates_for_deletion)
