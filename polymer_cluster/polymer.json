@@ -64,11 +64,6 @@
       },
       "bundle": true,
       "addServiceWorker": true
-    },
-    {
-      "name": "es6-bundled",
-      "preset": "es6-bundled",
-      "addServiceWorker": true
     }
   ],
   "lint": {

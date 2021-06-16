@@ -16,11 +16,11 @@ function getSourcesPath(request) {
   }
 }
 
-app.use('/', (req, res, next) => {
+app.use('/cluster/', (req, res, next) => {
   express.static(getSourcesPath(req))(req, res, next);
 });
 
-app.get(/.*service-worker\.js/, function (req, res) {
+app.get(/.*service-worker\.js/, function(req, res) {
   res.sendFile(getSourcesPath(req) + 'service-worker.js');
 });
 
