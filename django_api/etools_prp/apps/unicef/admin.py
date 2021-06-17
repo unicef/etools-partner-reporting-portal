@@ -43,11 +43,11 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @button(css_class="btn-warning auto-disable")
     def reconcile(self, request, pk):
-        self._reconcile(request, pk, False)
+        return self._reconcile(request, pk, False)
 
     @button(css_class="btn-error auto-disable", permission=lambda request, obj: request.user.is_superuser)
     def force_reconcile(self, request, pk):
-        self._reconcile(request, pk, True)
+        return self._reconcile(request, pk, True)
 
     def _reconcile(self, request, pk, force):
         obj = self.get_object(request, pk)
