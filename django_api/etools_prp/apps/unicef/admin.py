@@ -59,8 +59,10 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
         if pd:
             reporting_requirements = pd['reporting_requirements']
-            report_populated = reports_for_deletion = dates_for_deletion = pmp_date_match = []
-
+            report_populated = []
+            reports_for_deletion = []
+            dates_for_deletion = []
+            pmp_date_match = []
             for rep_req in reporting_requirements:
                 matching_date = dates.filter(start_date=rep_req['start_date'], end_date=rep_req['end_date']).first()
                 if matching_date:
@@ -75,7 +77,6 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
                             report_populated.append(progress_report)
                         else:
                             reports_for_deletion.append(progress_report.pk)
-
             for unmatching_date in obj.reporting_periods.exclude(pk__in=pmp_date_match):
                 progress_report = obj.progress_reports.filter(
                     start_date=unmatching_date.start_date, end_date=unmatching_date.end_date).first()
@@ -87,6 +88,8 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
                     else:
                         reports_for_deletion.append(progress_report.pk)
                         dates_for_deletion.append(unmatching_date.pk)
+                else:
+                    dates_for_deletion.append(unmatching_date.pk)
 
             prs = ProgressReport.objects.filter(pk__in=reports_for_deletion)
             rpd = ReportingPeriodDates.objects.filter(pk__in=dates_for_deletion)

@@ -24,6 +24,7 @@ celerybeat.pid
 node_modules/
 
 data/
+*.bz2
 
 polymer_3/index_dev.html
 
