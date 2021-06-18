@@ -1,10 +1,18 @@
+from django.contrib import messages
 from django.contrib.gis import admin
 
+from admin_extra_urls.decorators import button
+from admin_extra_urls.mixins import ExtraUrlMixin
 from leaflet.admin import LeafletGeoAdmin
+
+from etools_prp.apps.indicator.tasks import process_due_reports
+from etools_prp.apps.partner.tasks import process_partners
+from etools_prp.apps.unicef.tasks import process_programme_documents
 
 from .cartodb import update_sites_from_cartodb
 from .forms import AutoSizeTextForm, CartoDBTableForm, GatewayTypeModelForm
 from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from .tasks import process_period_reports, process_workspaces
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -57,12 +65,41 @@ class CartoDBTableAdmin(admin.ModelAdmin):
             update_sites_from_cartodb.delay(table.pk)
 
 
-class WorkspaceAdmin(admin.ModelAdmin):
+class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
     list_filter = ('countries',)
     search_fields = ('title', 'workspace_code', 'business_area_code',
                      'external_id')
+
+    @button()
+    def process_workspaces(self, request):
+        process_workspaces.delay()
+        messages.add_message(request, messages.INFO, 'Sync Workspace Task triggered')
+
+    @button()
+    def process_partners(self, request, pk):
+        obj = self.get_object(request, pk)
+        process_partners.delay(obj.business_area_code)
+        messages.add_message(request, messages.INFO, 'Sync Partners Task triggered')
+
+    @button()
+    def sync_programme_documents(self, request, pk):
+        obj = self.get_object(request, pk)
+        process_programme_documents.delay(area=obj.business_area_code)
+        messages.add_message(request, messages.INFO, 'Sync PDs Task triggered')
+
+    @button()
+    def report_generator_sync(self, request, pk):
+        obj = self.get_object(request, pk)
+        process_period_reports.delay(area=obj.business_area_code)
+        messages.add_message(request, messages.INFO, 'Sync Report Generator Task triggered')
+
+    @button()
+    def due_overdue_report_checker(self, request, pk):
+        obj = self.get_object(request, pk)
+        process_due_reports.delay(area=obj.business_area_code)
+        messages.add_message(request, messages.INFO, 'Due/Overdue Reports Checker triggered')
 
 
 class CountryAdmin(admin.ModelAdmin):

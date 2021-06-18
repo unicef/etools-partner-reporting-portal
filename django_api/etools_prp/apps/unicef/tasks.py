@@ -100,7 +100,7 @@ def save_person_and_user(person_data, create_user=False):
 
 
 @shared_task
-def process_programme_documents(fast=False, area=False):
+def process_programme_documents(area=False):
     """
     Specifically each below expected_results instance has the following
     mapping.
@@ -122,7 +122,7 @@ def process_programme_documents(fast=False, area=False):
     # partner_authorized_officer_group = PartnerAuthorizedOfficerRole.as_group()
 
     # Iterate over all workspaces
-    if fast:
+    if area:
         workspaces = Workspace.objects.filter(business_area_code=area)  # 2130 for Iraq
     else:
         workspaces = Workspace.objects.all()
@@ -698,3 +698,9 @@ def process_programme_documents(fast=False, area=False):
             except Exception as e:
                 logger.exception(e)
                 raise
+
+
+@shared_task
+def process_programme_documents_trigger():
+    for workspace in Workspace.objects.filter():  # need to filter by enabled
+        process_programme_documents.delay(workspace.business_area_code)

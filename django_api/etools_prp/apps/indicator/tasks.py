@@ -13,7 +13,7 @@ OVERDUE_DAYS = 15
 
 
 @shared_task
-def process_due_reports():
+def process_due_reports(area=None):
     updates = list()
     today = datetime.now().date()
     logger.info("Create due/overdue indicator reports")
@@ -33,6 +33,8 @@ def process_due_reports():
             updates.append(['Due', report])
 
     reports = ProgressReport.objects.filter(submission_date__isnull=True)
+    if area:
+        reports.filter(programme_document__workspace__business_area_code=area)
     # Iterate and set proper status
     for report in reports:
         logger.info("Progress Report: %s" % report.id)
