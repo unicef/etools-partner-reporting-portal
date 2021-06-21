@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   proxy:
-    image: traefik:v2.1
+    image: traefik:v2.4
     command: --api.insecure=true --providers.docker
     ports:
       - "8081:80"
@@ -11,8 +11,6 @@ services:
     container_name: prp_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    logging:
-      driver: none
 
   django_api:
     image: unicef/etools-prp:local
@@ -23,7 +21,6 @@ services:
       dockerfile: ./Dockerfile
       args:
         ENV: dev
-        REQUIREMENT_FILE: dev.txt
     volumes:
       - './django_api:/code/'
       - './data/django_api_logs:/data/django_api/logs'
@@ -68,13 +65,13 @@ services:
     build:
       context: ./db
       dockerfile: ./Dockerfile
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
 
   # Make sure the django .env file has the correct path for redis url set to:
   prp_redis:
-    image: redis:4.0.1-alpine
+    image: redis:6.2-alpine
     container_name: prp_redis
-    logging:
-      driver: none
 
   # id-management-frontend:
   #   image: unicef/etools-prp-id-management-frontend

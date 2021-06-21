@@ -1,4 +1,4 @@
-from fabric.api import local
+from fabric.operations import local
 
 
 def ssh(service):
