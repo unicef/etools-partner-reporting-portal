@@ -3,6 +3,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError as ModelValidationError
 from django.db import transaction
 
 from celery import shared_task
@@ -87,7 +88,7 @@ def save_person_and_user(person_data, create_user=False):
         person = process_model(
             Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
         )
-    except ValidationError:
+    except (ValidationError, ModelValidationError):
         logger.exception('Error trying to save Person model with {}'.format(person_data))
         return None, None
 
