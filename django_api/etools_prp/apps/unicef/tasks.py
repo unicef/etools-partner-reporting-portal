@@ -127,8 +127,8 @@ def process_programme_documents(fast=False, area=False):
     else:
         workspaces = Workspace.objects.all()
 
-    with transaction.atomic():
-        for workspace in workspaces:
+    for workspace in workspaces:
+        with transaction.atomic():
             # Skip global workspace and Syria Cross Border / MENARO
             if workspace.business_area_code in ("0", "234R"):
                 continue
