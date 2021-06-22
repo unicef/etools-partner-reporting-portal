@@ -85,7 +85,7 @@ def create_user_for_person(person):
 def save_person_and_user(person_data, create_user=False):
     try:
         person = process_model(
-            Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+            Person, PMPPDPersonSerializer, person_data, {'email': person_data['email'].lower()}
         )
     except ValidationError:
         logger.exception('Error trying to save Person model with {}'.format(person_data))
