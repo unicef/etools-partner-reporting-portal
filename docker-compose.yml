@@ -12,7 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  django_api:
+  backend:
     image: unicef/etools-prp:local
     env_file:
       - .env
@@ -23,40 +23,40 @@ services:
         ENV: dev
     volumes:
       - './django_api:/code/'
-      - './data/django_api_logs:/data/django_api/logs'
-      - './data/django_api_uploads_unicef_progress_reports:/data/django_api/uploads/unicef/progress_reports'
+      - './data/etools_prp_logs:/data/etools_prp/logs'
+      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
     command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
     depends_on:
       - db
     labels:
-      - "traefik.http.routers.django_api.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
-      - traefik.http.routers.django_api.service=django_api
-      - traefik.http.services.django_api.loadBalancer.server.port=8080
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
+      - traefik.http.routers.backend.service=backend
+      - traefik.http.services.backend.loadBalancer.server.port=8080
       - traefik.enable=true
 
 #  beater-prp:
-#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A django_api beat -l ${CELERY_LOG_LEVEL:-info} --scheduler django_celery_beat.schedulers:DatabaseScheduler -b $REDIS_URL"
+#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A etools_prp beat -l ${CELERY_LOG_LEVEL:-info} --scheduler django_celery_beat.schedulers:DatabaseScheduler -b $REDIS_URL"
 #    image: 'unicef/etools-prp'
 #    env_file:
 #      - .env
 #    depends_on:
-#      - django_api
+#      - backend
 #      - prp_redis
 #    restart: always
 #    volumes:
-#      - './django_api:/code/'
+#      - './etools_prp:/code/'
 #
 #  worker-prp:
-#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A django_api worker -l ${CELERY_LOG_LEVEL:-info} -b $REDIS_URL"
+#    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && celery -A etools_prp worker -l ${CELERY_LOG_LEVEL:-info} -b $REDIS_URL"
 #    image: 'unicef/etools-prp'
 #    env_file:
 #      - .env
 #    depends_on:
-#      - django_api
+#      - etools_prp
 #      - prp_redis
 #    restart: always
 #    volumes:
-#      - './django_api:/code/'
+#      - './etools_prp:/code/'
 
   db:
     image: unicef/etools-prp-db
@@ -69,7 +69,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   # Make sure the django .env file has the correct path for redis url set to:
-  prp_redis:
+  redis:
     image: redis:6.2-alpine
     container_name: prp_redis
 
