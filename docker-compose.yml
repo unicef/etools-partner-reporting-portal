@@ -12,7 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  backend:
+  prp_backend:
     image: unicef/etools-prp:local
     env_file:
       - .env
@@ -29,9 +29,9 @@ services:
     depends_on:
       - db
     labels:
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
-      - traefik.http.routers.backend.service=backend
-      - traefik.http.services.backend.loadBalancer.server.port=8080
+      - "traefik.http.routers.prp_backend.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
+      - traefik.http.routers.prp_backend.service=prp_backend
+      - traefik.http.services.prp_backend.loadBalancer.server.port=8080
       - traefik.enable=true
 
 #  beater-prp:
@@ -40,7 +40,7 @@ services:
 #    env_file:
 #      - .env
 #    depends_on:
-#      - backend
+#      - prp_backend
 #      - prp_redis
 #    restart: always
 #    volumes:
