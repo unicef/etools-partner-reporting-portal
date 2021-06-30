@@ -218,10 +218,21 @@ class LowerLevelOutputAdmin(admin.ModelAdmin):
     ]
 
 
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'title', 'active')
+    search_fields = ('name', 'title', 'email')
+    list_filter = ('active', )
+
+
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    search_fields = ('name', )
+
+
 admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
 admin.site.register(ProgressReport, ProgressReportAdmin)
 admin.site.register(PDResultLink, PDResultLinkAdmin)
 admin.site.register(LowerLevelOutput, LowerLevelOutputAdmin)
-admin.site.register(Section)
-admin.site.register(Person)
+admin.site.register(Section, SectionAdmin)
+admin.site.register(Person, PersonAdmin)
 admin.site.register(ReportingPeriodDates, ReportingPeriodDatesAdmin)
