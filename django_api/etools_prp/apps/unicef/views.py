@@ -236,8 +236,8 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
 
 class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
-
-    queryset = Reportable.objects.filter(lower_level_outputs__isnull=False)
+    queryset = Reportable.objects.filter(lower_level_outputs__isnull=False).select_related(
+        'blueprint').prefetch_related('disaggregations', 'reportablelocationgoal_set', 'content_object')
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
@@ -260,7 +260,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
         user_has_global_view = self.request.user.is_unicef
         programme_documents = ProgrammeDocument.objects.filter(
             workspace=self.kwargs['workspace_id']
-        )
+        ).select_related('unicef_focal_point', 'partner_focal_point')
         if not user_has_global_view:
             programme_documents = programme_documents.filter(partner=self.request.user.partner)
 

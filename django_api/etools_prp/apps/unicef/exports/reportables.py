@@ -25,7 +25,7 @@ def get_filter_in(value):
 class ProgressReportsMixin:
     def get_reportable_qs(self, reportable):
         # Need to have filtering applied here for indicator reports
-        # as filering occurred at higher level
+        # as filtering occurred at higher level
         reportable_qs = reportable.indicator_reports
         status_filter = get_filter_in(
             self.request.GET.get("report_status"),
