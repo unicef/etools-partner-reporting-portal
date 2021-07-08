@@ -54,14 +54,14 @@ jobs:
           DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/test_prp"
           DEPLOY_BRANCHES: "develop|staging|master"
       - image: circleci/redis:6-alpine
-      - image: circleci/postgres:9.6-alpine-postgis
+      - image: circleci/postgres:12-alpine-postgis
         environment:
           PGUSER: postgres
           POSTGRES_DB: test_prp
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
     steps:
-      - checkout
+      - checkout:
       - restore_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
       - run:
@@ -71,6 +71,8 @@ jobs:
                 export PYTHONHASHSEED=${RANDOM}
                 export ENV=dev
                 cd django_api/ && pipenv install -d --system --ignore-pipfile
+                flake8
+                isort . --check-only
                 python manage.py test
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/Pipfile.lock" }}-{{ checksum ".circleci/config.yml" }}
