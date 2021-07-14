@@ -29,7 +29,7 @@ class ProgrammeDocumentsXLSXExporter:
         filename = hashlib.sha256(';'.join([str(p.pk) for p in programme_documents]).encode('utf-8')).hexdigest()
         self.file_path = os.path.join(tempfile.gettempdir(), filename + '.xlsx')
         self.workbook = Workbook()
-        self.worksheet = self.workbook.get_active_sheet()
+        self.worksheet = self.workbook.active
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.xlsx'.format(
             timezone.now(), programme_documents.count()
         )
