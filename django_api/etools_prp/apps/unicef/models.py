@@ -28,6 +28,7 @@ from etools_prp.apps.core.common import (
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
+    SR_TYPE,
 )
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
@@ -462,9 +463,8 @@ class ProgressReport(TimeStampedModel):
         return '{} {}'.format(self.programme_document.title, self.get_reporting_period())
 
     def __str__(self):
-        return "Progress Report <pk:{}>: {} {} to {}".format(
-            self.id, self.programme_document, self.start_date, self.end_date
-        )
+        dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
+        return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
 
 
 @receiver(post_save,

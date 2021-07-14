@@ -7,11 +7,13 @@ REPORTABLE_PP_CONTENT_OBJECT = 'pp'
 REPORTABLE_PA_CONTENT_OBJECT = 'pa'
 
 QPR_TYPE = 'QPR'
+HR_TYPE = 'HR'
+SR_TYPE = 'SR'
 
 REPORTING_TYPES = Choices(
     (QPR_TYPE, 'Quarterly Progress Report'),
-    ('HR', 'Humanitarian Report'),
-    ('SR', 'Special Report'),
+    (HR_TYPE, 'Humanitarian Report'),
+    (SR_TYPE, 'Special Report'),
 )
 
 DISPLAY_CLUSTER_TYPES = Choices(
