@@ -3,7 +3,7 @@ from functools import reduce
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -241,9 +241,9 @@ class Reportable(TimeStampedExternalSourceModel):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = JSONField(default=default_value)
-    baseline = JSONField(default=default_value)
-    in_need = JSONField(blank=True, null=True)
+    target = models.JSONField(default=default_value)
+    baseline = models.JSONField(default=default_value)
+    in_need = models.JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
     comments = models.TextField(max_length=4048, blank=True, null=True)
@@ -260,7 +260,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = JSONField(default=default_total)
+    total = models.JSONField(default=default_total)
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -303,7 +303,7 @@ class Reportable(TimeStampedExternalSourceModel):
         models.DateField(), default=list, null=True, blank=True
     )
     location_admin_refs = ArrayField(
-        JSONField(), default=list, null=True, blank=True
+        models.JSONField(), default=list, null=True, blank=True
     )
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
@@ -633,9 +633,9 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = JSONField(default=default_value)
-    baseline = JSONField(default=default_value)
-    in_need = JSONField(blank=True, null=True)
+    target = models.JSONField(default=default_value)
+    baseline = models.JSONField(default=default_value)
+    in_need = models.JSONField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -685,7 +685,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=default_total)
+    total = models.JSONField(default=default_total)
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -1068,7 +1068,7 @@ class IndicatorLocationData(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    disaggregation = JSONField(default=dict)
+    disaggregation = models.JSONField(default=dict)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)

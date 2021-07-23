@@ -1,5 +1,4 @@
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
@@ -220,7 +219,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     """
     code = models.TextField(null=True, blank=True, unique=True, verbose_name='Project code in HRP')
     type = models.CharField(
-        max_length=3,
+        max_length=8,
         choices=RESPONSE_PLAN_TYPE,
         verbose_name='Plan Type',
         help_text='Is this project part of an HRP or FA?',
@@ -232,7 +231,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = JSONField(default=list, blank=True, null=True)
+    custom_fields = models.JSONField(default=list, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(

@@ -5,25 +5,11 @@ from django.core.exceptions import ValidationError
 
 from carto.exceptions import CartoException
 from carto.sql import SQLClient
-from suit.widgets import AutosizedTextarea
 
 from etools_prp.apps.core.cartodb import EtoolsCartoNoAuthClient
 from etools_prp.apps.core.models import CartoDBTable, GatewayType
 
 logger = logging.getLogger('locations.models')
-
-
-class AutoSizeTextForm(forms.ModelForm):
-    """
-    Adds large text boxes to name and description fields
-    """
-    class Meta:
-        widgets = {
-            'name':
-                AutosizedTextarea(attrs={'class': 'input-xlarge'}),
-            'description':
-                AutosizedTextarea(attrs={'class': 'input-xlarge'}),
-        }
 
 
 class CartoDBTableForm(forms.ModelForm):

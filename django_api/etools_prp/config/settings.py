@@ -100,7 +100,6 @@ INSTALLED_APPS = [
     'django_celery_results',
     'djcelery_email',
     'leaflet',
-    'suit',
     'django_cron',
     'social_django',
 
@@ -182,6 +181,8 @@ DATABASES = {
         'PORT': 5432,
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
