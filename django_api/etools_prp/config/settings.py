@@ -35,7 +35,6 @@ STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-print(STATICFILES_DIRS)
 
 DOMAIN_NAME = env('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
