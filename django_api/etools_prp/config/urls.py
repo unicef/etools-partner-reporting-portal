@@ -22,6 +22,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from rest_framework_swagger.views import get_swagger_view
 
+from etools_prp.apps.core.views import UnauthorizedView
+
 schema_view = get_swagger_view(title='eTools PRP API')
 
 urlpatterns = [
@@ -38,6 +40,7 @@ urlpatterns = [
 
     # Social auth urls
     url(r'^social/', include('social_django.urls', namespace='social')),
+    url(r'^unauthorized/$', UnauthorizedView.as_view(), name="unauthorized"),
 ]
 
 if settings.DEBUG:
