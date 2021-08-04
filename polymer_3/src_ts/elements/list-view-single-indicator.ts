@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
@@ -10,22 +10,20 @@ import {PaperButtonElement} from '@polymer/paper-button/paper-button';
 import '@polymer/polymer/lib/elements/dom-if';
 
 import './ip-reporting/ip-reporting-indicator-details';
-import './etools-prp-progress-bar';
+import '../etools-prp-common/elements/etools-prp-progress-bar';
 import './etools-prp-progress-bar-alt';
 import './etools-prp-progress-bar-cluster';
-import './etools-prp-number';
+import '../etools-prp-common/elements/etools-prp-number';
 
-import LocalizeMixin from '../mixins/localize-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
-import RoutingMixin from '../mixins/routing-mixin';
-import './etools-prp-permissions';
-import './status-badge';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
+import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
+import '../etools-prp-common/elements/etools-prp-permissions';
+import '../etools-prp-common/elements/status-badge';
 import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../typings/globals.types';
-import {tableStyles} from '../styles/table-styles';
-import {sharedStyles} from '../styles/shared-styles';
-import './cluster-reporting/indicator-editing-modal';
-import './cluster-reporting/indicator-locations-modal';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import {tableStyles} from '../etools-prp-common/styles/table-styles';
+import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 
 /**
  * @polymer
@@ -109,14 +107,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-      <template is="dom-if" if="[[canEdit]]" restamp="true">
-        <indicator-edit-modal id="modal-edit" edit-data="[[indicator]]"> </indicator-edit-modal>
-      </template>
-
-      <template is="dom-if" if="[[canEditLocations]]" restamp="true">
-        <indicator-locations-modal id="modal-locations" edit-data="[[indicator]]"> </indicator-locations-modal>
-      </template>
-
       <etools-data-table-row details-opened="{{detailsOpened}}" on-details-opened-changed="onDetailsOpenedChanged">
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
@@ -131,9 +121,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
             if="[[_equals(indicator.content_type_key, 'partner.partneractivityprojectcontext')]]"
             restamp="[[true]]"
           >
-            <span class="table-cell table-cell--text self-center">
-              [[indicator.content_object_title]]
-            </span>
+            <span class="table-cell table-cell--text self-center"> [[indicator.content_object_title]] </span>
           </template>
           <span class="table-cell table-cell--text self-center">
             [[indicator.blueprint.calculation_formula_across_locations]]
@@ -211,12 +199,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
             </div>
           </span>
 
-          <template is="dom-if" if="[[hasReports]]" restamp="true">
-            <span class="table-cell table-cell--text table-cell--action self-center">
-              <a href="[[indicatorReportsUrl]]">[[localize('reports')]]</a>
-            </span>
-          </template>
-
           <template is="dom-if" if="[[canEdit]]" restamp="true">
             <span class="table-cell table-cell--text table-cell--action self-center">
               <paper-button class="button-link" on-tap="_openModal" data-modal-type="edit"
@@ -225,14 +207,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
                   <iron-icon class="locations-warning" data-modal-type="edit" icon="icons:error"></iron-icon>
                 </template>
               </paper-button>
-            </span>
-          </template>
-
-          <template is="dom-if" if="[[canEditLocations]]" restamp="true">
-            <span class="table-cell table-cell--text table-cell--action self-center">
-              <paper-button class="button-link" on-tap="_openModal" data-modal-type="locations"
-                >[[localize('locations')]]</paper-button
-              >
             </span>
           </template>
         </div>
@@ -259,22 +233,13 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   @property({type: String, computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)'})
   indicatorReportsUrl!: string;
 
-  @property({type: Boolean, computed: '_computeIsClusterApp(appName)'})
-  isClusterApp!: boolean;
-
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   appName!: string;
 
   @property({type: String})
   type = '';
 
-  @property({type: Boolean, computed: '_computeCanEditLocations(isClusterApp, type, permissions)'})
-  canEditLocations!: boolean;
-
-  @property({type: Boolean, computed: '_computeHasReports(isClusterApp, type)'})
-  hasReports!: boolean;
-
-  @property({type: String, computed: '_computeProgressBarType(isClusterApp, indicator)'})
+  @property({type: String, computed: '_computeProgressBarType(indicator)'})
   progressBarType!: string;
 
   _flagIndicator(target: number, baseline: number, isCustom: boolean) {
@@ -283,10 +248,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
   _openModal(e: CustomEvent) {
     (this.shadowRoot!.querySelector('#modal-' + (e.target as PaperButtonElement).dataset.modalType) as any).open();
-  }
-
-  _computeIsClusterApp(appName: string) {
-    return appName === 'cluster-reporting';
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: GenericObject) {
@@ -311,20 +272,13 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
     return this.buildUrl(baseUrl, query_params);
   }
 
-  _computeCanEditLocations(isClusterApp: boolean, type: string, permissions: GenericObject) {
-    if (!permissions) {
-      return;
-    }
-    return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
-  }
-
-  _computeProgressBarType(isClusterApp: boolean, indicator: GenericObject) {
+  _computeProgressBarType(indicator: GenericObject) {
     if (!indicator) {
       return;
     }
 
     switch (true) {
-      case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
+      case !!indicator.ca_indicator_used_by_reporting_entity:
         return 'cluster';
 
       // TODO: other cases
@@ -332,10 +286,6 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
       default:
         return 'default';
     }
-  }
-
-  _computeHasReports(isClusterApp: boolean, type: string) {
-    return isClusterApp && type !== 'ca';
   }
 
   _showLocationsWarning(indicator: GenericObject, type: string) {

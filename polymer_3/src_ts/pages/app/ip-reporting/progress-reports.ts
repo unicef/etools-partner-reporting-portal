@@ -1,18 +1,18 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import '../../../elements/page-header';
-import '../../../elements/page-body';
-import '../../../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../elements/etools-prp-ajax';
+import '../../../etools-prp-common/elements/page-header';
+import '../../../etools-prp-common/elements/page-body';
+import '../../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import '../../../elements/ip-reporting/progress-reports-list';
 import '../../../elements/ip-reporting/progress-reports-toolbar';
 import '../../../elements/ip-reporting/progress-reports-filters';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../mixins/localize-mixin';
-import {GenericObject} from '../../../typings/globals.types';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {progressReportsFetch} from '../../../redux/actions/progressReports';
 
 /**

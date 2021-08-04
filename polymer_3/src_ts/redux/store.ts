@@ -9,23 +9,13 @@ import {App} from './reducers/app';
 import {Partner} from './reducers/partner';
 import {Indicators} from './reducers/indicators';
 import {ProgrammeDocuments} from './reducers/programmeDocuments';
-import {Analysis} from './reducers/analysis';
-import {Config} from './reducers/config';
 import {UserProfile} from './reducers/userProfile';
 import {ProgrammeDocumentsIndicators} from './reducers/programmeDocumentsIndicators';
-import {ProgrammeDocumentDetails} from './reducers/programmeDocumentDetails';
 import {ProgrammeDocumentReports} from './reducers/programmeDocumentReports';
 import {ProgrammeDocumentReportsAttachments} from './reducers/programmeDocumentReportsAttachments';
 import {ProgressReports} from './reducers/progressReports';
 import {ResponsePlans} from './reducers/responsePlans';
 import {Disaggregations} from './reducers/disaggregations';
-import {PartnerProjects} from './reducers/partnerProjects';
-import {PartnerActivities} from './reducers/partnerActivities';
-import {ClusterActivities} from './reducers/clusterActivities';
-import {ClusterDashboardData} from './reducers/clusterDashboardData';
-import {ClusterObjectives} from './reducers/clusterObjectives';
-import {ClusterDisaggregations} from './reducers/clusterDisaggregations';
-import {ClusterIndicatorReports} from './reducers/clusterIndicatorReports';
 import {CurrenciesData} from './reducers/currencies';
 
 declare global {
@@ -51,22 +41,12 @@ const rootReducer = combineReducers({
   indicators: Indicators,
   programmeDocuments: ProgrammeDocuments,
   programmeDocumentsIndicators: ProgrammeDocumentsIndicators,
-  programmeDocumentDetails: ProgrammeDocumentDetails,
   programmeDocumentReports: ProgrammeDocumentReports,
   programmeDocumentReportsAttachments: ProgrammeDocumentReportsAttachments,
   progressReports: ProgressReports,
   responsePlans: ResponsePlans,
   disaggregations: Disaggregations,
-  partnerProjects: PartnerProjects,
-  partnerActivities: PartnerActivities,
-  clusterActivities: ClusterActivities,
-  clusterObjectives: ClusterObjectives,
-  clusterDisaggregations: ClusterDisaggregations,
-  clusterIndicatorReports: ClusterIndicatorReports,
-  clusterDashboardData: ClusterDashboardData,
   userProfile: UserProfile,
-  analysis: Analysis,
-  config: Config,
   currencies: CurrenciesData
 });
 

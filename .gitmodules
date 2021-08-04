@@ -1,0 +1,6 @@
+[submodule "polymer_3/src_ts/etools-prp-common"]
+	path = polymer_3/src_ts/etools-prp-common
+	url = https://github.com/unicef/etools-prp-common.git
+[submodule "polymer_cluster/src_ts/etools-prp-common"]
+	path = polymer_cluster/src_ts/etools-prp-common
+	url = https://github.com/unicef/etools-prp-common.git

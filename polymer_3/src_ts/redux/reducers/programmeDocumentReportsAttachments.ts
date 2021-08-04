@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
-import {GenericObject} from '../../typings/globals.types';
-import Constants from '../../constants';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import Constants from '../../etools-prp-common/constants';
 
 export class ProgrammeDocumentReportsAttachmentsState {
   byReport: GenericObject = {};

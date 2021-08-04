@@ -1,4 +1,4 @@
-import Constants from '../../constants';
+import Constants from '../../etools-prp-common/constants';
 
 export const pdLoadingStart = function () {
   return {

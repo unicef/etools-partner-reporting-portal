@@ -4,11 +4,11 @@ import '@polymer/app-layout/app-header-layout/app-header-layout';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-icons/iron-icons';
-import {etoolsLogo} from '../etools-logo';
-import '../app-switcher';
-import '../workspace-dropdown';
+import {etoolsLogo} from '../../etools-prp-common/elements/etools-logo';
+import '../../etools-prp-common/elements/app-switcher';
+import '../../etools-prp-common/elements/workspace-dropdown';
 import '../language-dropdown';
-import '../user-profile/profile-dropdown';
+import '../../etools-prp-common/elements/user-profile/profile-dropdown';
 import {property} from '@polymer/decorators';
 
 /**

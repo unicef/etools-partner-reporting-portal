@@ -1,6 +1,4 @@
-# TODO change this to etools-base, if etools Dockerfile-base changes accepted
-# See https://github.com/unicef/etools/pull/2716
-FROM unicef/etools-prp-base:latest
+FROM unicef/etools-prp-base:base-39
 
 ARG env
 ENV ENV ${env:-dev}
@@ -17,8 +15,7 @@ ADD Pipfile .
 ADD Pipfile.lock .
 RUN pipenv install --dev --system  --ignore-pipfile
 
-RUN pip install greenlet==0.4.14
-RUN CFLAGS="-I/usr/local/include/python3.7" UWSGI_PROFILE="asyncio" pip install uwsgi==2.0.15
+RUN CFLAGS="-I/usr/local/include/python3.9" UWSGI_PROFILE="asyncio"
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads

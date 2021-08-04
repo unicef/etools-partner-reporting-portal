@@ -5,7 +5,6 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -238,7 +237,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         verbose_name='Funds received %'
     )
 
-    amendments = JSONField(default=list)
+    amendments = models.JSONField(default=list)
 
     # TODO:
     # cron job will create new report with due period !!!

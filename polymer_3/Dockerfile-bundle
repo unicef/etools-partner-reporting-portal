@@ -16,6 +16,7 @@ RUN npm install --no-save --production
 ADD . /code/
 WORKDIR /code
 RUN cp -a /tmp/node_modules /code/node_modules
+
 RUN npm run build
 
 

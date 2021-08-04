@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-route';
@@ -6,17 +6,17 @@ import '@polymer/iron-pages/iron-pages';
 import '@polymer/paper-toast/paper-toast';
 
 import '../elements/etools-prp-workspaces';
-import '../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
-import LocalizeMixin from '../mixins/localize-mixin';
-import UtilsMixin from '../mixins/utils-mixin';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import Endpoints from '../endpoints';
 import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {fetchCurrencies} from '../redux/actions/currencies';
-import {GenericObject, Route} from '../typings/globals.types';
+import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
-import {getDomainByEnv} from '../config';
+import {getDomainByEnv} from '../etools-prp-common/config';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**
@@ -70,10 +70,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       <iron-pages selected="[[page]]" attr-for-selected="name">
         <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
           <page-ip-reporting name="ip-reporting" route="{{subroute}}"> </page-ip-reporting>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
-          <page-cluster-reporting name="cluster-reporting" route="{{subroute}}"> </page-cluster-reporting>
         </template>
       </iron-pages>
 
@@ -182,9 +178,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _routeAppChanged(app: string) {
     setTimeout(() => {
-      let defaultApp = localStorage.getItem('defaultApp');
-      defaultApp = defaultApp ? this.cleanUpStorageVal(defaultApp) : 'ip-reporting';
-
+      const defaultApp = 'ip-reporting';
       if (!this.routeData.workspace_code) {
         return;
       }
@@ -195,13 +189,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
         this._fetchCurrencies(app);
 
-        // Store selected app
-        localStorage.setItem('defaultApp', app);
-
         // Render
         this.page = app;
-      } else {
-        localStorage.setItem('defaultApp', app);
       }
     });
   }
