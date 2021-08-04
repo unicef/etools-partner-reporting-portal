@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 
@@ -6,10 +6,10 @@ import '@polymer/app-layout/app-grid/app-grid-style';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/paper-spinner/paper-spinner';
 import '@unicef-polymer/etools-loading/etools-loading';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
-import UtilsMixin from '../../mixins/utils-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
 import {RootState} from '../../typings/redux.types';
 

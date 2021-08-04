@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux';
-import Constants from '../../constants';
+import Constants from '../../etools-prp-common/constants';
 
 export class ProgressReportsState {
   all = [];

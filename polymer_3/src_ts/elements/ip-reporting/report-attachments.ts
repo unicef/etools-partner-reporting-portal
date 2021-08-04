@@ -1,17 +1,17 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators/lib/decorators';
 import {html} from '@polymer/polymer';
-import UtilsMixin from '../../mixins/utils-mixin';
-import NotificationsMixin from '../../mixins/notifications-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import '../etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '@polymer/polymer/lib/elements/dom-if';
 import {
   programmeDocumentReportsAttachmentsPending,
   programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
-import {GenericObject} from '../../typings/globals.types';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
