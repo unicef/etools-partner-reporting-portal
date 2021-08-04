@@ -1,10 +1,10 @@
-import {ReduxConnectedElement} from '../../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../etools-prp-ajax';
+import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {llosAll} from '../../../redux/selectors/llos';
-import LocalizeMixin from '../../../mixins/localize-mixin';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {RootState} from '../../../typings/redux.types';
 
 /**

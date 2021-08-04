@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {property} from '@polymer/decorators';
 import {html} from '@polymer/polymer';
 import '@polymer/iron-icons/communication-icons';
@@ -9,22 +9,22 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import './pd-details-reporting-requirements';
 import './pd-details-doc-download';
-import '../page-body';
-import '../list-placeholder';
-import {tableStyles} from '../../styles/table-styles';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
+import '../../etools-prp-common/elements/page-body';
+import '../../etools-prp-common/elements/list-placeholder';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 
-import '../../elements/labelled-item';
+import '../../etools-prp-common/elements/labelled-item';
 import '../../elements/etools-prp-currency';
-import '../../elements/etools-prp-progress-bar';
-import {GenericObject} from '../../typings/globals.types';
+import '../../etools-prp-common/elements/etools-prp-progress-bar';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../endpoints';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import Settings from '../../settings';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import Settings from '../../etools-prp-common/settings';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 import {RootState} from '../../typings/redux.types';
 
@@ -325,7 +325,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
 
-  private _debouncer!: Debouncer;
   private _pdDetailDebouncer!: Debouncer;
 
   public static get observers() {

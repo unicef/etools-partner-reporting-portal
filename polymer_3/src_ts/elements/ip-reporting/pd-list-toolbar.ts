@@ -1,8 +1,8 @@
 import {PolymerElement, html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
-import UtilsMixin from '../../mixins/utils-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../etools-prp-toolbar';
-import '../download-button';
+import '../../etools-prp-common/elements/download-button';
 import {computePdUrl} from './js/pd-list-toolbar-functions';
 
 class PdListToolbar extends UtilsMixin(PolymerElement) {

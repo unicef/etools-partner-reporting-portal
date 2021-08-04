@@ -26,7 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      b) Use the `--base-path` command-line option for `polymer build`.
    -->
 
-  <base href="/">
+  <base href="/ip/">
 
   <link rel="icon" href="images/favicon.ico">
 
@@ -68,7 +68,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // Load pre-caching Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/service-worker.js');
+        navigator.serviceWorker.register('service-worker.js', {
+            scope: '/ip/',
+          });
       });
     }
     window.process = {env: {NODE_ENV: 'production'}};
