@@ -39,6 +39,7 @@ djangorestframework = "*"
 djangorestframework-gis = "*"
 djangorestframework-jwt = "*"  # migrate to djangorestframework-simplejwt
 drfpasswordless = "*"
+greenlet = "*"
 newrelic = "*"
 openpyxl = "*"
 psycopg2-binary = "*"
@@ -50,7 +51,8 @@ sentry-sdk = "*"
 social-auth-app-django = "*"
 social-auth-core = "<4.0.2"  # pyjtw compatibility
 unicef-notification = "*"
+uwsgi= "*"
 weasyprint = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"
