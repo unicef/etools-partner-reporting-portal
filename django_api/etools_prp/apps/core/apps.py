@@ -1,5 +1,6 @@
-from django.apps import AppConfig
+from django.apps import AppConfig as BaseAppConfig
 
 
-class CoreConfig(AppConfig):
-    name = 'core'
+class AppConfig(BaseAppConfig):
+    name = __name__.rpartition('.')[0]
+    verbose_name = 'Core'
