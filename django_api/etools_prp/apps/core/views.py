@@ -2,6 +2,7 @@ import importlib
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView
 
 import django_filters
 from django_celery_beat.models import PeriodicTask
@@ -226,3 +227,13 @@ class PRPRoleCreateAPIView(CreateAPIView):
 class CurrenciesView(APIView):
     def get(self, request):
         return Response([(k, v) for k, v in CURRENCIES])
+
+
+class UnauthorizedView(TemplateView):
+
+    template_name = 'unauthorized.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['unicef_user'] = self.request.user and self.request.user.email.endswith('@unicef.org')
+        return context
