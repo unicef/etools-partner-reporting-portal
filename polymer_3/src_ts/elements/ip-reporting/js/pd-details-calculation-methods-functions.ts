@@ -1,5 +1,5 @@
 import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computeIndicatorsUrl(locationId: string, pdId: string) {
   return locationId ? Endpoints.calculationMethods(locationId, pdId) : '';

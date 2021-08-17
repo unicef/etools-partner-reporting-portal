@@ -1,9 +1,5 @@
 import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../typings/globals.types';
-
-export function computeIsClusterApp(name: string) {
-  return name === 'cluster-reporting';
-}
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computeParams(val: boolean) {
   let params = {};

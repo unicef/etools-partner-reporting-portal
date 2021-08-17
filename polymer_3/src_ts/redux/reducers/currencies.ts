@@ -1,5 +1,5 @@
-import {GenericObject} from '../../typings/globals.types';
-import Constants from '../../constants';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import Constants from '../../etools-prp-common/constants';
 
 export class CurrenciesDataState {
   currenciesData: GenericObject[] = [];

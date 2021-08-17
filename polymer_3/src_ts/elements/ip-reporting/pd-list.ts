@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
@@ -10,16 +10,16 @@ import '@unicef-polymer/etools-data-table/data-table-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import DataTableMixin from '../../mixins/data-table-mixin';
-import PaginationMixin from '../../mixins/pagination-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import {tableStyles} from '../../styles/table-styles';
-import '../report-status';
-import '../etools-prp-number';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
+import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import {tableStyles} from '../../etools-prp-common/styles/table-styles';
+import '../../etools-prp-common/elements/report-status';
+import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';
-import '../list-placeholder';
+import '../../etools-prp-common/elements/list-placeholder';
 
 /**
  * @polymer
