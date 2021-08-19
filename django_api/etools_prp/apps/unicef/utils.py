@@ -4,7 +4,7 @@ from django.http import FileResponse
 from django.template.loader import render_to_string
 
 from weasyprint import CSS, HTML
-from weasyprint.fonts import FontConfiguration
+from weasyprint.text.fonts import FontConfiguration
 
 
 def render_pdf_to_response(request, template, data):

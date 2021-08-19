@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 import jwt
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from etools_prp.apps.core.permissions import (
     AnyPermission,
@@ -16,19 +16,23 @@ from etools_prp.apps.core.permissions import (
 )
 
 
-class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
+class CustomJSONWebTokenAuthentication(JWTAuthentication):
     """
     Handles setting the tenant after a JWT successful authentication
     """
-    def enforce_csrf(self, request):
-        return
 
     def authenticate(self, request):
 
-        jwt_value = self.get_jwt_value(request)
-        if jwt_value is None:
-            # no JWT token return to skip this authentication mechanism
-            return None
+        def _get_validated_token(request):
+            """basically override authenticate method but stop at checking token validity """
+            header = self.get_header(request)
+            if header is None:
+                return None
+
+            raw_token = self.get_raw_token(header)
+            if raw_token is None:
+                return None
+            return self.get_validated_token(raw_token)
 
         try:
             user, jwt_value = super().authenticate(request)
@@ -39,13 +43,18 @@ class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
             if getattr(settings, 'JWT_ALLOW_NON_EXISTENT_USERS', False):
                 try:
                     # try and see if the token is valid
-                    payload = jwt_decode_handler(jwt_value)
-                except (jwt.ExpiredSignature, jwt.DecodeError):
+                    payload = _get_validated_token(request)
+                except (jwt.ExpiredSignatureError, jwt.DecodeError):
                     raise PermissionDenied(detail='Authentication Failed')
                 else:
                     # signature is valid user does not exist... setting default authenticated user
                     user = get_user_model().objects.get(username=settings.DEFAULT_UNICEF_USER)
                     setattr(user, 'jwt_payload', payload)
+                    # check if the original request was made by UNICEF user
+                    if not payload['username'].endswith('@unicef.org'):
+                        raise PermissionDenied('Requested by external user')
+                    return user, payload
+
             else:
                 raise PermissionDenied(detail='Authentication Failed')
 
