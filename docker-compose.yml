@@ -12,19 +12,33 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+#  prp_backend:
+#    image: unicef/etools-prp:local
+#    env_file:
+#      - .env
+#    build:
+#      context: ./django_api
+#      dockerfile: ./Dockerfile
+#      args:
+#        ENV: dev
+#    volumes:
+#      - './django_api:/code/'
+#      - './data/etools_prp_logs:/data/etools_prp/logs'
+#      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
+#    command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
+#    depends_on:
+#      - db
+#    labels:
+#      - "traefik.http.routers.prp_backend.rule=PathPrefix(`/api`,`/social`,`/uploads`)"
+#      - traefik.http.routers.prp_backend.service=prp_backend
+#      - traefik.http.services.prp_backend.loadBalancer.server.port=8080
+#      - traefik.enable=true
+
+
   prp_backend:
-    image: unicef/etools-prp:local
+    image: unicef/etools-prp:develop
     env_file:
       - .env
-    build:
-      context: ./django_api
-      dockerfile: ./Dockerfile
-      args:
-        ENV: dev
-    volumes:
-      - './django_api:/code/'
-      - './data/etools_prp_logs:/data/etools_prp/logs'
-      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
     command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
     depends_on:
       - db
