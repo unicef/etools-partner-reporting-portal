@@ -28,15 +28,15 @@ gulp.task('prpl-server:clean', () => {
 });
 
 function injectBaseHref(basePath) {
-   return gulp.src('index.html')
-              .pipe(replace('<base href="/">', function(match) {
-                  console.log('Replace called on', match);
-                  return'<base href="'+ basePath +'">'
-                    }
-               ))
-              .pipe(rename({basename: 'index_dev'}))
-              .pipe(gulp.dest('./'));
-            };
+  return gulp.src('index.html')
+    .pipe(replace('<base href="/">', function(match) {
+      console.log('Replace called on', match);
+      return '<base href="' + basePath + '">'
+    }
+    ))
+    .pipe(rename({basename: 'index_dev'}))
+    .pipe(gulp.dest('./'));
+};
 
 /**
  * Copies the prpl-server build to the server directory while renaming the
@@ -69,7 +69,7 @@ gulp.task('serve', () => {
 });
 
 gulp.task('serve-app-poly3', () => {
-  injectBaseHref("/app_poly3/");
+  injectBaseHref("/ip/");
   spawn('tsc --skipLibCheck', ['--watch'], spawnOptions);
   spawn('polymer', ['serve --entrypoint="index_dev.html" -H 0.0.0.0 -p 8082'], spawnOptions);
 });
