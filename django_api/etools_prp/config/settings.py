@@ -202,40 +202,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# JWT
-# django-rest-framework-jwt: http://getblimp.github.io/django-rest-framework-jwt/
-JWT_AUTH = {
-   'JWT_ENCODE_HANDLER':
-   'rest_framework_jwt.utils.jwt_encode_handler',
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=480),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
 
-   'JWT_DECODE_HANDLER':
-   'rest_framework_jwt.utils.jwt_decode_handler',
+    'ALGORITHM': 'RS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'LEEWAY': 60,
 
-   'JWT_PAYLOAD_HANDLER':
-   'rest_framework_jwt.utils.jwt_payload_handler',
+    'AUTH_HEADER_TYPES': ('JWT', ),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
 
-   'JWT_PAYLOAD_GET_USER_ID_HANDLER':
-   'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
 
-   'JWT_PAYLOAD_GET_USERNAME_HANDLER':
-   'rest_framework_jwt.utils.jwt_get_username_from_payload_handler',
+    'JTI_CLAIM': 'user_id',
 
-   'JWT_RESPONSE_PAYLOAD_HANDLER':
-   'rest_framework_jwt.utils.jwt_response_payload_handler',
-
-   'JWT_ALGORITHM': 'HS256',
-   'JWT_VERIFY': True,
-   'JWT_VERIFY_EXPIRATION': True,
-   'JWT_LEEWAY': 30,
-   'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30000),
-   'JWT_AUDIENCE': None,
-   'JWT_ISSUER': None,
-
-   'JWT_ALLOW_REFRESH': False,
-   'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-
-   'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
 }
+
 DISABLE_JWT_AUTH = env.bool('DISABLE_JWT_AUTH', default=False)
 # This user will be used for all externals that have a valid JWT but no user account in the system
 DEFAULT_UNICEF_USER = 'default_unicef_user'
@@ -440,7 +436,6 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 # TODO: Set this url properly later
 LOGIN_ERROR_URL = "/404"
-JWT_LEEWAY = 1000
 
 SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.social_details',
@@ -501,13 +496,10 @@ if not DISABLE_JWT_AUTH:
 
     JWT_PUBLIC_KEY = certificate.public_key()
 
-    JWT_AUTH.update({  # noqa: F405
-        'JWT_SECRET_KEY': SECRET_KEY,
-        'JWT_PUBLIC_KEY': JWT_PUBLIC_KEY,
-        'JWT_ALGORITHM': 'RS256',
-        'JWT_LEEWAY': 60,
-        'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),  # noqa: F405
-        'JWT_AUDIENCE': 'https://etools.unicef.org/',
+    SIMPLE_JWT.update({  # noqa: F405
+        'SIGNING_KEY': SECRET_KEY,
+        'VERIFYING_KEY': JWT_PUBLIC_KEY,
+        'AUDIENCE': 'https://etools.unicef.org/',
     })
 
 AUTHENTICATION_BACKENDS = (
