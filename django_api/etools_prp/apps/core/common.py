@@ -47,17 +47,23 @@ USER_TYPES = Choices(
     ('PARTNER', 'partner', 'Partner user')
 )
 
-PRP_ROLE_TYPES = Choices(
+PRP_IP_ROLE_TYPES = Choices(
     ('IP_AUTHORIZED_OFFICER', 'ip_authorized_officer', 'IP Authorized officer'),
     ('IP_EDITOR', 'ip_editor', 'IP Editor'),
     ('IP_VIEWER', 'ip_viewer', 'IP Viewer'),
     ('IP_ADMIN', 'ip_admin', 'IP Admin'),
+)
+
+PRP_CLUSTER_ROLE_TYPES = Choices(
     ('CLUSTER_IMO', 'cluster_imo', 'Cluster IMO'),
     ('CLUSTER_SYSTEM_ADMIN', 'cluster_system_admin', 'Cluster System admin'),
     ('CLUSTER_VIEWER', 'cluster_viewer', 'Cluster Viewer'),
     ('CLUSTER_COORDINATOR', 'cluster_coordinator', 'Cluster Coordinator'),
     ('CLUSTER_MEMBER', 'cluster_member', 'Cluster Member'),
 )
+
+PRP_ROLE_TYPES = PRP_IP_ROLE_TYPES + PRP_CLUSTER_ROLE_TYPES
+
 
 CLUSTER_TYPES = DISPLAY_CLUSTER_TYPES + Choices(
     ('imported', 'Imported'),
