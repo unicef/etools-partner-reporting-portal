@@ -434,7 +434,8 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
 
-LOGIN_ERROR_URL = "/landing"
+LOGIN_URL = "/landing"
+LOGIN_ERROR_URL = "/unauthorized"
 
 SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.social_details',

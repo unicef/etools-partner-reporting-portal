@@ -62,12 +62,12 @@
             <h1 class="error primary-txt">Not authorized</h1>
         </header>
 
-    <h3> Hi {{ user }}, </h3>
+    <h3> Hi {% if user.is_authenticated %} {{ user }} {% else %} {{request.GET.eu}} {% endif %}, </h3>
     <p>
         {% if unicef_user %}
-            UNICEF users do not have access to Partner Reporting Portal.
+            UNICEF users do not have access to eTools - Partner Reporting Portal.
         {% else %}
-            You do not have access to eTools
+            You do not have access to eTools - Partner Reporting Portal.
         {% endif %}
     </p>
     </div>

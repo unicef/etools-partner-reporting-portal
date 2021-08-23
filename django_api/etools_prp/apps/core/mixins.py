@@ -115,7 +115,10 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
             return "/landing"
 
         strategy = getattr(request, 'social_strategy', None)
-        return strategy.setting('LOGIN_ERROR_URL')
+        redirect_url = strategy.setting('LOGIN_ERROR_URL')
+        if request.user.is_authenticated:
+            redirect_url = f'{redirect_url }?eu={request.user.username}'
+        return redirect_url
 
 
 @deconstructible
