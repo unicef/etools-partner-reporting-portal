@@ -17,6 +17,7 @@
         body {
             padding: 0;
             margin: 0;
+            background-color: rgba(21, 39, 79, 0.2);
         }
         .medium-tall{
             padding: 1%;
@@ -29,14 +30,16 @@
             text-align: center;
             background-image: url("/api/static/images/IP-Landing-Page-sm.jpeg");
             background-repeat: no-repeat;
-            background-color: rgb(21, 39, 79);
             background-position: center;
-            opacity: 0.7;
+            background-blend-mode: multiply;
+            opacity: 0.8;
             padding-top:0;
         }
         .messsage {
-            padding:265px;
+            padding-top: 50px;
+            padding-bottom: 300px;
             color:white;
+            font-size: 17px;
         }
 
     </style>
@@ -62,12 +65,26 @@
             <h1 class="error primary-txt">Not authorized</h1>
         </header>
 
-    <h3> Hi {% if user.is_authenticated %} {{ user }} {% else %} {{request.GET.eu}} {% endif %}, </h3>
+    <h3> Hi {% if user.is_authenticated %} {{ user }} {% else %} {{request.GET.eu}}{% endif %}, </h3>
     <p>
-        {% if unicef_user %}
-            UNICEF users do not have access to eTools - Partner Reporting Portal.
+        {% if request.GET.msgc == 'loginerror' %}
+            There was an error trying to log you in, please try again <a href="/landing" style="color:white">here</a>
+        {% elif request.GET.msgc == 'alreadyauthenticated' %}
+            You cannot login at the same time with multiple accounts, please <a href="/social/unicef-logout/" style="color:white"> Logout </a> and then login again.
+        {% elif unicef_user %}
+            UNICEF users do not have access to eTools Partner Reporting Portal.
+        {% elif request.GET.msgc == 'nouser' %}
+            The email address you are trying to log in with has no access to eTools Partner Reporting Portal.<br>
+            Please make sure to inform your UNICEF focal point or the user administrator colleague in your organization if you require access with {{request.GET.eu}}
         {% else %}
-            You do not have access to eTools - Partner Reporting Portal.
+            You do not have any roles assigned in eTools Partner Reporting Portal. <br>
+            Please follow up with your UNICEF focal point or the user administrator colleague in your organization. <br>
+            For your reference, the email for your account is {{user.email}}.
+
+        {% endif %}
+        {% if user %}
+            <br><br>
+            <a href="/social/unicef-logout/" style="color:white"> Logout </a>
         {% endif %}
     </p>
     </div>
