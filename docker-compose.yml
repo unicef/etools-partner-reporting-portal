@@ -113,10 +113,10 @@ services:
        - ./polymer_3/:/code
     command: ash -c "npm run devPoly3"
     labels:
-      - "traefik.http.routers.polymer33.rule=PathPrefix(`/app_poly3`)"
+      - "traefik.http.routers.polymer33.rule=PathPrefix(`/ip`)"
       - traefik.http.routers.polymer33.service=polymer33
       - traefik.http.routers.polymer33.middlewares=polymer33-stripprefix
-      - traefik.http.middlewares.polymer33-stripprefix.stripprefix.prefixes=/app_poly3
+      - traefik.http.middlewares.polymer33-stripprefix.stripprefix.prefixes=/ip
       - traefik.http.services.polymer33.loadBalancer.server.port=8082
       - traefik.enable=true
 

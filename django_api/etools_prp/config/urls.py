@@ -22,11 +22,12 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from rest_framework_swagger.views import get_swagger_view
 
-from etools_prp.apps.core.views import UnauthorizedView
+from etools_prp.apps.core.views import HomeView, UnauthorizedView
 
 schema_view = get_swagger_view(title='eTools PRP API')
 
 urlpatterns = [
+    url(r'^$', HomeView.as_view()),
     url(r'^api/docs/', schema_view),
     url(r'^api/admin/', admin.site.urls),
     url(r'^api/core/', include('etools_prp.apps.core.urls')),

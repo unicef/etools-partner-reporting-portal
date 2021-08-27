@@ -2,7 +2,7 @@ import importlib
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 
 import django_filters
 from django_celery_beat.models import PeriodicTask
@@ -12,7 +12,13 @@ from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIVie
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from etools_prp.apps.core.common import CURRENCIES, DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from etools_prp.apps.core.common import (
+    CURRENCIES,
+    DISPLAY_CLUSTER_TYPES,
+    PARTNER_PROJECT_STATUS,
+    PRP_CLUSTER_ROLE_TYPES,
+    PRP_IP_ROLE_TYPES,
+)
 from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from etools_prp.apps.utils.serializers import serialize_choices
@@ -227,6 +233,20 @@ class PRPRoleCreateAPIView(CreateAPIView):
 class CurrenciesView(APIView):
     def get(self, request):
         return Response([(k, v) for k, v in CURRENCIES])
+
+
+class HomeView(RedirectView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_redirect_url(self, *args, **kwargs):
+        user = self.request.user
+        if user.prp_roles.filter(role__in=[item for item, _, in PRP_IP_ROLE_TYPES]):
+            redirect_page = '/ip'
+        elif user.prp_roles.filter(role__in=[item for item, _, in PRP_CLUSTER_ROLE_TYPES]):
+            redirect_page = '/cluster'
+        else:
+            redirect_page = '/unauthorized'
+        return redirect_page
 
 
 class UnauthorizedView(TemplateView):
