@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseRedirect
 from django.utils.deconstruct import deconstructible
 
 from social_core.backends.azuread_b2c import AzureADB2COAuth2
@@ -13,6 +15,12 @@ from storages.utils import setting
 
 def social_details(backend, details, response, *args, **kwargs):
     r = social_auth.social_details(backend, details, response, *args, **kwargs)
+
+    user = kwargs.get('user', None)
+    if user:
+        # here we are preventing messing up between current us and social user
+        return HttpResponseRedirect(f"/unauthorized/?eu={user.email}&msgc=alreadyauthenticated")
+
     r['details']['idp'] = response.get('idp')
 
     if not r['details'].get('email'):
@@ -34,8 +42,8 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
         get_user_model().objects.get(username=username)
 
     except get_user_model().DoesNotExist:
-        return
-        # return HttpResponseRedirect("/workspace_inactive/")
+        email = quote(username)
+        return HttpResponseRedirect(f"/unauthorized/?eu={email}&msgc=nouser")
 
     return {'username': details.get('email')}
 
@@ -90,6 +98,7 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
 
 
 class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
+
     def get_redirect_uri(self, request, exception):
         error = request.GET.get('error', None)
 
@@ -98,7 +107,6 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
         # Correlation ID: 7e8c3cf9-2fa7-47c7-8924-a1ea91137ba9\r\n
         # Timestamp: 2018-11-13 11:37:56Z\r\n']
         error_description = request.GET.get('error_description', None)
-
         if error == "access_denied" and error_description is not None:
             if 'AADB2C90118' in error_description:
                 auth_class = CustomAzureADBBCOAuth2()
@@ -115,7 +123,8 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
             return "/landing"
 
         strategy = getattr(request, 'social_strategy', None)
-        return strategy.setting('LOGIN_ERROR_URL')
+        redirect_url = strategy.setting('LOGIN_ERROR_URL') + "?msgc=loginerror"
+        return redirect_url
 
 
 @deconstructible
