@@ -218,8 +218,8 @@ SIMPLE_JWT = {
 
     'AUTH_HEADER_TYPES': ('JWT', ),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
+    'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email',
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
@@ -424,6 +424,9 @@ SOCIAL_PASSWORD_RESET_POLICY = env('AZURE_B2C_PASS_RESET_POLICY', default="B2C_1
 POLICY = env('AZURE_B2C_POLICY_NAME', default="b2c_1A_UNICEF_PARTNERS_signup_signin")
 
 TENANT_ID = env('AZURE_B2C_TENANT', default='unicefpartners')
+TENANT_B2C_URL = f'{TENANT_ID}.b2clogin.com'
+
+
 SCOPE = ['openid', 'email']
 IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
@@ -434,7 +437,9 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
 
-LOGIN_ERROR_URL = "/landing"
+LOGIN_URL = "/landing"
+LOGIN_ERROR_URL = "/unauthorized"
+LOGOUT_URL = "/api/account/user-logout/"
 
 SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.social_details',
