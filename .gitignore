@@ -14,7 +14,7 @@
 # Python compiled
 *.pyc
 *.pem
-!django_api/django_api/keys/jwt/certificate.pem
+
 .coverage
 htmlcov
 .pytest_cache
@@ -24,8 +24,10 @@ celerybeat.pid
 node_modules/
 
 data/
+*.bz2
 
 polymer_3/index_dev.html
+polymer_cluster/index_dev.html
 
 # k8s secrets
 kubernetes/base/secrets.yml

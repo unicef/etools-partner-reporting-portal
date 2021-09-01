@@ -1,8 +1,8 @@
 import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
-import UtilsMixin from '../../mixins/utils-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../etools-prp-toolbar';
-import '../download-button';
+import '../../etools-prp-common/elements/download-button';
 import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
 
 /**

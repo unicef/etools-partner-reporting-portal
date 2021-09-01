@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/paper-dialog/paper-dialog';
@@ -6,24 +6,24 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 import '@polymer/paper-styles/typography';
 import '@polymer/iron-location/iron-location';
-import '../error-modal';
-import {ErrorModalEl} from '../error-modal';
-import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import '../etools-prp-ajax';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import '../../etools-prp-common/elements/error-modal';
+import {ErrorModalEl} from '../../etools-prp-common/elements/error-modal';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import '../../etools-prp-common/elements/etools-prp-ajax';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import RoutingMixin from '../../mixins/routing-mixin';
-import UtilsMixin from '../../mixins/utils-mixin';
-import '../etools-prp-permissions';
-import {GenericObject} from '../../typings/globals.types';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import '../../etools-prp-common/elements/etools-prp-permissions';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import {RootState} from '../../typings/redux.types';
-import {EtoolsPrpAjaxEl} from '../etools-prp-ajax';
-import {waitForIronOverlayToClose} from '../../utils/util';
+import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
+import {waitForIronOverlayToClose} from '../../etools-prp-common/utils/util';
 
 /**
  * @polymer
@@ -97,9 +97,7 @@ class AuthorizedOfficerModal extends LocalizeMixin(RoutingMixin(ModalMixin(Utils
           <paper-button class="btn-primary" on-tap="_save" raised disabled="[[busy]]">
             [[localize('submit')]]
           </paper-button>
-          <paper-button class="btn-primary" on-tap="_cancel" disabled="[[busy]]">
-            [[localize('cancel')]]
-          </paper-button>
+          <paper-button class="btn-primary" on-tap="_cancel" disabled="[[busy]]"> [[localize('cancel')]] </paper-button>
         </div>
       </paper-dialog>
       <error-modal id="error"></error-modal>

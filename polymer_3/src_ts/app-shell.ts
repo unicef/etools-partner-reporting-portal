@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from './ReduxConnectedElement';
+import {ReduxConnectedElement} from './etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
@@ -6,17 +6,17 @@ import '@polymer/app-route/app-route.js';
 import '@polymer/iron-pages/iron-pages.js';
 import 'etools-piwik-analytics/etools-piwik-analytics.js';
 
-import LocalizeMixin from './mixins/localize-mixin';
-import UtilsMixin from './mixins/utils-mixin';
-import ErrorHandlerMixin from './mixins/errors-mixin';
+import LocalizeMixin from './etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from './etools-prp-common/mixins/utils-mixin';
+import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin';
 import Endpoints from './endpoints';
-import './elements/app-redirect';
-import './elements/etools-prp-ajax';
-import './elements/etools-prp-auth';
-import {EtoolsPrpAjaxEl} from './elements/etools-prp-ajax';
-import {GenericObject} from './typings/globals.types';
+import './etools-prp-common/elements/app-redirect';
+import './etools-prp-common/elements/etools-prp-ajax';
+import './etools-prp-common/elements/etools-prp-auth';
+import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax';
+import {GenericObject} from './etools-prp-common/typings/globals.types';
 import {reset, userLogout} from './redux/actions';
-import {getDomainByEnv, BASE_PATH} from './config';
+import {getDomainByEnv, BASE_PATH} from './etools-prp-common/config';
 import {locales} from './locales';
 import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 declare const dayjs: any;
@@ -123,7 +123,6 @@ class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnected
   }
 
   _routePageChanged(page: string) {
-    // TODO - add `app` when app_poly3 is no longer used
     const validPages = [BASE_PATH, 'landing', 'unauthorized', 'not-found', 'login-token'];
     const isPageValid = validPages.includes(page); // Check if page is valid
 
