@@ -540,8 +540,8 @@ class ProgressReportXLSXExporter:
                         max_length = len(cell.value)
                 except BaseException:
                     pass
-            adjusted_width = max_length + 2
-            merged_sheet.column_dimensions[column].width = adjusted_width
+            # adjusted_width = max_length + 2
+            # merged_sheet.column_dimensions[column].width = adjusted_width
 
         # Add filters
         merged_sheet.auto_filter.ref = "A1:%s%d" % (

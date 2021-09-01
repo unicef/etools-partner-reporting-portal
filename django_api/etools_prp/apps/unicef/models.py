@@ -5,7 +5,6 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -28,6 +27,7 @@ from etools_prp.apps.core.common import (
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
+    SR_TYPE,
 )
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
@@ -237,7 +237,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         verbose_name='Funds received %'
     )
 
-    amendments = JSONField(default=list)
+    amendments = models.JSONField(default=list)
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -462,9 +462,8 @@ class ProgressReport(TimeStampedModel):
         return '{} {}'.format(self.programme_document.title, self.get_reporting_period())
 
     def __str__(self):
-        return "Progress Report <pk:{}>: {} {} to {}".format(
-            self.id, self.programme_document, self.start_date, self.end_date
-        )
+        dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
+        return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
 
 
 @receiver(post_save,

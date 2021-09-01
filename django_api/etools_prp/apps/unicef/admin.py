@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
@@ -11,6 +13,7 @@ from django.utils.translation import gettext as _
 from admin_extra_urls.api import button, ExtraUrlMixin
 
 from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.common import SR_TYPE
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
 from etools_prp.apps.indicator.models import IndicatorLocationData
@@ -51,49 +54,65 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     def _reconcile(self, request, pk, force):
         obj = self.get_object(request, pk)
-        dates = obj.reporting_periods
         api = PMP_API()
         pd = api.programme_documents(
             business_area_code=obj.workspace.business_area_code, id=obj.external_id
         )['results'][0]
 
         if pd:
-            reporting_requirements = pd['reporting_requirements']
+            old_progress_report = obj.progress_reports.values('pk', 'start_date', 'end_date', 'due_date', 'report_type')
+
             report_populated = []
             reports_for_deletion = []
-            dates_for_deletion = []
             pmp_date_match = []
-            for rep_req in reporting_requirements:
-                matching_date = dates.filter(start_date=rep_req['start_date'], end_date=rep_req['end_date']).first()
+
+            for rep_req in old_progress_report:
+                if rep_req['report_type'] == SR_TYPE:
+                    due_date = rep_req['due_date'].strftime('%Y-%m-%d')
+                    matching_date = list(filter(lambda x: x['due_date'] == due_date, pd['special_reports']))
+                else:
+                    start_date = rep_req['start_date'].strftime('%Y-%m-%d')
+                    end_date = rep_req['end_date'].strftime('%Y-%m-%d')
+                    matching_date = list(filter(lambda x:
+                                                x['start_date'] == start_date and
+                                                x['end_date'] == end_date and
+                                                x['report_type'] == rep_req['report_type'],
+                                                pd['reporting_requirements']))
                 if matching_date:
-                    pmp_date_match.append(matching_date.pk)
-                else:
-                    progress_report = obj.progress_reports.filter(
-                        start_date=rep_req['start_date'], end_date=rep_req['end_date']).first()
-                    if progress_report:
-                        data = IndicatorLocationData.objects.filter(
-                            indicator_report__progress_report=progress_report).exclude(modified=F('created'))
-                        if data:
-                            report_populated.append(progress_report)
-                        else:
-                            reports_for_deletion.append(progress_report.pk)
-            for unmatching_date in obj.reporting_periods.exclude(pk__in=pmp_date_match):
-                progress_report = obj.progress_reports.filter(
-                    start_date=unmatching_date.start_date, end_date=unmatching_date.end_date).first()
-                if progress_report:
-                    data = IndicatorLocationData.objects.filter(
-                        indicator_report__progress_report=progress_report).exclude(modified=F('created'))
-                    if data:
-                        report_populated.append(progress_report)
-                    else:
-                        reports_for_deletion.append(progress_report.pk)
-                        dates_for_deletion.append(unmatching_date.pk)
-                else:
-                    dates_for_deletion.append(unmatching_date.pk)
+                    pmp_date_match.append(rep_req['pk'])
 
+            for unmatching_report in obj.progress_reports.exclude(pk__in=pmp_date_match):
+                future_reports = obj.progress_reports.filter(report_type=unmatching_report.report_type)
+                if unmatching_report.report_type == SR_TYPE:
+                    future_reports = future_reports.filter(due_date__gte=unmatching_report.due_date)
+                else:
+                    future_reports = future_reports.filter(start_date__gte=unmatching_report.start_date)
+
+                data = IndicatorLocationData.objects.filter(
+                    indicator_report__progress_report__in=future_reports).exclude(modified=F('created'))
+                reports_for_deletion.extend([unmatching_report.pk for unmatching_report in future_reports])
+                if data:
+                    report_populated.extend(future_reports)
             prs = ProgressReport.objects.filter(pk__in=reports_for_deletion)
-            rpd = ReportingPeriodDates.objects.filter(pk__in=dates_for_deletion)
 
+            deleted_dates_pk = []
+            for date in pd['reporting_requirements']:
+                start_date = datetime.strptime(date['start_date'], '%Y-%m-%d')
+                end_date = datetime.strptime(date['end_date'], '%Y-%m-%d')
+                matching_date = obj.reporting_periods.exclude(report_type=SR_TYPE).filter(start_date=start_date, end_date=end_date)
+                if matching_date:
+                    deleted_dates_pk.append(matching_date.first().pk)
+
+            for date in pd['special_reports']:
+                due_date = datetime.strptime(date['due_date'], '%Y-%m-%d')
+                matching_date = obj.reporting_periods.filter(report_type=SR_TYPE, due_date=due_date)
+                if matching_date:
+                    deleted_dates_pk.append(matching_date.first().pk)
+
+            if deleted_dates_pk:
+                rpd = ReportingPeriodDates.objects.filter(programme_document=obj).exclude(pk__in=deleted_dates_pk)
+            else:
+                rpd = []
             if not (prs or rpd):
                 messages.add_message(request, messages.INFO, 'No need to reconcile! All good')
                 return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
@@ -105,8 +124,10 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
                 title = _("Are you sure?")
                 if request.POST.get('post'):
                     messages.add_message(request, messages.WARNING, f'{obj} has been reconcilied')
+
                     prs.delete()
                     rpd.delete()
+                    process_period_reports.delay()
                     return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
                 else:
                     if report_populated:
@@ -119,8 +140,7 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
                 'opts': self.model._meta,
                 'title': title,
                 'obj': obj,
-                'deletable_objects_prs': prs,
-                'deletable_objects_rpd': rpd,
+                'deletable_objects': (prs, rpd),
                 'queryset': None,
                 'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
                 'media': self.media,
@@ -171,13 +191,11 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
 
 class ProgressReportAdmin(admin.ModelAdmin):
-    list_display = ('programme_document', 'status', 'submitted_by',
-                    'start_date', 'end_date', 'due_date', 'submission_date',
-                    'review_date', 'report_type', 'report_number')
-    list_filter = (
-        'status',
-        'programme_document__status',)
-    search_fields = ('programme_document__title', )
+    list_display = ('programme_document', 'report_type', 'status',
+                    'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
+                    'review_date', 'report_number')
+    list_filter = ('status', 'report_type', 'programme_document__status',)
+    search_fields = ('programme_document__title', 'programme_document__reference_number')
     raw_id_fields = [
         'programme_document',
         'submitted_by',
@@ -187,7 +205,7 @@ class ProgressReportAdmin(admin.ModelAdmin):
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'report_type', 'start_date', 'end_date', 'due_date')
-    search_fields = ('programme_document__title', )
+    search_fields = ('programme_document__title', 'programme_document__reference_number')
     list_filter = [
         'report_type',
     ]

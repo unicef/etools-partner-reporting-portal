@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.db.models import Count, Prefetch, Q
+from django.http import HttpResponseRedirect
 
 import django_filters
 from drfpasswordless.utils import authenticate_by_token
@@ -51,6 +53,10 @@ class UserLogoutAPIView(APIView):
     def post(self, request, *args, **kwargs):
         logout(request)
         return Response({}, status=statuses.HTTP_200_OK)
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return HttpResponseRedirect(settings.LOGIN_URL)
 
 
 class LoginUserWithTokenAPIView(APIView):

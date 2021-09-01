@@ -1,5 +1,5 @@
 import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computePDReportsUrl(locationId: string) {
   return locationId ? Endpoints.programmeDocumentReports(locationId) : '';

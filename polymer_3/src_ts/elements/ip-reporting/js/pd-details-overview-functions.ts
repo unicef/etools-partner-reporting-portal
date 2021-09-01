@@ -1,4 +1,4 @@
-import {GenericObject} from '../../../typings/globals.types';
+import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 declare const dayjs: any;
 
 export function computeLoaded(pd: GenericObject) {

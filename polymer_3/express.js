@@ -5,8 +5,7 @@ const app = express();
 const basedir = __dirname + '/build/'; // eslint-disable-line
 
 function getSourcesPath(request) {
-  let clientCapabilities = browserCapabilities.browserCapabilities(
-    request.headers['user-agent']);
+  let clientCapabilities = browserCapabilities.browserCapabilities(request.headers['user-agent']);
 
   clientCapabilities = new Set(clientCapabilities); // eslint-disable-line
   if (clientCapabilities.has('modules')) {
@@ -16,11 +15,11 @@ function getSourcesPath(request) {
   }
 }
 
-app.use('/', (req, res, next) => {
+app.use('/ip/', (req, res, next) => {
   express.static(getSourcesPath(req))(req, res, next);
 });
 
-app.get(/.*service-worker\.js/, function (req, res) {
+app.get(/.*service-worker\.js/, function(req, res) {
   res.sendFile(getSourcesPath(req) + 'service-worker.js');
 });
 
@@ -30,5 +29,3 @@ app.use((req, res) => {
 });
 
 app.listen(8082);
-
-

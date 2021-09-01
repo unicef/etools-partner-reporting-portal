@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
 import '@polymer/paper-styles/typography.js';
@@ -7,13 +7,13 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../../elements/etools-prp-currency';
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import ModalMixin from '../../mixins/modal-mixin';
-import {buttonsStyles} from '../../styles/buttons-styles';
-import {modalStyles} from '../../styles/modal-styles';
-import {GenericObject} from '../../typings/globals.types';
-import {currentProgrammeDocument} from '../../redux/selectors/programmeDocuments';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
+import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {RootState} from '../../typings/redux.types';
 
 /**

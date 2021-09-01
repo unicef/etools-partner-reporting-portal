@@ -22,9 +22,12 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from rest_framework_swagger.views import get_swagger_view
 
+from etools_prp.apps.core.views import HomeView, SocialLogoutView, UnauthorizedView
+
 schema_view = get_swagger_view(title='eTools PRP API')
 
 urlpatterns = [
+    url(r'^$', HomeView.as_view()),
     url(r'^api/docs/', schema_view),
     url(r'^api/admin/', admin.site.urls),
     url(r'^api/core/', include('etools_prp.apps.core.urls')),
@@ -37,7 +40,9 @@ urlpatterns = [
     url(r'^api/id-management/', include('etools_prp.apps.id_management.urls')),
 
     # Social auth urls
+    url(r'^social/unicef-logout/', SocialLogoutView.as_view()),
     url(r'^social/', include('social_django.urls', namespace='social')),
+    url(r'^unauthorized/$', UnauthorizedView.as_view(), name="unauthorized"),
 ]
 
 if settings.DEBUG:

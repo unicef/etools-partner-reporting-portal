@@ -1,4 +1,4 @@
-import {ReduxConnectedElement} from '../../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-route';
@@ -9,15 +9,15 @@ import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/iron-pages/iron-pages';
 import '../../elements/ip-reporting/nav';
 import '../../elements/ip-reporting/app-header';
-import '../../elements/page-title';
+import '../../etools-prp-common/elements/page-title';
 import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
 import '@polymer/iron-flex-layout/iron-flex-layout';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 
-import UtilsMixin from '../../mixins/utils-mixin';
-import LocalizeMixin from '../../mixins/localize-mixin';
-import OverlayHelperMixin from '../../mixins/overlay-helper-mixin';
-import {getDomainByEnv} from '../../config';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import OverlayHelperMixin from '../../etools-prp-common/mixins/overlay-helper-mixin';
+import {getDomainByEnv} from '../../etools-prp-common/config';
 
 /**
  * @polymer

@@ -1,17 +1,17 @@
-import {ReduxConnectedElement} from '../ReduxConnectedElement';
+import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/paper-styles/typography';
 import Endpoints from '../endpoints';
-import LocalizeMixin from '../mixins/localize-mixin';
-import '../elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../elements/etools-prp-ajax';
-import '../elements/message-box';
-import '../elements/page-body';
-import '../elements/user-profile/profile-dropdown';
-import {fireEvent} from '../utils/fire-custom-event';
-import {BASE_PATH} from '../config';
+import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import '../etools-prp-common/elements/etools-prp-ajax';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
+import '../etools-prp-common/elements/message-box';
+import '../etools-prp-common/elements/page-body';
+import '../etools-prp-common/elements/user-profile/profile-dropdown';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import {BASE_PATH} from '../etools-prp-common/config';
 
 /**
  * @polymer
@@ -72,9 +72,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
         <template is="dom-if" if="[[!loading]]" restamp="true">
           <message-box type="warning">
-            <span hidden$="[[isAccessError]]">
-              It looks like you do not have workspace assigned.
-            </span>
+            <span hidden$="[[isAccessError]]"> It looks like you do not have workspace assigned. </span>
             <span hidden$="[[!isAccessError]]">
               It looks like you do not have the permissions assigned to enter the Partner Reporting Portal.
             </span>
@@ -114,7 +112,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.userProfile as EtoolsPrpAjaxEl)
       .thunk()()
       .then((res: any) => {
-        if (res.data && res.data.access && res.data.access.length) {
+        if (res.data && (res.data.access || []).includes('ip-reporting')) {
           this.checkWorkspaceExistence();
         } else {
           this.showMessage(true);

@@ -22,9 +22,9 @@
 {% block content %}
 
     <h2>{% trans "Progress Reports" %}</h2>
-    <ul>{{ deletable_objects_prs|unordered_list }}</ul>
+    <ul>{{ deletable_objects.0|unordered_list }}</ul>
     <h2>{% trans "Reporting Dates" %}</h2>
-    <ul>{{ deletable_objects_rpd|unordered_list }}</ul>
+    <ul>{{ deletable_objects.1|unordered_list }}</ul>
 
     {% if perms_lacking %}
         <h2>{% blocktrans %}You cannot reconcile <i>{{ obj }}</i>! Reporting data is there!{% endblocktrans %}</h2>
