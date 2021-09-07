@@ -496,7 +496,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
 
         subject_template_path = 'emails/on_progress_report_status_change_subject.txt'
         pd = instance.programme_document
-        part_pr_url = f'/app/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{instance.id}/'
+        part_pr_url = f'/ip/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{instance.id}/'
         pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
 
         template_data = {
