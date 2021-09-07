@@ -4,6 +4,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
+import django.contrib.postgres.fields.jsonb
 
 
 class Migration(migrations.Migration):
@@ -84,7 +85,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=1024)),
                 ('description', models.TextField(blank=True, max_length=5120, null=True)),
                 ('additional_information', models.CharField(blank=True, max_length=255, null=True, verbose_name='Additional information (e.g. links)')),
-                ('custom_fields', models.JSONField(default=[])),
+                ('custom_fields', django.contrib.postgres.fields.jsonb.JSONField(default=[])),
                 ('start_date', models.DateField()),
                 ('end_date', models.DateField()),
                 ('status', models.CharField(choices=[('Ong', 'Ongoing'), ('Pla', 'Planned'), ('Com', 'Completed')], default='Ong', max_length=3)),
