@@ -3,7 +3,9 @@ import importlib
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.generic import RedirectView, TemplateView
 
 import django_filters
@@ -250,6 +252,21 @@ class HomeView(LoginRequiredMixin, RedirectView):
         return redirect_page
 
 
+class RedirectAppView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        url = self.get_redirect_url(request, *args, **kwargs)
+        return HttpResponseRedirect(url)
+
+    def get_redirect_url(self, request, *args, **kwargs):
+        path = request.path
+        if "cluster" in path:
+            new_path = path.replace("app", "cluster", 1)
+        else:
+            new_path = path.replace("app", "ip", 1)
+        return new_path
+
+
 class UnauthorizedView(TemplateView):
     template_name = 'unauthorized.html'
 
@@ -264,4 +281,4 @@ class SocialLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
-               f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+            f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
