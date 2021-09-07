@@ -280,4 +280,4 @@ class SocialLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
-               f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+            f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
