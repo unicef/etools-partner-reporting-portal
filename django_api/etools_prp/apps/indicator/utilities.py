@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils.translation import get_language, to_locale
 
-from babel.numbers import format_number, format_percent
+from babel.numbers import format_decimal, format_percent
 
 from etools_prp.apps.core.helpers import create_ir_and_ilds_for_pr
 from etools_prp.apps.indicator.constants import ValueType
@@ -23,7 +23,7 @@ def format_total_value_to_string(total, is_percentage=False, percentage_display_
             value = 0 if denominator == 0 else value / denominator
             formatter = format_percent
     else:
-        formatter = format_number
+        formatter = format_decimal
     return formatter(value, locale=locale)
 
 
