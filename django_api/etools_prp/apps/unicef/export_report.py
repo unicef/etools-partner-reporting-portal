@@ -1,4 +1,5 @@
 import itertools
+import re
 
 from django.conf import settings
 from django.db.models import Count
@@ -6,6 +7,7 @@ from django.db.models import Count
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
+from openpyxl.workbook.child import INVALID_TITLE_REGEX
 
 from etools_prp.apps.core import common
 from etools_prp.apps.indicator.constants import ValueType
@@ -45,7 +47,7 @@ class ProgressReportXLSXExporter:
     def fill_sheet(self, disaggregation_types, indicators):
         # Setup a title (limited to 30 chars via excel requirements)
         self.sheet.title = ", ".join(
-            [dt.name for dt in disaggregation_types]
+            [re.sub(INVALID_TITLE_REGEX, '', dt.name) for dt in disaggregation_types]
         )[:30] if disaggregation_types else "None"
 
         # Generate disaggregation types columns
