@@ -36,6 +36,6 @@ spec:
         - name: polymer3
           ports:
             - containerPort: 8082
-          image: unicef/etools-prp-polymer_3:{{CF_SHORT_REVISION}}
+          image: unicef/etools-prp-frontend_ip:{{CF_SHORT_REVISION}}
           command: ["ash"]
           args: ["-c", "node express.js"]
