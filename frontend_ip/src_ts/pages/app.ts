@@ -104,6 +104,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _workspaceCode!: string;
 
+  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
+  _language!: string;
+
   @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
   _app!: string;
 
@@ -132,7 +135,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return [
       '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
       '_routeAppChanged(routeData.app)',
-      '_handleWorkspaceChange(currentWorkspace, workspaces)'
+      '_handleWorkspaceChange(currentWorkspace, workspaces)',
+      '_languageChanged(language)'
     ];
   }
 
@@ -193,6 +197,23 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         this.page = app;
       }
     });
+  }
+
+  _languageChanged(_language: string) {
+    this.setHtmlDirAttribute();
+  }
+
+  setHtmlDirAttribute() {
+    setTimeout(() => {
+      if (this.language) {
+        const htmlTag = document.querySelector('html');
+        if (this.language === 'ar') {
+          htmlTag!.setAttribute('dir', 'rtl');
+        } else if (htmlTag!.getAttribute('dir')) {
+          htmlTag!.removeAttribute('dir');
+        }
+      }
+    }, 300);
   }
 
   cleanUpStorageVal(val: string) {
