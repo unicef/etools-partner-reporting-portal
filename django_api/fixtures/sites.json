@@ -8,18 +8,10 @@
     },
     {
         "model": "sites.site",
-        "pk": 3,
-        "fields": {
-            "domain": "prp.tivixlabs.com",
-            "name": "prp.tivixlabs.com"
-        }
-    },
-    {
-        "model": "sites.site",
         "pk": 4,
         "fields": {
-            "domain": "etools-test.unicef.org",
-            "name": "etools-test.unicef.org"
+            "domain": "staging.unicef.org",
+            "name": "staging.unicef.org"
         }
     }, {
         "model": "sites.site",
@@ -49,8 +41,16 @@
         "model": "sites.site",
         "pk": 8,
         "fields": {
-            "domain": "prod.partnerreportingportal.org",
-            "name": "prod.partnerreportingportal.org"
+            "domain": "www.partnerreportingportal.org",
+            "name": "www.partnerreportingportal.org"
+        }
+    },
+    {
+        "model": "sites.site",
+        "pk": 9,
+        "fields": {
+            "domain": "prp.localhost",
+            "name": "prp.localhost"
         }
     }
 ]

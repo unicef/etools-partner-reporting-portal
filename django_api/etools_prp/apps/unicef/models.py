@@ -36,7 +36,7 @@ from etools_prp.apps.utils.emails import send_email_from_template
 logger = logging.getLogger(__name__)
 
 
-class Section(TimeStampedExternalSyncModelMixin):
+class Section(TimeStampedExternalBusinessAreaModel):
     """
     Section model define atomic act of help like: bottle of water, blanket.
     """
@@ -44,6 +44,9 @@ class Section(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return self.name
+
+    class Meta(TimeStampedExternalBusinessAreaModel.Meta):
+        pass
 
 
 class Person(TimeStampedExternalSyncModelMixin):
@@ -496,7 +499,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
 
         subject_template_path = 'emails/on_progress_report_status_change_subject.txt'
         pd = instance.programme_document
-        part_pr_url = f'/app/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{instance.id}/'
+        part_pr_url = f'/ip/{pd.workspace.workspace_code}/ip-reporting/pd/{pd.id}/report/{instance.id}/'
         pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
 
         template_data = {

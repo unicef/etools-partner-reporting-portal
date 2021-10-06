@@ -38,9 +38,7 @@ STATICFILES_DIRS = [
 
 DOMAIN_NAME = env('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
-ALLOWED_HOSTS = (
-    env('ALLOWED_HOST', default='localhost'),
-)
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(",")
 
 
 FRONTEND_HOST = env(
