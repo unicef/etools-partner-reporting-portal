@@ -82,6 +82,11 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
+from django.db.models import CharField
+from django.db.models.functions import Lower
+
+CharField.register_lookup(Lower)
+
 def save_location_list(location_list, source_type):
     if not location_list:
         logger.info('No locations for {}'.format(source_type))
@@ -108,10 +113,15 @@ def save_location_list(location_list, source_type):
                 external_id=location_data[id_key]
             ).first()
         else:
-            location = Location.objects.filter(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                title=location_data[id_key]
-            ).first()
+            try:
+                location = Location.objects.filter(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    title__unaccent__lower=location_data[id_key].lower()
+                ).first()
+            except Exception as e:
+                print("#####################################")
+                print(e)
+                raise
 
         if not location:
             parent_loc = None
@@ -119,7 +129,7 @@ def save_location_list(location_list, source_type):
             if source_type == "indicator" and 'parent' in location_data:
                 parent_loc = Location.objects.filter(
                     external_source=EXTERNAL_DATA_SOURCES.HPC,
-                    title=location_data['parent']['name']
+                    title__unaccent__lower=location_data['parent']['name'].lower()
                 ).first()
 
                 if not parent_loc:
