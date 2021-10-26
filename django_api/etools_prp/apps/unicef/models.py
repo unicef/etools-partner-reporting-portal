@@ -36,7 +36,7 @@ from etools_prp.apps.utils.emails import send_email_from_template
 logger = logging.getLogger(__name__)
 
 
-class Section(TimeStampedExternalSyncModelMixin):
+class Section(TimeStampedExternalBusinessAreaModel):
     """
     Section model define atomic act of help like: bottle of water, blanket.
     """
@@ -44,6 +44,9 @@ class Section(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return self.name
+
+    class Meta(TimeStampedExternalBusinessAreaModel.Meta):
+        pass
 
 
 class Person(TimeStampedExternalSyncModelMixin):

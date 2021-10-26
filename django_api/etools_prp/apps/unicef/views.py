@@ -349,6 +349,8 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
                     PROGRESS_REPORT_STATUS.accepted,
                 ],
             )
+            if not filter_qs.exists():
+                return Response({"error": "no data"}, status=statuses.HTTP_400_BAD_REQUEST)
             return exporter_class(filter_qs).get_as_response(request)
         return super().get(request, *args, **kwargs)
 

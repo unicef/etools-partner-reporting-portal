@@ -910,7 +910,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)
-    def test_list_api_export_filter(self, mock_create, mock_clean, mock_send):
+    def test_list_api_export_filter_empty(self, mock_create, mock_clean, mock_send):
         # ensure we have needed report statuses
         report_overdue = self.queryset.first()
         report_overdue.status = PROGRESS_REPORT_STATUS.overdue
@@ -930,27 +930,45 @@ class TestProgressReportAPIView(BaseAPITestCase):
             },
         )
 
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter(self, mock_create, mock_clean, mock_send):
+        # ensure we have needed report statuses
+        report_accepted = self.queryset.first()
+        report_accepted.status = PROGRESS_REPORT_STATUS.accepted
+        report_accepted.save()
+        report_submitted = self.queryset.last()
+        report_submitted.status = PROGRESS_REPORT_STATUS.submitted
+        report_submitted.save()
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": PROGRESS_REPORT_STATUS.submitted
+            },
+        )
+
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         disposition = response.get("Content-Disposition")
         self.assertTrue(disposition.startswith("attachment; filename="))
         self.assertTrue(
             disposition.endswith('Progress Report(s) Summary.xlsx"'),
         )
-        reports_overdue = self.queryset.filter(
-            status=PROGRESS_REPORT_STATUS.overdue
-        )
-        self.assertTrue(len(reports_overdue))
-        reports_due = self.queryset.filter(
-            status=PROGRESS_REPORT_STATUS.due
-        )
-        self.assertTrue(len(reports_due))
+        reports_submitted = self.queryset.filter(status=PROGRESS_REPORT_STATUS.submitted)
+        self.assertTrue(len(reports_submitted))
+
+        reports_accepted = self.queryset.filter(status=PROGRESS_REPORT_STATUS.accepted)
+        self.assertTrue(len(reports_accepted))
+
         self.assertFalse(string_in_download(
-            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
-            response,
-        ))
-        # Only submitted and accepted are allowed to be exported
-        self.assertFalse(string_in_download(
-            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.due],
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
             response,
         ))
 

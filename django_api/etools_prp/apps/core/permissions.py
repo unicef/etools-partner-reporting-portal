@@ -48,9 +48,8 @@ class IsAuthenticated(BasePermission):
 
 def IsIMOForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_imo,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -63,18 +62,19 @@ def IsIMOForCurrentWorkspaceCheck(request):
 
 
 def IsIMOCheck(request):
-    rules = [
-        request.user.is_authenticated,
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists(),
-    ]
-    return all(rules)
+    if request.user.is_authenticated:
+        rules = [
+            request.user.is_authenticated,
+            request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists(),
+        ]
+        return all(rules)
+    return False
 
 
 def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_authorized_officer,
                 workspace__id=workspace_id,
@@ -89,9 +89,8 @@ def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
 
 def IsPartnerEditorForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_editor,
                 workspace__id=workspace_id,
@@ -105,9 +104,8 @@ def IsPartnerEditorForCurrentWorkspaceCheck(request):
 
 def IsPartnerViewerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_viewer,
                 workspace__id=workspace_id,
@@ -121,9 +119,8 @@ def IsPartnerViewerForCurrentWorkspaceCheck(request):
 
 def IsPartnerAdminForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.ip_admin,
                 workspace__id=workspace_id,
@@ -136,18 +133,19 @@ def IsPartnerAdminForCurrentWorkspaceCheck(request):
 
 
 def IsClusterSystemAdminCheck(request):
-    rules = [
-        request.user.is_authenticated,
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists(),
-    ]
-    return all(rules)
+    if request.user.is_authenticated:
+        rules = [
+            request.user.is_authenticated,
+            request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists(),
+        ]
+        return all(rules)
+    return False
 
 
 def IsClusterViewerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_viewer,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -161,9 +159,8 @@ def IsClusterViewerForCurrentWorkspaceCheck(request):
 
 def IsClusterCoordinatorForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_coordinator,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -177,9 +174,8 @@ def IsClusterCoordinatorForCurrentWorkspaceCheck(request):
 
 def IsClusterMemberForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
-    if workspace_id:
+    if workspace_id and request.user.is_authenticated:
         rules = [
-            request.user.is_authenticated,
             request.user.prp_roles.filter(
                 role=PRP_ROLE_TYPES.cluster_member,
                 cluster__response_plan__workspace__id=workspace_id,
@@ -192,11 +188,12 @@ def IsClusterMemberForCurrentWorkspaceCheck(request):
 
 
 def IsIPAuthorizedOfficerCheck(request):
-    rules = [
-        request.user.is_authenticated,
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer, is_active=True).exists(),
-    ]
-    return all(rules)
+    if request.user.is_authenticated:
+        rules = [
+            request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer, is_active=True).exists(),
+        ]
+        return all(rules)
+    return False
 
 
 def IsIPAdminCheck(request):
@@ -216,11 +213,13 @@ def IsIPEditorCheck(request):
 
 
 def IsIPViewerCheck(request):
-    rules = [
-        request.user.is_authenticated,
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
-    ]
-    return all(rules)
+    if request.user.is_authenticated:
+        rules = [
+            request.user.is_authenticated,
+            request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
+        ]
+        return all(rules)
+    return False
 
 
 def has_permission_for_clusters_check(request, cluster_ids, roles):
