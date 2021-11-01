@@ -254,6 +254,7 @@ workflows:
                 - master
                 - staging
                 - develop
+                - ci-config
       - build_and_deploy_fe_cluster:
           filters:
             branches:
