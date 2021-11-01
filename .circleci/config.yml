@@ -124,7 +124,6 @@ jobs:
                 --data build_parameters[BASE_TAG]=$BASE_TAG \
                 --data revision=$CIRCLE_SHA1 \
                 https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
-  
 
   build_and_deploy_fe:
     working_directory: ~/code/frontend_ip
@@ -255,7 +254,7 @@ workflows:
                 - master
                 - staging
                 - develop
-      -build_and_deploy_id_management:
+      - build_and_deploy_id_management:
           filters:
             branches:
               only:
