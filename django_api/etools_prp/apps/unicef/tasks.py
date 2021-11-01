@@ -281,7 +281,10 @@ def process_programme_documents(fast=False, area=False):
                         section_data_list = item['sections']
                         for section_data in section_data_list:
                             section = process_model(
-                                Section, PMPSectionSerializer, section_data, {'external_id': section_data['id']}
+                                Section, PMPSectionSerializer, section_data, {
+                                    'external_id': section_data['id'],
+                                    'external_business_area_code': workspace.business_area_code,
+                                }
                             )  # Is section unique globally or per workspace?
                             pd.sections.add(section)
 

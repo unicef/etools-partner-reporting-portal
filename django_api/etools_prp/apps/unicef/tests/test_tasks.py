@@ -138,6 +138,8 @@ class TestProcessModel(BaseAPITestCase):
         self.assertTrue(pd_qs.exists())
 
     def test_section(self):
+        country = factories.CountryFactory()
+        workspace = factories.WorkspaceFactory(countries=[country, ])
         data = {
             'address': 'SEBRATHA',
             'alternate_name': None,
@@ -148,6 +150,7 @@ class TestProcessModel(BaseAPITestCase):
             'cso_type': 'National',
             'email': 'test@example.com',
             'external_id': 80,
+            'external_business_area_code': workspace.business_area_code,
             'id': 80,
             'last_assessment_date': '2020-02-21',
             'name': 'AFAQ FOUNDATION FOR RIGHTS AND DEVELOPMENT',
@@ -164,6 +167,7 @@ class TestProcessModel(BaseAPITestCase):
         }
         filter_dict = {
             'external_id': data['id'],
+            'external_business_area_code': workspace.business_area_code,
         }
         section_qs = Section.objects.filter(**filter_dict)
         self.assertFalse(section_qs.exists())

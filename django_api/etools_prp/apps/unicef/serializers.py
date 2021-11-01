@@ -801,7 +801,18 @@ class PMPSectionSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'external_business_area_code',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Section.objects.all(),
+                fields=[
+                    "id",
+                    "external_business_area_code",
+                    "name",
+                ],
+            )
+        ]
 
 
 class BasePMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
