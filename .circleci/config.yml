@@ -35,7 +35,7 @@ jobs:
             else
               echo "Not a followed branch not pushing latest"
             fi
-  test_backend: # Used by setup_backend
+  test_backend: # Used by setup
     working_directory: ~/code
     docker:
       - image: unicef/etools-prp:$BASE_TAG
@@ -90,7 +90,7 @@ jobs:
               echo "not triggered - '$CIRCLE_BRANCH' is not a deployable branch: '$DEPLOY_BRANCHES'"
             fi
 
-  setup_backend:
+  setup:
     machine: true
     steps:
       - checkout
@@ -240,7 +240,7 @@ workflows:
   version: 2
   all:
     jobs:
-      - setup_backend
+      - setup
       - build_and_deploy_fe:
           filters:
             branches:
