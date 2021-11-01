@@ -210,7 +210,7 @@ jobs:
     working_directory: ~/code/react/id_management_frontend
     # The primary container is an instance of the first list image listed. Your build commands run in this container.
     docker:
-      - image: cimg/node:12.22.7
+      - image: node:12.22.7
     steps:
       - checkout:
           path: ~/code
