@@ -215,7 +215,6 @@ jobs:
     steps:
       - checkout:
           path: ~/code
-      - setup_remote_docker
       - run:
           name: Exporting revision number
           command: |
