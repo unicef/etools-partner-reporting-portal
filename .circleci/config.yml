@@ -129,7 +129,7 @@ jobs:
     working_directory: ~/code/frontend_ip
     # The primary container is an instance of the first list image listed. Your build commands run in this container.
     docker:
-      - image: cimg/node:12.22.7
+      - image: node:12.22.7
     steps:
       - checkout:
           path: ~/code
@@ -170,7 +170,7 @@ jobs:
     working_directory: ~/code/frontend_cluster
     # The primary container is an instance of the first list image listed. Your build commands run in this container.
     docker:
-      - image: cimg/node:12.22.7
+      - image: node:12.22.7
     steps:
       - checkout:
           path: ~/code
@@ -262,6 +262,7 @@ workflows:
                 - master
                 - staging
                 - develop
+                - ci-config
       - build_and_deploy_id_management:
           filters:
             branches:
