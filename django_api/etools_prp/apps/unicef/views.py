@@ -1313,13 +1313,15 @@ class ProgressReportExcelExportView(RetrieveAPIView):
     """
     serializer_class = ProgressReportSerializer
     queryset = ProgressReport.objects.all()
-    # permission_classes = (
-    #     AnyPermission(
-    #         IsUNICEFAPIUser,
-    #         IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    #         IsPartnerEditorForCurrentWorkspace,
-    #     ),
-    # )
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAdminForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace
+        ),
+    )
 
     def get(self, request, *args, **kwargs):
         report = self.get_object()
