@@ -482,7 +482,7 @@ def process_programme_documents(fast=False, area=False):
                                             )
                                             disaggregations.append(disaggregation)
 
-                                            # Create Disag1gregation Values
+                                            # Create Disaggregation Values
                                             for dv in dis['disaggregation_values']:
                                                 dv['disaggregation'] = disaggregation.id
                                                 process_model(
