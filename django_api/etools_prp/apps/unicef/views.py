@@ -30,6 +30,7 @@ from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.core.permissions import (
     AnyPermission,
+    HasPartnerAccessForProgressReport,
     IsAuthenticated,
     IsPartnerAdminForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
@@ -1314,13 +1315,12 @@ class ProgressReportExcelExportView(RetrieveAPIView):
     """
     serializer_class = ProgressReportSerializer
     queryset = ProgressReport.objects.all()
-    # permission_classes = (
-    #     AnyPermission(
-    #         IsUNICEFAPIUser,
-    #         IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    #         IsPartnerEditorForCurrentWorkspace,
-    #     ),
-    # )
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            HasPartnerAccessForProgressReport
+        ),
+    )
 
     def get(self, request, *args, **kwargs):
         report = self.get_object()
