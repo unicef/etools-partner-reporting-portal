@@ -280,6 +280,7 @@ def process_programme_documents(fast=False, area=False):
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
+                            section_data['external_business_area_code'] = workspace.business_area_code
                             section = process_model(
                                 Section, PMPSectionSerializer, section_data, {
                                     'external_id': section_data['id'],
