@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 
+from etools_prp.apps.unicef.models import ProgressReport
+
 from .common import PRP_ROLE_TYPES
 
 
@@ -310,3 +312,32 @@ class IsIPViewer(BasePermission):
 class IsUNICEFAPIUser(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_unicef
+
+
+class HasConditionalPermission(IsAuthenticated):
+
+    def condition_check(self, request):
+        return False
+
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and self.condition_check(request)
+
+
+class PermissionGetObjectMixin:
+    model = None
+    pk_field = 'pk'
+
+    def get_object(self, request):
+        pk = request.resolver_match.kwargs.get(self.pk_field)
+        try:
+            return self.model.objects.filter(pk=pk)
+        except self.model.DoesNotExist:
+            return None
+
+
+class HasPartnerAccessForProgressReport(PermissionGetObjectMixin, HasConditionalPermission):
+    model = ProgressReport
+
+    def condition_check(self, request):
+        obj = self.get_object(request)
+        return obj and obj.programme_document.partner == request.user.partner
