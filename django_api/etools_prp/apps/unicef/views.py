@@ -36,7 +36,10 @@ from etools_prp.apps.core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsSafe,
+    IsSuperuser,
     IsUNICEFAPIUser,
+    UnicefPartnershipManager,
 )
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
@@ -68,7 +71,6 @@ from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
-from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .serializers import (
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
@@ -1005,7 +1007,9 @@ class ProgressReportReviewAPIView(APIView):
     permission_classes = (
         AnyPermission(
             IsUNICEFAPIUser,
-            UnicefPartnershipManagerOrRead,
+            IsSafe,
+            IsSuperuser,
+            UnicefPartnershipManager,
         ),
     )
 
@@ -1065,7 +1069,13 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     Only partner authorized officer and partner editor can change the
     calculation methods.
     """
-    permission_classes = (CanChangePDCalculationMethod,)
+    permission_classes = (
+        AnyPermission(
+            IsSafe,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        )
+    )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
     def get(self, request, workspace_id, pd_id):
