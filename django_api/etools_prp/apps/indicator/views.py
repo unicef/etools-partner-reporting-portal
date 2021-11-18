@@ -29,11 +29,18 @@ from etools_prp.apps.core.common import (
 )
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.paginations import SmallPagination
-from etools_prp.apps.core.permissions import AnyPermission, HasAnyRole, IsAuthenticated, IsUNICEFAPIUser
+from etools_prp.apps.core.permissions import (
+    AnyPermission,
+    HasAnyRole,
+    IsAuthenticated,
+    IsSafe,
+    IsSuperuser,
+    IsUNICEFAPIUser,
+    UnicefPartnershipManager,
+)
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.partner.models import PartnerActivityProjectContext, PartnerProject
 from etools_prp.apps.unicef.models import ProgressReport
-from etools_prp.apps.unicef.permissions import UnicefPartnershipManagerOrRead
 from etools_prp.apps.utils.emails import send_email_from_template
 
 from .disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
@@ -828,7 +835,9 @@ class ReportableReportingFrequencyListAPIView(APIView):
     permission_classes = (
         AnyPermission(
             IsUNICEFAPIUser,
-            UnicefPartnershipManagerOrRead,
+            IsSafe,
+            IsSuperuser,
+            UnicefPartnershipManager,
         ),
     )
 
