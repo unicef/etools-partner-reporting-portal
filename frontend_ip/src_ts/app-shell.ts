@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/iron-pages/iron-pages.js';
-import 'etools-piwik-analytics/etools-piwik-analytics.js';
+import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
 import LocalizeMixin from './etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from './etools-prp-common/mixins/utils-mixin';
