@@ -25,4 +25,4 @@ COPY --from=builder /code/express.js /code/express.js
 COPY --from=builder /code/build /code/build
 
 EXPOSE 3000
-CMD ["node express.js"]
+CMD ["node", "express.js"]
