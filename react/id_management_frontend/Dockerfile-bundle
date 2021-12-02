@@ -17,7 +17,7 @@ WORKDIR /code
 RUN npm run build && bash resolve_build_bundle.sh
 
 
-FROM node:12.22.7-alpine3.12 as builder
+FROM node:12.22.7-alpine3.12
 RUN apk update
 RUN apk add --update bash
 WORKDIR /code
