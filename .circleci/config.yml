@@ -268,4 +268,3 @@ workflows:
                 - master
                 - staging
                 - develop
-                - docker-img-size
