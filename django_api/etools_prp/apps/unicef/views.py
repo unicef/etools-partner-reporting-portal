@@ -1074,7 +1074,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             IsSafe,
             IsPartnerEditorForCurrentWorkspace,
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
-        )
+        ),
     )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
