@@ -169,11 +169,17 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         # API Ordering test
         response = self.client.get(reverse('users') + '?portal=IP&ordering=-status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['results'][0]['id'], role_count_annotated_queryset.order_by('-last_login', '-role_count').first().id)
+        self.assertEqual(
+            response.data['results'][0]['id'],
+            role_count_annotated_queryset.order_by('-last_login', '-role_count').first().id
+        )
 
         response = self.client.get(reverse('users') + '?portal=IP&ordering=status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['results'][0]['id'], role_count_annotated_queryset.order_by('last_login', 'role_count').first().id)
+        self.assertEqual(
+            response.data['results'][0]['id'],
+            role_count_annotated_queryset.order_by('last_login', 'role_count').first().id
+        )
 
         # API Filtering test
         filter_user = User.objects.get(prp_roles__role=PRP_ROLE_TYPES.ip_admin,)
@@ -196,7 +202,8 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         self.imo_user = factories.NonPartnerUserFactory()
         response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         cluster = factories.ClusterFactory(response_plan=response_plan)
-        factories.ClusterPRPRoleFactory(user=self.imo_user, workspace=self.workspace, cluster=cluster, role=PRP_ROLE_TYPES.cluster_imo)
+        factories.ClusterPRPRoleFactory(user=self.imo_user, workspace=self.workspace, cluster=cluster,
+                                        role=PRP_ROLE_TYPES.cluster_imo)
 
         # Test API as IMO first
         self.client.force_authenticate(self.imo_user)
@@ -239,7 +246,8 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(reverse('users') + '?portal=CLUSTER')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_member).count(), response.data['count'])
+        self.assertEqual(User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_member).count(),
+                         response.data['count'])
 
         # Test API as Cluster viewer
         viewer_user = User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_viewer).first()

@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from .views import (
     ChildrenLocationAPIView,
@@ -12,16 +12,16 @@ from .views import (
 )
 
 urlpatterns = [
-    url(r'^task-trigger/$', TaskTriggerAPIView.as_view(), name="task-trigger"),
-    url(r'^configuration/$', ConfigurationAPIView.as_view(), name="configuration"),
-    url(r'^workspace/$', WorkspaceAPIView.as_view(), name="workspace"),
-    url(r'^workspace/(?P<workspace_id>\d+)/response-plan/$',
-        ResponsePlanAPIView.as_view(), name="response-plan"),
-    url(r'^workspace/(?P<workspace_id>\d+)/response-plan/create/$',
-        ResponsePlanCreateAPIView.as_view(), name="response-plan-create"),
-    url(r'^(?P<response_plan_id>\d+)/location/$',
-        LocationListAPIView.as_view(), name="location"),
-    url(r'^(?P<location_id>\d+)/children-location/$',
-        ChildrenLocationAPIView.as_view(), name="children-location"),
-    url(r'^currencies/$', CurrenciesView.as_view(), name="currencies"),
+    re_path(r'^task-trigger/$', TaskTriggerAPIView.as_view(), name="task-trigger"),
+    re_path(r'^configuration/$', ConfigurationAPIView.as_view(), name="configuration"),
+    re_path(r'^workspace/$', WorkspaceAPIView.as_view(), name="workspace"),
+    re_path(r'^workspace/(?P<workspace_id>\d+)/response-plan/$',
+            ResponsePlanAPIView.as_view(), name="response-plan"),
+    re_path(r'^workspace/(?P<workspace_id>\d+)/response-plan/create/$',
+            ResponsePlanCreateAPIView.as_view(), name="response-plan-create"),
+    re_path(r'^(?P<response_plan_id>\d+)/location/$',
+            LocationListAPIView.as_view(), name="location"),
+    re_path(r'^(?P<location_id>\d+)/children-location/$',
+            ChildrenLocationAPIView.as_view(), name="children-location"),
+    re_path(r'^currencies/$', CurrenciesView.as_view(), name="currencies"),
 ]
