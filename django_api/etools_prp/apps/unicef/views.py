@@ -30,12 +30,16 @@ from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.core.permissions import (
     AnyPermission,
+    HasPartnerAccessForProgressReport,
     IsAuthenticated,
     IsPartnerAdminForCurrentWorkspace,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsSafe,
+    IsSuperuser,
     IsUNICEFAPIUser,
+    UnicefPartnershipManager,
 )
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
@@ -67,7 +71,6 @@ from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
-from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .serializers import (
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
@@ -609,22 +612,23 @@ class ProgressReportSubmitAPIView(APIView):
 
         # QPR report type specific validations
         if progress_report.report_type == "QPR":
-            if ir.overall_status == OVERALL_STATUS.no_status:
-                raise ValidationError(
-                    "You have not selected overall status for one of Outputs ({}).".format(
-                        ir.reportable.content_object
+            for ir in progress_report.indicator_reports.all():
+                if ir.overall_status == OVERALL_STATUS.no_status:
+                    raise ValidationError(
+                        "You have not selected overall status for one of Outputs ({}).".format(
+                            ir.reportable.content_object
+                        )
                     )
-                )
 
-            # Check for IndicatorReport narrative assessment for overall status Met or No Progress
-            if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
-                    and not ir.narrative_assessment:
-                raise ValidationError(
-                    "You have not completed the narrative assessment for one of the outputs ({}). Unless your output "
-                    "status is Met or No Progress, you have to fill in the narrative assessment.".format(
-                        ir.reportable.content_object
+                # Check for IndicatorReport narrative assessment for overall status Met or No Progress
+                if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
+                        and not ir.narrative_assessment:
+                    raise ValidationError(
+                        "You have not completed the narrative assessment for one of the outputs ({}). Unless your output "
+                        "status is Met or No Progress, you have to fill in the narrative assessment.".format(
+                            ir.reportable.content_object
+                        )
                     )
-                )
 
             # Check if PR other tab is fulfilled
             other_tab_errors = []
@@ -1003,7 +1007,9 @@ class ProgressReportReviewAPIView(APIView):
     permission_classes = (
         AnyPermission(
             IsUNICEFAPIUser,
-            UnicefPartnershipManagerOrRead,
+            IsSafe,
+            IsSuperuser,
+            UnicefPartnershipManager,
         ),
     )
 
@@ -1063,7 +1069,13 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     Only partner authorized officer and partner editor can change the
     calculation methods.
     """
-    permission_classes = (CanChangePDCalculationMethod,)
+    permission_classes = (
+        AnyPermission(
+            IsSafe,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
     def get(self, request, workspace_id, pd_id):
@@ -1313,13 +1325,12 @@ class ProgressReportExcelExportView(RetrieveAPIView):
     """
     serializer_class = ProgressReportSerializer
     queryset = ProgressReport.objects.all()
-    # permission_classes = (
-    #     AnyPermission(
-    #         IsUNICEFAPIUser,
-    #         IsPartnerAuthorizedOfficerForCurrentWorkspace,
-    #         IsPartnerEditorForCurrentWorkspace,
-    #     ),
-    # )
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            HasPartnerAccessForProgressReport
+        ),
+    )
 
     def get(self, request, *args, **kwargs):
         report = self.get_object()
