@@ -750,13 +750,9 @@ class IndicatorReport(TimeStampedModel):
 
     @property
     def is_complete(self):
-        location_disaggregations = IndicatorLocationData.objects.filter(indicator_report=self).values_list(
-            'disaggregation', flat=True
-        )
-        for location_disaggregation in location_disaggregations:
-            if location_disaggregation == {"()": {"c": 0, "d": 0, "v": 0}}:
+        for location_disaggregation in IndicatorLocationData.objects.filter(indicator_report=self):
+            if not location_disaggregation.is_complete:
                 return False
-
         return True
 
     @property
