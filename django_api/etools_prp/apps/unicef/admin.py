@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.utils.translation import gettext as _
 
 from admin_extra_urls.api import button, ExtraUrlMixin
@@ -153,7 +152,7 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         extra_urls = [
-            url(
+            re_path(
                 r"sync-and-process/",
                 self.admin_site.admin_view(self.sync_and_process),
                 name="sync-process-pds",
