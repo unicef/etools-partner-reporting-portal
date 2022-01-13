@@ -750,13 +750,9 @@ class IndicatorReport(TimeStampedModel):
 
     @property
     def is_complete(self):
-        location_disaggregations = IndicatorLocationData.objects.filter(indicator_report=self).values_list(
-            'disaggregation', flat=True
-        )
-        for location_disaggregation in location_disaggregations:
-            if location_disaggregation == {"()": {"c": 0, "d": 0, "v": 0}}:
+        for location_disaggregation in IndicatorLocationData.objects.filter(indicator_report=self):
+            if not location_disaggregation.is_complete:
                 return False
-
         return True
 
     @property
@@ -1049,6 +1045,10 @@ class ReportingEntity(TimeStampedModel):
         return "Reporting entity: {}".format(self.title)
 
 
+def default_disaggregation():
+    return {'()': {'c': 0, 'd': 0, 'v': 0}}
+
+
 class IndicatorLocationData(TimeStampedModel):
     """
     IndicatorLocationData module it includes indicators for chosen location.
@@ -1068,7 +1068,7 @@ class IndicatorLocationData(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    disaggregation = models.JSONField(default=dict)
+    disaggregation = models.JSONField(default=default_disaggregation)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)

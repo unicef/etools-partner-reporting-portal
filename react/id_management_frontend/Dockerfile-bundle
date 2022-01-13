@@ -1,18 +1,29 @@
-FROM node:8.11.3-jessie
-
-RUN apt-get update
-
-ADD package.json /tmp/
-
-ADD . /code/
+FROM node:12.22.7-alpine3.12 as builder
+RUN apk update
+RUN apk add --update bash
 
 WORKDIR /tmp
-
+ADD package.json /tmp/
+ADD package-lock.json /tmp/
+WORKDIR /tmp
 RUN npm install
+
+ADD . /code/
+WORKDIR /code
 RUN rm -rf /code/node_modules
 RUN cp -a /tmp/node_modules /code/node_modules
 
 WORKDIR /code
+RUN npm run build && bash resolve_build_bundle.sh
+
+
+FROM node:12.22.7-alpine3.12
+RUN apk update
+RUN apk add --update bash
+WORKDIR /code
+RUN npm install express@4.17.1
+COPY --from=builder /code/express.js /code/express.js
+COPY --from=builder /code/build /code/build
 
 EXPOSE 3000
-CMD ["npm run build && bash resolve_build_bundle.sh && node express.js"]
+CMD ["node", "express.js"]
