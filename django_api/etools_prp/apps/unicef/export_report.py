@@ -4,9 +4,11 @@ import re
 from django.conf import settings
 from django.db.models import Count
 
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
+from openpyxl.utils.exceptions import IllegalCharacterError
 from openpyxl.workbook.child import INVALID_TITLE_REGEX
 
 from etools_prp.apps.core import common
@@ -227,8 +229,12 @@ class ProgressReportXLSXExporter:
                     indicator.narrative_assessment
                 self.sheet.cell(row=start_row_id, column=19).fill = \
                     REQUIRED_FILL
-                self.sheet.cell(row=start_row_id, column=20).value = \
-                    indicator.reportable.blueprint.title
+                try:
+                    self.sheet.cell(row=start_row_id, column=20).value = \
+                        indicator.reportable.blueprint.title
+                except IllegalCharacterError:
+                    self.sheet.cell(row=start_row_id, column=20).value = \
+                        ILLEGAL_CHARACTERS_RE.sub(r'', indicator.reportable.blueprint.title)
                 self.sheet.cell(row=start_row_id, column=21).value = \
                     indicator.display_type
                 self.sheet.cell(row=start_row_id, column=22).value = \
