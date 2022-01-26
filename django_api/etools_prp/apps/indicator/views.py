@@ -309,7 +309,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
 
     def check_permissions(self, request):
         super().check_permissions(request)
-        if request.path == '/api/docs/':
+        if settings.DOCS_URL in request.path:
             return
 
         reportable_id = self.kwargs.get('reportable_id')
