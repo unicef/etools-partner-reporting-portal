@@ -49,27 +49,25 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
 
         # for CLUSTER roles:
         cluster_roles_set = {ROLES.cluster_member, ROLES.cluster_viewer}
-        if (obj_roles_set.issubset(cluster_roles_set) and
-                user.prp_roles.filter(
-                    Q(role=ROLES.cluster_system_admin) |
-                    Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id) |
-                    Q(role=ROLES.cluster_member, user__partner_id__isnull=False, user__partner_id=obj.user.partner_id)
-                ).exists()):
+        has_cluster_role = user.prp_roles.filter(
+            Q(role=ROLES.cluster_system_admin) |
+            Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id) |
+            Q(role=ROLES.cluster_member, user__partner_id__isnull=False, user__partner_id=obj.user.partner_id)
+        ).exists()
+        if obj_roles_set.issubset(cluster_roles_set) and has_cluster_role:
             return True
 
         cluster_roles_set.add(ROLES.cluster_coordinator)
-        if (obj_roles_set.issubset(cluster_roles_set) and
-                user.prp_roles.filter(
-                    Q(role=ROLES.cluster_system_admin) |
-                    Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id)
-                ).exists()):
+        has_cluster_role = user.prp_roles.filter(
+            Q(role=ROLES.cluster_system_admin) |
+            Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id)
+        ).exists()
+        if obj_roles_set.issubset(cluster_roles_set) and has_cluster_role:
             return True
 
         cluster_roles_set.update({ROLES.cluster_imo, ROLES.cluster_system_admin})
         if (obj_roles_set.issubset(cluster_roles_set) and
-                user.prp_roles.filter(
-                    role=ROLES.cluster_system_admin
-                ).exists()):
+                user.prp_roles.filter(role=ROLES.cluster_system_admin).exists()):
             return True
 
         if obj_roles_set.intersection(cluster_roles_set):

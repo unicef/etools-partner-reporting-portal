@@ -10,8 +10,8 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import GatewayType, Location, PRPRole, Workspace
-from etools_prp.apps.core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from etools_prp.apps.core.models import Location, PRPRole, Workspace
+from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
@@ -419,8 +419,6 @@ def process_programme_documents(fast=False, area=False):
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
-                                        country = workspace.countries.first()
-                                        loc['gateway_country'] = country.id
 
                                         if loc['admin_level'] is None:
                                             logger.warning("Admin level empty! Skipping!")
@@ -430,30 +428,17 @@ def process_programme_documents(fast=False, area=False):
                                             logger.warning("Location code empty! Skipping!")
                                             continue
 
-                                        loc['location_type'] = '{}-Admin Level {}'.format(
-                                            country.country_short_code,
-                                            loc['admin_level']
-                                        )
-
-                                        gateway = process_model(
-                                            GatewayType,
-                                            PMPGatewayTypeSerializer,
-                                            loc,
-                                            {
-                                                'admin_level': loc['admin_level'],
-                                                'country': loc['gateway_country'],
-                                            },
-                                        )
-
                                         # Create location
-                                        loc['gateway'] = gateway.id
                                         location = process_model(
                                             Location,
                                             PMPLocationSerializer,
                                             loc,
                                             {
+                                                'name': loc['name'],
                                                 'gateway': loc['gateway'],
-                                                'p_code': loc['pcode'],
+                                                'p_code': loc['p_code'],
+                                                'admin_level': loc['admin_level'],
+                                                'location_type': loc['location_type'],
                                             }
                                         )
                                         locations.append(location)

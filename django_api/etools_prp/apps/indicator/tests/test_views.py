@@ -24,6 +24,7 @@ from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.core.tests.factories import faker
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import (
     Disaggregation,
@@ -49,15 +50,15 @@ end_of_this_year = datetime.date(today.year, 12, 31)
 class TestPDReportsAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.workspace = factories.WorkspaceFactory()
+        self.carto_table = factories.CartoDBTableFactory()
+        self.partner = factories.PartnerFactory()
         self.user = factories.PartnerUserFactory(partner=self.partner)
         self.prp_role = factories.IPPRPRoleFactory(user=self.user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
@@ -204,16 +205,20 @@ class TestPDReportsAPIView(BaseAPITestCase):
 class TestIndicatorDataAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+
+        self.carto_table = factories.CartoDBTableFactory()
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -230,7 +235,7 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             ]
         )
 
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
 
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
@@ -327,16 +332,18 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 class TestIndicatorListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+
+        self.carto_table = factories.CartoDBTableFactory()
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -353,7 +360,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -550,14 +557,16 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -574,7 +583,7 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -763,14 +772,16 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 class TestIndicatorReportListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -787,7 +798,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -970,18 +981,20 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 class TestClusterIndicatorAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(
             workspace=self.workspace,
             start=beginning_of_this_year,
             end=end_of_this_year,
         )
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country, admin_level=3)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.admin_level = 3
+        self.loc1 = factories.LocationFactory(admin_level=self.admin_level)
+        self.loc2 = factories.LocationFactory(admin_level=self.admin_level)
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -998,7 +1011,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -1167,8 +1180,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             'frequency': REPORTABLE_FREQUENCY_LEVEL.weekly,
             'start_date_of_reporting_period': today.strftime(settings.INPUT_DATA_FORMAT),
             'locations': [
-                {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(gateway__admin_level=3)[0].id},
-                {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(gateway__admin_level=3)[1].id},
+                {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(admin_level=self.admin_level)[0].id},
+                {'target': {'d': 1, 'v': 300}, 'baseline': {'d': 1, 'v': 50}, 'location': Location.objects.filter(admin_level=self.admin_level)[1].id},
             ],
             'blueprint': {
                 'title': 'of temporary classrooms',
@@ -1177,8 +1190,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 'display_type': IndicatorBlueprint.NUMBER,
             },
             'disaggregations': IdDisaggregationSerializer(
-              [self.first_disaggregation, self.last_disaggregation],
-              many=True).data,
+                [self.first_disaggregation, self.last_disaggregation],
+                many=True).data,
             'target': {'d': 1, 'v': 3000},
             'baseline': {'d': 1, 'v': 2000},
             'in_need': {'d': 1, 'v': 20000},
@@ -1319,7 +1332,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         reportable = Reportable.objects.get(id=response.data['id'])
         self.data['locations'] = ReportableLocationGoalSerializer(
-          reportable.reportablelocationgoal_set.all(), many=True
+            reportable.reportablelocationgoal_set.all(), many=True
         ).data
 
         date = datetime.date(2020, 4, 9)
@@ -1351,14 +1364,16 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -1375,7 +1390,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -1901,14 +1916,16 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 class TestReportRefreshAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -1925,7 +1942,7 @@ class TestReportRefreshAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -2151,8 +2168,7 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             due_date=report.due_date + datetime.timedelta(days=1),
         )
         self.assertTrue(IndicatorReport.objects.exclude(
-                pk=report.pk,
-            ).filter(
+            pk=report.pk).filter(
                 progress_report=report.progress_report,
                 due_date__gt=report.due_date,
             ).exists()
@@ -2189,15 +2205,16 @@ class TestReportRefreshAPIView(BaseAPITestCase):
 class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.cluster2 = factories.ClusterFactory(type='education', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -2221,8 +2238,8 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
-        self.partner2 = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
+        self.partner2 = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)

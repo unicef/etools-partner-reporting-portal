@@ -9,6 +9,7 @@ from etools_prp.apps.account.models import User
 from etools_prp.apps.core.common import PRP_ROLE_TYPES
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.core.tests.factories import faker
 
 
 class UserProfileAPIViewTestCase(BaseAPITestCase):
@@ -110,9 +111,8 @@ class LoginUserWithTokenAPIViewTestCase(BaseAPITestCase):
 class UserListCreateAPIViewTestCase(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.workspace = factories.WorkspaceFactory()
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.PartnerUserFactory(partner=self.partner)
         self.ao_user_role = factories.IPPRPRoleFactory(
             user=self.user,
