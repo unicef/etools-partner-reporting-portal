@@ -107,8 +107,8 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
             factories.ClusterObjectiveFactory(
                 cluster=self.cluster,
                 locations=[
-                    factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                    factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                    factories.LocationFactory(gateway=self.loc_type),
+                    factories.LocationFactory(gateway=self.loc_type)
                 ]
             )
 
@@ -200,8 +200,8 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type),
+                factories.LocationFactory(gateway=self.loc_type)
             ]
         )
 
@@ -228,8 +228,8 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type),
+                factories.LocationFactory(gateway=self.loc_type)
             ]
         )
 
@@ -260,8 +260,8 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type),
+                factories.LocationFactory(gateway=self.loc_type)
             ]
         )
 
@@ -302,8 +302,8 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         obj = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type),
+                factories.LocationFactory(gateway=self.loc_type)
             ]
         )
 
@@ -344,8 +344,8 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -464,8 +464,8 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -541,8 +541,8 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
         obj = factories.ClusterActivityFactory(
             cluster_objective=self.objective,
             locations=[
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table),
-                factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+                factories.LocationFactory(gateway=self.loc_type),
+                factories.LocationFactory(gateway=self.loc_type)
             ]
         )
 
@@ -653,8 +653,8 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         """Test the API response and queryset count with ordering.
         Also, the filtering by ClusterActivityFilter will be tested: partner.
         """
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -817,8 +817,8 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -1016,8 +1016,8 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
         self.user = factories.NonPartnerUserFactory()
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
 
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -1117,8 +1117,8 @@ class ResponsePlanClusterDashboardAPIViewTestCase(BaseAPITestCase):
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
