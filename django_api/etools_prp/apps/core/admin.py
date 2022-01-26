@@ -10,7 +10,7 @@ from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, Respo
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     save_as = True
     fields = [
-        'title',
+        'name',
         'gateway',
         'p_code',
         'parent',
@@ -20,8 +20,8 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     list_filter = (
         'gateway',
     )
-    list_display = ('title', 'parent', 'gateway', 'p_code',)
-    search_fields = ('title', 'p_code',)
+    list_display = ('name', 'parent', 'gateway', 'p_code',)
+    search_fields = ('name', 'p_code',)
     raw_id_fields = ('parent', 'gateway')
 
     def get_form(self, request, obj=None, **kwargs):

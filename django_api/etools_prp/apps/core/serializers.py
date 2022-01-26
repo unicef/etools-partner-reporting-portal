@@ -45,34 +45,34 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     admin_level = serializers.CharField(source="gateway.admin_level")
-    title = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
-    def get_title(self, obj):
+    def get_name(self, obj):
         return "%s [%s - %s]" % (
-            obj.title,
-            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.name,
+            obj.gateway.name,
             obj.p_code if obj.p_code else "n/a"
         )
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'latitude', 'longitude', 'p_code', 'admin_level')
+        fields = ('id', 'name', 'latitude', 'longitude', 'p_code', 'admin_level')
 
 
 class ShortLocationSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     admin_level = serializers.SerializerMethodField()
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'admin_level')
+        fields = ('id', 'name', 'admin_level')
 
-    def get_title(self, obj):
+    def get_name(self, obj):
         return "%s [%s - %s]" % (
-            obj.title,
-            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.name,
+            obj.gateway.name,
             obj.p_code if obj.p_code else "n/a"
         )
 
@@ -246,7 +246,6 @@ class PMPGatewayTypeSerializer(serializers.ModelSerializer):
 
 class PMPLocationSerializer(serializers.ModelSerializer):
     pcode = serializers.CharField(source='p_code')
-    name = serializers.CharField(source='title')
     gateway = serializers.PrimaryKeyRelatedField(
         queryset=GatewayType.objects.all())
 

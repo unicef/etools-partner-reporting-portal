@@ -21,8 +21,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.loc_type = factories.GatewayTypeFactory(country=self.country)
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         super().setUp()
 
@@ -77,8 +77,8 @@ class TestLocationListAPIView(BaseAPITestCase):
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.loc_type = factories.GatewayTypeFactory(country=self.country)
         self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
+        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
 
         for _ in range(2):
             obj = factories.ClusterObjectiveFactory(

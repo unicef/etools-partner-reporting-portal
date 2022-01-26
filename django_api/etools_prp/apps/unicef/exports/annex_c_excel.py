@@ -205,7 +205,7 @@ class ProgressReportsXLSXExporter:
         location = location_data.location
         while True:
             location_info.append([
-                location.title, location.p_code
+                location.name, location.p_code
             ])
 
             if location.parent:

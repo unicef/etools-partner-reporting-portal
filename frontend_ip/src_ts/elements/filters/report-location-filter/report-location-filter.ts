@@ -24,7 +24,13 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
       <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
-      <searchable-dropdown-filter label="[[localize('location')]]" name="location" value="[[value]]" data="[[options]]">
+      <searchable-dropdown-filter
+        label="[[localize('location')]]"
+        name="location"
+        option-label="name"
+        value="[[value]]"
+        data="[[options]]"
+      >
       </searchable-dropdown-filter>
     `;
   }
@@ -53,7 +59,7 @@ class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
     (this.$.locations as EtoolsPrpAjaxEl).abort();
     thunk()
       .then((res: GenericObject) => {
-        this.set('options', [{id: '', title: 'All'}].concat(res.data || []));
+        this.set('options', [{id: '', name: 'All'}].concat(res.data || []));
       })
       .catch((_err: GenericObject) => {
         // TODO: error handling

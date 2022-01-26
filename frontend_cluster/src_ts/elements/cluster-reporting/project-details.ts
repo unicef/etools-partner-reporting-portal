@@ -97,7 +97,7 @@ class ProjectDetailsDisplay extends UtilsMixin(LocalizeMixin(ReduxConnectedEleme
                 <template
                     is="dom-repeat"
                     items="[[projectData.locations]]">
-                  <p class="location value">[[item.title]]</p>
+                  <p class="location value">[[item.name]]</p>
                 </template>
               </labelled-item>
             </li>
