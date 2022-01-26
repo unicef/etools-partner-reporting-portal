@@ -27,7 +27,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
         label="[[label]]"
         options="[[data]]"
         option-value="id"
-        option-label="title"
+        option-label="[[optionLabel]]"
         selected="[[value]]"
         disabled="[[disabled]]"
         selected-item="{{selectedItem}}"
@@ -52,6 +52,9 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
 
   @property({type: String})
   label!: string;
+
+  @property({type: String})
+  optionLabel = 'title';
 
   @property({type: Array, observer: '_handleData'})
   data = [];
