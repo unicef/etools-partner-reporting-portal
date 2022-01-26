@@ -227,7 +227,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
           </li>
         </ul>
         <labelled-item label="[[localize('locations')]]">
-          <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'title')]]</span>
+          <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'name')]]</span>
         </labelled-item>
       </etools-content-panel>
 

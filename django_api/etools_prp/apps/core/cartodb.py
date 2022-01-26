@@ -65,8 +65,8 @@ def create_location(pcode,
         location = Location.objects.get(p_code=pcode)
 
     except Location.MultipleObjectsReturned:
-        logger.warning("Multiple locations found for: {}, {} ({})".format(
-            carto_table.location_type, site_name, pcode
+        logger.warning("Multiple locations found for: {} ({})".format(
+            site_name, pcode
         ))
         sites_not_added += 1
         return False, sites_not_added, sites_created, sites_updated
@@ -77,7 +77,6 @@ def create_location(pcode,
             'p_code': pcode,
             'gateway': carto_table.location_type,
             'title': site_name,
-            'carto_db_table': carto_table,
         }
 
         if parent and parent_instance:
@@ -104,7 +103,7 @@ def create_location(pcode,
         else:
             logger.info('{}: {} ({})'.format(
                 'Added',
-                loc.title,
+                loc.name,
                 carto_table.location_type.name
             ))
 
@@ -112,7 +111,7 @@ def create_location(pcode,
 
     else:
         # names can be updated for existing locations with the same code
-        location.title = site_name
+        location.name = site_name
 
         if not row['the_geom']:
             logger.warning("No geo polygon data found for: {}, {} ({})".format(
@@ -145,7 +144,7 @@ def create_location(pcode,
 
         logger.info('{}: {} ({})'.format(
             'Updated',
-            location.title,
+            location.name,
             carto_table.location_type.name
         ))
 

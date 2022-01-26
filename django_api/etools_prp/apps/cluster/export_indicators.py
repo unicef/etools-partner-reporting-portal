@@ -209,7 +209,7 @@ class IndicatorsXLSXExporter:
                     column=18).value = indicator.reportable.total['c']
 
                 self.sheet.cell(row=start_row_id,
-                                column=19).value = location_data.location.title
+                                column=19).value = location_data.location.name
                 self.sheet.cell(
                     row=start_row_id,
                     column=20).value = location_data.location.gateway.name
@@ -220,7 +220,7 @@ class IndicatorsXLSXExporter:
                     admin_level = location.gateway.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
-                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.title
+                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.name
                     self.sheet.cell(row=start_row_id, column=20 + admin_level * 2 - 1).value = location.gateway.name
 
                     if location.parent:

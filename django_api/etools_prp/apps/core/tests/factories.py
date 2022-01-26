@@ -337,11 +337,11 @@ class LocationFactory(factory.django.DjangoModelFactory):
     """
     external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     external_source = factory.LazyFunction(faker.text)
-    title = factory.LazyFunction(faker.city)
+    name = factory.LazyFunction(faker.city)
     # We are going to fill location type manually
     gateway = factory.SubFactory('etools_prp.apps.core.tests.factories.GatewayTypeFactory', location=None)
     # We are going to fill CartoDBTable manually
-    carto_db_table = factory.SubFactory('etools_prp.apps.core.tests.factories.CartoDBTableFactory', location=None)
+    # carto_db_table = factory.SubFactory('etools_prp.apps.core.tests.factories.CartoDBTableFactory', location=None)
     latitude = factory.LazyFunction(faker.latitude)
     longitude = factory.LazyFunction(faker.longitude)
     p_code = factory.LazyAttribute(lambda o: "{}{}".format(o.gateway.country.country_short_code, faker.random_number(4)))

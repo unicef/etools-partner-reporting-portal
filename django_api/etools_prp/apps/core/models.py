@@ -511,7 +511,6 @@ class GatewayType(TimeStampedModel):
     """
 
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    display_name = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Display Name'))
     admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
     country = models.ForeignKey(
@@ -532,7 +531,7 @@ class GatewayType(TimeStampedModel):
 class LocationManager(TreeManager):
 
     def get_queryset(self):
-        return super().get_queryset().order_by('title').select_related('gateway')
+        return super().get_queryset().select_related('gateway')
 
 
 class Location(MPTTModel):
@@ -558,40 +557,28 @@ class Location(MPTTModel):
 
     external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
 
-    title = models.CharField(max_length=255)
+    name = models.CharField(verbose_name=_("Name"), max_length=254)
 
     gateway = models.ForeignKey(
         GatewayType, verbose_name='Location Type', related_name='locations',  on_delete=models.CASCADE,
     )
-    carto_db_table = models.ForeignKey(
-        'core.CartoDBTable',
-        related_name="locations",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
 
-    latitude = models.DecimalField(
+    latitude = models.FloatField(
+        verbose_name=_("Latitude"),
         null=True,
         blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[
-            MinValueValidator(Decimal(-90)),
-            MaxValueValidator(Decimal(90))
-        ]
     )
-    longitude = models.DecimalField(
+    longitude = models.FloatField(
+        verbose_name=_("Longitude"),
         null=True,
         blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[
-            MinValueValidator(Decimal(-180)),
-            MaxValueValidator(Decimal(180))
-        ]
     )
-    p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
+    p_code = models.CharField(
+        verbose_name=_("P Code"),
+        max_length=32,
+        blank=True,
+        default='',
+    )
 
     parent = TreeForeignKey(
         'self',
@@ -608,19 +595,19 @@ class Location(MPTTModel):
     objects = LocationManager()
 
     class Meta:
-        unique_together = ('title', 'p_code')
-        ordering = ['title']
+        unique_together = ('name', 'gateway', 'p_code')
+        ordering = ['name']
 
     def __str__(self):
         if self.p_code:
             return '{} ({} {})'.format(
-                self.title,
+                self.name,
                 self.gateway.name,
                 "{}: {}".format(
                     'CERD' if self.gateway.name == 'School' else 'PCode', self.p_code or ''
                 ))
 
-        return self.title
+        return self.name
 
     @property
     def geo_point(self):
@@ -671,5 +658,5 @@ class CartoDBTable(MPTTModel):
         return self.table_name
 
 
-mptt.register(Location, order_insertion_by=['title'])
+mptt.register(Location, order_insertion_by=['name'])
 mptt.register(CartoDBTable, order_insertion_by=['table_name'])

@@ -23,7 +23,13 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
 
       <etools-prp-ajax id="locationNames" url="[[locationNamesUrl]]"> </etools-prp-ajax>
 
-      <searchable-dropdown-filter label="[[localize('location')]]" name="location" value="[[value]]" data="[[data]]">
+      <searchable-dropdown-filter
+        label="[[localize('location')]]"
+        option-label="name"
+        name="location"
+        value="[[value]]"
+        data="[[data]]"
+      >
       </searchable-dropdown-filter>
     `;
   }
@@ -61,7 +67,7 @@ class IndicatorLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           [
             {
               id: '',
-              title: 'All'
+              name: 'All'
             }
           ].concat(res.data || [])
         );

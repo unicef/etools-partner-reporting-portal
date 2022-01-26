@@ -1137,7 +1137,7 @@ class PlannedActionProjectsModal extends LocalizeMixin(ModalMixin(RoutingMixin(U
     });
 
     changedLocations.forEach((location: GenericObject) => {
-      if (!location || !location.title) {
+      if (!location || !location.name) {
         this.set('errors', 'No location set - please set a location.');
         locationError = true;
       } else if (changedLocations[0].admin_level !== location.admin_level) {

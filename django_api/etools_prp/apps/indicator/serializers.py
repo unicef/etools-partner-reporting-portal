@@ -294,7 +294,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
         return obj.location.gateway.admin_level
 
     def get_title(self, obj):
-        return obj.location.title
+        return obj.location.name
 
     def validate_baseline(self, value):
         if 'd' not in value:
@@ -2094,7 +2094,7 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             for loc_data in loc.indicator_location_data.values_list('disaggregation', flat=True):
                 progress += loc_data['()']['c']
 
-            result[loc.title] = progress
+            result[loc.name] = progress
 
         return result
 
@@ -2430,10 +2430,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 'partners': partner_titles,
             }
 
-            if ild.location.title not in location_progresses:
-                location_progresses[ild.location.title] = list()
+            if ild.location.name not in location_progresses:
+                location_progresses[ild.location.name] = list()
 
-            location_progresses[ild.location.title].append(data)
+            location_progresses[ild.location.name].append(data)
 
     def get_current_progress_by_location(self, obj):
         location_progresses = defaultdict()

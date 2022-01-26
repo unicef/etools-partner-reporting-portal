@@ -253,7 +253,7 @@ class ProgressReportXLSXExporter:
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
                     self.sheet.cell(row=start_row_id, column=25 +
-                                    admin_level * 2).value = location.title
+                                    admin_level * 2).value = location.name
                     self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2 - 1).value = location.gateway.name
 

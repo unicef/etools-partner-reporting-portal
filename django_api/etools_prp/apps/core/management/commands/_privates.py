@@ -83,7 +83,7 @@ def clean_up_data():
         Workspace.objects.all().delete()
         Country.objects.all().delete()
         ResponsePlan.objects.all().delete()
-        Location.objects.filter(title__icontains="location_").delete()
+        Location.objects.filter(name__icontains="location_").delete()
         GatewayType.objects.filter(name__icontains="gateway_type_").delete()
         CartoDBTable.objects.filter(domain__icontains="domain_").delete()
         Person.objects.filter(name__icontains="Person_").delete()
