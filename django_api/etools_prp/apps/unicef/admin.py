@@ -111,7 +111,7 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
             if deleted_dates_pk:
                 rpd = ReportingPeriodDates.objects.filter(programme_document=obj).exclude(pk__in=deleted_dates_pk)
             else:
-                rpd = []
+                rpd = ReportingPeriodDates.objects.none()
             if not (prs or rpd):
                 messages.add_message(request, messages.INFO, 'No need to reconcile! All good')
                 return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
