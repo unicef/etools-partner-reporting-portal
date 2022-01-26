@@ -40,6 +40,7 @@ class LocationFilterMultiNarrowed extends LocalizeMixin(FilterDependenciesMixin(
         value="[[value]]"
         on-value-changed="_onValueChanged"
         data="[[data]]"
+        option-label="name"
         disabled="[[pending]]"
       >
       </dropdown-filter-multi>

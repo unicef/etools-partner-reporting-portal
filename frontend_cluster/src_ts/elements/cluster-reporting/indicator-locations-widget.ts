@@ -185,7 +185,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
 
               <template is="dom-if" if="[[_isLocked(item, lockedItems)]]" restamp="true">
                 <labelled-item class="item item-2-col" label="[[localize('location')]]">
-                  <span class="readonly">[[_getLocationTitle(item.id, index)]]</span>
+                  <span class="readonly">[[_getLocationName(item.id, index)]]</span>
                 </labelled-item>
               </template>
 
@@ -195,7 +195,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
                   label="[[localize('location')]]"
                   options="[[_getLocations(locations, item.loc_type, index)]]"
                   option-value="id"
-                  option-label="title"
+                  option-label="name"
                   selected="{{item.location.id}}"
                   selected-item="{{item.location}}"
                   disabled$="[[_getPending(pending, item.loc_type, index)]]"
@@ -459,7 +459,7 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this._fetchLocations(e.detail.selectedItem.id, undefined, index);
   }
 
-  _fetchLocations(loc_type: string, title: any, index: number) {
+  _fetchLocations(loc_type: string, name: any, index: number) {
     if (loc_type === undefined) {
       return;
     }
@@ -469,9 +469,9 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(100), () => {
       this._setPending(loc_type, true, index);
 
-      if (title !== undefined) {
+      if (name !== undefined) {
         // @ts-ignore
-        this.shadowRoot!.querySelector('#locations' + loc_type)!.params.title = title;
+        this.shadowRoot!.querySelector('#locations' + loc_type)!.params.name = name;
       }
 
       const thunk = (this.shadowRoot!.querySelector('#locations' + loc_type) as EtoolsPrpAjaxEl).thunk();
@@ -525,12 +525,12 @@ class IndicatorLocationsWidget extends UtilsMixin(NotificationsMixin(LocalizeMix
   }
 
   // @ts-ignore
-  _getLocationTitle(locationId: string, index: number) {
+  _getLocationName(locationId: string, index: number) {
     if (!this.value || !this.value[index]) {
       return;
     }
     const targetLocation = this.value[index];
-    return targetLocation ? targetLocation.title : '';
+    return targetLocation ? targetLocation.name : '';
   }
 
   _setPending(loc_type: string, value: any, index: number) {
