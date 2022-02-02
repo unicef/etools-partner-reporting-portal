@@ -76,7 +76,7 @@ def create_location(pcode,
         create_args = {
             'p_code': pcode,
             'gateway': carto_table.location_type,
-            'title': site_name,
+            'name': site_name,
         }
 
         if parent and parent_instance:
