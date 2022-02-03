@@ -254,7 +254,6 @@ workflows:
                 - master
                 - staging
                 - develop
-                - upgrade-intl-message
       - build_and_deploy_fe_cluster:
           filters:
             branches:
@@ -262,7 +261,6 @@ workflows:
                 - master
                 - staging
                 - develop
-                - upgrade-intl-message
       - build_and_deploy_id_management:
           filters:
             branches:
@@ -270,4 +268,3 @@ workflows:
                 - master
                 - staging
                 - develop
-                - upgrade-intl-message
