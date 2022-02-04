@@ -398,7 +398,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
             # require locations to have same admin level
             location_qs = Location.objects.filter(id__in=location_ids)
-            if location_qs.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
+            if location_qs.values_list('admin_level', flat=True).distinct().count() != 1:
                 raise serializers.ValidationError({
                     'locations': 'All locations need to have same admin level'
                 })

@@ -1,7 +1,7 @@
 from rest_framework.exceptions import ValidationError
 
-from etools_prp.apps.core.models import GatewayType, Location
-from etools_prp.apps.core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable
@@ -91,8 +91,7 @@ class TestProcessModel(BaseAPITestCase):
         self.assertFalse(person_qs.exists())
 
     def test_programme_document(self):
-        country = factories.CountryFactory()
-        workspace = factories.WorkspaceFactory(countries=[country, ])
+        workspace = factories.WorkspaceFactory()
         partner = factories.PartnerFactory()
         data = {
             "id": 101,
@@ -138,8 +137,7 @@ class TestProcessModel(BaseAPITestCase):
         self.assertTrue(pd_qs.exists())
 
     def test_section(self):
-        country = factories.CountryFactory()
-        workspace = factories.WorkspaceFactory(countries=[country, ])
+        workspace = factories.WorkspaceFactory()
         data = {
             'address': 'SEBRATHA',
             'alternate_name': None,
@@ -224,45 +222,16 @@ class TestProcessModel(BaseAPITestCase):
         )
         # self.assertTrue(reportable_qs.exists())
 
-    def test_gateway_type(self):
-        country = factories.CountryFactory()
-        data = {
-            'id': 8136,
-            'name': 'Abaipur',
-            'pcode': '40448010',
-            'location_type': 'BGD-Admin Level 4',
-            'admin_level': 4,
-            'gateway_country': country.pk,
-        }
-        filter_dict = {
-            'admin_level': data['admin_level'],
-            'country': data['gateway_country'],
-        }
-        gateway_type_qs = GatewayType.objects.filter(**filter_dict)
-        self.assertFalse(gateway_type_qs.exists())
-        process_model(
-            GatewayType,
-            PMPGatewayTypeSerializer,
-            data=data,
-            filter_dict=filter_dict,
-        )
-        self.assertTrue(gateway_type_qs.exists())
-
     def test_location(self):
-        country = factories.CountryFactory()
-        gateway = factories.GatewayTypeFactory(country=country)
         data = {
             'id': 8136,
             'name': 'Abaipur',
-            'pcode': '40448010',
-            'location_type': 'BGD-Admin Level 4',
+            'p_code': '40448010',
+            'admin_level_name': 'BGD-Admin Level 4',
             'admin_level': 4,
-            'gateway_country': country.pk,
-            'gateway': gateway.pk,
         }
         filter_dict = {
-            'gateway': data['gateway'],
-            'p_code': data['pcode'],
+            'p_code': data['p_code'],
         }
         location_qs = Location.objects.filter(**filter_dict)
         self.assertFalse(location_qs.exists())

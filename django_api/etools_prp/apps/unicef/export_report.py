@@ -172,7 +172,7 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=1).value = \
                     self.progress_report.programme_document.partner.title
                 self.sheet.cell(row=start_row_id, column=2).value = \
-                    location_data.location.gateway.country.name
+                    ', '.join([workspace.title for workspace in location_data.location.workspaces.all()])
                 self.sheet.cell(row=start_row_id, column=3).value = \
                     self.progress_report.programme_document.reference_number
                 self.sheet.cell(row=start_row_id, column=4).value = \
@@ -249,13 +249,13 @@ class ProgressReportXLSXExporter:
                 # Iterate over location admin references:
                 location = location_data.location
                 while True:
-                    admin_level = location.gateway.admin_level
+                    admin_level = location.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
                     self.sheet.cell(row=start_row_id, column=25 +
                                     admin_level * 2).value = location.name
                     self.sheet.cell(row=start_row_id, column=25 +
-                                    admin_level * 2 - 1).value = location.gateway.name
+                                    admin_level * 2 - 1).value = location.admin_level_name
 
                     if location.parent:
                         location = location.parent

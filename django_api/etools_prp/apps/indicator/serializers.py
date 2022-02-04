@@ -291,7 +291,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
 
     def get_loc_type(self, obj):
-        return obj.location.gateway.admin_level
+        return obj.location.admin_level
 
     def get_title(self, obj):
         return obj.location.name
@@ -1352,7 +1352,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(
-            'gateway__admin_level', flat=True) \
+            'admin_level', flat=True) \
                 .distinct().count() != 1:
             raise ValidationError(
                 {"locations": "Selected locations should share same admin level"})

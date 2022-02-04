@@ -12,7 +12,7 @@ from etools_prp.apps.core.tests import factories
 #         table = CartoDBTable.objects.first()
 
 #         location = LocationFactory(
-#             gateway=table.location_type,
+#             gateway=table.admin_level_name,
 #             carto_db_table=table,
 #         )
 #         LocationWithReportableLocationGoalFactory(

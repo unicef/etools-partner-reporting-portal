@@ -74,9 +74,10 @@ def create_location(pcode,
     except Location.DoesNotExist:
         # try to create the location
         create_args = {
+            'admin_level_name': carto_table.admin_level_name,
+            'admin_level': carto_table.admin_level,
             'p_code': pcode,
-            'gateway': carto_table.location_type,
-            'title': site_name,
+            'name': site_name,
         }
 
         if parent and parent_instance:
@@ -84,7 +85,7 @@ def create_location(pcode,
 
         if not row['the_geom']:
             logger.warning("No geo polygon data found for: {}, {} ({})".format(
-                carto_table.location_type, site_name, pcode
+                carto_table.admin_level_name, site_name, pcode
             ))
             return False, sites_not_added, sites_created, sites_updated
 
@@ -104,7 +105,7 @@ def create_location(pcode,
             logger.info('{}: {} ({})'.format(
                 'Added',
                 loc.name,
-                carto_table.location_type.name
+                carto_table.admin_level_name.name
             ))
 
         return True, sites_not_added, sites_created, sites_updated
@@ -115,7 +116,7 @@ def create_location(pcode,
 
         if not row['the_geom']:
             logger.warning("No geo polygon data found for: {}, {} ({})".format(
-                carto_table.location_type, site_name, pcode
+                carto_table.admin_level_name, site_name, pcode
             ))
 
             return False, sites_not_added, sites_created, sites_updated
@@ -145,7 +146,7 @@ def create_location(pcode,
         logger.info('{}: {} ({})'.format(
             'Updated',
             location.name,
-            carto_table.location_type.name
+            carto_table.admin_level_name.name
         ))
 
         return True, sites_not_added, sites_created, sites_updated

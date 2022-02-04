@@ -94,7 +94,7 @@ class PMP_API:
 
     def partners(self, business_area_code, url=None):
         self.url = self.url_prototype + "/prp/v1/partners/?workspace=%s" % (
-                business_area_code) if not url else url
+            business_area_code) if not url else url
         data = self._push_request(timeout=300)
         return data
 

@@ -449,21 +449,21 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs['response_plan_id']
         queryset = IndicatorReport.objects.filter(
-            Q(reportable__cluster_objectives__isnull=False)
-            | Q(reportable__cluster_activities__isnull=False)
-            | Q(reportable__partner_projects__isnull=False)
-            | Q(reportable__partner_activity_project_contexts__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False) |
+            Q(reportable__cluster_activities__isnull=False) |
+            Q(reportable__partner_projects__isnull=False) |
+            Q(reportable__partner_activity_project_contexts__isnull=False)
         ).filter(
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id,
-              **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__'))
-            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
-                **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__'))
-            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
-                **self.get_user_check_kwarg('reportable__partner_projects__clusters__'))
-            | Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,    # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__'))   # noqa: E501
-            | Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
-                **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))   # noqa: E501
+              **self.get_user_check_kwarg('reportable__cluster_objectives__cluster__')) |
+            Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('reportable__cluster_activities__cluster_objective__cluster__')) |
+            Q(reportable__partner_projects__clusters__response_plan=response_plan_id,
+              **self.get_user_check_kwarg('reportable__partner_projects__clusters__')) |
+            Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id,    # noqa: E501
+              **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__')) |  # noqa: E501
+            Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
+              **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))   # noqa: E501
         ).distinct()
         return queryset
 
@@ -1238,12 +1238,12 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                & Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+                & Q(admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
         else:
             final_result = result.filter(
-                gateway__admin_level=int(filter_parameters['loc_type'])
+                admin_level=int(filter_parameters['loc_type'])
             )
 
             if filter_parameters['locs']:
@@ -1412,12 +1412,12 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             indicators = indicators.filter(
                 Q(reportablelocationgoal__location__parent__id__in=map(
                     lambda x: int(x), filter_parameters['locs'].split(',')))
-                & Q(reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+                & Q(reportablelocationgoal__location__admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
         else:
             indicators = indicators.filter(
-                reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['loc_type'])
+                reportablelocationgoal__location__admin_level=int(filter_parameters['loc_type'])
             )
 
             if filter_parameters['locs']:
