@@ -158,8 +158,8 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
             })
 
         if validated_data['plan_type'] == RESPONSE_PLAN_TYPE.other \
-                and ('plan_custom_type_label' not in validated_data
-                     or validated_data['plan_custom_type_label'] == ''):
+                and ('plan_custom_type_label' not in validated_data or
+                     validated_data['plan_custom_type_label'] == ''):
             raise serializers.ValidationError({
                 'plan_custom_type_label': 'Plan custom type label is required when the type is other'
             })

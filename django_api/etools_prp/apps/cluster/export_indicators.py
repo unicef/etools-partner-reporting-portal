@@ -288,10 +288,8 @@ class IndicatorsXLSXExporter:
                                 continue
                             if sorted(list(eval(k))) == sorted(
                                     list(int(k) for k in dk.split(","))):
-                                self.sheet.cell(
-                                    row=start_row_id, column=dv).value = v['v'] \
-                                        if blueprint.unit == IndicatorBlueprint.NUMBER \
-                                        else "{}/{}".format(v['v'], v['d'])
+                                value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+                                self.sheet.cell(row=start_row_id, column=dv).value = value
 
                 start_row_id += 1
 
@@ -460,9 +458,7 @@ class IndicatorsXLSXExporter:
                     else:
                         # Total has None value as a type
                         if sheet.cell(column=column, row=4).value is None:
-                            col = self.disaggregations_start_column + \
-                                  len(merged_disaggregations) + \
-                                  len(merged_disaggregation_values)
+                            col = self.disaggregations_start_column + len(merged_disaggregations) + len(merged_disaggregation_values)
                             merged_sheet.cell(
                                 column=col, row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value

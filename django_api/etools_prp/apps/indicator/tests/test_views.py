@@ -1672,8 +1672,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            'disaggregation_reported_on list must have '
-            + 'level_reported # of elements',
+            'disaggregation_reported_on list must have ' +
+            'level_reported # of elements',
             response.data['non_field_errors'][0]
         )
 
@@ -1690,8 +1690,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u"num_disaggregation is not matched with "
-            + "its IndicatorReport's Reportable disaggregation counts",
+            u"num_disaggregation is not matched with " +
+            "its IndicatorReport's Reportable disaggregation counts",
             response.data['non_field_errors'][0]
         )
 
@@ -1712,8 +1712,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            'disaggregation_reported_on list must have all '
-            + 'its elements mapped to disaggregation ids',
+            'disaggregation_reported_on list must have all ' +
+            'its elements mapped to disaggregation ids',
             response.data['non_field_errors'][0]
         )
 
@@ -1755,8 +1755,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(
-            "Submitted disaggregation data entries do not contain "
-            + "all level %d combination pair keys" % (indicator_location_data.level_reported),
+            "Submitted disaggregation data entries do not contain " +
+            "all level %d combination pair keys" % (indicator_location_data.level_reported),
             str(response.data['non_field_errors'][0])
         )
 
@@ -1786,8 +1786,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "Submitted disaggregation data entries contains "
-            + "extra combination pair keys",
+            "Submitted disaggregation data entries contains " +
+            "extra combination pair keys",
             str(response.data['non_field_errors'][0])
         )
 
@@ -1818,9 +1818,9 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "Disaggregation data coordinate "
-            + "space cannot be higher than "
-            + "specified level_reported",
+            "Disaggregation data coordinate " +
+            "space cannot be higher than " +
+            "specified level_reported",
             response.data['non_field_errors'][0]
         )
 
@@ -1852,8 +1852,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "coordinate space does not "
-            + "belong to disaggregation value id list",
+            "coordinate space does not " +
+            "belong to disaggregation value id list",
             response.data['non_field_errors'][0]
         )
 
@@ -1907,8 +1907,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "coordinate space value does not "
-            + "have correct value key structure: c, d, v",
+            "coordinate space value does not " +
+            "have correct value key structure: c, d, v",
             response.data['non_field_errors'][0]
         )
 
@@ -2167,11 +2167,8 @@ class TestReportRefreshAPIView(BaseAPITestCase):
             reportable=self.llo_reportable,
             due_date=report.due_date + datetime.timedelta(days=1),
         )
-        self.assertTrue(IndicatorReport.objects.exclude(
-            pk=report.pk).filter(
-                progress_report=report.progress_report,
-                due_date__gt=report.due_date,
-            ).exists()
+        self.assertTrue(IndicatorReport.objects.exclude(pk=report.pk).filter(
+            progress_report=report.progress_report, due_date__gt=report.due_date).exists()
         )
 
         # test with no data
