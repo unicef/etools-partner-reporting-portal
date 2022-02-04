@@ -16,7 +16,7 @@ def migrate_workspace(apps, schema_editor):
         loc.save()
 
     for table in CartoDBTable.objects.all():
-        table.admin_level_name = table.admin_level_name.name
+        table.admin_level_name = table.location_type.name
         table.admin_level = table.location_type.admin_level
         table.save()
 
