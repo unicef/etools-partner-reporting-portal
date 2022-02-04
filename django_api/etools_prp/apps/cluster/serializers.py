@@ -9,7 +9,7 @@ from rest_framework_gis.fields import GeoJsonDict, GeometryField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
 from etools_prp.apps.core.common import CLUSTER_TYPE_NAME_DICT, OVERALL_STATUS, PARTNER_PROJECT_STATUS
-from etools_prp.apps.core.models import GatewayType, Location, ResponsePlan
+from etools_prp.apps.core.models import Location, ResponsePlan
 from etools_prp.apps.indicator.models import IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.indicator.serializers import ClusterIndicatorReportSerializer
 from etools_prp.apps.partner.models import Partner
@@ -348,15 +348,15 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         location_data = IndicatorLocationData.objects.filter(
             indicator_report__in=indicator_reports)
 
-        location_types = GatewayType.objects.filter(
-            locations__indicator_location_data__in=location_data).distinct()
+        admin_level_names = Location.objects.filter(indicator_location_data__in=location_data).values_list(
+            'admin_level_name', flat=True)
 
-        num_of_reports_by_location_type = {}
+        num_of_reports_by_admin_level_name = {}
 
-        for location_type in location_types:
-            num_of_reports_by_location_type[
-                str(location_type)
-            ] = location_data.filter(location__gateway=location_type).count()
+        for admin_level_name in admin_level_names:
+            num_of_reports_by_admin_level_name[
+                str(admin_level_name)
+            ] = location_data.filter(location__admin_level_name=admin_level_name).count()
 
         return {
             'num_of_activities': {
@@ -369,7 +369,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
                 'no_progress': num_nop_pr,
                 'constrained': num_con_pr,
             },
-            'num_of_reports_by_location_type': num_of_reports_by_location_type,
+            'num_of_reports_by_location_type': num_of_reports_by_admin_level_name,
             'num_of_projects': projects,
             'cluster_contributing_to': cluster_contributing_to,
         }
@@ -432,7 +432,7 @@ class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
 
     def get_partners(self, obj):
         partners = Partner.objects.filter(
-            clusters__response_plan__workspace__countries__gateway_types__locations=obj) \
+            clusters__response_plan__workspace__locations=obj) \
             .distinct() \
             .values_list('title', flat=True)
 

@@ -9,6 +9,7 @@ from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS,
 from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.core.tests.factories import faker
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData
 from etools_prp.apps.ocha.imports.serializers import (
@@ -24,14 +25,14 @@ SAMPLES_DIR = os.path.join(settings.APPS_DIR, 'ocha', 'samples')
 class V2PartnerProjectSerializerTest(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -48,7 +49,7 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -240,14 +241,14 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
 class V1ResponsePlanImportSerializerTest(TestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -264,7 +265,7 @@ class V1ResponsePlanImportSerializerTest(TestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)

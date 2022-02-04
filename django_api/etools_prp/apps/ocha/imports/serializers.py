@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, EXTERNAL_DATA_SOURCES, PARTNER_PROJECT_STATUS, RESPONSE_PLAN_TYPE
-from etools_prp.apps.core.models import Country, Location, ResponsePlan, Workspace
+from etools_prp.apps.core.models import Location, ResponsePlan, Workspace
 from etools_prp.apps.ocha.constants import RefCode
 from etools_prp.apps.ocha.imports.utilities import save_location_list
 from etools_prp.apps.partner.models import Partner, PartnerProject
@@ -184,25 +184,6 @@ class V1FundingSourceImportSerializer(serializers.Serializer):
         return PartnerProject.objects.filter(id__in=project_total_funding.keys())
 
 
-class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
-    name = serializers.CharField()
-    iso3 = serializers.CharField(source='iso3_code', allow_null=True)
-
-    class Meta:
-        model = Country
-        fields = (
-            'name',
-            'iso3',
-        )
-
-    def create(self, validated_data):
-        iso3_code = validated_data.pop('iso3_code')
-
-        return Country.objects.update_or_create(
-            iso3_code=iso3_code,  defaults=validated_data,
-        )[0]
-
-
 class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     workspace_id = serializers.IntegerField(required=False)
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
@@ -210,7 +191,6 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
     name = serializers.CharField(source='title')
     startDate = serializers.DateField(source='start')
     endDate = serializers.DateField(source='end')
-    locations = V1ResponsePlanLocationImportSerializer(many=True)
     emergencies = serializers.ListField()
     categories = serializers.ListField()
     governingEntities = serializers.ListField(allow_empty=False, error_messages={
@@ -226,7 +206,6 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             'id',
             'startDate',
             'endDate',
-            'locations',
             'categories',
             'emergencies',
             'governingEntities',
@@ -241,10 +220,10 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             workspace_title = emergencies[0]['name']
             # TODO: How do we generate workspace code for emergency
             workspace_code = 'EM{}'.format(emergencies[0]['id'])
-        elif len(locations) == 1:
-            workspace_id = None
-            workspace_title = locations[0]['name']
-            workspace_code = locations[0]['iso3_code']
+        # elif len(locations) == 1:
+        #     workspace_id = None
+        #     workspace_title = locations[0]['name']
+        #     workspace_code = locations[0]['iso3_code']
         else:
             raise serializers.ValidationError('No overall emergency named for multi country plan')
         # TODO: Handling of duplicate workspace codes
@@ -258,12 +237,12 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             }
         )
 
-        location_serializer = V1ResponsePlanLocationImportSerializer(
-            data=self.initial_data['locations'], many=True
-        )
-        location_serializer.is_valid(raise_exception=True)
-
-        workspace.countries.add(*location_serializer.save())
+        # location_serializer = V1ResponsePlanLocationImportSerializer(
+        #     data=self.initial_data['locations'], many=True
+        # )
+        # location_serializer.is_valid(raise_exception=True)
+        #
+        # workspace.countries.add(*location_serializer.save())
 
         return workspace.id
 

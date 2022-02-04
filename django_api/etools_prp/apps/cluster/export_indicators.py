@@ -155,10 +155,10 @@ class IndicatorsXLSXExporter:
 
                 self.sheet.cell(
                     row=start_row_id,
-                    column=1).value = location_data.location.gateway.country.name
+                    column=1).value = ', '.join([w.title for w in location_data.location.workspaces.all()])
                 self.sheet.cell(
                     row=start_row_id,
-                    column=2).value = location_data.location.gateway.country.country_short_code
+                    column=2).value = ', '.join([w.code for w in location_data.location.workspaces.all()])
                 self.sheet.cell(row=start_row_id,
                                 column=3).value = cluster.response_plan.title if cluster else ""
 
@@ -212,16 +212,16 @@ class IndicatorsXLSXExporter:
                                 column=19).value = location_data.location.name
                 self.sheet.cell(
                     row=start_row_id,
-                    column=20).value = location_data.location.gateway.name
+                    column=20).value = location_data.location.admin_level_name
 
                 # Iterate over location admin references:
                 location = location_data.location
                 while True:
-                    admin_level = location.gateway.admin_level
+                    admin_level = location.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
                     self.sheet.cell(row=start_row_id, column=20 + admin_level * 2).value = location.name
-                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2 - 1).value = location.gateway.name
+                    self.sheet.cell(row=start_row_id, column=20 + admin_level * 2 - 1).value = location.admin_level_name
 
                     if location.parent:
                         location = location.parent
@@ -288,10 +288,8 @@ class IndicatorsXLSXExporter:
                                 continue
                             if sorted(list(eval(k))) == sorted(
                                     list(int(k) for k in dk.split(","))):
-                                self.sheet.cell(
-                                    row=start_row_id, column=dv).value = v['v'] \
-                                        if blueprint.unit == IndicatorBlueprint.NUMBER \
-                                        else "{}/{}".format(v['v'], v['d'])
+                                value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+                                self.sheet.cell(row=start_row_id, column=dv).value = value
 
                 start_row_id += 1
 
@@ -460,9 +458,7 @@ class IndicatorsXLSXExporter:
                     else:
                         # Total has None value as a type
                         if sheet.cell(column=column, row=4).value is None:
-                            col = self.disaggregations_start_column + \
-                                  len(merged_disaggregations) + \
-                                  len(merged_disaggregation_values)
+                            col = self.disaggregations_start_column + len(merged_disaggregations) + len(merged_disaggregation_values)
                             merged_sheet.cell(
                                 column=col, row=merged_row
                             ).value = sheet.cell(column=column, row=sheet_row).value

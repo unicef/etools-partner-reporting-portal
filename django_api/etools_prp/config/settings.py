@@ -528,3 +528,5 @@ if DEBUG:
         'debug_toolbar',
     ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+
+DOCS_URL = 'api/docs/'
