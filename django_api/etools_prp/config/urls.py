@@ -29,7 +29,7 @@ schema_view = get_swagger_view(title='eTools PRP API')
 urlpatterns = [
     re_path(r'^$', HomeView.as_view()),
     re_path(r'^app/', RedirectAppView.as_view()),
-    re_path(r'^api/docs/', schema_view),
+    re_path(settings.DOCS_URL, schema_view),
     re_path(r'^api/admin/', admin.site.urls),
     re_path(r'^api/core/', include('etools_prp.apps.core.urls')),
     re_path(r'^api/account/', include('etools_prp.apps.account.urls')),
