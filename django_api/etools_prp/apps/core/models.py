@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -21,6 +22,14 @@ from etools_prp.apps.utils.emails import send_email_from_template
 from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 
 logger = logging.getLogger('locations.models')
+
+
+def get_random_color():
+    return '#%02X%02X%02X' % (
+        random.randint(0, 255),
+        random.randint(0, 255),
+        random.randint(0, 255)
+    )
 
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
@@ -621,12 +630,13 @@ class Location(MPTTModel):
         )
 
 
-class CartoDBTable(MPTTModel):
+class CartoDBTable(TimeStampedModel, MPTTModel):
     """
-    Represents a table in CartoDB, it is used to imports locations
+    Represents a table in CartoDB, it is used to import locations
     """
 
     domain = models.CharField(max_length=254, verbose_name=_('Domain'))
+    api_key = models.CharField(max_length=254, verbose_name=_('API Key'))
     table_name = models.CharField(max_length=254, verbose_name=_('Table Name'))
     display_name = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Display Name'))
     admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin level name'))
@@ -634,18 +644,20 @@ class CartoDBTable(MPTTModel):
 
     name_col = models.CharField(max_length=254, default='name', verbose_name=_('Name Column'))
     pcode_col = models.CharField(max_length=254, default='pcode', verbose_name=_('Pcode Column'))
+    remap_table_name = models.CharField(max_length=254, verbose_name=_('Remap Table Name'), blank=True, null=True)
     parent_code_col = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Parent Code Column'))
     parent = TreeForeignKey(
         'self', null=True, blank=True, related_name='children', db_index=True,
         verbose_name=_('Parent'),
         on_delete=models.CASCADE,
     )
-
-    class Meta:
-        verbose_name_plural = 'CartoDB tables'
+    color = models.CharField(blank=True, default=get_random_color, max_length=7, verbose_name=_('Color'))
 
     def __str__(self):
         return self.table_name
+
+    class Meta:
+        verbose_name_plural = 'CartoDB tables'
 
 
 mptt.register(Location, order_insertion_by=['name'])
