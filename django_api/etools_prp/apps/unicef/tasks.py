@@ -343,11 +343,11 @@ def process_programme_documents(fast=False, area=False):
                                 pdresultlink = process_model(
                                     PDResultLink, PMPPDResultLinkSerializer,
                                     rl, {
-                                            'external_id': rl['result_link'],
-                                            'external_cp_output_id': rl['id'],
-                                            'programme_document': pd.id,
-                                            'external_business_area_code': workspace.business_area_code,
-                                        }
+                                        'external_id': rl['result_link'],
+                                        'external_cp_output_id': rl['id'],
+                                        'programme_document': pd.id,
+                                        'external_business_area_code': workspace.business_area_code,
+                                    }
                                 )
 
                                 # Create LLO
@@ -409,9 +409,9 @@ def process_programme_documents(fast=False, area=False):
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
                                             i, {
-                                                    'external_id': i['blueprint_id'],
-                                                    'reportables__lower_level_outputs__cp_output__programme_document': pd.id
-                                                }
+                                                'external_id': i['blueprint_id'],
+                                                'reportables__lower_level_outputs__cp_output__programme_document': pd.id
+                                            }
                                         )
 
                                     locations = list()
@@ -462,9 +462,9 @@ def process_programme_documents(fast=False, area=False):
                                             disaggregation = process_model(
                                                 Disaggregation, PMPDisaggregationSerializer,
                                                 dis, {
-                                                        'name': dis['name'],
-                                                        'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
-                                                    }
+                                                    'name': dis['name'],
+                                                    'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
+                                                }
                                             )
                                             disaggregations.append(disaggregation)
 
@@ -494,9 +494,9 @@ def process_programme_documents(fast=False, area=False):
                                         Reportable,
                                         PMPReportableSerializer,
                                         i, {
-                                                'external_id': i['id'],
-                                                'lower_level_outputs__cp_output__programme_document': pd.id
-                                            }
+                                            'external_id': i['id'],
+                                            'lower_level_outputs__cp_output__programme_document': pd.id
+                                        }
                                     )
                                     reportable.active = i['is_active']
                                     partner_activity = None
@@ -535,9 +535,9 @@ def process_programme_documents(fast=False, area=False):
                                             )
 
                                             logger.info(
-                                                    "Created a new PartnerProject "
-                                                    "from PD: " + str(item['number'])
-                                                )
+                                                "Created a new PartnerProject "
+                                                "from PD: " + str(item['number'])
+                                            )
 
                                             pp.clusters.add(cai.content_object.cluster)
                                             pp.locations.add(*cai.locations.all())

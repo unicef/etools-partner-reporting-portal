@@ -700,27 +700,27 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
             if len(parsed_tuple) > data['level_reported']:
                 raise serializers.ValidationError(
-                    "%s Disaggregation data coordinate " % (key)
-                    + "space cannot be higher than "
-                    + "specified level_reported"
+                    "%s Disaggregation data coordinate " % (key) +
+                    "space cannot be higher than " +
+                    "specified level_reported"
                 )
 
             # Disaggregation data coordinate space check
             # from disaggregation choice ids
             elif set(parsed_tuple) not in valid_disaggregation_value_pairs:
                 raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "belong to disaggregation value id list")
+                    "%s coordinate space does not " % (key) +
+                    "belong to disaggregation value id list")
 
             elif not isinstance(data['disaggregation'][key], dict):
                 raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "have a correct value dictionary")
+                    "%s coordinate space does not " % (key) +
+                    "have a correct value dictionary")
 
             elif set(data['disaggregation'][key].keys()) != {'c', 'd', 'v'}:
                 raise serializers.ValidationError(
-                    "%s coordinate space value does not " % (key)
-                    + "have correct value key structure: c, d, v")
+                    "%s coordinate space value does not " % (key) +
+                    "have correct value key structure: c, d, v")
 
             if len(parsed_tuple) == data['level_reported']:
                 level_reported_key_count += 1
@@ -762,8 +762,8 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         if level_reported_key_count != valid_level_reported_key_count:
             raise serializers.ValidationError(
-                "Submitted disaggregation data entries do not contain "
-                + "all level %d combination pair keys" % (data['level_reported'])
+                "Submitted disaggregation data entries do not contain " +
+                "all level %d combination pair keys" % (data['level_reported'])
             )
 
         if data['indicator_report'].parent:
