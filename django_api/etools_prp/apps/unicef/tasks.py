@@ -435,7 +435,6 @@ def process_programme_documents(fast=False, area=False):
                                             loc,
                                             {
                                                 'name': loc['name'],
-                                                'gateway': loc['gateway'],
                                                 'p_code': loc['p_code'],
                                                 'admin_level': loc['admin_level'],
                                                 'location_type': loc['location_type'],
