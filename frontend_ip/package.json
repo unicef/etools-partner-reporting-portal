@@ -72,7 +72,7 @@
     "dayjs": "^1.10.7",
     "dexie": "^3.2.0",
     "@unicef-polymer/etools-piwik-analytics": "3.0.2",
-    "intl-messageformat": "^7.8.4",
+    "intl-messageformat": "^9.11.3",
     "leaflet": "^1.7.1",
     "lodash-es": "^4.17.21",
     "numeral": "^2.0.6",

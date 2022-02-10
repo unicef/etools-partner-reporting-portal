@@ -29,8 +29,7 @@
     "node_modules/web-animations-js/web-animations-next-lite.min.js",
     "node_modules/dayjs/dayjs.min.js",
     "node_modules/dayjs/plugin/utc.js",
-    "node_modules/numeral/min/numeral.min.js",
-    "node_modules/intl-messageformat/dist/umd/intl-messageformat.min.js"
+    "node_modules/numeral/min/numeral.min.js"
   ],
   "builds": [
     {
