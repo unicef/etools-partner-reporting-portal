@@ -99,7 +99,6 @@ You can find the most recent version of this guide [here](https://github.com/fac
   - [`npm run build` exits too early](#npm-run-build-exits-too-early)
   - [`npm run build` fails on Heroku](#npm-run-build-fails-on-heroku)
   - [`npm run build` fails to minify](#npm-run-build-fails-to-minify)
-  - [Moment.js locales are missing](#momentjs-locales-are-missing)
 - [Alternatives to Ejecting](#alternatives-to-ejecting)
 - [Something Missing?](#something-missing)
 
@@ -300,7 +299,7 @@ In the WebStorm menu `Run` select `Edit Configurations...`. Then click `+` and s
 
 Start your app by running `npm start`, then press `^D` on macOS or `F9` on Windows and Linux or click the green debug icon to start debugging in WebStorm.
 
-The same way you can debug your application in IntelliJ IDEA Ultimate, PhpStorm, PyCharm Pro, and RubyMine. 
+The same way you can debug your application in IntelliJ IDEA Ultimate, PhpStorm, PyCharm Pro, and RubyMine.
 
 ## Formatting Code Automatically
 
@@ -1675,7 +1674,7 @@ Use the following [`launch.json`](https://code.visualstudio.com/docs/editor/debu
       "name": "Debug CRA Tests",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",      
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
       "args": [
         "test",
         "--runInBand",
@@ -1989,7 +1988,7 @@ If you’re using [Apache HTTP Server](https://httpd.apache.org/), you need to c
     RewriteRule ^ index.html [QSA,L]
 ```
 
-It will get copied to the `build` folder when you run `npm run build`. 
+It will get copied to the `build` folder when you run `npm run build`.
 
 If you’re using [Apache Tomcat](http://tomcat.apache.org/), you need to follow [this Stack Overflow answer](https://stackoverflow.com/a/41249464/4878474).
 
@@ -2393,30 +2392,6 @@ If you are completely sure that you didn't terminate the process, consider [addi
 This may be a problem with case sensitive filenames.
 Please refer to [this section](#resolving-heroku-deployment-errors).
 
-### Moment.js locales are missing
-
-If you use a [Moment.js](https://momentjs.com/), you might notice that only the English locale is available by default. This is because the locale files are large, and you probably only need a subset of [all the locales provided by Moment.js](https://momentjs.com/#multiple-locale-support).
-
-To add a specific Moment.js locale to your bundle, you need to import it explicitly.<br>
-For example:
-
-```js
-import moment from 'moment';
-import 'moment/locale/fr';
-```
-
-If import multiple locales this way, you can later switch between them by calling `moment.locale()` with the locale name:
-
-```js
-import moment from 'moment';
-import 'moment/locale/fr';
-import 'moment/locale/es';
-
-// ...
-
-moment.locale('fr');
-```
-
 This will only work for locales that have been explicitly imported before.
 
 ### `npm run build` fails to minify
@@ -2429,7 +2404,7 @@ To resolve this:
 1. Open an issue on the dependency's issue tracker and ask that the package be published pre-compiled.
   * Note: Create React App can consume both CommonJS and ES modules. For Node.js compatibility, it is recommended that the main entry point is CommonJS. However, they can optionally provide an ES module entry point with the `module` field in `package.json`. Note that **even if a library provides an ES Modules version, it should still precompile other ES6 features to ES5 if it intends to support older browsers**.
 
-2. Fork the package and publish a corrected version yourself. 
+2. Fork the package and publish a corrected version yourself.
 
 3. If the dependency is small enough, copy it to your `src/` folder and treat it as application code.
 
