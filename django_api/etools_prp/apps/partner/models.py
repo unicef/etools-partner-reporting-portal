@@ -303,7 +303,7 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
     locations = instance.locations.all()
 
     if locations.exists():
-        loc_type = locations.first().gateway.admin_level
+        loc_type = locations.first().admin_level
         new_locations = Location.objects.filter(id__in=pk_set)
 
         for r in instance.reportables.all():
@@ -312,7 +312,7 @@ def sync_locations_for_pp_reportables(sender, instance, action, pk_set, **kwargs
             if not r_locations.exists():
                 return
 
-            r_loc_type = r_locations.first().gateway.admin_level
+            r_loc_type = r_locations.first().admin_level
 
             if loc_type == r_loc_type:
                 for loc in new_locations:

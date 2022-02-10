@@ -10,8 +10,8 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import GatewayType, Location, PRPRole, Workspace
-from etools_prp.apps.core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from etools_prp.apps.core.models import Location, PRPRole, Workspace
+from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
@@ -343,11 +343,11 @@ def process_programme_documents(fast=False, area=False):
                                 pdresultlink = process_model(
                                     PDResultLink, PMPPDResultLinkSerializer,
                                     rl, {
-                                            'external_id': rl['result_link'],
-                                            'external_cp_output_id': rl['id'],
-                                            'programme_document': pd.id,
-                                            'external_business_area_code': workspace.business_area_code,
-                                        }
+                                        'external_id': rl['result_link'],
+                                        'external_cp_output_id': rl['id'],
+                                        'programme_document': pd.id,
+                                        'external_business_area_code': workspace.business_area_code,
+                                    }
                                 )
 
                                 # Create LLO
@@ -409,9 +409,9 @@ def process_programme_documents(fast=False, area=False):
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
                                             i, {
-                                                    'external_id': i['blueprint_id'],
-                                                    'reportables__lower_level_outputs__cp_output__programme_document': pd.id
-                                                }
+                                                'external_id': i['blueprint_id'],
+                                                'reportables__lower_level_outputs__cp_output__programme_document': pd.id
+                                            }
                                         )
 
                                     locations = list()
@@ -419,8 +419,6 @@ def process_programme_documents(fast=False, area=False):
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
-                                        country = workspace.countries.first()
-                                        loc['gateway_country'] = country.id
 
                                         if loc['admin_level'] is None:
                                             logger.warning("Admin level empty! Skipping!")
@@ -430,30 +428,16 @@ def process_programme_documents(fast=False, area=False):
                                             logger.warning("Location code empty! Skipping!")
                                             continue
 
-                                        loc['location_type'] = '{}-Admin Level {}'.format(
-                                            country.country_short_code,
-                                            loc['admin_level']
-                                        )
-
-                                        gateway = process_model(
-                                            GatewayType,
-                                            PMPGatewayTypeSerializer,
-                                            loc,
-                                            {
-                                                'admin_level': loc['admin_level'],
-                                                'country': loc['gateway_country'],
-                                            },
-                                        )
-
                                         # Create location
-                                        loc['gateway'] = gateway.id
                                         location = process_model(
                                             Location,
                                             PMPLocationSerializer,
                                             loc,
                                             {
-                                                'gateway': loc['gateway'],
-                                                'p_code': loc['pcode'],
+                                                'name': loc['name'],
+                                                'p_code': loc['p_code'],
+                                                'admin_level': loc['admin_level'],
+                                                'location_type': loc['location_type'],
                                             }
                                         )
                                         locations.append(location)
@@ -477,9 +461,9 @@ def process_programme_documents(fast=False, area=False):
                                             disaggregation = process_model(
                                                 Disaggregation, PMPDisaggregationSerializer,
                                                 dis, {
-                                                        'name': dis['name'],
-                                                        'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
-                                                    }
+                                                    'name': dis['name'],
+                                                    'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
+                                                }
                                             )
                                             disaggregations.append(disaggregation)
 
@@ -509,9 +493,9 @@ def process_programme_documents(fast=False, area=False):
                                         Reportable,
                                         PMPReportableSerializer,
                                         i, {
-                                                'external_id': i['id'],
-                                                'lower_level_outputs__cp_output__programme_document': pd.id
-                                            }
+                                            'external_id': i['id'],
+                                            'lower_level_outputs__cp_output__programme_document': pd.id
+                                        }
                                     )
                                     reportable.active = i['is_active']
                                     partner_activity = None
@@ -550,9 +534,9 @@ def process_programme_documents(fast=False, area=False):
                                             )
 
                                             logger.info(
-                                                    "Created a new PartnerProject "
-                                                    "from PD: " + str(item['number'])
-                                                )
+                                                "Created a new PartnerProject "
+                                                "from PD: " + str(item['number'])
+                                            )
 
                                             pp.clusters.add(cai.content_object.cluster)
                                             pp.locations.add(*cai.locations.all())

@@ -26,6 +26,7 @@ from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.core.tests.factories import faker
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
@@ -59,14 +60,14 @@ def string_in_download(text, response):
 class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -83,7 +84,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -351,14 +352,14 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -375,7 +376,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -564,14 +565,14 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 class TestProgressReportAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -588,7 +589,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
@@ -1084,16 +1085,16 @@ class TestProgressReportAPIView(BaseAPITestCase):
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.workspace = factories.WorkspaceFactory()
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
         self.sample_disaggregation_value_map = {
@@ -1248,16 +1249,16 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
 class TestProgressReportAttachmentAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type)
+        self.workspace = factories.WorkspaceFactory()
+        self.carto_table = factories.CartoDBTableFactory()
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.partner_user = factories.PartnerUserFactory(partner=self.partner)
         factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
         self.sample_disaggregation_value_map = {
@@ -1419,11 +1420,8 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
 
 class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country])
-        self.partner = factories.PartnerFactory(
-            country_code=self.country.country_short_code,
-        )
+        self.workspace = factories.WorkspaceFactory()
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.PartnerUserFactory(partner=self.partner)
         self.prp_role = factories.IPPRPRoleFactory(
             user=self.user,
@@ -1478,11 +1476,11 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         )
         self.report_number += 1
         factories.ProgressReportIndicatorReportFactory(
-                progress_report=pr,
-                reportable=reportable,
-                report_status=INDICATOR_REPORT_STATUS.submitted,
-                overall_status=OVERALL_STATUS.met,
-            )
+            progress_report=pr,
+            reportable=reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+            overall_status=OVERALL_STATUS.met,
+        )
         return reportable, pr
 
     def test_get(self):
