@@ -569,8 +569,8 @@ class Location(MPTTModel):
 
     name = models.CharField(verbose_name=_("Name"), max_length=254)
 
-    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin Level Name'))
-    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'))
+    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin Level Name'), blank=True, null=True)
+    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'), blank=True, null=True)
     workspaces = models.ManyToManyField(Workspace, related_name='locations')
 
     latitude = models.FloatField(
