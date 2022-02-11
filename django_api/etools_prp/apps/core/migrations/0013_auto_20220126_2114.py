@@ -11,7 +11,7 @@ def migrate_workspace(apps, schema_editor):
         print(workspaces)
         assert workspaces == 1
         loc.workspaces.set(loc.gateway.country.workspaces.all())
-        loc.admin_level_name = loc.gateway.name
+        loc.admin_level_name = loc.gateway.name[4:]
         loc.admin_level = loc.gateway.admin_level
         loc.save()
 
