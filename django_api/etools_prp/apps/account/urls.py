@@ -1,17 +1,15 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from drfpasswordless.views import ObtainEmailCallbackToken
 
 from .views import LoginUserWithTokenAPIView, UserLogoutAPIView, UserProfileAPIView
 
 urlpatterns = [
-    url(r'^user-profile/$', UserProfileAPIView.as_view(), name="user-profile"),
-    url(r'^user-logout/$', UserLogoutAPIView.as_view(), name="user-logout"),
+    re_path(r'^user-profile/$', UserProfileAPIView.as_view(), name="user-profile"),
+    re_path(r'^user-logout/$', UserLogoutAPIView.as_view(), name="user-logout"),
 
-    url(r'^auth/login-with-token/$', LoginUserWithTokenAPIView.as_view(),
-        name='user-passwordless-login'),
+    re_path(r'^auth/login-with-token/$', LoginUserWithTokenAPIView.as_view(), name='user-passwordless-login'),
 
     # passwordless urls
-    url(r'^auth/get-token/$', ObtainEmailCallbackToken.as_view(),
-        name='user-passwordless-token'),
+    re_path(r'^auth/get-token/$', ObtainEmailCallbackToken.as_view(), name='user-passwordless-token'),
 ]

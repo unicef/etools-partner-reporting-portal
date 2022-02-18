@@ -13,16 +13,15 @@ from etools_prp.apps.core.tests.base import BaseAPITestCase
 
 class TestWorkspaceListAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.user = factories.NonPartnerUserFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         super().setUp()
 
@@ -33,8 +32,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             len(response.data),
-            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
-                countries__gateway_types__locations__isnull=False).distinct().count()
+            Workspace.objects.prefetch_related('locations').filter(
+                locations__isnull=False).distinct().count()
         )
 
         # Cluster system admin should also be able to query workspaces
@@ -48,8 +47,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             len(response.data),
-            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
-                countries__gateway_types__locations__isnull=False).distinct().count()
+            Workspace.objects.prefetch_related('locations').filter(
+                locations__isnull=False).distinct().count()
         )
 
     def test_api_filtering(self):
@@ -60,8 +59,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             len(response.data),
-            Workspace.objects.prefetch_related('countries__gateway_types__locations').filter(
-                countries__gateway_types__locations__isnull=False,
+            Workspace.objects.prefetch_related('locations').filter(
+                locations__isnull=False,
                 business_area_code=self.workspace.business_area_code,
                 workspace_code=self.workspace.workspace_code).distinct().count()
         )
@@ -69,16 +68,17 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
 
 class TestLocationListAPIView(BaseAPITestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.user = factories.NonPartnerUserFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.carto_table = factories.CartoDBTableFactory()
+        self.admin_level = 2
+        self.loc1 = factories.LocationFactory(admin_level=self.admin_level)
+        self.loc2 = factories.LocationFactory(admin_level=self.admin_level)
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         for _ in range(2):
             obj = factories.ClusterObjectiveFactory(
@@ -162,7 +162,7 @@ class TestLocationListAPIView(BaseAPITestCase):
             'location', kwargs={
                 'response_plan_id': self.response_plan.id})
         objective_ids = list(map(lambda x: str(x), self.cluster.cluster_objectives.values_list('id', flat=True)))
-        args = "?loc_type={}&cluster_objectives={}".format(self.loc_type.admin_level, ",".join(objective_ids))
+        args = "?loc_type={}&cluster_objectives={}".format(self.admin_level, ",".join(objective_ids))
         response = self.client.get(url + args, format='json')
 
         result = ResponsePlan.objects.filter(id=self.response_plan.id).values_list(
@@ -175,7 +175,7 @@ class TestLocationListAPIView(BaseAPITestCase):
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
         expected = Location.objects.filter(
             pk__in=pks,
-            gateway__admin_level=self.loc_type.admin_level,
+            admin_level=self.admin_level,
             cluster_objectives__in=objective_ids).count()
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -185,8 +185,7 @@ class TestLocationListAPIView(BaseAPITestCase):
 class TestResponsePlanAPIView(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.user = factories.NonPartnerUserFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)

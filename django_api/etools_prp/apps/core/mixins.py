@@ -64,28 +64,6 @@ def user_details(strategy, details, backend, user=None, *args, **kwargs):
         user.set_unusable_password()
         user.save()
 
-        # TODO: Not using country in profile for PRP at the moment. May need to re-evaluate
-        # def update_user_country():
-        #     try:
-        #         user.profile.country = Country.objects.get(business_area_code=business_area_code)
-
-        #     except Country.DoesNotExist:
-        #         user.profile.country = Country.objects.get(name='UAT')
-
-        # if not user.profile.country:
-        #     update_user_country()
-        #     updates_available = True
-
-        # elif not user.profile.country_override:
-        #     # make sure that we update the workspace based business area
-        #     if business_area_code != user.profile.country.business_area_code:
-        #         update_user_country()
-        #         updates_available = True
-
-        # if updates_available:
-        #     user.save()
-        #     user.profile.save()
-
     return social_core_user.user_details(strategy, details, backend, user, *args, **kwargs)
 
 

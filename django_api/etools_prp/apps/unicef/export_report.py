@@ -4,9 +4,11 @@ import re
 from django.conf import settings
 from django.db.models import Count
 
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Alignment, Font, NamedStyle, PatternFill
 from openpyxl.utils import get_column_letter
+from openpyxl.utils.exceptions import IllegalCharacterError
 from openpyxl.workbook.child import INVALID_TITLE_REGEX
 
 from etools_prp.apps.core import common
@@ -170,7 +172,7 @@ class ProgressReportXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=1).value = \
                     self.progress_report.programme_document.partner.title
                 self.sheet.cell(row=start_row_id, column=2).value = \
-                    location_data.location.gateway.country.name
+                    ', '.join([workspace.title for workspace in location_data.location.workspaces.all()])
                 self.sheet.cell(row=start_row_id, column=3).value = \
                     self.progress_report.programme_document.reference_number
                 self.sheet.cell(row=start_row_id, column=4).value = \
@@ -227,8 +229,12 @@ class ProgressReportXLSXExporter:
                     indicator.narrative_assessment
                 self.sheet.cell(row=start_row_id, column=19).fill = \
                     REQUIRED_FILL
-                self.sheet.cell(row=start_row_id, column=20).value = \
-                    indicator.reportable.blueprint.title
+                try:
+                    self.sheet.cell(row=start_row_id, column=20).value = \
+                        indicator.reportable.blueprint.title
+                except IllegalCharacterError:
+                    self.sheet.cell(row=start_row_id, column=20).value = \
+                        ILLEGAL_CHARACTERS_RE.sub(r'', indicator.reportable.blueprint.title)
                 self.sheet.cell(row=start_row_id, column=21).value = \
                     indicator.display_type
                 self.sheet.cell(row=start_row_id, column=22).value = \
@@ -243,13 +249,13 @@ class ProgressReportXLSXExporter:
                 # Iterate over location admin references:
                 location = location_data.location
                 while True:
-                    admin_level = location.gateway.admin_level
+                    admin_level = location.admin_level
                     # TODO: secure in case of wrong location data
                     admin_level = min(admin_level, 5)
                     self.sheet.cell(row=start_row_id, column=25 +
-                                    admin_level * 2).value = location.title
+                                    admin_level * 2).value = location.name
                     self.sheet.cell(row=start_row_id, column=25 +
-                                    admin_level * 2 - 1).value = location.gateway.name
+                                    admin_level * 2 - 1).value = location.admin_level_name
 
                     if location.parent:
                         location = location.parent

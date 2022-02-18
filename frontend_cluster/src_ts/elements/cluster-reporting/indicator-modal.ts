@@ -1313,12 +1313,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
             if (location.in_need.v > data.in_need.v) {
               invalidLocations.push(
-                'Location ' + location.title + ' has a greater in need than its indicator-level in need'
+                'Location ' + location.name + ' has a greater in need than its indicator-level in need'
               );
             }
           } else {
             invalidLocations.push(
-              'Location ' + location.title + ' does not have in need while indicator level in need exists'
+              'Location ' + location.name + ' does not have in need while indicator level in need exists'
             );
           }
         } else {
@@ -1327,15 +1327,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
         if (location.baseline.v > data.baseline.v) {
           invalidLocations.push(
-            'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
+            'Location ' + location.name + ' has a greater baseline than its indicator-level baseline'
           );
         }
         if (location.target.v > data.target.v) {
-          invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+          invalidLocations.push('Location ' + location.name + ' has a greater target than its indicator-level target');
         }
 
         if (location.in_need !== undefined && location.target.v > location.in_need.v) {
-          invalidLocations.push('Location ' + location.title + ' has a target greater than its in need');
+          invalidLocations.push('Location ' + location.name + ' has a target greater than its in need');
         }
 
         arr[idx] = location;
@@ -1361,12 +1361,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
             if (location.in_need.v > data.in_need.v) {
               invalidLocations.push(
-                'Location ' + location.title + ' has a greater in need than its indicator-level in need'
+                'Location ' + location.name + ' has a greater in need than its indicator-level in need'
               );
             }
           } else {
             invalidLocations.push(
-              'Location ' + location.title + ' does not have in need while indicator level in need exists'
+              'Location ' + location.name + ' does not have in need while indicator level in need exists'
             );
           }
         } else {
@@ -1375,15 +1375,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
         if (location.baseline.v > data.baseline.v) {
           invalidLocations.push(
-            'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
+            'Location ' + location.name + ' has a greater baseline than its indicator-level baseline'
           );
         }
         if (location.target.v > data.target.v) {
-          invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+          invalidLocations.push('Location ' + location.name + ' has a greater target than its indicator-level target');
         }
 
         if (location.in_need !== undefined && location.target.v > location.in_need.v) {
-          invalidLocations.push('Location ' + location.title + ' has a target greater than its in need');
+          invalidLocations.push('Location ' + location.name + ' has a target greater than its in need');
         }
 
         arr[idx] = location;
@@ -1409,12 +1409,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
             if (location.in_need.v > data.in_need.v) {
               invalidLocations.push(
-                'Location ' + location.title + ' has a greater in need than its indicator-level in need'
+                'Location ' + location.name + ' has a greater in need than its indicator-level in need'
               );
             }
           } else {
             invalidLocations.push(
-              'Location ' + location.title + ' does not have in need while indicator level in need exists'
+              'Location ' + location.name + ' does not have in need while indicator level in need exists'
             );
           }
         } else {
@@ -1423,15 +1423,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
         if (location.baseline.v > data.baseline.v) {
           invalidLocations.push(
-            'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
+            'Location ' + location.name + ' has a greater baseline than its indicator-level baseline'
           );
         }
         if (location.target.v > data.target.v) {
-          invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+          invalidLocations.push('Location ' + location.name + ' has a greater target than its indicator-level target');
         }
 
         if (location.in_need !== undefined && location.target.v > location.in_need.v) {
-          invalidLocations.push('Location ' + location.title + ' has a target greater than its in need');
+          invalidLocations.push('Location ' + location.name + ' has a target greater than its in need');
         }
 
         arr[idx] = location;
@@ -1466,12 +1466,12 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
             if (location.in_need.c > data.in_need.c) {
               invalidLocations.push(
-                'Location ' + location.title + ' has a greater in need than its indicator-level in need'
+                'Location ' + location.name + ' has a greater in need than its indicator-level in need'
               );
             }
           } else {
             invalidLocations.push(
-              'Location ' + location.title + ' does not have in need while indicator level in need exists'
+              'Location ' + location.name + ' does not have in need while indicator level in need exists'
             );
           }
         } else {
@@ -1480,15 +1480,15 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
 
         if (location.baseline.c > data.baseline.c) {
           invalidLocations.push(
-            'Location ' + location.title + ' has a greater baseline than its indicator-level baseline'
+            'Location ' + location.name + ' has a greater baseline than its indicator-level baseline'
           );
         }
         if (location.target.c > data.target.c) {
-          invalidLocations.push('Location ' + location.title + ' has a greater target than its indicator-level target');
+          invalidLocations.push('Location ' + location.name + ' has a greater target than its indicator-level target');
         }
 
         if (location.in_need !== undefined && location.target.c > location.in_need.c) {
-          invalidLocations.push('Location ' + location.title + ' has a target greater than its in need');
+          invalidLocations.push('Location ' + location.name + ' has a target greater than its in need');
         }
 
         arr[idx] = location;
@@ -1531,9 +1531,9 @@ class IndicatorModal extends LocalizeMixin(ModalMixin(UtilsMixin(ReduxConnectedE
     const changedLocations = rawLocations.map((location: GenericObject) => {
       if (location.location && location.location.id) {
         const id = location.location.id;
-        const title = location.location.title;
+        const name = location.location.name;
         location.location = id;
-        location.title = title;
+        location.name = name;
         return location;
       } else if (location.loc_type && !location.location) {
         this.set('errors', 'No location set - please set a location.');

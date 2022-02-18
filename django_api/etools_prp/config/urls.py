@@ -11,14 +11,14 @@ Class-based views
     2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
-    2. Import the include() function: from django.conf.urls import url, include
+    2. Import the include() function: from django.urls import url, include
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import include, re_path
 
 from rest_framework_swagger.views import get_swagger_view
 
@@ -27,29 +27,29 @@ from etools_prp.apps.core.views import HomeView, RedirectAppView, SocialLogoutVi
 schema_view = get_swagger_view(title='eTools PRP API')
 
 urlpatterns = [
-    url(r'^$', HomeView.as_view()),
-    url(r'^app/', RedirectAppView.as_view()),
-    url(r'^api/docs/', schema_view),
-    url(r'^api/admin/', admin.site.urls),
-    url(r'^api/core/', include('etools_prp.apps.core.urls')),
-    url(r'^api/account/', include('etools_prp.apps.account.urls')),
-    url(r'^api/indicator/', include('etools_prp.apps.indicator.urls')),
-    url(r'^api/partner/', include('etools_prp.apps.partner.urls')),
-    url(r'^api/unicef/', include('etools_prp.apps.unicef.urls')),
-    url(r'^api/cluster/', include('etools_prp.apps.cluster.urls')),
-    url(r'^api/ocha/', include('etools_prp.apps.ocha.urls')),
-    url(r'^api/id-management/', include('etools_prp.apps.id_management.urls')),
+    re_path(r'^$', HomeView.as_view()),
+    re_path(r'^app/', RedirectAppView.as_view()),
+    re_path(settings.DOCS_URL, schema_view),
+    re_path(r'^api/admin/', admin.site.urls),
+    re_path(r'^api/core/', include('etools_prp.apps.core.urls')),
+    re_path(r'^api/account/', include('etools_prp.apps.account.urls')),
+    re_path(r'^api/indicator/', include('etools_prp.apps.indicator.urls')),
+    re_path(r'^api/partner/', include('etools_prp.apps.partner.urls')),
+    re_path(r'^api/unicef/', include('etools_prp.apps.unicef.urls')),
+    re_path(r'^api/cluster/', include('etools_prp.apps.cluster.urls')),
+    re_path(r'^api/ocha/', include('etools_prp.apps.ocha.urls')),
+    re_path(r'^api/id-management/', include('etools_prp.apps.id_management.urls')),
 
     # Social auth urls
-    url(r'^social/unicef-logout/', SocialLogoutView.as_view()),
-    url(r'^social/', include('social_django.urls', namespace='social')),
-    url(r'^unauthorized/$', UnauthorizedView.as_view(), name="unauthorized"),
+    re_path(r'^social/unicef-logout/', SocialLogoutView.as_view()),
+    re_path(r'^social/', include('social_django.urls', namespace='social')),
+    re_path(r'^unauthorized/$', UnauthorizedView.as_view(), name="unauthorized"),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        re_path(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
     # Serving staticserve files for both dev and remote environments
@@ -58,10 +58,10 @@ if settings.DEBUG:
 elif settings.STATICFILES_STORAGE == 'django.contrib.staticfiles.storage.StaticFilesStorage':
     from django.views.static import serve
     urlpatterns += [
-        url(r'^api/static/(?P<path>.*)$', serve, {
+        re_path(r'^api/static/(?P<path>.*)$', serve, {
             'document_root': settings.STATIC_ROOT,
         }),
-        url(r'^api/media/(?P<path>.*)$', serve, {
+        re_path(r'^api/media/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
         }),
     ]

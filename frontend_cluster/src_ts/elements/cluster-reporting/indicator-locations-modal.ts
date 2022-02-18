@@ -158,7 +158,7 @@ class IndicatorLocationsModal extends ModalMixin(UtilsMixin(LocalizeMixin(ReduxC
                     <tr>
                       <td>Admin [[location.loc_type]]</td>
                       <td>
-                        <div class="text">[[location.title]]</div>
+                        <div class="text">[[location.name]]</div>
                       </td>
                       <td>
                         <json-field

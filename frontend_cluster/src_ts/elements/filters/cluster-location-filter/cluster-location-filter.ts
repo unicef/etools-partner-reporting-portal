@@ -32,7 +32,8 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
         label="[[localize('location')]]"
         name="location"
         value="[[value]]"
-        data="[[data]]">
+        data="[[data]]"
+        option-label="name">
     </searchable-dropdown-filter>
   </template>
   `;
@@ -72,7 +73,7 @@ class ClusterLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           [
             {
               id: '',
-              title: 'All'
+              name: 'All'
             }
           ].concat(res.data.results || [])
         );

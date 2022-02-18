@@ -172,7 +172,7 @@ class ReportableListPDFExporter(ProgressReportsMixin, ProgressReportDetailPDFExp
 
         return [
             [
-                HTMLTableHeader(current_data.location.title, colspan=3, klass='subsection'),
+                HTMLTableHeader(current_data.location.name, colspan=3, klass='subsection'),
             ],
             [
                 HTMLTableHeader('Reporting period'),

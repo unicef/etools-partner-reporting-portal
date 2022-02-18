@@ -7,7 +7,7 @@ from carto.exceptions import CartoException
 from carto.sql import SQLClient
 
 from etools_prp.apps.core.cartodb import EtoolsCartoNoAuthClient
-from etools_prp.apps.core.models import CartoDBTable, GatewayType
+from etools_prp.apps.core.models import CartoDBTable
 
 logger = logging.getLogger('locations.models')
 
@@ -49,17 +49,3 @@ class CartoDBTableForm(forms.ModelForm):
                 ))
 
         return self.cleaned_data
-
-
-class GatewayTypeModelForm(forms.ModelForm):
-    admin_level = forms.IntegerField(
-        min_value=1, max_value=10,
-    )
-
-    class Meta:
-        model = GatewayType
-        fields = (
-            'name',
-            'admin_level',
-            'country',
-        )
