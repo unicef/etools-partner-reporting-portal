@@ -424,7 +424,7 @@ def process_programme_documents(fast=False, area=False):
                                             logger.warning("Admin level empty! Skipping!")
                                             continue
 
-                                        if loc['pcode'] is None or not loc['pcode']:
+                                        if loc['p_code'] is None or not loc['p_code']:
                                             logger.warning("Location code empty! Skipping!")
                                             continue
 
