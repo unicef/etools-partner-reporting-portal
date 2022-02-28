@@ -227,6 +227,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
                 fields=[
                     "name",
                     "p_code",
+                    "admin_level"
                 ],
             )
         ]
