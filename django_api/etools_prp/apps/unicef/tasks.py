@@ -437,7 +437,7 @@ def process_programme_documents(fast=False, area=False):
                                                 'name': loc['name'],
                                                 'p_code': loc['p_code'],
                                                 'admin_level': loc['admin_level'],
-                                                'location_type': loc['location_type'],
+                                                'admin_level_name': loc['admin_level_name'],
                                             }
                                         )
                                         locations.append(location)
