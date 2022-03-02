@@ -118,10 +118,12 @@ class ProgressReportsXLSXExporter:
 
         if indicator_report.is_percentage:
             indicator_report_value_format = FORMAT_PERCENTAGE
-            achievement_in_reporting_period = indicator_report.total.get(ValueType.CALCULATED, 0)
-            total_cumulative_progress = indicator_report.reportable.achieved.get(
+            # fixing percent number format: 0.1 is equivalent to 10% in math, openpyxl works the same way
+            # e.g. a calculated value of 88.72 becomes 8872% on xls export, that's why it needs divided by 100
+            achievement_in_reporting_period = int(indicator_report.total.get(ValueType.CALCULATED, 0)) / 100
+            total_cumulative_progress = int(indicator_report.reportable.achieved.get(
                 ValueType.CALCULATED, 0
-            )
+            )) / 100
         else:
             indicator_report_value_format = None
             achievement_in_reporting_period = indicator_report.total.get(ValueType.VALUE, 0)
