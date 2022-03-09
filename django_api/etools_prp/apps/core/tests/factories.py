@@ -35,7 +35,7 @@ from etools_prp.apps.core.common import (
     SHARED_PARTNER_TYPE,
 )
 from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-from etools_prp.apps.core.models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from etools_prp.apps.core.models import CartoDBTable, Location, PRPRole, ResponsePlan, Workspace
 from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
@@ -246,15 +246,6 @@ class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
         model = PRPRole
 
 
-class CountryFactory(factory.django.DjangoModelFactory):
-    country_short_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
-    name = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.country_short_code])
-    long_name = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.country_short_code])
-
-    class Meta:
-        model = Country
-
-
 class WorkspaceFactory(factory.django.DjangoModelFactory):
     """
     Arguments:
@@ -284,67 +275,29 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('workspace_code', )
 
 
-class GatewayTypeFactory(factory.django.DjangoModelFactory):
-    """
-    Arguments:
-        country {Country} -- Country ORM objects
-
-    Ex) GatewayTypeFactory(country=country1)
-    """
-
-    name = factory.LazyAttribute(lambda o: "{}-Admin Level {}".format(o.country.country_short_code, o.admin_level))
-    admin_level = factory.Sequence(lambda n: "%d" % n)
-
-    # We are going to fill country manually
-    country = factory.SubFactory('etools_prp.apps.core.tests.factories.CountryFactory', gateway_type=None)
-
-    class Meta:
-        model = GatewayType
-        django_get_or_create = ('name', )
-
-
 class CartoDBTableFactory(factory.django.DjangoModelFactory):
-    """
-    Arguments:
-        location_type {GatewayType} -- GatewayType ORM objects
-        country {Country} -- Country ORM objects
-
-    Ex) CartoDBTableFactory(location_type=loc_type, country=country1)
-    """
     domain = 'example'
     table_name = factory.LazyFunction(faker.uuid4)
     display_name = factory.LazyFunction(faker.city)
-    # We are going to fill location type manually
-    location_type = factory.SubFactory('etools_prp.apps.core.tests.factories.GatewayTypeFactory', carto_db_table=None)
+    admin_level = factory.Sequence(lambda n: faker.random_number(4))
     name_col = factory.LazyFunction(faker.word)
     pcode_col = factory.LazyFunction(faker.word)
     parent_code_col = ''
     parent = None
-    # We are going to fill location type manually
-    country = factory.SubFactory('etools_prp.apps.core.tests.factories.CountryFactory', carto_db_table=None)
 
     class Meta:
         model = CartoDBTable
 
 
 class LocationFactory(factory.django.DjangoModelFactory):
-    """
-    Arguments:
-        gateway {GatewayType} -- GatewayType ORM objects
-        carto_db_table {Country} -- CartoDBTable ORM objects
-
-    Ex) LocationFactory(gateway=b, carto_db_table=c)
-    """
     external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     external_source = factory.LazyFunction(faker.text)
-    title = factory.LazyFunction(faker.city)
+    name = factory.LazyFunction(faker.city)
     # We are going to fill location type manually
-    gateway = factory.SubFactory('etools_prp.apps.core.tests.factories.GatewayTypeFactory', location=None)
-    # We are going to fill CartoDBTable manually
-    carto_db_table = factory.SubFactory('etools_prp.apps.core.tests.factories.CartoDBTableFactory', location=None)
     latitude = factory.LazyFunction(faker.latitude)
     longitude = factory.LazyFunction(faker.longitude)
-    p_code = factory.LazyAttribute(lambda o: "{}{}".format(o.gateway.country.country_short_code, faker.random_number(4)))
+    p_code = factory.LazyAttribute(lambda o: "{}{}".format(faker.country_code(), faker.random_number(4)))
+    admin_level = factory.Sequence(lambda n: faker.random_number(4))
     parent = None
     geom = factory.LazyFunction(create_fake_multipolygon)
     point = None
@@ -366,8 +319,8 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
             n + beginning_of_this_year.year,
         )
     )
-    start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1))
-    end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n-1) + datetime.timedelta(days=364))
+    start = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n - 1))
+    end = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(years=n - 1) + datetime.timedelta(days=364))
     plan_type = RESPONSE_PLAN_TYPE.hrp
     plan_custom_type_label = ""
     workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')

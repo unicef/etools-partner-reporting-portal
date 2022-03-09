@@ -128,7 +128,7 @@ class ProjectListTable extends DataTableMixin(
                 <div class="table-cell table-cell--text">
                   <project-status status="[[project.status]]"></project-status>
                 </div>
-                <div class="table-cell table-cell--text">[[_commaSeparatedDictValues(project.locations, 'title')]]</div>
+                <div class="table-cell table-cell--text">[[_commaSeparatedDictValues(project.locations, 'name')]]</div>
                 <div class="table-cell table-cell--text">
                   <template is="dom-if" if="[[project.is_ocha_imported]]">
                     <iron-icon icon="icons:check"></iron-icon>

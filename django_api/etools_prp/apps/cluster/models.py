@@ -120,8 +120,8 @@ class Cluster(TimeStampedExternalSourceModel):
     @cached_property
     def partner_activity_reportables_queryset(self):
         return Reportable.objects.filter(
-            Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster=self)
-            | Q(partner_activity_project_contexts__activity__cluster_objective__cluster=self)).distinct()
+            Q(partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster=self) |
+            Q(partner_activity_project_contexts__activity__cluster_objective__cluster=self)).distinct()
 
     @cached_property
     def latest_indicator_reports(self):

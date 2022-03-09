@@ -123,8 +123,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             Q(reportable__cluster_objectives__cluster__partner_projects__in=value_list) |
             Q(reportable__cluster_objectives__cluster_activities__partner_activities__projects__in=value_list) |
             Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects__in=value_list) |
-            Q(reportable__cluster_activities__partner_activities__projects__in=value_list)
-            |
+            Q(reportable__cluster_activities__partner_activities__projects__in=value_list) |
             Q(reportable__partner_activity_project_contexts__project__in=value_list) |
             Q(reportable__partner_projects__in=value_list)
         ).distinct()

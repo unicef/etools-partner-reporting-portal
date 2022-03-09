@@ -111,12 +111,12 @@ class UserListCreateAPIView(ListCreateAPIView):
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
 
         cluster_roles = (
-                PRP_ROLE_TYPES.cluster_system_admin,
-                PRP_ROLE_TYPES.cluster_imo,
-                PRP_ROLE_TYPES.cluster_member,
-                PRP_ROLE_TYPES.cluster_coordinator,
-                PRP_ROLE_TYPES.cluster_viewer,
-            )
+            PRP_ROLE_TYPES.cluster_system_admin,
+            PRP_ROLE_TYPES.cluster_imo,
+            PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_coordinator,
+            PRP_ROLE_TYPES.cluster_viewer,
+        )
 
         if portal_choice == 'CLUSTER':
             roles_in = cluster_roles

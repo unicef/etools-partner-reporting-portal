@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -7,7 +8,7 @@ from django.contrib.gis.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 import mptt
 import pycountry
@@ -21,6 +22,14 @@ from etools_prp.apps.utils.emails import send_email_from_template
 from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 
 logger = logging.getLogger('locations.models')
+
+
+def get_random_color():
+    return '#%02X%02X%02X' % (
+        random.randint(0, 255),
+        random.randint(0, 255),
+        random.randint(0, 255)
+    )
 
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
@@ -60,6 +69,7 @@ class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
         unique_together = ('external_id', 'external_source')
 
 
+# TODO remove me
 class Country(TimeStampedModel):
     """
     Represents a country which has many offices and sections.
@@ -173,17 +183,17 @@ class Workspace(TimeStampedExternalSourceModel):
     def __str__(self):
         return self.title
 
-    @property
-    def locations(self):
-        """
-        Returns a list of locations that belong to countries associated with
-        this workspace.
-        """
-        result = self.countries.all().values_list(
-            'gateway_types__locations').distinct()
-        pks = []
-        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
-        return Location.objects.filter(pk__in=pks)
+    # @property
+    # def locations(self):
+    #     """
+    #     Returns a list of locations that belong to countries associated with
+    #     this workspace.
+    #     """
+    #     result = self.countries.all().values_list(
+    #         'gateway_types__locations').distinct()
+    #     pks = []
+    #     [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+    #     return Location.objects.filter(pk__in=pks)
 
     @property
     def can_import_ocha_response_plans(self):
@@ -464,8 +474,8 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 
         if partner:
             indicator_reports = indicator_reports.filter(
-                Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
+                Q(reportable__partner_projects__partner=partner) |
+                Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
 
         if limit:
@@ -481,8 +491,8 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         indicator_reports = self._latest_indicator_reports(clusters)
         if partner:
             indicator_reports = indicator_reports.filter(
-                Q(reportable__partner_projects__partner=partner)
-                | Q(reportable__partner_activity_project_contexts__activity__partner=partner)
+                Q(reportable__partner_projects__partner=partner) |
+                Q(reportable__partner_activity_project_contexts__activity__partner=partner)
             )
         indicator_reports = indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.accepted,
@@ -497,21 +507,21 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         if not clusters or clusters == []:
             clusters = self.all_clusters
         qset = partner.partner_activities.filter(
-            Q(cluster_objective__cluster__in=clusters)
-            | Q(cluster_activity__cluster_objective__cluster__in=clusters)
+            Q(cluster_objective__cluster__in=clusters) |
+            Q(cluster_activity__cluster_objective__cluster__in=clusters)
         ).distinct()
         if limit:
             qset = qset[:limit]
         return qset
 
 
+# TODO Remove me
 class GatewayType(TimeStampedModel):
     """
     Represents an Admin Type in location-related models.
     """
 
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    display_name = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Display Name'))
     admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
     country = models.ForeignKey(
@@ -526,13 +536,13 @@ class GatewayType(TimeStampedModel):
         unique_together = ('country', 'admin_level')
 
     def __str__(self):
-        return '{} - {}'.format(self.country, self.name)
+        return '{} - {}'.format(self.name, self.admin_level)
 
 
 class LocationManager(TreeManager):
 
     def get_queryset(self):
-        return super().get_queryset().order_by('title').select_related('gateway')
+        return super().get_queryset()
 
 
 class Location(MPTTModel):
@@ -547,7 +557,6 @@ class Location(MPTTModel):
     related models:
         indicator.Reportable (ForeignKey): "reportable"
         core.Location (ForeignKey): "self"
-        core.GatewayType: "gateway"
     """
     external_id = models.CharField(
         help_text='An ID representing this instance in an external system',
@@ -558,40 +567,28 @@ class Location(MPTTModel):
 
     external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
 
-    title = models.CharField(max_length=255)
+    name = models.CharField(verbose_name=_("Name"), max_length=254)
 
-    gateway = models.ForeignKey(
-        GatewayType, verbose_name='Location Type', related_name='locations',  on_delete=models.CASCADE,
-    )
-    carto_db_table = models.ForeignKey(
-        'core.CartoDBTable',
-        related_name="locations",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
+    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin Level Name'), blank=True, null=True)
+    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'), blank=True, null=True)
+    workspaces = models.ManyToManyField(Workspace, related_name='locations')
 
-    latitude = models.DecimalField(
+    latitude = models.FloatField(
+        verbose_name=_("Latitude"),
         null=True,
         blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[
-            MinValueValidator(Decimal(-90)),
-            MaxValueValidator(Decimal(90))
-        ]
     )
-    longitude = models.DecimalField(
+    longitude = models.FloatField(
+        verbose_name=_("Longitude"),
         null=True,
         blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[
-            MinValueValidator(Decimal(-180)),
-            MaxValueValidator(Decimal(180))
-        ]
     )
-    p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
+    p_code = models.CharField(
+        verbose_name=_("P Code"),
+        max_length=32,
+        blank=True,
+        default='',
+    )
 
     parent = TreeForeignKey(
         'self',
@@ -608,19 +605,18 @@ class Location(MPTTModel):
     objects = LocationManager()
 
     class Meta:
-        unique_together = ('title', 'p_code')
-        ordering = ['title']
+        unique_together = ('name', 'p_code', 'admin_level')
+        ordering = ['name']
 
     def __str__(self):
         if self.p_code:
             return '{} ({} {})'.format(
-                self.title,
-                self.gateway.name,
-                "{}: {}".format(
-                    'CERD' if self.gateway.name == 'School' else 'PCode', self.p_code or ''
-                ))
+                self.name,
+                self.admin_level_name,
+                "{}: {}".format(self.admin_level, self.p_code or '')
+            )
 
-        return self.title
+        return self.name
 
     @property
     def geo_point(self):
@@ -634,42 +630,35 @@ class Location(MPTTModel):
         )
 
 
-class CartoDBTable(MPTTModel):
+class CartoDBTable(TimeStampedModel, MPTTModel):
     """
-    Represents a table in CartoDB, it is used to imports locations
-    related models:
-        core.GatewayType: 'gateway'
-        core.Country: 'country'
+    Represents a table in CartoDB, it is used to import locations
     """
 
     domain = models.CharField(max_length=254, verbose_name=_('Domain'))
+    api_key = models.CharField(max_length=254, verbose_name=_('API Key'))
     table_name = models.CharField(max_length=254, verbose_name=_('Table Name'))
     display_name = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Display Name'))
-    location_type = models.ForeignKey(
-        GatewayType, verbose_name=_('Location Type'),
-        on_delete=models.CASCADE,
-    )
+    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin level name'))
+    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'))
+
     name_col = models.CharField(max_length=254, default='name', verbose_name=_('Name Column'))
     pcode_col = models.CharField(max_length=254, default='pcode', verbose_name=_('Pcode Column'))
+    remap_table_name = models.CharField(max_length=254, verbose_name=_('Remap Table Name'), blank=True, null=True)
     parent_code_col = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Parent Code Column'))
     parent = TreeForeignKey(
         'self', null=True, blank=True, related_name='children', db_index=True,
         verbose_name=_('Parent'),
         on_delete=models.CASCADE,
     )
-
-    country = models.ForeignKey(
-        Country,
-        related_name="carto_db_tables",
-        on_delete=models.CASCADE,
-    )
-
-    class Meta:
-        verbose_name_plural = 'CartoDB tables'
+    color = models.CharField(blank=True, default=get_random_color, max_length=7, verbose_name=_('Color'))
 
     def __str__(self):
         return self.table_name
 
+    class Meta:
+        verbose_name_plural = 'CartoDB tables'
 
-mptt.register(Location, order_insertion_by=['title'])
+
+mptt.register(Location, order_insertion_by=['name'])
 mptt.register(CartoDBTable, order_insertion_by=['table_name'])

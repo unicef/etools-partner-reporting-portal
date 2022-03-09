@@ -11,7 +11,7 @@ from requests.status_codes import codes
 
 from etools_prp.apps.cluster.models import Cluster, ClusterObjective
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES
-from etools_prp.apps.core.models import Country, GatewayType, Location
+from etools_prp.apps.core.models import Location
 from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
@@ -140,43 +140,12 @@ def save_location_list(location_list, source_type):
                     ))
                     continue
 
-            if parent_loc:
-                country = parent_loc.gateway.country
-
-            elif 'adminLevel' in location_data \
-                    and location_data['adminLevel'] == 0:
-                country, _ = Country.objects.update_or_create(
-                    iso3_code=location_data['iso3'],
-                    defaults={
-                        'name': location_data['name']
-                    }
-                )
-
-            if not country:
-                logger.warning('Couldn\'t find country for {}, skipping: {}'.format(
-                    source_type, location_data
-                ))
-                continue
-
-            if 'adminLevel' not in location_data:
-                logger.warning('Couldn\'t find gateway for {}, skipping: {}'.format(
-                    source_type, location_data
-                ))
-                continue
-
-            gateway_name = '{}-Admin Level {}'.format(country.iso3_code, location_data['adminLevel'])
-            logger.debug('Saving gateway type with name {}'.format(gateway_name))
-            gateway, _ = GatewayType.objects.get_or_create(
-                country=country,
-                admin_level=location_data['adminLevel'],
-                name=gateway_name,
-            )
-
             loc_id = location_data['id'] if 'id' in location_data else location_data['external_id']
             loc_name = location_data['name'] if 'name' in location_data else location_data['title']
 
             location, _ = Location.objects.update_or_create(
-                gateway=gateway,
+                admin_level_name=location_data['iso3'],
+                admin_level=location_data['adminLevel'],
                 title=loc_name,
                 defaults={
                     'external_source': EXTERNAL_DATA_SOURCES.HPC,

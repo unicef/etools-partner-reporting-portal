@@ -8,13 +8,7 @@ from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
-from .models import Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
-
-
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = ('name', 'country_short_code', 'long_name')
+from .models import Location, PRPRole, ResponsePlan, Workspace
 
 
 class WorkspaceSimpleSerializer(serializers.ModelSerializer):
@@ -25,7 +19,6 @@ class WorkspaceSimpleSerializer(serializers.ModelSerializer):
 
 class WorkspaceSerializer(serializers.ModelSerializer):
 
-    countries = CountrySerializer(many=True)
     latitude = serializers.DecimalField(max_digits=8, decimal_places=5, coerce_to_string=False)
     longitude = serializers.DecimalField(max_digits=8, decimal_places=5, coerce_to_string=False)
 
@@ -37,42 +30,40 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'workspace_code',
             'latitude',
             'longitude',
-            'countries',
             'business_area_code',
             'can_import_ocha_response_plans',
         )
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    admin_level = serializers.CharField(source="gateway.admin_level")
-    title = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
-    def get_title(self, obj):
+    def get_name(self, obj):
         return "%s [%s - %s]" % (
-            obj.title,
-            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.name,
+            obj.admin_level_name,
             obj.p_code if obj.p_code else "n/a"
         )
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'latitude', 'longitude', 'p_code', 'admin_level')
+        fields = ('id', 'name', 'latitude', 'longitude', 'p_code', 'admin_level')
 
 
 class ShortLocationSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     admin_level = serializers.SerializerMethodField()
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'admin_level')
+        fields = ('id', 'name', 'admin_level')
 
-    def get_title(self, obj):
+    def get_name(self, obj):
         return "%s [%s - %s]" % (
-            obj.title,
-            obj.gateway.display_name if obj.gateway.display_name else obj.gateway.name,
+            obj.name,
+            obj.admin_level_name,
             obj.p_code if obj.p_code else "n/a"
         )
 
@@ -80,7 +71,7 @@ class ShortLocationSerializer(serializers.ModelSerializer):
         return str(obj.id)
 
     def get_admin_level(self, obj):
-        return obj.gateway.admin_level
+        return obj.admin_level
 
 
 class IdLocationSerializer(serializers.ModelSerializer):
@@ -167,8 +158,8 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
             })
 
         if validated_data['plan_type'] == RESPONSE_PLAN_TYPE.other \
-                and ('plan_custom_type_label' not in validated_data
-                     or validated_data['plan_custom_type_label'] == ''):
+                and ('plan_custom_type_label' not in validated_data or
+                     validated_data['plan_custom_type_label'] == ''):
             raise serializers.ValidationError({
                 'plan_custom_type_label': 'Plan custom type label is required when the type is other'
             })
@@ -225,40 +216,18 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPGatewayTypeSerializer(serializers.ModelSerializer):
-    gateway_country = serializers.PrimaryKeyRelatedField(
-        queryset=Country.objects.all(), source="country")
-    location_type = serializers.CharField(source='name')
-
-    class Meta:
-        model = GatewayType
-        fields = ('location_type', 'admin_level', 'gateway_country')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=GatewayType.objects.all(),
-                fields=[
-                    "gateway_country",
-                    "admin_level",
-                ],
-            )
-        ]
-
-
 class PMPLocationSerializer(serializers.ModelSerializer):
-    pcode = serializers.CharField(source='p_code')
-    name = serializers.CharField(source='title')
-    gateway = serializers.PrimaryKeyRelatedField(
-        queryset=GatewayType.objects.all())
 
     class Meta:
         model = Location
-        fields = ('name', 'pcode', 'gateway')
+        fields = ('name', 'p_code', 'admin_level_name', 'admin_level')
         validators = [
             UniqueTogetherValidator(
                 queryset=Location.objects.all(),
                 fields=[
                     "name",
-                    "pcode",
+                    "p_code",
+                    "admin_level"
                 ],
             )
         ]

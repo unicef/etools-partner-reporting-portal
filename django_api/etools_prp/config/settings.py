@@ -154,8 +154,8 @@ TEMPLATES = [
                 'social_django.context_processors.login_redirect',
             ],
             'loaders': [
-              'django.template.loaders.filesystem.Loader',
-              'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
             ],
         },
     },
@@ -493,16 +493,17 @@ elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
 if not DISABLE_JWT_AUTH:
-    public_key_text = open(os.path.join(BASE_DIR, 'keys/jwt/certificate.txt'), 'rb').read()  # noqa: F405
-    certificate = load_pem_x509_certificate(public_key_text, default_backend())
+    with open(os.path.join(BASE_DIR, 'keys/jwt/certificate.txt'), 'rb') as public_key:
+        public_key_text = public_key.read()  # noqa: F405
+        certificate = load_pem_x509_certificate(public_key_text, default_backend())
 
-    JWT_PUBLIC_KEY = certificate.public_key()
+        JWT_PUBLIC_KEY = certificate.public_key()
 
-    SIMPLE_JWT.update({  # noqa: F405
-        'SIGNING_KEY': SECRET_KEY,
-        'VERIFYING_KEY': JWT_PUBLIC_KEY,
-        'AUDIENCE': 'https://etools.unicef.org/',
-    })
+        SIMPLE_JWT.update({  # noqa: F405
+            'SIGNING_KEY': SECRET_KEY,
+            'VERIFYING_KEY': JWT_PUBLIC_KEY,
+            'AUDIENCE': 'https://etools.unicef.org/',
+        })
 
 AUTHENTICATION_BACKENDS = (
     'etools_prp.apps.core.mixins.CustomAzureADBBCOAuth2',
@@ -527,3 +528,5 @@ if DEBUG:
         'debug_toolbar',
     ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+
+DOCS_URL = 'api/docs/'

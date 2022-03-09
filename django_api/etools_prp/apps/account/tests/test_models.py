@@ -7,11 +7,7 @@ from etools_prp.apps.core.tests import factories
 
 class TestUser(TestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(
-            title=self.country.name,
-            countries=[self.country, ],
-        )
+        self.workspace = factories.WorkspaceFactory()
 
     def test_user_type(self):
         user = factories.PartnerUserFactory()

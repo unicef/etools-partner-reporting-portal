@@ -503,12 +503,12 @@ def send_notification_on_status_change(sender, instance, **kwargs):
         pr_url = urljoin(settings.FRONTEND_HOST, part_pr_url)
 
         template_data = {
-                'person': None,
-                'report': instance,
-                'pd': pd,
-                'pr_url': pr_url,
-                'status': instance.get_status_display()
-            }
+            'person': None,
+            'report': instance,
+            'pd': pd,
+            'pr_url': pr_url,
+            'status': instance.get_status_display()
+        }
 
         template_data['person'] = instance.submitting_user
         to_email_list = [template_data['person'].email]

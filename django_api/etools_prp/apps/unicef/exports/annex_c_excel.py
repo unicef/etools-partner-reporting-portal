@@ -33,7 +33,7 @@ class ProgressReportsXLSXExporter:
 
     general_info_headers = [
         'Partner Name',
-        'Country',
+        'Workspace',
         'PD Reference Number',
         'PD Title',
         'PD Output Title',
@@ -169,7 +169,7 @@ class ProgressReportsXLSXExporter:
 
         general_info_row = [
             (partner.title, None),
-            (location_data.location.gateway.country.name, None),
+            (', '.join([workspace.title for workspace in location_data.location.workspaces.all()]), None),
             (programme_document.reference_number, None),
             (programme_document.title, None),
             (indicator_report.reportable.content_object.title, None),
@@ -205,7 +205,7 @@ class ProgressReportsXLSXExporter:
         location = location_data.location
         while True:
             location_info.append([
-                location.title, location.p_code
+                location.name, location.p_code
             ])
 
             if location.parent:

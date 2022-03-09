@@ -8,6 +8,7 @@ from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data
 )
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
+from etools_prp.apps.core.tests.factories import faker
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData
 
@@ -15,16 +16,16 @@ from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocati
 class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.carto_table = factories.CartoDBTableFactory()
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -41,7 +42,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             ]
         )
 
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
 
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
@@ -376,16 +377,16 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
     def setUp(self):
-        self.country = factories.CountryFactory()
-        self.workspace = factories.WorkspaceFactory(countries=[self.country, ])
+        self.workspace = factories.WorkspaceFactory()
         self.response_plan = factories.ResponsePlanFactory(workspace=self.workspace)
         self.cluster = factories.ClusterFactory(type='cccm', response_plan=self.response_plan)
-        self.loc_type = factories.GatewayTypeFactory(country=self.country)
-        self.carto_table = factories.CartoDBTableFactory(location_type=self.loc_type, country=self.country)
+        self.carto_table = factories.CartoDBTableFactory()
         self.user = factories.NonPartnerUserFactory()
         self.prp_role = factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        self.loc1 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
-        self.loc2 = factories.LocationFactory(gateway=self.loc_type, carto_db_table=self.carto_table)
+        self.loc1 = factories.LocationFactory()
+        self.loc2 = factories.LocationFactory()
+        self.loc1.workspaces.add(self.workspace)
+        self.loc2.workspaces.add(self.workspace)
 
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
@@ -402,7 +403,7 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
             ]
         )
 
-        self.partner = factories.PartnerFactory(country_code=self.country.country_short_code)
+        self.partner = factories.PartnerFactory(country_code=faker.country_code())
 
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,

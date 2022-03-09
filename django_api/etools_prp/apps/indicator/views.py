@@ -309,6 +309,9 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
 
     def check_permissions(self, request):
         super().check_permissions(request)
+        if settings.DOCS_URL in request.path:
+            return
+
         reportable_id = self.kwargs.get('reportable_id')
         reportable = Reportable.objects.get(id=reportable_id)
         or_q_list = [

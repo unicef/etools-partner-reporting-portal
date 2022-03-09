@@ -3,35 +3,32 @@ from django.contrib.gis import admin
 from leaflet.admin import LeafletGeoAdmin
 
 from .cartodb import update_sites_from_cartodb
-from .forms import CartoDBTableForm, GatewayTypeModelForm
-from .models import CartoDBTable, Country, GatewayType, Location, PRPRole, ResponsePlan, Workspace
+from .forms import CartoDBTableForm
+from .models import CartoDBTable, Location, PRPRole, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     save_as = True
     fields = [
-        'title',
-        'gateway',
+        'name',
+        'admin_level_name',
+        'admin_level',
         'p_code',
         'parent',
         'geom',
         'point',
     ]
     list_filter = (
-        'gateway',
+        'admin_level_name',
+        'admin_level',
     )
-    list_display = ('title', 'parent', 'gateway', 'p_code',)
-    search_fields = ('title', 'p_code',)
-    raw_id_fields = ('parent', 'gateway')
+    list_display = ('name', 'parent', 'admin_level_name', 'admin_level', 'p_code',)
+    search_fields = ('name', 'p_code',)
+    raw_id_fields = ('parent', )
 
     def get_form(self, request, obj=None, **kwargs):
-        self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
+        self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point']
         return super().get_form(request, obj, **kwargs)
-
-
-class GatewayTypeAdmin(admin.ModelAdmin):
-    form = GatewayTypeModelForm
-    fields = ('name', 'admin_level', 'country')
 
 
 class CartoDBTableAdmin(admin.ModelAdmin):
@@ -41,12 +38,13 @@ class CartoDBTableAdmin(admin.ModelAdmin):
     list_display = (
         'domain',
         'table_name',
-        'location_type',
+        'admin_level_name',
+        'admin_level',
         'parent_table_name',
     )
 
     actions = ('import_sites',)
-    raw_id_fields = ('location_type', 'parent')
+    raw_id_fields = ('parent', )
 
     def parent_table_name(self, obj):
         return obj.parent.table_name if obj.parent else "No parent"
@@ -62,11 +60,6 @@ class WorkspaceAdmin(admin.ModelAdmin):
     list_filter = ('countries',)
     search_fields = ('title', 'workspace_code', 'business_area_code',
                      'external_id')
-
-
-class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'iso3_code', 'country_short_code')
-    search_fields = ('name', 'iso3_code', 'country_short_code')
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):
@@ -85,7 +78,5 @@ class PRPRoleAdmin(admin.ModelAdmin):
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
-admin.site.register(GatewayType)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
-admin.site.register(Country, CountryAdmin)
 admin.site.register(PRPRole, PRPRoleAdmin)
