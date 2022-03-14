@@ -432,10 +432,6 @@ class V1ResponsePlanImportSerializerTest(TestCase):
         self.assertTrue(serializer.is_valid(raise_exception=True))
         response_plan = serializer.save()
         self.assertEqual(response_plan.title, 'Sahel Regional 2015')
-        self.assertEqual(
-            len(response_plan_data['locations']),
-            response_plan.workspace.countries.count()
-        )
         self.assertEqual(response_plan.workspace.title, 'Sahel 2014-2016')
         self.assertEqual(
             len(response_plan_data['governingEntities']),
@@ -453,10 +449,6 @@ class V1ResponsePlanImportSerializerTest(TestCase):
         self.assertTrue(serializer.is_valid(raise_exception=True))
         response_plan = serializer.save()
         self.assertEqual(response_plan.title, 'Chad 2013')
-        self.assertEqual(
-            len(response_plan_data['locations']),
-            response_plan.workspace.countries.count()
-        )
         self.assertEqual(response_plan.workspace.title, 'Chad')
         self.assertEqual(
             len(response_plan_data['governingEntities']),
