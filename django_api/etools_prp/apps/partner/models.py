@@ -15,6 +15,7 @@ from etools_prp.apps.core.common import (
     SHARED_PARTNER_TYPE,
 )
 from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
+from etools_prp.apps.core.encoders import CustomJSONEncoder
 from etools_prp.apps.core.fields import UniqueNullCharField
 from etools_prp.apps.core.models import TimeStampedExternalSourceModel
 
@@ -231,7 +232,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
-    custom_fields = models.JSONField(default=list, blank=True, null=True)
+    custom_fields = models.JSONField(default=list, blank=True, null=True, encoder=CustomJSONEncoder)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(

@@ -24,6 +24,7 @@ from etools_prp.apps.core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     REPORTING_TYPES,
 )
+from etools_prp.apps.core.encoders import CustomJSONEncoder
 from etools_prp.apps.core.models import TimeStampedExternalSourceModel
 from etools_prp.apps.indicator.constants import ValueType
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
@@ -241,9 +242,9 @@ class Reportable(TimeStampedExternalSourceModel):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = models.JSONField(default=default_value)
-    baseline = models.JSONField(default=default_value)
-    in_need = models.JSONField(blank=True, null=True)
+    target = models.JSONField(default=default_value, encoder=CustomJSONEncoder)
+    baseline = models.JSONField(default=default_value, encoder=CustomJSONEncoder)
+    in_need = models.JSONField(blank=True, null=True, encoder=CustomJSONEncoder)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
     comments = models.TextField(max_length=4048, blank=True, null=True)
@@ -260,7 +261,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = models.JSONField(default=default_total)
+    total = models.JSONField(default=default_total, encoder=CustomJSONEncoder)
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -303,7 +304,7 @@ class Reportable(TimeStampedExternalSourceModel):
         models.DateField(), default=list, null=True, blank=True
     )
     location_admin_refs = ArrayField(
-        models.JSONField(), default=list, null=True, blank=True
+        models.JSONField(encoder=CustomJSONEncoder), default=list, null=True, blank=True
     )
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
@@ -633,9 +634,9 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = models.JSONField(default=default_value)
-    baseline = models.JSONField(default=default_value)
-    in_need = models.JSONField(blank=True, null=True)
+    target = models.JSONField(default=default_value, encoder=CustomJSONEncoder)
+    baseline = models.JSONField(default=default_value, encoder=CustomJSONEncoder)
+    in_need = models.JSONField(blank=True, null=True, encoder=CustomJSONEncoder)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -685,7 +686,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = models.JSONField(default=default_total)
+    total = models.JSONField(default=default_total, encoder=CustomJSONEncoder)
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -1068,7 +1069,7 @@ class IndicatorLocationData(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    disaggregation = models.JSONField(default=default_disaggregation)
+    disaggregation = models.JSONField(default=default_disaggregation, encoder=CustomJSONEncoder)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)

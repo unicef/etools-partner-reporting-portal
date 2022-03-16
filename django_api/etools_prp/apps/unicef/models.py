@@ -29,6 +29,7 @@ from etools_prp.apps.core.common import (
     REPORTING_TYPES,
     SR_TYPE,
 )
+from etools_prp.apps.core.encoders import CustomJSONEncoder
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
@@ -240,7 +241,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         verbose_name='Funds received %'
     )
 
-    amendments = models.JSONField(default=list)
+    amendments = models.JSONField(default=list, encoder=CustomJSONEncoder)
 
     # TODO:
     # cron job will create new report with due period !!!
