@@ -22,8 +22,8 @@ class ProgressReportsToolbar extends UtilsMixin(ReduxConnectedElement) {
 
       <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
         <template is="dom-if" if="[[canExport]]" restamp="true">
-          <download-button url="[[pdfExportUrl]]">PDF</download-button>
-          <download-button url="[[xlsExportUrl]]">XLS</download-button>
+          <download-button url="[[pdfExportUrl]]" tracker="Progress Reports Export Pdf">PDF</download-button>
+          <download-button url="[[xlsExportUrl]]" tracker="Progress Reports Export Xls">XLS</download-button>
         </template>
       </etools-prp-toolbar>
     `;
