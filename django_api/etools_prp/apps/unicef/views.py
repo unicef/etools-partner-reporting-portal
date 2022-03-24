@@ -1090,7 +1090,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         data = {'ll_outputs_and_indicators': []}
         for llo in pd.lower_level_outputs:
             indicator_blueprints = []
-            for reportable in llo.reportables.filter(active=True):
+            for reportable in llo.reportables.all():
                 indicator_blueprints.append(reportable.blueprint)
 
             inner_data = {
