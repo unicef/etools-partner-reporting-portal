@@ -132,6 +132,12 @@ class PdOutput extends LocalizeMixin(
         /* indicator-details {
         padding-top: 15px;
       } */
+
+        .indicatorType {
+          font-weight: 600;
+          font-size: 16px;
+          margin-right: 4px;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -182,8 +188,13 @@ class PdOutput extends LocalizeMixin(
                     </report-status>
                   </div>
                   <div>
-                    <h3>[[indicator.reportable.blueprint.title]]</h3>
-
+                    <div class="layout horizontal">
+                      <label class="indicatorType"
+                        >[[getIndicatorDisplayType(indicator.reportable.blueprint.unit,
+                        indicator.reportable.blueprint.display_type)]]</label
+                      >
+                      <h3>[[indicator.reportable.blueprint.title]]</h3>
+                    </div>
                     <dl class="layout horizontal">
                       <dt>
                         <a href="[[calculationMethodUrl]]"
@@ -470,6 +481,26 @@ class PdOutput extends LocalizeMixin(
     this.shadowRoot!.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
       section.opened = false;
     });
+  }
+
+  getIndicatorDisplayType(unit: string, displayType: string) {
+    if (!unit) {
+      return '';
+    }
+
+    switch (unit) {
+      case 'number':
+        return '# ';
+      case 'percentage':
+        if (displayType === 'percentage') {
+          return '% ';
+        } else if (displayType === 'ratio') {
+          return '÷ ';
+        }
+        return '';
+      default:
+        return '';
+    }
   }
 }
 
