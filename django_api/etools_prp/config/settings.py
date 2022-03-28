@@ -534,3 +534,8 @@ if DEBUG:
 DOCS_URL = 'api/docs/'
 
 UNICEF_LOCATIONS_MODEL = 'core.Location'
+
+# Matomo settings
+MATOMO_HOST_URL = env('MATOMO_HOST_URL', default='https://unisitetracker.unicef.io/')
+MATOMO_TRACKER_URL = env('MATOMO_TRACKER_URL', default='matomo.php')
+MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)
