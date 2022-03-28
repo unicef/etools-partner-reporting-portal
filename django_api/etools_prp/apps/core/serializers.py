@@ -31,7 +31,6 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'business_area_code',
-            'can_import_ocha_response_plans',
         )
 
 
