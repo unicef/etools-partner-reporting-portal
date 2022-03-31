@@ -5,9 +5,9 @@ from django.core.exceptions import ValidationError
 
 from carto.exceptions import CartoException
 from carto.sql import SQLClient
+from unicef_locations.models import CartoDBTable
 
 from etools_prp.apps.core.cartodb import EtoolsCartoNoAuthClient
-from etools_prp.apps.core.models import CartoDBTable
 
 logger = logging.getLogger('locations.models')
 
