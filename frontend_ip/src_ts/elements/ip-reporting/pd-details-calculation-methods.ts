@@ -89,6 +89,11 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
         .buttons {
           margin: 1em 0;
         }
+
+        .missing-indicator {
+          margin-left: 40px;
+          font-weight: normal;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -126,6 +131,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
               <etools-data-table-row class="pd-output" no-collapse>
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">[[item.text]]</div>
+                </div>
+              </etools-data-table-row>
+            </template>
+            <template is="dom-if" if="[[_equals(item.type, 'missingIndicators')]]" restamp="true">
+              <etools-data-table-row class="pd-output" no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell table-cell--text missing-indicator">[[localize(item.text)]]</div>
                 </div>
               </etools-data-table-row>
             </template>

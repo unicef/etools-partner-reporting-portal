@@ -1,10 +1,11 @@
 from django.contrib.gis import admin
 
 from leaflet.admin import LeafletGeoAdmin
+from unicef_locations.models import CartoDBTable
 
 from .cartodb import update_sites_from_cartodb
 from .forms import CartoDBTableForm
-from .models import CartoDBTable, Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRole, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -57,7 +58,6 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 class WorkspaceAdmin(admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
-    list_filter = ('countries',)
     search_fields = ('title', 'workspace_code', 'business_area_code',
                      'external_id')
 
@@ -78,5 +78,6 @@ class PRPRoleAdmin(admin.ModelAdmin):
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
+admin.site.unregister(CartoDBTable)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(PRPRole, PRPRoleAdmin)
