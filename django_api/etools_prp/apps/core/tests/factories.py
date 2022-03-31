@@ -11,6 +11,7 @@ import factory
 from dateutil.relativedelta import relativedelta
 from factory import fuzzy
 from faker import Faker
+from unicef_locations.models import CartoDBTable
 
 from etools_prp.apps.account.models import User, UserProfile
 from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
@@ -35,7 +36,7 @@ from etools_prp.apps.core.common import (
     SHARED_PARTNER_TYPE,
 )
 from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-from etools_prp.apps.core.models import CartoDBTable, Location, PRPRole, ResponsePlan, Workspace
+from etools_prp.apps.core.models import Location, PRPRole, ResponsePlan, Workspace
 from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
@@ -260,15 +261,6 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
     latitude = factory.LazyFunction(faker.latitude)
     longitude = factory.LazyFunction(faker.longitude)
     initial_zoom = 10
-
-    @factory.post_generation
-    def countries(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for country in extracted:
-                self.countries.add(country)
 
     class Meta:
         model = Workspace
