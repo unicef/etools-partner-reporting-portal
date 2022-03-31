@@ -12,6 +12,13 @@ export function computeFormattedData(data: GenericObject) {
       text: curr.ll_output.title
     });
 
+    if (!curr.indicators.length) {
+      acc.push({
+        type: 'missingIndicators',
+        text: 'missing_active_indicators'
+      });
+    }
+
     const items = curr.indicators.map(function (indicator: GenericObject) {
       return {
         type: 'data',
