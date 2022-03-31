@@ -48,8 +48,8 @@ jobs:
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
           DEPLOY_BRANCHES: 'develop|staging|master'
-      - image: circleci/redis:6-alpine
-      - image: circleci/postgres:12-alpine-postgis
+      - image: cimg/redis:6.2
+      - image: cimg/postgres:12.9-postgis
         environment:
           PGUSER: postgres
           POSTGRES_DB: test_prp
@@ -235,6 +235,7 @@ jobs:
           command: |
             TAG=${CIRCLE_BRANCH}
             docker build -t unicef/etools-prp-id-management-frontend:$TAG -f Dockerfile-bundle .
+          no_output_timeout: 17m
       - run:
           name: Pushing to Docker Hub
           command: |
