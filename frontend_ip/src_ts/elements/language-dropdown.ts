@@ -9,6 +9,7 @@ import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import {localizeSet} from '../redux/actions/localize';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 
 /**
  * @polymer
@@ -16,7 +17,7 @@ import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
  * @mixinFunction
  * @appliesMixin LocalizeMixin
  */
-class LanguageDropdown extends ReduxConnectedElement {
+class LanguageDropdown extends MatomoMixin(ReduxConnectedElement) {
   public static get template() {
     return html` <style>
         :host {
@@ -78,6 +79,7 @@ class LanguageDropdown extends ReduxConnectedElement {
           slot="dropdown-content"
           class="dropdown-content"
           on-iron-select="_languageSelected"
+          tracker="Language change"
           selected="[[selected]]"
         >
           <template id="repeat" is="dom-repeat" items="[[data]]">
@@ -113,6 +115,7 @@ class LanguageDropdown extends ReduxConnectedElement {
     if (newLanguage === this.current) {
       return;
     }
+    this.trackAnalytics(e);
     this._storeSelectedLanguage(newLanguage);
   }
 
