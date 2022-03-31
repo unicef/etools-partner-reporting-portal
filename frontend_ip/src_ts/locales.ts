@@ -210,6 +210,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'Financial contribution during reporting period',
     challenges_bottlenecks: 'Challenges/bottlenecks in the reporting period (latest)',
     proposed_way_forward: 'Proposed way forward (latest)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'latest',
     face: 'FACE',
     other: 'Other',
@@ -688,6 +690,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'Financial contribution during reporting period',
     challenges_bottlenecks: "Défis/goulots d'étranglement au cours de la période de reporting (dernier en date)",
     proposed_way_forward: 'Proposition de voie à suivre (dernière en date)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'dernière',
     face: 'FACE',
     other: 'Autre',
@@ -1170,6 +1174,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'Financial contribution during reporting period',
     challenges_bottlenecks: 'Retos/ cuellos de botella en el período del informe (más reciente)',
     proposed_way_forward: 'Camino a seguir propuesto (último)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'último',
     face: 'FACE',
     other: 'Otro',
@@ -1654,6 +1660,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'Financial contribution during reporting period',
     challenges_bottlenecks: 'Трудности/помехи в течении отчетного периода (последний)',
     proposed_way_forward: 'Предлагаемые дальнейшие шаги (последние)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'последние',
     face: 'Форма подтверждения финансирования и свидельства о расходах',
     other: 'Другое',
@@ -2139,6 +2147,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'Financial contribution during reporting period',
     challenges_bottlenecks: 'Desafios / estrangulamentos no período de referência (último)',
     proposed_way_forward: 'Proposta de encaminhamento (mais recente)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'mais recente',
     face: 'FACE',
     other: 'Outros',
@@ -2617,6 +2627,8 @@ export const locales = {
     financial_contribution_during_reporting_period: 'المساهمة المالية خلال الفترة المشمولة بالتقرير',
     challenges_bottlenecks: 'التحديات/الصعوبات في الفترة المشمولة بالتقرير (الأحدث)',
     proposed_way_forward: 'الطريقة المقترحة للمضي قدما (الاحدث)',
+    face_form_submitted:
+      'Thank you for completing your narrative progress report! Please ensure that your organization has also submitted the FACE form to UNICEF to report on the expenditure of funds.',
     latest: 'الأحدث',
     face: 'استمارة الإذن بالصرف وشهادة الإنفاق',
     other: 'أخرى',
