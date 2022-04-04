@@ -49,7 +49,7 @@ export function bucketByLocation(data: any[]) {
       } else {
         const newDict: GenericObject = {reportInfo: {}};
         newDict[timeframe] = locationReport;
-        newDict.name = locationReport.location.title;
+        newDict.name = locationReport.location.name;
         newDict.reportInfo[timeframe] = report;
         locations[locationReport.location.id] = newDict;
       }

@@ -109,6 +109,12 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
             display: none;
           }
         }
+        .face-form-message {
+          color: var(--theme-primary-color);
+          font-size: 16px;
+          font-style: italic;
+          margin: 10px 80px 0 0;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -209,6 +215,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   maxlength="2000"
                 >
                 </paper-input>
+                <div class="face-form-message">[[localize('face_form_submitted')]]</div>
               </template>
             </labelled-item>
           </div>
@@ -221,9 +228,12 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
             </template>
           </div>
 
-          <div class="row">
-            <report-attachments readonly="[[_equals(computedMode, 'view')]]"> </report-attachments>
-          </div>
+          <!-- Hide FACE Attachments for now -->
+          <!--
+            <div class="row">
+              <report-attachments readonly="[[_equals(computedMode, 'view')]]"> </report-attachments>
+            </div>
+          -->
         </div>
       </etools-content-panel>
     `;
