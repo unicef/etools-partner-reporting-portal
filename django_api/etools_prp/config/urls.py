@@ -22,7 +22,7 @@ from django.urls import include, re_path
 
 from rest_framework_swagger.views import get_swagger_view
 
-from etools_prp.apps.core.views import HomeView, RedirectAppView, SocialLogoutView, UnauthorizedView
+from etools_prp.apps.core.views import HomeView, RedirectAppView, UnauthorizedView
 
 schema_view = get_swagger_view(title='eTools PRP API')
 
@@ -41,7 +41,7 @@ urlpatterns = [
     re_path(r'^api/id-management/', include('etools_prp.apps.id_management.urls')),
 
     # Social auth urls
-    re_path(r'^social/unicef-logout/', SocialLogoutView.as_view()),
+    re_path(r'^security/', include('unicef_security.urls')),
     re_path(r'^social/', include('social_django.urls', namespace='social')),
     re_path(r'^unauthorized/$', UnauthorizedView.as_view(), name="unauthorized"),
 ]

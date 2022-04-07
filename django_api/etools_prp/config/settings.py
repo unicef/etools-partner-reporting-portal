@@ -10,6 +10,8 @@ from cryptography.x509 import load_pem_x509_certificate
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
+import etools_prp
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 
@@ -36,10 +38,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-DOMAIN_NAME = env('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
+DOMAIN_NAME = env('DOMAIN_NAME', default='localhost:8081')  # 'www.partnerreportingportal.org'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(",")
-
+HOST = DOMAIN_NAME
 
 FRONTEND_HOST = env(
     'PRP_FRONTEND_HOST',
@@ -100,9 +102,9 @@ INSTALLED_APPS = [
     'leaflet',
     'django_cron',
     'social_django',
-
+    'unicef_djangolib',
     'unicef_locations',
-
+    'unicef_security',
     'etools_prp.apps.account',
     'etools_prp.apps.cluster',
     'etools_prp.apps.core',
@@ -122,7 +124,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'etools_prp.apps.core.mixins.CustomSocialAuthExceptionMiddleware',
+    'unicef_security.middleware.UNICEFSocialAuthExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -423,8 +425,9 @@ SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_PASSWORD_RESET_POLICY = env('AZURE_B2C_PASS_RESET_POLICY', default="B2C_1_PasswordResetPolicy")
 POLICY = env('AZURE_B2C_POLICY_NAME', default="b2c_1A_UNICEF_PARTNERS_signup_signin")
 
-TENANT_ID = env('AZURE_B2C_TENANT', default='unicefpartners')
-TENANT_B2C_URL = f'{TENANT_ID}.b2clogin.com'
+TENANT_NAME = env('TENANT_NAME', default='unicefpartners')
+TENANT_ID = f'{TENANT_NAME}.onmicrosoft.com'
+TENANT_B2C_URL = f'{TENANT_NAME}.b2clogin.com'
 
 
 SCOPE = ['openid', 'email']
@@ -443,7 +446,7 @@ LOGOUT_URL = "/api/account/user-logout/"
 
 SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.social_auth.social_details',
-    'etools_prp.apps.core.mixins.social_details',
+    'unicef_security.pipeline.social_details',
     'social_core.pipeline.social_auth.social_uid',
     # allows based on emails being listed in 'WHITELISTED_EMAILS' or 'WHITELISTED_DOMAINS'
     'social_core.pipeline.social_auth.auth_allowed',
@@ -455,7 +458,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     # 'social_core.pipeline.user.user_details',
-    'etools_prp.apps.core.mixins.user_details',
+    'unicef_security.pipeline.user_details',
 )
 
 
@@ -517,7 +520,7 @@ if not DISABLE_JWT_AUTH:
         })
 
 AUTHENTICATION_BACKENDS = (
-    'etools_prp.apps.core.mixins.CustomAzureADBBCOAuth2',
+    'unicef_security.backends.UNICEFAzureADB2COAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -543,3 +546,6 @@ if DEBUG:
 DOCS_URL = 'api/docs/'
 
 UNICEF_LOCATIONS_MODEL = 'core.Location'
+
+PROJECT_NAME = etools_prp.NAME
+PROJECT_VERSION = etools_prp.VERSION
