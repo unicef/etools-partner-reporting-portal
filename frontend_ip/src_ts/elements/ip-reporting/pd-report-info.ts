@@ -215,7 +215,10 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   maxlength="2000"
                 >
                 </paper-input>
-                <div class="face-form-message">[[localize('face_form_submitted')]]</div>
+
+                <template is="dom-if" if="[[showFaceMessage]]">
+                  <div class="face-form-message">[[localize('face_form_submitted')]]</div>
+                </template>
               </template>
             </labelled-item>
           </div>
@@ -228,12 +231,9 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
             </template>
           </div>
 
-          <!-- Hide FACE Attachments for now -->
-          <!--
-            <div class="row">
-              <report-attachments readonly="[[_equals(computedMode, 'view')]]"> </report-attachments>
-            </div>
-          -->
+          <div class="row">
+            <report-attachments readonly="[[_equals(computedMode, 'view')]]"></report-attachments>
+          </div>
         </div>
       </etools-content-panel>
     `;
@@ -247,6 +247,9 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
 
   @property({type: Boolean})
   noHeader!: boolean;
+
+  @property({type: Boolean})
+  showFaceMessage!: boolean;
 
   @property({type: Object, computed: '_reportInfoCurrent(rootState)'})
   data!: GenericObject;
@@ -353,14 +356,20 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     super.connectedCallback();
 
     this.set('localData', {});
+    this.addEventListener('attachments-loaded', this.attachmentsLoaded as any);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
+    this.removeEventListener('error', this.attachmentsLoaded as any);
     if (this.updateDebouncer && this.updateDebouncer.isActive()) {
       this.updateDebouncer.cancel();
     }
+  }
+
+  attachmentsLoaded(e: CustomEvent) {
+    this.set('showFaceMessage', !e.detail.hasFaceAttachment);
   }
 }
 
