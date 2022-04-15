@@ -1191,8 +1191,8 @@ class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
             raise ValidationError('This progress report already has 1 FACE attachment')
 
         if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 2:
-            raise ValidationError('This progress report already has 2 Other attachments')
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
+            raise ValidationError('This progress report already has 3 Other attachments')
 
         serializer.save(progress_report_id=self.kwargs['progress_report_id'])
 
