@@ -21,8 +21,8 @@ class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
       </style>
 
       <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
-        <download-button url="[[xlsExportUrl]]">XLS</download-button>
-        <download-button url="[[pdfExportUrl]]">PDF</download-button>
+        <download-button url="[[xlsExportUrl]]" tracker="Indicators Export Xls">XLS</download-button>
+        <download-button url="[[pdfExportUrl]]" tracker="Indicators Export Pdf">PDF</download-button>
       </etools-prp-toolbar>
     `;
   }

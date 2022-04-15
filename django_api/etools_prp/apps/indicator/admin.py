@@ -64,7 +64,7 @@ class IndicatorLocationDataAdmin(admin.ModelAdmin):
     list_display = ('indicator_report', 'location', 'num_disaggregation',
                     'level_reported')
     list_filter = ('num_disaggregation', 'level_reported',)
-    search_fields = ('indicator_report__title', 'location__title')
+    search_fields = ('indicator_report__title', 'location__name')
     raw_id_fields = ['location', 'indicator_report']
 
 

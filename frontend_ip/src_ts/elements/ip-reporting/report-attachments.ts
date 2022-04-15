@@ -37,7 +37,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
         #face-container,
         #other-one-container,
-        #other-two-container {
+        #other-two-container,
+        #other-three-container {
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -53,21 +54,23 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
 
       <etools-prp-ajax id="delete" method="delete" url="[[attachmentDeleteUrl]]"> </etools-prp-ajax>
 
-      <div id="face-container">
-        <etools-file
-          id="faceAttachmentComponent"
-          files="{{faceAttachment}}"
-          label="[[localize('face')]]"
-          disabled="[[pending]]"
-          readonly="[[readonly]]"
-          use-delete-events
-        >
-        </etools-file>
+      <template is="dom-if" if="[[showFace]]">
+        <div id="face-container">
+          <etools-file
+            id="faceAttachmentComponent"
+            files="{{faceAttachment}}"
+            label="[[localize('face')]]"
+            disabled="[[pending]]"
+            readonly="[[readonly]]"
+            use-delete-events
+          >
+          </etools-file>
 
-        <template is="dom-if" if="{{faceLoading}}">
-          <paper-spinner active></paper-spinner>
-        </template>
-      </div>
+          <template is="dom-if" if="{{faceLoading}}">
+            <paper-spinner active></paper-spinner>
+          </template>
+        </div>
+      </template>
 
       <div id="other-one-container">
         <etools-file
@@ -100,6 +103,24 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           <paper-spinner active></paper-spinner>
         </template>
       </div>
+
+      <template is="dom-if" if="[[!showFace]]">
+        <div id="other-three-container">
+          <etools-file
+            id="otherThreeAttachmentComponent"
+            files="{{otherThreeAttachment}}"
+            label="[[localize('other')]] #3"
+            disabled="[[pending]]"
+            readonly="[[readonly]]"
+            use-delete-events
+          >
+          </etools-file>
+
+          <template is="dom-if" if="{{otherThreeLoading}}">
+            <paper-spinner active></paper-spinner>
+          </template>
+        </div>
+      </template>
     `;
   }
 
@@ -115,14 +136,23 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
   @property({type: Array})
   otherTwoAttachment!: any[];
 
+  @property({type: Array})
+  otherThreeAttachment!: any[];
+
   @property({type: Boolean})
   faceLoading!: boolean;
+
+  @property({type: Boolean})
+  showFace = false;
 
   @property({type: Boolean})
   otherOneLoading!: boolean;
 
   @property({type: Boolean})
   otherTwoLoading!: boolean;
+
+  @property({type: Boolean})
+  otherThreeLoading!: boolean;
 
   @property({type: Boolean, computed: '_programmeDocumentReportsAttachmentsPending(rootState)'})
   pending!: boolean;
@@ -148,7 +178,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     return [
       '_filesChanged(faceAttachment.*)',
       '_filesChanged(otherOneAttachment.*)',
-      '_filesChanged(otherTwoAttachment.*)'
+      '_filesChanged(otherTwoAttachment.*)',
+      '_filesChanged(otherThreeAttachment.*)'
     ];
   }
 
@@ -171,13 +202,30 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
     this.set('faceAttachment', []);
     this.set('otherOneAttachment', []);
     this.set('otherTwoAttachment', []);
+    this.set('otherThreeAttachment', []);
+    if (!this.attachments) {
+      this.attachments = [];
+    }
+    this.set('showFace', this.attachments.find((attachment) => attachment.type === 'FACE') ? true : false);
+
+    this.dispatchEvent(
+      new CustomEvent('attachments-loaded', {
+        detail: {hasFaceAttachment: this.showFace},
+        bubbles: true,
+        composed: true
+      })
+    );
 
     setFiles(this.attachments).forEach((attachment: GenericObject) => {
-      if (attachment.type === 'Other' && this.get('otherOneAttachment').length === 1) {
-        this.set('otherTwoAttachment', [attachment]);
-      } else if (attachment.type === 'Other') {
-        this.set('otherOneAttachment', [attachment]);
-      } else {
+      if (attachment.type === 'Other') {
+        if (!this.get('otherOneAttachment').length) {
+          this.set('otherOneAttachment', [attachment]);
+        } else if (!this.get('otherTwoAttachment').length) {
+          this.set('otherTwoAttachment', [attachment]);
+        } else if (!this.get('otherThreeAttachment').length) {
+          this.set('otherThreeAttachment', [attachment]);
+        }
+      } else if (attachment.type === 'FACE') {
         this.set('faceAttachment', [attachment]);
       }
     });
@@ -222,6 +270,12 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           ) {
             (this.$.otherTwoAttachmentComponent as any).fileInput.value = null;
             (this.$.otherTwoAttachmentComponent as any).set('files', []);
+          } else if (
+            this.get('otherThreeAttachment').length !== 0 &&
+            e.detail.file.id === this.get('otherThreeAttachment')[0].id
+          ) {
+            (this.$.otherThreeAttachmentComponent as any).fileInput.value = null;
+            (this.$.otherThreeAttachmentComponent as any).set('files', []);
           }
         })
         // @ts-ignore
@@ -281,6 +335,8 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           this.set('otherOneLoading', true);
         } else if (attachmentPropertyName === 'otherTwoAttachment') {
           this.set('otherTwoLoading', true);
+        } else if (attachmentPropertyName === 'otherThreeAttachment') {
+          this.set('otherThreeLoading', true);
         }
       } else {
         const replaceUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
