@@ -48,9 +48,7 @@ class JSONSchemaValidator:
             raise exceptions.ValidationError(self.message, code=self.code, params={'value': e.message})
 
     def __eq__(self, other):
-        return (
-                isinstance(other, self.__class__)
-                and (self.json_schema == other.json_schema)
-                and (self.message == other.message)
-                and (self.code == other.code)
-        )
+        return isinstance(other, self.__class__) and \
+            self.json_schema == other.json_schema and \
+            self.message == other.message and \
+            self.code == other.code

@@ -17,6 +17,6 @@ disaggregation_schema = {
     "type": "object",
     "additionalProperties": False,
     "patternProperties": {
-        "^\((\d*,\s*)*\d*\)$": indicator_schema
+        "^\((\d*,\s*)*\d*\)$": indicator_schema  # noqa W605
     }
 }
