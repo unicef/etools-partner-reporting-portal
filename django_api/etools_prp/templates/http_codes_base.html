@@ -23,6 +23,7 @@
         var u='{% matomo_settings "MATOMO_HOST_URL" %}';
         _paq.push(['setTrackerUrl', u+'{% matomo_settings "MATOMO_TRACKER_URL" %}']);
         _paq.push(['setSiteId', '{% matomo_settings "MATOMO_SITE_ID" %}']);
+        _paq.push(['setUserId', '{{ request.user.pk }}']);
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
         g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
       })();
