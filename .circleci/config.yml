@@ -235,7 +235,7 @@ jobs:
           command: |
             TAG=${CIRCLE_BRANCH}
             docker build -t unicef/etools-prp-id-management-frontend:$TAG -f Dockerfile-bundle .
-          no_output_timeout: 17m
+          no_output_timeout: 25m
       - run:
           name: Pushing to Docker Hub
           command: |

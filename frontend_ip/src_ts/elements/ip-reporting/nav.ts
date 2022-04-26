@@ -6,6 +6,7 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-selector/iron-selector';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
@@ -22,7 +23,7 @@ import {pageNavStyles} from '../../styles/page-nav-styles';
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(ReduxConnectedElement)))) {
+class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(ReduxConnectedElement))))) {
   static get template() {
     return html`
       ${pageNavStyles}
@@ -38,13 +39,13 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
       <div class="nav-menu">
         <iron-selector selected="[[selected]]" attr-for-selected="name" selectable="paper-item" role="navigation">
           <paper-item name="overview" class="nav-menu-item">
-            <a href="[[overviewUrl]]">
+            <a href="[[overviewUrl]]" on-tap="trackAnalytics" tracker="Overview">
               <span><iron-icon icon="social:public" role="presentation"></iron-icon>[[localize('overview')]]</span>
             </a>
           </paper-item>
 
           <paper-item name="pd" class="nav-menu-item">
-            <a href="[[_appendQuery(pdUrl, pdQuery)]]">
+            <a href="[[_appendQuery(pdUrl, pdQuery)]]" on-tap="trackAnalytics" tracker="Programme Documents">
               <span
                 ><iron-icon icon="description" role="presentation"></iron-icon>[[localize('programme_documents')]]</span
               >
@@ -52,13 +53,21 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
           </paper-item>
 
           <paper-item name="progress-reports" class="nav-menu-item">
-            <a href="[[_appendQuery(progressReportsUrl, reportsQuery)]]">
+            <a
+              href="[[_appendQuery(progressReportsUrl, reportsQuery)]]"
+              on-tap="trackAnalytics"
+              tracker="Progress Reports"
+            >
               <span><iron-icon icon="assignment" role="presentation"></iron-icon>[[localize('progress_reports')]]</span>
             </a>
           </paper-item>
 
           <paper-item name="indicators" class="nav-menu-item">
-            <a href="[[_appendQuery(indicatorsReportsUrl, indicatorsQuery)]]">
+            <a
+              href="[[_appendQuery(indicatorsReportsUrl, indicatorsQuery)]]"
+              on-tap="trackAnalytics"
+              tracker="Indicators"
+            >
               <span><iron-icon icon="trending-up" role="presentation"></iron-icon>[[localize('indicators')]]</span>
             </a>
           </paper-item>
@@ -79,7 +88,7 @@ class IpReportingNav extends LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(
         <div class="nav-menu-item section-title">
           <hr />
           <paper-item name="indicators">
-            <a href="https://prphelp.zendesk.com/" target="_blank">
+            <a href="https://prphelp.zendesk.com/" target="_blank" on-tap="trackAnalytics" tracker="Knowledge base">
               <span
                 ><iron-icon icon="communication:import-contacts" role="presentation"></iron-icon
                 >[[localize('knowledge_base')]]</span
