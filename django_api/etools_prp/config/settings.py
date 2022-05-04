@@ -101,6 +101,8 @@ INSTALLED_APPS = [
     'django_cron',
     'social_django',
 
+    'unicef_locations',
+
     'etools_prp.apps.account',
     'etools_prp.apps.cluster',
     'etools_prp.apps.core',
@@ -430,7 +432,7 @@ IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
@@ -530,3 +532,5 @@ if DEBUG:
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
 DOCS_URL = 'api/docs/'
+
+UNICEF_LOCATIONS_MODEL = 'core.Location'

@@ -7,6 +7,7 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/paper-spinner/paper-spinner';
 import '@unicef-polymer/etools-loading/etools-loading';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
@@ -20,7 +21,7 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin NotificationsMixin
  */
-class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedElement)) {
+class PdDetailsDocDownload extends MatomoMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
       <style>
@@ -36,7 +37,7 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
       <div>
         <!--Text-->
         <paper-spinner hidden="[[!spinnerActive]]" class="spinner-size" active="[[spinnerActive]]"></paper-spinner>
-        <a href="" on-click="_openDoc">Download Document</a>
+        <a href="" on-click="_openDoc" tracker="PD Details Download Document">Download Document</a>
       </div>
       <etools-prp-ajax id="pddoc" url="[[pdDocumentUrl]]"> </etools-prp-ajax>
     `;
@@ -67,6 +68,7 @@ class PdDetailsDocDownload extends NotificationsMixin(UtilsMixin(ReduxConnectedE
 
   _openDoc(e: CustomEvent) {
     e.preventDefault();
+    this.trackAnalytics(e);
     this.set('spinnerActive', true);
     const thunk = (this.$.pddoc as EtoolsPrpAjaxEl).thunk();
 
