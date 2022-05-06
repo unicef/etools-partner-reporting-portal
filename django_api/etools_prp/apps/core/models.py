@@ -461,7 +461,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 class PRPLocationsManager(TreeManager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('parent').defer('geom')
+        return super().get_queryset().select_related('parent').defer('geom', 'point')
 
     def active(self):
         return self.get_queryset().filter(is_active=True)
