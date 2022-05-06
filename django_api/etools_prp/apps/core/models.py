@@ -13,7 +13,8 @@ from django.utils.translation import gettext as _
 import mptt
 import pycountry
 from model_utils.models import TimeStampedModel
-from unicef_locations.models import AbstractLocation
+from mptt.managers import TreeManager
+from unicef_locations.models import AbstractLocation, LocationsManager
 
 from etools_prp.apps.utils.emails import send_email_from_template
 
@@ -457,6 +458,18 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return qset
 
 
+class PRPLocationsManager(TreeManager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('parent').defer('geom')
+
+    def active(self):
+        return self.get_queryset().filter(is_active=True)
+
+    def archived_locations(self):
+        return self.get_queryset().filter(is_active=False)
+
+
 class Location(AbstractLocation):
     external_id = models.CharField(
         help_text='An ID representing this instance in an external system',
@@ -468,6 +481,9 @@ class Location(AbstractLocation):
     external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
 
     workspaces = models.ManyToManyField(Workspace, related_name='locations')
+
+    objects = PRPLocationsManager()
+    super_objects = LocationsManager()
 
 
 mptt.register(Location, order_insertion_by=['name'])
