@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from etools_prp.apps.account.forms import CustomUserCreationForm, UserAdminForm
-from etools_prp.apps.account.models import User, UserProfile
+from etools_prp.apps.account.models import User
 
 
 class CustomUserAdmin(UserAdmin):
@@ -56,4 +56,3 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(UserProfile)

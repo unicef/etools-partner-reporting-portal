@@ -37,7 +37,7 @@ class UserProfileAPIView(RetrieveAPIView):
         prefetch_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
                                                            'cluster__response_plan__workspace')
         prefetch_prp_roles = Prefetch('prp_roles', queryset=prefetch_queryset)
-        queryset = User.objects.select_related('profile', 'partner').prefetch_related(prefetch_prp_roles)
+        queryset = User.objects.select_related('partner').prefetch_related(prefetch_prp_roles)
         return queryset.get(id=self.request.user.id)
 
 
@@ -149,4 +149,4 @@ class UserListCreateAPIView(ListCreateAPIView):
 
         users_queryset = self.custom_ordering(users_queryset)
 
-        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
+        return users_queryset.select_related('partner', ).prefetch_related(prp_roles_prefetch)

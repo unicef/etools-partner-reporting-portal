@@ -5,8 +5,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
-from model_utils.models import TimeStampedModel
-
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_TYPES
 from etools_prp.apps.utils.emails import send_email_from_template
 
@@ -112,30 +110,4 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 
-class UserProfile(TimeStampedModel):
-    """
-    User Profile model related with user as profile.
-
-    related models:
-        account.User (OneToOne): "user"
-    """
-    user = models.OneToOneField(
-        User,
-        related_name="profile",
-        on_delete=models.CASCADE,
-    )
-
-    def __str__(self):
-        return "{} - Profile".format(self.user.get_fullname())
-
-    @classmethod
-    def create_user_profile(cls, sender, instance, created, **kwargs):
-        """
-        Signal handler to create user profiles automatically
-        """
-        if created:
-            cls.objects.create(user=instance)
-
-
-post_save.connect(UserProfile.create_user_profile, sender=User)
 post_save.connect(User.lock_password_if_new, sender=User)
