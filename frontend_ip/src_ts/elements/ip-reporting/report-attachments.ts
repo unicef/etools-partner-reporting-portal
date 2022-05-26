@@ -359,6 +359,7 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
           this.set('faceLoading', false);
           this.set('otherOneLoading', false);
           this.set('otherTwoLoading', false);
+          this.set('otherThreeLoading', false);
 
           const attachments = this.get('attachments');
 
