@@ -495,9 +495,9 @@ elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
 if not DISABLE_JWT_AUTH:
-    cert_path="keys/jwt/certificate.txt"
+    cert_path = "keys/jwt/certificate.txt"
     if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
-        cert_path="keys/jwt/certificate.pem"
+        cert_path = "keys/jwt/certificate.pem"
         from storages.backends.azure_storage import AzureStorage
         storage = AzureStorage()
         with storage.open('keys/jwt/certificate.pem') as jwt_cert:
