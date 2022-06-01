@@ -501,7 +501,7 @@ if not DISABLE_JWT_AUTH:
         from storages.backends.azure_storage import AzureStorage
         storage = AzureStorage()
         with storage.open('keys/jwt/certificate.pem') as jwt_cert:
-            with open(os.path.join(CONFIG_ROOT, 'keys/jwt/certificate.pem'), 'wb+') as new_jwt_cert:
+            with open(os.path.join(BASE_DIR, 'keys/jwt/certificate.pem'), 'wb+') as new_jwt_cert:
                 new_jwt_cert.write(jwt_cert.read())
 
     with open(os.path.join(BASE_DIR, cert_path), 'rb') as public_key:
