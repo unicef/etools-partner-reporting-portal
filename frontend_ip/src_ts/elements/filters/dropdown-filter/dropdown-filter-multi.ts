@@ -26,7 +26,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
         label="[[label]]"
         options="[[data]]"
         option-value="id"
-        option-label="title"
+        option-label="name"
         selected-values="{{selectedValues}}"
         trigger-value-change-event
         on-etools-selected-items-changed="_handleChange"
