@@ -255,6 +255,7 @@ workflows:
                 - master
                 - staging
                 - develop
+                - locations-name
       - build_and_deploy_fe_cluster:
           filters:
             branches:
