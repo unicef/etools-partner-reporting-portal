@@ -6,7 +6,7 @@ const Endpoints = {
   },
 
   login() {
-    return '/social/login/azuread-b2c-oauth2/';
+    return '/social/login/unicef-azuread-b2c-oauth2/';
   },
 
   config() {
