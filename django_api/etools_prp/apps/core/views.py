@@ -1,6 +1,5 @@
 import importlib
 
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -274,11 +273,3 @@ class UnauthorizedView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['unicef_user'] = self.request.user.is_authenticated and self.request.user.email.endswith('@unicef.org')
         return context
-
-
-# TODO import from unicef-security
-class SocialLogoutView(RedirectView):
-
-    def get_redirect_url(self, *args, **kwargs):
-        return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
-            f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
