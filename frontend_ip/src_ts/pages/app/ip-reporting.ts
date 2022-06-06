@@ -56,6 +56,10 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
         #page-container {
           margin-left: -30px;
         }
+        #pageOverlay.opened {
+          opacity: 0.6 !important;
+          transition: opacity 0.2s linear;
+        }
       </style>
 
       <page-title title="[[localize('ip_reporting')]]"></page-title>
