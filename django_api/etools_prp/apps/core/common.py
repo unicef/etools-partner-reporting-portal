@@ -105,7 +105,6 @@ SHARED_PARTNER_TYPE = Choices(
 )
 
 
-
 INTERVENTION_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),
