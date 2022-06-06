@@ -44,7 +44,7 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
 
   _filterValueChanged() {
     this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const newValue = ((this.$.field as PaperInputElement)?.value || '').trim();
+      const newValue = (this.$.field as PaperInputElement).value!.trim();
 
       if (newValue !== this.lastValue) {
         fireEvent(this, 'filter-changed', {
