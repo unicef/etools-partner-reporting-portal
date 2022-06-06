@@ -143,7 +143,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     )
     status = models.CharField(
         choices=PD_STATUS,
-        default=PD_STATUS.draft,
+        default=PD_STATUS.development,
         max_length=256,
         verbose_name='PD/SSFA status'
     )
