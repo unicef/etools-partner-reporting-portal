@@ -26,7 +26,7 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
         label="[[label]]"
         options="[[data]]"
         option-value="id"
-        option-label="title"
+        option-label="[[optionLabel]]"
         selected-values="{{selectedValues}}"
         trigger-value-change-event
         on-etools-selected-items-changed="_handleChange"
@@ -51,6 +51,9 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
 
   @property({type: Array})
   selectedValues = [];
+
+  @property({type: String})
+  optionLabel = 'title';
 
   public static get observers() {
     return ['_setSelectedValues(value, data)'];
