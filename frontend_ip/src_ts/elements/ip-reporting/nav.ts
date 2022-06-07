@@ -127,7 +127,7 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
   reportsQuery = {status: String(['Due', 'Ove', 'Sen'])};
 
   @property({type: Object})
-  indicatorsQuery = {pd_statuses: String(['Act'])};
+  indicatorsQuery = {pd_statuses: String(['active'])};
 }
 
 window.customElements.define('ip-reporting-nav', IpReportingNav);
