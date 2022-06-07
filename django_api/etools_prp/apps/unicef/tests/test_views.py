@@ -289,7 +289,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             document['title'])
 
         response = self.client.get(
-            url + "?ref_title=&status=%s&location=" % document['status'][:3],
+            url + "?ref_title=&status=%s&location=" % document['status'].lower(),
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
