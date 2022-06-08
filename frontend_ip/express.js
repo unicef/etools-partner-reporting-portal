@@ -1,17 +1,24 @@
 var express = require('express'); // eslint-disable-line
 var browserCapabilities = require('browser-capabilities'); // eslint-disable-line
+const UAParser = require('ua-parser-js').UAParser; // eslint-disable-line
 
 const app = express();
 const basedir = __dirname + '/build/'; // eslint-disable-line
 
 function getSourcesPath(request) {
-  let clientCapabilities = browserCapabilities.browserCapabilities(request.headers['user-agent']);
+  const userAgent = request.headers['user-agent'];
+  let clientCapabilities = browserCapabilities.browserCapabilities(userAgent);
+  const isEdge = (new UAParser(userAgent).getBrowser().name || '') === 'Edge';
 
   clientCapabilities = new Set(clientCapabilities); // eslint-disable-line
   if (clientCapabilities.has('modules')) {
     return basedir + 'esm-bundled/';
   } else {
-    return basedir + 'es6-bundled/';
+    if (isEdge) {
+      return basedir + 'esm-bundled/';
+    } else {
+      return basedir + 'es6-bundled/';
+    }
   }
 }
 
