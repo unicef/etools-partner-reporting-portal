@@ -1,6 +1,5 @@
 var express = require('express'); // eslint-disable-line
 var browserCapabilities = require('browser-capabilities'); // eslint-disable-line
-const UAParser = require('ua-parser-js').UAParser; // eslint-disable-line
 
 const app = express();
 const basedir = __dirname + '/build/'; // eslint-disable-line
