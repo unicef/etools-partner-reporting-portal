@@ -1,17 +1,25 @@
 var express = require('express'); // eslint-disable-line
 var browserCapabilities = require('browser-capabilities'); // eslint-disable-line
+const UAParser = require('ua-parser-js').UAParser; // eslint-disable-line
 
 const app = express();
 const basedir = __dirname + '/build/'; // eslint-disable-line
 
 function getSourcesPath(request) {
-  let clientCapabilities = browserCapabilities.browserCapabilities(request.headers['user-agent']);
+  const userAgent = request.headers['user-agent'];
+  let clientCapabilities = browserCapabilities.browserCapabilities(userAgent);
 
+  const browserName = new UAParser(userAgent).getBrowser().name || '';
+  const isEdge = browserName === 'Edge';
   clientCapabilities = new Set(clientCapabilities); // eslint-disable-line
   if (clientCapabilities.has('modules')) {
     return basedir + 'esm-bundled/';
   } else {
-    return basedir + 'es6-bundled/';
+    if (isEdge) {
+      return basedir + 'es6-bundled/';
+    } else {
+      return basedir + 'esm-bundled/';
+    }
   }
 }
 
@@ -19,7 +27,7 @@ app.use('/ip/', (req, res, next) => {
   express.static(getSourcesPath(req))(req, res, next);
 });
 
-app.get(/.*service-worker\.js/, function(req, res) {
+app.get(/.*service-worker\.js/, function (req, res) {
   res.sendFile(getSourcesPath(req) + 'service-worker.js');
 });
 
