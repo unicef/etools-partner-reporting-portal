@@ -6,20 +6,13 @@ const app = express();
 const basedir = __dirname + '/build/'; // eslint-disable-line
 
 function getSourcesPath(request) {
-  const userAgent = request.headers['user-agent'];
-  let clientCapabilities = browserCapabilities.browserCapabilities(userAgent);
+  let clientCapabilities = browserCapabilities.browserCapabilities(request.headers['user-agent']);
 
-  const browserName = new UAParser(userAgent).getBrowser().name || '';
-  const isEdge = browserName === 'Edge';
   clientCapabilities = new Set(clientCapabilities); // eslint-disable-line
   if (clientCapabilities.has('modules')) {
     return basedir + 'esm-bundled/';
   } else {
-    if (isEdge) {
-      return basedir + 'es6-bundled/';
-    } else {
-      return basedir + 'esm-bundled/';
-    }
+    return basedir + 'es6-bundled/';
   }
 }
 
