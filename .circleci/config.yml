@@ -254,8 +254,7 @@ workflows:
               only:
                 - master
                 - staging
-                - develop
-                - fix-other-browsers
+                - develop                
       - build_and_deploy_fe_cluster:
           filters:
             branches:
