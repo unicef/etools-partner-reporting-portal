@@ -1,5 +1,8 @@
 version: '3.8'
 
+volumes:
+    pg-data-prp: {}
+
 services:
 
   proxy:
@@ -88,6 +91,9 @@ services:
     build:
       context: ./db
       dockerfile: ./Dockerfile
+    volumes:
+      - pg-data-prp:/var/lib/postgresql/data/
+      - ./db/db_dump.bz2:/tmp/psql_data/db_dump.bz2
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
 
