@@ -254,8 +254,7 @@ workflows:
               only:
                 - master
                 - staging
-                - develop
-                - ui-tweak-2
+                - develop    
       - build_and_deploy_fe_cluster:
           filters:
             branches:
