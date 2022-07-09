@@ -255,7 +255,7 @@ workflows:
                 - master
                 - staging
                 - develop
-                - fix-print-content
+                - submodule-ref-2
 
       - build_and_deploy_fe_cluster:
           filters:
