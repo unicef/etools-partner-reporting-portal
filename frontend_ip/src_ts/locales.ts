@@ -140,6 +140,7 @@ export const locales = {
     list_of_reports: 'List of Reports',
     pd_status: 'PD status',
     pd: 'PD',
+    pd_title: 'PD Title',
     indicator_title: 'Indicator Title',
     list_of_indicators: 'List of Indicators',
     indicator: 'Indicator',
