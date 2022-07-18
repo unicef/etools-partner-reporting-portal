@@ -101,7 +101,7 @@ const Endpoints = {
   },
 
   userSignOut() {
-    return this._buildUrl('/account/user-logout/');
+    return this._buildUrl('/social/unicef-logout/');
   },
 
   userLogin() {
