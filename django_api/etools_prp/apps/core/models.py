@@ -14,12 +14,12 @@ import mptt
 import pycountry
 from model_utils.models import TimeStampedModel
 from mptt.managers import TreeManager
-from mptt.models import MPTTModel, TreeForeignKey
+from unicef_locations.models import AbstractLocation, LocationsManager
 
-from etools_prp.apps.core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
 from etools_prp.apps.utils.emails import send_email_from_template
 
 from .common import EXTERNAL_DATA_SOURCES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
+from .countries import COUNTRY_NAME_TO_ALPHA2_CODE
 
 logger = logging.getLogger('locations.models')
 
@@ -69,56 +69,6 @@ class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
         unique_together = ('external_id', 'external_source')
 
 
-# TODO remove me
-class Country(TimeStampedModel):
-    """
-    Represents a country which has many offices and sections.
-    Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
-    on Sep. 14, 2017.
-    """
-    name = models.CharField(max_length=100)
-    iso3_code = models.CharField(
-        max_length=10,
-        blank=True,
-        default='',
-        verbose_name=_("ISO3 Code"),
-    )
-    country_short_code = models.CharField(
-        max_length=10,
-        null=True,
-        blank=True
-    )
-    long_name = models.CharField(max_length=255, null=True, blank=True)
-
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = 'Countries'
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def details(self):
-        """
-        Tries to retrieve a usable country reference
-        :return: pycountry Country object or None
-        """
-        lookup = None
-
-        if not self.country_short_code:
-            lookup = {'alpha_2': COUNTRY_NAME_TO_ALPHA2_CODE.get(self.name, None)}
-        elif len(self.country_short_code) == 3:
-            lookup = {'alpha_3': self.country_short_code}
-        elif len(self.country_short_code) == 2:
-            lookup = {'alpha_2': self.country_short_code}
-
-        if lookup:
-            try:
-                return pycountry.countries.get(**lookup)
-            except KeyError:
-                pass
-
-
 class WorkspaceManager(models.Manager):
     def user_workspaces(self, user, role_list=None):
         if user.is_unicef:
@@ -152,7 +102,6 @@ class Workspace(TimeStampedExternalSourceModel):
         max_length=8,
         unique=True
     )
-    countries = models.ManyToManyField(Country, related_name='workspaces')
     business_area_code = models.CharField(
         max_length=10,
         null=True, blank=True
@@ -194,12 +143,6 @@ class Workspace(TimeStampedExternalSourceModel):
     #     pks = []
     #     [pks.extend(filter(lambda x: x is not None, part)) for part in result]
     #     return Location.objects.filter(pk__in=pks)
-
-    @property
-    def can_import_ocha_response_plans(self):
-        return any([
-            c.details for c in self.countries.all()
-        ])
 
 
 class PRPRole(TimeStampedExternalSourceModel):
@@ -515,6 +458,87 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return qset
 
 
+class PRPLocationsManager(TreeManager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('parent').defer('geom', 'point')
+
+    def active(self):
+        return self.get_queryset().filter(is_active=True)
+
+    def archived_locations(self):
+        return self.get_queryset().filter(is_active=False)
+
+
+class Location(AbstractLocation):
+    external_id = models.CharField(
+        help_text='An ID representing this instance in an external system',
+        blank=True,
+        null=True,
+        max_length=32
+    )
+
+    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
+
+    workspaces = models.ManyToManyField(Workspace, related_name='locations')
+
+    objects = PRPLocationsManager()
+    super_objects = LocationsManager()
+
+
+mptt.register(Location, order_insertion_by=['name'])
+
+
+# TODO remove me
+class Country(TimeStampedModel):
+    """
+    Represents a country which has many offices and sections.
+    Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
+    on Sep. 14, 2017.
+    """
+    name = models.CharField(max_length=100)
+    iso3_code = models.CharField(
+        max_length=10,
+        blank=True,
+        default='',
+        verbose_name=_("ISO3 Code"),
+    )
+    country_short_code = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    long_name = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'Countries'
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def details(self):
+        """
+        Tries to retrieve a usable country reference
+        :return: pycountry Country object or None
+        """
+        lookup = None
+
+        if not self.country_short_code:
+            lookup = {'alpha_2': COUNTRY_NAME_TO_ALPHA2_CODE.get(self.name, None)}
+        elif len(self.country_short_code) == 3:
+            lookup = {'alpha_3': self.country_short_code}
+        elif len(self.country_short_code) == 2:
+            lookup = {'alpha_2': self.country_short_code}
+
+        if lookup:
+            try:
+                return pycountry.countries.get(**lookup)
+            except KeyError:
+                pass
+
+
 # TODO Remove me
 class GatewayType(TimeStampedModel):
     """
@@ -537,128 +561,3 @@ class GatewayType(TimeStampedModel):
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.admin_level)
-
-
-class LocationManager(TreeManager):
-
-    def get_queryset(self):
-        return super().get_queryset()
-
-
-class Location(MPTTModel):
-    """
-    Location model define place where agents are working.
-    The background of the location can be:
-    Country > Region > City > District/Point.
-
-    Either a point or geospatial object.
-    pcode should be unique.
-
-    related models:
-        indicator.Reportable (ForeignKey): "reportable"
-        core.Location (ForeignKey): "self"
-    """
-    external_id = models.CharField(
-        help_text='An ID representing this instance in an external system',
-        blank=True,
-        null=True,
-        max_length=32
-    )
-
-    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
-
-    name = models.CharField(verbose_name=_("Name"), max_length=254)
-
-    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin Level Name'), blank=True, null=True)
-    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'), blank=True, null=True)
-    workspaces = models.ManyToManyField(Workspace, related_name='locations')
-
-    latitude = models.FloatField(
-        verbose_name=_("Latitude"),
-        null=True,
-        blank=True,
-    )
-    longitude = models.FloatField(
-        verbose_name=_("Longitude"),
-        null=True,
-        blank=True,
-    )
-    p_code = models.CharField(
-        verbose_name=_("P Code"),
-        max_length=32,
-        blank=True,
-        default='',
-    )
-
-    parent = TreeForeignKey(
-        'self',
-        verbose_name=_("Parent"),
-        null=True,
-        blank=True,
-        related_name='children',
-        db_index=True,
-        on_delete=models.CASCADE
-    )
-
-    geom = models.MultiPolygonField(null=True, blank=True)
-    point = models.PointField(null=True, blank=True)
-    objects = LocationManager()
-
-    class Meta:
-        unique_together = ('name', 'p_code', 'admin_level')
-        ordering = ['name']
-
-    def __str__(self):
-        if self.p_code:
-            return '{} ({} {})'.format(
-                self.name,
-                self.admin_level_name,
-                "{}: {}".format(self.admin_level, self.p_code or '')
-            )
-
-        return self.name
-
-    @property
-    def geo_point(self):
-        return self.point if self.point else self.geom.point_on_surface if self.geom else ""
-
-    @property
-    def point_lat_long(self):
-        return "Lat: {}, Long: {}".format(
-            self.point.y,
-            self.point.x
-        )
-
-
-class CartoDBTable(TimeStampedModel, MPTTModel):
-    """
-    Represents a table in CartoDB, it is used to import locations
-    """
-
-    domain = models.CharField(max_length=254, verbose_name=_('Domain'))
-    api_key = models.CharField(max_length=254, verbose_name=_('API Key'))
-    table_name = models.CharField(max_length=254, verbose_name=_('Table Name'))
-    display_name = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Display Name'))
-    admin_level_name = models.CharField(max_length=64, verbose_name=_('Admin level name'))
-    admin_level = models.SmallIntegerField(verbose_name=_('Admin Level'))
-
-    name_col = models.CharField(max_length=254, default='name', verbose_name=_('Name Column'))
-    pcode_col = models.CharField(max_length=254, default='pcode', verbose_name=_('Pcode Column'))
-    remap_table_name = models.CharField(max_length=254, verbose_name=_('Remap Table Name'), blank=True, null=True)
-    parent_code_col = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Parent Code Column'))
-    parent = TreeForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True,
-        verbose_name=_('Parent'),
-        on_delete=models.CASCADE,
-    )
-    color = models.CharField(blank=True, default=get_random_color, max_length=7, verbose_name=_('Color'))
-
-    def __str__(self):
-        return self.table_name
-
-    class Meta:
-        verbose_name_plural = 'CartoDB tables'
-
-
-mptt.register(Location, order_insertion_by=['name'])
-mptt.register(CartoDBTable, order_insertion_by=['table_name'])
