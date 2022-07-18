@@ -16,8 +16,8 @@ class PdListToolbar extends UtilsMixin(PolymerElement) {
 
       <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
         <!-- TODO: Possibly use https://www.webcomponents.org/element/Collaborne/iron-file-icons for different files? -->
-        <download-button url="[[pdfExportUrl]]">PDF</download-button>
-        <download-button url="[[xlsxExportUrl]]">XLS</download-button>
+        <download-button url="[[pdfExportUrl]]" tracker="Programme Documents Export Pdf">PDF</download-button>
+        <download-button url="[[xlsxExportUrl]]" tracker="Programme Documents Export Xlsx">XLS</download-button>
       </etools-prp-toolbar>
     `;
   }

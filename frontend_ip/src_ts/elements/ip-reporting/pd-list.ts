@@ -15,6 +15,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-number';
@@ -30,7 +31,9 @@ import '../../etools-prp-common/elements/list-placeholder';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement))))) {
+class PdList extends MatomoMixin(
+  LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement)))))
+) {
   public static get template() {
     return html`
       ${tableStyles}
@@ -100,7 +103,11 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
           <etools-data-table-row no-collapse>
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                <a href="[[getLinkUrl(pd.id, 'details')]]">
+                <a
+                  on-tap="trackAnalytics"
+                  tracker$="[[_getPdRefNumberTracker(pd.reference_number)]]"
+                  href="[[getLinkUrl(pd.id, 'details')]]"
+                >
                   [[_withDefault(pd.reference_number)]]
                   <paper-tooltip>[[pd.title]]</paper-tooltip>
                 </a>
@@ -135,7 +142,9 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
                 ([[_computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)]])
               </div>
               <div class="table-cell table-cell--text cell-reports">
-                <a href="[[getLinkUrl(pd.id, 'reports')]]">[[localize('reports')]]</a>
+                <a on-tap="trackAnalytics" tracker="Reports" href="[[getLinkUrl(pd.id, 'reports')]]"
+                  >[[localize('reports')]]</a
+                >
               </div>
             </div>
           </etools-data-table-row>
@@ -177,6 +186,10 @@ class PdList extends LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataT
 
   getLinkUrl(id: string, page: string) {
     return this.buildUrl(this._baseUrl, `pd/${id}/view/${page}`);
+  }
+
+  _getPdRefNumberTracker(pdRefNumber: string) {
+    return `PD reference number: ${pdRefNumber}`;
   }
 }
 

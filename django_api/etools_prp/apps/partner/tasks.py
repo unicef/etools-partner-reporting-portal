@@ -42,12 +42,6 @@ def process_partners(area=None):
                         break
 
                 for item in data['results']:
-                    # Fill missing country code value
-                    # We have M2M, but PMP API return 1-to-1
-                    # In addition we have to save 2-alpha code
-                    country = workspace.countries.first().details
-                    item['country_code'] = country.alpha_2 if country else None
-
                     # Constructing value for basis_for_risk_rating based on
                     # type_of_assessment and last_assessment_date field
                     if item['type_of_assessment'] and item['last_assessment_date']:

@@ -26,7 +26,13 @@ class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxCon
 
       <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
 
-      <dropdown-filter-multi label="[[localize('location')]]" name="location" value="[[value]]" data="[[data]]">
+      <dropdown-filter-multi
+        label="[[localize('location')]]"
+        option-label="name"
+        name="location"
+        value="[[value]]"
+        data="[[data]]"
+      >
       </dropdown-filter-multi>
     `;
   }

@@ -89,6 +89,19 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
         .buttons {
           margin: 1em 0;
         }
+
+        .missing-indicator {
+          margin-left: 40px;
+          font-weight: normal;
+        }
+
+        [hidden] {
+          display: none !important;
+        }
+
+        paper-radio-button[name='latest'] {
+          text-transform: uppercase;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -126,6 +139,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
               <etools-data-table-row class="pd-output" no-collapse>
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">[[item.text]]</div>
+                </div>
+              </etools-data-table-row>
+            </template>
+            <template is="dom-if" if="[[_equals(item.type, 'missingIndicators')]]" restamp="true">
+              <etools-data-table-row class="pd-output" no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell table-cell--text missing-indicator">[[localize(item.text)]]</div>
                 </div>
               </etools-data-table-row>
             </template>
@@ -176,6 +196,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
                         </paper-radio-button>
                         <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
                           [[localize('avg')]]
+                        </paper-radio-button>
+                        <paper-radio-button
+                          name="latest"
+                          hidden$="[[!_hasTypeRatio(item.data)]]"
+                          disabled="[[_computeDisabled(item.data.display_type)]]"
+                        >
+                          [[localize('latest')]]
                         </paper-radio-button>
                       </paper-radio-group>
                     </template>
@@ -268,6 +295,10 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
   _computeDisabled(display_type: any) {
     return computeDisabled(display_type);
+  }
+
+  _hasTypeRatio(data: any) {
+    return data.display_type === 'ratio';
   }
 
   _fetchData(url: string) {

@@ -111,7 +111,7 @@ export default (getDataFn, defaultFilter, defaultSorting) => {
                         let sorting = {};
 
                         if (option.startsWith('-')) {
-                            sorting.columnName = option.substr(1);
+                            sorting.columnName = option.substring(1);
                             sorting.direction = 'desc';
                         }
                         else {

@@ -54,14 +54,16 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
       <refresh-report-modal id="refresh" data="[[refreshData]]" refresh-url="[[refreshUrl]]"> </refresh-report-modal>
 
       <etools-prp-toolbar query="{{query}}" report-id="{{reportId}}" location-id="{{locationId}}">
-        <download-button url="[[pdfExportUrl]]">PDF</download-button>
-        <download-button url="[[xlsExportUrl]]">XLS</download-button>
+        <download-button url="[[pdfExportUrl]]" tracker="PD Report Export Pdf">PDF</download-button>
+        <download-button url="[[xlsExportUrl]]" tracker="PD Report Export Xls">XLS</download-button>
 
         <template is="dom-if" if="[[showImportButtons]]" restamp="true">
           <upload-button url="[[importUrl]]" modal-title="Import Template">
             [[localize('import_template')]]
           </upload-button>
-          <download-button url="[[importTemplateUrl]]">[[localize('generate_uploader')]]</download-button>
+          <download-button url="[[importTemplateUrl]]" tracker="Import template"
+            >[[localize('generate_uploader')]]</download-button
+          >
           <template is="dom-if" if="[[showRefresh]]" restamp="true">
             <paper-button class="btn-primary" on-tap="_refresh" disabled="[[busy]]" raised>
               [[localize('refresh')]]
