@@ -60,3 +60,17 @@ class TestFormatTotalValueToString(TestCase):
             format_total_value_to_string(total, True, "ratio"),
             "300/1",
         )
+
+    def test_string_denominator_value_percentage(self):
+        total = {"d": "100", "v": "30"}
+        self.assertEqual(
+            format_total_value_to_string(total, True, None),
+            "30%",
+        )
+
+    def test_string_denominator_value_ratio(self):
+        total = {"d": "100", "v": "300"}
+        self.assertEqual(
+            format_total_value_to_string(total, True, "ratio"),
+            "300/100",
+        )
