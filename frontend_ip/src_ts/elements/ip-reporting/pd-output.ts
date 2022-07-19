@@ -386,10 +386,14 @@ class PdOutput extends LocalizeMixin(
   }
 
   _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
-    return (
-      computeCompleteIndicator(complete) ||
-      disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)
-    );
+    let status = computeCompleteIndicator(complete);
+    if (status === 'Ove') {
+      // trigger computation after data entered for a location
+      if (disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)) {
+        status = 'Met';
+      }
+    }
+    return status;
   }
 
   _computeReportableUrl(reportId: string, data: GenericObject) {
