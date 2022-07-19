@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
@@ -184,7 +185,10 @@ class PdOutput extends LocalizeMixin(
               <div class="indicator-header__title flex-3 layout vertical center-justified">
                 <div class="layout horizontal">
                   <div class="status-badge layout vertical center-justified">
-                    <report-status status="[[_computeCompleteIndicator(indicator.is_complete)]]" no-label>
+                    <report-status
+                      status="[[_computeCompleteIndicator(indicator.is_complete, indicator.id, disaggregationsByIndicator)]]"
+                      no-label
+                    >
                     </report-status>
                   </div>
                   <div>
@@ -333,6 +337,9 @@ class PdOutput extends LocalizeMixin(
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode!: string;
 
+  @property({type: String, computed: 'getReduxStateValue(rootState.disaggregations.byIndicator)'})
+  disaggregationsByIndicator!: string;
+
   @property({type: String, computed: '_computeMode(mode, overrideMode, currentReport, permissions)'})
   computedMode!: string;
 
@@ -378,8 +385,11 @@ class PdOutput extends LocalizeMixin(
     return computeIcon(opened);
   }
 
-  _computeCompleteIndicator(complete: boolean) {
-    return computeCompleteIndicator(complete);
+  _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
+    return (
+      computeCompleteIndicator(complete) ||
+      disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)
+    );
   }
 
   _computeReportableUrl(reportId: string, data: GenericObject) {
