@@ -389,7 +389,11 @@ class PdOutput extends LocalizeMixin(
     let status = computeCompleteIndicator(complete);
     if (status === 'Ove') {
       // trigger computation after data entered for a location
-      if (disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)) {
+
+      if (
+        disaggregationsByIndicator &&
+        disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)
+      ) {
         status = 'Met';
       }
     }
