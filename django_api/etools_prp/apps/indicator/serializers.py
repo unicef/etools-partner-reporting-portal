@@ -25,12 +25,13 @@ from etools_prp.apps.core.helpers import (
 )
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.serializers import IdLocationSerializer, LocationSerializer
-from etools_prp.apps.core.validators import add_indicator_object_type_validator
+from etools_prp.apps.core.validators import add_indicator_object_type_validator, JSONSchemaValidator
 from etools_prp.apps.ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from etools_prp.apps.unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
+from .json_schemas import disaggregation_schema, indicator_schema
 from .models import (
     create_pa_reportables_for_new_ca_reportable,
     Disaggregation,
@@ -227,9 +228,16 @@ class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSeriali
 
 class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False, allow_null=True)
-    target = serializers.JSONField()
+    baseline = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    in_need = serializers.JSONField(
+        required=False, allow_null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    target = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     location = LocationSerializer(read_only=True)
 
     def validate(self, data):
@@ -594,7 +602,9 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
     disaggregation_reported_on = serializers.ListField(
         child=serializers.IntegerField()
     )
-    disaggregation = serializers.JSONField()
+    disaggregation = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=disaggregation_schema)]
+    )
     reporting_entity_percentage_map = serializers.JSONField(
         required=False,
     )
@@ -1126,8 +1136,8 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
     cluster_objective_id = serializers.IntegerField()
     reportable_id = serializers.IntegerField()
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
-    target = serializers.JSONField()
-    baseline = serializers.JSONField()
+    target = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    baseline = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
 
     def validate(self, data):
         """
@@ -1245,12 +1255,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
     object_type = serializers.CharField(
-        validators=[add_indicator_object_type_validator], write_only=True)
+        validators=[add_indicator_object_type_validator], write_only=True
+    )
     blueprint = IndicatorBlueprintSerializer()
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
-    target = serializers.JSONField()
-    baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False, allow_null=True)
+    target = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    baseline = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    in_need = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     project_context_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     cs_dates = SortedDateArrayField(child=serializers.DateField(), required=False)
 

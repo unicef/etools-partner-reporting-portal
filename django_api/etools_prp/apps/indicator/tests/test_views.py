@@ -1612,8 +1612,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "c value is not number",
-            response.data['non_field_errors'][0]
+            "'aaaa' is not of type 'number'",
+            response.data['disaggregation'][0]
         )
 
         update_data['disaggregation'][str(level_reported_3_key)] = copy.deepcopy(validated_data)
@@ -1622,8 +1622,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "d value is not number",
-            response.data['non_field_errors'][0]
+            "'aaaa' is not of type 'number'",
+            response.data['disaggregation'][0]
         )
 
         update_data['disaggregation'][str(level_reported_3_key)] = copy.deepcopy(validated_data)
@@ -1632,8 +1632,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "v value is not number",
-            response.data['non_field_errors'][0]
+            "'aaaa' is not of type 'number'",
+            response.data['disaggregation'][0]
         )
 
     def test_update_zero_division_data_entry_validation_not_on_quantity(self):
@@ -1811,7 +1811,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         del update_data['disaggregation'][str(level_reported_3_key)]
         level_reported_3_key = list(level_reported_3_key)
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {'d': 0, 'v': 0}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -1845,7 +1845,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         level_reported_3_key = list(level_reported_3_key[:-1])
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {'d': 0, 'v': 0}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -1881,8 +1881,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "key is not in tuple format",
-            response.data['non_field_errors'][0]
+            "'bad key' does not match",
+            response.data['disaggregation'][0]
         )
 
     def test_update_invalid_coordinate_space_value_format_validation(self):
@@ -1900,7 +1900,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        update_data['disaggregation'][str(level_reported_3_key)] = {}
+        update_data['disaggregation'][str(level_reported_3_key)] = {'d': 0, 'v': 0}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -2373,9 +2373,20 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_client_error(response.status_code))
 
+        # Target value is string
+        data['target'] = {'d': 1, 'v': '1', 'c': 1}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
         # Baseline value type check
         data['target'] = {'d': 1, 'v': 1, 'c': 1}
         data['baseline'] = list()
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_client_error(response.status_code))
+
+        # Baseline value is string
+        data['target'] = {'d': 1, 'v': 1, 'c': 1}
+        data['baseline'] = {'d': 0, 'v': '1', 'c': 1}
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_client_error(response.status_code))
 

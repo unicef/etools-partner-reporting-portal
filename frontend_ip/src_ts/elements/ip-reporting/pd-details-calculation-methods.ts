@@ -94,6 +94,14 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
           margin-left: 40px;
           font-weight: normal;
         }
+
+        [hidden] {
+          display: none !important;
+        }
+
+        paper-radio-button[name='latest'] {
+          text-transform: uppercase;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -189,6 +197,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
                         <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
                           [[localize('avg')]]
                         </paper-radio-button>
+                        <paper-radio-button
+                          name="latest"
+                          hidden$="[[!_hasTypeRatio(item.data)]]"
+                          disabled="[[_computeDisabled(item.data.display_type)]]"
+                        >
+                          [[localize('latest')]]
+                        </paper-radio-button>
                       </paper-radio-group>
                     </template>
                     <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
@@ -280,6 +295,10 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
   _computeDisabled(display_type: any) {
     return computeDisabled(display_type);
+  }
+
+  _hasTypeRatio(data: any) {
+    return data.display_type === 'ratio';
   }
 
   _fetchData(url: string) {
