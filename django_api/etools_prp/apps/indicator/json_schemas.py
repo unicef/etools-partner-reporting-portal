@@ -5,9 +5,9 @@ indicator_schema = {
     "type": "object",
     "additionalProperties": False,
     "properties": {
-        "c": {"type": "number"},
-        "d": {"type": "number"},
-        "v": {"type": "number"}
+        "c": {"type": ["number", "null"]},
+        "d": {"type": ["number", "null"]},
+        "v": {"type": ["number", "null"]}
     },
     "required": ["d", "v"]
 }
