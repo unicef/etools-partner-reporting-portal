@@ -2500,3 +2500,15 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertTrue(Reportable.objects.filter(id=response.data['id']).exists())
+
+        # Allow NULL for Target values
+        data['target'] = {'d': None, 'v': None, 'c': None}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertTrue(Reportable.objects.filter(id=response.data['id']).exists())
+
+        # Allow NULL for Baseline values
+        data['baseline'] = {'d': None, 'v': None, 'c': None}
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertTrue(Reportable.objects.filter(id=response.data['id']).exists())
