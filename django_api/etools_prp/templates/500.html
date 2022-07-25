@@ -1,0 +1,31 @@
+{% extends "http_codes_base.html" %}
+
+
+{% block content %}
+<div class="errorContent">
+    <section id="error-container">
+
+        <div class="block-error">
+
+            <header>
+                <h1 class="error primary-txt">500 - Something went wrong</h1>
+            </header>
+
+            <p class="text-center">Our engineers have have been notified and will address the issue shortly</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <a class="btn btn-info btn-block btn-3d" href="{% url 'home' %}">Back to Dashboard</a>
+                </div>
+                <br>
+                <br>
+                <div class="col-md-6">
+                    <button class="btn btn-primary btn-block btn-3d" onclick="history.back();">Previous Page</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>
+{% endblock content %}
+
