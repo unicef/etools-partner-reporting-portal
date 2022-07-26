@@ -101,9 +101,10 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         else:
             for loc_data in ilds:
                 loc_total = loc_data.disaggregation['()']
-
-                ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
-                ir_total[ValueType.CALCULATED] += loc_total[ValueType.CALCULATED]
+                if loc_total[ValueType.VALUE]:
+                    ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
+                if loc_total[ValueType.CALCULATED]:
+                    ir_total[ValueType.CALCULATED] += loc_total[ValueType.CALCULATED]
 
         if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG \
                 and loc_count > 0:
@@ -175,9 +176,10 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         for loc_data in ilds:
             loc_total = loc_data.disaggregation['()']
-
-            ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
-            ir_total[ValueType.DENOMINATOR] += loc_total[ValueType.DENOMINATOR]
+            if loc_total[ValueType.VALUE]:
+                ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
+            if loc_total[ValueType.DENOMINATOR]:
+                ir_total[ValueType.DENOMINATOR] += loc_total[ValueType.DENOMINATOR]
 
         if loc_count > 0:
             if ir_total[ValueType.DENOMINATOR]:
