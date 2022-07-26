@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 from django.contrib.auth import get_user_model
@@ -489,8 +490,17 @@ def process_programme_documents(fast=False, area=False):
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
 
-                                    convert_string_values_to_numeric(i['target'])
-                                    convert_string_values_to_numeric(i['baseline'])
+                                    try:
+                                        for ind_dict_key in ['target', 'baseline']:
+                                            if isinstance(i[ind_dict_key], str):
+                                                i[ind_dict_key] = json.loads(i[ind_dict_key])
+
+                                            convert_string_values_to_numeric(i[ind_dict_key])
+
+                                    except Exception as e:
+                                        logger.exception(
+                                            "Malformed data found for '{}': {}. Skipping..".format(ind_dict_key, i[ind_dict_key]), e)
+                                        continue
 
                                     reportable = process_model(
                                         Reportable,
