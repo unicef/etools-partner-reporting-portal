@@ -24,7 +24,7 @@ class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
 
       <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
-      <dropdown-filter-multi class="item" label="[[localize('pd')]]" name="pds" value="[[value]]" data="[[data]]">
+      <dropdown-filter-multi class="item" label="[[localize('pd_title')]]" name="pds" value="[[value]]" data="[[data]]">
       </dropdown-filter-multi>
     `;
   }
