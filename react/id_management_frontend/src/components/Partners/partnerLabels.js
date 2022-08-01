@@ -18,4 +18,4 @@ export default {
     alternate_id: "Alternate ID",
     type_of_assessment: "Type of assessment",
     clusters: "Clusters"
-}
+};

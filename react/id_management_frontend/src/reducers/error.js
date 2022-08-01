@@ -1,5 +1,4 @@
-import {ERROR} from "../actions";
-
+import { ERROR } from "../actions";
 export default function error(state = null, action) {
     switch (action.type) {
         case ERROR:

@@ -1,21 +1,16 @@
 import qs from "query-string";
 import axios from "axios";
-import {SubmissionError} from "redux-form";
+import { SubmissionError } from "redux-form";
 import store from "../store";
-import {error as errorAction} from "../actions";
+import { error as errorAction } from "../actions";
 import * as R from 'ramda';
-
-
 const baseUrl = "/api/";
-
 function transformParam(param) {
     if (Array.isArray(param)) {
         return String(param);
     }
-
     return param;
 }
-
 function makeRequest(method, url, data, params) {
     return axios({
         method: method,
@@ -23,7 +18,7 @@ function makeRequest(method, url, data, params) {
         data: data,
         params: method === 'get' ? data : params,
         paramsSerializer: function (params) {
-            return qs.stringify(R.mapObjIndexed(transformParam, params), {encode: false});
+            return qs.stringify(R.mapObjIndexed(transformParam, params), { encode: false });
         },
         xsrfHeaderName: "X-CSRFToken",
         xsrfCookieName: "csrftoken",
@@ -34,14 +29,12 @@ function makeRequest(method, url, data, params) {
         if (error.response.data.error_codes === "not_authenticated") {
             document.location.href = "/";
         }
-
         switch (error.response.status) {
             case 500:
                 alert("Internal Server Error occurred");
                 throw new Error(error.response);
             default:
                 const errorDetail = error.response.data.detail ? error.response.data.detail[0] : undefined;
-
                 switch (method) {
                     case 'post':
                     case 'put':
@@ -56,7 +49,6 @@ function makeRequest(method, url, data, params) {
         }
     });
 }
-
 export const api = {
     post: function (url, data, params) {
         return makeRequest('post', url, data, params);

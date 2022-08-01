@@ -1,5 +1,4 @@
-import {PARTNERS, APPEND_PARTNER} from "../actions";
-
+import { PARTNERS, APPEND_PARTNER } from "../actions";
 export default function partners(state = [], action) {
     switch (action.type) {
         case PARTNERS:

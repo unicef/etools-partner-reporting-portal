@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {withStyles} from "@material-ui/core/styles";
-import {Typography} from "../../../node_modules/@material-ui/core";
+import {Typography} from "@material-ui/core";
 import PropTypes from "prop-types";
 
 const styleSheet = () => ({

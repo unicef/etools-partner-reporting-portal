@@ -1,5 +1,4 @@
-import {PARTNER_DETAILS} from "../actions";
-
+import { PARTNER_DETAILS } from "../actions";
 export default function partnerDetails(state = {}, action) {
     switch (action.type) {
         case PARTNER_DETAILS:

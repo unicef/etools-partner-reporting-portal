@@ -16,9 +16,7 @@ const labels = {
     userType: "User type",
     status: "Status"
 };
-
 export function getLabels(localLabels) {
     return Object.assign({}, labels, localLabels);
 }
-
 export default labels;

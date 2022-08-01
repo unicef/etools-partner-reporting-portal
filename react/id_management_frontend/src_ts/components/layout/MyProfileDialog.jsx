@@ -9,10 +9,10 @@ import Grid from "@material-ui/core/Grid";
 import withProps from "../hoc/withProps";
 import {portal} from "../../helpers/props";
 import {PORTALS} from "../../actions";
-import Typography from "../../../node_modules/@material-ui/core/Typography";
-import List from "../../../node_modules/@material-ui/core/List/List";
-import ListItem from "../../../node_modules/@material-ui/core/ListItem/ListItem";
-import Divider from "../../../node_modules/@material-ui/core/Divider/Divider";
+import Typography from "@material-ui/core/Typography";
+import List from "@material-ui/core/List/List";
+import ListItem from "@material-ui/core/ListItem/ListItem";
+import Divider from "@material-ui/core/Divider/Divider";
 
 const title = "My Profile";
 

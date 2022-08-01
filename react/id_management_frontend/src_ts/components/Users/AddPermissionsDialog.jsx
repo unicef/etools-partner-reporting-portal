@@ -105,8 +105,8 @@ AddPermissionsDialog.propTypes = {
     width: PropTypes.string
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({
+export default connect(mapStateToProps, mapDispatchToProps, { forwardRef: true })(reduxForm({
     form: "addPermissionsForm",
-    initialValues: {prp_roles: [{}]}
+    initialValues: {prp_roles: [{}]},
 })(AddPermissionsDialog));
 

@@ -1,0 +1,21 @@
+export default {
+    ocha_external_id: "OCHA ID",
+    external_id: "External ID",
+    externalIdHelper: "An ID representing this instance in an external system",
+    external_source: "External source",
+    fullName: "Full name",
+    fullNameHelper: "Please make sure this matches the name you enter in VISION",
+    short_title: "Short title",
+    alternate_title: "Alternate title",
+    shared_partner: "Shared partner",
+    partnerType: "Partner type",
+    cso_type: "CSO Type",
+    street_address: "Street address",
+    city: "City",
+    postal_code: "Postal code",
+    country_code: "Country code",
+    unicef_vendor_number: "UNICEF vendor number",
+    alternate_id: "Alternate ID",
+    type_of_assessment: "Type of assessment",
+    clusters: "Clusters"
+}

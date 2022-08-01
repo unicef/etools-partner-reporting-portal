@@ -1,7 +1,6 @@
-import {PORTALS, USER_PROFILE} from "../actions";
-import {hasAnyRole} from "../helpers/user";
-import {PORTAL_ACCESS} from "../constants";
-
+import { PORTALS, USER_PROFILE } from "../actions";
+import { hasAnyRole } from "../helpers/user";
+import { PORTAL_ACCESS } from "../constants";
 export default function userProfile(state = null, action) {
     switch (action.type) {
         case USER_PROFILE:

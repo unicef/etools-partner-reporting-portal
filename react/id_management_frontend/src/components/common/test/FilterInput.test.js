@@ -1,18 +1,12 @@
-import React from 'react';
-import {shallow} from 'enzyme';
+import { jsx as _jsx } from "react/jsx-runtime";
+import { shallow } from 'enzyme';
 import toJSON from 'enzyme-to-json';
 import FilterInput from '../FilterInput';
-
 describe('FilterInput component', () => {
-    const children = <input value="test"/>;
+    const children = _jsx("input", { value: "test" }, void 0);
     const classes = {};
-
     it('renders properly', () => {
-        const wrapper = shallow(<FilterInput
-            children={children}
-            classes={classes}
-        />);
-
+        const wrapper = shallow(_jsx(FilterInput, { children: children, classes: classes }, void 0));
         expect(wrapper.dive().length).toBe(1);
         expect(toJSON(wrapper)).toMatchSnapshot();
     });

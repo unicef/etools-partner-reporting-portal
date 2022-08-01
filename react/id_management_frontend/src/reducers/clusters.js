@@ -1,5 +1,4 @@
-import {CLUSTERS} from "../actions";
-
+import { CLUSTERS } from "../actions";
 export default function clusters(state = null, action) {
     switch (action.type) {
         case CLUSTERS:

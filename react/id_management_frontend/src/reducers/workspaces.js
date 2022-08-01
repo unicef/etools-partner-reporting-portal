@@ -1,5 +1,4 @@
-import {WORKSPACES} from "../actions";
-
+import { WORKSPACES } from "../actions";
 export default function workspaces(state = [], action) {
     switch (action.type) {
         case WORKSPACES:
