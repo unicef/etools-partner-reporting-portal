@@ -1,0 +1,60 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/components/app-shell/app-shell.js",
+  "fragments": [
+    "src/components/pages/page-not-found.js",
+    "src/components/pages/ip-reporting/ip-reporting-list.js",
+    "src/components/pages/ip-reporting/ip-reporting-tabs.js",
+    "src/components/pages/ip-reporting/ip-reporting-tab-pages/ip-reporting-details.js",
+    "src/components/pages/ip-reporting/ip-reporting-tab-pages/ip-reporting-questionnaires.js"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "package.json"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "push-manifest.json",
+    "node_modules/@webcomponents/webcomponentsjs/**",
+    "node_modules/web-animations-js/web-animations-next-lite.min.js",
+    "node_modules/dayjs/dayjs.min.js",
+    "node_modules/dayjs/plugin/utc.js"
+  ],
+  "lint": {
+    "rules": [
+      "polymer-3"
+    ],
+    "ignoreWarnings": [
+      "could-not-resolve-reference",
+      "non-literal-import"
+    ]
+  },
+  "builds": [
+    {
+      "name": "esm-bundled",
+      "browserCapabilities": [
+        "es2015",
+        "modules"
+      ],
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      },
+      "bundle": true,
+      "addServiceWorker": true
+    },
+    {
+      "name": "es6-bundled",
+      "preset": "es6-bundled",
+      "addServiceWorker": true
+    }
+  ],
+  "moduleResolution": "node",
+  "npm": true
+}

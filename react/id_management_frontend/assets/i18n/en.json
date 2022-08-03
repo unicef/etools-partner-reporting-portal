@@ -1,0 +1,14 @@
+{
+  "USERS": "Users",
+  "SEARCH": "Search",
+  "STATUS": "Status",
+  "WORKSPACE": "Workspace",
+  "ROLE": "Role",
+  "NAME": "Name",
+  "POSITION": "Position",
+  "E-MAIL": "E-mail",
+  "LAST_LOGIN": "Last login",
+  "USER_TYPE": "User type",
+  "CLEAR_ALL": "CLEAR ALL",
+  "FILTERS": "Filters"
+}

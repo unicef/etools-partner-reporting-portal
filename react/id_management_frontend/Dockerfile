@@ -1,19 +1,13 @@
-FROM node:8.11.3-jessie
+FROM node:12.22.7-alpine3.12 as builder
+RUN apk update
+RUN apk add --update bash
 
-RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
-RUN apt-get update
-
-ADD package.json /tmp/
-
-ADD . /code/
-
-WORKDIR /tmp
-
-RUN npm install
-RUN rm -rf /code/node_modules
-RUN cp -a /tmp/node_modules /code/node_modules
+RUN apk add git
+RUN npm install -g --unsafe-perm polymer-cli
+RUN npm install -g gulp
+RUN npm install -g typescript
 
 WORKDIR /code
 
 EXPOSE 3000
-CMD ["npm start"]
+CMD ["npm", "start"]
