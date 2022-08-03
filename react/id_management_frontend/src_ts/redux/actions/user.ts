@@ -2,7 +2,7 @@ import {Action, ActionCreator} from 'redux';
 import {EtoolsUserModel} from '../../components/user/user-model';
 // import {ThunkAction} from 'redux-thunk';
 // import {RootState} from '../store';
-import {AnyObject} from '../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 
 export const UPDATE_USER_DATA = 'UPDATE_USER_DATA';
 export const UPDATE_USER_PERMISSIONS = 'UPDATE_USER_PERMISSIONS';

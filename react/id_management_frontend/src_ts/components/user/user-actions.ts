@@ -1,4 +1,4 @@
-import {AnyObject} from '../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 import {updateUserData} from '../../redux/actions/user';
 import {getEndpoint} from '../../endpoints/endpoints';
 import {store} from '../../redux/store';

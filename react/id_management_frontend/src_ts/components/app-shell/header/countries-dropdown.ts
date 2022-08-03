@@ -6,7 +6,7 @@ import {EtoolsDropdownEl} from '@unicef-polymer/etools-dropdown/etools-dropdown.
 import {customElement, LitElement, html, property, query} from 'lit-element';
 
 import {fireEvent} from '../../utils/fire-custom-event';
-import {AnyObject} from '../../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 import {EtoolsUserModel} from '../../user/user-model';
 import {countriesDropdownStyles} from './countries-dropdown-styles';
 import {changeCurrentUserCountry} from '../../user/user-actions';

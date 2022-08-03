@@ -7,7 +7,7 @@ import '../../common/layout/etools-tabs';
 import {pageContentHeaderSlottedStyles} from '../../common/layout/page-content-header/page-content-header-slotted-styles';
 import '../../common/layout/status/etools-status';
 import './actions/ip-reporting-actions';
-import {AnyObject} from '../../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 import {connect} from 'pwa-helpers/connect-mixin';
 import {RootState, store} from '../../../redux/store';
 import {updateAppLocation} from '../../../routing/routes';

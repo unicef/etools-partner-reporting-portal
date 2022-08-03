@@ -1,6 +1,6 @@
 import {getPartnersDummyData, geUnicefUsersDummyData} from '../../components/pages/ip-reporting/list/list-dummy-data';
 import {Action, ActionCreator} from 'redux';
-import {AnyObject} from '../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 
 export const SET_UNICEF_USERS_DATA = 'SET_UNICEF_USERS_DATA';
 export const SET_PARTNERS = 'SET_PARTNERS';

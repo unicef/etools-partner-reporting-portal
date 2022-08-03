@@ -1,4 +1,4 @@
-import {AnyObject} from '../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 import {EtoolsEndpoint} from './endpoints-list';
 import {EtoolsRequestEndpoint} from '@unicef-polymer/etools-ajax';
 import cloneDeep from 'lodash-es/cloneDeep';

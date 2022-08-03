@@ -1,4 +1,4 @@
-import {AnyObject} from '../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 
 // TODO: improve this user model
 export interface EtoolsUserModel {

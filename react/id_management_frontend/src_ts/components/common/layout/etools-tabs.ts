@@ -1,8 +1,7 @@
 import {LitElement, html, property, customElement} from 'lit-element';
 import '@polymer/paper-tabs/paper-tabs';
 import '@polymer/paper-tabs/paper-tab';
-import {AnyObject} from '../../../types/globals';
-
+import {AnyObject} from '@unicef-polymer/etools-types';
 /**
  * @LitElement
  * @customElement

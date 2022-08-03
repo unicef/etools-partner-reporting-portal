@@ -23,8 +23,16 @@ export const TableStyles = css`
     border-radius: 50%;
     width: 10px;
     height: 10px;
-    background: #dddddd;
     margin-right: 5px;
     display: inline-flex;
+  }
+  .ACTIVE {
+    background: #4caf50;
+  }
+  .INVITED {
+    background: #f44336;
+  }
+  .INCOMPLETE {
+    background: #616161;
   }
 `;

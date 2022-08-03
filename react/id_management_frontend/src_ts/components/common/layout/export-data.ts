@@ -3,7 +3,7 @@ import '@polymer/paper-button/paper-button';
 import '@polymer/paper-menu-button/paper-menu-button';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/paper-listbox/paper-listbox';
-import {AnyObject} from '../../../types/globals';
+import {AnyObject} from '@unicef-polymer/etools-types';
 import {elevation2} from '../../styles/lit-styles/elevation-styles';
 import {fireEvent} from '../../utils/fire-custom-event';
 

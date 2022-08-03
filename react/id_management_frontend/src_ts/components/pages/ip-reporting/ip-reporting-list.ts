@@ -9,7 +9,7 @@ import '../../common/layout/page-content-header/page-content-header';
 import {pageContentHeaderSlottedStyles} from '../../common/layout/page-content-header/page-content-header-slotted-styles';
 
 import '@unicef-polymer/etools-filters/src/etools-filters';
-import {getIpReportingFilters, FilterKeysAndTheirSelectedValues, IpReportingFiltersHelper} from './list/filters';
+import {getIpReportingFilters, IpReportingFiltersHelper} from './list/filters';
 import {ROOT_PATH} from '../../../config/config';
 import {EtoolsFilter} from '@unicef-polymer/etools-filters/src/etools-filters';
 import {pageLayoutStyles} from '../../styles/page-layout-styles';
@@ -40,8 +40,8 @@ import {sendRequest} from '@unicef-polymer/etools-ajax';
 import {USER_TYPE} from '../../common/constants';
 import {getUserTypeLabel} from '../../utils/utils';
 import {TableStyles} from './list/table-styles';
-import {omit, pick} from 'lodash-es';
-import {GenericObject, AnyObject} from '@unicef-polymer/etools-types';
+import {pick} from 'lodash-es';
+import {GenericObject} from '@unicef-polymer/etools-types';
 
 /**
  * @LitElement
@@ -165,7 +165,7 @@ export class IpReportingList extends connect(store)(LitElement) {
       type: EtoolsTableColumnType.Custom,
       customMethod: (item: any, _key: string) => {
         return html`<span
-          ><div class="circle"></div>
+          ><div class="circle ${item.status}"></div>
           ${item.status}</span
         >`;
       }
@@ -178,10 +178,12 @@ export class IpReportingList extends connect(store)(LitElement) {
   ];
 
   @property({type: Array})
-  listData: AnyObject[] = [];
+  listData: GenericObject[] = [];
 
   @property({type: Object})
-  prevQueryStringObj: GenericObject = {size: 10, sort: 'last_login.desc'};
+  prevQueryStringObj: GenericObject = {page_size: 10, sort: 'last_login.desc'};
+
+  private paramsInitialized = false;
 
   stateChanged(state: RootState) {
     const routeDetails = get(state, 'app.routeDetails');
@@ -189,33 +191,80 @@ export class IpReportingList extends connect(store)(LitElement) {
       return; // Avoid code execution while on a different page
     }
 
-    if (!this.dataRequiredByFiltersHasBeenLoaded(state)) {
-      return;
-    }
-
     const stateRouteDetails = {...state.app!.routeDetails};
 
-    if (!this.filters) {
-      this.initFiltersForDisplay(state);
-    }
-
     if (JSON.stringify(stateRouteDetails) !== JSON.stringify(this.routeDetails)) {
-      if (this.hadToinitializeUrlWithPrevQueryString(stateRouteDetails)) {
+      if (
+        (!stateRouteDetails.queryParams || Object.keys(stateRouteDetails.queryParams).length === 0) &&
+        this.prevQueryStringObj
+      ) {
+        this.routeDetails = stateRouteDetails;
+        this.updateCurrentParams(this.prevQueryStringObj);
         return;
       }
 
+      this.onParamsChange(stateRouteDetails, false);
+    }
+
+    this.initFiltersForDisplay(state);
+  }
+
+  onParamsChange(routeDetails: RouteDetails, _forceReGet: boolean): void {
+    this.routeDetails = routeDetails;
+    const currentParams: GenericObject<any> = this.routeDetails?.queryParams || {};
+    const paramsValid: boolean = this.paramsInitialized || this.initializeAndValidateParams(currentParams);
+
+    if (paramsValid) {
+      // get data as params are valid
       this.showListLoading = true;
-      this.routeDetails = cloneDeep(stateRouteDetails);
-      this.setSelectedValuesInFilters();
-      this.initializePaginatorFromUrl(this.routeDetails?.queryParams);
       this.getListData();
     }
   }
 
-  initFiltersForDisplay(_state: RootState) {
-    const availableFilters = JSON.parse(JSON.stringify(getIpReportingFilters()));
-    // this.populateDropdownFilterOptionsFromCommonData(state availableFilters);
-    this.filters = availableFilters;
+  private initializeAndValidateParams(currentParams: GenericObject<any>): boolean {
+    this.paramsInitialized = true;
+
+    // update sort in listColumns
+    const [field, direction] = (currentParams.sort || '').split('.');
+    if (field && direction) {
+      this.listColumns = this.listColumns.map((column: EtoolsTableColumn) => {
+        if (column.name !== field) {
+          return column;
+        } else {
+          return {
+            ...column,
+            sort: direction as EtoolsTableColumnSort
+          };
+        }
+      });
+    }
+
+    // set required params in url
+    if (!currentParams.page_size) {
+      // prevQueryStringObj store page previous filtering params, if set, apply them to preserve user filters selection
+      this.updateCurrentParams(
+        this.prevQueryStringObj
+          ? this.prevQueryStringObj
+          : {
+              page_size: '20',
+              status: ['draft', 'active', 'review', 'signed', 'signature']
+            }
+      );
+      return false;
+    } else {
+      // store existing url params in prevQueryStringObj property, to be used on navigation to PD list as default params
+      this.prevQueryStringObj = currentParams;
+      return true;
+    }
+  }
+
+  initFiltersForDisplay(state: RootState) {
+    if (!this.filters && this.dataRequiredByFiltersHasBeenLoaded(state)) {
+      const availableFilters = JSON.parse(JSON.stringify(getIpReportingFilters()));
+      // this.populateDropdownFilterOptionsFromCommonData(state availableFilters);
+      const currentParams: RouteQueryParams = state.app!.routeDetails.queryParams || {};
+      this.filters = IpReportingFiltersHelper.updateFiltersSelectedValues(currentParams, availableFilters);
+    }
   }
 
   hadToinitializeUrlWithPrevQueryString(stateRouteDetails: any) {
@@ -239,17 +288,6 @@ export class IpReportingList extends connect(store)(LitElement) {
     const stringParams: string = buildUrlQueryString(this.prevQueryStringObj);
     // replaceAppLocation(`${this.routeDetails.path}?${stringParams}`, true);
     replaceAppLocation(`ip-reporting/list?${stringParams}`);
-  }
-
-  private setSelectedValuesInFilters() {
-    if (this.filters) {
-      // update filter selection and assign the result to etools-filters(trigger render)
-      const currentParams: RouteQueryParams = this.routeDetails!.queryParams || {};
-      this.filters = IpReportingFiltersHelper.updateFiltersSelectedValues(
-        omit(currentParams, ['page', 'size', 'sort']),
-        this.filters
-      );
-    }
   }
 
   initializePaginatorFromUrl(queryParams: any) {
