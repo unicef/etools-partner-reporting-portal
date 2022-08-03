@@ -27,13 +27,6 @@ import {
   defaultPaginator,
   getPaginatorWithBackend
 } from '@unicef-polymer/etools-table/pagination/etools-pagination';
-import {
-  EtoolsTableSortItem,
-  getSelectedFiltersFromUrlParams,
-  getSortFields,
-  getSortFieldsFromUrlSortParams,
-  getUrlQueryStringSort
-} from '../../common/layout/etools-table-utility';
 import {buildUrlQueryString, cloneDeep} from '@unicef-polymer/etools-modules-common/dist/utils/utils';
 import {RouteDetails, RouteQueryParams} from '../../../routing/router';
 import {replaceAppLocation} from '../../../routing/routes';
@@ -128,9 +121,6 @@ export class IpReportingList extends connect(store)(LitElement) {
 
   @property({type: Object})
   paginator: EtoolsPaginator = {...defaultPaginator};
-
-  @property({type: Array})
-  sort: EtoolsTableSortItem[] = [{name: 'last_login', sort: EtoolsTableColumnSort.Desc}];
 
   @property({type: Array})
   filters!: EtoolsFilter[];
