@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -70,7 +71,7 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
 
             if len(disaggregation_values) != len(unique_list_dicts):
                 raise serializers.ValidationError({
-                    "disaggregation_values": "Duplicated disaggregation value is not allowed",
+                    "disaggregation_values": _("Duplicated disaggregation value is not allowed"),
                 })
 
         instance = Disaggregation.objects.create(**validated_data)
@@ -111,6 +112,17 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
             'calculation_formula_across_periods',
             'calculation_formula_across_locations',
         )
+
+    def validate(self, data):
+
+        unit = data.get('unit', None)
+        calc_periods = data.get('calculation_formula_across_periods', None)
+        if unit and unit == IndicatorBlueprint.RATIO and \
+                calc_periods and calc_periods != IndicatorBlueprint.LATEST:
+            raise ValidationError({
+                "calculation_formula_across_periods": _("Calculation Formula Across Periods has to be Latest"),
+            })
+        return data
 
 
 class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
@@ -2026,6 +2038,7 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'disaggregatable',
             'unit',
             'display_type',
+            'calculation_formula_across_periods'
         )
 
 
