@@ -35,7 +35,7 @@ export class NewUserDialog extends ComponentBaseMixin(LitElement) {
       </style>
 
       <etools-dialog
-        id="supplyAgreementDialog"
+        id="addUserDialog"
         size="md"
         ?opened="${this.dialogOpened}"
         ?show-spinner="${this.requestInProcess}"
