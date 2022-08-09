@@ -10,5 +10,12 @@
   "LAST_LOGIN": "Last login",
   "USER_TYPE": "User type",
   "CLEAR_ALL": "CLEAR ALL",
-  "FILTERS": "Filters"
+  "FILTERS": "Filters",
+  "FIRST_NAME": "First name",
+  "LAST_NAME": "Last name",
+  "EMAIL": "E-mail",
+  "REQUIRED_FIELD": "This field is required",
+  "CANCEL": "Cancel",
+  "SAVE_AND_CONTINUE": "Save and continue",
+  "ADD_NEW_USER": "Add new user"
 }

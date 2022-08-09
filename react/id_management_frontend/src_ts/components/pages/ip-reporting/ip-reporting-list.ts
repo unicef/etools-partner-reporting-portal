@@ -32,6 +32,10 @@ import {RouteDetails, RouteQueryParams} from '../../../routing/router';
 import {replaceAppLocation} from '../../../routing/routes';
 import {SharedStylesLit} from '../../styles/shared-styles-lit';
 
+import {
+  getSortFields,
+  getUrlQueryStringSort
+} from '@unicef-polymer/etools-modules-common/dist/layout/etools-table/etools-table-utility';
 import '@unicef-polymer/etools-loading';
 import get from 'lodash-es/get';
 import {etoolsEndpoints} from '../../../endpoints/endpoints-list';
@@ -42,6 +46,8 @@ import {getUserTypeLabel} from '../../utils/utils';
 import {TableStyles} from './list/table-styles';
 import {pick} from 'lodash-es';
 import {GenericObject} from '@unicef-polymer/etools-types';
+import './components/new-user-dialog';
+import {openDialog} from '@unicef-polymer/etools-modules-common/dist/utils/dialog';
 
 /**
  * @LitElement
@@ -80,7 +86,7 @@ export class IpReportingList extends connect(store)(LitElement) {
 
         <div slot="title-row-actions" class="content-header-actions">
           <div class="action">
-            <paper-button id="addBtn" class="primary left-icon" raised>
+            <paper-button id="addBtn" class="primary left-icon" raised @click="${() => this.onAddUserClick()}">
               <iron-icon icon="add"></iron-icon><span>NEW</span>
             </paper-button>
           </div>
@@ -106,6 +112,7 @@ export class IpReportingList extends connect(store)(LitElement) {
           .paginator="${this.paginator}"
           .getChildRowTemplateMethod="${this.getChildRowTemplate.bind(this)}"
           .extraCSS="${TableStyles}"
+          singleSort
           @paginator-change="${this.paginatorChange}"
           @sort-change="${this.sortChange}"
         ></etools-table>
@@ -173,7 +180,8 @@ export class IpReportingList extends connect(store)(LitElement) {
     {
       label: translate('LAST_LOGIN') as unknown as string,
       name: 'last_login',
-      type: EtoolsTableColumnType.Date
+      type: EtoolsTableColumnType.Date,
+      sort: EtoolsTableColumnSort.Desc
     }
   ];
 
@@ -246,8 +254,7 @@ export class IpReportingList extends connect(store)(LitElement) {
         this.prevQueryStringObj
           ? this.prevQueryStringObj
           : {
-              page_size: '20',
-              status: ['draft', 'active', 'review', 'signed', 'signature']
+              page_size: '20'
             }
       );
       return false;
@@ -324,9 +331,8 @@ export class IpReportingList extends connect(store)(LitElement) {
   }
 
   sortChange(e: CustomEvent) {
-    // this.sort = getSortFields(e.detail);
-    const sort = e.detail.field + '.' + e.detail.direction;
-    this.updateCurrentParams({sort: sort});
+    const sort = getSortFields(e.detail);
+    this.updateCurrentParams({sort: getUrlQueryStringSort(sort)});
   }
 
   getListData() {
@@ -347,6 +353,12 @@ export class IpReportingList extends connect(store)(LitElement) {
       .then(() => {
         this.showListLoading = false;
       });
+  }
+
+  onAddUserClick() {
+    openDialog({
+      dialog: 'new-user-dialog'
+    });
   }
 
   goToAddnewPage() {
