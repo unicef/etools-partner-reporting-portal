@@ -100,7 +100,7 @@ class ProgressReportsList extends LocalizeMixin(
                 </span>
               </div>
               <div class="table-cell table-cell--text">
-                <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
+                <pd-reports-report-title display-link display-link-icon report="[[report]]"></pd-reports-report-title>
               </div>
               <div class="table-cell table-cell--text">
                 <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>
