@@ -13,7 +13,7 @@ from factory import fuzzy
 from faker import Faker
 from unicef_locations.models import CartoDBTable
 
-from etools_prp.apps.account.models import User, UserProfile
+from etools_prp.apps.account.models import User
 from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObjective
 from etools_prp.apps.core.common import (
     CLUSTER_TYPES,
@@ -158,20 +158,11 @@ class AbstractUserFactory(factory.django.DjangoModelFactory):
     position = factory.LazyFunction(faker.job)
     username = factory.LazyFunction(faker.user_name)
     password = factory.PostGenerationMethodCall('set_password', 'test')
-    profile = factory.RelatedFactory('etools_prp.apps.core.tests.factories.UserProfileFactory', 'user')
 
     class Meta:
         model = User
         django_get_or_create = ('email', 'username')
         abstract = True
-
-
-@factory.django.mute_signals(signals.post_save)
-class UserProfileFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = UserProfile
-
-    user = factory.SubFactory('etools_prp.apps.core.tests.factories.AbstractUserFactory', profile=None)
 
 
 @factory.django.mute_signals(signals.post_save)
@@ -1225,8 +1216,8 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     review_date = due_date
     submission_date = due_date
     programme_document = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgrammeDocument', progress_report=None)
-    submitted_by = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
-    submitting_user = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
+    submitted_by = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory')
+    submitting_user = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory')
     reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
     reviewed_by_name = factory.LazyFunction(faker.name)
     sent_back_feedback = factory.LazyFunction(faker.text)

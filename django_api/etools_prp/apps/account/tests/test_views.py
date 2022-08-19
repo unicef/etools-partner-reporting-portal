@@ -21,13 +21,12 @@ class UserProfileAPIViewTestCase(BaseAPITestCase):
         super().setUp()
 
     def test_user_profile(self):
-        """Test if the user profile is created when user is created
+        """Test the user api
         """
         url = reverse('user-profile')
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['profile']['id'], self.user.profile.id)
 
     def test_unauthenticated_user(self):
         """Test if the user profile is not accessible to unauthenticated user
