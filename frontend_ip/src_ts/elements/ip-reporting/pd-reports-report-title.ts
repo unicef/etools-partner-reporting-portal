@@ -52,7 +52,12 @@ class PdReportsReportTitle extends LocalizeMixin(
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
       <template is="dom-if" if="[[showLink]]" restamp="true">
-        <a href="[[_getReportLink(report, permissions)]]">[[_getReportTitle(report, localize)]]</a>
+        <a href="[[_getReportLink(report, permissions)]]">
+          <template is="dom-if" if="[[displayLinkIcon]]" restamp="true">
+            <iron-icon class="link-mode-icon" icon="[[_getReportIcon(report, permissions)]]"></iron-icon>
+          </template>
+          [[_getReportTitle(report, localize)]]
+        </a>
       </template>
       <template is="dom-if" if="[[!showLink]]" restamp="true"> [[_getReportTitleFull(report, localize)]] </template>
       <template is="dom-if" if="[[_isFinalReport(report)]]" restamp="true">
@@ -69,6 +74,9 @@ class PdReportsReportTitle extends LocalizeMixin(
 
   @property({type: Boolean})
   displayLink = false;
+
+  @property({type: Boolean})
+  displayLinkIcon = false;
 
   @property({type: Boolean, computed: '_shouldDisplayLink(displayLink, report, permissions)'})
   showLink!: boolean;
@@ -94,6 +102,14 @@ class PdReportsReportTitle extends LocalizeMixin(
     }
     const suffix = this._getMode(report, permissions);
     return getReportLink(report, suffix, this.buildUrl, this._baseUrl);
+  }
+
+  _getReportIcon(report: GenericObject, permissions: GenericObject) {
+    if (!permissions) {
+      return 'icons:visibility';
+    }
+    const suffix = this._getMode(report, permissions);
+    return suffix === 'view' ? 'icons:visibility' : 'icons:create';
   }
 }
 
