@@ -22,6 +22,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {getReportTitle} from './js/progress-reports-list-functions';
+import '@unicef-polymer/etools-data-table/data-table-styles';
 
 /**
  * @polymer

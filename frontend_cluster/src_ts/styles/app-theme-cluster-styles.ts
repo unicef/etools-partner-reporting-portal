@@ -4,6 +4,7 @@ import '@polymer/paper-styles/color';
 export const appThemeClusterStyles = html`
   <style>
     :host {
+      --primary-color: #0099ff;
       --theme-primary-color: #009d55;
       --theme-secondary-color-a: #ceffcc;
       --theme-secondary-color-b: #88c245;

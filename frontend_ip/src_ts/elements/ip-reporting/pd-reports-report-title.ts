@@ -38,6 +38,10 @@ class PdReportsReportTitle extends LocalizeMixin(
           margin-left: 5px;
           font-weight: bold;
         }
+
+        a {
+          color: var(--primary-color);
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
