@@ -161,6 +161,7 @@ PD_DOCUMENT_TYPE = Choices(
 
 PROGRESS_REPORT_STATUS = Choices(
     ('Due', 'due', 'Due'),
+    ('Not', 'not_yet_due', 'Not Yet Due'),
     ('Ove', 'overdue', 'Overdue'),
     ('Sub', 'submitted', 'Submitted'),
     ('Sen', 'sent_back', 'Sent back'),
