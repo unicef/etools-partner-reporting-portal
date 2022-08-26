@@ -71,7 +71,8 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: this.localize('due'), id: 'Due'},
       {title: this.localize('all'), id: ''},
       {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'}
+      {title: this.localize('accepted'), id: 'Acc'},
+      {title: this.localize('not_due_yet'), id: 'Not'}
     ];
   }
 }
