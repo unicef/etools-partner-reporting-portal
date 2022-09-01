@@ -15,7 +15,7 @@ from openpyxl.utils import get_column_letter
 
 from etools_prp.apps.indicator.constants import ValueType
 from etools_prp.apps.indicator.models import Disaggregation, IndicatorBlueprint
-from etools_prp.apps.indicator.utilities import convert_string_number_to_float
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float, format_total_value_to_string
 from etools_prp.apps.unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from etools_prp.apps.unicef.models import ProgressReport
 
@@ -385,9 +385,15 @@ class ProgressReportsXLSXExporter:
 
                 for disaggregation, total_value in location_data.disaggregation.items():
                     combination_column = disaggregation_column_map.get(disaggregation)
+
+                    is_percentage = indicator_report.reportable.blueprint.unit == indicator_report.reportable.blueprint.PERCENTAGE
+                    total = format_total_value_to_string(
+                        total_value,
+                        is_percentage=is_percentage,
+                        percentage_display_type='ratio' if indicator_report.reportable.blueprint.display_type == 'ratio' else None)
                     if combination_column:
                         self.current_sheet.cell(
-                            row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
+                            row=current_row, column=combination_column, value=total
                         )
                     else:
                         logger.exception('Location data {} contains unknown disaggregation: {}'.format(
