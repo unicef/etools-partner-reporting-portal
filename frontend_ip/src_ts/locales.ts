@@ -428,7 +428,7 @@ export const locales = {
     edit_partner: 'Edit Partner',
     changes_saved: 'Changes saved.',
     an_error_occurred: 'An error occurred, please try again later.',
-    error_verify_entered_data: 'An error occured, please verify entered data.',
+    error_verify_entered_data: 'An error occurred, please verify entered data.',
     file_uploaded: 'File uploaded.',
     file_deleted: 'File deleted.',
     request_ocha_timed_out: 'Request to OCHA timed out. Please try again.',
