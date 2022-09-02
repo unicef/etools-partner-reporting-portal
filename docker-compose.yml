@@ -1,10 +1,9 @@
 version: '3.8'
 
 volumes:
-    pg-data-prp: {}
+  pg-data-prp: {}
 
 services:
-
   proxy:
     image: traefik:v2.4
     command:
@@ -14,8 +13,8 @@ services:
       - '--entryPoints.web.address=:80'
       - '--providers.docker.constraints=Label(`project.label`,`prp`)'
     ports:
-      - "8081:80"
-      - "8097:8080"
+      - '8081:80'
+      - '8097:8080'
     container_name: prp_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -43,46 +42,46 @@ services:
       - traefik.enable=true
       - project.label=prp
 
-###### BUILT VERSION
-#  prp_backend:
-#    image: unicef/etools-prp:develop
-#    env_file:
-#      - .env
-#    command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
-#    depends_on:
-#      - db
-#    labels:
-#      - traefik.http.routers.prp_backend.rule=PathPrefix(`/`) && Host(`prp.localhost`)
-#      - traefik.http.routers.prp_backend.service=prp_backend
-#      - traefik.http.services.prp_backend.loadBalancer.server.port=8080
-#      - traefik.enable=true
-#      - project.label=prp
+  ###### BUILT VERSION
+  #  prp_backend:
+  #    image: unicef/etools-prp:develop
+  #    env_file:
+  #      - .env
+  #    command: bash -c "python /code/manage.py runserver 0.0.0.0:8080"
+  #    depends_on:
+  #      - db
+  #    labels:
+  #      - traefik.http.routers.prp_backend.rule=PathPrefix(`/`) && Host(`prp.localhost`)
+  #      - traefik.http.routers.prp_backend.service=prp_backend
+  #      - traefik.http.services.prp_backend.loadBalancer.server.port=8080
+  #      - traefik.enable=true
+  #      - project.label=prp
 
-#  beater-prp:
-#    command: bash -c "celery -A etools_prp beat -l ${CELERY_LOG_LEVEL:-info} --scheduler django_celery_beat.schedulers:DatabaseScheduler"
-#    image: unicef/etools-prp:develop
-#    env_file:
-#      - .env
-#    depends_on:
-#      - prp_backend
-#      - prp_redis
-##
-#  worker-prp:
-#    image: unicef/etools-prp:local
-#    env_file:
-#      - .env
-#    build:
-#      context: ./django_api
-#      dockerfile: ./Dockerfile
-#      args:
-#        ENV: dev
-#    volumes:
-#      - './django_api:/code/'
-#      - './data/etools_prp_logs:/data/etools_prp/logs'
-#      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
-#    depends_on:
-#      - db
-#    command: bash -c "celery -A etools_prp worker -l ${CELERY_LOG_LEVEL:-info}"
+  #  beater-prp:
+  #    command: bash -c "celery -A etools_prp beat -l ${CELERY_LOG_LEVEL:-info} --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+  #    image: unicef/etools-prp:develop
+  #    env_file:
+  #      - .env
+  #    depends_on:
+  #      - prp_backend
+  #      - prp_redis
+  ##
+  #  worker-prp:
+  #    image: unicef/etools-prp:local
+  #    env_file:
+  #      - .env
+  #    build:
+  #      context: ./django_api
+  #      dockerfile: ./Dockerfile
+  #      args:
+  #        ENV: dev
+  #    volumes:
+  #      - './django_api:/code/'
+  #      - './data/etools_prp_logs:/data/etools_prp/logs'
+  #      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
+  #    depends_on:
+  #      - db
+  #    command: bash -c "celery -A etools_prp worker -l ${CELERY_LOG_LEVEL:-info}"
 
   db:
     image: unicef/etools-prp-db
@@ -102,34 +101,34 @@ services:
     image: redis:6.2-alpine
     container_name: prp_redis
 
-#  id-management:
-#    image: unicef/etools-prp-id-management-frontend:1307dc7
-#    container_name: prp_id
-#    labels:
-#      - traefik.http.routers.prp_id.rule=PathPrefix(`/id-management/`) && Host(`prp.localhost`)
-#      - traefik.http.services.prp_id.loadBalancer.server.port=3000
-#      - traefik.http.routers.prp_id.service=prp_id
-#      - traefik.enable=true
-#      - project.label=prp
-#    command: bash -c 'npm run build && bash resolve_build_bundle.sh && node express.js'
+  #  id-management:
+  #    image: unicef/etools-prp-id-management-frontend:1307dc7
+  #    container_name: prp_id
+  #    labels:
+  #      - traefik.http.routers.prp_id.rule=PathPrefix(`/id-management/`) && Host(`prp.localhost`)
+  #      - traefik.http.services.prp_id.loadBalancer.server.port=3000
+  #      - traefik.http.routers.prp_id.service=prp_id
+  #      - traefik.enable=true
+  #      - project.label=prp
+  #    command: bash -c 'npm run build && bash resolve_build_bundle.sh && node express.js'
 
-#  id-management:
-#    build:
-#     context: ./react/id_management_frontend
-#     dockerfile: ./Dockerfile
-#    image: unicef/etools-prp-id-management-frontend
-#    container_name: prp_id_local
-#    labels:
-#     - traefik.http.routers.prp_id.rule=PathPrefix(`/id-management/`) && Host(`prp.localhost`)
-#     - traefik.http.routers.prp_id.middlewares=prp_id-stripprefix
-#     - traefik.http.middlewares.prp_id-stripprefix.stripprefix.prefixes=/id-management/
-#     - traefik.http.services.prp_id.loadBalancer.server.port=3000
-#     - traefik.http.routers.prp_id.service=prp_id
-#     - traefik.enable=true
-#     - project.label=prp
-#    volumes:
-#     - ./react/id_management_frontend/:/code
-#    command: bash -c "npm run start"
+  #  id-management:
+  #    build:
+  #     context: ./react/id_management_frontend
+  #     dockerfile: ./Dockerfile
+  #    image: unicef/etools-prp-id-management-frontend
+  #    container_name: prp_id_local
+  #    labels:
+  #     - traefik.http.routers.prp_id.rule=PathPrefix(`/id-management/`) && Host(`prp.localhost`)
+  #     - traefik.http.routers.prp_id.middlewares=prp_id-stripprefix
+  #     - traefik.http.middlewares.prp_id-stripprefix.stripprefix.prefixes=/id-management/
+  #     - traefik.http.services.prp_id.loadBalancer.server.port=3000
+  #     - traefik.http.routers.prp_id.service=prp_id
+  #     - traefik.enable=true
+  #     - project.label=prp
+  #    volumes:
+  #     - ./react/id_management_frontend/:/code
+  #    command: bash -c "npm run start"
 
   cluster:
     image: unicef/etools-prp-cluster-fe:develop
@@ -141,56 +140,51 @@ services:
       - traefik.enable=true
       - project.label=prp
     command: node express.js
-#
-#  cluster:
-#    build:
-#      context: ./frontend_cluster
-#      dockerfile: ./Dockerfile-dev
-#    image: prpdev/etools-fe-cluster:dev
-#    container_name: prp_cl_local
-#    labels:
-#      - traefik.http.routers.prp_cl.rule=PathPrefix(`/cluster/`) && Host(`prp.localhost`)
-#      - traefik.http.routers.prp_cl.middlewares=prp_cl-stripprefix
-#      - traefik.http.middlewares.prp_cl-stripprefix.stripprefix.prefixes=/cluster/
-#      - traefik.http.services.prp_cl.loadBalancer.server.port=8082
-#      - traefik.http.routers.prp_cl.service=prp_cl
-#      - traefik.enable=true
-#      - project.label=prp
-#    volumes:
-#      - "./frontend_cluster:/code"
-#    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}
+  #
+  #  cluster:
+  #    build:
+  #      context: ./frontend_cluster
+  #      dockerfile: ./Dockerfile-dev
+  #    image: prpdev/etools-fe-cluster:dev
+  #    container_name: prp_cl_local
+  #    labels:
+  #      - traefik.http.routers.prp_cl.rule=PathPrefix(`/cluster/`) && Host(`prp.localhost`)
+  #      - traefik.http.routers.prp_cl.middlewares=prp_cl-stripprefix
+  #      - traefik.http.middlewares.prp_cl-stripprefix.stripprefix.prefixes=/cluster/
+  #      - traefik.http.services.prp_cl.loadBalancer.server.port=8082
+  #      - traefik.http.routers.prp_cl.service=prp_cl
+  #      - traefik.enable=true
+  #      - project.label=prp
+  #    volumes:
+  #      - "./frontend_cluster:/code"
+  #    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}
 
+  #
+  # ip:
+  #   image: unicef/etools-prp-polymer:develop
+  #   container_name: prp_ip
+  #   labels:
+  #     - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
+  #     - traefik.http.services.prp_ip.loadBalancer.server.port=8082
+  #     - traefik.http.routers.prp_ip.service=prp_ip
+  #     - traefik.enable=true
+  #     - project.label=prp
+  #   command: node express.js
 
-
-#
   ip:
-    image: unicef/etools-prp-polymer:develop
-    container_name: prp_ip
+    build:
+      context: ./frontend_ip
+      dockerfile: ./Dockerfile-dev
+    image: etoolsdev/etools-ip:dev
+    container_name: prp_ip_local
     labels:
       - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
+      - traefik.http.routers.prp_ip.middlewares=prp_ip-stripprefix
+      - traefik.http.middlewares.prp_ip-stripprefix.stripprefix.prefixes=/ip/
       - traefik.http.services.prp_ip.loadBalancer.server.port=8082
       - traefik.http.routers.prp_ip.service=prp_ip
       - traefik.enable=true
       - project.label=prp
-    command: node express.js
-
-#  ip:
-#    build:
-#      context: ./frontend_ip
-#      dockerfile: ./Dockerfile-dev
-#    image: etoolsdev/etools-ip:dev
-#    container_name: prp_ip_local
-#    labels:
-#      - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
-#      - traefik.http.routers.prp_ip.middlewares=prp_ip-stripprefix
-#      - traefik.http.middlewares.prp_ip-stripprefix.stripprefix.prefixes=/ip/
-#      - traefik.http.services.prp_ip.loadBalancer.server.port=8082
-#      - traefik.http.routers.prp_ip.service=prp_ip
-#      - traefik.enable=true
-#      - project.label=prp
-#    volumes:
-#      - "./frontend_ip:/code"
-#    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}
-
-
-
+    volumes:
+      - './frontend_ip:/code'
+    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}

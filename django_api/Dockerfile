@@ -1,4 +1,4 @@
-ARG BASE_TAG=installed
+ARG BASE_TAG=latest
 FROM unicef/etools-prp:$BASE_TAG
 
 ARG env
