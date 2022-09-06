@@ -106,7 +106,8 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
       {title: this.localize('sent_back'), id: 'Sen'},
       {title: this.localize('due'), id: 'Due'},
       {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'}
+      {title: this.localize('accepted'), id: 'Acc'},
+      {title: this.localize('not_yet_due'), id: 'Not'}
     ];
   }
 
