@@ -64,7 +64,7 @@
     "@unicef-polymer/etools-currency-amount-input": "^4.0.2",
     "@unicef-polymer/etools-data-table": "6.1.1",
     "@unicef-polymer/etools-date-time": "^3.0.3",
-    "@unicef-polymer/etools-dropdown": "^3.9.4",
+    "@unicef-polymer/etools-dropdown": "^3.9.7",
     "@unicef-polymer/etools-file": "^3.0.3",
     "@unicef-polymer/etools-loading": "^5.0.1",
     "@webcomponents/webcomponentsjs": "^2.6.0",
