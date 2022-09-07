@@ -56,7 +56,7 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
 
     fireEvent(this, 'filter-changed', {
       name: this.name,
-      value: String(newValue)
+      value: newValue == -1 ? '' : String(newValue)
     });
   }
 

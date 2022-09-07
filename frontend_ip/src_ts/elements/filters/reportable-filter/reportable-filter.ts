@@ -55,7 +55,7 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
 
     return [
       {
-        id: '',
+        id: '-1',
         title: 'All'
       }
     ].concat(other);
