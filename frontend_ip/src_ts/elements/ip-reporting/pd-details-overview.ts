@@ -24,9 +24,9 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Settings from '../../etools-prp-common/settings';
-import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
-import {RootState} from '../../typings/redux.types';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
+import {pdAdd} from '../../redux/actions/pd';
 
 /**
  * @polymer
@@ -382,6 +382,11 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
       pdThunk()
         .then((res: any) => {
           this.set('pd', res.data);
+
+          const pdFromAllList = currentProgrammeDocument(this.rootState);
+          if (!pdFromAllList || !Object.keys(pdFromAllList).length) {
+            this.reduxStore.dispatch(pdAdd(res.data));
+          }
         })
         .catch((err: GenericObject) => {
           console.log(err);
