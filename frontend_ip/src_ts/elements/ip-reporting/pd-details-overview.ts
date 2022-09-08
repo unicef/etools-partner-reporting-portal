@@ -104,11 +104,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     </style>
 
     <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="programmeDocumentDetail"
         url="[[programmeDocumentDetailUrl]]">
     </etools-prp-ajax>
@@ -291,7 +286,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
+  @property({type: Object})
   pd: GenericObject = {};
 
   @property({type: Object})
@@ -318,9 +313,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
-
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
 
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
@@ -358,10 +350,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     return computeReportingRequirements(reportingPeriods, Settings.dateFormat);
   }
 
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  }
-
   _computePdDetailsUrl(locationId: string, pdId: string) {
     if (!locationId || !pdId) {
       return;
@@ -393,16 +381,12 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
       pdThunk()
         .then((res: any) => {
-          this.pd = res.data;
+          this.set('pd', res.data);
         })
         .catch((err: GenericObject) => {
           console.log(err);
         });
     });
-  }
-
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
   }
 
   disconnectedCallback() {
