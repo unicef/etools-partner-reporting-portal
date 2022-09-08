@@ -25,8 +25,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Settings from '../../etools-prp-common/settings';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
-import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
-import {pdAdd} from '../../redux/actions/pd';
+import {pdAdd, pdSetCount} from '../../redux/actions/pd';
 
 /**
  * @polymer
@@ -382,10 +381,12 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
       pdThunk()
         .then((res: any) => {
           this.set('pd', res.data);
-
-          const pdFromAllList = currentProgrammeDocument(this.rootState);
-          if (!pdFromAllList || !Object.keys(pdFromAllList).length) {
+          // if PD is missing from state programmeDocuments need to add it because
+          // it's loaded from list in other places with currentProgrammeDocument
+          const pdFromList = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(res.data.id));
+          if (!pdFromList) {
             this.reduxStore.dispatch(pdAdd(res.data));
+            this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
           }
         })
         .catch((err: GenericObject) => {
