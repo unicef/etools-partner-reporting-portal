@@ -58,7 +58,7 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
           >
           </text-filter>
 
-          <location-filter class="item" value="[[_withDefault(queryParams.location, '')]]"> </location-filter>
+          <location-filter class="item" value="[[_withDefault(queryParams.location, '-1')]]"> </location-filter>
 
           <dropdown-filter-multi
             class="item item-2-col"
