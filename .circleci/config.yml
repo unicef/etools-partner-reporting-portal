@@ -255,7 +255,6 @@ workflows:
                 - master
                 - staging
                 - develop
-                - links-style
                 - pd-overview-loading
       - build_and_deploy_fe_cluster:
           filters:
