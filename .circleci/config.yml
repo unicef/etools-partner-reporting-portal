@@ -255,6 +255,7 @@ workflows:
                 - master
                 - staging
                 - develop
+                - pd-overview-loading
                 - update-packages-fixes
       - build_and_deploy_fe_cluster:
           filters:
