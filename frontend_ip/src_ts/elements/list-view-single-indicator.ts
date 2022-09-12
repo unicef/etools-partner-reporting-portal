@@ -107,7 +107,7 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
 
-      <etools-data-table-row details-opened="{{detailsOpened}}" on-details-opened-changed="onDetailsOpenedChanged">
+      <etools-data-table-row details-opened="{{detailsOpened}}" on-opened-changed="onDetailsOpenedChanged">
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
             <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
@@ -293,9 +293,10 @@ class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(Redu
   }
 
   onDetailsOpenedChanged(event: CustomEvent) {
+    this.detailsOpened = event.detail.opened;
     this.dispatchEvent(
       new CustomEvent('details-opened-changed', {
-        detail: {row: event.target, detailsOpened: event.detail.value},
+        detail: {row: event.target, detailsOpened: event.detail.opened},
         bubbles: true,
         composed: true
       })
