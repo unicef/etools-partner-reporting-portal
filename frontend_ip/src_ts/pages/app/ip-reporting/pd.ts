@@ -135,8 +135,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    if (this.subroute.path && this.currentPD && typeof this.currentPD.id !== 'undefined') {
-      // Don't refetch on child routes, unless navigated to directly.
+    if (this.subroute.path) {
+      // Don't refetch on child routes
       return;
     }
 
