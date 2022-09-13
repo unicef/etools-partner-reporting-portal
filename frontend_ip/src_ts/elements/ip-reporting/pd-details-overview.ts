@@ -306,9 +306,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: Boolean, computed: '_computeLoaded(pd)'})
   loaded = false;
 
-  @property({type: Boolean, computed: '_loadedProgrammeDocuments(rootState)'})
-  pdDocumentsLoaded = false;
-
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
@@ -324,7 +321,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   private _pdDetailDebouncer!: Debouncer;
 
   public static get observers() {
-    return ['_getPdRecord(pdDocumentsLoaded, programmeDocumentDetailUrl)'];
+    return ['_getPdRecord(programmeDocumentDetailUrl)'];
   }
 
   _computeFunds(num: number) {
@@ -378,7 +375,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   }
 
   _getPdRecord() {
-    if (!this.pdDocumentsLoaded || !this.programmeDocumentDetailUrl) {
+    if (!this.programmeDocumentDetailUrl) {
       return;
     }
 
