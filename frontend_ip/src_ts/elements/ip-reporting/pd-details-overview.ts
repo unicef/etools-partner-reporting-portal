@@ -14,6 +14,7 @@ import '../../etools-prp-common/elements/list-placeholder';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {loadedProgrammeDocuments} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 
 import '../../etools-prp-common/elements/labelled-item';
 import '../../elements/etools-prp-currency';
@@ -26,6 +27,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import Settings from '../../etools-prp-common/settings';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 import {pdAdd, pdSetCount} from '../../redux/actions/pd';
+import {RootState} from '../../typings/redux.types';
 
 /**
  * @polymer
@@ -304,6 +306,9 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: Boolean, computed: '_computeLoaded(pd)'})
   loaded = false;
 
+  @property({type: Boolean, computed: '_loadedProgrammeDocuments(rootState)'})
+  pdDocumentsLoaded = false;
+
   @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
   locationId!: string;
 
@@ -319,7 +324,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   private _pdDetailDebouncer!: Debouncer;
 
   public static get observers() {
-    return ['_getPdRecord(programmeDocumentDetailUrl)'];
+    return ['_getPdRecord(pdDocumentsLoaded, programmeDocumentDetailUrl)'];
   }
 
   _computeFunds(num: number) {
@@ -328,6 +333,10 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     } else {
       return num / 100;
     }
+  }
+
+  _loadedProgrammeDocuments(rootState: RootState) {
+    return loadedProgrammeDocuments(rootState);
   }
 
   _computeLoaded(pd: GenericObject) {
@@ -369,9 +378,10 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   }
 
   _getPdRecord() {
-    if (!this.programmeDocumentDetailUrl) {
+    if (!this.pdDocumentsLoaded || !this.programmeDocumentDetailUrl) {
       return;
     }
+
     this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(100), () => {
       const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
 
