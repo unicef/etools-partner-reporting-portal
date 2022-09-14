@@ -106,7 +106,7 @@ def create_location(pcode,
             logger.info('{}: {} ({})'.format(
                 'Added',
                 loc.name,
-                carto_table.admin_level_name.name
+                carto_table.admin_level_name
             ))
 
         return True, sites_not_added, sites_created, sites_updated
@@ -147,7 +147,7 @@ def create_location(pcode,
         logger.info('{}: {} ({})'.format(
             'Updated',
             location.name,
-            carto_table.admin_level_name.name
+            carto_table.admin_level_name
         ))
 
         return True, sites_not_added, sites_created, sites_updated

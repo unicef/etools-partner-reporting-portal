@@ -46,6 +46,7 @@ from etools_prp.apps.unicef.serializers import (
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
+from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -323,7 +324,7 @@ def process_programme_documents(fast=False, area=False):
                                 },
                             )
 
-                        if item['status'] not in ("draft, signed",):
+                        if item['status'] not in ("draft", "signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
                             llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
                             llos.update(active=False)
@@ -486,6 +487,9 @@ def process_programme_documents(fast=False, area=False):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
+
+                                    convert_string_values_to_numeric(i['target'])
+                                    convert_string_values_to_numeric(i['baseline'])
 
                                     reportable = process_model(
                                         Reportable,

@@ -412,7 +412,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         queryset = obj.indicator_reports.all()
         if self.llo_id and self.llo_id is not None:
             queryset = queryset.filter(reportable__object_id=self.llo_id)
-        if self.location_id and self.llo_id is not None:
+        if self.location_id and self.location_id is not None:
             queryset = queryset.filter(reportable__locations__id=self.location_id)
 
         if self.show_incomplete_only in [1, "1", "true", "True", True]:

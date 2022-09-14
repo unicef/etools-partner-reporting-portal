@@ -879,6 +879,63 @@ class TestProgressReportAPIView(BaseAPITestCase):
             ir_qs.count(),
         )
 
+    def test_detail_api_filter_location(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+        new_loc = factories.LocationFactory()
+        llo_reportable_2 = factories.QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        factories.LocationWithReportableLocationGoalFactory(
+            location=new_loc,
+            reportable=llo_reportable_2,
+        )
+        factories.ProgressReportIndicatorReportFactory(
+            progress_report=progress_report,
+            reportable=llo_reportable_2,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+            overall_status=OVERALL_STATUS.met,
+        )
+
+        # test an indicator report exists for given location
+        ir_qs = ir_qs.filter(reportable__locations__id=new_loc.pk)
+        self.assertEquals(ir_qs.count(), 1)
+        url_loc_filter = url + f'?location={new_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        # test no indicator reports exist for a unused location
+        unused_loc = factories.LocationFactory()
+        ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
+        self.assertEquals(ir_qs.count(), 0)
+        url_loc_filter = url + f'?location={unused_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            0,
+        )
+
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
     @patch.object(Notification, "send_notification", return_value=None)

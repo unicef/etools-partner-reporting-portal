@@ -67,7 +67,7 @@ class IndicatorsFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
           <pd-dropdown-filter class="item item-2-col" value="[[_withDefault(queryParams.pds, '')]]">
           </pd-dropdown-filter>
 
-          <location-filter class="item" value="[[_withDefault(queryParams.location, '')]]"> </location-filter>
+          <location-filter class="item" value="[[_withDefault(queryParams.location, '-1')]]"> </location-filter>
 
           <text-filter
             class="item"

@@ -257,6 +257,8 @@ workflows:
                 - develop
                 - locations-name
                 - epd_sync_updates
+                - pd-overview-loading
+                - update-packages-fixes
       - build_and_deploy_fe_cluster:
           filters:
             branches:

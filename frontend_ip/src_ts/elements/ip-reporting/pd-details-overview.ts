@@ -24,9 +24,8 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Settings from '../../etools-prp-common/settings';
-import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
-import {RootState} from '../../typings/redux.types';
+import {pdAdd, pdSetCount} from '../../redux/actions/pd';
 
 /**
  * @polymer
@@ -102,11 +101,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         margin-bottom: 50px;
       }
     </style>
-
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
 
     <etools-prp-ajax
         id="programmeDocumentDetail"
@@ -291,7 +285,7 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   `;
   }
 
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
+  @property({type: Object})
   pd: GenericObject = {};
 
   @property({type: Object})
@@ -318,9 +312,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
-
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
 
   @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
   programmeDocumentDetailUrl!: string;
@@ -358,10 +349,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     return computeReportingRequirements(reportingPeriods, Settings.dateFormat);
   }
 
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  }
-
   _computePdDetailsUrl(locationId: string, pdId: string) {
     if (!locationId || !pdId) {
       return;
@@ -393,16 +380,19 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
 
       pdThunk()
         .then((res: any) => {
-          this.pd = res.data;
+          this.set('pd', res.data);
+          // if PD is missing from state programmeDocuments need to add it because
+          // it's loaded from list in other places with currentProgrammeDocument
+          const pdFromList = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(res.data.id));
+          if (!pdFromList) {
+            this.reduxStore.dispatch(pdAdd(res.data));
+            this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
+          }
         })
         .catch((err: GenericObject) => {
           console.log(err);
         });
     });
-  }
-
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
   }
 
   disconnectedCallback() {

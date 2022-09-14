@@ -27,3 +27,15 @@ def render_pdf_to_response(request, template, data):
         )
 
     return response
+
+
+def convert_string_values_to_numeric(d):
+    """
+    Convert numbers as strings into numeric
+    "1500"->1500 "2,000.9"->2000.9  "2.5"->2.5
+    :param d: dict
+    """
+    for k, v in d.items():
+        if type(v) == str:
+            d[k] = d[k].replace(',', '')
+            d[k] = float(d[k]) if '.' in d[k] else int(d[k])

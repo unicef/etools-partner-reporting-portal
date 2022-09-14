@@ -1,0 +1,83 @@
+{% load prp %}
+
+<!doctype html>
+
+<html lang="">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="UNICEF Partner Reporting Portal" />
+    <title>"UNICEF Partner Reporting Portal"</title>
+    <meta name="theme-color" content="#2E3AA1">
+
+    <!-- Matomo -->
+    <script>
+      var _paq = window._paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u='{% matomo_settings "MATOMO_HOST_URL" %}';
+        _paq.push(['setTrackerUrl', u+'{% matomo_settings "MATOMO_TRACKER_URL" %}']);
+        _paq.push(['setSiteId', '{% matomo_settings "MATOMO_SITE_ID" %}']);
+        _paq.push(['setUserId', '{{ request.user.pk }}']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <!-- End Matomo Code -->
+
+    {% block extra_head %}
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        .unicefblue {
+            background-color: #15274f;
+        }
+
+        .medium-tall{
+            padding: 1%;
+            height: 100px;
+            background-color: #15274f;
+            color: #ffffff;
+        }
+
+        .bottom{
+            padding-top: 2%;
+        }
+        .errorContent{
+            margin: 0 auto;
+            display: block;
+            text-align: center;
+            padding-top: 3em;
+        }
+
+    </style>
+
+
+    {% endblock %}
+
+</head>
+
+<body class="fullbleed vertical layout">
+{% block toolbar %}
+<div class="medium-tall">
+    <img src="/api/static/images/unicefetools.svg" width="200px">
+    <img src="/api/static/images/IP-logo.png" width="300px" max-width="120%" align="right"/>
+</div>
+{% endblock toolbar %}
+
+
+{% block content %}
+{% endblock content %}
+{% block extra_js %}
+{% endblock %}
+</body>
+
+</html>
