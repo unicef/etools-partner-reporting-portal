@@ -158,7 +158,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    if (this.fetchPdsDebouncer && this.fetchPdsDebouncer.isActive()) {
+    if (this.fetchPdsDebouncer && this.fetchPdsDebouncer.isActive) {
       this.fetchPdsDebouncer.cancel();
     }
   }
