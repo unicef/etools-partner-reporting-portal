@@ -14,13 +14,6 @@ export const pdSet = function (data: any) {
   };
 };
 
-export const pdAdd = function (data: any) {
-  return {
-    type: Constants.ADD_PROGRAMME_DOCUMENTS,
-    data: data
-  };
-};
-
 export const pdSetCount = function (count: number) {
   return {
     type: Constants.SET_PROGRAMME_DOCUMENTS_COUNT,
