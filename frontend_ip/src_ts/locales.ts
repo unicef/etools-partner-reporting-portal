@@ -480,7 +480,8 @@ export const locales = {
     report_submitted: 'Report submitted',
     please_make_sure_indicators: 'Please make sure indicators have locations set for reports to be generated.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'The export contains only Accepted and Submitted Reports'
   },
   fr: {
     civil_society_organization: 'Civil Society Organization',
@@ -967,7 +968,8 @@ export const locales = {
     please_make_sure_indicators:
       'Veuillez vous assurer que les indicateurs ont des emplacements pour les rapports à générer.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: "L'exportation ne contient que les rapports acceptés et soumis"
   },
   es: {
     civil_society_organization: 'Civil Society Organization',
@@ -1454,7 +1456,8 @@ export const locales = {
     please_make_sure_indicators:
       'Por favor asegúrese de que los indicadores tengan ubicaciones establecidas para generar informes.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'La exportación contiene solo informes aceptados y enviados'
   },
   ru: {
     civil_society_organization: 'Civil Society Organization',
@@ -1945,7 +1948,8 @@ export const locales = {
     please_make_sure_indicators:
       'Пожалуйста, удостоверьтесь, что индикаторы включают местоположения, установленные для данных отчетов.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'Экспорт содержит только принятые и отправленные отчеты.'
   },
   pt: {
     civil_society_organization: 'Organização da Sociedade Civil',
@@ -2430,7 +2434,8 @@ export const locales = {
     please_make_sure_indicators:
       'Favor garantir que todos os indicadores possuem locais definidos para os relatórios à serem gerados',
     you_are_about_to_location:
-      "Você está prestes à reiniciar todos os dados de local e informações inseridas para este indicador do relatório; incluindo status geral, análise narrativa e status do relatório. Novos campos para entrada de dados de local serão gerados. Esta ação é irreversível. Favor clicar em 'Atualizar' caso você queira prosseguir."
+      "Você está prestes à reiniciar todos os dados de local e informações inseridas para este indicador do relatório; incluindo status geral, análise narrativa e status do relatório. Novos campos para entrada de dados de local serão gerados. Esta ação é irreversível. Favor clicar em 'Atualizar' caso você queira prosseguir.",
+    progress_reports_export_status: 'A exportação contém apenas relatórios aceitos e enviados'
   },
   ar: {
     civil_society_organization: 'منظمة المجتمع المدني',
@@ -2912,6 +2917,7 @@ export const locales = {
     report_submitted: 'تم تقديم التقرير',
     please_make_sure_indicators: 'الرجاء التأكد من أن المؤشرات تحتوي على مواقع محددة للتقارير التي سيتم إنشاؤها.',
     you_are_about_to_location:
-      'أنت على وشك إعادة تعيين كافة بيانات الموقع وإدخال المعلومات  المتغلقة بتقرير المؤشر هذا؛ بما في ذلك الحالة العامة والتقييم السردي وحالة التقرير. سيتم إنشاء مدخلات بيانات الموقع الجديد. وهذا الإجراء لا رجعة فيه. الرجاء النقر فوق "تحديث" إذا كنت ترغب في المتابعة'
+      'أنت على وشك إعادة تعيين كافة بيانات الموقع وإدخال المعلومات  المتغلقة بتقرير المؤشر هذا؛ بما في ذلك الحالة العامة والتقييم السردي وحالة التقرير. سيتم إنشاء مدخلات بيانات الموقع الجديد. وهذا الإجراء لا رجعة فيه. الرجاء النقر فوق "تحديث" إذا كنت ترغب في المتابعة',
+    progress_reports_export_status: 'يحتوي التصدير على التقارير المقبولة والمرسلة فقط'
   }
 };
