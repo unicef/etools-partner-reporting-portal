@@ -43,7 +43,7 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             class="item"
             label="[[localize('status')]]"
             name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
+            value="[[_withDefault(queryParams.status, '-1')]]"
             data="[[statuses]]"
           >
           </dropdown-filter>
