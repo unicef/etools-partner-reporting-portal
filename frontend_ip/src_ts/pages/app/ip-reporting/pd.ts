@@ -130,6 +130,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
+    // in case user navigates directly to detail url, state.programmeDocuments it's empty so need to load Pd
     this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(10), () => {
       const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
 
@@ -138,13 +139,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
 
       pdThunk()
         .then((res: any) => {
-          // if PD is missing from state programmeDocuments need to add it because
-          // it's loaded from list in other places with currentProgrammeDocument
-          const pdFromList = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(res.data.id));
-          if (!pdFromList) {
-            this.reduxStore.dispatch(pdAdd(res.data));
-            this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
-          }
+          this.reduxStore.dispatch(pdAdd(res.data));
+          this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
         })
         .catch((err: GenericObject) => {
           console.log(err);
