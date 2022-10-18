@@ -15,7 +15,7 @@ from openpyxl.utils import get_column_letter
 
 from etools_prp.apps.indicator.constants import ValueType
 from etools_prp.apps.indicator.models import Disaggregation, IndicatorBlueprint
-from etools_prp.apps.indicator.utilities import convert_string_number_to_float
+from etools_prp.apps.indicator.utilities import convert_string_number_to_float, format_total_value_to_string
 from etools_prp.apps.unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 from etools_prp.apps.unicef.models import ProgressReport
 
@@ -118,16 +118,27 @@ class ProgressReportsXLSXExporter:
 
         if indicator_report.is_percentage:
             indicator_report_value_format = FORMAT_PERCENTAGE
-            achievement_in_reporting_period = indicator_report.total.get(ValueType.CALCULATED, 0)
-            total_cumulative_progress = indicator_report.reportable.achieved.get(
+            # fixing percent number format: 0.1 is equivalent to 10% in math, openpyxl works the same way
+            # e.g. a calculated value of 88.72 becomes 8872% on xls export, that's why it needs divided by 100
+            achievement_in_reporting_period = int(indicator_report.total.get(ValueType.CALCULATED, 0)) / 100
+            total_cumulative_progress = int(indicator_report.reportable.total.get(
                 ValueType.CALCULATED, 0
+            )) / 100
+        elif indicator_report.is_number:
+            indicator_report_value_format = None
+            achievement_in_reporting_period = indicator_report.total.get(ValueType.VALUE, 0)
+            total_cumulative_progress = indicator_report.reportable.total.get(
+                ValueType.VALUE, 0
             )
         else:
             indicator_report_value_format = None
-            achievement_in_reporting_period = indicator_report.total.get(ValueType.VALUE, 0)
-            total_cumulative_progress = indicator_report.reportable.achieved.get(
-                ValueType.VALUE, 0
-            )
+            value = int(convert_string_number_to_float(indicator_report.total.get(ValueType.VALUE, 0)))
+            denominator = int(convert_string_number_to_float(indicator_report.total.get(ValueType.DENOMINATOR, 1)))
+            achievement_in_reporting_period = f"{value}/{denominator}"
+
+            value = int(convert_string_number_to_float(indicator_report.reportable.total.get(ValueType.VALUE, 0)))
+            denominator = int(convert_string_number_to_float(indicator_report.reportable.total.get(ValueType.DENOMINATOR, 1)))
+            total_cumulative_progress = f"{value}/{denominator}"
 
         face_attachment = None
         other_attachment1 = None
@@ -368,14 +379,21 @@ class ProgressReportsXLSXExporter:
                         self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
                     column += 1  # columns are not 0-indexed...
                     cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
+                    cell.alignment = Alignment(horizontal='right')
                     if cell_format:
                         cell.number_format = cell_format
 
                 for disaggregation, total_value in location_data.disaggregation.items():
                     combination_column = disaggregation_column_map.get(disaggregation)
+
+                    is_percentage = indicator_report.reportable.blueprint.unit == indicator_report.reportable.blueprint.PERCENTAGE
+                    total = format_total_value_to_string(
+                        total_value,
+                        is_percentage=is_percentage,
+                        percentage_display_type='ratio' if indicator_report.reportable.blueprint.display_type == 'ratio' else None)
                     if combination_column:
                         self.current_sheet.cell(
-                            row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
+                            row=current_row, column=combination_column, value=total
                         )
                     else:
                         logger.exception('Location data {} contains unknown disaggregation: {}'.format(

@@ -38,7 +38,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-DOMAIN_NAME = env('DOMAIN_NAME', default='localhost:8081')  # 'www.partnerreportingportal.org'
+DOMAIN_NAME = env('DOMAIN_NAME', default='127.0.0.1:8081')  # 'www.partnerreportingportal.org'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(",")
 HOST = DOMAIN_NAME
@@ -425,7 +425,7 @@ SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_PASSWORD_RESET_POLICY = env('AZURE_B2C_PASS_RESET_POLICY', default="B2C_1_PasswordResetPolicy")
 POLICY = env('AZURE_B2C_POLICY_NAME', default="b2c_1A_UNICEF_PARTNERS_signup_signin")
 
-TENANT_NAME = env('TENANT_NAME', default='unicefpartners')
+TENANT_NAME = env('AZURE_B2C_TENANT', default='unicefpartners')
 TENANT_ID = f'{TENANT_NAME}.onmicrosoft.com'
 TENANT_B2C_URL = f'{TENANT_NAME}.b2clogin.com'
 
@@ -549,3 +549,8 @@ UNICEF_LOCATIONS_MODEL = 'core.Location'
 
 PROJECT_NAME = etools_prp.NAME
 PROJECT_VERSION = etools_prp.VERSION
+
+# Matomo settings
+MATOMO_HOST_URL = env('MATOMO_HOST_URL', default='https://unisitetracker.unicef.io/')
+MATOMO_TRACKER_URL = env('MATOMO_TRACKER_URL', default='matomo.php')
+MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)

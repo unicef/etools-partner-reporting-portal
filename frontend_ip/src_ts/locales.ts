@@ -126,6 +126,7 @@ export const locales = {
     overdue: 'Overdue',
     sent_back: 'Sent back',
     due: 'Due',
+    not_yet_due: 'Not Yet Due',
     submitted: 'Submitted',
     accepted: 'Accepted',
     report_status: 'Report Status',
@@ -140,6 +141,7 @@ export const locales = {
     list_of_reports: 'List of Reports',
     pd_status: 'PD status',
     pd: 'PD',
+    pd_title: 'PD Title',
     indicator_title: 'Indicator Title',
     list_of_indicators: 'List of Indicators',
     indicator: 'Indicator',
@@ -427,6 +429,7 @@ export const locales = {
     edit_partner: 'Edit Partner',
     changes_saved: 'Changes saved.',
     an_error_occurred: 'An error occurred, please try again later.',
+    error_verify_entered_data: 'An error occurred, please verify entered data.',
     file_uploaded: 'File uploaded.',
     file_deleted: 'File deleted.',
     request_ocha_timed_out: 'Request to OCHA timed out. Please try again.',
@@ -477,7 +480,8 @@ export const locales = {
     report_submitted: 'Report submitted',
     please_make_sure_indicators: 'Please make sure indicators have locations set for reports to be generated.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'The export contains only Accepted and Submitted Reports'
   },
   fr: {
     civil_society_organization: 'Civil Society Organization',
@@ -603,6 +607,7 @@ export const locales = {
     reports: 'Rapports',
     all: 'Tout',
     overdue: 'En souffrance',
+    not_yet_due: 'Pas Encore Dû',
     sent_back: 'Refusé',
     due: 'Dû',
     submitted: 'Soumis',
@@ -619,6 +624,7 @@ export const locales = {
     list_of_reports: 'Liste des rapports',
     pd_status: 'Statut de DP',
     pd: 'DP',
+    pd_title: 'Titre de DP',
     indicator_title: 'Titre d’indicateur',
     list_of_indicators: 'Liste des indicateurs',
     indicator: 'Indicateur',
@@ -908,6 +914,7 @@ export const locales = {
     edit_partner: 'Éditer un partenaire',
     changes_saved: 'Modifications enregistrées.',
     an_error_occurred: "Une erreur s'est produite. Veuillez réessayer plus tard.",
+    error_verify_entered_data: "Une erreur s'est produite. Veuillez vérifier les données saisies.",
     file_uploaded: 'Télécharger un fichier',
     file_deleted: 'Fichier supprimé',
     request_ocha_timed_out: "La requête auprès d'OCHA a expiré. Veuillez réessayer.",
@@ -961,7 +968,8 @@ export const locales = {
     please_make_sure_indicators:
       'Veuillez vous assurer que les indicateurs ont des emplacements pour les rapports à générer.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: "L'exportation ne contient que les rapports acceptés et soumis"
   },
   es: {
     civil_society_organization: 'Civil Society Organization',
@@ -1087,6 +1095,7 @@ export const locales = {
     reports: 'Informes',
     all: 'Todo',
     overdue: 'Atrasado',
+    not_yet_due: 'Aún no vence',
     sent_back: 'Devuelto',
     due: 'Pendiente',
     submitted: 'Enviado',
@@ -1103,6 +1112,7 @@ export const locales = {
     list_of_reports: 'Lista de informes',
     pd_status: 'Estado de PD',
     pd: 'PD',
+    pd_title: 'Título del PD',
     indicator_title: 'Título del indicador',
     list_of_indicators: 'Lista de indicadores',
     indicator: 'Indicador',
@@ -1393,6 +1403,7 @@ export const locales = {
     edit_partner: 'Edite el socio',
     changes_saved: 'Cambios guardados.',
     an_error_occurred: 'Se produjo un error; por favor, inténtelo de nuevo más tarde.',
+    error_verify_entered_data: 'Se produjo un error; por favor, verifique los datos ingresados',
     file_uploaded: 'Archivo subido',
     file_deleted: 'Archivo eliminado',
     request_ocha_timed_out: 'Se ha agotado el tiempo de espera de la solicitud a OCHA. Por favor, inténtelo de nuevo.',
@@ -1445,7 +1456,8 @@ export const locales = {
     please_make_sure_indicators:
       'Por favor asegúrese de que los indicadores tengan ubicaciones establecidas para generar informes.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'La exportación contiene solo informes aceptados y enviados'
   },
   ru: {
     civil_society_organization: 'Civil Society Organization',
@@ -1572,6 +1584,7 @@ export const locales = {
     reports: 'Отчеты',
     all: 'Все',
     overdue: 'Просроченный',
+    not_yet_due: 'еще не срок',
     sent_back: 'Возвращенный',
     due: 'Ожидаемый',
     submitted: 'Представленный на рассмотрение',
@@ -1588,6 +1601,7 @@ export const locales = {
     list_of_reports: 'Перечень отчетов',
     pd_status: 'Статус Программного документа',
     pd: 'Пд',
+    pd_title: 'Пд Title',
     indicator_title: 'Название индикатора',
     list_of_indicators: 'Перечень индикаторов',
     indicator: 'Индикатор',
@@ -1880,6 +1894,7 @@ export const locales = {
     edit_partner: 'Редактировать партнера',
     changes_saved: 'Изменения сохранены',
     an_error_occurred: 'Возникла ошибка, пожалуйста, попробуйте еще раз позже.',
+    error_verify_entered_data: 'произошла ошибка, проверьте введенные данные',
     file_uploaded: 'Файл загружен.',
     file_deleted: 'Файл удален.',
     request_ocha_timed_out:
@@ -1933,7 +1948,8 @@ export const locales = {
     please_make_sure_indicators:
       'Пожалуйста, удостоверьтесь, что индикаторы включают местоположения, установленные для данных отчетов.',
     you_are_about_to_location:
-      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed."
+      "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
+    progress_reports_export_status: 'Экспорт содержит только принятые и отправленные отчеты.'
   },
   pt: {
     civil_society_organization: 'Organização da Sociedade Civil',
@@ -2060,6 +2076,7 @@ export const locales = {
     reports: 'Relatórios',
     all: 'Todos',
     overdue: 'Fora do Prazo',
+    not_yet_due: 'Ainda não venceu',
     sent_back: 'Enviado de volta',
     due: 'No Prazo',
     submitted: 'Submetido',
@@ -2076,6 +2093,7 @@ export const locales = {
     list_of_reports: 'Lista de relatórios',
     pd_status: 'Estado do DP',
     pd: 'PD',
+    pd_title: 'Título do PD',
     indicator_title: 'Título do Indicador',
     list_of_indicators: 'Lista de Indicadores',
     indicator: 'Indicador',
@@ -2365,6 +2383,7 @@ export const locales = {
     edit_partner: 'Editar parceiro',
     changes_saved: 'Mudanças salvas',
     an_error_occurred: 'Ocorreu um erro. Por favor tente novamente mais tarde.',
+    error_verify_entered_data: 'Ocorreu um erro. Por favor verifique os dados inseridos',
     file_uploaded: 'Arquivo uploaded',
     file_deleted: 'Arquivo deletado.',
     request_ocha_timed_out: 'Pedido do OCHA expirado. Favor tentar novamente',
@@ -2415,7 +2434,8 @@ export const locales = {
     please_make_sure_indicators:
       'Favor garantir que todos os indicadores possuem locais definidos para os relatórios à serem gerados',
     you_are_about_to_location:
-      "Você está prestes à reiniciar todos os dados de local e informações inseridas para este indicador do relatório; incluindo status geral, análise narrativa e status do relatório. Novos campos para entrada de dados de local serão gerados. Esta ação é irreversível. Favor clicar em 'Atualizar' caso você queira prosseguir."
+      "Você está prestes à reiniciar todos os dados de local e informações inseridas para este indicador do relatório; incluindo status geral, análise narrativa e status do relatório. Novos campos para entrada de dados de local serão gerados. Esta ação é irreversível. Favor clicar em 'Atualizar' caso você queira prosseguir.",
+    progress_reports_export_status: 'A exportação contém apenas relatórios aceitos e enviados'
   },
   ar: {
     civil_society_organization: 'منظمة المجتمع المدني',
@@ -2541,6 +2561,7 @@ export const locales = {
     reports: 'تقارير',
     all: 'الكل',
     overdue: 'متأخرة',
+    not_yet_due: 'ليس مستحقًا بعد',
     sent_back: 'أُرجِعْ ',
     due: 'مُسْتَحقْ',
     submitted: 'مُقَدَّم إلى',
@@ -2557,6 +2578,7 @@ export const locales = {
     list_of_reports: 'قائمة التقارير',
     pd_status: 'حالة وثيقة البرنامج',
     pd: 'وثيقة البرنامج',
+    pd_title: 'PD Title',
     indicator_title: 'عنوان المؤشر',
     list_of_indicators: 'قائمة المؤشرات',
     indicator: 'المؤشر',
@@ -2844,6 +2866,7 @@ export const locales = {
     edit_partner: 'تحرير الشريك',
     changes_saved: 'تم حفظ التغييرات.',
     an_error_occurred: 'حدث خطأ، الرجاء المحاولة مرة أخرى لاحقا.',
+    error_verify_entered_data: 'حدث خطأ ، يرجى التحقق من البيانات المدخلة',
     file_uploaded: 'ملف تم تحميله',
     file_deleted: 'ملف تم خذفه',
     request_ocha_timed_out: 'انتهت مدة الطلب المقدم الى مكتب تنسيق الشؤون الانسانية . الرجاء المحاولة مرة اخرى',
@@ -2894,6 +2917,7 @@ export const locales = {
     report_submitted: 'تم تقديم التقرير',
     please_make_sure_indicators: 'الرجاء التأكد من أن المؤشرات تحتوي على مواقع محددة للتقارير التي سيتم إنشاؤها.',
     you_are_about_to_location:
-      'أنت على وشك إعادة تعيين كافة بيانات الموقع وإدخال المعلومات  المتغلقة بتقرير المؤشر هذا؛ بما في ذلك الحالة العامة والتقييم السردي وحالة التقرير. سيتم إنشاء مدخلات بيانات الموقع الجديد. وهذا الإجراء لا رجعة فيه. الرجاء النقر فوق "تحديث" إذا كنت ترغب في المتابعة'
+      'أنت على وشك إعادة تعيين كافة بيانات الموقع وإدخال المعلومات  المتغلقة بتقرير المؤشر هذا؛ بما في ذلك الحالة العامة والتقييم السردي وحالة التقرير. سيتم إنشاء مدخلات بيانات الموقع الجديد. وهذا الإجراء لا رجعة فيه. الرجاء النقر فوق "تحديث" إذا كنت ترغب في المتابعة',
+    progress_reports_export_status: 'يحتوي التصدير على التقارير المقبولة والمرسلة فقط'
   }
 };

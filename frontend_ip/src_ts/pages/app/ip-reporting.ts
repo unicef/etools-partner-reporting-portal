@@ -38,6 +38,7 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
           --app-drawer-content-container: {
             box-shadow: 1px 0 2px 1px rgba(0, 0, 0, 0.1);
           }
+          z-index: 0 !important;
         }
         app-toolbar {
           background: var(--theme-primary-color);
@@ -55,6 +56,10 @@ class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxC
         }
         #page-container {
           margin-left: -30px;
+        }
+        #pageOverlay.opened {
+          opacity: 0.6 !important;
+          transition: opacity 0.2s linear;
         }
       </style>
 

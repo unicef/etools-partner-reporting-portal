@@ -25,8 +25,10 @@ from etools_prp.apps.core.common import (
     REPORTING_TYPES,
 )
 from etools_prp.apps.core.models import TimeStampedExternalSourceModel
+from etools_prp.apps.core.validators import JSONSchemaValidator
 from etools_prp.apps.indicator.constants import ValueType
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
+from etools_prp.apps.indicator.json_schemas import disaggregation_schema, indicator_schema
 from etools_prp.apps.indicator.utilities import convert_string_number_to_float
 from etools_prp.apps.partner.models import PartnerActivity
 from etools_prp.apps.utils.emails import send_email_from_template
@@ -106,6 +108,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     SUM = 'sum'
     MAX = 'max'
     AVG = 'avg'
+    LATEST = 'latest'
     RATIO = 'ratio'
 
     QUANTITY_CALC_CHOICE_LIST = (
@@ -132,6 +135,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
         (SUM, SUM),
         (MAX, MAX),
         (AVG, AVG),
+        (LATEST, LATEST),
     )
 
     QUANTITY_DISPLAY_TYPE_CHOICES = (
@@ -241,9 +245,18 @@ class Reportable(TimeStampedExternalSourceModel):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = models.JSONField(default=default_value)
-    baseline = models.JSONField(default=default_value)
-    in_need = models.JSONField(blank=True, null=True)
+    target = models.JSONField(
+        default=default_value,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    baseline = models.JSONField(
+        default=default_value,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    in_need = models.JSONField(
+        blank=True, null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
     comments = models.TextField(max_length=4048, blank=True, null=True)
@@ -260,7 +273,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = models.JSONField(default=default_total)
+    total = models.JSONField(default=default_total, validators=[JSONSchemaValidator(json_schema=indicator_schema)])
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -633,9 +646,18 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = models.JSONField(default=default_value)
-    baseline = models.JSONField(default=default_value)
-    in_need = models.JSONField(blank=True, null=True)
+    target = models.JSONField(
+        default=default_value,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    baseline = models.JSONField(
+        default=default_value,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    in_need = models.JSONField(
+        blank=True, null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -685,7 +707,10 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = models.JSONField(default=default_total)
+    total = models.JSONField(
+        default=default_total,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -976,6 +1001,8 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                     accepted_indicator_reports,
                     key=lambda item: item.total['v'])
                 reportable_total = max_total_ir.total
+            elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.LATEST:
+                reportable_total = accepted_indicator_reports.order_by('-time_period_start').first().total
             else:   # if its SUM or avg then add data up
                 for indicator_report in accepted_indicator_reports:
                     reportable_total['v'] += indicator_report.total['v']
@@ -1068,7 +1095,10 @@ class IndicatorLocationData(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    disaggregation = models.JSONField(default=default_disaggregation)
+    disaggregation = models.JSONField(
+        default=default_disaggregation,
+        validators=[JSONSchemaValidator(json_schema=disaggregation_schema)]
+    )
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
