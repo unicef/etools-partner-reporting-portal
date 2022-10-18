@@ -406,6 +406,9 @@ def process_programme_documents(fast=False, area=False):
                                         elif i['unit'] == 'number':
                                             i['display_type'] = 'number'
 
+                                        elif i['unit'] == 'percentage':
+                                            i['calculation_formula_across_periods'] = 'latest'
+
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
