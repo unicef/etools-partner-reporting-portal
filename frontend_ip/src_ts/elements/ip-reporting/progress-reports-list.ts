@@ -22,6 +22,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {getReportTitle} from './js/progress-reports-list-functions';
+import '@unicef-polymer/etools-data-table/data-table-styles';
 
 /**
  * @polymer
@@ -100,7 +101,7 @@ class ProgressReportsList extends LocalizeMixin(
                 </span>
               </div>
               <div class="table-cell table-cell--text">
-                <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
+                <pd-reports-report-title display-link display-link-icon report="[[report]]"></pd-reports-report-title>
               </div>
               <div class="table-cell table-cell--text">
                 <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>

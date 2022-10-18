@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import Constants from '../../etools-prp-common/constants';
+import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 export class ProgrammeDocumentsState {
   all: any[] = [];
@@ -15,10 +16,13 @@ export const ProgrammeDocuments = combineReducers({
   loading: loadingPDsReducer
 });
 
-function allPDsReducer(state = [], action: any) {
+function allPDsReducer(state: GenericObject[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_PROGRAMME_DOCUMENTS:
       return action.data.slice();
+
+    case Constants.ADD_PROGRAMME_DOCUMENTS:
+      return state.concat([action.data]);
 
     case Constants.RESET:
       return [];

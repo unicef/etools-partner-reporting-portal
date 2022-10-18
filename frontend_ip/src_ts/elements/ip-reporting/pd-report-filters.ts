@@ -43,7 +43,7 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             class="item"
             label="[[localize('status')]]"
             name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
+            value="[[_withDefault(queryParams.status, '-1')]]"
             data="[[statuses]]"
           >
           </dropdown-filter>
@@ -69,9 +69,10 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: this.localize('overdue'), id: 'Ove'},
       {title: this.localize('sent_back'), id: 'Sen'},
       {title: this.localize('due'), id: 'Due'},
-      {title: this.localize('all'), id: ''},
+      {title: this.localize('all'), id: '-1'},
       {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'}
+      {title: this.localize('accepted'), id: 'Acc'},
+      {title: this.localize('not_yet_due'), id: 'Not'}
     ];
   }
 }
