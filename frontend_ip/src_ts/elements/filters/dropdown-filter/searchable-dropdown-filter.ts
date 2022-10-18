@@ -45,7 +45,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   disabled!: boolean;
 
   @property({type: String})
-  value = '';
+  value = '-1';
 
   @property({type: String})
   name!: string;
@@ -64,7 +64,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       setTimeout(() => {
         fireEvent(this, 'filter-changed', {
           name: this.name,
-          value: String(event.detail.selectedItem.id)
+          value: event.detail.selectedItem.id == -1 ? '' : String(event.detail.selectedItem.id)
         });
       });
     }
