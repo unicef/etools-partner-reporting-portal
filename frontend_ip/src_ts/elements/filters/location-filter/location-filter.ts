@@ -42,7 +42,7 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
   locationId!: string;
 
   @property({type: String})
-  value = '';
+  value = '-1';
 
   @property({type: Array})
   data = [];
@@ -64,7 +64,7 @@ class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
           'data',
           [
             {
-              id: '',
+              id: '-1',
               name: 'All'
             }
           ].concat(res.data || [])

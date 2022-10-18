@@ -14,7 +14,6 @@ import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/progra
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
-import {pdFetch} from '../../redux/actions/pd';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-body';
@@ -27,7 +26,7 @@ import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Endpoints from '../../endpoints';
+
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -105,8 +104,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="indicators" url="[[indicatorsUrl]]"> </etools-prp-ajax>
 
@@ -252,16 +249,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   @property({type: String, computed: '_computeIndicatorsUrl(locationId, pdId)', observer: '_fetchData'})
   indicatorsUrl!: string;
 
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
-
-  @property({
-    type: Object,
-    computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
-    observer: '_getPdReports'
-  })
-  pdReportsCount!: GenericObject;
-
   private _debouncer!: Debouncer;
   private _fetchDataDebouncer!: Debouncer;
 
@@ -279,10 +266,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
   _pdIndicatorsLoading(rootState: RootState) {
     return pdIndicatorsLoading(rootState);
-  }
-
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
   _computeFormattedData(data: any) {
@@ -373,31 +356,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
     if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
-    }
-  }
-
-  _getPdReports() {
-    // Status being present prevents Redux / res.data from getting reports,
-    // preventing pd-details title from rendering. In that case (which we
-    // check by seeing if this.pdReportsCount is present), just get the reports again
-    if (this.pdReportsCount[this.pdId] === undefined) {
-      this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-        pdThunk.params = {
-          page: 1,
-          page_size: 10,
-          programme_document: this.pdId
-        };
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore
-          .dispatch(pdFetch(pdThunk.thunk()))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            //   // TODO: error handling
-          });
-      });
     }
   }
 }
