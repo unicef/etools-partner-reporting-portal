@@ -41,13 +41,13 @@ def process_due_reports():
             report.status = PROGRESS_REPORT_STATUS.overdue
             report.save(update_fields=['status'])
             updates.append(['Overdue', report])
-        elif (report.report_type != "SR" and report.end_date < today < due_date) \
+        elif (report.report_type != "SR" and report.end_date <= today < due_date) \
                 or (report.report_type == "SR" and due_date > today) \
                 and report.status != PROGRESS_REPORT_STATUS.due:
             report.status = PROGRESS_REPORT_STATUS.due
             report.save(update_fields=['status'])
             updates.append(['Due', report])
-        elif (report.report_type != "SR" and report.end_date < today) \
+        elif (report.report_type != "SR" and report.end_date > today) \
                 and report.status != PROGRESS_REPORT_STATUS.not_yet_due:
             report.status = PROGRESS_REPORT_STATUS.not_yet_due
             report.save(update_fields=['status'])
