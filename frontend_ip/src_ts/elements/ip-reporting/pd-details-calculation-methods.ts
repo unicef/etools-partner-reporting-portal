@@ -196,7 +196,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
                         </paper-radio-button>
                         <paper-radio-button
                           name="latest"
-                          hidden$="[[!_hasTypeRatio(item.data)]]"
+                          hidden$="[[!_hasTypeRatioOrPercentage(item.data)]]"
                           disabled="[[_computeDisabled(item.data.display_type)]]"
                         >
                           [[localize('latest')]]
@@ -280,7 +280,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     return computeDisabled(display_type);
   }
 
-  _hasTypeRatio(data: any) {
+  _hasTypeRatioOrPercentage(data: any) {
     return data.display_type === 'ratio';
   }
 
