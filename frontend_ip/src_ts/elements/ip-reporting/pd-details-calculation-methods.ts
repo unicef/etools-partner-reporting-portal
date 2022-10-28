@@ -37,6 +37,7 @@ import {
   canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
+import {includes} from 'lodash-es';
 
 /**
  * @polymer
@@ -281,7 +282,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   }
 
   _hasTypeRatioOrPercentage(data: any) {
-    return data.display_type === 'ratio';
+    return ['ratio', 'percentage'].includes(data.display_type);
   }
 
   _fetchData(url: string) {
