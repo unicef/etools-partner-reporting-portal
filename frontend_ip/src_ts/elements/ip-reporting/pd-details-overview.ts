@@ -19,10 +19,6 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../elements/etools-prp-currency';
 import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../endpoints';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import Settings from '../../etools-prp-common/settings';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
@@ -102,16 +98,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
         margin-bottom: 50px;
       }
     </style>
-
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-        id="programmeDocumentDetail"
-        url="[[programmeDocumentDetailUrl]]">
-    </etools-prp-ajax>
 
     <page-body>
       <etools-content-panel panel-title="[[localize('partnership_info')]]">
@@ -319,18 +305,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
   pdId!: string;
 
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
-
-  @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
-  programmeDocumentDetailUrl!: string;
-
-  private _pdDetailDebouncer!: Debouncer;
-
-  public static get observers() {
-    return ['_getPdRecord(programmeDocumentDetailUrl)'];
-  }
-
   _computeFunds(num: number) {
     if (num === null || num === -1) {
       return 'N/A';
@@ -358,17 +332,6 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
     return computeReportingRequirements(reportingPeriods, Settings.dateFormat);
   }
 
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  }
-
-  _computePdDetailsUrl(locationId: string, pdId: string) {
-    if (!locationId || !pdId) {
-      return;
-    }
-    return Endpoints.programmeDocumentDetail(locationId, pdId);
-  }
-
   _displayFullName(types: any[]) {
     if (!types) {
       return '';
@@ -381,36 +344,8 @@ class PdDetailsOverview extends UtilsMixin(LocalizeMixin(ReduxConnectedElement))
       .join(', ');
   }
 
-  _getPdRecord() {
-    if (!this.programmeDocumentDetailUrl) {
-      return;
-    }
-    this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(100), () => {
-      const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
-
-      // Cancel the pending request, if any
-      (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).abort();
-
-      pdThunk()
-        .then((res: any) => {
-          this.pd = res.data;
-        })
-        .catch((err: GenericObject) => {
-          console.log(err);
-        });
-    });
-  }
-
   _currentProgrammeDocument(rootState: RootState) {
     return currentProgrammeDocument(rootState);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-
-    if (this._pdDetailDebouncer && this._pdDetailDebouncer.isActive()) {
-      this._pdDetailDebouncer.cancel();
-    }
   }
 }
 
