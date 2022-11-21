@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.gis.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
@@ -145,6 +146,44 @@ class Workspace(TimeStampedExternalSourceModel):
     #     return Location.objects.filter(pk__in=pks)
 
 
+class Realm(TimeStampedExternalSyncModelMixin):
+    user = models.ForeignKey(
+        'account.User',
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    workspace = models.ForeignKey(
+        Workspace,
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    partner = models.ForeignKey(
+        'partner.Partner',
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    group = models.ForeignKey(
+        Group,
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    is_active = models.BooleanField(_('Active'), default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'workspace', 'partner', 'group'], name='unique_realm')
+        ]
+        indexes = [
+            models.Index(fields=['user', 'workspace', 'partner'])
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - {self.workspace.title} - {self.partner.title}: " \
+               f"{self.group.name if self.group else ''}"
+
+
+# TODO REALMS clean up
 class PRPRole(TimeStampedExternalSourceModel):
     """
     PRPRole model present a workspace-partner level permission entity
