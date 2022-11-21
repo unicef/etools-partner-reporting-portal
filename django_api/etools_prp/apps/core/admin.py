@@ -5,7 +5,7 @@ from unicef_locations.models import CartoDBTable
 
 from .cartodb import update_sites_from_cartodb
 from .forms import CartoDBTableForm
-from .models import Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRole, Realm, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -75,9 +75,20 @@ class PRPRoleAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'cluster')
 
 
+class RealmAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', )
+    search_fields = ('user__email', 'user__first_name', 'user__last_name',
+                     'workspace__title', 'workspace__workspace_code',
+                     'workspace__business_area_code', 'workspace__external_id',
+                     'partner__title', 'partner__short_title',
+                     'group__name')
+    autocomplete_fields = ('partner', 'workspace', 'group')
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
 admin.site.unregister(CartoDBTable)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(PRPRole, PRPRoleAdmin)
+admin.site.register(Realm, RealmAdmin)

@@ -3,6 +3,15 @@ from django.contrib.auth.admin import UserAdmin
 
 from etools_prp.apps.account.forms import CustomUserCreationForm, UserAdminForm
 from etools_prp.apps.account.models import User, UserProfile
+from etools_prp.apps.core.models import Realm
+
+
+class RealmInline(admin.StackedInline):
+    verbose_name_plural = "User Realms"
+
+    model = Realm
+    raw_id_fields = ('workspace', 'partner')
+    extra = 0
 
 
 class CustomUserAdmin(UserAdmin):
@@ -53,6 +62,7 @@ class CustomUserAdmin(UserAdmin):
     )
 
     filter_horizontal = ('user_permissions',)
+    inlines = [RealmInline]
 
     def country(self, obj):
         if obj.partner:
