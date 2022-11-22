@@ -5,7 +5,7 @@ from unicef_locations.models import CartoDBTable
 
 from .cartodb import update_sites_from_cartodb
 from .forms import CartoDBTableForm
-from .models import Location, PRPRole, Realm, ResponsePlan, Workspace
+from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -90,5 +90,5 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
 admin.site.unregister(CartoDBTable)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
-admin.site.register(PRPRole, PRPRoleAdmin)
+admin.site.register(PRPRoleOld, PRPRoleAdmin)
 admin.site.register(Realm, RealmAdmin)

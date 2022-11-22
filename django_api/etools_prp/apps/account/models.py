@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
@@ -20,7 +20,15 @@ class User(AbstractUser):
     """
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
-
+    # current workspace
+    workspace = models.ForeignKey(
+        'core.Workspace',
+        related_name="users",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    # current partner in current workspace
     partner = models.ForeignKey(
         'partner.Partner',
         related_name="users",
@@ -28,6 +36,7 @@ class User(AbstractUser):
         blank=True,
         on_delete=models.CASCADE,
     )
+    # TODO REALMS clean up
     organization = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(
         verbose_name='email address',
@@ -60,13 +69,23 @@ class User(AbstractUser):
             instance.set_unusable_password()
             instance.save()
 
+    @property
+    def prp_roles(self):
+        return Group.objects\
+            .filter(
+                realms__user=self,
+                realms__workspace=self.workspace,
+                realms__partner=self.partner,
+                realms__is_active=True)\
+            .distinct()
+
     @cached_property
     def role_list(self):
-        return self.prp_roles.values_list('role', flat=True).distinct()
+        return self.prp_roles.values_list('name', flat=True)
 
     @property
     def user_type(self):
-        user_prp_roles = set(prp_role.role for prp_role in self.prp_roles.all())
+        user_prp_roles = set(prp_role for prp_role in self.role_list)
         if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
             return USER_TYPES.cluster_admin
         if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
@@ -83,7 +102,7 @@ class User(AbstractUser):
 
     @cached_property
     def is_cluster_system_admin(self):
-        return self.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
+        return self.prp_roles.filter(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin).exists()
 
     def send_email_notification_on_create(self, portal=None):
         template_data = {
@@ -112,6 +131,7 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 
+# TODO REALMS clean up
 class UserProfile(TimeStampedModel):
     """
     User Profile model related with user as profile.

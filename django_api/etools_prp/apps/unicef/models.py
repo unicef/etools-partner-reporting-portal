@@ -75,7 +75,7 @@ class Person(TimeStampedExternalSyncModelMixin):
     def is_authorized_officer(self):
         return get_user_model().objects.filter(
             email=self.email,
-            prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+            realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
 
     def save(self, *args, **kwargs):

@@ -28,7 +28,7 @@ from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestr
 from etools_prp.apps.utils.serializers import serialize_choices
 
 from .filters import LocationFilter
-from .models import Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRoleOld, ResponsePlan, Workspace
 from .permissions import AnyPermission, IsAuthenticated, IsClusterSystemAdmin, IsIMOForCurrentWorkspace, IsSuperuser
 from .serializers import (
     ChildrenLocationSerializer,
@@ -123,7 +123,7 @@ class ResponsePlanAPIView(ListAPIView):
         if self.request.user.is_cluster_system_admin:
             return queryset.distinct()
 
-        return queryset.filter(clusters__prp_roles__user=self.request.user).distinct()
+        return queryset.filter(clusters__old_prp_roles__user=self.request.user).distinct()
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):
@@ -207,7 +207,7 @@ class TaskTriggerAPIView(APIView):
                 task_func()
 
         return Response({
-            'task_name': task_name,
+            'task_name': 'task_name',
             'status': 'started'
         })
 
@@ -215,7 +215,7 @@ class TaskTriggerAPIView(APIView):
 class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView):
     serializer_class = PRPRoleUpdateSerializer
     permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
-    queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
+    queryset = PRPRoleOld.objects.select_related('user', 'workspace', 'cluster')
 
     def perform_destroy(self, instance):
         super().perform_destroy(instance)
@@ -230,7 +230,7 @@ class PRPRoleCreateAPIView(CreateAPIView):
         user_id = serializer.validated_data['user_id']
 
         for prp_role_data in serializer.validated_data['prp_roles']:
-            self.check_object_permissions(self.request, obj=PRPRole(user_id=user_id, **prp_role_data))
+            self.check_object_permissions(self.request, obj=PRPRoleOld(user_id=user_id, **prp_role_data))
         super().perform_create(serializer)
 
 

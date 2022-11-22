@@ -75,14 +75,14 @@ class WorkspaceManager(models.Manager):
         if user.is_unicef:
             return self.all()
 
-        ip_kw = {'prp_roles__user': user}
-        cluster_kw = {'response_plans__clusters__prp_roles__user': user}
+        ip_kw = {'realms__user': user}
+        cluster_kw = {'response_plans__clusters__old_prp_roles__user': user}
 
         if role_list:
-            ip_kw['prp_roles__role__in'] = role_list
-            cluster_kw['response_plans__clusters__prp_roles__role__in'] = role_list
+            ip_kw['realms__group__name__in'] = role_list
+            cluster_kw['response_plans__clusters__old_prp_roles__role__in'] = role_list
 
-        if user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
+        if user.prp_roles.filter(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin).exists():
             q_cluster_admin = Q(response_plans__clusters__isnull=False)
         else:
             q_cluster_admin = Q()
@@ -179,14 +179,14 @@ class Realm(TimeStampedExternalSyncModelMixin):
         ]
 
     def __str__(self):
-        return f"{self.user.email} - {self.workspace.title} - {self.partner.title}: " \
-               f"{self.group.name if self.group else ''}"
+        return f"{self.user.email} - {self.workspace.title} - " \
+               f"{self.partner.title}: {self.group.name}"
 
 
 # TODO REALMS clean up
-class PRPRole(TimeStampedExternalSourceModel):
+class PRPRoleOld(TimeStampedExternalSourceModel):
     """
-    PRPRole model present a workspace-partner level permission entity
+    PRPRoleOld model present a workspace-partner level permission entity
     with cluster association.
 
     related models:
@@ -194,20 +194,20 @@ class PRPRole(TimeStampedExternalSourceModel):
     """
     user = models.ForeignKey(
         'account.User',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
     )
     role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
     workspace = models.ForeignKey(
         'core.Workspace',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
     cluster = models.ForeignKey(
         'cluster.Cluster',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
         blank=True,
         null=True,

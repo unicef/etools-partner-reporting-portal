@@ -32,8 +32,8 @@ class ReportableLocationGoalInline(admin.StackedInline):
 
 
 class ReportableAdmin(admin.ModelAdmin):
-    inlines = (ReportableLocationGoalInline, )
-    list_display = ('blueprint', 'active', 'target', 'baseline', 'total',
+    # inlines = (ReportableLocationGoalInline, )
+    list_display = ('id', 'blueprint', 'active', 'target', 'baseline', 'total',
                     'parent_indicator', 'frequency', 'assumptions',
                     'means_of_verification', 'is_cluster_indicator',
                     'cs_dates', 'content_object', 'content_type', 'external_id')

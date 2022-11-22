@@ -74,7 +74,7 @@ class ClusterListAPIView(ListAPIView):
         queryset = Cluster.objects.filter(response_plan_id=response_plan_id)
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(prp_roles__user=self.request.user)
+            queryset = queryset.filter(old_prp_roles__user=self.request.user)
 
         return queryset
 
@@ -127,8 +127,10 @@ class ClusterObjectiveAPIView(APIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
 
-        if not request.user.prp_roles.filter(Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                                             Q(role__in=roles_permitted, cluster_id=obj.cluster_id)).exists():
+        if not request.user.prp_roles.filter(
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters=obj.cluster)).exists():
             self.permission_denied(request)
 
     def get_instance(self, request, pk=None):
@@ -212,8 +214,9 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan_id__in=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -224,7 +227,7 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
             cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(cluster__prp_roles__user=self.request.user)
+            queryset = queryset.filter(cluster__old_prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -277,8 +280,10 @@ class ClusterActivityAPIView(APIView):
             ])
 
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__cluster_objectives=obj.cluster_objective_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted)
+                # TODO REALMS TBD
+                # realms__partner__clusters__clusters_objectives=obj.cluster_objective)
         ).exists():
             self.permission_denied(request)
 
@@ -355,8 +360,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan_id__in=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -367,7 +373,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
             cluster_objective__cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(cluster_objective__cluster__prp_roles__user=self.request.user)
+            queryset = queryset.filter(cluster_objective__cluster__old_prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -435,8 +441,9 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan_id__in=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -485,8 +492,9 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan_id__in=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -546,8 +554,9 @@ class ClusterReportablesIdListAPIView(ListAPIView):
                 PRP_ROLE_TYPES.cluster_viewer
             ])
         if not request.user.prp_roles.filter(
-                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan_id__in=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -605,8 +614,9 @@ class ResponsePlanClusterDashboardAPIView(APIView):
             ])
 
         if not request.user.prp_roles.filter(
-            Q(cluster__response_plan=obj, role__in=roles_permitted) |
-            Q(role=PRP_ROLE_TYPES.cluster_system_admin)
+                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(realms__group__name__in=roles_permitted,
+                  realms__partner__clusters__response_plan=obj)
         ).exists():
             self.permission_denied(request)
 
@@ -640,7 +650,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
             if request.user.is_cluster_system_admin:
                 clusters = Cluster.objects.filter(response_plan=response_plan)
             else:
-                clusters = response_plan.clusters.filter(prp_roles__user=request.user)
+                clusters = response_plan.clusters.filter(old_prp_roles__user=request.user)
 
         serializer = ResponsePlanClusterDashboardSerializer(
             instance=response_plan, context={'clusters': clusters})
@@ -674,7 +684,9 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
             PRP_ROLE_TYPES.cluster_coordinator,
         )
 
-        if not request.user.prp_roles.filter(cluster__response_plan=obj, role__in=roles_permitted).exists():
+        if not request.user.prp_roles.filter(
+                realms__group__name__in=roles_permitted,
+                realms__partner__clusters__response_plan=obj).exists():
             self.permission_denied(request)
 
     def get(self, request, response_plan_id, *args, **kwargs):
@@ -689,11 +701,11 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
             cluster_ids = list(map(lambda x: int(x), cluster_ids.split(',')))
             clusters = Cluster.objects.filter(id__in=cluster_ids,
                                               response_plan=response_plan,
-                                              prp_roles__user=request.user)
+                                              old_prp_roles__user=request.user)
             if not clusters:
                 raise Exception('Invalid cluster ids')
         else:
-            clusters = response_plan.clusters.filter(prp_roles__user=request.user)
+            clusters = response_plan.clusters.filter(old_prp_roles__user=request.user)
 
         serializer = ResponsePlanPartnerDashboardSerializer(
             instance=response_plan, context={

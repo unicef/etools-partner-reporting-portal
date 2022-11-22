@@ -27,6 +27,8 @@ def fwd_migrate_to_user_realms(apps, schema_editor):
                 group_id=Group.objects.get_or_create(name=PRP_IP_ROLE_TYPES[prp_role.role])[0].id,
                 is_active=prp_role.is_active
             ))
+        user.workspace = prp_role.workspace
+        user.save(update_fields=['workspace'])
     unique_realms = [dict(t) for t in {tuple(sorted(d.items())) for d in realm_list}]
     Realm.objects.bulk_create([Realm(**realm_dict) for realm_dict in unique_realms])
 

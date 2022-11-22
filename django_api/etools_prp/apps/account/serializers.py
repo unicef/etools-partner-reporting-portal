@@ -6,7 +6,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
-from etools_prp.apps.core.models import PRPRole
+from etools_prp.apps.core.models import PRPRoleOld, Realm
 from etools_prp.apps.id_management.serializers import PRPRoleWithRelationsSerializer
 from etools_prp.apps.partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 
@@ -99,10 +99,10 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
             return USER_STATUS_TYPES.deactivated
 
     def get_is_incomplete(self, obj):
-        role_count = getattr(obj, 'role_count', None)
-        if role_count is not None:
-            return not role_count
-        return not PRPRole.objects.filter(user=obj).exists()
+        realm_count = getattr(obj, 'realm_count', None)
+        if realm_count is not None:
+            return not realm_count
+        return not Realm.objects.filter(user=obj, is_active=True).exists()
 
     class Meta:
         model = User
@@ -159,7 +159,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
                                       user_l.send_email_notification_on_create(portal='CLUSTER'))
 
                 if user_type == USER_TYPES.cluster_admin:
-                    role = PRPRole.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
+                    role = PRPRoleOld.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
                     transaction.on_commit(lambda role_l=role: role_l.send_email_notification())
 
                 return new_user

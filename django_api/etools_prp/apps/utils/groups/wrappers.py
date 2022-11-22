@@ -3,6 +3,7 @@ import weakref
 from django.contrib.auth.models import Group
 
 
+# TODO REALMS clean up
 class GroupWrapper:
     code = None
     name = None

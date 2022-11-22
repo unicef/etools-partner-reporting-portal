@@ -16,7 +16,7 @@ class RealmInline(admin.StackedInline):
 
 class CustomUserAdmin(UserAdmin):
     list_display = (
-        'email', 'username', 'country', 'partner', 'last_login', 'date_joined',
+        'email', 'username', 'workspace', 'partner', 'last_login', 'date_joined',
     )
     list_filter = (
         'is_superuser', 'is_staff', 'is_active',
@@ -50,8 +50,8 @@ class CustomUserAdmin(UserAdmin):
             }
         ),
         (
-            'Organization info', {
-                'fields': ('partner', 'organization')
+            'Current Context', {
+                'fields': ('workspace', 'partner')
             }
         ),
         (
@@ -60,7 +60,7 @@ class CustomUserAdmin(UserAdmin):
             }
         ),
     )
-
+    autocomplete_fields = ['workspace', 'partner']
     filter_horizontal = ('user_permissions',)
     inlines = [RealmInline]
 
