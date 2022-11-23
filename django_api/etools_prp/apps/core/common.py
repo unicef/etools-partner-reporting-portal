@@ -168,6 +168,14 @@ PROGRESS_REPORT_STATUS = Choices(
     ('Acc', 'accepted', 'Accepted'),
 )
 
+FINAL_REVIEW_CHOICES = Choices(
+    ('very_unsatisfied', 'Very Unsatisfied'),
+    ('unsatisfied', 'Unsatisfied'),
+    ('neutral', 'Neutral'),
+    ('satisfied', 'Satisfied'),
+    ('very_satisfied', 'Very Satisfied'),
+)
+
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Sig", "signed", "Signed"),

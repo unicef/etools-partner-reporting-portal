@@ -17,6 +17,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.common import (
     CURRENCIES,
+    FINAL_REVIEW_CHOICES,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_DOCUMENT_TYPE,
@@ -467,6 +468,26 @@ class ProgressReport(TimeStampedModel):
     def __str__(self):
         dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
         return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
+
+
+class FinalReview(TimeStampedModel):
+    progress_report = models.OneToOneField(ProgressReport, on_delete=models.deletion.CASCADE)
+
+    release_cash_in_time = models.CharField(
+        verbose_name="Did UNICEF release cash in time", max_length=2000, null=True, blank=True)
+    release_supplies_in_time = models.CharField(
+        verbose_name="Did UNICEF release supplies in time", max_length=2000, null=True, blank=True)
+    feedback_face_form_in_time = models.CharField(
+        verbose_name="Did UNICEF provide timely feedback on FACE forms", max_length=2000, null=True, blank=True)
+    respond_requests_in_time = models.CharField(
+        verbose_name="Did UNICEF staff respond to queries and requests", max_length=2000, null=True, blank=True)
+    implemented_as_planned = models.CharField(
+        verbose_name="Were activities implemented as planned", max_length=2000, null=True, blank=True)
+    action_to_address = models.CharField(
+        verbose_name="Action to address findings", max_length=2000, null=True, blank=True)
+    overall_satisfaction_choices = models.CharField(
+        max_length=20, choices=FINAL_REVIEW_CHOICES, null=True, blank=True)
+    overall_satisfaction_comment = models.CharField(max_length=2000, null=True, blank=True)
 
 
 @receiver(post_save,
