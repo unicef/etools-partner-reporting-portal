@@ -29,6 +29,7 @@ from etools_prp.apps.core.common import (
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
     SR_TYPE,
+    YES_NO_CHOICE,
 )
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
@@ -448,6 +449,11 @@ class ProgressReport(TimeStampedModel):
         ordering = ['-due_date', '-id']
         unique_together = ('programme_document', 'report_type', 'report_number')
 
+    def save(self, *args, **kwargs):
+        if self.is_final and not hasattr(self, 'finalreview'):
+            FinalReview.objects.create(progress_report=self)
+        super().save(*args, **kwargs)
+
     @cached_property
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
@@ -473,21 +479,39 @@ class ProgressReport(TimeStampedModel):
 class FinalReview(TimeStampedModel):
     progress_report = models.OneToOneField(ProgressReport, on_delete=models.deletion.CASCADE)
 
-    release_cash_in_time = models.CharField(
-        verbose_name="Did UNICEF release cash in time", max_length=2000, null=True, blank=True)
-    release_supplies_in_time = models.CharField(
-        verbose_name="Did UNICEF release supplies in time", max_length=2000, null=True, blank=True)
-    feedback_face_form_in_time = models.CharField(
-        verbose_name="Did UNICEF provide timely feedback on FACE forms", max_length=2000, null=True, blank=True)
-    respond_requests_in_time = models.CharField(
-        verbose_name="Did UNICEF staff respond to queries and requests", max_length=2000, null=True, blank=True)
-    implemented_as_planned = models.CharField(
-        verbose_name="Were activities implemented as planned", max_length=2000, null=True, blank=True)
-    action_to_address = models.CharField(
-        verbose_name="Action to address findings", max_length=2000, null=True, blank=True)
-    overall_satisfaction_choices = models.CharField(
+    release_cash_in_time_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    release_cash_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF release cash in time", null=True, blank=True)
+
+    release_supplies_in_time_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    release_supplies_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF release supplies in time", null=True, blank=True)
+
+    feedback_face_form_in_time_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    feedback_face_form_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF provide timely feedback on FACE forms", null=True, blank=True)
+
+    respond_requests_in_time_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    respond_requests_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF staff respond to queries and requests", null=True, blank=True)
+
+    implemented_as_planned_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    implemented_as_planned_comment = models.TextField(
+        verbose_name="Were activities implemented as planned", null=True, blank=True)
+
+    action_to_address_choice = models.CharField(
+        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    action_to_address_comment = models.TextField(
+        verbose_name="Action to address findings", null=True, blank=True)
+
+    overall_satisfaction_choice = models.CharField(
         max_length=20, choices=FINAL_REVIEW_CHOICES, null=True, blank=True)
-    overall_satisfaction_comment = models.CharField(max_length=2000, null=True, blank=True)
+    overall_satisfaction_comment = models.TextField(null=True, blank=True)
 
 
 @receiver(post_save,

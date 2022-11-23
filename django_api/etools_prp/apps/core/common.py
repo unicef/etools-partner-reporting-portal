@@ -176,6 +176,11 @@ FINAL_REVIEW_CHOICES = Choices(
     ('very_satisfied', 'Very Satisfied'),
 )
 
+YES_NO_CHOICE = Choices(
+    ('yes', 'Yes'),
+    ('no', 'No')
+)
+
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Sig", "signed", "Signed"),

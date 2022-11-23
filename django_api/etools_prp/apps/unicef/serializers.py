@@ -21,6 +21,7 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from .models import (
+    FinalReview,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -292,6 +293,12 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
         )
 
 
+class FinalReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinalReview
+        exclude = ('id', 'progress_report')
+
+
 class ProgressReportSimpleSerializer(serializers.ModelSerializer):
     programme_document = ProgrammeDocumentSimpleSerializer()
     reporting_period = serializers.SerializerMethodField()
@@ -374,6 +381,12 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super().__init__(*args, **kwargs)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.is_final and hasattr(instance, 'finalreview') and instance.finalreview:
+            data['final_review'] = FinalReviewSerializer(instance.finalreview).data
+        return data
 
     class Meta:
         model = ProgressReport
@@ -503,6 +516,15 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'narrative',
+        )
+
+
+class ProgressReportFinalUpdateSerializer(ProgressReportUpdateSerializer):
+    final_review = FinalReviewSerializer()
+
+    class Meta(ProgressReportUpdateSerializer.Meta):
+        fields = ProgressReportUpdateSerializer.Meta.fields + (
+            "final_review",
         )
 
 
