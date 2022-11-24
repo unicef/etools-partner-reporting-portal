@@ -18,7 +18,6 @@ from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObje
 from etools_prp.apps.core.common import (
     CLUSTER_TYPES,
     CSO_TYPES,
-    FINAL_REVIEW_CHOICES,
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -56,7 +55,6 @@ from etools_prp.apps.partner.models import (
     PartnerProjectFunding,
 )
 from etools_prp.apps.unicef.models import (
-    FinalReview,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -1242,20 +1240,6 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
             'programme_document', 'report_type', 'report_number'
         )
         model = ProgressReport
-
-
-class FinalReviewFactory(factory.django.DjangoModelFactory):
-    release_cash_in_time = factory.LazyFunction(faker.text)
-    release_supplies_in_time = factory.LazyFunction(faker.text)
-    feedback_face_form_in_time = factory.LazyFunction(faker.text)
-    respond_requests_in_time = factory.LazyFunction(faker.text)
-    implemented_as_planned = factory.LazyFunction(faker.text)
-    action_to_address = factory.LazyFunction(faker.text)
-    overall_satisfaction_choice = fuzzy.FuzzyChoice(FINAL_REVIEW_CHOICES)
-    overall_satisfaction_comment = factory.LazyFunction(faker.text)
-
-    class Meta:
-        model = FinalReview
 
 
 class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):
