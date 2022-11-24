@@ -1053,7 +1053,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         progress_report = self.pd.progress_reports.filter(is_final=False).first()
         progress_report.is_final = True
         progress_report.save(update_fields=['is_final'])
-        self.assertTrue(hasattr(progress_report, 'finalreview'))
+        self.assertTrue(hasattr(progress_report, 'final_review'))
 
         url = reverse(
             'progress-reports-details',

@@ -450,7 +450,7 @@ class ProgressReport(TimeStampedModel):
         unique_together = ('programme_document', 'report_type', 'report_number')
 
     def save(self, *args, **kwargs):
-        if self.is_final and not hasattr(self, 'finalreview'):
+        if self.is_final and not hasattr(self, 'final_review'):
             FinalReview.objects.create(progress_report=self)
         super().save(*args, **kwargs)
 
@@ -477,7 +477,8 @@ class ProgressReport(TimeStampedModel):
 
 
 class FinalReview(TimeStampedModel):
-    progress_report = models.OneToOneField(ProgressReport, on_delete=models.deletion.CASCADE)
+    progress_report = models.OneToOneField(
+        ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
 
     release_cash_in_time_choice = models.CharField(
         max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
