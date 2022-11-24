@@ -385,9 +385,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.is_final:
-            if not hasattr(instance, 'finalreview') or not instance.finalreview:
+            if not hasattr(instance, 'final_review') or not instance.final_review:
                 FinalReview.objects.create(progress_report=instance)
-            data['final_review'] = FinalReviewSerializer(instance.finalreview).data
+            data['final_review'] = FinalReviewSerializer(instance.final_review).data
         return data
 
     class Meta:
@@ -528,6 +528,17 @@ class ProgressReportFinalUpdateSerializer(ProgressReportUpdateSerializer):
         fields = ProgressReportUpdateSerializer.Meta.fields + (
             "final_review",
         )
+
+    def update(self, instance, validated_data):
+        final_review = validated_data.pop('final_review', None)
+
+        instance = super().update(instance, validated_data)
+        if final_review:
+            for key, value in final_review.items():
+                setattr(instance.final_review, key, value)
+            instance.final_review.save()
+
+        return instance
 
 
 class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
