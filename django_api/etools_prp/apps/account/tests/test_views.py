@@ -113,13 +113,10 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.PartnerUserFactory(partner=self.partner)
-        self.ao_user_role = factories.IPPRPRoleFactory(
-            user=self.user,
-            workspace=self.workspace,
-            role=PRP_ROLE_TYPES.ip_authorized_officer
+        self.user = factories.PartnerUserFactory(
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
-
         super().setUp()
 
     def test_invalid_list_requests(self):
@@ -141,44 +138,34 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         """
         # Create some test users for partner
         NUM_TEST_USERS = 2
-        for idx in range(NUM_TEST_USERS):
-            user = factories.PartnerUserFactory(
-                partner=self.partner
-            )
-            factories.IPPRPRoleFactory(
-                user=user,
+        for role in [PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_admin]:
+            factories.PartnerUserFactory(
                 workspace=self.workspace,
-                role=PRP_ROLE_TYPES.ip_editor
+                partner=self.partner,
+                realms__data=[role]
             )
-
-            if idx == 0:
-                factories.IPPRPRoleFactory(
-                    user=user,
-                    workspace=self.workspace,
-                    role=PRP_ROLE_TYPES.ip_admin
-                )
 
         response = self.client.get(reverse('users') + '?portal=IP')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(NUM_TEST_USERS, response.data['count'])
 
-        role_count_annotated_queryset = User.objects.exclude(
+        realm_count_annotated_queryset = User.objects.exclude(
             id=self.user.id
-        ).annotate(role_count=Count('prp_roles')).order_by('-id')
+        ).annotate(realm_count=Count('realms')).order_by('-id')
 
         # API Ordering test
         response = self.client.get(reverse('users') + '?portal=IP&ordering=-status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data['results'][0]['id'],
-            role_count_annotated_queryset.order_by('-last_login', '-role_count').first().id
+            realm_count_annotated_queryset.order_by('-last_login', '-realm_count').first().id
         )
 
         response = self.client.get(reverse('users') + '?portal=IP&ordering=status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data['results'][0]['id'],
-            role_count_annotated_queryset.order_by('last_login', 'role_count').first().id
+            realm_count_annotated_queryset.order_by('last_login', 'realm_count').first().id
         )
 
         # API Filtering test
@@ -221,12 +208,9 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
                 )
             else:
                 user = factories.PartnerUserFactory(
-                    partner=self.partner
-                )
-                factories.IPPRPRoleFactory(
-                    user=user,
                     workspace=self.workspace,
-                    role=PRP_ROLE_TYPES.ip_editor,
+                    partner=self.partner,
+                    realms__data=[PRP_ROLE_TYPES.ip_editor, ]
                 )
                 factories.ClusterPRPRoleFactory(
                     user=user,

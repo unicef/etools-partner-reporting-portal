@@ -86,10 +86,12 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -378,10 +380,12 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -591,10 +595,12 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -1152,8 +1158,11 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -1316,8 +1325,11 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -1479,13 +1491,11 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.PartnerUserFactory(partner=self.partner)
-        self.prp_role = factories.IPPRPRoleFactory(
-            user=self.user,
+        self.partner_user = factories.PartnerUserFactory(
             workspace=self.workspace,
-            role=PRP_ROLE_TYPES.ip_authorized_officer,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
-
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
