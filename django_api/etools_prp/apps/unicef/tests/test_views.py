@@ -562,7 +562,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             response.data['reference_number'])
 
 
-class TestProgressReportAPIView(BaseAPITestCase):
+class BaseProgressReportAPITestCase(BaseAPITestCase):
 
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
@@ -778,6 +778,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
 
+
+class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
+
     def test_list_api(self):
         url = reverse(
             'progress-reports',
@@ -853,88 +856,6 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
-
-    def test_detail_api_filter_incomplete(self):
-        progress_report = self.pd.progress_reports.first()
-        ir_qs = IndicatorReport.objects.filter(
-            progress_report=progress_report,
-        )
-        url = reverse(
-            'progress-reports-details',
-            args=[self.workspace.pk, progress_report.pk],
-        )
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
-
-        ir_qs = ir_qs.filter(submission_date__isnull=True)
-        url += '?incomplete=true'
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
-
-    def test_detail_api_filter_location(self):
-        progress_report = self.pd.progress_reports.first()
-        ir_qs = IndicatorReport.objects.filter(
-            progress_report=progress_report,
-        )
-        url = reverse(
-            'progress-reports-details',
-            args=[self.workspace.pk, progress_report.pk],
-        )
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
-        new_loc = factories.LocationFactory()
-        llo_reportable_2 = factories.QuantityReportableToLowerLevelOutputFactory(
-            content_object=self.llo,
-            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
-                unit=IndicatorBlueprint.NUMBER,
-                calculation_formula_across_locations=IndicatorBlueprint.SUM,
-            )
-        )
-        factories.LocationWithReportableLocationGoalFactory(
-            location=new_loc,
-            reportable=llo_reportable_2,
-        )
-        factories.ProgressReportIndicatorReportFactory(
-            progress_report=progress_report,
-            reportable=llo_reportable_2,
-            report_status=INDICATOR_REPORT_STATUS.submitted,
-            overall_status=OVERALL_STATUS.met,
-        )
-
-        # test an indicator report exists for given location
-        ir_qs = ir_qs.filter(reportable__locations__id=new_loc.pk)
-        self.assertEquals(ir_qs.count(), 1)
-        url_loc_filter = url + f'?location={new_loc.pk}'
-        response = self.client.get(url_loc_filter, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
-
-        # test no indicator reports exist for a unused location
-        unused_loc = factories.LocationFactory()
-        ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
-        self.assertEquals(ir_qs.count(), 0)
-        url_loc_filter = url + f'?location={unused_loc.pk}'
-        response = self.client.get(url_loc_filter, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            0,
-        )
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
@@ -1113,6 +1034,181 @@ class TestProgressReportAPIView(BaseAPITestCase):
             status=PROGRESS_REPORT_STATUS.submitted
         )
         self.assertTrue(len(self.reports))
+
+
+class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
+
+    def test_detail_api_not_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('final_review' not in response.data)
+
+    def test_detail_api_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+        progress_report.is_final = True
+        progress_report.save(update_fields=['is_final'])
+        self.assertTrue(hasattr(progress_report, 'final_review'))
+
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('final_review' in response.data)
+        self.assertEqual(response.data['final_review']['respond_requests_in_time_choice'], None)
+        self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'], None)
+        self.assertEquals(response.data['final_review']['respond_requests_in_time_comment'],
+                          getattr(progress_report.final_review, 'respond_requests_in_time_comment'))
+
+    def test_detail_update_not_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        data = {
+            "partner_contribution_to_date": "Partner contribution text",
+            "financial_contribution_currency": "USD",
+            "challenges_in_the_reporting_period": "Challenges in the reporting period text",
+            "proposed_way_forward": "Proposed way forward text"
+        }
+        response = self.client.put(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        for field in data.keys():
+            self.assertEquals(response.data[field], data[field])
+
+    def test_detail_update_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+        progress_report.is_final = True
+        progress_report.save(update_fields=['is_final'])
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        data = {
+            "financial_contribution_currency": "USD",
+            "proposed_way_forward": "Proposed way forward text",
+            "final_review": {
+                "release_cash_in_time_choice": True,
+                "release_cash_in_time_comment": "Unicef did release cash in time",
+
+                "release_supplies_in_time_choice": True,
+                "release_supplies_in_time_comment": "Unicef did release supplies in time",
+
+                "feedback_face_form_in_time_choice": False,
+                "feedback_face_form_in_time_comment": "Unicef did not feedback in time",
+
+                "respond_requests_in_time_choice": True,
+                "respond_requests_in_time_comment": "Unicef did respond in time",
+
+                "implemented_as_planned_choice": False,
+                "implemented_as_planned_comment": "Unicef did not implement",
+
+                "action_to_address_choice": True,
+                "action_to_address_comment": "Unicef action to address",
+
+                "overall_satisfaction_choice": "very_satisfied",
+                "overall_satisfaction_comment": "Very satisfied with Unicef",
+            }
+        }
+        response = self.client.put(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['proposed_way_forward'], data['proposed_way_forward'])
+        progress_report.final_review.refresh_from_db()
+        for field in data['final_review'].keys():
+            self.assertEquals(response.data['final_review'][field], data['final_review'][field])
+            self.assertEquals(response.data['final_review'][field], getattr(progress_report.final_review, field))
+
+    def test_detail_api_filter_incomplete(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        ir_qs = ir_qs.filter(submission_date__isnull=True)
+        url += '?incomplete=true'
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+    def test_detail_api_filter_location(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+        new_loc = factories.LocationFactory()
+        llo_reportable_2 = factories.QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        factories.LocationWithReportableLocationGoalFactory(
+            location=new_loc,
+            reportable=llo_reportable_2,
+        )
+        factories.ProgressReportIndicatorReportFactory(
+            progress_report=progress_report,
+            reportable=llo_reportable_2,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+            overall_status=OVERALL_STATUS.met,
+        )
+
+        # test an indicator report exists for given location
+        ir_qs = ir_qs.filter(reportable__locations__id=new_loc.pk)
+        self.assertEquals(ir_qs.count(), 1)
+        url_loc_filter = url + f'?location={new_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        # test no indicator reports exist for a unused location
+        unused_loc = factories.LocationFactory()
+        ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
+        self.assertEquals(ir_qs.count(), 0)
+        url_loc_filter = url + f'?location={unused_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            0,
+        )
 
     def test_detail_api_export_pdf(self):
         progress_report = self.pd.progress_reports.first()
