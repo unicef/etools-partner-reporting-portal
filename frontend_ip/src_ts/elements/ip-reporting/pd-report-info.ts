@@ -514,6 +514,12 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
     if(!data.final_review){
       data.final_review = {};
     }
+    else{
+      Object.keys(data.final_review).forEach((key) => {
+        data.final_review[key] =
+          data.final_review[key] === true ? 'yes' : data.final_review[key] === false ? 'no' : data.final_review[key];
+      });
+    }
     this.set('localData',  {...data});
     return data;
   }
