@@ -29,7 +29,6 @@ from etools_prp.apps.core.common import (
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
     SR_TYPE,
-    YES_NO_CHOICE,
 )
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
@@ -480,33 +479,27 @@ class FinalReview(TimeStampedModel):
     progress_report = models.OneToOneField(
         ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
 
-    release_cash_in_time_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    release_cash_in_time_choice = models.BooleanField(null=True)
     release_cash_in_time_comment = models.TextField(
         verbose_name="Did UNICEF release cash in time", null=True, blank=True)
 
-    release_supplies_in_time_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    release_supplies_in_time_choice = models.BooleanField(null=True)
     release_supplies_in_time_comment = models.TextField(
         verbose_name="Did UNICEF release supplies in time", null=True, blank=True)
 
-    feedback_face_form_in_time_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    feedback_face_form_in_time_choice = models.BooleanField(null=True)
     feedback_face_form_in_time_comment = models.TextField(
         verbose_name="Did UNICEF provide timely feedback on FACE forms", null=True, blank=True)
 
-    respond_requests_in_time_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    respond_requests_in_time_choice = models.BooleanField(null=True)
     respond_requests_in_time_comment = models.TextField(
         verbose_name="Did UNICEF staff respond to queries and requests", null=True, blank=True)
 
-    implemented_as_planned_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    implemented_as_planned_choice = models.BooleanField(null=True)
     implemented_as_planned_comment = models.TextField(
         verbose_name="Were activities implemented as planned", null=True, blank=True)
 
-    action_to_address_choice = models.CharField(
-        max_length=3, choices=YES_NO_CHOICE, null=True, blank=True)
+    action_to_address_choice = models.BooleanField(null=True)
     action_to_address_comment = models.TextField(
         verbose_name="Action to address findings", null=True, blank=True)
 

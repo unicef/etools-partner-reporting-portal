@@ -1064,6 +1064,8 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         self.assertTrue('final_review' in response.data)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_choice'], None)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'], None)
+        self.assertEquals(response.data['final_review']['respond_requests_in_time_comment'],
+                          getattr(progress_report.final_review, 'respond_requests_in_time_comment'))
 
     def test_detail_update_not_final(self):
         progress_report = self.pd.progress_reports.filter(is_final=False).first()
@@ -1096,22 +1098,22 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             "financial_contribution_currency": "USD",
             "proposed_way_forward": "Proposed way forward text",
             "final_review": {
-                "release_cash_in_time_choice": "yes",
+                "release_cash_in_time_choice": True,
                 "release_cash_in_time_comment": "Unicef did release cash in time",
 
-                "release_supplies_in_time_choice": "yes",
+                "release_supplies_in_time_choice": True,
                 "release_supplies_in_time_comment": "Unicef did release supplies in time",
 
-                "feedback_face_form_in_time_choice": "no",
+                "feedback_face_form_in_time_choice": False,
                 "feedback_face_form_in_time_comment": "Unicef did not feedback in time",
 
-                "respond_requests_in_time_choice": "yes",
+                "respond_requests_in_time_choice": True,
                 "respond_requests_in_time_comment": "Unicef did respond in time",
 
-                "implemented_as_planned_choice": "no",
+                "implemented_as_planned_choice": False,
                 "implemented_as_planned_comment": "Unicef did not implement",
 
-                "action_to_address_choice": "yes",
+                "action_to_address_choice": True,
                 "action_to_address_comment": "Unicef action to address",
 
                 "overall_satisfaction_choice": "very_satisfied",
@@ -1121,9 +1123,10 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         response = self.client.put(url, format='json', data=data)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data['proposed_way_forward'], data['proposed_way_forward'])
-
+        progress_report.final_review.refresh_from_db()
         for field in data['final_review'].keys():
             self.assertEquals(response.data['final_review'][field], data['final_review'][field])
+            self.assertEquals(response.data['final_review'][field], getattr(progress_report.final_review, field))
 
     def test_detail_api_filter_incomplete(self):
         progress_report = self.pd.progress_reports.first()
