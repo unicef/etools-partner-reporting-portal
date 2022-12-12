@@ -116,6 +116,10 @@ class ProgressReportFilter(django_filters.FilterSet):
         label='Due date',
         input_formats=[settings.PRINT_DATA_FORMAT],
     )
+    year = DateFilter(
+        method='get_year',
+        input_formats=["%Y"],
+    )
     due = TypedChoiceFilter(
         field_name='due',
         choices=Boolean.CHOICES,
@@ -176,6 +180,9 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_due_date(self, queryset, name, value):
         return queryset.filter(due_date__lte=value)
+
+    def get_year(self, queryset, name, value):
+        return queryset.filter(end_date__year=value.year)
 
     def get_location(self, queryset, name, value):
         return queryset.filter(
