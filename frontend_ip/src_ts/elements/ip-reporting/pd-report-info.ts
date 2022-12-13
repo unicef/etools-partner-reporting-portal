@@ -121,6 +121,10 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
           margin-bottom:25px;
         }
 
+        :host labelled-item paper-radio-group paper-radio-button:first-child {
+          padding-left: 0;
+        }
+
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -233,17 +237,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('release_cash_in_time')]]">
                 <paper-radio-group selected="{{localData.final_review.release_cash_in_time_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.release_cash_in_time_choice)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.release_cash_in_time_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -263,17 +267,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('release_supplies_in_time')]]">
                 <paper-radio-group selected="{{localData.final_review.release_supplies_in_time_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.release_supplies_in_time_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.release_supplies_in_time_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -293,17 +297,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('feedback_face_form_in_time')]]">
                 <paper-radio-group selected="{{localData.final_review.feedback_face_form_in_time_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.feedback_face_form_in_time_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.feedback_face_form_in_time_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -323,17 +327,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('respond_requests_in_time')]]">
                 <paper-radio-group selected="{{localData.final_review.respond_requests_in_time_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.respond_requests_in_time_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.respond_requests_in_time_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -353,17 +357,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('implemented_as_planned')]]">
                 <paper-radio-group selected="{{localData.final_review.implemented_as_planned_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.implemented_as_planned_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.implemented_as_planned_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -383,17 +387,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('action_to_address')]]">
                 <paper-radio-group selected="{{localData.final_review.action_to_address_choice}}">
-                  <paper-radio-button name="yes">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('yes')]]
                   </paper-radio-button>
 
-                  <paper-radio-button name="no">
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('no')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.action_to_address_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.action_to_address_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
@@ -413,25 +417,25 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
             <div class="row">
               <labelled-item label="[[localize('overall_satisfaction')]]">
                 <paper-radio-group selected="{{localData.final_review.overall_satisfaction_choice}}">
-                  <paper-radio-button name="very_unsatisfied">
+                  <paper-radio-button name="very_unsatisfied" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('very_unsatisfied')]]
                   </paper-radio-button>
-                  <paper-radio-button name="unsatisfied">
+                  <paper-radio-button name="unsatisfied" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('unsatisfied')]]
                   </paper-radio-button>
-                  <paper-radio-button name="neutral">
+                  <paper-radio-button name="neutral" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('neutral')]]
                   </paper-radio-button>
-                  <paper-radio-button name="satisfied">
+                  <paper-radio-button name="satisfied" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('satisfied')]]
                   </paper-radio-button>
-                  <paper-radio-button name="very_satisfied">
+                  <paper-radio-button name="very_satisfied" disabled$="[[_equals(computedMode, 'view')]]">
                     [[localize('very_satisfied')]]
                   </paper-radio-button>
                 </paper-radio-group>
 
                 <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                  <span class="value">[[_withDefault(data.final_review.overall_satisfaction_comment)]]</span>
+                  <div class="value">[[_withDefault(data.final_review.overall_satisfaction_comment)]]</div>
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
