@@ -17,6 +17,7 @@ from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
 from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
+    FinalReview,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -189,6 +190,10 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return redirect("admin:unicef_programmedocument_changelist")
 
 
+class FinalReviewAdminInline(admin.StackedInline):
+    model = FinalReview
+
+
 class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'report_type', 'status',
                     'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
@@ -200,6 +205,7 @@ class ProgressReportAdmin(admin.ModelAdmin):
         'submitted_by',
         'submitting_user',
     ]
+    inlines = [FinalReviewAdminInline]
 
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):

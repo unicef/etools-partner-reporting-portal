@@ -30,7 +30,7 @@ function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseCla
     }
 
     public _isFinalReport(report: any) {
-      return report.is_final && report.report_type.toLowerCase() !== 'sr';
+      return report && report.is_final && report.report_type.toLowerCase() !== 'sr';
     }
   }
   return ProgressReportUtilsClass;

@@ -44,9 +44,9 @@ class ReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
       <filter-list filters="{{filters}}">
         <div class="app-grid">
-          <reportable-filter class="item" value="[[_withDefault(queryParams.llo, '')]]"> </reportable-filter>
+          <reportable-filter class="item" value="[[_withDefault(queryParams.llo, '-1')]]"> </reportable-filter>
 
-          <report-location-filter class="item" value="[[_withDefault(queryParams.location, '')]]">
+          <report-location-filter class="item" value="[[_withDefault(queryParams.location, '-1')]]">
           </report-location-filter>
 
           <checkbox-filter class="incomplete" name="incomplete" value="[[_withDefault(queryParams.incomplete, '')]]">

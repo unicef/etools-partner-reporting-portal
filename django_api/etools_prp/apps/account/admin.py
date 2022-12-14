@@ -7,7 +7,7 @@ from etools_prp.apps.account.models import User, UserProfile
 
 class CustomUserAdmin(UserAdmin):
     list_display = (
-        'email', 'username', 'last_login', 'date_joined', 'partner',
+        'email', 'username', 'country', 'partner', 'last_login', 'date_joined',
     )
     list_filter = (
         'is_superuser', 'is_staff', 'is_active',
@@ -53,6 +53,13 @@ class CustomUserAdmin(UserAdmin):
     )
 
     filter_horizontal = ('user_permissions',)
+
+    def country(self, obj):
+        if obj.partner:
+            return ', '.join(obj.partner.programmedocument_set.distinct().values_list(
+                'workspace__title', flat=True).distinct().order_by())
+
+    country.short_description = 'Workspace'
 
 
 admin.site.register(User, CustomUserAdmin)

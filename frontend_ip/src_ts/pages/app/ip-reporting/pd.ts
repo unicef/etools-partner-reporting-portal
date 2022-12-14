@@ -15,7 +15,7 @@ import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdFetch, pdSetCurrent} from '../../../redux/actions/pd';
+import {pdAdd, pdFetch, pdSetCount, pdSetCurrent} from '../../../redux/actions/pd';
 import {getDomainByEnv} from '../../../etools-prp-common/config';
 import './pd/pd-index';
 import './pd/pd-router';
@@ -36,6 +36,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
           display: block;
         }
       </style>
+
+      <etools-prp-ajax id="programmeDocumentDetail" url="[[programmeDocumentDetailUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]" params="[[queryParams]]">
       </etools-prp-ajax>
@@ -82,13 +84,18 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   @property({type: Number})
   pdId!: number;
 
+  @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
+  programmeDocumentDetailUrl!: string;
+
   fetchPdsDebouncer!: Debouncer | null;
+  private _pdDetailDebouncer!: Debouncer;
 
   public static get observers() {
     return [
       '_handleInputChange(programmeDocumentsUrl, queryParams)',
       '_routePdIdChanged(routeData.pd_id)',
-      '_routePathChanged(route.path)'
+      '_routePathChanged(route.path)',
+      '_getPdRecord(programmeDocumentDetailUrl)'
     ];
   }
 
@@ -97,11 +104,48 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
   }
 
   _routePdIdChanged(pd_id: number) {
-    if (pd_id !== this.pdId) {
+    if (pd_id && pd_id !== this.pdId) {
+      this.pdId = pd_id;
       this.reduxStore.dispatch(pdSetCurrent(pd_id));
     }
 
     this.page = pd_id ? 'pd-router' : 'pd-index';
+  }
+
+  _computePdDetailsUrl(locationId: string, pdId: string) {
+    if (!locationId || !pdId) {
+      return;
+    }
+    return Endpoints.programmeDocumentDetail(locationId, pdId);
+  }
+
+  _getPdRecord() {
+    if (!this.programmeDocumentDetailUrl) {
+      return;
+    }
+
+    const pdDataIsLoaded = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(this.pdId));
+    if (pdDataIsLoaded) {
+      // pd it's already loaded
+      return;
+    }
+
+    // in case user navigates directly to detail url, state.programmeDocuments it's empty so need to load Pd
+    this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(10), () => {
+      const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
+
+      // Cancel the pending request, if any
+      (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).abort();
+
+      pdThunk()
+        .then((res: any) => {
+          this.reduxStore.dispatch(pdAdd(res.data));
+          this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
+        })
+        .catch((err: GenericObject) => {
+          console.log(err);
+        });
+    });
   }
 
   _routePathChanged(path: string) {
@@ -135,8 +179,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    if (this.subroute.path && this.currentPD && typeof this.currentPD.id !== 'undefined') {
-      // Don't refetch on child routes, unless navigated to directly.
+    if (this.subroute.path) {
+      // Don't refetch on child routes
       return;
     }
 

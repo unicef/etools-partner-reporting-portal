@@ -65,7 +65,7 @@ class EtoolsPrpToolbar extends UtilsMixin(ReduxConnectedElement) {
   @property({type: String, notify: true})
   query!: string;
 
-  @property({type: Object})
+  @property({type: Object, notify: true})
   params!: GenericObject;
 }
 

@@ -17,6 +17,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.common import (
     CURRENCIES,
+    FINAL_REVIEW_CHOICES,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_DOCUMENT_TYPE,
@@ -447,6 +448,11 @@ class ProgressReport(TimeStampedModel):
         ordering = ['-due_date', '-id']
         unique_together = ('programme_document', 'report_type', 'report_number')
 
+    def save(self, *args, **kwargs):
+        if self.is_final and not hasattr(self, 'final_review'):
+            FinalReview.objects.create(progress_report=self)
+        super().save(*args, **kwargs)
+
     @cached_property
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
@@ -467,6 +473,39 @@ class ProgressReport(TimeStampedModel):
     def __str__(self):
         dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
         return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
+
+
+class FinalReview(TimeStampedModel):
+    progress_report = models.OneToOneField(
+        ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
+
+    release_cash_in_time_choice = models.BooleanField(null=True)
+    release_cash_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF release cash in time", null=True, blank=True)
+
+    release_supplies_in_time_choice = models.BooleanField(null=True)
+    release_supplies_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF release supplies in time", null=True, blank=True)
+
+    feedback_face_form_in_time_choice = models.BooleanField(null=True)
+    feedback_face_form_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF provide timely feedback on FACE forms", null=True, blank=True)
+
+    respond_requests_in_time_choice = models.BooleanField(null=True)
+    respond_requests_in_time_comment = models.TextField(
+        verbose_name="Did UNICEF staff respond to queries and requests", null=True, blank=True)
+
+    implemented_as_planned_choice = models.BooleanField(null=True)
+    implemented_as_planned_comment = models.TextField(
+        verbose_name="Were activities implemented as planned", null=True, blank=True)
+
+    action_to_address_choice = models.BooleanField(null=True)
+    action_to_address_comment = models.TextField(
+        verbose_name="Action to address findings", null=True, blank=True)
+
+    overall_satisfaction_choice = models.CharField(
+        max_length=20, choices=FINAL_REVIEW_CHOICES, null=True, blank=True)
+    overall_satisfaction_comment = models.TextField(null=True, blank=True)
 
 
 @receiver(post_save,
