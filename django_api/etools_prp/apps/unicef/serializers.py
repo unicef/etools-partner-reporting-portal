@@ -21,6 +21,7 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from .models import (
+    FinalReview,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -292,6 +293,12 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
         )
 
 
+class FinalReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinalReview
+        exclude = ('id', 'progress_report')
+
+
 class ProgressReportSimpleSerializer(serializers.ModelSerializer):
     programme_document = ProgrammeDocumentSimpleSerializer()
     reporting_period = serializers.SerializerMethodField()
@@ -374,6 +381,14 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super().__init__(*args, **kwargs)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.is_final:
+            if not hasattr(instance, 'final_review') or not instance.final_review:
+                FinalReview.objects.create(progress_report=instance)
+            data['final_review'] = FinalReviewSerializer(instance.final_review).data
+        return data
 
     class Meta:
         model = ProgressReport
@@ -504,6 +519,26 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
             'id',
             'narrative',
         )
+
+
+class ProgressReportFinalUpdateSerializer(ProgressReportUpdateSerializer):
+    final_review = FinalReviewSerializer(required=False)
+
+    class Meta(ProgressReportUpdateSerializer.Meta):
+        fields = ProgressReportUpdateSerializer.Meta.fields + (
+            "final_review",
+        )
+
+    def update(self, instance, validated_data):
+        final_review = validated_data.pop('final_review', None)
+
+        instance = super().update(instance, validated_data)
+        if final_review:
+            for key, value in final_review.items():
+                setattr(instance.final_review, key, value)
+            instance.final_review.save()
+
+        return instance
 
 
 class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
